@@ -1,5 +1,6 @@
 import logging.config  # Provides access to logging configuration file.
 import os
+import tomllib
 import sys
 import time
 from datetime import datetime
@@ -16,25 +17,18 @@ from dash_extensions.logging import NotificationsLogHandler
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-########################
-# Constants
-scenario_to_monitor = "VT Ground Intermediate S5 Bot 2"
-stats_dir = "S:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
-
-# Only care about runs within the last N days
-within_n_days = 30
-
-# Limit to the top N scores
-top_n_scores = 5
-
-# How often to poll for file updates (in milliseconds)
-polling_interval = 5 * 1000
-# can probably move these to a separate file at some point
-########################
-
 log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
 app = DashProxy()
+
+log_format = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
+console_logger = logging.getLogger(__name__)
+
+# Pull arguments from a config file.
+with open("config.toml", "rb") as f:
+    config = tomllib.load(f)
+console_logger.debug(f"Loaded config: {config}")
 
 # TODO: Global variables best practices ?
 scenario_data = {}
@@ -44,7 +38,7 @@ fig = None
 
 def get_unique_scenarios(_dir: str) -> list:
     unique_scenarios = set()
-    files = [f for f in os.listdir(stats_dir) if os.path.isfile(os.path.join(stats_dir, f))]
+    files = [f for f in os.listdir(config['stats_dir']) if os.path.isfile(os.path.join(config['stats_dir'], f))]
     csv_files = [file for file in files if file.endswith(".csv")]
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
@@ -52,7 +46,7 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(list(unique_scenarios))
 
 
-all_scenarios = get_unique_scenarios(stats_dir)
+all_scenarios = get_unique_scenarios(config['stats_dir'])
 
 
 @app.callback(Output('live-update-text', 'children'),
@@ -68,19 +62,19 @@ def update_layout(_):
     Input('live-update-text', 'children')
 )
 def update_graph(value, _):
-    global fig, new_data, scenario_to_monitor, scenario_data
+    global fig, new_data, scenario_data
     # console_logger.debug("Checking for updates...")
-    if not value or (value == scenario_to_monitor and not new_data):
+    if not value or (value == config['scenario_to_monitor'] and not new_data):
         return fig, no_update
 
-    scenario_to_monitor = value
+    config['scenario_to_monitor'] = value
 
     # Get scenario data
     console_logger.debug("Performing update...")
     scenario_data = get_scenario_data(value)
     if not scenario_data:
         console_logger.warning(
-            f"No scenario data for '{value}'. Perhaps choose a longer date range? (currently {within_n_days} days)")
+            f"No scenario data for '{value}'. Perhaps choose a longer date range? (currently {config['within_n_days']} days)")
         return fig, no_update
 
     fig = initialize_plot(scenario_data)
@@ -100,10 +94,10 @@ app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
-        dcc.Dropdown(all_scenarios, value=scenario_to_monitor, id='dropdown-selection'),
+        dcc.Dropdown(all_scenarios, value=config['scenario_to_monitor'], id='dropdown-selection'),
         dcc.Interval(
             id='interval-component',
-            interval=polling_interval,
+            interval=config['polling_interval'],
             n_intervals=0
         ),
         dcc.Graph(id='graph-content', style={'height': '80vh'}),
@@ -114,7 +108,7 @@ app.layout = dmc.MantineProvider(
 
 
 def extract_data_from_file(filename: str) -> tuple:
-    file_path = Path(stats_dir, filename)
+    file_path = Path(config['stats_dir'], filename)
     with open(file_path, 'r') as file:
         lines_list = file.readlines()  # Read all lines into a list
     score = None
@@ -139,7 +133,7 @@ def is_file_of_interest(file: str) -> bool:
 
     filename = Path(file).stem
     scenario_name = filename.split("-")[0].strip()
-    if scenario_name != scenario_to_monitor:
+    if scenario_name != config['scenario_to_monitor']:
         return False
 
     # splits = filename.split(" ")
@@ -148,14 +142,14 @@ def is_file_of_interest(file: str) -> bool:
     format_string = "%Y.%m.%d-%H.%M.%S"
     datetime_object = datetime.strptime(datetime_string, format_string)
     delta = datetime.today() - datetime_object
-    if delta.days > within_n_days:
+    if delta.days > config['within_n_days']:
         return False
 
     return True
 
 
 def get_scenario_data(scenario: str) -> dict:
-    files = [f for f in os.listdir(stats_dir) if os.path.isfile(os.path.join(stats_dir, f))]
+    files = [f for f in os.listdir(config['stats_dir']) if os.path.isfile(os.path.join(config['stats_dir'], f))]
     csv_files = [file for file in files if file.endswith(".csv")]
     scenario_files = []
     for file in csv_files:
@@ -171,7 +165,7 @@ def get_scenario_data(scenario: str) -> dict:
         format_string = "%Y.%m.%d-%H.%M.%S"
         datetime_object = datetime.strptime(datetime_string, format_string)
         delta = datetime.today() - datetime_object
-        if delta.days > within_n_days:
+        if delta.days > config['within_n_days']:
             continue
 
         # scenario_name = scenario_file.split("-")[0].strip()
@@ -201,7 +195,7 @@ def initialize_plot(_scenario_data: dict) -> go.Figure:
     for sens, scores in _scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(scores, reverse=True)
-        top_n_largest = sorted_list[:top_n_scores]
+        top_n_largest = sorted_list[:config['top_n_scores']]
         for score in top_n_largest:
             x_data.append(sens)
             y_data.append(score)
@@ -214,15 +208,15 @@ def initialize_plot(_scenario_data: dict) -> go.Figure:
     #     return
 
     current_date = datetime.now().ctime()
-    title = f"{scenario_to_monitor} (last updated: {str(current_date)})"
-    console_logger.debug(f"Generating plot for: {scenario_to_monitor}")
+    title = f"{config['scenario_to_monitor']} (last updated: {str(current_date)})"
+    console_logger.debug(f"Generating plot for: {config['scenario_to_monitor']}")
     fig1 = px.scatter(
         title=title,
         x=x_data,
         y=y_data,
         labels={
             "x": "Sensitivity (cm/360)",
-            "y": f"Score (top {top_n_scores})",
+            "y": f"Score (top {config['top_n_scores']})",
         })
     # trendline="lowess"  # simply using average line for now
     fig2 = px.line(
@@ -269,10 +263,10 @@ class NewFileHandler(FileSystemEventHandler):
         else:
             previous_scores = sorted(scenario_data[horizontal_sens])
             score_to_beat = previous_scores[0]
-            if len(previous_scores) > top_n_scores:
-                score_to_beat = previous_scores[-top_n_scores]
+            if len(previous_scores) > config['top_n_scores']:
+                score_to_beat = previous_scores[-config['top_n_scores']]
             if score > score_to_beat:
-                console_logger.debug(f"New top {top_n_scores} score: {score}")
+                console_logger.debug(f"New top {config['top_n_scores']} score: {score}")
                 should_update = True
         if not should_update:
             console_logger.debug(
@@ -283,12 +277,8 @@ class NewFileHandler(FileSystemEventHandler):
 
 
 if __name__ == '__main__':
-    log_format = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
-    console_logger = logging.getLogger(__name__)
-
     # Get scenario_data data
-    my_data = get_scenario_data(scenario_to_monitor)
+    my_data = get_scenario_data(config['scenario_to_monitor'])
 
     # Do first time run and initialize plot
     fig = initialize_plot(my_data)
@@ -296,9 +286,10 @@ if __name__ == '__main__':
     # Monitor for new files
     event_handler = NewFileHandler()
     observer = Observer()
-    observer.schedule(event_handler, stats_dir, recursive=False)  # Set recursive=True to monitor subdirectories
+    observer.schedule(event_handler, config['stats_dir'],
+                      recursive=False)  # Set recursive=True to monitor subdirectories
     observer.start()
-    console_logger.info(f"Monitoring directory: {stats_dir}")
+    console_logger.info(f"Monitoring directory: {config['stats_dir']}")
 
     # Run the Dash app
     app.run(debug=True, use_reloader=False)
