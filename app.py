@@ -26,8 +26,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
 console_logger = logging.getLogger(__name__)
 
 # Pull arguments from a config file.
-with open("config.toml", "rb") as f:
-    config = tomllib.load(f)
+with open("config.toml", "rb") as _file:
+    config = tomllib.load(_file)
 console_logger.debug(f"Loaded config: {config}")
 
 # TODO: Global variables best practices ?
