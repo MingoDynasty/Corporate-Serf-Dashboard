@@ -39,7 +39,7 @@ log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
 app = DashProxy()
 
-# TODO: Some global variables ?
+# TODO: Global variables best practices ?
 new_data = False
 fig = None
 
@@ -77,10 +77,10 @@ def update_graph(value, _):
 
     scenario_to_monitor = value
 
-    # Get voltaic data
+    # Get scenario data
     console_logger.debug("Performing update...")
-    voltaic_data = get_voltaic_data()
-    fig = initialize_plot(voltaic_data)
+    scenario_data = get_scenario_data()
+    fig = initialize_plot(scenario_data)
 
     new_data = False
     notification = {
@@ -96,15 +96,16 @@ def update_graph(value, _):
 app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
-        html.H1(children='My Dash App', style={'textAlign': 'center'}),
+        # html.H1(children='My Dash App', style={'textAlign': 'center'}),
         dcc.Dropdown(all_scenarios, value=scenario_to_monitor, id='dropdown-selection'),
-        html.Div(id='live-update-text'),
+        # html.Div(id='live-update-text'),
         dcc.Interval(
             id='interval-component',
             interval=polling_interval,
             n_intervals=0
         ),
-        dcc.Graph(id='graph-content')
+        dcc.Graph(id='graph-content'),
+        html.Div(id='live-update-text'),
     ]
     + log_handler.embed()
 )
@@ -151,23 +152,19 @@ def is_file_of_interest(file: str) -> bool:
     return True
 
 
-def get_voltaic_data() -> dict:
+def get_scenario_data() -> dict:
     files = [f for f in os.listdir(stats_dir) if os.path.isfile(os.path.join(stats_dir, f))]
     csv_files = [file for file in files if file.endswith(".csv")]
-    voltaic_files = []
+    scenario_files = []
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
         if scenario_name == scenario_to_monitor:
-            voltaic_files.append(file)
+            scenario_files.append(file)
 
-    # Get the subset of files that we care about;
-    # i.e. the files that pertain to the list of scenarios that we care about
-    # subset_files = []
-    voltaic_data = dict()
-    # for benchmark in voltaic_benchmarks:
-    voltaic_data[scenario_to_monitor] = dict()
-    for file in voltaic_files:
-        splits = file.split(" - Challenge - ")
+    # Get the subset of files that pertain to the scenario
+    scenario_data = {}
+    for scenario_file in scenario_files:
+        splits = scenario_file.split(" - Challenge - ")
         datetime_string = splits[1].split(" ")[0]
         format_string = "%Y.%m.%d-%H.%M.%S"
         datetime_object = datetime.strptime(datetime_string, format_string)
@@ -175,74 +172,68 @@ def get_voltaic_data() -> dict:
         if delta.days > within_n_days:
             continue
 
-        scenario_name = file.split("-")[0].strip()
-        score, sens_scale, horizontal_sens, _ = extract_data_from_file(file)
+        scenario_name = scenario_file.split("-")[0].strip()
+        score, sens_scale, horizontal_sens, _ = extract_data_from_file(scenario_file)
         # key = horizontal_sens + " " + sens_scale
         key = horizontal_sens
         # console_logger.debug(key)
-        scenario_data = voltaic_data[scenario_name]
         if key not in scenario_data:
             scenario_data[key] = []
         scenario_data[key].append(score)
         # subset_files.append(file)
 
     # Sort by Sensitivity
-    for scenario in voltaic_data:
-        data = voltaic_data[scenario]
-        sorted_dict_by_key = dict(sorted(data.items()))
-        voltaic_data[scenario] = sorted_dict_by_key
-    return voltaic_data
+    scenario_data = dict(sorted(scenario_data.items()))
+    return scenario_data
 
 
-def initialize_plot(voltaic_data: dict) -> go.Figure:
-    for scenario, data in voltaic_data.items():
-        # x and y given as array_like objects
-        x_data = []
-        y_data = []
-        average_x_data = []
-        average_y_data = []
-        for sens, scores in data.items():
-            # Get top N scores for each sensitivity
-            sorted_list = sorted(scores, reverse=True)
-            top_n_largest = sorted_list[:top_n_scores]
-            for score in top_n_largest:
-                x_data.append(sens)
-                y_data.append(score)
-            average_x_data.append(sens)
-            average_y_data.append(np.mean(top_n_largest))
-        # If we want to generate a trendline (e.g. lowess)
-        # if len(data.keys()) <= 2:
-        #     # We need at least 3 sensitivities to generate a trendline
-        #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-        #     return
+def initialize_plot(scenario_data: dict) -> go.Figure:
+    x_data = []
+    y_data = []
+    average_x_data = []
+    average_y_data = []
+    for sens, scores in scenario_data.items():
+        # Get top N scores for each sensitivity
+        sorted_list = sorted(scores, reverse=True)
+        top_n_largest = sorted_list[:top_n_scores]
+        for score in top_n_largest:
+            x_data.append(sens)
+            y_data.append(score)
+        average_x_data.append(sens)
+        average_y_data.append(np.mean(top_n_largest))
+    # If we want to generate a trendline (e.g. lowess)
+    # if len(data.keys()) <= 2:
+    #     # We need at least 3 sensitivities to generate a trendline
+    #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
+    #     return
 
-        current_date = datetime.now().ctime()
-        title = f"{scenario} (last updated: {str(current_date)})"
-        console_logger.debug(f"Generating plot for: {scenario}")
-        fig1 = px.scatter(
-            title=title,
-            x=x_data,
-            y=y_data,
-            labels={
-                "x": "Sensitivity (cm/360)",
-                "y": f"Score (top {top_n_scores})",
-            })
-        # trendline="lowess")  # simply using average line for now
-        fig2 = px.line(
-            x=average_x_data,
-            y=average_y_data,
-            # title="My Title",
-            labels={
-                "x": "Sensitivity (cm/360)",
-                "y": "Average Score",
-            },
-        )
+    current_date = datetime.now().ctime()
+    title = f"{scenario_to_monitor} (last updated: {str(current_date)})"
+    console_logger.debug(f"Generating plot for: {scenario_to_monitor}")
+    fig1 = px.scatter(
+        title=title,
+        x=x_data,
+        y=y_data,
+        labels={
+            "x": "Sensitivity (cm/360)",
+            "y": f"Score (top {top_n_scores})",
+        })
+    # trendline="lowess")  # simply using average line for now
+    fig2 = px.line(
+        x=average_x_data,
+        y=average_y_data,
+        # title="My Title",
+        labels={
+            "x": "Sensitivity (cm/360)",
+            "y": "Average Score",
+        },
+    )
 
-        combined_figure = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
-        combined_figure['data'][0]['name'] = 'Score Data'
-        combined_figure['data'][0]['showlegend'] = True
-        combined_figure['data'][1]['name'] = 'Average Score'
-        combined_figure['data'][1]['showlegend'] = True
+    combined_figure = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
+    combined_figure['data'][0]['name'] = 'Score Data'
+    combined_figure['data'][0]['showlegend'] = True
+    combined_figure['data'][1]['name'] = 'Average Score'
+    combined_figure['data'][1]['showlegend'] = True
     return combined_figure
 
 
@@ -254,7 +245,6 @@ class NewFileHandler(FileSystemEventHandler):
         console_logger.debug(f"Detected new file: {event.src_path}")
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
-        # update_plot_with_file(event.src_path)
         file = event.src_path
 
         # 1. Check if this file is a file that we care about.
@@ -266,11 +256,11 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         score, sens_scale, horizontal_sens, scenario = extract_data_from_file(file)
         should_update = False
-        if horizontal_sens not in voltaic_data[scenario]:
+        if horizontal_sens not in scenario_data:
             console_logger.debug(f"New sensitivity detected: {horizontal_sens}")
             should_update = True
         else:
-            previous_scores = sorted(voltaic_data[scenario][horizontal_sens])
+            previous_scores = sorted(scenario_data[horizontal_sens])
 
             score_to_beat = previous_scores[0]
             if len(previous_scores) > top_n_scores:
@@ -285,19 +275,17 @@ class NewFileHandler(FileSystemEventHandler):
         new_data = True
         return
 
-    # def should_update(self, event):
-
 
 if __name__ == '__main__':
     log_format = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
     logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
     console_logger = logging.getLogger(__name__)
 
-    # Get voltaic data
-    voltaic_data = get_voltaic_data()
+    # Get scenario_data data
+    scenario_data = get_scenario_data()
 
     # Do first time run and intialize plot
-    fig = initialize_plot(voltaic_data)
+    fig = initialize_plot(scenario_data)
 
     # Monitor for new files
     event_handler = NewFileHandler()
@@ -306,11 +294,9 @@ if __name__ == '__main__':
     observer.start()
     console_logger.info(f"Monitoring directory: {stats_dir}")
 
-    # try:
-    #     while True:
-    #         time.sleep(1)  # Keep the main thread alive
-    # except KeyboardInterrupt:
-    #     observer.stop()
-    # observer.join()  # Wait until the observer thread terminates
-
+    # Run the Dash app
     app.run(debug=True, use_reloader=False)
+
+    # Probably don't need this but I kept it anyway
+    observer.stop()
+    observer.join()  # Wait until the observer thread terminates
