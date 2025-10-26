@@ -96,9 +96,7 @@ def update_graph(value, _):
 app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
-        # html.H1(children='My Dash App', style={'textAlign': 'center'}),
         dcc.Dropdown(all_scenarios, value=scenario_to_monitor, id='dropdown-selection'),
-        # html.Div(id='live-update-text'),
         dcc.Interval(
             id='interval-component',
             interval=polling_interval,
