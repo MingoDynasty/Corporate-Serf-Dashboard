@@ -37,6 +37,7 @@ logger = log_handler.setup_logger(__name__)
 app = DashProxy()
 
 # TODO: Global variables best practices ?
+scenario_data = {}
 new_data = False
 fig = None
 
@@ -67,7 +68,7 @@ def update_layout(_):
     Input('live-update-text', 'children')
 )
 def update_graph(value, _):
-    global fig, new_data, scenario_to_monitor
+    global fig, new_data, scenario_to_monitor, scenario_data
     # console_logger.debug("Checking for updates...")
     if not value or (value == scenario_to_monitor and not new_data):
         return fig, no_update
@@ -98,13 +99,14 @@ def update_graph(value, _):
 app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
+        html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
         dcc.Dropdown(all_scenarios, value=scenario_to_monitor, id='dropdown-selection'),
         dcc.Interval(
             id='interval-component',
             interval=polling_interval,
             n_intervals=0
         ),
-        dcc.Graph(id='graph-content'),
+        dcc.Graph(id='graph-content', style={'height': '80vh'}),
         html.Div(id='live-update-text'),
     ]
     + log_handler.embed()
@@ -162,7 +164,7 @@ def get_scenario_data(scenario: str) -> dict:
             scenario_files.append(file)
 
     # Get the subset of files that pertain to the scenario
-    scenario_data = {}
+    _scenario_data = {}
     for scenario_file in scenario_files:
         splits = scenario_file.split(" - Challenge - ")
         datetime_string = splits[1].split(" ")[0]
@@ -177,22 +179,26 @@ def get_scenario_data(scenario: str) -> dict:
         # key = horizontal_sens + " " + sens_scale
         key = horizontal_sens
         # console_logger.debug(key)
-        if key not in scenario_data:
-            scenario_data[key] = []
-        scenario_data[key].append(score)
+        if key not in _scenario_data:
+            _scenario_data[key] = []
+        _scenario_data[key].append(score)
         # subset_files.append(file)
 
     # Sort by Sensitivity
-    scenario_data = dict(sorted(scenario_data.items()))
-    return scenario_data
+    _scenario_data = dict(sorted(_scenario_data.items()))
+    return _scenario_data
 
 
-def initialize_plot(scenario_data: dict) -> go.Figure:
+def initialize_plot(_scenario_data: dict) -> go.Figure:
+    if not _scenario_data:
+        return go.Figure()
+    x_data = []
+    y_data = []
     x_data = []
     y_data = []
     average_x_data = []
     average_y_data = []
-    for sens, scores in scenario_data.items():
+    for sens, scores in _scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(scores, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
@@ -239,7 +245,7 @@ def initialize_plot(scenario_data: dict) -> go.Figure:
 
 class NewFileHandler(FileSystemEventHandler):
     def on_created(self, event):
-        global new_data
+        global new_data, scenario_data
         if event.is_directory:  # Check if it's a file, not a directory
             return
         console_logger.debug(f"Detected new file: {event.src_path}")
@@ -282,10 +288,10 @@ if __name__ == '__main__':
     console_logger = logging.getLogger(__name__)
 
     # Get scenario_data data
-    scenario_data = get_scenario_data(scenario_to_monitor)
+    my_data = get_scenario_data(scenario_to_monitor)
 
     # Do first time run and initialize plot
-    fig = initialize_plot(scenario_data)
+    fig = initialize_plot(my_data)
 
     # Monitor for new files
     event_handler = NewFileHandler()
