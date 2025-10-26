@@ -79,7 +79,12 @@ def update_graph(value, _):
 
     # Get scenario data
     console_logger.debug("Performing update...")
-    scenario_data = get_scenario_data()
+    scenario_data = get_scenario_data(value)
+    if not scenario_data:
+        console_logger.warning(
+            f"No scenario data for '{value}'. Perhaps choose a longer date range? (currently {within_n_days} days)")
+        return fig, no_update
+
     fig = initialize_plot(scenario_data)
 
     new_data = False
@@ -150,13 +155,13 @@ def is_file_of_interest(file: str) -> bool:
     return True
 
 
-def get_scenario_data() -> dict:
+def get_scenario_data(scenario: str) -> dict:
     files = [f for f in os.listdir(stats_dir) if os.path.isfile(os.path.join(stats_dir, f))]
     csv_files = [file for file in files if file.endswith(".csv")]
     scenario_files = []
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
-        if scenario_name == scenario_to_monitor:
+        if scenario_name == scenario:
             scenario_files.append(file)
 
     # Get the subset of files that pertain to the scenario
@@ -280,7 +285,7 @@ if __name__ == '__main__':
     console_logger = logging.getLogger(__name__)
 
     # Get scenario_data data
-    scenario_data = get_scenario_data()
+    scenario_data = get_scenario_data(scenario_to_monitor)
 
     # Do first time run and intialize plot
     fig = initialize_plot(scenario_data)
@@ -288,7 +293,7 @@ if __name__ == '__main__':
     # Monitor for new files
     event_handler = NewFileHandler()
     observer = Observer()
-    observer.schedule(event_handler, stats_dir, recursive=True)  # Set recursive=True to monitor subdirectories
+    observer.schedule(event_handler, stats_dir, recursive=False)  # Set recursive=True to monitor subdirectories
     observer.start()
     console_logger.info(f"Monitoring directory: {stats_dir}")
 
