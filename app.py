@@ -38,7 +38,8 @@ fig = None
 
 def get_unique_scenarios(_dir: str) -> list:
     unique_scenarios = set()
-    files = [f for f in os.listdir(config['stats_dir']) if os.path.isfile(os.path.join(config['stats_dir'], f))]
+    files = [file for file in os.listdir(config['stats_dir']) if
+             os.path.isfile(os.path.join(config['stats_dir'], file))]
     csv_files = [file for file in files if file.endswith(".csv")]
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
@@ -149,7 +150,8 @@ def is_file_of_interest(file: str) -> bool:
 
 
 def get_scenario_data(scenario: str) -> dict:
-    files = [f for f in os.listdir(config['stats_dir']) if os.path.isfile(os.path.join(config['stats_dir'], f))]
+    files = [file for file in os.listdir(config['stats_dir']) if
+             os.path.isfile(os.path.join(config['stats_dir'], file))]
     csv_files = [file for file in files if file.endswith(".csv")]
     scenario_files = []
     for file in csv_files:
@@ -186,8 +188,6 @@ def get_scenario_data(scenario: str) -> dict:
 def initialize_plot(_scenario_data: dict) -> go.Figure:
     if not _scenario_data:
         return go.Figure()
-    x_data = []
-    y_data = []
     x_data = []
     y_data = []
     average_x_data = []
