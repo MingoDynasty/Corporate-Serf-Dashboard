@@ -1,26 +1,21 @@
-import logging  # Provides access to logging api.
 import logging.config  # Provides access to logging configuration file.
 import os
 import sys
-from datetime import datetime
 import time
-from watchdog.events import FileSystemEventHandler
-from watchdog.observers import Observer
-import plotly.express as px
+from datetime import datetime
 from pathlib import Path
 
-from dash_extensions import Lottie
-from dash_extensions.enrich import DashProxy, Input, Output, html
-from dash_extensions.events import add_event_listener, dispatch_event, resolve_event_components
 import dash_mantine_components as dmc
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
-from dash import Output, Input, html, callback, no_update
+from dash import Output, Input, html, no_update
 from dash import dcc
 from dash_extensions.enrich import DashProxy
-import threading
 from dash_extensions.logging import NotificationsLogHandler
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 ########################
 # Constants
@@ -49,6 +44,19 @@ new_data = False
 fig = None
 
 
+def get_unique_scenarios(_dir: str) -> list:
+    unique_scenarios = set()
+    files = [f for f in os.listdir(stats_dir) if os.path.isfile(os.path.join(stats_dir, f))]
+    csv_files = [file for file in files if file.endswith(".csv")]
+    for file in csv_files:
+        scenario_name = file.split("-")[0].strip()
+        unique_scenarios.add(scenario_name)
+    return sorted(list(unique_scenarios))
+
+
+all_scenarios = get_unique_scenarios(stats_dir)
+
+
 @app.callback(Output('live-update-text', 'children'),
               Input('interval-component', 'n_intervals'))
 def update_layout(_):
@@ -58,14 +66,16 @@ def update_layout(_):
 @app.callback(
     Output('graph-content', 'figure'),
     Output("notification-container", "sendNotifications"),
-    # Input('dropdown-selection', 'value'),
+    Input('dropdown-selection', 'value'),
     Input('live-update-text', 'children')
 )
-def update_graph(_):
-    global fig, new_data
+def update_graph(value, _):
+    global fig, new_data, scenario_to_monitor
     # console_logger.debug("Checking for updates...")
-    if not new_data:
+    if not value or (value == scenario_to_monitor and not new_data):
         return fig, no_update
+
+    scenario_to_monitor = value
 
     # Get voltaic data
     console_logger.debug("Performing update...")
@@ -76,7 +86,7 @@ def update_graph(_):
     notification = {
         "action": "show",
         "title": "Notification",
-        "message": "Graph has been updated!",
+        "message": "Graph updated!",
         "color": "blue",
         "id": "notify"
     }
@@ -87,11 +97,7 @@ app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
         html.H1(children='My Dash App', style={'textAlign': 'center'}),
-        dcc.Dropdown(df.country.unique(), 'Canada', id='dropdown-selection'),
-        # html.Div([
-        #     "Input: ",
-        #     dcc.Input(id='my-input', value=10, type='text')
-        # ]),
+        dcc.Dropdown(all_scenarios, value=scenario_to_monitor, id='dropdown-selection'),
         html.Div(id='live-update-text'),
         dcc.Interval(
             id='interval-component',
@@ -101,7 +107,6 @@ app.layout = dmc.MantineProvider(
         dcc.Graph(id='graph-content')
     ]
     + log_handler.embed()
-    + resolve_event_components()  # must be called *after* all callbacks have been defined
 )
 
 
@@ -205,10 +210,11 @@ def initialize_plot(voltaic_data: dict) -> go.Figure:
                 y_data.append(score)
             average_x_data.append(sens)
             average_y_data.append(np.mean(top_n_largest))
-        if len(data.keys()) <= 2:
-            # We need at least 3 sensitivities to generate a trendline
-            console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-            return
+        # If we want to generate a trendline (e.g. lowess)
+        # if len(data.keys()) <= 2:
+        #     # We need at least 3 sensitivities to generate a trendline
+        #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
+        #     return
 
         current_date = datetime.now().ctime()
         title = f"{scenario} (last updated: {str(current_date)})"
@@ -221,7 +227,7 @@ def initialize_plot(voltaic_data: dict) -> go.Figure:
                 "x": "Sensitivity (cm/360)",
                 "y": f"Score (top {top_n_scores})",
             })
-        # trendline="lowess")  # TODO: instead of trend line, simply use average?
+        # trendline="lowess")  # simply using average line for now
         fig2 = px.line(
             x=average_x_data,
             y=average_y_data,
@@ -232,13 +238,12 @@ def initialize_plot(voltaic_data: dict) -> go.Figure:
             },
         )
 
-        fig3 = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
-        fig3['data'][0]['name'] = 'Score Data'
-        fig3['data'][0]['showlegend'] = True
-        fig3['data'][1]['name'] = 'Average Score'
-        fig3['data'][1]['showlegend'] = True
-        # fig3.show()
-    return fig3
+        combined_figure = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
+        combined_figure['data'][0]['name'] = 'Score Data'
+        combined_figure['data'][0]['showlegend'] = True
+        combined_figure['data'][1]['name'] = 'Average Score'
+        combined_figure['data'][1]['showlegend'] = True
+    return combined_figure
 
 
 class NewFileHandler(FileSystemEventHandler):
