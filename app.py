@@ -1,7 +1,7 @@
-# import logging  # Provides access to logging api.
-# import logging.config  # Provides access to logging configuration file.
-# import os
-# import sys
+import logging  # Provides access to logging api.
+import logging.config  # Provides access to logging configuration file.
+import os
+import sys
 import dash_mantine_components as dmc
 import numpy as np
 import pandas as pd
@@ -15,7 +15,6 @@ df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapmi
 
 log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
-
 app = DashProxy()
 
 # app.layout = Lottie(
@@ -35,6 +34,7 @@ app.layout = dmc.MantineProvider([
                                  ] + log_handler.embed()
                                  )
 
+
 @callback(
     Output('graph-content', 'figure'),
     Output("notification-container", "sendNotifications"),
@@ -42,6 +42,7 @@ app.layout = dmc.MantineProvider([
     log=True
 )
 def update_graph(value):
+    console_logger.debug("mingotest update graph")
     np.random.seed(1)
 
     N = 10
@@ -62,27 +63,19 @@ def update_graph(value):
                              mode='markers', name='markers'))
 
     notification = {
-            "action": "show",
-            "title": "Notification",
-            "message": "Graph has been updated!",
-            "color": "blue",
-            "id": "notify"
-        }
+        "action": "show",
+        "title": "Notification",
+        "message": "Graph has been updated!",
+        "color": "blue",
+        "id": "notify"
+    }
     return fig, [notification]
 
 
-
-
 if __name__ == '__main__':
-    # logConfFile = os.path.join(os.path.dirname(__file__), 'logging.conf')
-    # if not os.path.isfile(logConfFile):
-    #     print(logConfFile + " not found.")
-    #     exit()
-    #
-    # log_format = "%(asctime)-15s - %(levelname)s - %(message)s"
-    # logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
-    # logging.config.fileConfig(logConfFile)
-    # logger = logging.getLogger(__name__)
+    log_format = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
+    console_logger = logging.getLogger(__name__)
 
     # Get voltaic data
     # voltaic_data = get_voltaic_data()
@@ -114,4 +107,3 @@ if __name__ == '__main__':
     # observer.join()  # Wait until the observer thread terminates
 
     app.run(debug=True)
-    print("foo")
