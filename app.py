@@ -1,5 +1,6 @@
 import logging.config  # Provides access to logging configuration file.
 import os
+import tomli_w
 import tomllib
 import sys
 import time
@@ -26,7 +27,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
 console_logger = logging.getLogger(__name__)
 
 # Pull arguments from a config file.
-with open("config.toml", "rb") as _file:
+config_file = "config.toml"
+with open(config_file, "rb") as _file:
     config = tomllib.load(_file)
 console_logger.debug(f"Loaded config: {config}")
 
@@ -69,6 +71,8 @@ def update_graph(value, _):
         return fig, no_update
 
     config['scenario_to_monitor'] = value
+    with open(config_file, 'wb') as file:
+        tomli_w.dump(config, file)
 
     # Get scenario data
     console_logger.debug("Performing update...")
@@ -278,10 +282,10 @@ class NewFileHandler(FileSystemEventHandler):
 
 if __name__ == '__main__':
     # Get scenario_data data
-    my_data = get_scenario_data(config['scenario_to_monitor'])
+    scenario_data = get_scenario_data(config['scenario_to_monitor'])
 
     # Do first time run and initialize plot
-    fig = initialize_plot(my_data)
+    fig = initialize_plot(scenario_data)
 
     # Monitor for new files
     event_handler = NewFileHandler()
