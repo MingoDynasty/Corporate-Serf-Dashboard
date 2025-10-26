@@ -1,9 +1,8 @@
 import logging.config  # Provides access to logging configuration file.
 import os
-import tomli_w
-import tomllib
 import sys
 import time
+import tomllib
 from datetime import datetime
 from pathlib import Path
 
@@ -11,6 +10,7 @@ import dash_mantine_components as dmc
 import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
+import tomli_w
 from dash import Output, Input, html, no_update
 from dash import dcc
 from dash_extensions.enrich import DashProxy
