@@ -7,7 +7,6 @@ from pathlib import Path
 
 import dash_mantine_components as dmc
 import numpy as np
-import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 from dash import Output, Input, html, no_update
@@ -32,8 +31,6 @@ top_n_scores = 5
 polling_interval = 5 * 1000
 # can probably move these to a separate file at some point
 ########################
-
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder_unfiltered.csv')
 
 log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
@@ -175,7 +172,7 @@ def get_scenario_data(scenario: str) -> dict:
         if delta.days > within_n_days:
             continue
 
-        scenario_name = scenario_file.split("-")[0].strip()
+        # scenario_name = scenario_file.split("-")[0].strip()
         score, sens_scale, horizontal_sens, _ = extract_data_from_file(scenario_file)
         # key = horizontal_sens + " " + sens_scale
         key = horizontal_sens
@@ -221,7 +218,7 @@ def initialize_plot(scenario_data: dict) -> go.Figure:
             "x": "Sensitivity (cm/360)",
             "y": f"Score (top {top_n_scores})",
         })
-    # trendline="lowess")  # simply using average line for now
+    # trendline="lowess"  # simply using average line for now
     fig2 = px.line(
         x=average_x_data,
         y=average_y_data,
@@ -259,12 +256,12 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         score, sens_scale, horizontal_sens, scenario = extract_data_from_file(file)
         should_update = False
+        score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
         if horizontal_sens not in scenario_data:
             console_logger.debug(f"New sensitivity detected: {horizontal_sens}")
             should_update = True
         else:
             previous_scores = sorted(scenario_data[horizontal_sens])
-
             score_to_beat = previous_scores[0]
             if len(previous_scores) > top_n_scores:
                 score_to_beat = previous_scores[-top_n_scores]
@@ -287,7 +284,7 @@ if __name__ == '__main__':
     # Get scenario_data data
     scenario_data = get_scenario_data(scenario_to_monitor)
 
-    # Do first time run and intialize plot
+    # Do first time run and initialize plot
     fig = initialize_plot(scenario_data)
 
     # Monitor for new files
