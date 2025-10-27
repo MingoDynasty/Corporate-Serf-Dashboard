@@ -3,7 +3,7 @@ import os
 import sys
 import time
 import tomllib
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import dash_mantine_components as dmc
@@ -88,10 +88,14 @@ def update_top_n_scores(new_top_n_scores):
 
 
 @app.callback(
-    Input('within_n_days', 'value'),
+    Input('date-picker', 'date'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
-def update_within_n_days(new_within_n_days):
+def update_within_n_days(new_date):
+    console_logger.debug(f"New date: {new_date}")
+    date_object = date.fromisoformat(new_date)
+    new_within_n_days = (date.today() - date_object).days
+
     console_logger.debug(f"New within_n_days: {new_within_n_days}")
     config['within_n_days'] = new_within_n_days
     update_config()
@@ -116,7 +120,7 @@ def update_graph(do_update):
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
     if not scenario_data:
         console_logger.warning(
-            f"No scenario data for '{config['scenario_to_monitor']}'. Perhaps choose a longer date range? (currently {config['within_n_days']} days)")
+            f"No scenario data for '{config['scenario_to_monitor']}'. Perhaps choose a longer date range?")
         return fig, no_update
 
     fig = initialize_plot(scenario_data)
@@ -160,7 +164,7 @@ app.layout = dmc.MantineProvider(
             ),
             html.Label('Top N Scores',
                        style={
-                           'line-height': '30px',
+                           'line-height': '50px',
                            'margin-left': 50,
                            'margin-right': 10,
                            'font-weight': 'bold'}
@@ -175,16 +179,16 @@ app.layout = dmc.MantineProvider(
             ),
             html.Label('Oldest date to consider',
                        style={
-                           'line-height': '30px',
+                           'line-height': '50px',
                            'margin-left': 50,
                            'margin-right': 10,
                            'font-weight': 'bold'}
                        ),
-            dcc.Input(
-                id='within_n_days',
-                placeholder='Enter number of days to consider...',
-                type='number',
-                value=config['within_n_days'],
+            dcc.DatePickerSingle(
+                id='date-picker',
+                date=datetime.now() - timedelta(days=config['within_n_days']),
+                display_format="YYYY-MM-DD",
+                max_date_allowed=datetime.now(),
                 persistence=True,
             ),
         ], style={"display": "flex"}),
