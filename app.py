@@ -165,6 +165,7 @@ app.layout = dmc.MantineProvider(
                                 maxDropdownHeight=1000,
                                 checkIconPosition="right",
                                 persistence=True,
+                                scrollAreaProps={"type": "auto"},
                             ),
                             dmc.NumberInput(
                                 id='top_n_scores',
