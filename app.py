@@ -227,7 +227,10 @@ app.layout = dmc.MantineProvider(
         dcc.Graph(id='graph-content', style={'height': '85vh'}),
         dmc.Group(
             children=[
-                dmc.Text(id='live-update-text', size="md", ml='xl')
+                dmc.Text(id='live-update-text', size="md", ml='xl'),
+                dmc.Anchor(DashIconify(icon="logos:discord-icon", width=40),
+                           href="https://discordapp.com/users/222910150636339211"),
+                dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
             ],
         ),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
