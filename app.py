@@ -166,6 +166,7 @@ app.layout = dmc.MantineProvider(
                                 checkIconPosition="right",
                                 persistence=True,
                                 scrollAreaProps={"type": "auto"},
+                                ml="xl",
                             ),
                             dmc.NumberInput(
                                 id='top_n_scores',
@@ -188,7 +189,7 @@ app.layout = dmc.MantineProvider(
                             ),
                         ],
                         gap="md",
-                        justify="center",
+                        justify="flex-start",
                         align="flex-start",
                         direction="row",
                         wrap="wrap",
