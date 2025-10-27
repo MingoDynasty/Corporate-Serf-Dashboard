@@ -81,6 +81,8 @@ def select_new_scenario(new_scenario):
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
 def update_top_n_scores(new_top_n_scores):
+    if not new_top_n_scores:
+        return False
     console_logger.debug(f"New top_n_scores: {new_top_n_scores}")
     config['top_n_scores'] = new_top_n_scores
     update_config()
@@ -148,7 +150,7 @@ app.layout = dmc.MantineProvider(
         html.Div([
             html.Label('Selected Scenario',
                        style={
-                           'line-height': '30px',
+                           'line-height': '34px',
                            'margin-left': 50,
                            'margin-right': 10,
                            'font-weight': 'bold'}
@@ -164,7 +166,7 @@ app.layout = dmc.MantineProvider(
             ),
             html.Label('Top N Scores',
                        style={
-                           'line-height': '50px',
+                           'line-height': '34px',
                            'margin-left': 50,
                            'margin-right': 10,
                            'font-weight': 'bold'}
@@ -176,10 +178,11 @@ app.layout = dmc.MantineProvider(
                 value=config['top_n_scores'],
                 min=1,
                 persistence=True,
+                style={"width": "130px", "height": "36px"}
             ),
             html.Label('Oldest date to consider',
                        style={
-                           'line-height': '50px',
+                           'line-height': '34px',
                            'margin-left': 50,
                            'margin-right': 10,
                            'font-weight': 'bold'}
