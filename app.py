@@ -148,7 +148,7 @@ app.layout = dmc.MantineProvider(
             n_intervals=0
         ),
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
-        html.Div([
+        dmc.Box([
             dmc.Select(
                 label="Selected scenario",
                 placeholder='Select a scenario...',
@@ -157,6 +157,9 @@ app.layout = dmc.MantineProvider(
                 searchable=True,
                 value=config['scenario_to_monitor'],
                 style={"width": "800px"},
+                maxDropdownHeight=1000,
+                checkIconPosition="right",
+                persistence=True,
             ),
             dmc.NumberInput(
                 id='top_n_scores',
@@ -167,6 +170,7 @@ app.layout = dmc.MantineProvider(
                 radius="sm",
                 min=1,
                 value=config['top_n_scores'],
+                persistence=True,
             ),
             dmc.DatePickerInput(
                 id='date-picker',
