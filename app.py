@@ -149,47 +149,28 @@ app.layout = dmc.MantineProvider(
         ),
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
         html.Div([
-            html.Label('Selected Scenario',
-                       style={
-                           'line-height': '34px',
-                           'margin-left': 50,
-                           'margin-right': 10,
-                           'font-weight': 'bold'}
-                       ),
-            dcc.Dropdown(
-                all_scenarios,
+            dmc.Select(
+                label="Selected scenario",
                 placeholder='Select a scenario...',
+                id="dropdown-selection",
+                data=all_scenarios,
+                searchable=True,
                 value=config['scenario_to_monitor'],
-                id='dropdown-selection',
-                persistence=True,
-                maxHeight=1000,
                 style={"width": "800px"},
             ),
-            html.Label('Top N Scores',
-                       style={
-                           'line-height': '34px',
-                           'margin-left': 50,
-                           'margin-right': 10,
-                           'font-weight': 'bold'}
-                       ),
-            dcc.Input(
+            dmc.NumberInput(
                 id='top_n_scores',
-                placeholder='Enter top N scores to consider...',
-                type='number',
-                value=config['top_n_scores'],
+                placeholder="Top N scores to consider...",
+                label="Top N scores",
+                variant="default",
+                size="sm",
+                radius="sm",
                 min=1,
-                persistence=True,
-                style={"width": "130px", "height": "36px"}
+                value=config['top_n_scores'],
             ),
-            html.Label('Oldest date to consider',
-                       style={
-                           'line-height': '34px',
-                           'margin-left': 50,
-                           'margin-right': 10,
-                           'font-weight': 'bold'}
-                       ),
             dmc.DatePickerInput(
                 id='date-picker',
+                label="Oldest date to consider",
                 value=(datetime.now() - timedelta(days=config['within_n_days'])),
                 maxDate=datetime.now(),
                 persistence=True,

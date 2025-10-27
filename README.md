@@ -10,8 +10,9 @@ you keep playing and generating new scores, the plot will automatically update i
 1. Python
 2. Dash
     1. Plotly.js
-    2. React
-    3. Flask
+    2. Dash Mantine Components
+    3. React
+    4. Flask
 
 ## Requirements
 
