@@ -118,13 +118,13 @@ def update_graph(do_update):
     if not config['scenario_to_monitor']:
         return fig, no_update
 
-    console_logger.debug("Performing update...")
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
     if not scenario_data:
         console_logger.warning(
             f"No scenario data for '{config['scenario_to_monitor']}'. Perhaps choose a longer date range?")
         return fig, no_update
 
+    console_logger.debug("Performing update...")
     fig = initialize_plot(scenario_data)
 
     new_data = False
