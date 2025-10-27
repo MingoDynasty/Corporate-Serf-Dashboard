@@ -18,13 +18,16 @@ you keep playing and generating new scores, the plot will automatically update i
 
 1. Python 3.13 (Dash is bugged with Python 3.14)
 
-## Installation
+## Installation / First Time Setup
 
-`pip install -r requirements.txt`
+1. Install the Python package dependencies: `pip install -r requirements.txt`
+2. Make a copy of the `example.toml`. Name the new file `config.toml`.
+3. Inside `config.toml`, update the `stats_dir` variable to point to your Kovaak's stats file directory.
+4. Feel free to change any other settings inside the TOML file, or leave them at their defaults.
 
 ## Usage
 
-1. `python app.py`
+1. Run the app in your terminal: `python app.py`
 2. Open a browser and navigate to: http://127.0.0.1:8050/
 
 ## Example
