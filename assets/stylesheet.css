@@ -1,14 +1,15 @@
-.DateInput, .DateInput_1 {
-    border-radius: 4px 0 0 4px !important;
+.mantine-Select-label {
+    font-weight: bold;
 }
 
-.DateInput_input, .DateInput_input_1 {
-    Height: 34px !important;
-    Width: 100% !important;
-    border-radius: inherit;
+.mantine-Select-option[data-checked] {
+    font-weight: bold;
 }
 
-.SingleDatePickerInput__withBorder {
-    border-radius: 4px 0 0 4px;
-    border: 1px solid #ccc !important;
+.mantine-NumberInput-label {
+    font-weight: bold;
+}
+
+.mantine-DatePickerInput-label {
+    font-weight: bold;
 }
