@@ -52,34 +52,68 @@ def get_unique_scenarios(_dir: str) -> list:
 all_scenarios = get_unique_scenarios(config['stats_dir'])
 
 
-@app.callback(Output('live-update-text', 'children'),
-              Input('interval-component', 'n_intervals'))
-def update_layout(_):
-    return f"Last file scan: {datetime.now()}"
-
-
-@app.callback(
-    Output('graph-content', 'figure'),
-    Output("notification-container", "sendNotifications"),
-    Input('dropdown-selection', 'value'),
-    Input('live-update-text', 'children')
-)
-def update_graph(value, _):
-    global fig, new_data, scenario_data
-    # console_logger.debug("Checking for updates...")
-    if not value or (value == config['scenario_to_monitor'] and not new_data):
-        return fig, no_update
-
-    config['scenario_to_monitor'] = value
+def update_config() -> None:
     with open(config_file, 'wb') as file:
         tomli_w.dump(config, file)
 
+
+@app.callback(Output('live-update-text', 'children'),
+              Input('interval-component', 'n_intervals'))
+def update_layout(_):
+    return f"Last file scan: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}"
+
+
+@app.callback(
+    Input('dropdown-selection', 'value'),
+    Output('do_update', 'data', allow_duplicate=True),
+    prevent_initial_call=True)
+def select_new_scenario(new_scenario):
+    console_logger.debug(f"New scenario selected: {new_scenario}")
+    config['scenario_to_monitor'] = new_scenario
+    update_config()
+    return True
+
+
+@app.callback(
+    Input('top_n_scores', 'value'),
+    Output('do_update', 'data', allow_duplicate=True),
+    prevent_initial_call=True)
+def update_top_n_scores(new_top_n_scores):
+    console_logger.debug(f"New top_n_scores: {new_top_n_scores}")
+    config['top_n_scores'] = new_top_n_scores
+    update_config()
+    return True
+
+
+@app.callback(
+    Input('within_n_days', 'value'),
+    Output('do_update', 'data', allow_duplicate=True),
+    prevent_initial_call=True)
+def update_within_n_days(new_within_n_days):
+    console_logger.debug(f"New within_n_days: {new_within_n_days}")
+    config['within_n_days'] = new_within_n_days
+    update_config()
+    return True
+
+
+@app.callback(
+    Input('do_update', 'data'),
+    Output('graph-content', 'figure'),
+    Output("notification-container", "sendNotifications"),
+)
+def update_graph(do_update):
+    global fig, new_data, scenario_data
+    # console_logger.debug(f"Updating graph with scenario: {value}")
+    # # console_logger.debug("Checking for updates...")
+    # if not value or (value == config['scenario_to_monitor'] and not new_data):
+    #     return fig, no_update
+
     # Get scenario data
     console_logger.debug("Performing update...")
-    scenario_data = get_scenario_data(value)
+    scenario_data = get_scenario_data(config['scenario_to_monitor'])
     if not scenario_data:
         console_logger.warning(
-            f"No scenario data for '{value}'. Perhaps choose a longer date range? (currently {config['within_n_days']} days)")
+            f"No scenario data for '{config['scenario_to_monitor']}'. Perhaps choose a longer date range? (currently {config['within_n_days']} days)")
         return fig, no_update
 
     fig = initialize_plot(scenario_data)
@@ -98,15 +132,35 @@ def update_graph(value, _):
 app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
-        html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
-        dcc.Dropdown(all_scenarios, value=config['scenario_to_monitor'], id='dropdown-selection'),
         dcc.Interval(
             id='interval-component',
             interval=config['polling_interval'],
             n_intervals=0
         ),
+        html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
+        dcc.Dropdown(
+            all_scenarios,
+            value=config['scenario_to_monitor'],
+            id='dropdown-selection',
+            persistence=True,
+        ),
         dcc.Graph(id='graph-content', style={'height': '80vh'}),
         html.Div(id='live-update-text'),
+        dcc.Input(
+            id='top_n_scores',
+            placeholder='Enter top N scores to consider...',
+            type='number',
+            value=config['top_n_scores'],
+            persistence=True,
+        ),
+        dcc.Input(
+            id='within_n_days',
+            placeholder='Enter number of days to consider...',
+            type='number',
+            value=config['within_n_days'],
+            persistence=True,
+        ),
+        dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
     + log_handler.embed()
 )
@@ -211,8 +265,9 @@ def initialize_plot(_scenario_data: dict) -> go.Figure:
     #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
     #     return
 
-    current_date = datetime.now().ctime()
-    title = f"{config['scenario_to_monitor']} (last updated: {str(current_date)})"
+    # current_date = datetime.now().ctime()
+    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+    title = f"{config['scenario_to_monitor']} (last updated: {str(current_datetime)})"
     console_logger.debug(f"Generating plot for: {config['scenario_to_monitor']}")
     fig1 = px.scatter(
         title=title,
