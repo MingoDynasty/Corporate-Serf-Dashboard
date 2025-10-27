@@ -161,7 +161,7 @@ app.layout = dmc.MantineProvider(
                                 data=all_scenarios,
                                 searchable=True,
                                 value=config['scenario_to_monitor'],
-                                style={"width": "600px"},
+                                style={"min-width": "500px"},
                                 maxDropdownHeight=1000,
                                 checkIconPosition="right",
                                 persistence=True,
@@ -193,8 +193,7 @@ app.layout = dmc.MantineProvider(
                         align="flex-start",
                         direction="row",
                         wrap="wrap",
-                    ), span=6,
-                    # style={"border-style": "solid"},
+                    ), span=10,
                 ),
                 dmc.GridCol(
                     dmc.Flex(
