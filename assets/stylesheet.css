@@ -4,6 +4,7 @@
 
 .mantine-Select-option[data-checked] {
     font-weight: bold;
+    background-color: rgb(229, 236, 246, 0.5);
 }
 
 .mantine-NumberInput-label {
