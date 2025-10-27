@@ -103,12 +103,10 @@ def update_within_n_days(new_within_n_days):
 )
 def update_graph(do_update):
     global fig, new_data, scenario_data
-    # console_logger.debug(f"Updating graph with scenario: {value}")
-    # # console_logger.debug("Checking for updates...")
-    # if not value or (value == config['scenario_to_monitor'] and not new_data):
-    #     return fig, no_update
+    # No scenario selected yet
+    if not config['scenario_to_monitor']:
+        return fig, no_update
 
-    # Get scenario data
     console_logger.debug("Performing update...")
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
     if not scenario_data:
@@ -140,6 +138,7 @@ app.layout = dmc.MantineProvider(
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
         dcc.Dropdown(
             all_scenarios,
+            placeholder='Select a scenario...',
             value=config['scenario_to_monitor'],
             id='dropdown-selection',
             persistence=True,
@@ -336,7 +335,7 @@ class NewFileHandler(FileSystemEventHandler):
 
 
 if __name__ == '__main__':
-    # Get scenario_data data
+    # Get scenario data
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
 
     # Do first time run and initialize plot
