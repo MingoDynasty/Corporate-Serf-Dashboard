@@ -11,10 +11,11 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objs as go
 import tomli_w
-from dash import Output, Input, html, no_update
+from dash import Output, Input, html, no_update, clientside_callback
 from dash import dcc
 from dash_extensions.enrich import DashProxy
 from dash_extensions.logging import NotificationsLogHandler
+from dash_iconify import DashIconify
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
@@ -148,45 +149,99 @@ app.layout = dmc.MantineProvider(
             n_intervals=0
         ),
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
-        dmc.Box([
-            dmc.Select(
-                label="Selected scenario",
-                placeholder='Select a scenario...',
-                id="dropdown-selection",
-                data=all_scenarios,
-                searchable=True,
-                value=config['scenario_to_monitor'],
-                style={"width": "800px"},
-                maxDropdownHeight=1000,
-                checkIconPosition="right",
-                persistence=True,
-            ),
-            dmc.NumberInput(
-                id='top_n_scores',
-                placeholder="Top N scores to consider...",
-                label="Top N scores",
-                variant="default",
-                size="sm",
-                radius="sm",
-                min=1,
-                value=config['top_n_scores'],
-                persistence=True,
-            ),
-            dmc.DatePickerInput(
-                id='date-picker',
-                label="Oldest date to consider",
-                value=(datetime.now() - timedelta(days=config['within_n_days'])),
-                maxDate=datetime.now(),
-                persistence=True,
-            ),
-        ], style={"display": "flex"}),
+        dmc.Grid(
+            children=[
+                dmc.GridCol(
+                    dmc.Flex(
+                        children=[
+                            dmc.Select(
+                                label="Selected scenario",
+                                placeholder='Select a scenario...',
+                                id="dropdown-selection",
+                                data=all_scenarios,
+                                searchable=True,
+                                value=config['scenario_to_monitor'],
+                                style={"width": "600px"},
+                                maxDropdownHeight=1000,
+                                checkIconPosition="right",
+                                persistence=True,
+                            ),
+                            dmc.NumberInput(
+                                id='top_n_scores',
+                                placeholder="Top N scores to consider...",
+                                label="Top N scores",
+                                variant="default",
+                                size="sm",
+                                radius="sm",
+                                min=1,
+                                value=config['top_n_scores'],
+                                persistence=True,
+                            ),
+                            dmc.DatePickerInput(
+                                id='date-picker',
+                                label="Oldest date to consider",
+                                rightSection=DashIconify(icon="clarity:date-line"),
+                                value=(datetime.now() - timedelta(days=config['within_n_days'])),
+                                maxDate=datetime.now(),
+                                persistence=True,
+                            ),
+                        ],
+                        gap="md",
+                        justify="center",
+                        align="flex-start",
+                        direction="row",
+                        wrap="wrap",
+                    ), span=6,
+                    # style={"border-style": "solid"},
+                ),
+                dmc.GridCol(
+                    dmc.Flex(
+                        children=[
+                            dmc.Anchor(DashIconify(icon="ion:logo-github", width=40),
+                                       href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard"),
+                            dmc.Switch(
+                                offLabel=DashIconify(icon="radix-icons:sun", width=15,
+                                                     color=dmc.DEFAULT_THEME["colors"]["yellow"][8]),
+                                onLabel=DashIconify(icon="radix-icons:moon", width=15,
+                                                    color=dmc.DEFAULT_THEME["colors"]["yellow"][6]),
+                                id="color-scheme-switch",
+                                persistence=True,
+                                color="grey",
+                                mr='xl'
+                            ),
+                        ],
+                        gap="md",
+                        justify="flex-end",
+                        align="center",
+                        direction="row",
+                        wrap="wrap",
+                    ),
+                    span="auto",
+                ),
+            ],
+            gutter="xl",
+            overflow="hidden",
+        ),
         dcc.Graph(id='graph-content', style={'height': '85vh'}),
-        dmc.Box([
-            dmc.Text(id='live-update-text', size="md")
-        ]),
+        dmc.Group(
+            children=[
+                dmc.Text(id='live-update-text', size="md", ml='xl')
+            ],
+        ),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
     + log_handler.embed()
+)
+
+clientside_callback(
+    """
+    (switchOn) => {
+       document.documentElement.setAttribute('data-mantine-color-scheme', switchOn ? 'dark' : 'light');
+       return window.dash_clientside.no_update
+    }
+    """,
+    Output("color-scheme-switch", "id"),
+    Input("color-scheme-switch", "checked"),
 )
 
 
