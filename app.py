@@ -90,7 +90,7 @@ def update_top_n_scores(new_top_n_scores):
 
 
 @app.callback(
-    Input('date-picker', 'date'),
+    Input('date-picker', 'value'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
 def update_within_n_days(new_date):
@@ -138,6 +138,7 @@ def update_graph(do_update):
     return fig, [notification]
 
 
+# noinspection PyTypeChecker
 app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
@@ -187,11 +188,10 @@ app.layout = dmc.MantineProvider(
                            'margin-right': 10,
                            'font-weight': 'bold'}
                        ),
-            dcc.DatePickerSingle(
+            dmc.DatePickerInput(
                 id='date-picker',
-                date=datetime.now() - timedelta(days=config['within_n_days']),
-                display_format="YYYY-MM-DD",
-                max_date_allowed=datetime.now(),
+                value=(datetime.now() - timedelta(days=config['within_n_days'])),
+                maxDate=datetime.now(),
                 persistence=True,
             ),
         ], style={"display": "flex"}),
