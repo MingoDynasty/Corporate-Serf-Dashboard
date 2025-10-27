@@ -101,7 +101,7 @@ def update_within_n_days(new_within_n_days):
     Output('graph-content', 'figure'),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(do_update):
+def update_graph(_):
     global fig, new_data, scenario_data
     # No scenario selected yet
     if not config['scenario_to_monitor']:
@@ -217,7 +217,7 @@ def get_scenario_data(scenario: str) -> dict:
             scenario_files.append(file)
 
     # Get the subset of files that pertain to the scenario
-    _scenario_data = {}
+    _scenario_data: dict[str, list] = {}
     for scenario_file in scenario_files:
         splits = scenario_file.split(" - Challenge - ")
         datetime_string = splits[1].split(" ")[0]
