@@ -181,7 +181,9 @@ app.layout = dmc.MantineProvider(
             ),
         ], style={"display": "flex"}),
         dcc.Graph(id='graph-content', style={'height': '85vh'}),
-        html.Div(id='live-update-text'),
+        dmc.Box([
+            dmc.Text(id='live-update-text', size="md")
+        ]),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
     + log_handler.embed()
