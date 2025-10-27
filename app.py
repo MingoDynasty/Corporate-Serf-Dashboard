@@ -136,29 +136,55 @@ app.layout = dmc.MantineProvider(
             n_intervals=0
         ),
         html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
-        dcc.Dropdown(
-            all_scenarios,
-            placeholder='Select a scenario...',
-            value=config['scenario_to_monitor'],
-            id='dropdown-selection',
-            persistence=True,
-        ),
-        dcc.Graph(id='graph-content', style={'height': '80vh'}),
+        html.Div([
+            html.Label('Selected Scenario',
+                       style={
+                           'line-height': '30px',
+                           'margin-left': 50,
+                           'margin-right': 10,
+                           'font-weight': 'bold'}
+                       ),
+            dcc.Dropdown(
+                all_scenarios,
+                placeholder='Select a scenario...',
+                value=config['scenario_to_monitor'],
+                id='dropdown-selection',
+                persistence=True,
+                maxHeight=1000,
+                style={"width": "800px"},
+            ),
+            html.Label('Top N Scores',
+                       style={
+                           'line-height': '30px',
+                           'margin-left': 50,
+                           'margin-right': 10,
+                           'font-weight': 'bold'}
+                       ),
+            dcc.Input(
+                id='top_n_scores',
+                placeholder='Enter top N scores to consider...',
+                type='number',
+                value=config['top_n_scores'],
+                min=1,
+                persistence=True,
+            ),
+            html.Label('Oldest date to consider',
+                       style={
+                           'line-height': '30px',
+                           'margin-left': 50,
+                           'margin-right': 10,
+                           'font-weight': 'bold'}
+                       ),
+            dcc.Input(
+                id='within_n_days',
+                placeholder='Enter number of days to consider...',
+                type='number',
+                value=config['within_n_days'],
+                persistence=True,
+            ),
+        ], style={"display": "flex"}),
+        dcc.Graph(id='graph-content', style={'height': '85vh'}),
         html.Div(id='live-update-text'),
-        dcc.Input(
-            id='top_n_scores',
-            placeholder='Enter top N scores to consider...',
-            type='number',
-            value=config['top_n_scores'],
-            persistence=True,
-        ),
-        dcc.Input(
-            id='within_n_days',
-            placeholder='Enter number of days to consider...',
-            type='number',
-            value=config['within_n_days'],
-            persistence=True,
-        ),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
     + log_handler.embed()
