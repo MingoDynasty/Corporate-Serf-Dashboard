@@ -57,10 +57,12 @@ def update_config() -> None:
         tomli_w.dump(config, file)
 
 
-@app.callback(Output('live-update-text', 'children'),
-              Input('interval-component', 'n_intervals'))
+@app.callback(
+    Input('interval-component', 'n_intervals'),
+    Output('live-update-text', 'children'),
+    Output('do_update', 'data', allow_duplicate=True))
 def update_layout(_):
-    return f"Last file scan: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}"
+    return f"Last file scan: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}", new_data
 
 
 @app.callback(
@@ -101,8 +103,11 @@ def update_within_n_days(new_within_n_days):
     Output('graph-content', 'figure'),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(_):
+def update_graph(do_update):
     global fig, new_data, scenario_data
+    if not do_update:
+        return fig, no_update
+
     # No scenario selected yet
     if not config['scenario_to_monitor']:
         return fig, no_update
