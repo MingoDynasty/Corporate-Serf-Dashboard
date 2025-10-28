@@ -165,7 +165,7 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
         key = run_data.horizontal_sens
         if key not in scenario_data:
             scenario_data[key] = []
-        scenario_data[key].append(run_data.score)
+        scenario_data[key].append(run_data)
 
     # Sort by Sensitivity
     scenario_data = dict(sorted(scenario_data.items()))
@@ -191,15 +191,18 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     # with open('result.json', 'w') as fp:
     #     json.dump(scenario_data, fp)
 
-    for sens, scores in scenario_data.items():
+    # print(scenario_data)
+
+    for sens, runs_data in scenario_data.items():
         # Get top N scores for each sensitivity
-        sorted_list = sorted(scores, reverse=True)
+        sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
-        for score in top_n_largest:
+        for run_data in top_n_largest:
             x_data.append(sens)
-            y_data.append(score)
+            y_data.append(run_data.score)
         average_x_data.append(sens)
-        average_y_data.append(np.mean(top_n_largest))
+        # average_y_data.append(np.mean(top_n_largest))
+        average_y_data.append(np.mean([rd.score for rd in top_n_largest]))
     # If we want to generate a trendline (e.g. lowess)
     # if len(data.keys()) <= 2:
     #     # We need at least 3 sensitivities to generate a trendline
@@ -235,3 +238,4 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     combined_figure['data'][1]['name'] = 'Average Score'
     combined_figure['data'][1]['showlegend'] = True
     return combined_figure
+    # return fig1
