@@ -59,7 +59,7 @@ app = DashProxy()
     Output('do_update', 'data', allow_duplicate=True))
 def check_for_new_data(_) -> bool:
     """
-    This function simply serves as a periodic trigger to check for new data. If so then forward to update_graph() function.
+    Simple periodic trigger function to check for new data. If so then forward to update_graph() function.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
     :return: Current datetime, and the new_data flag.
     """
