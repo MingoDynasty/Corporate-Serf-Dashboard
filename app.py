@@ -1,3 +1,6 @@
+"""
+Entrypoint to the Corporate Serf Dashboard app.
+"""
 import logging.config  # Provides access to logging configuration file.
 import os
 import sys
@@ -5,6 +8,7 @@ import time
 import tomllib
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 import dash_mantine_components as dmc
 import numpy as np
@@ -23,15 +27,15 @@ log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
 app = DashProxy()
 
-log_format = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
-logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_format)
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=LOG_FORMAT)
 console_logger = logging.getLogger(__name__)
 
 # Pull arguments from a config file.
-config_file = "config.toml"
-with open(config_file, "rb") as _file:
+CONFIG_FILE = "config.toml"
+with open(CONFIG_FILE, "rb") as _file:
     config = tomllib.load(_file)
-console_logger.debug(f"Loaded config: {config}")
+console_logger.debug("Loaded config: %s", config)
 
 # TODO: Global variables best practices ?
 scenario_data = {}
@@ -40,6 +44,11 @@ fig = None
 
 
 def get_unique_scenarios(_dir: str) -> list:
+    """
+    Gets the list of unique scenarios from a directory.
+    :param _dir: directory to search for scenarios.
+    :return: list of unique scenarios
+    """
     unique_scenarios = set()
     files = [file for file in os.listdir(config['stats_dir']) if
              os.path.isfile(os.path.join(config['stats_dir'], file))]
@@ -54,7 +63,8 @@ all_scenarios = get_unique_scenarios(config['stats_dir'])
 
 
 def update_config() -> None:
-    with open(config_file, 'wb') as file:
+    """Write the current config file to disk."""
+    with open(CONFIG_FILE, 'wb') as file:
         tomli_w.dump(config, file)
 
 
@@ -62,7 +72,12 @@ def update_config() -> None:
     Input('interval-component', 'n_intervals'),
     Output('live-update-text', 'children'),
     Output('do_update', 'data', allow_duplicate=True))
-def update_layout(_):
+def update_layout(_) -> tuple[str, bool]:
+    """
+    This function simply serves as a periodic trigger to update the graph if there is new data.
+    :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
+    :return: Current datetime, and the new_data flag.
+    """
     return f"Last file scan: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}", new_data
 
 
@@ -70,8 +85,13 @@ def update_layout(_):
     Input('dropdown-selection', 'value'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
-def select_new_scenario(new_scenario):
-    console_logger.debug(f"New scenario selected: {new_scenario}")
+def select_new_scenario(new_scenario) -> bool:
+    """
+    TODO
+    :param new_scenario:
+    :return:
+    """
+    console_logger.debug("New scenario selected: %s", new_scenario)
     config['scenario_to_monitor'] = new_scenario
     update_config()
     return True
@@ -84,7 +104,7 @@ def select_new_scenario(new_scenario):
 def update_top_n_scores(new_top_n_scores):
     if not new_top_n_scores:
         return False
-    console_logger.debug(f"New top_n_scores: {new_top_n_scores}")
+    console_logger.debug("New top_n_scores: %s", new_top_n_scores)
     config['top_n_scores'] = new_top_n_scores
     update_config()
     return True
@@ -95,11 +115,11 @@ def update_top_n_scores(new_top_n_scores):
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
 def update_within_n_days(new_date):
-    console_logger.debug(f"New date: {new_date}")
+    console_logger.debug("New date: %s", new_date)
     date_object = date.fromisoformat(new_date)
     new_within_n_days = (date.today() - date_object).days
 
-    console_logger.debug(f"New within_n_days: {new_within_n_days}")
+    console_logger.debug("New within_n_days: %s", new_within_n_days)
     config['within_n_days'] = new_within_n_days
     update_config()
     return True
@@ -249,7 +269,7 @@ clientside_callback(
 )
 
 
-def extract_data_from_file(filename: str) -> tuple:
+def extract_data_from_file(filename: str) -> tuple[Optional[float], Optional[str], Optional[str], Optional[str]]:
     file_path = Path(config['stats_dir'], filename)
     with open(file_path, 'r') as file:
         lines_list = file.readlines()  # Read all lines into a list
@@ -312,7 +332,11 @@ def get_scenario_data(scenario: str) -> dict:
             continue
 
         # scenario_name = scenario_file.split("-")[0].strip()
-        score, sens_scale, horizontal_sens, _ = extract_data_from_file(scenario_file)
+        score, _, horizontal_sens, _ = extract_data_from_file(scenario_file)
+        if not horizontal_sens:
+            # Missing sens data.
+            continue
+
         # key = horizontal_sens + " " + sens_scale
         key = horizontal_sens
         # console_logger.debug(key)
@@ -351,7 +375,7 @@ def initialize_plot(_scenario_data: dict) -> go.Figure:
     # current_date = datetime.now().ctime()
     current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
     title = f"{config['scenario_to_monitor']} (last updated: {str(current_datetime)})"
-    console_logger.debug(f"Generating plot for: {config['scenario_to_monitor']}")
+    console_logger.debug("Generating plot for: %s", config['scenario_to_monitor'])
     fig1 = px.scatter(
         title=title,
         x=x_data,
@@ -384,14 +408,14 @@ class NewFileHandler(FileSystemEventHandler):
         global new_data, scenario_data
         if event.is_directory:  # Check if it's a file, not a directory
             return
-        console_logger.debug(f"Detected new file: {event.src_path}")
+        console_logger.debug("Detected new file: %s", event.src_path)
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
 
         # 1. Check if this file is a file that we care about.
         if not is_file_of_interest(file):
-            console_logger.debug(f"Not an interesting file: {file}")
+            console_logger.debug("Not an interesting file: %s", file)
             return
 
         # 2. Extract data from the file, and check if this data will actually change the plot.
@@ -400,7 +424,7 @@ class NewFileHandler(FileSystemEventHandler):
         should_update = False
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
         if horizontal_sens not in scenario_data:
-            console_logger.debug(f"New sensitivity detected: {horizontal_sens}")
+            console_logger.debug("New sensitivity detected: %s", horizontal_sens)
             should_update = True
         else:
             previous_scores = sorted(scenario_data[horizontal_sens])
@@ -431,7 +455,7 @@ if __name__ == '__main__':
     observer.schedule(event_handler, config['stats_dir'],
                       recursive=False)  # Set recursive=True to monitor subdirectories
     observer.start()
-    console_logger.info(f"Monitoring directory: {config['stats_dir']}")
+    console_logger.info("Monitoring directory: %s", config['stats_dir'])
 
     # Run the Dash app
     app.run(debug=True, use_reloader=False)
