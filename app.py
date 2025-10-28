@@ -244,7 +244,7 @@ app.layout = dmc.MantineProvider(
             gutter="xl",
             overflow="hidden",
         ),
-        dcc.Graph(id='graph-content', style={'height': '85vh'}),
+        dcc.Graph(id='graph-content', style={'height': '80vh'}),
         dmc.Group(
             children=[
                 # dmc.Text(id='live-update-text', size="md", ml='xl', hidden=True),
