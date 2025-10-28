@@ -43,6 +43,7 @@ def update_config() -> None:
 
 ################################
 # TODO: Global variables best practices ?
+# There is possibly a risky race condition here, but too lazy to fix.
 scenario_data = {}
 new_data = False
 fig = None
@@ -56,9 +57,9 @@ app = DashProxy()
     Input('interval-component', 'n_intervals'),
     # Output('live-update-text', 'children'),
     Output('do_update', 'data', allow_duplicate=True))
-def update_layout(_) -> bool:
+def check_for_new_data(_) -> bool:
     """
-    This function simply serves as a periodic trigger to update the graph if there is new data.
+    This function simply serves as a periodic trigger to check for new data. If so then forward to update_graph() function.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
     :return: Current datetime, and the new_data flag.
     """
@@ -67,7 +68,7 @@ def update_layout(_) -> bool:
 
 
 @app.callback(
-    Input('dropdown-selection', 'value'),
+    Input('scenario-dropdown-selection', 'value'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
 def select_new_scenario(new_scenario) -> bool:
@@ -177,7 +178,7 @@ app.layout = dmc.MantineProvider(
                             dmc.Select(
                                 label="Selected scenario",
                                 placeholder='Select a scenario...',
-                                id="dropdown-selection",
+                                id="scenario-dropdown-selection",
                                 data=ALL_SCENARIOS,
                                 searchable=True,
                                 value=config['scenario_to_monitor'],
@@ -330,7 +331,7 @@ if __name__ == '__main__':
     console_logger.info("Monitoring directory: %s", config['stats_dir'])
 
     # Run the Dash app
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False, host="localhost")
 
     # Probably don't need this but I kept it anyway
     observer.stop()
