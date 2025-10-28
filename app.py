@@ -161,7 +161,7 @@ def update_graph(do_update):
         return fig, no_update
 
     console_logger.debug("Performing update...")
-    fig = initialize_plot(scenario_data)
+    fig = generate_plot(scenario_data)
 
     new_data = False
     notification = {
@@ -338,11 +338,11 @@ def is_file_of_interest(file: str) -> bool:
     return True
 
 
-def get_scenario_data(scenario: str) -> dict:
+def get_relevant_csv_files(scenario: str) -> list:
     """
-    Get scenario data for a given scenario.
-    :param scenario: the name of a scenario to get data for.
-    :return: dictionary of scenario data.
+    Get relevant CSV files for a given scenario.
+    :param scenario: the name of a scenario to get CSV files for.
+    :return: list of relevant CSV files.
     """
     files = [file for file in os.listdir(config['stats_dir']) if
              os.path.isfile(os.path.join(config['stats_dir'], file))]
@@ -354,7 +354,7 @@ def get_scenario_data(scenario: str) -> dict:
             scenario_files.append(file)
 
     # Get the subset of files that pertain to the scenario
-    _scenario_data: dict[str, list] = {}
+    relevant_csv_files = []
     for scenario_file in scenario_files:
         splits = scenario_file.split(" - Challenge - ")
         datetime_string = splits[1].split(" ")[0]
@@ -363,7 +363,19 @@ def get_scenario_data(scenario: str) -> dict:
         delta = datetime.today() - datetime_object
         if delta.days > config['within_n_days']:
             continue
+        relevant_csv_files.append(scenario_file)
+    return relevant_csv_files
 
+
+def get_scenario_data(scenario: str) -> dict:
+    """
+    Get all scenario data for a given scenario.
+    :param scenario: the name of a scenario to get data for.
+    :return: dictionary of scenario data.
+    """
+    scenario_files = get_relevant_csv_files(scenario)
+    _scenario_data: dict[str, list] = {}
+    for scenario_file in scenario_files:
         # scenario_name = scenario_file.split("-")[0].strip()
         score, _, horizontal_sens, _ = extract_data_from_file(scenario_file)
         if not horizontal_sens:
@@ -383,9 +395,9 @@ def get_scenario_data(scenario: str) -> dict:
     return _scenario_data
 
 
-def initialize_plot(_scenario_data: dict) -> go.Figure:
-    """TODO: rename to generate
-    Initialize a plot using the scenario data.
+def generate_plot(_scenario_data: dict) -> go.Figure:
+    """
+    Generate a plot using the scenario data.
     :param _scenario_data: the scenario data to use for the plot.
     :return: go.Figure Plot
     """
@@ -489,8 +501,8 @@ if __name__ == '__main__':
     # Get scenario data
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
 
-    # Do first time run and initialize plot
-    fig = initialize_plot(scenario_data)
+    # Do first time run and generate plot
+    fig = generate_plot(scenario_data)
 
     # Monitor for new files
     event_handler = NewFileHandler()
