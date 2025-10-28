@@ -157,7 +157,7 @@ def update_graph(do_update):
     scenario_data = get_scenario_data(config['scenario_to_monitor'])
     if not scenario_data:
         console_logger.warning(
-            f"No scenario data for '{config['scenario_to_monitor']}'. Perhaps choose a longer date range?")
+            "No scenario data for '%s'. Perhaps choose a longer date range?", config['scenario_to_monitor'])
         return fig, no_update
 
     console_logger.debug("Performing update...")
@@ -442,8 +442,12 @@ def initialize_plot(_scenario_data: dict) -> go.Figure:
 
 
 class NewFileHandler(FileSystemEventHandler):
+    """
+    This class handles monitoring a specified directory for newly created files.
+    """
+
     def on_created(self, event):
-        global new_data, scenario_data
+        global new_data
         if event.is_directory:  # Check if it's a file, not a directory
             return
         console_logger.debug("Detected new file: %s", event.src_path)
@@ -458,7 +462,7 @@ class NewFileHandler(FileSystemEventHandler):
 
         # 2. Extract data from the file, and check if this data will actually change the plot.
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        score, sens_scale, horizontal_sens, scenario = extract_data_from_file(file)
+        score, _, horizontal_sens, _ = extract_data_from_file(file)
         should_update = False
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
         if horizontal_sens not in scenario_data:
@@ -470,11 +474,12 @@ class NewFileHandler(FileSystemEventHandler):
             if len(previous_scores) > config['top_n_scores']:
                 score_to_beat = previous_scores[-config['top_n_scores']]
             if score > score_to_beat:
-                console_logger.debug(f"New top {config['top_n_scores']} score: {score}")
+                console_logger.debug("New top %s score: %s", config['top_n_scores'], score)
                 should_update = True
         if not should_update:
             console_logger.debug(
-                f"Not a new sensitivity ({horizontal_sens}), and score ({score}) not high enough ({score_to_beat}).")
+                "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
+                horizontal_sens, score, score_to_beat)
             return
         new_data = True
         return
