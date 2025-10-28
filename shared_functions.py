@@ -124,7 +124,7 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
     :return: dictionary of scenario data.
     """
     scenario_files = get_relevant_csv_files(stats_dir, scenario, within_n_days)
-    _scenario_data: dict[str, list] = {}
+    scenario_data: dict[str, list] = {}
     for scenario_file in scenario_files:
         # scenario_name = scenario_file.split("-")[0].strip()
         score, _, horizontal_sens, _ = extract_data_from_file(str(Path(stats_dir, scenario_file)))
@@ -135,31 +135,31 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
         # key = horizontal_sens + " " + sens_scale
         key = horizontal_sens
         # console_logger.debug(key)
-        if key not in _scenario_data:
-            _scenario_data[key] = []
-        _scenario_data[key].append(score)
+        if key not in scenario_data:
+            scenario_data[key] = []
+        scenario_data[key].append(score)
         # subset_files.append(file)
 
     # Sort by Sensitivity
-    _scenario_data = dict(sorted(_scenario_data.items()))
-    return _scenario_data
+    scenario_data = dict(sorted(scenario_data.items()))
+    return scenario_data
 
 
-def generate_plot(_scenario_data: dict, scenario_name: str, top_n_scores: int) -> go.Figure:
+def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) -> go.Figure:
     """
     Generate a plot using the scenario data.
-    :param _scenario_data: the scenario data to use for the plot.
+    :param scenario_data: the scenario data to use for the plot.
     :param scenario_name: the name of the scenario to use for the plot.
     :param top_n_scores: the number of top scores to use for the plot.
     :return: go.Figure Plot
     """
-    if not _scenario_data:
+    if not scenario_data:
         return go.Figure()
     x_data = []
     y_data = []
     average_x_data = []
     average_y_data = []
-    for sens, scores in _scenario_data.items():
+    for sens, scores in scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(scores, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
