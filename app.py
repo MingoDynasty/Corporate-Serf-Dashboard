@@ -78,7 +78,7 @@ def update_layout(_) -> tuple[str, bool]:
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
     :return: Current datetime, and the new_data flag.
     """
-    return f"Last file scan: {datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")}", new_data
+    return f"Last file scan: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}", new_data
 
 
 @app.callback(
