@@ -14,6 +14,22 @@ import plotly.graph_objs as go
 console_logger = logging.getLogger(__name__)
 
 
+def get_unique_scenarios(_dir: str) -> list:
+    """
+    Gets the list of unique scenarios from a directory.
+    :param _dir: directory to search for scenarios.
+    :return: list of unique scenarios
+    """
+    unique_scenarios = set()
+    files = [file for file in os.listdir(_dir) if
+             os.path.isfile(os.path.join(_dir, file))]
+    csv_files = [file for file in files if file.endswith(".csv")]
+    for file in csv_files:
+        scenario_name = file.split("-")[0].strip()
+        unique_scenarios.add(scenario_name)
+    return sorted(list(unique_scenarios))
+
+
 def extract_data_from_file(full_file_path: str) -> tuple[
     Optional[float], Optional[str], Optional[str], Optional[str]]:
     """

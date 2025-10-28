@@ -2,7 +2,6 @@
 Entrypoint to the Corporate Serf Dashboard app.
 """
 import logging.config  # Provides access to logging configuration file.
-import os
 import sys
 import time
 import tomllib
@@ -19,45 +18,21 @@ from dash_iconify import DashIconify
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+from shared_functions import extract_data_from_file, get_unique_scenarios, is_file_of_interest, get_scenario_data, \
+    generate_plot
+
+# Logging setup
 log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=LOG_FORMAT)
 console_logger = logging.getLogger(__name__)
 
-from shared_functions import extract_data_from_file, is_file_of_interest, get_scenario_data, generate_plot
-
-app = DashProxy()
-
 # Pull arguments from a config file.
 CONFIG_FILE = "config.toml"
 with open(CONFIG_FILE, "rb") as _file:
     config = tomllib.load(_file)
 console_logger.debug("Loaded config: %s", config)
-
-# TODO: Global variables best practices ?
-scenario_data = {}
-new_data = False
-fig = None
-
-
-def get_unique_scenarios(_dir: str) -> list:
-    """
-    Gets the list of unique scenarios from a directory.
-    :param _dir: directory to search for scenarios.
-    :return: list of unique scenarios
-    """
-    unique_scenarios = set()
-    files = [file for file in os.listdir(config['stats_dir']) if
-             os.path.isfile(os.path.join(config['stats_dir'], file))]
-    csv_files = [file for file in files if file.endswith(".csv")]
-    for file in csv_files:
-        scenario_name = file.split("-")[0].strip()
-        unique_scenarios.add(scenario_name)
-    return sorted(list(unique_scenarios))
-
-
-all_scenarios = get_unique_scenarios(config['stats_dir'])
 
 
 def update_config() -> None:
@@ -66,17 +41,29 @@ def update_config() -> None:
         tomli_w.dump(config, file)
 
 
+################################
+# TODO: Global variables best practices ?
+scenario_data = {}
+new_data = False
+fig = None
+################################
+
+ALL_SCENARIOS = get_unique_scenarios(config['stats_dir'])
+app = DashProxy()
+
+
 @app.callback(
     Input('interval-component', 'n_intervals'),
-    Output('live-update-text', 'children'),
+    # Output('live-update-text', 'children'),
     Output('do_update', 'data', allow_duplicate=True))
-def update_layout(_) -> tuple[str, bool]:
+def update_layout(_) -> bool:
     """
     This function simply serves as a periodic trigger to update the graph if there is new data.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
     :return: Current datetime, and the new_data flag.
     """
-    return f"Last file scan: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}", new_data
+    # return f"Last file scan: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}", new_data
+    return new_data
 
 
 @app.callback(
@@ -158,7 +145,7 @@ def update_graph(do_update):
             "No scenario data for '%s'. Perhaps choose a longer date range?", config['scenario_to_monitor'])
         return fig, no_update
 
-    console_logger.debug("Performing update...")
+    console_logger.debug("Updating graph...")
     fig = generate_plot(scenario_data, config['scenario_to_monitor'], config['top_n_scores'])
 
     new_data = False
@@ -191,7 +178,7 @@ app.layout = dmc.MantineProvider(
                                 label="Selected scenario",
                                 placeholder='Select a scenario...',
                                 id="dropdown-selection",
-                                data=all_scenarios,
+                                data=ALL_SCENARIOS,
                                 searchable=True,
                                 value=config['scenario_to_monitor'],
                                 style={"min-width": "500px"},
@@ -259,9 +246,10 @@ app.layout = dmc.MantineProvider(
         dcc.Graph(id='graph-content', style={'height': '85vh'}),
         dmc.Group(
             children=[
-                dmc.Text(id='live-update-text', size="md", ml='xl'),
+                # dmc.Text(id='live-update-text', size="md", ml='xl', hidden=True),
                 dmc.Anchor(DashIconify(icon="logos:discord-icon", width=40),
-                           href="https://discordapp.com/users/222910150636339211"),
+                           href="https://discordapp.com/users/222910150636339211",
+                           ml='xl'),
                 dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
             ],
         ),
