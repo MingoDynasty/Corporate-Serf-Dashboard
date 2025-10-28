@@ -28,7 +28,7 @@ you keep playing and generating new scores, the plot will automatically update i
 ## Usage
 
 1. Run the app in your terminal: `python app.py`
-2. Open a browser and navigate to: http://127.0.0.1:8050/
+2. Open a browser and navigate to: http://localhost:8080/
 
 ## Example
 
