@@ -3,6 +3,7 @@ Shared functions for the Corporate Serf app.
 """
 import logging
 import os
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -12,6 +13,15 @@ import plotly.express as px
 import plotly.graph_objs as go
 
 console_logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class RunData:
+    datetime_object: datetime
+    score: float
+    sens_scale: str
+    horizontal_sens: str
+    scenario: str
 
 
 def get_unique_scenarios(_dir: str) -> list:
@@ -30,30 +40,44 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(list(unique_scenarios))
 
 
-def extract_data_from_file(full_file_path: str) -> tuple[
-    Optional[float], Optional[str], Optional[str], Optional[str]]:
+def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     """
     Extracts data from a scenario CSV file.
     :param full_file_path: full file path of the file to extract data from.
-    :return: Score, Sensitivity Scale, Horizontal Sensitivity, Scenario name
-    :example: 12345, 'cm/360', '40.0', 'VT Snake Track'
+    :return: RunData object
     """
-    with open(full_file_path, 'r', encoding="utf-8") as file:
-        lines_list = file.readlines()  # Read all lines into a list
+    datetime_object = None
     score = None
     sens_scale = None
     horizontal_sens = None
     scenario = None
-    for line in lines_list:
-        if line.startswith("Score:"):
-            score = float(line.split(",")[1].strip())
-        elif line.startswith("Sens Scale:"):
-            sens_scale = line.split(",")[1].strip()
-        elif line.startswith("Horiz Sens:"):
-            horizontal_sens = line.split(",")[1].strip()
-        elif line.startswith("Scenario:"):
-            scenario = line.split(",")[1].strip()
-    return score, sens_scale, horizontal_sens, scenario
+
+    try:
+        splits = Path(full_file_path).stem.split(' Stats')[0].split(' - ')
+        datetime_object = datetime.strptime(splits[-1], "%Y.%m.%d-%H.%M.%S")
+
+        with open(full_file_path, 'r', encoding="utf-8") as file:
+            lines_list = file.readlines()  # Read all lines into a list
+
+        for line in lines_list:
+            if line.startswith("Score:"):
+                score = float(line.split(",")[1].strip())
+            elif line.startswith("Sens Scale:"):
+                sens_scale = line.split(",")[1].strip()
+            elif line.startswith("Horiz Sens:"):
+                horizontal_sens = line.split(",")[1].strip()
+            elif line.startswith("Scenario:"):
+                scenario = line.split(",")[1].strip()
+    except ValueError:
+        console_logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
+        return None
+    run_data = RunData(datetime_object=datetime_object,
+                       score=score,
+                       sens_scale=sens_scale,
+                       horizontal_sens=horizontal_sens,
+                       scenario=scenario,
+                       )
+    return run_data
 
 
 def is_file_of_interest(file: str, scenario_name: str, within_n_days: int) -> bool:
@@ -126,19 +150,22 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
     scenario_files = get_relevant_csv_files(stats_dir, scenario, within_n_days)
     scenario_data: dict[str, list] = {}
     for scenario_file in scenario_files:
-        # scenario_name = scenario_file.split("-")[0].strip()
-        score, _, horizontal_sens, _ = extract_data_from_file(str(Path(stats_dir, scenario_file)))
-        if not horizontal_sens:
-            # Missing sens data.
+        run_data = extract_data_from_file(
+            str(Path(stats_dir, scenario_file)))
+        if not run_data:
+            console_logger.warning("Failed to get run data for CSV file: %s", scenario_file)
             continue
+        # if sens_scale != 'cm/360':
+        #     # TODO: sensitivities other than cm/360 are currently not supported,
+        #     #  as I don't know how to convert them to cm/360.
+        #     console_logger.warning("Unsupported sensitivity scale: %s", sens_scale)
+        #     continue
 
-        # key = horizontal_sens + " " + sens_scale
-        key = horizontal_sens
-        # console_logger.debug(key)
+        # key = run_data.horizontal_sens + " " + run_data.sens_scale
+        key = run_data.horizontal_sens
         if key not in scenario_data:
             scenario_data[key] = []
-        scenario_data[key].append(score)
-        # subset_files.append(file)
+        scenario_data[key].append(run_data.score)
 
     # Sort by Sensitivity
     scenario_data = dict(sorted(scenario_data.items()))
@@ -159,6 +186,11 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     y_data = []
     average_x_data = []
     average_y_data = []
+
+    # import json
+    # with open('result.json', 'w') as fp:
+    #     json.dump(scenario_data, fp)
+
     for sens, scores in scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(scores, reverse=True)
