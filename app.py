@@ -87,9 +87,9 @@ def update_layout(_) -> tuple[str, bool]:
     prevent_initial_call=True)
 def select_new_scenario(new_scenario) -> bool:
     """
-    TODO
-    :param new_scenario:
-    :return:
+    Triggers when the user selects a new scenario from the dropdown.
+    :param new_scenario: The newly selected scenario.
+    :return: Flag to trigger a graph update.
     """
     console_logger.debug("New scenario selected: %s", new_scenario)
     config['scenario_to_monitor'] = new_scenario
@@ -101,7 +101,12 @@ def select_new_scenario(new_scenario) -> bool:
     Input('top_n_scores', 'value'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
-def update_top_n_scores(new_top_n_scores):
+def update_top_n_scores(new_top_n_scores) -> bool:
+    """
+    Triggers when the user changes the Top N Scores value.
+    :param new_top_n_scores: The new Top N Scores value.
+    :return: Flag to trigger a graph update.
+    """
     if not new_top_n_scores:
         return False
     console_logger.debug("New top_n_scores: %s", new_top_n_scores)
@@ -114,7 +119,12 @@ def update_top_n_scores(new_top_n_scores):
     Input('date-picker', 'value'),
     Output('do_update', 'data', allow_duplicate=True),
     prevent_initial_call=True)
-def update_within_n_days(new_date):
+def update_within_n_days(new_date) -> bool:
+    """
+    Triggers when the user selects a date from the date picker.
+    :param new_date: The newly selected date.
+    :return: Flag to trigger a graph update.
+    """
     console_logger.debug("New date: %s", new_date)
     date_object = date.fromisoformat(new_date)
     new_within_n_days = (date.today() - date_object).days
@@ -131,6 +141,11 @@ def update_within_n_days(new_date):
     Output("notification-container", "sendNotifications"),
 )
 def update_graph(do_update):
+    """
+    Updates to the graph.
+    :param do_update: whether to do an update or not.
+    :return: Figure, Notification
+    """
     global fig, new_data, scenario_data
     if not do_update:
         return fig, no_update
@@ -270,8 +285,14 @@ clientside_callback(
 
 
 def extract_data_from_file(filename: str) -> tuple[Optional[float], Optional[str], Optional[str], Optional[str]]:
+    """
+    Extracts data from a scenario CSV file.
+    :param filename: name of file to extract data from.
+    :return: Score, Sensitivity Scale, Horizontal Sensitivity, Scenario name
+    :example: 12345, 'cm/360', '40.0', 'VT Snake Track'
+    """
     file_path = Path(config['stats_dir'], filename)
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf-8") as file:
         lines_list = file.readlines()  # Read all lines into a list
     score = None
     sens_scale = None
@@ -290,6 +311,13 @@ def extract_data_from_file(filename: str) -> tuple[Optional[float], Optional[str
 
 
 def is_file_of_interest(file: str) -> bool:
+    """
+    Check if a file is of interest. More specifically:
+    1. The file is related to a scenario that we are monitoring (i.e. user has selected).
+    2. The file is not too old, based on the date the user selected.
+    :param file: full file path of the file to check.
+    :return: True if the file is interesting, else False.
+    """
     if not file.endswith(".csv"):
         return False
 
@@ -311,6 +339,11 @@ def is_file_of_interest(file: str) -> bool:
 
 
 def get_scenario_data(scenario: str) -> dict:
+    """
+    Get scenario data for a given scenario.
+    :param scenario: the name of a scenario to get data for.
+    :return: dictionary of scenario data.
+    """
     files = [file for file in os.listdir(config['stats_dir']) if
              os.path.isfile(os.path.join(config['stats_dir'], file))]
     csv_files = [file for file in files if file.endswith(".csv")]
@@ -351,6 +384,11 @@ def get_scenario_data(scenario: str) -> dict:
 
 
 def initialize_plot(_scenario_data: dict) -> go.Figure:
+    """TODO: rename to generate
+    Initialize a plot using the scenario data.
+    :param _scenario_data: the scenario data to use for the plot.
+    :return: go.Figure Plot
+    """
     if not _scenario_data:
         return go.Figure()
     x_data = []
