@@ -1,0 +1,189 @@
+"""
+Shared functions for the Corporate Serf app.
+"""
+import logging
+import os
+from datetime import datetime
+from pathlib import Path
+from typing import Optional
+
+import numpy as np
+import plotly.express as px
+import plotly.graph_objs as go
+
+console_logger = logging.getLogger(__name__)
+
+
+def extract_data_from_file(full_file_path: str) -> tuple[
+    Optional[float], Optional[str], Optional[str], Optional[str]]:
+    """
+    Extracts data from a scenario CSV file.
+    :param full_file_path: full file path of the file to extract data from.
+    :return: Score, Sensitivity Scale, Horizontal Sensitivity, Scenario name
+    :example: 12345, 'cm/360', '40.0', 'VT Snake Track'
+    """
+    with open(full_file_path, 'r', encoding="utf-8") as file:
+        lines_list = file.readlines()  # Read all lines into a list
+    score = None
+    sens_scale = None
+    horizontal_sens = None
+    scenario = None
+    for line in lines_list:
+        if line.startswith("Score:"):
+            score = float(line.split(",")[1].strip())
+        elif line.startswith("Sens Scale:"):
+            sens_scale = line.split(",")[1].strip()
+        elif line.startswith("Horiz Sens:"):
+            horizontal_sens = line.split(",")[1].strip()
+        elif line.startswith("Scenario:"):
+            scenario = line.split(",")[1].strip()
+    return score, sens_scale, horizontal_sens, scenario
+
+
+def is_file_of_interest(file: str, scenario_name: str, within_n_days: int) -> bool:
+    """
+    Check if a file is of interest. More specifically:
+    1. The file is related to a scenario that we are monitoring (i.e. user has selected).
+    2. The file is not too old, based on the date the user selected.
+    :param file: full file path of the file to check.
+    :param scenario_name: the name of the scenario to check.
+    :param within_n_days: file must be within n days to be interesting.
+    :return: True if the file is interesting, else False.
+    """
+    if not file.endswith(".csv"):
+        return False
+
+    filename = Path(file).stem
+    if scenario_name != filename.split("-")[0].strip():
+        return False
+
+    # splits = filename.split(" ")
+    splits = file.split(" - Challenge - ")
+    datetime_string = splits[1].split(" ")[0]
+    format_string = "%Y.%m.%d-%H.%M.%S"
+    datetime_object = datetime.strptime(datetime_string, format_string)
+    delta = datetime.today() - datetime_object
+    if delta.days > within_n_days:
+        return False
+
+    return True
+
+
+def get_relevant_csv_files(stats_dir: str, scenario_name: str, within_n_days: int) -> list:
+    """
+    Get relevant CSV files for a given scenario.
+    :param stats_dir: directory where scenario CSV files are located.
+    :param scenario_name: the name of a scenario to get CSV files for.
+    :param within_n_days: file must be within n days to be interesting.
+    :return: list of relevant CSV files.
+    """
+    files = [file for file in os.listdir(stats_dir) if
+             os.path.isfile(os.path.join(stats_dir, file))]
+    csv_files = [file for file in files if file.endswith(".csv")]
+    scenario_files = []
+    for file in csv_files:
+        if scenario_name == file.split("-")[0].strip():
+            scenario_files.append(file)
+
+    # Get the subset of files that pertain to the scenario
+    relevant_csv_files = []
+    for scenario_file in scenario_files:
+        splits = scenario_file.split(" - Challenge - ")
+        datetime_string = splits[1].split(" ")[0]
+        format_string = "%Y.%m.%d-%H.%M.%S"
+        datetime_object = datetime.strptime(datetime_string, format_string)
+        delta = datetime.today() - datetime_object
+        if delta.days > within_n_days:
+            continue
+        relevant_csv_files.append(scenario_file)
+    return relevant_csv_files
+
+
+def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict:
+    """
+    Get all scenario data for a given scenario.
+    :param stats_dir: directory where scenario CSV files are located.
+    :param scenario: the name of a scenario to get data for.
+    :param within_n_days: data must be within n days to be interesting.
+    :return: dictionary of scenario data.
+    """
+    scenario_files = get_relevant_csv_files(stats_dir, scenario, within_n_days)
+    _scenario_data: dict[str, list] = {}
+    for scenario_file in scenario_files:
+        # scenario_name = scenario_file.split("-")[0].strip()
+        score, _, horizontal_sens, _ = extract_data_from_file(str(Path(stats_dir, scenario_file)))
+        if not horizontal_sens:
+            # Missing sens data.
+            continue
+
+        # key = horizontal_sens + " " + sens_scale
+        key = horizontal_sens
+        # console_logger.debug(key)
+        if key not in _scenario_data:
+            _scenario_data[key] = []
+        _scenario_data[key].append(score)
+        # subset_files.append(file)
+
+    # Sort by Sensitivity
+    _scenario_data = dict(sorted(_scenario_data.items()))
+    return _scenario_data
+
+
+def generate_plot(_scenario_data: dict, scenario_name: str, top_n_scores: int) -> go.Figure:
+    """
+    Generate a plot using the scenario data.
+    :param _scenario_data: the scenario data to use for the plot.
+    :param scenario_name: the name of the scenario to use for the plot.
+    :param top_n_scores: the number of top scores to use for the plot.
+    :return: go.Figure Plot
+    """
+    if not _scenario_data:
+        return go.Figure()
+    x_data = []
+    y_data = []
+    average_x_data = []
+    average_y_data = []
+    for sens, scores in _scenario_data.items():
+        # Get top N scores for each sensitivity
+        sorted_list = sorted(scores, reverse=True)
+        top_n_largest = sorted_list[:top_n_scores]
+        for score in top_n_largest:
+            x_data.append(sens)
+            y_data.append(score)
+        average_x_data.append(sens)
+        average_y_data.append(np.mean(top_n_largest))
+    # If we want to generate a trendline (e.g. lowess)
+    # if len(data.keys()) <= 2:
+    #     # We need at least 3 sensitivities to generate a trendline
+    #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
+    #     return
+
+    # current_date = datetime.now().ctime()
+    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+    title = f"{scenario_name} (last updated: {str(current_datetime)})"
+    console_logger.debug("Generating plot for: %s", scenario_name)
+    fig1 = px.scatter(
+        title=title,
+        x=x_data,
+        y=y_data,
+        labels={
+            "x": "Sensitivity (cm/360)",
+            "y": f"Score (top {top_n_scores})",
+        })
+    # trendline="lowess"  # simply using average line for now
+    fig2 = px.line(
+        x=average_x_data,
+        y=average_y_data,
+        # title="My Title",
+        labels={
+            "x": "Sensitivity (cm/360)",
+            "y": "Average Score",
+        },
+    )
+
+    combined_figure = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
+    combined_figure['data'][0]['name'] = 'Score Data'
+    combined_figure['data'][0]['showlegend'] = True
+    combined_figure['data'][1]['name'] = 'Average Score'
+    combined_figure['data'][1]['showlegend'] = True
+    return combined_figure
