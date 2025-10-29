@@ -176,7 +176,8 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
         scenario_data[key].append(run_data)
 
     # Sort by Sensitivity
-    scenario_data = dict(sorted(scenario_data.items()))
+    # Note that for example: "5.0 cm/360" should come before "25.0 cm/360"
+    scenario_data = dict(sorted(scenario_data.items(), key=lambda item: float(item[0].split(" ")[0])))
     return scenario_data
 
 
