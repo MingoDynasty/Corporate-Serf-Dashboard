@@ -66,6 +66,8 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
                 sens_scale = line.split(",")[1].strip()
             elif line.startswith("Horiz Sens:"):
                 horizontal_sens = line.split(",")[1].strip()
+                # sometimes the sens looks like 20.123456789, so round it to look cleaner
+                horizontal_sens = round(float(horizontal_sens), 4)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",")[1].strip()
     except ValueError:
