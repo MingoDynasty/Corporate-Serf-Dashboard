@@ -351,7 +351,7 @@ if __name__ == '__main__':
     console_logger.info("Monitoring directory: %s", config['stats_dir'])
 
     # Run the Dash app
-    app.run(debug=True, use_reloader=False, host="localhost", port=8080)
+    app.run(debug=True, use_reloader=False, host="localhost", port=config['port'])
 
     # Probably don't need this but I kept it anyway
     observer.stop()
