@@ -47,7 +47,6 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     :param full_file_path: full file path of the file to extract data from.
     :return: RunData object
     """
-    datetime_object = None
     score = None
     sens_scale = None
     horizontal_sens = None
@@ -217,27 +216,49 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     #     return
 
     current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
-    title = f"{scenario_name} (last updated: {str(current_datetime)})"
+    title = f"{scenario_name} (updated: {str(current_datetime)})"
     console_logger.debug("Generating plot for: %s", scenario_name)
 
-    fig_scatter = px.scatter(
-        title=title,
+    figure_scatter = px.scatter(
         data_frame=pd.DataFrame(scatter_plot_data),
         x="Sensitivity",
         y="Score",
         hover_name="Datetime",
+        hover_data=["Datetime"],
+        custom_data=["Datetime"],
+    )
+    figure_scatter.update_traces(
+        hovertemplate='<b>%{customdata[0]}</b><br><br>' +
+                      '<b>Score</b>: %{y}<br>' +
+                      '<b>Sensitivity</b>: %{x}' +
+                      '<extra></extra>',
+        hoverlabel={"font_size": 16},
     )
 
     # trendline="lowess"  # simply using average line for now
-    fig_line = px.line(
+    figure_line = px.line(
         data_frame=pd.DataFrame(line_plot_data),
         x="Sensitivity",
         y="Score",
     )
+    figure_line.update_traces(
+        hovertemplate='<b>Average Score</b>: %{y}<br>' +
+                      '<b>Sensitivity</b>: %{x}' +
+                      '<extra></extra>',
+        hoverlabel={"font_size": 16},
+    )
 
-    combined_figure = go.Figure(data=fig_scatter.data + fig_line.data, layout=fig_scatter.layout)
-    combined_figure['data'][0]['name'] = 'Score Data'
-    combined_figure['data'][0]['showlegend'] = True
-    combined_figure['data'][1]['name'] = 'Average Score'
-    combined_figure['data'][1]['showlegend'] = True
-    return combined_figure
+    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
+    figure_combined.update_layout(
+        title=title,
+        xaxis={"title": "Sensitivity"},
+        yaxis={"title": "Score"},
+        font={
+            "size": 14,
+        }
+    )
+    figure_combined['data'][0]['name'] = 'Run Data Point'
+    figure_combined['data'][0]['showlegend'] = True
+    figure_combined['data'][1]['name'] = 'Average Score'
+    figure_combined['data'][1]['showlegend'] = True
+    return figure_combined
