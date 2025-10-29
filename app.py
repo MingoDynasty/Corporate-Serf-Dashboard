@@ -273,12 +273,10 @@ app.layout = dmc.MantineProvider(
                            ml='xl'),
                 dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
             ],
-            # style={'position': 'absolute', 'bottom': '10px'},
         ),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
     + log_handler.embed(),
-    # forceColorScheme="dark",
 )
 
 clientside_callback(
