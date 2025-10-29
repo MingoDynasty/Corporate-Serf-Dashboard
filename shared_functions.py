@@ -255,10 +255,22 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
         yaxis={"title": "Score"},
         font={
             "size": 14,
-        }
+        },
     )
     figure_combined['data'][0]['name'] = 'Run Data Point'
     figure_combined['data'][0]['showlegend'] = True
     figure_combined['data'][1]['name'] = 'Average Score'
     figure_combined['data'][1]['showlegend'] = True
     return figure_combined
+
+
+def apply_light_dark_mode(figure: go.Figure, switch_on) -> go.Figure:
+    """
+    Apply light or dark mode to figure.
+    :param figure: figure to lighten or darken.
+    :param switch_on: True=Dark mode, False=Light mode.
+    :return: figure with template applied.
+    """
+    template = "mantine_dark" if switch_on else "mantine_light"
+    figure.update_layout(template=template)
+    return figure

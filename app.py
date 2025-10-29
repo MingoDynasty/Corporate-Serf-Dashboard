@@ -18,7 +18,8 @@ from dash_iconify import DashIconify
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from shared_functions import extract_data_from_file, get_unique_scenarios, is_file_of_interest, get_scenario_data, \
+from shared_functions import apply_light_dark_mode, extract_data_from_file, get_unique_scenarios, is_file_of_interest, \
+    get_scenario_data, \
     generate_plot
 
 # Logging setup
@@ -123,13 +124,15 @@ def update_within_n_days(new_date) -> bool:
 
 @app.callback(
     Input('do_update', 'data'),
+    Input("color-scheme-switch", "checked"),
     Output('graph-content', 'figure'),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(do_update):
+def update_graph(do_update, switch_on):
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
+    :param switch_on: light/dark mode switch.
     :return: Figure, Notification
     """
     global fig, new_data, scenario_data
@@ -158,8 +161,24 @@ def update_graph(do_update):
         "id": "graph-updated-notification",
         "icon": DashIconify(icon="material-symbols:refresh-rounded"),
     }
-    return fig, [notification]
+    return apply_light_dark_mode(fig, switch_on), [notification]
 
+
+@app.callback(
+    Input("color-scheme-switch", "checked"),
+    Output("graph-content", "figure", allow_duplicate=True),
+)
+def apply_light_dark_theme_to_graph(switch_on):
+    """
+    Applies the light or dark theme to the graph.
+    :param switch_on: switch value.
+    :return: Figure with theme applied.
+    """
+    return apply_light_dark_mode(fig, switch_on)
+
+
+# Add Dash Mantine Component figure templates to Plotly's templates.
+dmc.add_figure_templates()
 
 # noinspection PyTypeChecker
 app.layout = dmc.MantineProvider(
@@ -254,10 +273,12 @@ app.layout = dmc.MantineProvider(
                            ml='xl'),
                 dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
             ],
+            # style={'position': 'absolute', 'bottom': '10px'},
         ),
         dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
     ]
-    + log_handler.embed()
+    + log_handler.embed(),
+    # forceColorScheme="dark",
 )
 
 clientside_callback(
