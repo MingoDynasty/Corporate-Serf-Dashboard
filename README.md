@@ -32,4 +32,4 @@ you keep playing and generating new scores, the plot will automatically update i
 
 ## Example
 
-TODO
+![Corporate Serf Dashboard example](./assets/example.png "Corporate Serf Dashboard example")
