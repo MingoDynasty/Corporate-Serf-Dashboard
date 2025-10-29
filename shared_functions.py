@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
@@ -71,6 +72,11 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     except ValueError:
         console_logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
         return None
+
+    if not datetime_object or not score or not sens_scale or not horizontal_sens or not scenario:
+        console_logger.warning("Missing data from file: %s", full_file_path, exc_info=True)
+        return None
+
     run_data = RunData(datetime_object=datetime_object,
                        score=score,
                        sens_scale=sens_scale,
@@ -162,7 +168,8 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
         #     continue
 
         # key = run_data.horizontal_sens + " " + run_data.sens_scale
-        key = run_data.horizontal_sens
+        # key = run_data.horizontal_sens
+        key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
         if key not in scenario_data:
             scenario_data[key] = []
         scenario_data[key].append(run_data)
@@ -182,60 +189,55 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     """
     if not scenario_data:
         return go.Figure()
-    x_data = []
-    y_data = []
-    average_x_data = []
-    average_y_data = []
 
-    # import json
-    # with open('result.json', 'w') as fp:
-    #     json.dump(scenario_data, fp)
-
-    # print(scenario_data)
+    scatter_plot_data = {
+        'Score': [],
+        'Sensitivity': [],
+        'Datetime': []
+    }
+    line_plot_data = {
+        'Score': [],
+        'Sensitivity': [],
+    }
 
     for sens, runs_data in scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
         for run_data in top_n_largest:
-            x_data.append(sens)
-            y_data.append(run_data.score)
-        average_x_data.append(sens)
-        # average_y_data.append(np.mean(top_n_largest))
-        average_y_data.append(np.mean([rd.score for rd in top_n_largest]))
+            scatter_plot_data['Score'].append(run_data.score)
+            scatter_plot_data['Sensitivity'].append(f"{run_data.horizontal_sens} {run_data.sens_scale}")
+            scatter_plot_data['Datetime'].append(run_data.datetime_object.strftime('%Y-%m-%d %I:%M:%S %p'))
+        line_plot_data['Sensitivity'].append(sens)
+        line_plot_data['Score'].append(np.mean([rd.score for rd in top_n_largest]))
     # If we want to generate a trendline (e.g. lowess)
     # if len(data.keys()) <= 2:
     #     # We need at least 3 sensitivities to generate a trendline
     #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
     #     return
 
-    # current_date = datetime.now().ctime()
     current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
     title = f"{scenario_name} (last updated: {str(current_datetime)})"
     console_logger.debug("Generating plot for: %s", scenario_name)
-    fig1 = px.scatter(
+
+    fig_scatter = px.scatter(
         title=title,
-        x=x_data,
-        y=y_data,
-        labels={
-            "x": "Sensitivity (cm/360)",
-            "y": f"Score (top {top_n_scores})",
-        })
-    # trendline="lowess"  # simply using average line for now
-    fig2 = px.line(
-        x=average_x_data,
-        y=average_y_data,
-        # title="My Title",
-        labels={
-            "x": "Sensitivity (cm/360)",
-            "y": "Average Score",
-        },
+        data_frame=pd.DataFrame(scatter_plot_data),
+        x="Sensitivity",
+        y="Score",
+        hover_name="Datetime",
     )
 
-    combined_figure = go.Figure(data=fig1.data + fig2.data, layout=fig1.layout)
+    # trendline="lowess"  # simply using average line for now
+    fig_line = px.line(
+        data_frame=pd.DataFrame(line_plot_data),
+        x="Sensitivity",
+        y="Score",
+    )
+
+    combined_figure = go.Figure(data=fig_scatter.data + fig_line.data, layout=fig_scatter.layout)
     combined_figure['data'][0]['name'] = 'Score Data'
     combined_figure['data'][0]['showlegend'] = True
     combined_figure['data'][1]['name'] = 'Average Score'
     combined_figure['data'][1]['showlegend'] = True
     return combined_figure
-    # return fig1
