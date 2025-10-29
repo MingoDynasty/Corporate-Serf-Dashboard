@@ -155,7 +155,8 @@ def update_graph(do_update):
         "title": "Notification",
         "message": "Graph updated!",
         "color": "blue",
-        "id": "notify"
+        "id": "graph-updated-notification",
+        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
     }
     return fig, [notification]
 
