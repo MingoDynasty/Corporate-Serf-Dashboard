@@ -164,6 +164,7 @@ def update_graph(do_update, switch_on):
             "color": "green",
             "id": "new-top-n-score-notification",
             "icon": DashIconify(icon="fontisto:line-chart"),
+            "autoClose": 8000,
         }
     else:
         notification = {
