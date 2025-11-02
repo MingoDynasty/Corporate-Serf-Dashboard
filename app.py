@@ -24,7 +24,6 @@ from shared_functions import (
     get_scenario_data,
     get_unique_scenarios,
     is_file_of_interest,
-    RunData,
 )
 
 # Logging setup
