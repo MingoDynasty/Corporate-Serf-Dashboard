@@ -1,6 +1,7 @@
 """
 Entrypoint to the Corporate Serf Dashboard app.
 """
+
 import logging.config  # Provides access to logging configuration file.
 import sys
 import time
@@ -10,17 +11,21 @@ from pathlib import Path
 
 import dash_mantine_components as dmc
 import tomli_w
-from dash import Output, Input, html, no_update, clientside_callback
-from dash import dcc
+from dash import Input, Output, clientside_callback, dcc, html, no_update
 from dash_extensions.enrich import DashProxy
 from dash_extensions.logging import NotificationsLogHandler
 from dash_iconify import DashIconify
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from shared_functions import apply_light_dark_mode, extract_data_from_file, get_unique_scenarios, is_file_of_interest, \
-    get_scenario_data, \
-    generate_plot
+from shared_functions import (
+    apply_light_dark_mode,
+    extract_data_from_file,
+    generate_plot,
+    get_scenario_data,
+    get_unique_scenarios,
+    is_file_of_interest,
+)
 
 # Logging setup
 log_handler = NotificationsLogHandler()
@@ -38,7 +43,7 @@ console_logger.debug("Loaded config: %s", config)
 
 def update_config() -> None:
     """Write the current config file to disk."""
-    with open(CONFIG_FILE, 'wb') as file:
+    with open(CONFIG_FILE, "wb") as file:
         tomli_w.dump(config, file)
 
 
@@ -50,14 +55,15 @@ new_data = False
 fig = None
 ################################
 
-ALL_SCENARIOS = get_unique_scenarios(config['stats_dir'])
+ALL_SCENARIOS = get_unique_scenarios(config["stats_dir"])
 app = DashProxy()
 
 
 @app.callback(
-    Input('interval-component', 'n_intervals'),
+    Input("interval-component", "n_intervals"),
     # Output('live-update-text', 'children'),
-    Output('do_update', 'data', allow_duplicate=True))
+    Output("do_update", "data", allow_duplicate=True),
+)
 def check_for_new_data(_) -> bool:
     """
     Simple periodic trigger function to check for new data. If so then forward to update_graph() function.
@@ -69,9 +75,10 @@ def check_for_new_data(_) -> bool:
 
 
 @app.callback(
-    Input('scenario-dropdown-selection', 'value'),
-    Output('do_update', 'data', allow_duplicate=True),
-    prevent_initial_call=True)
+    Input("scenario-dropdown-selection", "value"),
+    Output("do_update", "data", allow_duplicate=True),
+    prevent_initial_call=True,
+)
 def select_new_scenario(new_scenario) -> bool:
     """
     Triggers when the user selects a new scenario from the dropdown.
@@ -79,15 +86,16 @@ def select_new_scenario(new_scenario) -> bool:
     :return: Flag to trigger a graph update.
     """
     console_logger.debug("New scenario selected: %s", new_scenario)
-    config['scenario_to_monitor'] = new_scenario
+    config["scenario_to_monitor"] = new_scenario
     update_config()
     return True
 
 
 @app.callback(
-    Input('top_n_scores', 'value'),
-    Output('do_update', 'data', allow_duplicate=True),
-    prevent_initial_call=True)
+    Input("top_n_scores", "value"),
+    Output("do_update", "data", allow_duplicate=True),
+    prevent_initial_call=True,
+)
 def update_top_n_scores(new_top_n_scores) -> bool:
     """
     Triggers when the user changes the Top N Scores value.
@@ -97,15 +105,16 @@ def update_top_n_scores(new_top_n_scores) -> bool:
     if not new_top_n_scores:
         return False
     console_logger.debug("New top_n_scores: %s", new_top_n_scores)
-    config['top_n_scores'] = new_top_n_scores
+    config["top_n_scores"] = new_top_n_scores
     update_config()
     return True
 
 
 @app.callback(
-    Input('date-picker', 'value'),
-    Output('do_update', 'data', allow_duplicate=True),
-    prevent_initial_call=True)
+    Input("date-picker", "value"),
+    Output("do_update", "data", allow_duplicate=True),
+    prevent_initial_call=True,
+)
 def update_within_n_days(new_date) -> bool:
     """
     Triggers when the user selects a date from the date picker.
@@ -117,15 +126,15 @@ def update_within_n_days(new_date) -> bool:
     new_within_n_days = (date.today() - date_object).days
 
     console_logger.debug("New within_n_days: %s", new_within_n_days)
-    config['within_n_days'] = new_within_n_days
+    config["within_n_days"] = new_within_n_days
     update_config()
     return True
 
 
 @app.callback(
-    Input('do_update', 'data'),
+    Input("do_update", "data"),
     Input("color-scheme-switch", "checked"),
-    Output('graph-content', 'figure'),
+    Output("graph-content", "figure"),
     Output("notification-container", "sendNotifications"),
 )
 def update_graph(do_update, switch_on):
@@ -140,17 +149,23 @@ def update_graph(do_update, switch_on):
         return fig, no_update
 
     # No scenario selected yet
-    if not config['scenario_to_monitor']:
+    if not config["scenario_to_monitor"]:
         return fig, no_update
 
-    scenario_data = get_scenario_data(config['stats_dir'], config['scenario_to_monitor'], config['within_n_days'])
+    scenario_data = get_scenario_data(
+        config["stats_dir"], config["scenario_to_monitor"], config["within_n_days"]
+    )
     if not scenario_data:
         console_logger.warning(
-            "No scenario data for '%s'. Perhaps choose a longer date range?", config['scenario_to_monitor'])
+            "No scenario data for '%s'. Perhaps choose a longer date range?",
+            config["scenario_to_monitor"],
+        )
         return fig, no_update
 
     console_logger.debug("Updating graph...")
-    fig = generate_plot(scenario_data, config['scenario_to_monitor'], config['top_n_scores'])
+    fig = generate_plot(
+        scenario_data, config["scenario_to_monitor"], config["top_n_scores"]
+    )
 
     new_data = False
     notification = {
@@ -185,11 +200,11 @@ app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
         dcc.Interval(
-            id='interval-component',
-            interval=config['polling_interval'],
-            n_intervals=0
+            id="interval-component", interval=config["polling_interval"], n_intervals=0
         ),
-        html.H1(children='Corporate Serf Dashboard v1.0.0', style={'textAlign': 'center'}),
+        html.H1(
+            children="Corporate Serf Dashboard v1.0.0", style={"textAlign": "center"}
+        ),
         dmc.Grid(
             children=[
                 dmc.GridCol(
@@ -197,11 +212,11 @@ app.layout = dmc.MantineProvider(
                         children=[
                             dmc.Select(
                                 label="Selected scenario",
-                                placeholder='Select a scenario...',
+                                placeholder="Select a scenario...",
                                 id="scenario-dropdown-selection",
                                 data=ALL_SCENARIOS,
                                 searchable=True,
-                                value=config['scenario_to_monitor'],
+                                value=config["scenario_to_monitor"],
                                 style={"min-width": "500px"},
                                 maxDropdownHeight="75vh",
                                 checkIconPosition="right",
@@ -210,21 +225,24 @@ app.layout = dmc.MantineProvider(
                                 ml="xl",
                             ),
                             dmc.NumberInput(
-                                id='top_n_scores',
+                                id="top_n_scores",
                                 placeholder="Top N scores to consider...",
                                 label="Top N scores",
                                 variant="default",
                                 size="sm",
                                 radius="sm",
                                 min=1,
-                                value=config['top_n_scores'],
+                                value=config["top_n_scores"],
                                 persistence=True,
                             ),
                             dmc.DatePickerInput(
-                                id='date-picker',
+                                id="date-picker",
                                 label="Oldest date to consider",
                                 rightSection=DashIconify(icon="clarity:date-line"),
-                                value=(datetime.now() - timedelta(days=config['within_n_days'])),
+                                value=(
+                                    datetime.now()
+                                    - timedelta(days=config["within_n_days"])
+                                ),
                                 maxDate=datetime.now(),
                                 persistence=True,
                             ),
@@ -234,22 +252,31 @@ app.layout = dmc.MantineProvider(
                         align="flex-start",
                         direction="row",
                         wrap="wrap",
-                    ), span=10,
+                    ),
+                    span=10,
                 ),
                 dmc.GridCol(
                     dmc.Flex(
                         children=[
-                            dmc.Anchor(DashIconify(icon="ion:logo-github", width=40),
-                                       href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard"),
+                            dmc.Anchor(
+                                DashIconify(icon="ion:logo-github", width=40),
+                                href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+                            ),
                             dmc.Switch(
-                                offLabel=DashIconify(icon="radix-icons:sun", width=15,
-                                                     color=dmc.DEFAULT_THEME["colors"]["yellow"][8]),
-                                onLabel=DashIconify(icon="radix-icons:moon", width=15,
-                                                    color=dmc.DEFAULT_THEME["colors"]["yellow"][6]),
+                                offLabel=DashIconify(
+                                    icon="radix-icons:sun",
+                                    width=15,
+                                    color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
+                                ),
+                                onLabel=DashIconify(
+                                    icon="radix-icons:moon",
+                                    width=15,
+                                    color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
+                                ),
                                 id="color-scheme-switch",
                                 persistence=True,
                                 color="grey",
-                                mr='xl'
+                                mr="xl",
                             ),
                         ],
                         gap="md",
@@ -264,17 +291,21 @@ app.layout = dmc.MantineProvider(
             gutter="xl",
             overflow="hidden",
         ),
-        dcc.Graph(id='graph-content', style={'height': '80vh'}),
+        dcc.Graph(id="graph-content", style={"height": "80vh"}),
         dmc.Group(
             children=[
                 # dmc.Text(id='live-update-text', size="md", ml='xl', hidden=True),
-                dmc.Anchor(DashIconify(icon="logos:discord-icon", width=40),
-                           href="https://discordapp.com/users/222910150636339211",
-                           ml='xl'),
+                dmc.Anchor(
+                    DashIconify(icon="logos:discord-icon", width=40),
+                    href="https://discordapp.com/users/222910150636339211",
+                    ml="xl",
+                ),
                 dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
             ],
         ),
-        dcc.Store(id='do_update', storage_type='memory')  # Stores data in browser's memory
+        dcc.Store(
+            id="do_update", storage_type="memory"
+        ),  # Stores data in browser's memory
     ]
     + log_handler.embed(),
 )
@@ -306,13 +337,17 @@ class NewFileHandler(FileSystemEventHandler):
         file = event.src_path
 
         # 1. Check if this file is a file that we care about.
-        if not is_file_of_interest(file, config['scenario_to_monitor'], config['within_n_days']):
+        if not is_file_of_interest(
+            file, config["scenario_to_monitor"], config["within_n_days"]
+        ):
             console_logger.debug("Not an interesting file: %s", file)
             return
 
         # 2. Extract data from the file, and check if this data will actually change the plot.
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        score, _, horizontal_sens, _ = extract_data_from_file(str(Path(config['stats_dir'], file)))
+        score, _, horizontal_sens, _ = extract_data_from_file(
+            str(Path(config["stats_dir"], file))
+        )
         should_update = False
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
         if horizontal_sens not in scenario_data:
@@ -321,37 +356,47 @@ class NewFileHandler(FileSystemEventHandler):
         else:
             previous_scores = sorted(scenario_data[horizontal_sens])
             score_to_beat = previous_scores[0]
-            if len(previous_scores) > config['top_n_scores']:
-                score_to_beat = previous_scores[-config['top_n_scores']]
+            if len(previous_scores) > config["top_n_scores"]:
+                score_to_beat = previous_scores[-config["top_n_scores"]]
             if score > score_to_beat:
-                console_logger.debug("New top %s score: %s", config['top_n_scores'], score)
+                console_logger.debug(
+                    "New top %s score: %s", config["top_n_scores"], score
+                )
                 should_update = True
         if not should_update:
             console_logger.debug(
                 "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
-                horizontal_sens, score, score_to_beat)
+                horizontal_sens,
+                score,
+                score_to_beat,
+            )
             return
         new_data = True
         return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Get scenario data
-    scenario_data = get_scenario_data(config['stats_dir'], config['scenario_to_monitor'], config['within_n_days'])
+    scenario_data = get_scenario_data(
+        config["stats_dir"], config["scenario_to_monitor"], config["within_n_days"]
+    )
 
     # Do first time run and generate plot
-    fig = generate_plot(scenario_data, config['scenario_to_monitor'], config['top_n_scores'])
+    fig = generate_plot(
+        scenario_data, config["scenario_to_monitor"], config["top_n_scores"]
+    )
 
     # Monitor for new files
     event_handler = NewFileHandler()
     observer = Observer()
-    observer.schedule(event_handler, config['stats_dir'],
-                      recursive=False)  # Set recursive=True to monitor subdirectories
+    observer.schedule(
+        event_handler, config["stats_dir"], recursive=False
+    )  # Set recursive=True to monitor subdirectories
     observer.start()
-    console_logger.info("Monitoring directory: %s", config['stats_dir'])
+    console_logger.info("Monitoring directory: %s", config["stats_dir"])
 
     # Run the Dash app
-    app.run(debug=True, use_reloader=False, host="localhost", port=config['port'])
+    app.run(debug=True, use_reloader=False, host="localhost", port=config["port"])
 
     # Probably don't need this but I kept it anyway
     observer.stop()

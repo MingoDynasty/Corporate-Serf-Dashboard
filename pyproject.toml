@@ -558,3 +558,7 @@ ignored-argument-names = "_.*|^ignored_|^unused_"
 redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", "builtins", "io"]
 
 
+[tool.isort]
+#profile = "hug"
+#src_paths = ["isort", "test"]
+profile = "black"

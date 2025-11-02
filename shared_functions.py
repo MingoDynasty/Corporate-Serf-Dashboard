@@ -1,6 +1,7 @@
 """
 Shared functions for the Corporate Serf app.
 """
+
 import logging
 import os
 from dataclasses import dataclass
@@ -32,8 +33,9 @@ def get_unique_scenarios(_dir: str) -> list:
     :return: list of unique scenarios
     """
     unique_scenarios = set()
-    files = [file for file in os.listdir(_dir) if
-             os.path.isfile(os.path.join(_dir, file))]
+    files = [
+        file for file in os.listdir(_dir) if os.path.isfile(os.path.join(_dir, file))
+    ]
     csv_files = [file for file in files if file.endswith(".csv")]
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
@@ -53,10 +55,10 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     scenario = None
 
     try:
-        splits = Path(full_file_path).stem.split(' Stats')[0].split(' - ')
+        splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
         datetime_object = datetime.strptime(splits[-1], "%Y.%m.%d-%H.%M.%S")
 
-        with open(full_file_path, 'r', encoding="utf-8") as file:
+        with open(full_file_path, "r", encoding="utf-8") as file:
             lines_list = file.readlines()  # Read all lines into a list
 
         for line in lines_list:
@@ -71,19 +73,30 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
             elif line.startswith("Scenario:"):
                 scenario = line.split(",")[1].strip()
     except ValueError:
-        console_logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
+        console_logger.warning(
+            "Failed to parse file: %s", full_file_path, exc_info=True
+        )
         return None
 
-    if not datetime_object or not score or not sens_scale or not horizontal_sens or not scenario:
-        console_logger.warning("Missing data from file: %s", full_file_path, exc_info=True)
+    if (
+        not datetime_object
+        or not score
+        or not sens_scale
+        or not horizontal_sens
+        or not scenario
+    ):
+        console_logger.warning(
+            "Missing data from file: %s", full_file_path, exc_info=True
+        )
         return None
 
-    run_data = RunData(datetime_object=datetime_object,
-                       score=score,
-                       sens_scale=sens_scale,
-                       horizontal_sens=horizontal_sens,
-                       scenario=scenario,
-                       )
+    run_data = RunData(
+        datetime_object=datetime_object,
+        score=score,
+        sens_scale=sens_scale,
+        horizontal_sens=horizontal_sens,
+        scenario=scenario,
+    )
     return run_data
 
 
@@ -116,7 +129,9 @@ def is_file_of_interest(file: str, scenario_name: str, within_n_days: int) -> bo
     return True
 
 
-def get_relevant_csv_files(stats_dir: str, scenario_name: str, within_n_days: int) -> list:
+def get_relevant_csv_files(
+    stats_dir: str, scenario_name: str, within_n_days: int
+) -> list:
     """
     Get relevant CSV files for a given scenario.
     :param stats_dir: directory where scenario CSV files are located.
@@ -124,8 +139,11 @@ def get_relevant_csv_files(stats_dir: str, scenario_name: str, within_n_days: in
     :param within_n_days: file must be within n days to be interesting.
     :return: list of relevant CSV files.
     """
-    files = [file for file in os.listdir(stats_dir) if
-             os.path.isfile(os.path.join(stats_dir, file))]
+    files = [
+        file
+        for file in os.listdir(stats_dir)
+        if os.path.isfile(os.path.join(stats_dir, file))
+    ]
     csv_files = [file for file in files if file.endswith(".csv")]
     scenario_files = []
     for file in csv_files:
@@ -157,10 +175,11 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
     scenario_files = get_relevant_csv_files(stats_dir, scenario, within_n_days)
     scenario_data: dict[str, list] = {}
     for scenario_file in scenario_files:
-        run_data = extract_data_from_file(
-            str(Path(stats_dir, scenario_file)))
+        run_data = extract_data_from_file(str(Path(stats_dir, scenario_file)))
         if not run_data:
-            console_logger.warning("Failed to get run data for CSV file: %s", scenario_file)
+            console_logger.warning(
+                "Failed to get run data for CSV file: %s", scenario_file
+            )
             continue
         # if sens_scale != 'cm/360':
         #     # TODO: sensitivities other than cm/360 are currently not supported,
@@ -177,11 +196,15 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
 
     # Sort by Sensitivity
     # Note that for example: "5.0 cm/360" should come before "25.0 cm/360"
-    scenario_data = dict(sorted(scenario_data.items(), key=lambda item: float(item[0].split(" ")[0])))
+    scenario_data = dict(
+        sorted(scenario_data.items(), key=lambda item: float(item[0].split(" ")[0]))
+    )
     return scenario_data
 
 
-def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) -> go.Figure:
+def generate_plot(
+    scenario_data: dict, scenario_name: str, top_n_scores: int
+) -> go.Figure:
     """
     Generate a plot using the scenario data.
     :param scenario_data: the scenario data to use for the plot.
@@ -192,14 +215,10 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
     if not scenario_data:
         return go.Figure()
 
-    scatter_plot_data = {
-        'Score': [],
-        'Sensitivity': [],
-        'Datetime': []
-    }
+    scatter_plot_data = {"Score": [], "Sensitivity": [], "Datetime": []}
     line_plot_data = {
-        'Score': [],
-        'Sensitivity': [],
+        "Score": [],
+        "Sensitivity": [],
     }
 
     for sens, runs_data in scenario_data.items():
@@ -207,11 +226,15 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
         sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
         for run_data in top_n_largest:
-            scatter_plot_data['Score'].append(run_data.score)
-            scatter_plot_data['Sensitivity'].append(f"{run_data.horizontal_sens} {run_data.sens_scale}")
-            scatter_plot_data['Datetime'].append(run_data.datetime_object.strftime('%Y-%m-%d %I:%M:%S %p'))
-        line_plot_data['Sensitivity'].append(sens)
-        line_plot_data['Score'].append(np.mean([rd.score for rd in top_n_largest]))
+            scatter_plot_data["Score"].append(run_data.score)
+            scatter_plot_data["Sensitivity"].append(
+                f"{run_data.horizontal_sens} {run_data.sens_scale}"
+            )
+            scatter_plot_data["Datetime"].append(
+                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p")
+            )
+        line_plot_data["Sensitivity"].append(sens)
+        line_plot_data["Score"].append(np.mean([rd.score for rd in top_n_largest]))
     # If we want to generate a trendline (e.g. lowess)
     # if len(data.keys()) <= 2:
     #     # We need at least 3 sensitivities to generate a trendline
@@ -231,10 +254,10 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
         custom_data=["Datetime"],
     )
     figure_scatter.update_traces(
-        hovertemplate='<b>%{customdata[0]}</b><br><br>' +
-                      '<b>Score</b>: %{y}<br>' +
-                      '<b>Sensitivity</b>: %{x}' +
-                      '<extra></extra>',
+        hovertemplate="<b>%{customdata[0]}</b><br><br>"
+        + "<b>Score</b>: %{y}<br>"
+        + "<b>Sensitivity</b>: %{x}"
+        + "<extra></extra>",
         hoverlabel={"font_size": 16},
     )
 
@@ -245,9 +268,9 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
         y="Score",
     )
     figure_line.update_traces(
-        hovertemplate='<b>Average Score</b>: %{y}<br>' +
-                      '<b>Sensitivity</b>: %{x}' +
-                      '<extra></extra>',
+        hovertemplate="<b>Average Score</b>: %{y}<br>"
+        + "<b>Sensitivity</b>: %{x}"
+        + "<extra></extra>",
         hoverlabel={"font_size": 16},
     )
 
@@ -260,10 +283,10 @@ def generate_plot(scenario_data: dict, scenario_name: str, top_n_scores: int) ->
             "size": 14,
         },
     )
-    figure_combined['data'][0]['name'] = 'Run Data Point'
-    figure_combined['data'][0]['showlegend'] = True
-    figure_combined['data'][1]['name'] = 'Average Score'
-    figure_combined['data'][1]['showlegend'] = True
+    figure_combined["data"][0]["name"] = "Run Data Point"
+    figure_combined["data"][0]["showlegend"] = True
+    figure_combined["data"][1]["name"] = "Average Score"
+    figure_combined["data"][1]["showlegend"] = True
     return figure_combined
 
 
