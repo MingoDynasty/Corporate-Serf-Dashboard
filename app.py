@@ -160,19 +160,19 @@ def update_graph(do_update, switch_on):
         notification = {
             "action": "show",
             "title": "Notification",
-            "message": "Graph updated!",
-            "color": "blue",
-            "id": "graph-updated-notification",
-            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+            "message": f"New top {config.top_n_scores} score!",
+            "color": "green",
+            "id": "new-top-n-score-notification",
+            "icon": DashIconify(icon="fontisto:line-chart"),
         }
     else:
         notification = {
             "action": "show",
             "title": "Notification",
-            "message": f"New top {config.top_n_scores} score!",
-            "color": "green",
+            "message": "Graph updated!",
+            "color": "blue",
             "id": "graph-updated-notification",
-            "icon": DashIconify(icon="fontisto:line-chart"),
+            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
         }
 
     new_data = False
