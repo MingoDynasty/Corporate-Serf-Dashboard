@@ -25,6 +25,7 @@ from shared_functions import (
     get_scenario_data,
     get_unique_scenarios,
     is_file_of_interest,
+    RunData,
 )
 
 # Logging setup
@@ -345,29 +346,34 @@ class NewFileHandler(FileSystemEventHandler):
 
         # 2. Extract data from the file, and check if this data will actually change the plot.
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        score, _, horizontal_sens, _ = extract_data_from_file(
-            str(Path(config["stats_dir"], file))
-        )
         should_update = False
+        # score, _, horizontal_sens, _ = extract_data_from_file(
+        run_data: RunData = extract_data_from_file(str(Path(config["stats_dir"], file)))
+        if not run_data:
+            console_logger.warning("Failed to get run data for CSV file: %s", file)
+            return
+
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
-        if horizontal_sens not in scenario_data:
-            console_logger.debug("New sensitivity detected: %s", horizontal_sens)
+        if run_data.horizontal_sens not in scenario_data:
+            console_logger.debug(
+                "New sensitivity detected: %s", run_data.horizontal_sens
+            )
             should_update = True
         else:
-            previous_scores = sorted(scenario_data[horizontal_sens])
+            previous_scores = sorted(scenario_data[run_data.horizontal_sens])
             score_to_beat = previous_scores[0]
             if len(previous_scores) > config["top_n_scores"]:
                 score_to_beat = previous_scores[-config["top_n_scores"]]
-            if score > score_to_beat:
+            if run_data.score > score_to_beat:
                 console_logger.debug(
-                    "New top %s score: %s", config["top_n_scores"], score
+                    "New top %s score: %s", config["top_n_scores"], run_data.score
                 )
                 should_update = True
         if not should_update:
             console_logger.debug(
                 "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
-                horizontal_sens,
-                score,
+                run_data.horizontal_sens,
+                run_data.score,
                 score_to_beat,
             )
             return
