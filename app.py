@@ -5,12 +5,10 @@ Entrypoint to the Corporate Serf Dashboard app.
 import logging.config  # Provides access to logging configuration file.
 import sys
 import time
-import tomllib
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import dash_mantine_components as dmc
-import tomli_w
 from dash import Input, Output, clientside_callback, dcc, html, no_update
 from dash_extensions.enrich import DashProxy
 from dash_extensions.logging import NotificationsLogHandler
@@ -18,6 +16,7 @@ from dash_iconify import DashIconify
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+from config_controller import load_config, update_config
 from shared_functions import (
     apply_light_dark_mode,
     extract_data_from_file,
@@ -36,17 +35,8 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=LOG_FORMAT)
 console_logger = logging.getLogger(__name__)
 
 # Pull arguments from a config file.
-CONFIG_FILE = "config.toml"
-with open(CONFIG_FILE, "rb") as _file:
-    config = tomllib.load(_file)
+config = load_config()
 console_logger.debug("Loaded config: %s", config)
-
-
-def update_config() -> None:
-    """Write the current config file to disk."""
-    with open(CONFIG_FILE, "wb") as file:
-        tomli_w.dump(config, file)
-
 
 ################################
 # TODO: Global variables best practices ?
@@ -168,15 +158,26 @@ def update_graph(do_update, switch_on):
         scenario_data, config["scenario_to_monitor"], config["top_n_scores"]
     )
 
+    if new_data:
+        notification = {
+            "action": "show",
+            "title": "Notification",
+            "message": "Graph updated!",
+            "color": "blue",
+            "id": "graph-updated-notification",
+            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+        }
+    else:
+        notification = {
+            "action": "show",
+            "title": "Notification",
+            "message": f"New top {config["top_n_scores"]} score!",
+            "color": "green",
+            "id": "graph-updated-notification",
+            "icon": DashIconify(icon="fontisto:line-chart"),
+        }
+
     new_data = False
-    notification = {
-        "action": "show",
-        "title": "Notification",
-        "message": "Graph updated!",
-        "color": "blue",
-        "id": "graph-updated-notification",
-        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-    }
     return apply_light_dark_mode(fig, switch_on), [notification]
 
 
