@@ -367,7 +367,7 @@ class NewFileHandler(FileSystemEventHandler):
 
             if len(previous_scores) < config.top_n_scores:
                 notification_message = (
-                    f"{key} has new top {config.top_n_scores} score: {run_data.score}",
+                    f"{key} has new top {config.top_n_scores} score: {run_data.score}"
                 )
                 console_logger.debug(notification_message)
                 should_update = True
@@ -375,14 +375,14 @@ class NewFileHandler(FileSystemEventHandler):
                 score_to_beat = previous_scores[-config.top_n_scores]
                 if run_data.score > score_to_beat:
                     notification_message = (
-                        f"New top {config.top_n_scores} score: {run_data.score}",
+                        f"New top {config.top_n_scores} score: {run_data.score}"
                     )
                     console_logger.debug(notification_message)
                     should_update = True
         if not should_update:
             console_logger.debug(
                 "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
-                run_data.horizontal_sens,
+                key,
                 run_data.score,
                 score_to_beat,
             )
