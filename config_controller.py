@@ -1,12 +1,12 @@
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 import tomli_w
 
 CONFIG_FILE = "config.toml"
 
 
-@dataclass(frozen=True)
+@dataclass()
 class ConfigData:
     scenario_to_monitor: str
     stats_dir: str
@@ -16,13 +16,13 @@ class ConfigData:
     port: int
 
 
-def load_config() -> dict:
+def load_config() -> ConfigData:
     with open(CONFIG_FILE, "rb") as _file:
-        config = tomllib.load(_file)
-    return config
+        config_dict = tomllib.load(_file)
+    return ConfigData(**config_dict)
 
 
-def update_config(config) -> None:
+def update_config(config_data: ConfigData) -> None:
     """Write the current config file to disk."""
     with open(CONFIG_FILE, "wb") as file:
-        tomli_w.dump(config, file)
+        tomli_w.dump(asdict(config_data), file)

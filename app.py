@@ -46,7 +46,7 @@ new_data = False
 fig = None
 ################################
 
-ALL_SCENARIOS = get_unique_scenarios(config["stats_dir"])
+ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
 app = DashProxy()
 
 
@@ -77,7 +77,7 @@ def select_new_scenario(new_scenario) -> bool:
     :return: Flag to trigger a graph update.
     """
     console_logger.debug("New scenario selected: %s", new_scenario)
-    config["scenario_to_monitor"] = new_scenario
+    config.scenario_to_monitor = new_scenario
     update_config()
     return True
 
@@ -96,7 +96,7 @@ def update_top_n_scores(new_top_n_scores) -> bool:
     if not new_top_n_scores:
         return False
     console_logger.debug("New top_n_scores: %s", new_top_n_scores)
-    config["top_n_scores"] = new_top_n_scores
+    config.top_n_scores = new_top_n_scores
     update_config()
     return True
 
@@ -117,7 +117,7 @@ def update_within_n_days(new_date) -> bool:
     new_within_n_days = (date.today() - date_object).days
 
     console_logger.debug("New within_n_days: %s", new_within_n_days)
-    config["within_n_days"] = new_within_n_days
+    config.within_n_days = new_within_n_days
     update_config()
     return True
 
@@ -140,23 +140,21 @@ def update_graph(do_update, switch_on):
         return fig, no_update
 
     # No scenario selected yet
-    if not config["scenario_to_monitor"]:
+    if not config.scenario_to_monitor:
         return fig, no_update
 
     scenario_data = get_scenario_data(
-        config["stats_dir"], config["scenario_to_monitor"], config["within_n_days"]
+        config.stats_dir, config.scenario_to_monitor, config.within_n_days
     )
     if not scenario_data:
         console_logger.warning(
             "No scenario data for '%s'. Perhaps choose a longer date range?",
-            config["scenario_to_monitor"],
+            config.scenario_to_monitor,
         )
         return fig, no_update
 
     console_logger.debug("Updating graph...")
-    fig = generate_plot(
-        scenario_data, config["scenario_to_monitor"], config["top_n_scores"]
-    )
+    fig = generate_plot(scenario_data, config.scenario_to_monitor, config.top_n_scores)
 
     if new_data:
         notification = {
@@ -171,7 +169,7 @@ def update_graph(do_update, switch_on):
         notification = {
             "action": "show",
             "title": "Notification",
-            "message": f"New top {config["top_n_scores"]} score!",
+            "message": f"New top {config.top_n_scores} score!",
             "color": "green",
             "id": "graph-updated-notification",
             "icon": DashIconify(icon="fontisto:line-chart"),
@@ -202,7 +200,7 @@ app.layout = dmc.MantineProvider(
     [
         dmc.NotificationContainer(id="notification-container"),
         dcc.Interval(
-            id="interval-component", interval=config["polling_interval"], n_intervals=0
+            id="interval-component", interval=config.polling_interval, n_intervals=0
         ),
         html.H1(
             children="Corporate Serf Dashboard v1.0.0", style={"textAlign": "center"}
@@ -218,7 +216,7 @@ app.layout = dmc.MantineProvider(
                                 id="scenario-dropdown-selection",
                                 data=ALL_SCENARIOS,
                                 searchable=True,
-                                value=config["scenario_to_monitor"],
+                                value=config.scenario_to_monitor,
                                 style={"min-width": "500px"},
                                 maxDropdownHeight="75vh",
                                 checkIconPosition="right",
@@ -234,7 +232,7 @@ app.layout = dmc.MantineProvider(
                                 size="sm",
                                 radius="sm",
                                 min=1,
-                                value=config["top_n_scores"],
+                                value=config.top_n_scores,
                                 persistence=True,
                             ),
                             dmc.DatePickerInput(
@@ -243,7 +241,7 @@ app.layout = dmc.MantineProvider(
                                 rightSection=DashIconify(icon="clarity:date-line"),
                                 value=(
                                     datetime.now()
-                                    - timedelta(days=config["within_n_days"])
+                                    - timedelta(days=config.within_n_days)
                                 ),
                                 maxDate=datetime.now(),
                                 persistence=True,
@@ -340,7 +338,7 @@ class NewFileHandler(FileSystemEventHandler):
 
         # 1. Check if this file is a file that we care about.
         if not is_file_of_interest(
-            file, config["scenario_to_monitor"], config["within_n_days"]
+            file, config.scenario_to_monitor, config.within_n_days
         ):
             console_logger.debug("Not an interesting file: %s", file)
             return
@@ -349,7 +347,7 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         should_update = False
         # score, _, horizontal_sens, _ = extract_data_from_file(
-        run_data: RunData = extract_data_from_file(str(Path(config["stats_dir"], file)))
+        run_data: RunData = extract_data_from_file(str(Path(config.stats_dir, file)))
         if not run_data:
             console_logger.warning("Failed to get run data for CSV file: %s", file)
             return
@@ -363,11 +361,11 @@ class NewFileHandler(FileSystemEventHandler):
         else:
             previous_scores = sorted(scenario_data[run_data.horizontal_sens])
             score_to_beat = previous_scores[0]
-            if len(previous_scores) > config["top_n_scores"]:
-                score_to_beat = previous_scores[-config["top_n_scores"]]
+            if len(previous_scores) > config.top_n_scores:
+                score_to_beat = previous_scores[-config.top_n_scores]
             if run_data.score > score_to_beat:
                 console_logger.debug(
-                    "New top %s score: %s", config["top_n_scores"], run_data.score
+                    "New top %s score: %s", config.top_n_scores, run_data.score
                 )
                 should_update = True
         if not should_update:
@@ -385,25 +383,23 @@ class NewFileHandler(FileSystemEventHandler):
 if __name__ == "__main__":
     # Get scenario data
     scenario_data = get_scenario_data(
-        config["stats_dir"], config["scenario_to_monitor"], config["within_n_days"]
+        config.stats_dir, config.scenario_to_monitor, config.within_n_days
     )
 
     # Do first time run and generate plot
-    fig = generate_plot(
-        scenario_data, config["scenario_to_monitor"], config["top_n_scores"]
-    )
+    fig = generate_plot(scenario_data, config.scenario_to_monitor, config.top_n_scores)
 
     # Monitor for new files
     event_handler = NewFileHandler()
     observer = Observer()
     observer.schedule(
-        event_handler, config["stats_dir"], recursive=False
+        event_handler, config.stats_dir, recursive=False
     )  # Set recursive=True to monitor subdirectories
     observer.start()
-    console_logger.info("Monitoring directory: %s", config["stats_dir"])
+    console_logger.info("Monitoring directory: %s", config.stats_dir)
 
     # Run the Dash app
-    app.run(debug=True, use_reloader=False, host="localhost", port=config["port"])
+    app.run(debug=True, use_reloader=False, host="localhost", port=config.port)
 
     # Probably don't need this but I kept it anyway
     observer.stop()
