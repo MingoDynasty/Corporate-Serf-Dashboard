@@ -43,6 +43,7 @@ console_logger.debug("Loaded config: %s", config)
 # There is possibly a risky race condition here, but too lazy to fix.
 scenario_data = {}
 new_data = False
+notification_message = None
 fig = None
 ################################
 
@@ -135,7 +136,7 @@ def update_graph(do_update, switch_on):
     :param switch_on: light/dark mode switch.
     :return: Figure, Notification
     """
-    global fig, new_data, scenario_data
+    global fig, new_data, notification_message, scenario_data
     if not do_update:
         return fig, no_update
 
@@ -160,7 +161,7 @@ def update_graph(do_update, switch_on):
         notification = {
             "action": "show",
             "title": "Notification",
-            "message": f"New top {config.top_n_scores} score!",
+            "message": notification_message,
             "color": "green",
             "id": "new-top-n-score-notification",
             "icon": DashIconify(icon="fontisto:line-chart"),
@@ -176,6 +177,7 @@ def update_graph(do_update, switch_on):
         }
 
     new_data = False
+    notification_message = None
     return apply_light_dark_mode(fig, switch_on), [notification]
 
 
@@ -328,7 +330,7 @@ class NewFileHandler(FileSystemEventHandler):
     """
 
     def on_created(self, event):
-        global new_data
+        global new_data, notification_message
         if event.is_directory:  # Check if it's a file, not a directory
             return
         console_logger.debug("Detected new file: %s", event.src_path)
@@ -347,27 +349,36 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         should_update = False
         # score, _, horizontal_sens, _ = extract_data_from_file(
-        run_data: RunData = extract_data_from_file(str(Path(config.stats_dir, file)))
+        run_data = extract_data_from_file(str(Path(config.stats_dir, file)))
         if not run_data:
             console_logger.warning("Failed to get run data for CSV file: %s", file)
             return
 
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
-        if run_data.horizontal_sens not in scenario_data:
-            console_logger.debug(
-                "New sensitivity detected: %s", run_data.horizontal_sens
-            )
+        key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
+        if key not in scenario_data:
+            notification_message = f"New sensitivity detected: {key}"
+            console_logger.debug(notification_message)
             should_update = True
         else:
-            previous_scores = sorted(scenario_data[run_data.horizontal_sens])
+            scores = [item.score for item in scenario_data[key]]
+            previous_scores = sorted(scores)
             score_to_beat = previous_scores[0]
-            if len(previous_scores) > config.top_n_scores:
-                score_to_beat = previous_scores[-config.top_n_scores]
-            if run_data.score > score_to_beat:
-                console_logger.debug(
-                    "New top %s score: %s", config.top_n_scores, run_data.score
+
+            if len(previous_scores) < config.top_n_scores:
+                notification_message = (
+                    f"{key} has new top {config.top_n_scores} score: {run_data.score}",
                 )
+                console_logger.debug(notification_message)
                 should_update = True
+            else:
+                score_to_beat = previous_scores[-config.top_n_scores]
+                if run_data.score > score_to_beat:
+                    notification_message = (
+                        f"New top {config.top_n_scores} score: {run_data.score}",
+                    )
+                    console_logger.debug(notification_message)
+                    should_update = True
         if not should_update:
             console_logger.debug(
                 "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
