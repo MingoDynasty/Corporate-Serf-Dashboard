@@ -78,7 +78,7 @@ def select_new_scenario(new_scenario) -> bool:
     """
     console_logger.debug("New scenario selected: %s", new_scenario)
     config.scenario_to_monitor = new_scenario
-    update_config()
+    update_config(config)
     return True
 
 
@@ -97,7 +97,7 @@ def update_top_n_scores(new_top_n_scores) -> bool:
         return False
     console_logger.debug("New top_n_scores: %s", new_top_n_scores)
     config.top_n_scores = new_top_n_scores
-    update_config()
+    update_config(config)
     return True
 
 
@@ -118,7 +118,7 @@ def update_within_n_days(new_date) -> bool:
 
     console_logger.debug("New within_n_days: %s", new_within_n_days)
     config.within_n_days = new_within_n_days
-    update_config()
+    update_config(config)
     return True
 
 
