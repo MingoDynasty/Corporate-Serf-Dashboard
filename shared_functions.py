@@ -181,14 +181,7 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
                 "Failed to get run data for CSV file: %s", scenario_file
             )
             continue
-        # if sens_scale != 'cm/360':
-        #     # TODO: sensitivities other than cm/360 are currently not supported,
-        #     #  as I don't know how to convert them to cm/360.
-        #     console_logger.warning("Unsupported sensitivity scale: %s", sens_scale)
-        #     continue
 
-        # key = run_data.horizontal_sens + " " + run_data.sens_scale
-        # key = run_data.horizontal_sens
         key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
         if key not in scenario_data:
             scenario_data[key] = []
