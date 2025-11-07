@@ -7,14 +7,11 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
-import numpy as np
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objs as go
 
-console_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
+scenario_data = {}
 
 
 @dataclass(frozen=True)
@@ -22,7 +19,7 @@ class RunData:
     datetime_object: datetime
     score: float
     sens_scale: str
-    horizontal_sens: str
+    horizontal_sens: float
     scenario: str
 
 
@@ -67,15 +64,13 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
             elif line.startswith("Sens Scale:"):
                 sens_scale = line.split(",")[1].strip()
             elif line.startswith("Horiz Sens:"):
-                horizontal_sens = line.split(",")[1].strip()
+                str_horizontal_sens = line.split(",")[1].strip()
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
-                horizontal_sens = round(float(horizontal_sens), 4)
+                horizontal_sens = round(float(str_horizontal_sens), 4)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",")[1].strip()
     except ValueError:
-        console_logger.warning(
-            "Failed to parse file: %s", full_file_path, exc_info=True
-        )
+        logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
         return None
 
     if (
@@ -85,9 +80,7 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         or not horizontal_sens
         or not scenario
     ):
-        console_logger.warning(
-            "Missing data from file: %s", full_file_path, exc_info=True
-        )
+        logger.warning("Missing data from file: %s", full_file_path, exc_info=True)
         return None
 
     run_data = RunData(
@@ -164,7 +157,15 @@ def get_relevant_csv_files(
     return relevant_csv_files
 
 
-def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict:
+@dataclass()
+class ScenarioStats:
+    date_last_played: Optional[datetime]
+    number_of_runs: int
+
+
+def get_scenario_data(
+    stats_dir: str, scenario: str, within_n_days: int
+) -> Tuple[dict[str, list], ScenarioStats]:
     """
     Get all scenario data for a given scenario.
     :param stats_dir: directory where scenario CSV files are located.
@@ -174,12 +175,11 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
     """
     scenario_files = get_relevant_csv_files(stats_dir, scenario, within_n_days)
     scenario_data: dict[str, list] = {}
+    scenario_stats = ScenarioStats(None, 0)
     for scenario_file in scenario_files:
         run_data = extract_data_from_file(str(Path(stats_dir, scenario_file)))
         if not run_data:
-            console_logger.warning(
-                "Failed to get run data for CSV file: %s", scenario_file
-            )
+            logger.warning("Failed to get run data for CSV file: %s", scenario_file)
             continue
 
         key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
@@ -187,109 +187,16 @@ def get_scenario_data(stats_dir: str, scenario: str, within_n_days: int) -> dict
             scenario_data[key] = []
         scenario_data[key].append(run_data)
 
+        scenario_stats.number_of_runs += 1
+        if (
+            scenario_stats.date_last_played is None
+            or run_data.datetime_object > scenario_stats.date_last_played
+        ):
+            scenario_stats.date_last_played = run_data.datetime_object
+
     # Sort by Sensitivity
     # Note that for example: "5.0 cm/360" should come before "25.0 cm/360"
     scenario_data = dict(
         sorted(scenario_data.items(), key=lambda item: float(item[0].split(" ")[0]))
     )
-    return scenario_data
-
-
-def generate_plot(
-    scenario_data: dict, scenario_name: str, top_n_scores: int
-) -> go.Figure:
-    """
-    Generate a plot using the scenario data.
-    :param scenario_data: the scenario data to use for the plot.
-    :param scenario_name: the name of the scenario to use for the plot.
-    :param top_n_scores: the number of top scores to use for the plot.
-    :return: go.Figure Plot
-    """
-    if not scenario_data:
-        return go.Figure()
-
-    scatter_plot_data = {"Score": [], "Sensitivity": [], "Datetime": []}
-    line_plot_data = {
-        "Score": [],
-        "Sensitivity": [],
-    }
-
-    for sens, runs_data in scenario_data.items():
-        # Get top N scores for each sensitivity
-        sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)
-        top_n_largest = sorted_list[:top_n_scores]
-        for run_data in top_n_largest:
-            scatter_plot_data["Score"].append(run_data.score)
-            scatter_plot_data["Sensitivity"].append(
-                f"{run_data.horizontal_sens} {run_data.sens_scale}"
-            )
-            scatter_plot_data["Datetime"].append(
-                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p")
-            )
-        line_plot_data["Sensitivity"].append(sens)
-        line_plot_data["Score"].append(np.mean([rd.score for rd in top_n_largest]))
-    # If we want to generate a trendline (e.g. lowess)
-    # if len(data.keys()) <= 2:
-    #     # We need at least 3 sensitivities to generate a trendline
-    #     console_logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-    #     return
-
-    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
-    title = f"{scenario_name} (updated: {str(current_datetime)})"
-    console_logger.debug("Generating plot for: %s", scenario_name)
-
-    figure_scatter = px.scatter(
-        data_frame=pd.DataFrame(scatter_plot_data),
-        x="Sensitivity",
-        y="Score",
-        hover_name="Datetime",
-        hover_data=["Datetime"],
-        custom_data=["Datetime"],
-    )
-    figure_scatter.update_traces(
-        hovertemplate="<b>%{customdata[0]}</b><br><br>"
-        + "<b>Score</b>: %{y}<br>"
-        + "<b>Sensitivity</b>: %{x}"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    # trendline="lowess"  # simply using average line for now
-    figure_line = px.line(
-        data_frame=pd.DataFrame(line_plot_data),
-        x="Sensitivity",
-        y="Score",
-    )
-    figure_line.update_traces(
-        hovertemplate="<b>Average Score</b>: %{y}<br>"
-        + "<b>Sensitivity</b>: %{x}"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
-    figure_combined.update_layout(
-        title=title,
-        xaxis={"title": "Sensitivity"},
-        yaxis={"title": "Score"},
-        font={
-            "size": 14,
-        },
-    )
-    figure_combined["data"][0]["name"] = "Run Data Point"
-    figure_combined["data"][0]["showlegend"] = True
-    figure_combined["data"][1]["name"] = "Average Score"
-    figure_combined["data"][1]["showlegend"] = True
-    return figure_combined
-
-
-def apply_light_dark_mode(figure: go.Figure, switch_on) -> go.Figure:
-    """
-    Apply light or dark mode to figure.
-    :param figure: figure to lighten or darken.
-    :param switch_on: True=Dark mode, False=Light mode.
-    :return: figure with template applied.
-    """
-    template = "mantine_dark" if switch_on else "mantine_light"
-    figure.update_layout(template=template)
-    return figure
+    return scenario_data, scenario_stats

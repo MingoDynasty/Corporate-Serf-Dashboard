@@ -17,10 +17,12 @@ from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
 from config_controller import load_config, update_config
-from shared_functions import (
-    apply_light_dark_mode,
-    extract_data_from_file,
+from plot_service import (
     generate_plot,
+    apply_light_dark_mode,
+)
+from shared_functions import (
+    extract_data_from_file,
     get_scenario_data,
     get_unique_scenarios,
     is_file_of_interest,
@@ -29,18 +31,19 @@ from shared_functions import (
 # Logging setup
 log_handler = NotificationsLogHandler()
 logger = log_handler.setup_logger(__name__)
-LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=LOG_FORMAT)
-console_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Pull arguments from a config file.
 config = load_config()
-console_logger.debug("Loaded config: %s", config)
+logger.debug("Loaded config: %s", config)
 
 ################################
 # TODO: Global variables best practices ?
 # There is possibly a risky race condition here, but too lazy to fix.
 scenario_data = {}
+scenario_stats = None
 new_data = False
 notification_message = None
 fig = None
@@ -76,7 +79,7 @@ def select_new_scenario(new_scenario) -> bool:
     :param new_scenario: The newly selected scenario.
     :return: Flag to trigger a graph update.
     """
-    console_logger.debug("New scenario selected: %s", new_scenario)
+    logger.debug("New scenario selected: %s", new_scenario)
     config.scenario_to_monitor = new_scenario
     update_config(config)
     return True
@@ -95,7 +98,7 @@ def update_top_n_scores(new_top_n_scores) -> bool:
     """
     if not new_top_n_scores:
         return False
-    console_logger.debug("New top_n_scores: %s", new_top_n_scores)
+    logger.debug("New top_n_scores: %s", new_top_n_scores)
     config.top_n_scores = new_top_n_scores
     update_config(config)
     return True
@@ -112,14 +115,44 @@ def update_within_n_days(new_date) -> bool:
     :param new_date: The newly selected date.
     :return: Flag to trigger a graph update.
     """
-    console_logger.debug("New date: %s", new_date)
+    logger.debug("New date: %s", new_date)
     date_object = date.fromisoformat(new_date)
     new_within_n_days = (date.today() - date_object).days
 
-    console_logger.debug("New within_n_days: %s", new_within_n_days)
+    logger.debug("New within_n_days: %s", new_within_n_days)
     config.within_n_days = new_within_n_days
     update_config(config)
     return True
+
+
+@app.callback(
+    Input("do_update", "data"),
+    Output("scenario_num_runs", "children"),
+)
+def get_scenario_num_runs(do_update):
+    global scenario_stats
+    if do_update:
+        logger.debug("Updating scenario num runs...")
+        _, scenario_stats = get_scenario_data(
+            config.stats_dir, config.scenario_to_monitor, config.within_n_days
+        )
+    return scenario_stats.number_of_runs
+    # TODO: this is really inefficient. Any way to combine these function calls?
+
+
+@app.callback(
+    Input("do_update", "data"),
+    Output("scenario_datetime_last_played", "children"),
+)
+def get_scenario_datetime_last_played(do_update):
+    global scenario_stats
+    if do_update:
+        logger.debug("Updating scenario date last played...")
+        _, scenario_stats = get_scenario_data(
+            config.stats_dir, config.scenario_to_monitor, config.within_n_days
+        )
+    return scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p")
+    # TODO: this is really inefficient. Any way to combine these function calls?
 
 
 @app.callback(
@@ -143,17 +176,17 @@ def update_graph(do_update, switch_on):
     if not config.scenario_to_monitor:
         return fig, no_update
 
-    scenario_data = get_scenario_data(
+    scenario_data, scenario_stats = get_scenario_data(
         config.stats_dir, config.scenario_to_monitor, config.within_n_days
     )
     if not scenario_data:
-        console_logger.warning(
+        logger.warning(
             "No scenario data for '%s'. Perhaps choose a longer date range?",
             config.scenario_to_monitor,
         )
         return fig, no_update
 
-    console_logger.debug("Updating graph...")
+    logger.debug("Updating graph...")
     fig = generate_plot(scenario_data, config.scenario_to_monitor, config.top_n_scores)
 
     if new_data:
@@ -248,6 +281,34 @@ app.layout = dmc.MantineProvider(
                                 maxDate=datetime.now(),
                                 persistence=True,
                             ),
+                            dmc.Box(
+                                [
+                                    dmc.Title("Scenario Stats", order=6),
+                                    dmc.Text(
+                                        [
+                                            dmc.Text(
+                                                "Last played: ", fw=700, span=True
+                                            ),
+                                            dmc.Text(
+                                                id="scenario_datetime_last_played",
+                                                span=True,
+                                            ),
+                                        ],
+                                        size="sm",
+                                    ),
+                                    dmc.Text(
+                                        [
+                                            dmc.Text(
+                                                "Number of runs: ", fw=700, span=True
+                                            ),
+                                            dmc.Text(id="scenario_num_runs", span=True),
+                                        ],
+                                        size="sm",
+                                    ),
+                                    # dmc.Text("<b>Default</b> text 2", size="sm"),
+                                ],
+                                w=300,
+                            ),
                         ],
                         gap="md",
                         justify="flex-start",
@@ -329,11 +390,13 @@ class NewFileHandler(FileSystemEventHandler):
     This class handles monitoring a specified directory for newly created files.
     """
 
+    # TODO: this class should be responsible for updating the state, then sharing it.
+    #  Then the UI controllers simply need to display it, and the polling interval can be sped up.
     def on_created(self, event):
         global new_data, notification_message
         if event.is_directory:  # Check if it's a file, not a directory
             return
-        console_logger.debug("Detected new file: %s", event.src_path)
+        logger.debug("Detected new file: %s", event.src_path)
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
@@ -342,7 +405,7 @@ class NewFileHandler(FileSystemEventHandler):
         if not is_file_of_interest(
             file, config.scenario_to_monitor, config.within_n_days
         ):
-            console_logger.debug("Not an interesting file: %s", file)
+            logger.debug("Not an interesting file: %s", file)
             return
 
         # 2. Extract data from the file, and check if this data will actually change the plot.
@@ -351,14 +414,14 @@ class NewFileHandler(FileSystemEventHandler):
         # score, _, horizontal_sens, _ = extract_data_from_file(
         run_data = extract_data_from_file(str(Path(config.stats_dir, file)))
         if not run_data:
-            console_logger.warning("Failed to get run data for CSV file: %s", file)
+            logger.warning("Failed to get run data for CSV file: %s", file)
             return
 
         score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
         key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
         if key not in scenario_data:
             notification_message = f"New sensitivity detected: {key}"
-            console_logger.debug(notification_message)
+            logger.debug(notification_message)
             should_update = True
         else:
             scores = [item.score for item in scenario_data[key]]
@@ -367,20 +430,18 @@ class NewFileHandler(FileSystemEventHandler):
 
             if len(previous_scores) < config.top_n_scores:
                 notification_message = (
-                    f"{key} has new top {config.top_n_scores} score: {run_data.score}"
+                    f"{key} has a new top {config.top_n_scores} score: {run_data.score}"
                 )
-                console_logger.debug(notification_message)
+                logger.debug(notification_message)
                 should_update = True
             else:
                 score_to_beat = previous_scores[-config.top_n_scores]
                 if run_data.score > score_to_beat:
-                    notification_message = (
-                        f"New top {config.top_n_scores} score: {run_data.score}"
-                    )
-                    console_logger.debug(notification_message)
+                    notification_message = f"{key} has a new top {config.top_n_scores} score: {run_data.score}"
+                    logger.debug(notification_message)
                     should_update = True
         if not should_update:
-            console_logger.debug(
+            logger.debug(
                 "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
                 key,
                 run_data.score,
@@ -393,7 +454,7 @@ class NewFileHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     # Get scenario data
-    scenario_data = get_scenario_data(
+    scenario_data, scenario_stats = get_scenario_data(
         config.stats_dir, config.scenario_to_monitor, config.within_n_days
     )
 
@@ -407,7 +468,7 @@ if __name__ == "__main__":
         event_handler, config.stats_dir, recursive=False
     )  # Set recursive=True to monitor subdirectories
     observer.start()
-    console_logger.info("Monitoring directory: %s", config.stats_dir)
+    logger.info("Monitoring directory: %s", config.stats_dir)
 
     # Run the Dash app
     app.run(debug=True, use_reloader=False, host="localhost", port=config.port)
