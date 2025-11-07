@@ -562,3 +562,4 @@ redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", 
 #profile = "hug"
 #src_paths = ["isort", "test"]
 profile = "black"
+skip = [".venv", "venv"]  # Skips directories named .venv or venv
