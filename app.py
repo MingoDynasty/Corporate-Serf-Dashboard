@@ -72,6 +72,8 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
     :param selected_scenario: user-selected scenario name.
     :return: Scenario Stats data
     """
+    if not selected_scenario:
+        return 0, "N/A"
     scenario_stats = kovaaks_database[selected_scenario]["scenario_stats"]
     return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
         "%Y-%m-%d %I:%M:%S %p"
@@ -98,6 +100,9 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
     :return: Figure, Notification
     """
     global cached_plot
+    if not newly_selected_scenario:
+        return cached_plot, no_update
+
     if newly_selected_scenario not in kovaaks_database:
         logger.warning(
             "No scenario data for '%s'. Perhaps choose a longer date range?",
