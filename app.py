@@ -40,8 +40,9 @@ logger = logging.getLogger(__name__)
 cached_plot = None
 ################################
 
+APP_NAME = "Corporate Serf Dashboard v1.0.0"
 ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
-app = DashProxy()
+app = DashProxy(title=APP_NAME, update_title=None)
 
 
 @app.callback(
@@ -179,9 +180,7 @@ app.layout = dmc.MantineProvider(
         dcc.Interval(
             id="interval-component", interval=config.polling_interval, n_intervals=0
         ),
-        html.H1(
-            children="Corporate Serf Dashboard v1.0.0", style={"textAlign": "center"}
-        ),
+        html.H1(children=APP_NAME, style={"textAlign": "center"}),
         dmc.Grid(
             children=[
                 dmc.GridCol(
