@@ -4,49 +4,39 @@ Entrypoint to the Corporate Serf Dashboard app.
 
 import logging.config  # Provides access to logging configuration file.
 import sys
-import time
 from datetime import date, datetime, timedelta
-from pathlib import Path
 
 import dash_mantine_components as dmc
 from dash import Input, Output, clientside_callback, dcc, html, no_update
 from dash_extensions.enrich import DashProxy
 from dash_extensions.logging import NotificationsLogHandler
 from dash_iconify import DashIconify
-from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-from config_controller import load_config, update_config
+from config_service import config
+from file_watchdog import NewFileHandler
+from kovaaks_data_service import (
+    initialize_kovaaks_data,
+    get_unique_scenarios,
+    kovaaks_database,
+)
+from message_queue import message_queue
 from plot_service import (
     generate_plot,
     apply_light_dark_mode,
 )
-from shared_functions import (
-    extract_data_from_file,
-    get_scenario_data,
-    get_unique_scenarios,
-    is_file_of_interest,
-)
+from utilities import ordinal
 
 # Logging setup
 log_handler = NotificationsLogHandler()
-logger = log_handler.setup_logger(__name__)
+dash_logger = log_handler.setup_logger(__name__)
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
-# Pull arguments from a config file.
-config = load_config()
-logger.debug("Loaded config: %s", config)
-
 ################################
 # TODO: Global variables best practices ?
-# There is possibly a risky race condition here, but too lazy to fix.
-scenario_data = {}
-scenario_stats = None
-new_data = False
-notification_message = None
-fig = None
+cached_plot = None
 ################################
 
 ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
@@ -55,163 +45,98 @@ app = DashProxy()
 
 @app.callback(
     Input("interval-component", "n_intervals"),
-    # Output('live-update-text', 'children'),
     Output("do_update", "data", allow_duplicate=True),
 )
-def check_for_new_data(_) -> bool:
+def check_for_new_data(_):
     """
     Simple periodic trigger function to check for new data. If so then forward to update_graph() function.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
     :return: Current datetime, and the new_data flag.
     """
-    # return f"Last file scan: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}", new_data
-    return new_data
+    if message_queue.empty():
+        return no_update
+    return True
 
 
 @app.callback(
+    Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
-    Output("do_update", "data", allow_duplicate=True),
-    prevent_initial_call=True,
-)
-def select_new_scenario(new_scenario) -> bool:
-    """
-    Triggers when the user selects a new scenario from the dropdown.
-    :param new_scenario: The newly selected scenario.
-    :return: Flag to trigger a graph update.
-    """
-    logger.debug("New scenario selected: %s", new_scenario)
-    config.scenario_to_monitor = new_scenario
-    update_config(config)
-    return True
-
-
-@app.callback(
-    Input("top_n_scores", "value"),
-    Output("do_update", "data", allow_duplicate=True),
-    prevent_initial_call=True,
-)
-def update_top_n_scores(new_top_n_scores) -> bool:
-    """
-    Triggers when the user changes the Top N Scores value.
-    :param new_top_n_scores: The new Top N Scores value.
-    :return: Flag to trigger a graph update.
-    """
-    if not new_top_n_scores:
-        return False
-    logger.debug("New top_n_scores: %s", new_top_n_scores)
-    config.top_n_scores = new_top_n_scores
-    update_config(config)
-    return True
-
-
-@app.callback(
-    Input("date-picker", "value"),
-    Output("do_update", "data", allow_duplicate=True),
-    prevent_initial_call=True,
-)
-def update_within_n_days(new_date) -> bool:
-    """
-    Triggers when the user selects a date from the date picker.
-    :param new_date: The newly selected date.
-    :return: Flag to trigger a graph update.
-    """
-    logger.debug("New date: %s", new_date)
-    date_object = date.fromisoformat(new_date)
-    new_within_n_days = (date.today() - date_object).days
-
-    logger.debug("New within_n_days: %s", new_within_n_days)
-    config.within_n_days = new_within_n_days
-    update_config(config)
-    return True
-
-
-@app.callback(
-    Input("do_update", "data"),
     Output("scenario_num_runs", "children"),
-)
-def get_scenario_num_runs(do_update):
-    global scenario_stats
-    if do_update:
-        logger.debug("Updating scenario num runs...")
-        _, scenario_stats = get_scenario_data(
-            config.stats_dir, config.scenario_to_monitor, config.within_n_days
-        )
-    return scenario_stats.number_of_runs
-    # TODO: this is really inefficient. Any way to combine these function calls?
-
-
-@app.callback(
-    Input("do_update", "data"),
     Output("scenario_datetime_last_played", "children"),
 )
-def get_scenario_datetime_last_played(do_update):
-    global scenario_stats
-    if do_update:
-        logger.debug("Updating scenario date last played...")
-        _, scenario_stats = get_scenario_data(
-            config.stats_dir, config.scenario_to_monitor, config.within_n_days
-        )
-    return scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p")
-    # TODO: this is really inefficient. Any way to combine these function calls?
+def get_scenario_num_runs(_, selected_scenario):
+    scenario_stats = kovaaks_database[selected_scenario]["scenario_stats"]
+    return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
+        "%Y-%m-%d %I:%M:%S %p"
+    )
 
 
 @app.callback(
     Input("do_update", "data"),
+    Input("scenario-dropdown-selection", "value"),
+    Input("top_n_scores", "value"),
+    Input("date-picker", "value"),
     Input("color-scheme-switch", "checked"),
     Output("graph-content", "figure"),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(do_update, switch_on):
+def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, switch_on):
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
     :param switch_on: light/dark mode switch.
     :return: Figure, Notification
     """
-    global fig, new_data, notification_message, scenario_data
-    if not do_update:
-        return fig, no_update
-
-    # No scenario selected yet
-    if not config.scenario_to_monitor:
-        return fig, no_update
-
-    scenario_data, scenario_stats = get_scenario_data(
-        config.stats_dir, config.scenario_to_monitor, config.within_n_days
-    )
-    if not scenario_data:
+    global cached_plot
+    if newly_selected_scenario not in kovaaks_database:
         logger.warning(
             "No scenario data for '%s'. Perhaps choose a longer date range?",
-            config.scenario_to_monitor,
+            newly_selected_scenario,
         )
-        return fig, no_update
+        return cached_plot, no_update
 
-    logger.debug("Updating graph...")
-    fig = generate_plot(scenario_data, config.scenario_to_monitor, config.top_n_scores)
+    date_object = datetime.fromisoformat(new_date).date()
+    _ = (date.today() - date_object).days
 
-    if new_data:
-        notification = {
-            "action": "show",
-            "title": "Notification",
-            "message": notification_message,
-            "color": "green",
-            "id": "new-top-n-score-notification",
-            "icon": DashIconify(icon="fontisto:line-chart"),
-            "autoClose": 8000,
-        }
-    else:
-        notification = {
-            "action": "show",
-            "title": "Notification",
-            "message": "Graph updated!",
-            "color": "blue",
-            "id": "graph-updated-notification",
-            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-        }
+    sensitivities_vs_runs = kovaaks_database[newly_selected_scenario][
+        "sensitivities_vs_runs"
+    ]
+    cached_plot = generate_plot(
+        sensitivities_vs_runs, newly_selected_scenario, top_n_scores
+    )
 
-    new_data = False
-    notification_message = None
-    return apply_light_dark_mode(fig, switch_on), [notification]
+    # Default notification is simply notifying that the graph updated,
+    #  usually due to user input.
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": "Graph updated!",
+        "color": "blue",
+        "id": "graph-updated-notification",
+        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+    }
+
+    # Display a custom notification if we detected a new Top N score.
+    if do_update and not message_queue.empty():
+        message_data = message_queue.get()
+        if (
+            newly_selected_scenario == message_data.scenario_name
+            and message_data.nth_score <= top_n_scores
+        ):
+            notification_message = (
+                f"{message_data.sensitivity} has a new "
+                f"{ordinal(message_data.nth_score)} place score: {message_data.score}"
+            )
+            notification = {
+                "action": "show",
+                "title": "Notification",
+                "message": notification_message,
+                "color": "green",
+                "id": "new-top-n-score-notification",
+                "icon": DashIconify(icon="fontisto:line-chart"),
+                "autoClose": 8000,
+            }
+    return apply_light_dark_mode(cached_plot, switch_on), [notification]
 
 
 @app.callback(
@@ -224,7 +149,9 @@ def apply_light_dark_theme_to_graph(switch_on):
     :param switch_on: switch value.
     :return: Figure with theme applied.
     """
-    return apply_light_dark_mode(fig, switch_on)
+    if not cached_plot:
+        return cached_plot
+    return apply_light_dark_mode(cached_plot, switch_on)
 
 
 # Add Dash Mantine Component figure templates to Plotly's templates.
@@ -357,7 +284,6 @@ app.layout = dmc.MantineProvider(
         dcc.Graph(id="graph-content", style={"height": "80vh"}),
         dmc.Group(
             children=[
-                # dmc.Text(id='live-update-text', size="md", ml='xl', hidden=True),
                 dmc.Anchor(
                     DashIconify(icon="logos:discord-icon", width=40),
                     href="https://discordapp.com/users/222910150636339211",
@@ -367,7 +293,8 @@ app.layout = dmc.MantineProvider(
             ],
         ),
         dcc.Store(
-            id="do_update", storage_type="memory"
+            id="do_update",
+            storage_type="memory",
         ),  # Stores data in browser's memory
     ]
     + log_handler.embed(),
@@ -385,81 +312,11 @@ clientside_callback(
 )
 
 
-class NewFileHandler(FileSystemEventHandler):
-    """
-    This class handles monitoring a specified directory for newly created files.
-    """
+def main() -> None:
+    logger.debug("Loaded config: %s", config)
 
-    # TODO: this class should be responsible for updating the state, then sharing it.
-    #  Then the UI controllers simply need to display it, and the polling interval can be sped up.
-    def on_created(self, event):
-        global new_data, notification_message
-        if event.is_directory:  # Check if it's a file, not a directory
-            return
-        logger.debug("Detected new file: %s", event.src_path)
-        # Add your custom logic here to process the new file
-        # For example, you could read its content, move it, or trigger another function.
-        file = event.src_path
-
-        # 1. Check if this file is a file that we care about.
-        if not is_file_of_interest(
-            file, config.scenario_to_monitor, config.within_n_days
-        ):
-            logger.debug("Not an interesting file: %s", file)
-            return
-
-        # 2. Extract data from the file, and check if this data will actually change the plot.
-        time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        should_update = False
-        # score, _, horizontal_sens, _ = extract_data_from_file(
-        run_data = extract_data_from_file(str(Path(config.stats_dir, file)))
-        if not run_data:
-            logger.warning("Failed to get run data for CSV file: %s", file)
-            return
-
-        score_to_beat = None  # don't really need to initialize this here, but squelches Python warning
-        key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
-        if key not in scenario_data:
-            notification_message = f"New sensitivity detected: {key}"
-            logger.debug(notification_message)
-            should_update = True
-        else:
-            scores = [item.score for item in scenario_data[key]]
-            previous_scores = sorted(scores)
-            score_to_beat = previous_scores[0]
-
-            if len(previous_scores) < config.top_n_scores:
-                notification_message = (
-                    f"{key} has a new top {config.top_n_scores} score: {run_data.score}"
-                )
-                logger.debug(notification_message)
-                should_update = True
-            else:
-                score_to_beat = previous_scores[-config.top_n_scores]
-                if run_data.score > score_to_beat:
-                    notification_message = f"{key} has a new top {config.top_n_scores} score: {run_data.score}"
-                    logger.debug(notification_message)
-                    should_update = True
-        if not should_update:
-            logger.debug(
-                "Not a new sensitivity (%s), and score (%s) not high enough (%s).",
-                key,
-                run_data.score,
-                score_to_beat,
-            )
-            return
-        new_data = True
-        return
-
-
-if __name__ == "__main__":
-    # Get scenario data
-    scenario_data, scenario_stats = get_scenario_data(
-        config.stats_dir, config.scenario_to_monitor, config.within_n_days
-    )
-
-    # Do first time run and generate plot
-    fig = generate_plot(scenario_data, config.scenario_to_monitor, config.top_n_scores)
+    # Initialize scenario data
+    initialize_kovaaks_data(config.stats_dir)
 
     # Monitor for new files
     event_handler = NewFileHandler()
@@ -473,6 +330,11 @@ if __name__ == "__main__":
     # Run the Dash app
     app.run(debug=True, use_reloader=False, host="localhost", port=config.port)
 
-    # Probably don't need this but I kept it anyway
+    # Probably don't need this, but I kept it anyway
     observer.stop()
     observer.join()  # Wait until the observer thread terminates
+    return
+
+
+if __name__ == "__main__":
+    main()

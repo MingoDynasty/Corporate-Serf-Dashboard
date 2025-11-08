@@ -37,6 +37,7 @@ def generate_plot(
         "Sensitivity": [],
     }
 
+    # TODO: move this to data service. Plot Service should only be concerned with receiving a dict of data and plotting it.
     for sens, runs_data in scenario_data.items():
         # Get top N scores for each sensitivity
         sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)

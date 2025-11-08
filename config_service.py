@@ -1,7 +1,10 @@
-import tomllib
-from dataclasses import asdict, dataclass
+"""
+Manages the config file for the app, and shares that data to all other modules.
+"""
 
-import tomli_w
+import tomllib
+
+from pydantic.dataclasses import dataclass
 
 CONFIG_FILE = "config.toml"
 
@@ -22,7 +25,4 @@ def load_config() -> ConfigData:
     return ConfigData(**config_dict)
 
 
-def update_config(config_data: ConfigData) -> None:
-    """Write the current config file to disk."""
-    with open(CONFIG_FILE, "wb") as file:
-        tomli_w.dump(asdict(config_data), file)
+config = load_config()
