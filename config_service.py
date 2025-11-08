@@ -11,6 +11,8 @@ CONFIG_FILE = "config.toml"
 
 @dataclass()
 class ConfigData:
+    """Dataclass models configuration for this app."""
+
     scenario_to_monitor: str
     stats_dir: str
     within_n_days: int
@@ -20,6 +22,7 @@ class ConfigData:
 
 
 def load_config() -> ConfigData:
+    """Loads the config file for this app."""
     with open(CONFIG_FILE, "rb") as _file:
         config_dict = tomllib.load(_file)
     return ConfigData(**config_dict)

@@ -9,6 +9,8 @@ from datetime import datetime
 
 @dataclass(frozen=True)
 class NewFileMessage:
+    """Dataclass models messages in this queue."""
+
     datetime_created: datetime
     nth_score: int
     scenario_name: str

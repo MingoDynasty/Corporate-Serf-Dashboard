@@ -5,6 +5,7 @@ Entrypoint to the Corporate Serf Dashboard app.
 import logging.config  # Provides access to logging configuration file.
 import sys
 from datetime import date, datetime, timedelta
+from typing import Tuple
 
 import dash_mantine_components as dmc
 from dash import Input, Output, clientside_callback, dcc, html, no_update
@@ -49,9 +50,9 @@ app = DashProxy()
 )
 def check_for_new_data(_):
     """
-    Simple periodic trigger function to check for new data. If so then forward to update_graph() function.
+    Simple periodic trigger function to check for new data. If so then forward to interested functions.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
-    :return: Current datetime, and the new_data flag.
+    :return: True if we have data, else no_update.
     """
     if message_queue.empty():
         return no_update
@@ -64,7 +65,13 @@ def check_for_new_data(_):
     Output("scenario_num_runs", "children"),
     Output("scenario_datetime_last_played", "children"),
 )
-def get_scenario_num_runs(_, selected_scenario):
+def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
+    """
+    Updates the Scenario Stats on the UI.
+    :param _: trigger from the interval component. Its actual value is not used.
+    :param selected_scenario: user-selected scenario name.
+    :return: Scenario Stats data
+    """
     scenario_stats = kovaaks_database[selected_scenario]["scenario_stats"]
     return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
         "%Y-%m-%d %I:%M:%S %p"
@@ -84,6 +91,9 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
+    :param newly_selected_scenario: user-selected scenario name.
+    :param top_n_scores: user-selected top n scores.
+    :param new_date: user-selected date.
     :param switch_on: light/dark mode switch.
     :return: Figure, Notification
     """
@@ -313,6 +323,10 @@ clientside_callback(
 
 
 def main() -> None:
+    """
+    Main entry point.
+    :return: None.
+    """
     logger.debug("Loaded config: %s", config)
 
     # Initialize scenario data

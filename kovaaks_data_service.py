@@ -24,6 +24,8 @@ kovaaks_database: Dict = {}
 
 @dataclass(frozen=True)
 class RunData:
+    """Dataclass models data extracted from a Kovaak's run file."""
+
     datetime_object: datetime
     score: float
     sens_scale: str
@@ -33,6 +35,8 @@ class RunData:
 
 @dataclass()
 class ScenarioStats:
+    """Dataclass models statistics for a scenario."""
+
     date_last_played: datetime
     number_of_runs: int
 
