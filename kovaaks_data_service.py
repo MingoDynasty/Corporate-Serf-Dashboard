@@ -173,10 +173,11 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
 
     if (
         not datetime_object
-        or not score
-        or not sens_scale
+        or not accuracy
         or not horizontal_sens
         or not scenario
+        or not score
+        or not sens_scale
     ):
         logger.warning("Missing data from file: %s", full_file_path, exc_info=True)
         return None
