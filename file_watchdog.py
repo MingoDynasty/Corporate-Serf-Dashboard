@@ -75,7 +75,7 @@ class NewFileHandler(FileSystemEventHandler):
 
         # Case 3: existing scenario and existing sensitivity, find nth score.
         nth_score = 1
-        # TODO: O(n) linear search, should be O(log(n)) binary search instead
+        # TODO: O(n) linear search, should do O(log(n)) binary search instead
         for prev_run_data in sensitivities_vs_runs[sensitivity_key]:
             if prev_run_data.score > run_data.score:
                 nth_score += 1
