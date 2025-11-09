@@ -13,6 +13,7 @@ from sortedcontainers import SortedDict, SortedList
 
 from stopwatch import Stopwatch
 
+SUB_CSV_HEADER = "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation"  # pylint: disable=line-too-long
 logger = logging.getLogger(__name__)
 
 # TODO: maybe at some point convert this to in-memory SQLite
@@ -31,6 +32,7 @@ class RunData:
     sens_scale: str
     horizontal_sens: float
     scenario: str
+    accuracy: float
 
 
 @dataclass()
@@ -128,10 +130,11 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     :param full_file_path: full file path of the file to extract data from.
     :return: RunData object
     """
-    score = None
-    sens_scale = None
+    accuracy = None
     horizontal_sens = None
     scenario = None
+    score = None
+    sens_scale = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -140,7 +143,20 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         with open(full_file_path, "r", encoding="utf-8") as file:
             lines_list = file.readlines()  # Read all lines into a list
 
+        sub_csv_line = False
         for line in lines_list:
+            line = line.strip()
+            # If we encounter this specific line, then the next line is a specific CSV line
+            if line == SUB_CSV_HEADER:
+                sub_csv_line = True
+                continue
+            if sub_csv_line:
+                shots = int(line.split(",")[1].strip())
+                hits = int(line.split(",")[2].strip())
+                accuracy = hits / shots
+                sub_csv_line = False
+                continue
+
             if line.startswith("Score:"):
                 score = float(line.split(",")[1].strip())
             elif line.startswith("Sens Scale:"):
@@ -171,5 +187,6 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         sens_scale=sens_scale,
         horizontal_sens=horizontal_sens,
         scenario=scenario,
+        accuracy=accuracy,
     )
     return run_data

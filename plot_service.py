@@ -31,6 +31,7 @@ def generate_plot(
         "Score": [],
         "Sensitivity": [],
         "Datetime": [],
+        "Accuracy": [],
     }
     line_plot_data: Dict[str, List[Union[float, str]]] = {
         "Score": [],
@@ -50,6 +51,7 @@ def generate_plot(
             scatter_plot_data["Datetime"].append(
                 run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p")
             )
+            scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
         line_plot_data["Sensitivity"].append(sens)
         line_plot_data["Score"].append(
             float(np.mean([rd.score for rd in top_n_largest]))
@@ -70,12 +72,13 @@ def generate_plot(
         y="Score",
         hover_name="Datetime",
         hover_data=["Datetime"],
-        custom_data=["Datetime"],
+        custom_data=["Datetime", "Accuracy"],
     )
     figure_scatter.update_traces(
         hovertemplate="<b>%{customdata[0]}</b><br><br>"
         + "<b>Score</b>: %{y}<br>"
-        + "<b>Sensitivity</b>: %{x}"
+        + "<b>Sensitivity</b>: %{x}<br>"
+        + "<b>Accuracy</b>: %{customdata[1]}%"
         + "<extra></extra>",
         hoverlabel={"font_size": 16},
     )
