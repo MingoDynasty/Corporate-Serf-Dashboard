@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 
 # TODO: maybe at some point convert this to in-memory SQLite
 #  But a simple dictionary should suffice for now.
-#  Just ensure that only this module is allowed to write to the database!
 kovaaks_database: Dict = {}
-# TODO: need to build some helper functions so access to this database is better controlled.
 
 
 @dataclass(frozen=True)
@@ -44,14 +42,17 @@ class ScenarioStats:
 
 
 def is_scenario_in_database(scenario_name: str) -> bool:
+    """Check if a scenario is in the database."""
     return scenario_name in kovaaks_database
 
 
 def get_scenario_stats(scenario_name: str) -> Dict[str, List[RunData]]:
+    """Get scenario statistics for a scenario."""
     return kovaaks_database[scenario_name]["scenario_stats"]
 
 
 def get_sensitivities_vs_runs(scenario_name: str) -> Dict[str, List[RunData]]:
+    """Get sensitivities vs runs for a scenario."""
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
 
 
