@@ -12,8 +12,9 @@ from watchdog.events import FileSystemEventHandler
 from config_service import config
 from kovaaks_data_service import (
     extract_data_from_file,
-    kovaaks_database,
     load_csv_file_into_database,
+    is_scenario_in_database,
+    get_sensitivities_vs_runs,
 )
 from message_queue import message_queue, NewFileMessage
 
@@ -42,7 +43,7 @@ class NewFileHandler(FileSystemEventHandler):
         sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
 
         # Case 1: new scenario.
-        if run_data.scenario not in kovaaks_database:
+        if not is_scenario_in_database(run_data.scenario):
             logger.debug("Found new scenario: %s", run_data.scenario)
             message_queue.put(
                 NewFileMessage(
@@ -57,9 +58,7 @@ class NewFileHandler(FileSystemEventHandler):
             return
 
         # Case 2: new sensitivity.
-        sensitivities_vs_runs = kovaaks_database[run_data.scenario][
-            "sensitivities_vs_runs"
-        ]
+        sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
         if sensitivity_key not in sensitivities_vs_runs:
             logger.debug("Found new sensitivity: %s", sensitivity_key)
             message_queue.put(

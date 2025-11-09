@@ -7,7 +7,7 @@ import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 from sortedcontainers import SortedDict, SortedList
 
@@ -43,7 +43,24 @@ class ScenarioStats:
     number_of_runs: int
 
 
+def is_scenario_in_database(scenario_name: str) -> bool:
+    return scenario_name in kovaaks_database
+
+
+def get_scenario_stats(scenario_name: str) -> Dict[str, List[RunData]]:
+    return kovaaks_database[scenario_name]["scenario_stats"]
+
+
+def get_sensitivities_vs_runs(scenario_name: str) -> Dict[str, List[RunData]]:
+    return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
+
+
 def initialize_kovaaks_data(stats_dir: str) -> None:
+    """
+    Initialize the Kovaaks database.
+    :param stats_dir: stats directory to read data from.
+    :return: None.
+    """
     stopwatch = Stopwatch()
     stopwatch.start()
     csv_files = []
@@ -53,19 +70,18 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
                 csv_files.append(entry.path)
 
     logger.debug("Found %d csv files.", len(csv_files))
-    # counter = 0
     for csv_file in csv_files:
-        # if not Path(csv_file).stem.startswith("VT ControlTS Intermediate S5"):
-        #     continue
         load_csv_file_into_database(csv_file)
-        # counter += 1
-        # if counter >= 1:
-        #     break
     stopwatch.stop()
     return
 
 
 def load_csv_file_into_database(csv_file: str) -> None:
+    """
+    Loads a CSV file into the database.
+    :param csv_file: CSV to load.
+    :return: None.
+    """
     run_data = extract_data_from_file(csv_file)
     if not run_data:
         logger.warning("Failed to get run data for CSV file: %s", csv_file)

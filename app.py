@@ -19,7 +19,9 @@ from file_watchdog import NewFileHandler
 from kovaaks_data_service import (
     initialize_kovaaks_data,
     get_unique_scenarios,
-    kovaaks_database,
+    get_scenario_stats,
+    is_scenario_in_database,
+    get_sensitivities_vs_runs,
 )
 from message_queue import message_queue
 from plot_service import (
@@ -31,8 +33,11 @@ from utilities import ordinal
 # Logging setup
 log_handler = NotificationsLogHandler()
 dash_logger = log_handler.setup_logger(__name__)
-LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG, format=LOG_FORMAT)
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.DEBUG,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
 logger = logging.getLogger(__name__)
 
 ################################
@@ -75,7 +80,7 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
     """
     if not selected_scenario:
         return 0, "N/A"
-    scenario_stats = kovaaks_database[selected_scenario]["scenario_stats"]
+    scenario_stats = get_scenario_stats(selected_scenario)
     return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
         "%Y-%m-%d %I:%M:%S %p"
     )
@@ -104,7 +109,7 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
     if not newly_selected_scenario:
         return cached_plot, no_update
 
-    if newly_selected_scenario not in kovaaks_database:
+    if not is_scenario_in_database(newly_selected_scenario):
         logger.warning(
             "No scenario data for '%s'. Perhaps choose a longer date range?",
             newly_selected_scenario,
@@ -114,9 +119,7 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
     date_object = datetime.fromisoformat(new_date).date()
     _ = (date.today() - date_object).days
 
-    sensitivities_vs_runs = kovaaks_database[newly_selected_scenario][
-        "sensitivities_vs_runs"
-    ]
+    sensitivities_vs_runs = get_sensitivities_vs_runs(newly_selected_scenario)
     cached_plot = generate_plot(
         sensitivities_vs_runs, newly_selected_scenario, top_n_scores
     )
