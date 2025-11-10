@@ -8,7 +8,7 @@ from datetime import date, datetime, timedelta
 from typing import Tuple
 
 import dash_mantine_components as dmc
-from dash import Input, Output, clientside_callback, dcc, html, no_update
+from dash import Input, Output, clientside_callback, dcc, html, no_update, State
 from dash_extensions.enrich import DashProxy
 from dash_extensions.logging import NotificationsLogHandler
 from dash_iconify import DashIconify
@@ -47,6 +47,12 @@ cached_plot = None
 
 APP_NAME = "Corporate Serf Dashboard v1.0.0"
 ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
+ALL_PLAYLISTS = ["Voltaic", "Viscose", "foo"]
+ALL_PLAYLIST_FILTERS = {
+    "Voltaic": ["Scenario 1", "Scenario 2", "Scenario 3"],
+    "Viscose": ["Scenario 2", "Scenario 3"],
+    "foo": ["Scenario 1"],
+}
 app = DashProxy(title=APP_NAME, update_title=None)
 
 
@@ -78,7 +84,7 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
     :param selected_scenario: user-selected scenario name.
     :return: Scenario Stats data
     """
-    if not selected_scenario:
+    if not selected_scenario or not is_scenario_in_database(selected_scenario):
         return 0, "N/A"
     scenario_stats = get_scenario_stats(selected_scenario)
     return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
@@ -173,6 +179,51 @@ def apply_light_dark_theme_to_graph(switch_on):
     return apply_light_dark_mode(cached_plot, switch_on)
 
 
+@app.callback(
+    Output("settings-modal", "opened"),
+    Input("settings-modal-open-button", "n_clicks"),
+    State("settings-modal", "opened"),
+    prevent_initial_call=True,
+)
+def modal_demo(_, opened):
+    """This function simply handles opening/closing the Settings modal."""
+    return not opened
+
+
+@app.callback(
+    Input("settings-modal-import-button", "n_clicks"),
+    State("settings-modal-import-playlist-textinput", "value"),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    prevent_initial_call=True,
+)
+def import_playlist(_, playlist_to_import):
+    if not playlist_to_import:
+        return no_update
+    playlist_to_import = playlist_to_import.strip()
+    logger.debug("Importing playlist '%s'", playlist_to_import)
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": "Successfully imported playlist!",
+        "color": "green",
+        "id": "imported-playlist-successful-notification",
+        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+    }
+    return [notification]
+
+
+@app.callback(
+    Input("playlist-dropdown-selection", "value"),
+    Output("scenario-dropdown-selection", "data"),
+)
+def select_playlist(selected_playlist):
+    logger.debug("Mingotest: Selected playlist '%s'", selected_playlist)
+    if not selected_playlist:
+        return ALL_SCENARIOS
+    filtered_scenarios = ALL_PLAYLIST_FILTERS[selected_playlist]
+    return filtered_scenarios
+
+
 # Add Dash Mantine Component figure templates to Plotly's templates.
 dmc.add_figure_templates()
 
@@ -203,6 +254,15 @@ app.layout = dmc.MantineProvider(
                                 scrollAreaProps={"type": "auto"},
                                 ml="xl",
                             ),
+                            dmc.Select(
+                                label="Playlist filter",
+                                placeholder="Select a playlist...",
+                                id="playlist-dropdown-selection",
+                                data=ALL_PLAYLISTS,
+                                clearable=True,
+                            ),
+                            dmc.Space(h="xl"),
+                            dmc.Space(h="xl"),
                             dmc.NumberInput(
                                 id="top_n_scores",
                                 placeholder="Top N scores to consider...",
@@ -265,6 +325,38 @@ app.layout = dmc.MantineProvider(
                 dmc.GridCol(
                     dmc.Flex(
                         children=[
+                            dmc.Button(
+                                "Settings",
+                                id="settings-modal-open-button",
+                                variant="default",
+                                leftSection=DashIconify(
+                                    icon="clarity:settings-line", width=25
+                                ),
+                            ),
+                            dmc.Modal(
+                                title="Settings",
+                                id="settings-modal",
+                                children=[
+                                    dmc.Group(
+                                        gap="md",
+                                        grow=False,
+                                        children=[
+                                            dmc.TextInput(
+                                                id="settings-modal-import-playlist-textinput",
+                                                placeholder="KovaaK's playlist code...",
+                                                label="Import Playlist",
+                                                size="md",
+                                                w="300px",
+                                            ),
+                                            dmc.Button(
+                                                children="Import",
+                                                id="settings-modal-import-button",
+                                                mt="lg",
+                                            ),
+                                        ],
+                                    ),
+                                ],
+                            ),
                             dmc.Anchor(
                                 DashIconify(icon="ion:logo-github", width=40),
                                 href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",

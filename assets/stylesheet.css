@@ -14,3 +14,12 @@
 .mantine-DatePickerInput-label {
     font-weight: bold;
 }
+
+.mantine-TextInput-label {
+    font-weight: bold;
+}
+
+.mantine-Modal-title {
+    font-weight: bold;
+    font-size: 1.6em;
+}
