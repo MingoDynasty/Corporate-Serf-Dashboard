@@ -22,7 +22,9 @@ from kovaaks_data_service import (
     get_scenario_stats,
     is_scenario_in_database,
     get_sensitivities_vs_runs,
-    playlist_database,
+    load_playlist_from_code,
+    get_scenarios_from_playlists,
+    get_playlists,
 )
 from message_queue import message_queue
 from plot_service import (
@@ -47,9 +49,6 @@ cached_plot = None
 ################################
 
 APP_NAME = "Corporate Serf Dashboard v1.0.0"
-ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
-ALL_PLAYLIST_FILTERS = playlist_database
-ALL_PLAYLISTS = list(ALL_PLAYLIST_FILTERS.keys())
 app = DashProxy(title=APP_NAME, update_title=None)
 
 
@@ -191,6 +190,7 @@ def modal_demo(_, opened):
     Input("settings-modal-import-button", "n_clicks"),
     State("settings-modal-import-playlist-textinput", "value"),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("playlist-dropdown-selection", "data"),
     prevent_initial_call=True,
 )
 def import_playlist(_, playlist_to_import):
@@ -198,15 +198,30 @@ def import_playlist(_, playlist_to_import):
         return no_update
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
-    notification = {
-        "action": "show",
-        "title": "Notification",
-        "message": "Successfully imported playlist!",
-        "color": "green",
-        "id": "imported-playlist-successful-notification",
-        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-    }
-    return [notification]
+    error_message = load_playlist_from_code(playlist_to_import)
+    if error_message:
+        notification = {
+            "action": "show",
+            "title": "Notification",
+            "message": "Failed to import playlist.",
+            "color": "red",
+            "id": "imported-playlist-failed-notification",
+            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+            # TODO: use a different icon.
+        }
+    else:
+        # TODO: when importing a playlist, need to also update the dropdown.
+        # TODO: perhaps put the playlist filter dropdown to the left of the selected scenario dropdown.
+        # TODO: use Pydantic validation more, particularly with Kovaaks API.
+        notification = {
+            "action": "show",
+            "title": "Notification",
+            "message": "Successfully imported playlist!",
+            "color": "green",
+            "id": "imported-playlist-successful-notification",
+            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+        }
+    return [notification], get_playlists()
 
 
 @app.callback(
@@ -215,9 +230,8 @@ def import_playlist(_, playlist_to_import):
 )
 def select_playlist(selected_playlist):
     if not selected_playlist:
-        return ALL_SCENARIOS
-    filtered_scenarios = ALL_PLAYLIST_FILTERS[selected_playlist]
-    return filtered_scenarios
+        return get_unique_scenarios(config.stats_dir)
+    return get_scenarios_from_playlists(selected_playlist)
 
 
 # Add Dash Mantine Component figure templates to Plotly's templates.
@@ -240,7 +254,7 @@ app.layout = dmc.MantineProvider(
                                 label="Selected scenario",
                                 placeholder="Select a scenario...",
                                 id="scenario-dropdown-selection",
-                                data=ALL_SCENARIOS,
+                                data=get_unique_scenarios(config.stats_dir),
                                 searchable=True,
                                 value=config.scenario_to_monitor,
                                 style={"min-width": "500px"},
@@ -254,10 +268,11 @@ app.layout = dmc.MantineProvider(
                                 label="Playlist filter",
                                 placeholder="Select a playlist...",
                                 id="playlist-dropdown-selection",
-                                data=ALL_PLAYLISTS,
+                                data=get_playlists(),
                                 clearable=True,
                                 checkIconPosition="right",
                                 miw=300,
+                                persistence=True,
                             ),
                             dmc.Space(h="xl"),
                             dmc.Space(h="xl"),

@@ -62,6 +62,16 @@ def get_sensitivities_vs_runs(scenario_name: str) -> Dict[str, List[RunData]]:
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
 
 
+def get_playlists() -> List[str]:
+    """Get list of available playlists."""
+    return sorted(list(playlist_database.keys()))
+
+
+def get_scenarios_from_playlists(playlist_name: str) -> List[str]:
+    """Get scenarios from a playlist."""
+    return playlist_database[playlist_name]
+
+
 def initialize_kovaaks_data(stats_dir: str) -> None:
     """
     Initialize the Kovaaks database.
@@ -130,6 +140,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
     return
 
 
+# TODO: simply pull this from the database instead of rescanning files again.
 def get_unique_scenarios(_dir: str) -> list:
     """
     Gets the list of unique scenarios from a directory.
@@ -221,6 +232,7 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
 # Define your Pydantic model
 class PlaylistData(BaseModel):
     playlist_name: str
+    playlist_code: str
     scenario_list: List[str]
 
 
@@ -248,28 +260,37 @@ def load_playlists() -> None:
     return
 
 
-def load_playlist_from_code(playlist_code: str) -> None:
-    json_data = get_playlist_data(playlist_code)
+def load_playlist_from_code(input_playlist_code: str) -> Optional[str]:
+    json_data = get_playlist_data(input_playlist_code)
+    if not json_data:
+        message = (
+            f"Failed to load playlist data for playlist code: {input_playlist_code}"
+        )
+        logger.warning(message)
+        return message
 
     if len(json_data) > 1:
-        logger.warning("Found more than one playlist from code: %s", playlist_code)
-        return
+        message = f"Found more than one playlist from code: {input_playlist_code}"
+        logger.warning(message)
+        return message
 
     playlist_name = json_data[0]["playlistName"]
     scenario_list = json_data[0]["scenarioList"]
+    playlist_code = json_data[0]["playlistCode"]
 
     playlist_data = PlaylistData(
         playlist_name=playlist_name,
+        playlist_code=playlist_code,
         scenario_list=[item["scenarioName"] for item in scenario_list],
     )
 
     if playlist_data.playlist_name in playlist_database:
-        logger.warning(
-            "Playlist already exists in database: %s", playlist_data.playlist_name
-        )
-        return
+        message = f"Playlist already exists in database: {playlist_data.playlist_name}"
+        logger.warning(message)
+        return message
     write_playlist_data_to_file(playlist_data)
-    return
+    playlist_database[playlist_data.playlist_name] = playlist_data.scenario_list
+    return None
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
