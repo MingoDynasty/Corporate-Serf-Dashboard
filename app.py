@@ -214,7 +214,6 @@ def import_playlist(_, playlist_to_import):
     Output("scenario-dropdown-selection", "data"),
 )
 def select_playlist(selected_playlist):
-    logger.debug("Mingotest: Selected playlist '%s'", selected_playlist)
     if not selected_playlist:
         return ALL_SCENARIOS
     filtered_scenarios = ALL_PLAYLIST_FILTERS[selected_playlist]
