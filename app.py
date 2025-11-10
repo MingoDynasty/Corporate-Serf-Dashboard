@@ -206,12 +206,9 @@ def import_playlist(_, playlist_to_import):
             "message": "Failed to import playlist.",
             "color": "red",
             "id": "imported-playlist-failed-notification",
-            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-            # TODO: use a different icon.
+            "icon": DashIconify(icon="material-symbols:upload"),
         }
     else:
-        # TODO: when importing a playlist, need to also update the dropdown.
-        # TODO: perhaps put the playlist filter dropdown to the left of the selected scenario dropdown.
         # TODO: use Pydantic validation more, particularly with Kovaaks API.
         notification = {
             "action": "show",
@@ -219,7 +216,7 @@ def import_playlist(_, playlist_to_import):
             "message": "Successfully imported playlist!",
             "color": "green",
             "id": "imported-playlist-successful-notification",
-            "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+            "icon": DashIconify(icon="material-symbols:upload"),
         }
     return [notification], get_playlists()
 
@@ -251,6 +248,17 @@ app.layout = dmc.MantineProvider(
                     dmc.Flex(
                         children=[
                             dmc.Select(
+                                label="Playlist filter",
+                                placeholder="Select a playlist...",
+                                id="playlist-dropdown-selection",
+                                data=get_playlists(),
+                                clearable=True,
+                                checkIconPosition="right",
+                                miw=300,
+                                persistence=True,
+                                ml="xl",
+                            ),
+                            dmc.Select(
                                 label="Selected scenario",
                                 placeholder="Select a scenario...",
                                 id="scenario-dropdown-selection",
@@ -262,17 +270,6 @@ app.layout = dmc.MantineProvider(
                                 checkIconPosition="right",
                                 persistence=True,
                                 scrollAreaProps={"type": "auto"},
-                                ml="xl",
-                            ),
-                            dmc.Select(
-                                label="Playlist filter",
-                                placeholder="Select a playlist...",
-                                id="playlist-dropdown-selection",
-                                data=get_playlists(),
-                                clearable=True,
-                                checkIconPosition="right",
-                                miw=300,
-                                persistence=True,
                             ),
                             dmc.Space(h="xl"),
                             dmc.Space(h="xl"),
