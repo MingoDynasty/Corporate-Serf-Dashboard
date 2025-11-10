@@ -13,8 +13,10 @@ from pydantic import BaseModel, ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from config_service import config
+from kovaaks_api_service import get_playlist_data
 from stopwatch import Stopwatch
 
+PLAYLIST_DIRECTORY = "resources/playlists"
 SUB_CSV_HEADER = "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation"  # pylint: disable=line-too-long
 logger = logging.getLogger(__name__)
 
@@ -224,7 +226,7 @@ class PlaylistData(BaseModel):
 
 def load_playlists() -> None:
     playlist_files = []
-    with os.scandir("resources/playlists") as entries:
+    with os.scandir(PLAYLIST_DIRECTORY) as entries:
         for entry in entries:
             if entry.is_file() and entry.name.endswith(".json"):
                 playlist_files.append(entry.path)
@@ -244,6 +246,37 @@ def load_playlists() -> None:
         except ValidationError:
             logger.warning("Invalid JSON format in playlist file: %s", playlist_file)
     return
+
+
+def load_playlist_from_code(playlist_code: str) -> None:
+    json_data = get_playlist_data(playlist_code)
+
+    if len(json_data) > 1:
+        logger.warning("Found more than one playlist from code: %s", playlist_code)
+        return
+
+    playlist_name = json_data[0]["playlistName"]
+    scenario_list = json_data[0]["scenarioList"]
+
+    playlist_data = PlaylistData(
+        playlist_name=playlist_name,
+        scenario_list=[item["scenarioName"] for item in scenario_list],
+    )
+
+    if playlist_data.playlist_name in playlist_database:
+        logger.warning(
+            "Playlist already exists in database: %s", playlist_data.playlist_name
+        )
+        return
+    write_playlist_data_to_file(playlist_data)
+    return
+
+
+def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
+    file_path = Path(PLAYLIST_DIRECTORY, playlist_data.playlist_name + ".json")
+    with open(file_path, "w", encoding="utf-8") as file:
+        json_string = playlist_data.model_dump_json(indent=2)
+        file.write(json_string)
 
 
 load_playlists()
