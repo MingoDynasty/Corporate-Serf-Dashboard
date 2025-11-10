@@ -11,6 +11,7 @@ from typing import Optional, Dict, List
 
 from sortedcontainers import SortedDict, SortedList
 
+from config_service import config
 from stopwatch import Stopwatch
 
 SUB_CSV_HEADER = "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation"  # pylint: disable=line-too-long
@@ -181,7 +182,9 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
             elif line.startswith("Horiz Sens:"):
                 str_horizontal_sens = line.split(",")[1].strip()
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
-                horizontal_sens = round(float(str_horizontal_sens), 4)
+                horizontal_sens = round(
+                    float(str_horizontal_sens), config.sens_round_decimal_places
+                )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",")[1].strip()
     except ValueError:
@@ -189,14 +192,14 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         return None
 
     if (
-        not datetime_object
-        or not accuracy
-        or not horizontal_sens
-        or not scenario
-        or not score
-        or not sens_scale
+        datetime_object is None
+        or accuracy is None
+        or horizontal_sens is None
+        or scenario is None
+        or score is None
+        or sens_scale is None
     ):
-        logger.warning("Missing data from file: %s", full_file_path, exc_info=True)
+        logger.warning("Missing data from file: %s", full_file_path)
         return None
 
     run_data = RunData(

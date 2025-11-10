@@ -18,3 +18,7 @@ polling_interval = 1000  # 1 second
 
 # Port to use for the backend server.
 port = 8080
+
+# How many decimal places to round the Sensitivity. The smaller the number, the more the Sensitivities are grouped.
+# For example, if Sensitivity=40.159, rounded to one digit -> 40.2
+sens_round_decimal_places = 1

@@ -19,6 +19,7 @@ class ConfigData:
     top_n_scores: int
     polling_interval: int
     port: int
+    sens_round_decimal_places: int
 
 
 def load_config() -> ConfigData:
