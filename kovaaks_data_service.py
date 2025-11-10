@@ -9,6 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, List
 
+from pydantic import BaseModel, ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from config_service import config
@@ -20,6 +21,8 @@ logger = logging.getLogger(__name__)
 # TODO: maybe at some point convert this to in-memory SQLite
 #  But a simple dictionary should suffice for now.
 kovaaks_database: Dict = {}
+
+playlist_database: Dict = {}
 
 
 @dataclass(frozen=True)
@@ -211,3 +214,36 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         accuracy=accuracy,
     )
     return run_data
+
+
+# Define your Pydantic model
+class PlaylistData(BaseModel):
+    playlist_name: str
+    scenario_list: List[str]
+
+
+def load_playlists() -> None:
+    playlist_files = []
+    with os.scandir("resources/playlists") as entries:
+        for entry in entries:
+            if entry.is_file() and entry.name.endswith(".json"):
+                playlist_files.append(entry.path)
+    for playlist_file in playlist_files:
+        try:
+            with open(playlist_file, "r", encoding="utf-8") as file:
+                json_data = file.read()
+            playlist_data = PlaylistData.model_validate_json(json_data)
+
+            if playlist_data.playlist_name in playlist_database:
+                logger.warning(
+                    "Playlist already exists in database: %s",
+                    playlist_data.playlist_name,
+                )
+                continue
+            playlist_database[playlist_data.playlist_name] = playlist_data.scenario_list
+        except ValidationError:
+            logger.warning("Invalid JSON format in playlist file: %s", playlist_file)
+    return
+
+
+load_playlists()

@@ -22,6 +22,7 @@ from kovaaks_data_service import (
     get_scenario_stats,
     is_scenario_in_database,
     get_sensitivities_vs_runs,
+    playlist_database,
 )
 from message_queue import message_queue
 from plot_service import (
@@ -47,12 +48,8 @@ cached_plot = None
 
 APP_NAME = "Corporate Serf Dashboard v1.0.0"
 ALL_SCENARIOS = get_unique_scenarios(config.stats_dir)
-ALL_PLAYLISTS = ["Voltaic", "Viscose", "foo"]
-ALL_PLAYLIST_FILTERS = {
-    "Voltaic": ["Scenario 1", "Scenario 2", "Scenario 3"],
-    "Viscose": ["Scenario 2", "Scenario 3"],
-    "foo": ["Scenario 1"],
-}
+ALL_PLAYLIST_FILTERS = playlist_database
+ALL_PLAYLISTS = list(ALL_PLAYLIST_FILTERS.keys())
 app = DashProxy(title=APP_NAME, update_title=None)
 
 
@@ -260,6 +257,8 @@ app.layout = dmc.MantineProvider(
                                 id="playlist-dropdown-selection",
                                 data=ALL_PLAYLISTS,
                                 clearable=True,
+                                checkIconPosition="right",
+                                miw=300,
                             ),
                             dmc.Space(h="xl"),
                             dmc.Space(h="xl"),
