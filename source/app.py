@@ -392,9 +392,9 @@ app.layout = dmc.MantineProvider(
                                             ),
                                         ],
                                     ),
-                                    dmc.Space(h=20),
+                                    dmc.Space(h="lg"),
                                     dmc.Title("Display Settings", order=4),
-                                    dmc.Space(h="sm"),
+                                    dmc.Space(h="xs"),
                                     dmc.Switch(
                                         id="rank-overlay-switch",
                                         labelPosition="right",
