@@ -349,13 +349,16 @@ app.layout = dmc.MantineProvider(
                 dmc.GridCol(
                     dmc.Flex(
                         children=[
-                            dmc.Button(
-                                "Settings",
-                                id="settings-modal-open-button",
-                                variant="default",
-                                leftSection=DashIconify(
-                                    icon="clarity:settings-line", width=25
+                            dmc.Tooltip(
+                                dmc.Button(
+                                    "Settings",
+                                    id="settings-modal-open-button",
+                                    variant="default",
+                                    leftSection=DashIconify(
+                                        icon="clarity:settings-line", width=25
+                                    ),
                                 ),
+                                label="App Settings",
                             ),
                             dmc.Modal(
                                 title="Settings",
@@ -381,9 +384,19 @@ app.layout = dmc.MantineProvider(
                                     ),
                                 ],
                             ),
-                            dmc.Anchor(
-                                DashIconify(icon="ion:logo-github", width=40),
-                                href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+                            dmc.Tooltip(
+                                dmc.Anchor(
+                                    DashIconify(icon="logos:discord-icon", width=40),
+                                    href="https://discordapp.com/users/222910150636339211",
+                                ),
+                                label="Contact me via Discord: MingoDynasty",
+                            ),
+                            dmc.Tooltip(
+                                dmc.Anchor(
+                                    DashIconify(icon="ion:logo-github", width=40),
+                                    href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+                                ),
+                                label="View this app on GitHub",
                             ),
                             dmc.Switch(
                                 offLabel=DashIconify(
@@ -415,16 +428,6 @@ app.layout = dmc.MantineProvider(
             overflow="hidden",
         ),
         dcc.Graph(id="graph-content", style={"height": "80vh"}),
-        dmc.Group(
-            children=[
-                dmc.Anchor(
-                    DashIconify(icon="logos:discord-icon", width=40),
-                    href="https://discordapp.com/users/222910150636339211",
-                    ml="xl",
-                ),
-                dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
-            ],
-        ),
         dcc.Store(
             id="do_update",
             storage_type="memory",
