@@ -563,3 +563,6 @@ redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", 
 #src_paths = ["isort", "test"]
 profile = "black"
 skip = [".venv", "venv"]  # Skips directories named .venv or venv
+
+[tool.mypy]
+disable_error_code = ["import-untyped"]
