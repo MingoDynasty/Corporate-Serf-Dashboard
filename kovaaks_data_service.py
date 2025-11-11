@@ -229,7 +229,6 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
     return run_data
 
 
-# Define your Pydantic model
 class PlaylistData(BaseModel):
     playlist_name: str
     playlist_code: str
@@ -261,27 +260,23 @@ def load_playlists() -> None:
 
 
 def load_playlist_from_code(input_playlist_code: str) -> Optional[str]:
-    json_data = get_playlist_data(input_playlist_code)
-    if not json_data:
+    response = get_playlist_data(input_playlist_code)
+    if not response:
         message = (
             f"Failed to load playlist data for playlist code: {input_playlist_code}"
         )
         logger.warning(message)
         return message
 
-    if len(json_data) > 1:
+    if len(response.data) > 1:
         message = f"Found more than one playlist from code: {input_playlist_code}"
         logger.warning(message)
         return message
 
-    playlist_name = json_data[0]["playlistName"]
-    scenario_list = json_data[0]["scenarioList"]
-    playlist_code = json_data[0]["playlistCode"]
-
     playlist_data = PlaylistData(
-        playlist_name=playlist_name,
-        playlist_code=playlist_code,
-        scenario_list=[item["scenarioName"] for item in scenario_list],
+        playlist_name=response.data[0].playlistName,
+        playlist_code=response.data[0].playlistCode,
+        scenario_list=[item.scenarioName for item in response.data[0].scenarioList],
     )
 
     if playlist_data.playlist_name in playlist_database:

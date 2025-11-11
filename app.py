@@ -209,7 +209,6 @@ def import_playlist(_, playlist_to_import):
             "icon": DashIconify(icon="material-symbols:upload"),
         }
     else:
-        # TODO: use Pydantic validation more, particularly with Kovaaks API.
         notification = {
             "action": "show",
             "title": "Notification",
