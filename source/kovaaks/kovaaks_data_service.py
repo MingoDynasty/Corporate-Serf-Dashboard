@@ -86,10 +86,14 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
             if entry.is_file() and entry.name.endswith(".csv"):
                 csv_files.append(entry.path)
 
-    logger.debug("Found %d csv files.", len(csv_files))
     for csv_file in csv_files:
         load_csv_file_into_database(csv_file)
     stopwatch.stop()
+    logger.debug(
+        "Loaded %d CSV files in %.2f seconds.",
+        len(csv_files),
+        round(stopwatch.elapsed(), 2),
+    )
     return
 
 
