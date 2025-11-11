@@ -11,7 +11,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
-from source.kovaaks.data_models import RunData
+from kovaaks.data_models import RunData
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ import tomllib
 
 from pydantic.dataclasses import dataclass
 
-CONFIG_FILE = "../config.toml"
+CONFIG_FILE = "config.toml"
 
 
 @dataclass()
