@@ -15,13 +15,14 @@ logger = logging.getLogger(__name__)
 
 
 def generate_plot(
-    scenario_data: dict, scenario_name: str, top_n_scores: int
+    scenario_data: dict, scenario_name: str, top_n_scores: int, oldest_date: datetime
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
     :param scenario_data: the scenario data to use for the plot.
     :param scenario_name: the name of the scenario to use for the plot.
     :param top_n_scores: the number of top scores to use for the plot.
+    :param oldest_date: date to filter by.
     :return: go.Figure Plot
     """
     if not scenario_data:
@@ -40,8 +41,14 @@ def generate_plot(
 
     # TODO: move this to data service. Plot Service should only be concerned with receiving a dict of data and plotting it.
     for sens, runs_data in scenario_data.items():
+        filtered_runs = [
+            item for item in runs_data if item.datetime_object >= oldest_date
+        ]
+        if not filtered_runs:
+            continue
+
         # Get top N scores for each sensitivity
-        sorted_list = sorted(runs_data, key=lambda rd: rd.score, reverse=True)
+        sorted_list = sorted(filtered_runs, key=lambda rd: rd.score, reverse=True)
         top_n_largest = sorted_list[:top_n_scores]
         for run_data in top_n_largest:
             scatter_plot_data["Score"].append(run_data.score)

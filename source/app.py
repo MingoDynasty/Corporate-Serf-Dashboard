@@ -123,12 +123,13 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
         )
         return cached_plot, no_update
 
-    date_object = datetime.fromisoformat(new_date).date()
-    _ = (date.today() - date_object).days
+    oldest_datetime = datetime.combine(
+        datetime.fromisoformat(new_date).date(), datetime.min.time()
+    )
 
     sensitivities_vs_runs = get_sensitivities_vs_runs(newly_selected_scenario)
     cached_plot = generate_plot(
-        sensitivities_vs_runs, newly_selected_scenario, top_n_scores
+        sensitivities_vs_runs, newly_selected_scenario, top_n_scores, oldest_datetime
     )
 
     # Default notification is simply notifying that the graph updated,
