@@ -44,6 +44,37 @@ def get_sensitivities_vs_runs(scenario_name: str) -> Dict[str, List[RunData]]:
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
 
 
+def get_sensitivities_vs_runs_filtered(
+    scenario_name: str, top_n_scores: int, oldest_date: datetime
+) -> Dict[str, List[RunData]]:
+    """
+    Get sensitivities vs runs for a scenario, filtered by top N scores, and oldest date.
+    :param scenario_name: the name of the scenario to filter by.
+    :param top_n_scores: the number of top scores to filter by.
+    :param oldest_date: oldest date to filter by (inclusive).
+    """
+    # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
+    #  Besides, this logic might get blown away if/when we migrate to SQLite.
+    filtered_data = {}
+    for key, runs_data in kovaaks_database[scenario_name][
+        "sensitivities_vs_runs"
+    ].items():
+        filtered_data[key] = []
+
+        # RunData list is already sorted by score, so we can simply iterate backwards.
+        for run_data in reversed(runs_data):
+            if run_data.datetime_object < oldest_date:
+                continue
+            filtered_data[key].append(run_data)
+            if len(filtered_data[key]) >= top_n_scores:
+                break
+
+        # avoid issues with empty arrays in the dictionary
+        if not filtered_data[key]:
+            del filtered_data[key]
+    return filtered_data
+
+
 def get_playlists() -> List[str]:
     """Get list of available playlists."""
     return sorted(list(playlist_database.keys()))

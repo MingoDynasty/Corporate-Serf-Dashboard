@@ -4,7 +4,7 @@ Entrypoint to the Corporate Serf Dashboard app.
 
 import logging.config  # Provides access to logging configuration file.
 import sys
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Tuple
 
 import dash_mantine_components as dmc
@@ -15,18 +15,18 @@ from dash_iconify import DashIconify
 from watchdog.observers import Observer
 
 from config.config_service import config
-from my_watchdog.file_watchdog import NewFileHandler
 from kovaaks.data_service import (
     initialize_kovaaks_data,
     get_unique_scenarios,
     get_scenario_stats,
     is_scenario_in_database,
-    get_sensitivities_vs_runs,
     load_playlist_from_code,
     get_scenarios_from_playlists,
     get_playlists,
+    get_sensitivities_vs_runs_filtered,
 )
 from my_queue.message_queue import message_queue
+from my_watchdog.file_watchdog import NewFileHandler
 from plot.plot_service import (
     generate_plot,
     apply_light_dark_mode,
@@ -117,19 +117,21 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
         return cached_plot, no_update
 
     if not is_scenario_in_database(newly_selected_scenario):
-        logger.warning(
-            "No scenario data for '%s'. Perhaps choose a longer date range?",
-            newly_selected_scenario,
-        )
+        logger.warning("No scenario data found.")
         return cached_plot, no_update
 
-    date_object = datetime.fromisoformat(new_date).date()
-    _ = (date.today() - date_object).days
-
-    sensitivities_vs_runs = get_sensitivities_vs_runs(newly_selected_scenario)
-    cached_plot = generate_plot(
-        sensitivities_vs_runs, newly_selected_scenario, top_n_scores
+    oldest_datetime = datetime.combine(
+        datetime.fromisoformat(new_date).date(), datetime.min.time()
     )
+
+    sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
+        newly_selected_scenario, top_n_scores, oldest_datetime
+    )
+    if not sensitivities_vs_runs:
+        logger.warning("No scenario data for the given date range.")
+        return cached_plot, no_update
+
+    cached_plot = generate_plot(sensitivities_vs_runs, newly_selected_scenario)
 
     # Default notification is simply notifying that the graph updated,
     #  usually due to user input.
