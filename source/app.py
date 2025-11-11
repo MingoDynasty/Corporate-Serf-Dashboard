@@ -16,7 +16,7 @@ from watchdog.observers import Observer
 
 from config.config_service import config
 from my_watchdog.file_watchdog import NewFileHandler
-from kovaaks.kovaaks_data_service import (
+from kovaaks.data_service import (
     initialize_kovaaks_data,
     get_unique_scenarios,
     get_scenario_stats,

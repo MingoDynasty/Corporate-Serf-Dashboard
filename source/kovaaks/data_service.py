@@ -4,16 +4,16 @@ Provides business logic for managing Kovaaks data.
 
 import logging
 import os
-from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, List
 
-from pydantic import BaseModel, ValidationError
+from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from source.config.config_service import config
-from source.kovaaks.kovaaks_api_service import get_playlist_data
+from source.kovaaks.api_service import get_playlist_data
+from source.kovaaks.data_models import ScenarioStats, RunData, PlaylistData
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_DIRECTORY = "../resources/playlists"
@@ -25,26 +25,6 @@ logger = logging.getLogger(__name__)
 kovaaks_database: Dict = {}
 
 playlist_database: Dict = {}
-
-
-@dataclass(frozen=True)
-class RunData:
-    """Dataclass models data extracted from a Kovaak's run file."""
-
-    datetime_object: datetime
-    score: float
-    sens_scale: str
-    horizontal_sens: float
-    scenario: str
-    accuracy: float
-
-
-@dataclass()
-class ScenarioStats:
-    """Dataclass models statistics for a scenario."""
-
-    date_last_played: datetime
-    number_of_runs: int
 
 
 def is_scenario_in_database(scenario_name: str) -> bool:
@@ -231,12 +211,6 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         accuracy=accuracy,
     )
     return run_data
-
-
-class PlaylistData(BaseModel):
-    playlist_name: str
-    playlist_code: str
-    scenario_list: List[str]
 
 
 def load_playlists() -> None:

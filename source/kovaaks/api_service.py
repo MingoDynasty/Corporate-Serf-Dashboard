@@ -6,7 +6,7 @@ import logging
 
 import requests
 
-from source.kovaaks.kovaaks_api_models import PlaylistAPIResponse
+from source.kovaaks.api_models import PlaylistAPIResponse
 
 BASE_URL = "https://kovaaks.com/webapp-backend"
 ENDPOINTS = {"playlist": BASE_URL + "/playlist/playlists"}

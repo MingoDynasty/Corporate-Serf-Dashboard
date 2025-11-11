@@ -10,7 +10,7 @@ from pathlib import Path
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import config
-from source.kovaaks.kovaaks_data_service import (
+from source.kovaaks.data_service import (
     extract_data_from_file,
     load_csv_file_into_database,
     is_scenario_in_database,
