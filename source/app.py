@@ -72,8 +72,9 @@ def check_for_new_data(_):
     Input("scenario-dropdown-selection", "value"),
     Output("scenario_num_runs", "children"),
     Output("scenario_datetime_last_played", "children"),
+    Output("last-played-tooltip", "label"),
 )
-def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
+def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
     """
     Updates the Scenario Stats on the UI.
     :param _: trigger from the interval component. Its actual value is not used.
@@ -81,12 +82,14 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
     :return: Scenario Stats data
     """
     if not selected_scenario or not is_scenario_in_database(selected_scenario):
-        return 0, "N/A"
+        return 0, "N/A", "N/A"
     scenario_stats = get_scenario_stats(selected_scenario)
 
-    # TODO: do a calculation to say "N days ago"
-    return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
-        "%Y-%m-%d %I:%M:%S %p"
+    days_ago = abs((scenario_stats.date_last_played - datetime.now()).days)
+    return (
+        scenario_stats.number_of_runs,
+        f"{days_ago} days ago",
+        scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
     )
 
 
@@ -299,17 +302,25 @@ app.layout = dmc.MantineProvider(
                             dmc.Box(
                                 [
                                     dmc.Title("Scenario Stats", order=6),
-                                    dmc.Text(
+                                    dmc.Group(
                                         [
                                             dmc.Text(
-                                                "Last played: ", fw=700, span=True
-                                            ),
-                                            dmc.Text(
-                                                id="scenario_datetime_last_played",
+                                                "Last played:",
+                                                fw=700,
                                                 span=True,
+                                                size="sm",
+                                            ),
+                                            dmc.Tooltip(
+                                                dmc.Text(
+                                                    id="scenario_datetime_last_played",
+                                                    span=True,
+                                                    size="sm",
+                                                ),
+                                                id="last-played-tooltip",
+                                                label="My Tooltip",
                                             ),
                                         ],
-                                        size="sm",
+                                        gap="0.25em",
                                     ),
                                     dmc.Text(
                                         [
