@@ -49,7 +49,7 @@ cached_plot = None
 ################################
 
 APP_NAME = "Corporate Serf Dashboard v1.0.0"
-app = DashProxy(title=APP_NAME, update_title=None)
+app = DashProxy(title=APP_NAME, update_title=None, assets_folder="../assets")
 
 
 @app.callback(
