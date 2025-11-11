@@ -99,21 +99,29 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
     Input("top_n_scores", "value"),
     Input("date-picker", "value"),
     Input("color-scheme-switch", "checked"),
+    Input("rank-overlay-switch", "checked"),
     Output("graph-content", "figure"),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, switch_on):
+def update_graph(
+    do_update,
+    newly_selected_scenario,
+    top_n_scores,
+    new_date,
+    dark_mode_switch,
+    rank_overlay_switch,
+):
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
     :param newly_selected_scenario: user-selected scenario name.
     :param top_n_scores: user-selected top n scores.
     :param new_date: user-selected date.
-    :param switch_on: light/dark mode switch.
+    :param dark_mode_switch: dark mode switch. True=Dark, else Light.
     :return: Figure, Notification
     """
     global cached_plot
-    if not newly_selected_scenario:
+    if not newly_selected_scenario or not top_n_scores:
         return cached_plot, no_update
 
     if not is_scenario_in_database(newly_selected_scenario):
@@ -131,7 +139,9 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
         logger.warning("No scenario data for the given date range.")
         return cached_plot, no_update
 
-    cached_plot = generate_plot(sensitivities_vs_runs, newly_selected_scenario)
+    cached_plot = generate_plot(
+        sensitivities_vs_runs, newly_selected_scenario, rank_overlay_switch
+    )
 
     # Default notification is simply notifying that the graph updated,
     #  usually due to user input.
@@ -164,7 +174,7 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
                 "icon": DashIconify(icon="fontisto:line-chart"),
                 "autoClose": 8000,
             }
-    return apply_light_dark_mode(cached_plot, switch_on), [notification]
+    return apply_light_dark_mode(cached_plot, dark_mode_switch), [notification]
 
 
 @app.callback(
@@ -349,13 +359,16 @@ app.layout = dmc.MantineProvider(
                 dmc.GridCol(
                     dmc.Flex(
                         children=[
-                            dmc.Button(
-                                "Settings",
-                                id="settings-modal-open-button",
-                                variant="default",
-                                leftSection=DashIconify(
-                                    icon="clarity:settings-line", width=25
+                            dmc.Tooltip(
+                                dmc.Button(
+                                    "Settings",
+                                    id="settings-modal-open-button",
+                                    variant="default",
+                                    leftSection=DashIconify(
+                                        icon="clarity:settings-line", width=25
+                                    ),
                                 ),
+                                label="App Settings",
                             ),
                             dmc.Modal(
                                 title="Settings",
@@ -379,11 +392,31 @@ app.layout = dmc.MantineProvider(
                                             ),
                                         ],
                                     ),
+                                    dmc.Space(h="lg"),
+                                    dmc.Title("Display Settings", order=4),
+                                    dmc.Space(h="xs"),
+                                    dmc.Switch(
+                                        id="rank-overlay-switch",
+                                        labelPosition="right",
+                                        label="Rank Overlay",
+                                        checked=True,
+                                        persistence=True,
+                                    ),
                                 ],
                             ),
-                            dmc.Anchor(
-                                DashIconify(icon="ion:logo-github", width=40),
-                                href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+                            dmc.Tooltip(
+                                dmc.Anchor(
+                                    DashIconify(icon="logos:discord-icon", width=40),
+                                    href="https://discordapp.com/users/222910150636339211",
+                                ),
+                                label="Contact me via Discord: MingoDynasty",
+                            ),
+                            dmc.Tooltip(
+                                dmc.Anchor(
+                                    DashIconify(icon="ion:logo-github", width=40),
+                                    href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+                                ),
+                                label="View this app on GitHub",
                             ),
                             dmc.Switch(
                                 offLabel=DashIconify(
@@ -415,16 +448,6 @@ app.layout = dmc.MantineProvider(
             overflow="hidden",
         ),
         dcc.Graph(id="graph-content", style={"height": "80vh"}),
-        dmc.Group(
-            children=[
-                dmc.Anchor(
-                    DashIconify(icon="logos:discord-icon", width=40),
-                    href="https://discordapp.com/users/222910150636339211",
-                    ml="xl",
-                ),
-                dmc.Text("Contact me via Discord: MingoDynasty", size="md"),
-            ],
-        ),
         dcc.Store(
             id="do_update",
             storage_type="memory",
