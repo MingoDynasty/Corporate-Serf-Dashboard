@@ -14,9 +14,9 @@ from dash_extensions.logging import NotificationsLogHandler
 from dash_iconify import DashIconify
 from watchdog.observers import Observer
 
-from config_service import config
-from file_watchdog import NewFileHandler
-from kovaaks_data_service import (
+from config.config_service import config
+from my_watchdog.file_watchdog import NewFileHandler
+from kovaaks.kovaaks_data_service import (
     initialize_kovaaks_data,
     get_unique_scenarios,
     get_scenario_stats,
@@ -26,12 +26,12 @@ from kovaaks_data_service import (
     get_scenarios_from_playlists,
     get_playlists,
 )
-from message_queue import message_queue
-from plot_service import (
+from my_queue.message_queue import message_queue
+from plot.plot_service import (
     generate_plot,
     apply_light_dark_mode,
 )
-from utilities import ordinal
+from utilities.utilities import ordinal
 
 # Logging setup
 log_handler = NotificationsLogHandler()
@@ -83,6 +83,8 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str]:
     if not selected_scenario or not is_scenario_in_database(selected_scenario):
         return 0, "N/A"
     scenario_stats = get_scenario_stats(selected_scenario)
+
+    # TODO: do a calculation to say "N days ago"
     return scenario_stats.number_of_runs, scenario_stats.date_last_played.strftime(
         "%Y-%m-%d %I:%M:%S %p"
     )

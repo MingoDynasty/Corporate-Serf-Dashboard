@@ -12,11 +12,11 @@ from typing import Optional, Dict, List
 from pydantic import BaseModel, ValidationError
 from sortedcontainers import SortedDict, SortedList
 
-from config_service import config
-from kovaaks_api_service import get_playlist_data
-from stopwatch import Stopwatch
+from source.config.config_service import config
+from source.kovaaks.kovaaks_api_service import get_playlist_data
+from source.utilities.stopwatch import Stopwatch
 
-PLAYLIST_DIRECTORY = "resources/playlists"
+PLAYLIST_DIRECTORY = "../resources/playlists"
 SUB_CSV_HEADER = "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation"  # pylint: disable=line-too-long
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 """
-Shared message queue between UI and File Watchdog components.
+Shared message my_queue between UI and File Watchdog components.
 """
 
 import queue
@@ -9,7 +9,7 @@ from datetime import datetime
 
 @dataclass(frozen=True)
 class NewFileMessage:
-    """Dataclass models messages in this queue."""
+    """Dataclass models messages in this my_queue."""
 
     datetime_created: datetime
     nth_score: int
