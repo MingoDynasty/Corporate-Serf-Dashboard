@@ -509,3 +509,4 @@ marimo/_lsp/
 __marimo__/
 
 config.toml
+ignore/
