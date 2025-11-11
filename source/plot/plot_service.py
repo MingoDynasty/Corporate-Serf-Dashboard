@@ -11,18 +11,18 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
+from source.kovaaks.data_models import RunData
+
 logger = logging.getLogger(__name__)
 
 
 def generate_plot(
-    scenario_data: dict, scenario_name: str, top_n_scores: int, oldest_date: datetime
+    scenario_data: Dict[str, List[RunData]], scenario_name: str
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
     :param scenario_data: the scenario data to use for the plot.
     :param scenario_name: the name of the scenario to use for the plot.
-    :param top_n_scores: the number of top scores to use for the plot.
-    :param oldest_date: date to filter by.
     :return: go.Figure Plot
     """
     if not scenario_data:
@@ -39,18 +39,8 @@ def generate_plot(
         "Sensitivity": [],
     }
 
-    # TODO: move this to data service. Plot Service should only be concerned with receiving a dict of data and plotting it.
     for sens, runs_data in scenario_data.items():
-        filtered_runs = [
-            item for item in runs_data if item.datetime_object >= oldest_date
-        ]
-        if not filtered_runs:
-            continue
-
-        # Get top N scores for each sensitivity
-        sorted_list = sorted(filtered_runs, key=lambda rd: rd.score, reverse=True)
-        top_n_largest = sorted_list[:top_n_scores]
-        for run_data in top_n_largest:
+        for run_data in runs_data:
             scatter_plot_data["Score"].append(run_data.score)
             scatter_plot_data["Sensitivity"].append(
                 f"{run_data.horizontal_sens} {run_data.sens_scale}"
@@ -60,9 +50,7 @@ def generate_plot(
             )
             scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
         line_plot_data["Sensitivity"].append(sens)
-        line_plot_data["Score"].append(
-            float(np.mean([rd.score for rd in top_n_largest]))
-        )
+        line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
     # If we want to generate a trendline (e.g. lowess)
     # if len(data.keys()) <= 2:
     #     # We need at least 3 sensitivities to generate a trendline
