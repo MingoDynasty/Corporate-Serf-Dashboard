@@ -26,6 +26,8 @@ kovaaks_database: Dict = {}
 
 playlist_database: Dict = {}
 
+sensitivity_database: Dict = {}
+
 
 def is_scenario_in_database(scenario_name: str) -> bool:
     """Check if a scenario is in the database."""
