@@ -17,12 +17,15 @@ logger = logging.getLogger(__name__)
 
 
 def generate_plot(
-    scenario_data: Dict[str, List[RunData]], scenario_name: str
+    scenario_data: Dict[str, List[RunData]],
+    scenario_name: str,
+    rank_overlay_switch: bool,
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
     :param scenario_data: the scenario data to use for the plot.
     :param scenario_name: the name of the scenario to use for the plot.
+    :param rank_overlay_switch: enable/disable rank overlay.
     :return: go.Figure Plot
     """
     if not scenario_data:
@@ -107,13 +110,13 @@ def generate_plot(
     return figure_combined
 
 
-def apply_light_dark_mode(figure: go.Figure, switch_on) -> go.Figure:
+def apply_light_dark_mode(figure: go.Figure, dark_mode_switch) -> go.Figure:
     """
     Apply light or dark mode to figure.
     :param figure: figure to lighten or darken.
-    :param switch_on: True=Dark mode, False=Light mode.
+    :param dark_mode_switch: True=Dark mode, False=Light mode.
     :return: figure with template applied.
     """
-    template = "mantine_dark" if switch_on else "mantine_light"
+    template = "mantine_dark" if dark_mode_switch else "mantine_light"
     figure.update_layout(template=template)
     return figure

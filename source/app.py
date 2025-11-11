@@ -99,17 +99,25 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
     Input("top_n_scores", "value"),
     Input("date-picker", "value"),
     Input("color-scheme-switch", "checked"),
+    Input("rank-overlay-switch", "checked"),
     Output("graph-content", "figure"),
     Output("notification-container", "sendNotifications"),
 )
-def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, switch_on):
+def update_graph(
+    do_update,
+    newly_selected_scenario,
+    top_n_scores,
+    new_date,
+    dark_mode_switch,
+    rank_overlay_switch,
+):
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
     :param newly_selected_scenario: user-selected scenario name.
     :param top_n_scores: user-selected top n scores.
     :param new_date: user-selected date.
-    :param switch_on: light/dark mode switch.
+    :param dark_mode_switch: dark mode switch. True=Dark, else Light.
     :return: Figure, Notification
     """
     global cached_plot
@@ -131,7 +139,9 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
         logger.warning("No scenario data for the given date range.")
         return cached_plot, no_update
 
-    cached_plot = generate_plot(sensitivities_vs_runs, newly_selected_scenario)
+    cached_plot = generate_plot(
+        sensitivities_vs_runs, newly_selected_scenario, rank_overlay_switch
+    )
 
     # Default notification is simply notifying that the graph updated,
     #  usually due to user input.
@@ -164,7 +174,7 @@ def update_graph(do_update, newly_selected_scenario, top_n_scores, new_date, swi
                 "icon": DashIconify(icon="fontisto:line-chart"),
                 "autoClose": 8000,
             }
-    return apply_light_dark_mode(cached_plot, switch_on), [notification]
+    return apply_light_dark_mode(cached_plot, dark_mode_switch), [notification]
 
 
 @app.callback(
@@ -381,6 +391,16 @@ app.layout = dmc.MantineProvider(
                                                 mt="lg",
                                             ),
                                         ],
+                                    ),
+                                    dmc.Space(h=20),
+                                    dmc.Title("Display Settings", order=4),
+                                    dmc.Space(h="sm"),
+                                    dmc.Switch(
+                                        id="rank-overlay-switch",
+                                        labelPosition="right",
+                                        label="Rank Overlay",
+                                        checked=True,
+                                        persistence=True,
                                     ),
                                 ],
                             ),
