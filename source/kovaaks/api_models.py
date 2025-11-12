@@ -3,7 +3,7 @@ Pydantic models for Kovaak's API responses.
 """
 
 import datetime
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 
@@ -37,3 +37,35 @@ class PlaylistAPIResponse(BaseModel):
     max: int
     total: int
     data: List[Playlist]
+
+
+class BenchmarkScenario(BaseModel):
+    score: int
+    leaderboard_rank: None
+    scenario_rank: int
+    rank_maxes: List[float]
+    leaderboard_id: int
+
+
+class Category(BaseModel):
+    benchmark_progress: int
+    category_rank: int
+    rank_maxes: List[float]
+    scenarios: Dict[str, BenchmarkScenario]
+
+
+class Rank(BaseModel):
+    icon: str
+    name: str
+    color: str
+    frame: str
+    description: str
+    playercard_large: str
+    playercard_small: str
+
+
+class BenchmarksAPIResponse(BaseModel):
+    benchmark_progress: int
+    overall_rank: int
+    categories: Dict[str, Category]
+    ranks: List[Rank]

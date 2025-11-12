@@ -13,7 +13,13 @@ from sortedcontainers import SortedDict, SortedList
 
 from config.config_service import config
 from kovaaks.api_service import get_playlist_data
-from kovaaks.data_models import ScenarioStats, RunData, PlaylistData
+from kovaaks.data_models import (
+    ScenarioStats,
+    RunData,
+    PlaylistData,
+    Scenario,
+    Rank,
+)
 from utilities.stopwatch import Stopwatch
 
 PLAYLIST_DIRECTORY = "resources/playlists"
@@ -24,7 +30,7 @@ logger = logging.getLogger(__name__)
 #  But a simple dictionary should suffice for now.
 kovaaks_database: Dict = {}
 
-playlist_database: Dict = {}
+playlist_database: Dict[str, List[Scenario]] = {}
 
 
 def is_scenario_in_database(scenario_name: str) -> bool:
@@ -80,7 +86,28 @@ def get_playlists() -> List[str]:
 
 def get_scenarios_from_playlists(playlist_name: str) -> List[str]:
     """Get scenarios from a playlist."""
-    return playlist_database[playlist_name]
+    return [item.scenario_name for item in playlist_database[playlist_name]]
+
+
+def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> List[Rank]:
+    if playlist_name not in playlist_database:
+        logger.warning(
+            "Failed to get rank data for playlist (%s), scenario (%s)",
+            playlist_name,
+            scenario_name,
+        )
+        return []
+    scenarios = playlist_database[playlist_name]
+    for scenario in scenarios:
+        if scenario.scenario_name != scenario_name:
+            continue
+        return scenario.rank_data
+    logger.warning(
+        "Failed to get rank data for playlist (%s), scenario (%s)",
+        playlist_name,
+        scenario_name,
+    )
+    return []
 
 
 def initialize_kovaaks_data(stats_dir: str) -> None:

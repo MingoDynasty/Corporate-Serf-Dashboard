@@ -11,7 +11,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
 
-from kovaaks.data_models import RunData
+from kovaaks.data_models import RunData, Rank
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ def generate_plot(
     scenario_data: Dict[str, List[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
+    rank_data: List[Rank],
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
@@ -107,6 +108,19 @@ def generate_plot(
     figure_combined["data"][0]["showlegend"] = True
     figure_combined["data"][1]["name"] = "Average Score"
     figure_combined["data"][1]["showlegend"] = True
+
+    if rank_overlay_switch and rank_data:
+        for rank in rank_data:
+            figure_combined.add_hline(
+                name=rank.rank_name,
+                label=dict(
+                    text=f"{rank.rank_name} ({rank.rank_threshold})",
+                    textposition="end",
+                ),
+                y=rank.rank_threshold,
+                line_dash="dash",
+                line_color=rank.rank_color,
+            )
     return figure_combined
 
 

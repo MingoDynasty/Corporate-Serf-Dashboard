@@ -24,6 +24,7 @@ from kovaaks.data_service import (
     get_scenarios_from_playlists,
     get_playlists,
     get_sensitivities_vs_runs_filtered,
+    get_rank_data_from_playlist,
 )
 from my_queue.message_queue import message_queue
 from my_watchdog.file_watchdog import NewFileHandler
@@ -102,6 +103,7 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
     Input("rank-overlay-switch", "checked"),
     Output("graph-content", "figure"),
     Output("notification-container", "sendNotifications"),
+    State("playlist-dropdown-selection", "value"),
 )
 def update_graph(
     do_update,
@@ -110,6 +112,7 @@ def update_graph(
     new_date,
     dark_mode_switch,
     rank_overlay_switch,
+    selected_playlist,
 ):
     """
     Updates to the graph.
@@ -139,8 +142,14 @@ def update_graph(
         logger.warning("No scenario data for the given date range.")
         return cached_plot, no_update
 
+    rank_data = None
+    if selected_playlist:
+        rank_data = get_rank_data_from_playlist(
+            selected_playlist, newly_selected_scenario
+        )
+
     cached_plot = generate_plot(
-        sensitivities_vs_runs, newly_selected_scenario, rank_overlay_switch
+        sensitivities_vs_runs, newly_selected_scenario, rank_overlay_switch, rank_data
     )
 
     # Default notification is simply notifying that the graph updated,
