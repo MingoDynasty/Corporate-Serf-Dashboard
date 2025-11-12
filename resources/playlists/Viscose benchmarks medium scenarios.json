@@ -1,0 +1,1626 @@
+{
+  "playlist_name": "Viscose benchmarks medium scenarios",
+  "playlist_code": "KovaaKsPushingMauveWeaponlevel",
+  "scenario_list": [
+    {
+      "scenario_name": "WhisphereRawControl",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 5300.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 6700.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 7600.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 8800.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 10000.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 10900.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 11800.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Whisphere",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 6000.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 8500.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 11000.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 13500.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 15500.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 17500.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 19500.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 20750.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "SmoothBot Invincible Goated",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1700.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2200.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2750.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 3250.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3800.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 4300.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 4650.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Leaptrack Goated 75% Slightly Larger",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1400.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 1750.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2000.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 2250.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 2500.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 2750.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 3000.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 3275.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere rAim Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 7400.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 8500.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 9600.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 10700.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 11900.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 13100.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 14300.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 15100.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Controlsphere Novice S5 Hard",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 2100.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2500.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2950.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 3250.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3550.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 3800.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 4100.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Angelic 4 Voltaic Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 2100.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2500.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 3200.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3600.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 3950.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 4300.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 4650.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "cloverRawControl Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 5000.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 6100.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 7000.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 8100.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 9200.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 10100.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 10900.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 11700.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere Far Larger",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 7800.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 8600.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 9300.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 10000.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 10800.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 11700.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 12700.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 13600.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "PGTI Voltaic Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 900.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 1200.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 1500.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 1800.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 2100.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 2400.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air CELESTIAL No UFO Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 825.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 840.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 855.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 865.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 881.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 890.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 902.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 908.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Whisphere Small & Slow 75%",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 5500.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 7500.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 9500.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 11500.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 13500.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 15500.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 17500.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 19000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Ground Plaza Sparky V3",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 862.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 872.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 882.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 888.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 894.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 900.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 905.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 909.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere OW",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 4800.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 5700.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 6400.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 7300.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 8100.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 8900.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 9800.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 10500.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Flicker Plaza rAim Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 860.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 870.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 881.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 891.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 900.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 908.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 913.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 917.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Polarized Hell Easy 20% Slower",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1600.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 1850.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2100.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 2350.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 2600.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 3150.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 3350.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Pure Intermediate",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 850.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 865.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 878.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 890.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 898.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 905.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 909.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 913.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Voltaic Easy Invincible 4",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1900.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2250.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2600.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 3050.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3450.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 3850.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 4250.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 4550.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Pokeball Frenzy Auto TE Wide",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1950.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2250.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2550.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3150.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 3400.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 3600.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w3ts reload",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 68.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 78.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 88.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 98.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 108.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 118.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 128.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 137.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "voxTargetSwitch 2",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 78.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 88.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 98.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 107.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 116.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 123.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 130.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 136.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "beanTS",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 90.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 105.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 117.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 129.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 138.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 145.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 151.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 158.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "FloatTS Angelic Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 70.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 79.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 86.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 93.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 100.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 107.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 115.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 123.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "waldoTS Intermediate",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 108.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 117.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 126.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 135.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 144.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 153.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 162.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 170.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "devTS Goated NR Static 5Bot",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 600.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 650.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 705.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 760.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 810.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 840.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 870.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 900.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "domiSwitch Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 4200.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 4700.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 5200.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 5700.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 6150.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 6600.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 7100.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 7600.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "tamTargetSwitch Smooth Easy",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 22.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 26.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 29.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 32.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 34.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 36.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 38.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 41.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1wall5targets_pasu Reload",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 70.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 85.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 100.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 115.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 130.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 142.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 155.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 165.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Bounceshot Intermediate",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 560.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 650.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 730.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 790.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 860.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 910.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 990.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 1070.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere Click",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 27.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 33.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 39.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 45.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 50.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 56.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 61.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 67.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Popcorn MV Intermediate",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 150.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 190.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 240.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 280.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 330.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 380.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 430.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 480.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Pasu Angelic 20% Larger",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 72.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 79.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 85.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 90.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 96.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 103.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 115.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w2ts Pasu Perfected",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 60.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 70.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 80.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 88.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 96.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 101.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 107.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 112.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w3ts Pasu Perfected Micro Goated Larger",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 900.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 1000.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 1100.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 1200.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 1300.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 1400.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 1500.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Floating Heads Timing 400% Larger",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 1950.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 2300.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 2650.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 3000.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 3350.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 3650.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 3900.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "voxTargetClick 20% Small",
+      "rank_data": [
+        {
+          "rank_name": "Cinnabar",
+          "rank_color": "#A71112",
+          "rank_threshold": 62.0
+        },
+        {
+          "rank_name": "Vermillion",
+          "rank_color": "#F85939",
+          "rank_threshold": 72.0
+        },
+        {
+          "rank_name": "Saffron",
+          "rank_color": "#F1C338",
+          "rank_threshold": 80.0
+        },
+        {
+          "rank_name": "Celadon",
+          "rank_color": "#9CFF91",
+          "rank_threshold": 87.0
+        },
+        {
+          "rank_name": "Cerulean",
+          "rank_color": "#02A4D3",
+          "rank_threshold": 95.0
+        },
+        {
+          "rank_name": "Lavender",
+          "rank_color": "#C2C2FF",
+          "rank_threshold": 102.0
+        },
+        {
+          "rank_name": "Indigo",
+          "rank_color": "#5C3896",
+          "rank_threshold": 108.0
+        },
+        {
+          "rank_name": "Fuchsia",
+          "rank_color": "#C74375",
+          "rank_threshold": 116.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1266 @@
+{
+  "playlist_name": "Viscose benchmarks hard scenarios",
+  "playlist_code": "KovaaKsQuestingMaximumblueNightfall",
+  "scenario_list": [
+    {
+      "scenario_name": "WhisphereRawControl 30% small",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 7100.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 7700.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 8300.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 8900.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 9900.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Whisphere Small & Slow",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 14500.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 15750.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 17000.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 18500.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 20000.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 21000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "SmoothBot Invincible Goated Smaller",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 2800.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3300.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3550.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 3950.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 4300.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Leaptrack Goated 80%",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 2500.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 2625.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 2750.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 3000.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere rAim",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 9100.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 9850.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 10700.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 11300.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 11900.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 12350.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Controlsphere Intermediate S5 Hard",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3200.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3500.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 3800.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 4000.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Angelic 4 Voltaic",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 3300.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3650.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3850.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 4100.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 4225.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4350.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "cloverRawControl",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 7000.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 7650.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 8200.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 8650.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 9200.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 10100.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere Far",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 8600.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 9200.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 9800.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 10600.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 11200.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "PGTI Voltaic",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 1450.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 1750.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 2000.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 2250.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 2500.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 2750.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air CELESTIAL",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 867.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 875.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 885.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 890.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 894.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 897.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Whisphere Extra Small & Slow",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 8500.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 10300.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 11000.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 12500.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 13500.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Ground Plaza Sparky V3 Thin",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 881.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 886.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 891.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 895.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 898.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 901.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere OW 150%",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 6900.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 7600.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 8100.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 8500.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 8900.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 9450.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Flicker Plaza",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 890.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 896.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 901.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 905.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 910.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 914.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Polarized Hell 20% Slower",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 2550.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 2700.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 3000.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 3150.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Pure",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 884.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 890.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 895.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 900.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 905.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 909.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Air Voltaic Invincible 4",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 2800.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3150.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3450.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 3700.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 3900.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Pokeball Frenzy Auto TE Wide",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 3550.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3725.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3850.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 4000.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 4100.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w2ts reload",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 118.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 125.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 131.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 137.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 142.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "voxTargetSwitch 2 20% Smaller",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 102.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 115.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 120.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 126.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 132.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "beanTS 30% Smaller",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 119.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 127.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 134.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 139.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 143.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 147.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "FloatTS Angelic",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 94.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 100.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 105.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 114.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 118.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "waldoTS",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 145.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 153.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 160.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 168.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 175.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 180.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "devTS Goated NR Static Small 5Bot",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 750.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 775.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 800.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 825.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 850.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 870.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "domiSwitch",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 5500.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 5900.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 6200.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 6500.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 6800.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 7100.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "tamTargetSwitch Smooth",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 32.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 35.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 37.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 39.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 42.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 45.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Pasu Reload Goated",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 120.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 130.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 140.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 150.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 160.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Bounceshot Advanced",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 740.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 800.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 860.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 920.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 960.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Controlsphere Click Smaller",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 39.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 45.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 51.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 56.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 60.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 64.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Popcorn MV Advanced",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 290.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 330.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 370.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 420.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 460.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 500.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Pasu Angelic",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 87.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 94.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 102.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 110.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 118.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 125.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w2ts Pasu Perfected 30% Smaller",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 75.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 82.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 87.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 93.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 98.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 103.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "1w3ts Pasu Perfected Micro Goated",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 1100.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 1200.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 1300.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 1400.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 1500.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 1560.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "Floating Heads Timing 400% FIXED",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 3200.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 3484.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 3648.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 3848.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 4048.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 4248.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VoxTargetSwitch Click Small",
+      "rank_data": [
+        {
+          "rank_name": "Wool",
+          "rank_color": "#F1ECEB",
+          "rank_threshold": 90.0
+        },
+        {
+          "rank_name": "Linen",
+          "rank_color": "#EED3CE",
+          "rank_threshold": 96.0
+        },
+        {
+          "rank_name": "Velvet",
+          "rank_color": "#ECA1B0",
+          "rank_threshold": 101.0
+        },
+        {
+          "rank_name": "Chiffon",
+          "rank_color": "#8FC7E7",
+          "rank_threshold": 106.0
+        },
+        {
+          "rank_name": "Satin",
+          "rank_color": "#5CA9C6",
+          "rank_threshold": 111.0
+        },
+        {
+          "rank_name": "Silk",
+          "rank_color": "#2E6F8A",
+          "rank_threshold": 115.0
+        }
+      ]
+    }
+  ]
+}

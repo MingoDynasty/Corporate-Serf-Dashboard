@@ -2,23 +2,455 @@
   "playlist_name": "Voltaic Intermediate Benchmarks S5",
   "playlist_code": "KovaaKsBottingShinyDoor",
   "scenario_list": [
-    "VT Pasu Intermediate S5",
-    "VT Popcorn Intermediate S5",
-    "VT 1w3ts Intermediate S5",
-    "VT ww5t Intermediate S5",
-    "VT Frogtagon Intermediate S5",
-    "VT Floating Heads Intermediate S5",
-    "VT PGT Intermediate S5",
-    "VT Snake Track Intermediate S5",
-    "VT Aether Intermediate S5",
-    "VT Ground Intermediate S5",
-    "VT Raw Control Intermediate S5",
-    "VT Controlsphere Intermediate S5",
-    "VT DotTS Intermediate S5",
-    "VT EddieTS Intermediate S5",
-    "VT DriftTS Intermediate S5",
-    "VT FlyTS Intermediate S5",
-    "VT ControlTS Intermediate S5",
-    "VT Penta Bounce Intermediate S5"
+    {
+      "scenario_name": "VT Pasu Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 770.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 850.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 930.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 980.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Popcorn Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 600.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 690.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 780.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 860.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT 1w3ts Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 1120.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 1220.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 1300.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 1380.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT ww5t Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 1310.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 1400.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 1490.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 1560.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Frogtagon Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 940.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 1040.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 1140.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 1230.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Floating Heads Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 610.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 690.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 770.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 860.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT PGT Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2275.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 2675.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 3050.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3325.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Snake Track Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2800.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 3175.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 3500.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Aether Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2175.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 2550.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 2900.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3175.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Ground Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2550.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 2850.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 3100.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3350.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Raw Control Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2775.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 3200.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 3550.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3875.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Controlsphere Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 2750.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 3175.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 3525.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 3825.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT DotTS Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 1110.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 1180.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 1230.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 1280.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT EddieTS Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 880.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 950.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 1020.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT DriftTS Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 390.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 430.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 460.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 490.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT FlyTS Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 520.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 570.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 610.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 650.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT ControlTS Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 420.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 460.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 485.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 520.0
+        }
+      ]
+    },
+    {
+      "scenario_name": "VT Penta Bounce Intermediate S5",
+      "rank_data": [
+        {
+          "rank_name": "Platinum",
+          "rank_color": "#2FCFC2",
+          "rank_threshold": 450.0
+        },
+        {
+          "rank_name": "Diamond",
+          "rank_color": "#B9F2FF",
+          "rank_threshold": 490.0
+        },
+        {
+          "rank_name": "Jade",
+          "rank_color": "#85FA85",
+          "rank_threshold": 540.0
+        },
+        {
+          "rank_name": "Master",
+          "rank_color": "#EC44CA",
+          "rank_threshold": 580.0
+        }
+      ]
+    }
   ]
 }
