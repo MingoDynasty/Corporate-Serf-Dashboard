@@ -12,6 +12,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 
 from kovaaks.data_models import RunData, Rank
+from utilities.utilities import format_decimal
 
 logger = logging.getLogger(__name__)
 
@@ -114,7 +115,7 @@ def generate_plot(
             figure_combined.add_hline(
                 name=rank.rank_name,
                 label=dict(
-                    text=f"{rank.rank_name} ({rank.rank_threshold})",
+                    text=f"{rank.rank_name} ({format_decimal(rank.rank_threshold)})",
                     textposition="end",
                 ),
                 y=rank.rank_threshold,
