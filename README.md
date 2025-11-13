@@ -14,20 +14,21 @@ you keep playing and generating new scores, the plot will automatically update i
     3. React
     4. Flask
 
-## Requirements
+## First Time Setup
 
-1. Python 3.13 (Dash is bugged with Python 3.14)
-
-## Installation / First Time Setup
-
-1. Install the Python package dependencies: `pip install -r requirements.txt`
-2. Make a copy of the `example.toml`. Name the new file `config.toml`.
-3. Inside `config.toml`, update the `stats_dir` variable to point to your Kovaak's stats file directory.
-4. Feel free to change any other settings inside the TOML file, or leave them at their defaults.
+1. Make a copy of the `example.toml`. Name the new file `config.toml`.
+2. Inside `config.toml`, update the `stats_dir` variable to point to your Kovaak's stats file directory.
+3. Feel free to change any other settings inside the TOML file, or leave them at their defaults.
 
 ## Usage
 
-1. Run the app in your terminal: `python source/app.py`
+1. Run the app in your terminal:
+
+```
+uv sync
+uv run python source/app.py
+```
+
 2. Open a browser and navigate to: http://localhost:8080/
 
 ## Example

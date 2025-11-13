@@ -1,3 +1,25 @@
+[project]
+name = "Corporate-Serf-Dashboard"
+version = "1.0.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "dash>=3.3.0",
+    "dash-extensions>=2.0.4",
+    "dash-iconify>=0.1.2",
+    "dash-mantine-components>=2.4.0",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "plotly>=6.4.0",
+    "pydantic>=2.12.4",
+    "requests>=2.32.5",
+    "sortedcontainers>=2.4.0",
+    "tomli-w>=1.2.0",
+    "tzdata>=2025.2",
+    "watchdog>=6.0.0",
+]
+
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
 # compatible code, which means that the block might have code that exists only in
