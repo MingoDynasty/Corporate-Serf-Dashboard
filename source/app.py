@@ -4,7 +4,7 @@ Entrypoint to the Corporate Serf Dashboard app.
 
 import logging.config  # Provides access to logging configuration file.
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Tuple
 
 import dash_mantine_components as dmc
