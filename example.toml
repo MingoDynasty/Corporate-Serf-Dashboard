@@ -1,17 +1,10 @@
 #
 # This is an example configuration file.
 #
-scenario_to_monitor = ""
 
 # Directory where the Kovaak's stats files are stored.
 # stats_dir = "C:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
 stats_dir = "Change me!"
-
-# Only care about runs within the last N days
-within_n_days = 30
-
-# Limit to the top N scores
-top_n_scores = 5
 
 # How often to poll for updates (in milliseconds)
 polling_interval = 1000  # 1 second

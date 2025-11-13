@@ -289,7 +289,6 @@ app.layout = dmc.MantineProvider(
                                 id="scenario-dropdown-selection",
                                 data=get_unique_scenarios(config.stats_dir),
                                 searchable=True,
-                                value=config.scenario_to_monitor,
                                 style={"min-width": "500px"},
                                 maxDropdownHeight="75vh",
                                 checkIconPosition="right",
@@ -306,17 +305,12 @@ app.layout = dmc.MantineProvider(
                                 size="sm",
                                 radius="sm",
                                 min=1,
-                                value=config.top_n_scores,
                                 persistence=True,
                             ),
                             dmc.DatePickerInput(
                                 id="date-picker",
                                 label="Oldest date to consider",
                                 rightSection=DashIconify(icon="clarity:date-line"),
-                                value=(
-                                    datetime.now()
-                                    - timedelta(days=config.within_n_days)
-                                ),
                                 maxDate=datetime.now(),
                                 persistence=True,
                             ),

@@ -13,10 +13,7 @@ CONFIG_FILE = "config.toml"
 class ConfigData:
     """Dataclass models configuration for this app."""
 
-    scenario_to_monitor: str
     stats_dir: str
-    within_n_days: int
-    top_n_scores: int
     polling_interval: int
     port: int
     sens_round_decimal_places: int
