@@ -124,7 +124,7 @@ def update_graph(
     :return: Figure, Notification
     """
     global cached_plot
-    if not newly_selected_scenario or not top_n_scores:
+    if not newly_selected_scenario or not top_n_scores or not new_date:
         return cached_plot, no_update
 
     if not is_scenario_in_database(newly_selected_scenario):
