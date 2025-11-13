@@ -111,16 +111,21 @@ def generate_plot(
     figure_combined["data"][1]["showlegend"] = True
 
     if rank_overlay_switch and rank_data:
+        min_score = min(scatter_plot_data["Score"])
+        max_score = max(scatter_plot_data["Score"])
+
+        # TODO: percentages don't work that well.
+        #  Change to show highest rank below min_score, and lowest rank above max_score.
         for rank in rank_data:
             figure_combined.add_hline(
-                name=rank.rank_name,
+                name=rank.name,
                 label=dict(
-                    text=f"{rank.rank_name} ({format_decimal(rank.rank_threshold)})",
+                    text=f"{rank.name} ({format_decimal(rank.threshold)})",
                     textposition="end",
                 ),
-                y=rank.rank_threshold,
+                y=rank.threshold,
                 line_dash="dash",
-                line_color=rank.rank_color,
+                line_color=rank.color,
             )
     return figure_combined
 

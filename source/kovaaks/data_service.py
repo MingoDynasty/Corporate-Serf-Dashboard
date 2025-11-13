@@ -86,7 +86,7 @@ def get_playlists() -> List[str]:
 
 def get_scenarios_from_playlists(playlist_name: str) -> List[str]:
     """Get scenarios from a playlist."""
-    return [item.scenario_name for item in playlist_database[playlist_name]]
+    return [item.name for item in playlist_database[playlist_name]]
 
 
 def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> List[Rank]:
@@ -99,9 +99,9 @@ def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> List[
         return []
     scenarios = playlist_database[playlist_name]
     for scenario in scenarios:
-        if scenario.scenario_name != scenario_name:
+        if scenario.name != scenario_name:
             continue
-        return scenario.rank_data
+        return scenario.ranks
     logger.warning(
         "Failed to get rank data for playlist (%s), scenario (%s)",
         playlist_name,
@@ -283,13 +283,13 @@ def load_playlists() -> None:
                 json_data = file.read()
             playlist_data = PlaylistData.model_validate_json(json_data)
 
-            if playlist_data.playlist_name in playlist_database:
+            if playlist_data.name in playlist_database:
                 logger.warning(
                     "Playlist already exists in database: %s",
-                    playlist_data.playlist_name,
+                    playlist_data.name,
                 )
                 continue
-            playlist_database[playlist_data.playlist_name] = playlist_data.scenario_list
+            playlist_database[playlist_data.name] = playlist_data.scenarios
         except ValidationError:
             logger.warning("Invalid JSON format in playlist file: %s", playlist_file)
     return
