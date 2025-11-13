@@ -1,0 +1,426 @@
+{
+  "name": "Aimerz+ Precise Tracking Benchmarks Hard",
+  "code": "KovaaKsDeathballingForestgreenAp",
+  "scenarios": [
+    {
+      "name": "Smoothbot Pauer Glider",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 4750.0
+        }
+      ]
+    },
+    {
+      "name": "Deceptive Tracking XYZ",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2660.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Pauer",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 5250.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 5900.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 11250.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Control Phantasy 30% Smaller",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PreciseTrack S1 Modified",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3550.0
+        }
+      ]
+    },
+    {
+      "name": "Centering II 180",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 11200.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 12250.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 15000.0
+        }
+      ]
+    },
+    {
+      "name": "tamAngleSmoothness",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 11100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 12400.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Small & Slow",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 13800.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 15400.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 16700.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 19500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 22200.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PTI Med S1",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 5100.0
+        }
+      ]
+    },
+    {
+      "name": "Bouncesphere Smooth",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 4750.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 5000.0
+        }
+      ]
+    }
+  ]
+}

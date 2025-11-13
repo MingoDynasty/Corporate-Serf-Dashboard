@@ -1,0 +1,1566 @@
+{
+  "name": "XYZ Benchmarks - Easy",
+  "code": "KovaaKsChattingCobaltChatfrag",
+  "scenarios": [
+    {
+      "name": "XYZ EvolveClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 670.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 710.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 800.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 890.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 910.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 940.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 970.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ MixClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 800.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 850.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 940.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1840.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ DepthClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 780.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 820.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 890.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 970.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1760.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ XYZClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 400.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 420.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 500.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 580.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 660.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 740.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 760.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 790.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 830.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 870.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 910.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1830.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 220.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 240.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 310.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 380.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 430.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 480.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 560.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 590.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 630.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 660.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1420.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ 3DClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 500.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 530.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 590.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 660.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 730.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 810.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 840.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 870.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 910.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 960.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1720.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ StarClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 240.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 260.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 340.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 420.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 440.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 470.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 490.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 550.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 590.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 620.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1030.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AxisClick Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 290.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 310.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 390.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 470.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 500.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 530.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 560.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 590.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 620.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 650.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 680.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1030.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SmoothTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4782.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1425.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5052.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ JagTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4334.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AirTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4995.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ GroundTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4370.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ ReactiveTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4006.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ TwisterTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1625.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5336.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ LeapTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 1925.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4477.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SwaySwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 710.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 750.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 820.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 900.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 930.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 970.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 990.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1427.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ FloatSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 850.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 900.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 980.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1607.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 470.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 500.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 560.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 620.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 660.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 730.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 760.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 780.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 800.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 840.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1220.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AscendSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 430.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 450.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 480.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 510.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 530.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 560.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 570.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 590.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 620.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 650.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 862.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SnowSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 380.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 400.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 430.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 460.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 470.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 490.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 510.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 520.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 530.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 560.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 741.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WarpSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 400.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 420.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 460.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 500.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 520.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 550.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 560.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 580.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 590.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 610.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 640.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 860.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SlopeSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 480.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 510.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 530.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 550.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 560.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 570.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 580.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 590.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 610.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 640.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 793.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WideSwitch Easy",
+      "ranks": [
+        {
+          "name": "Trainee-",
+          "color": "#FEC68C",
+          "threshold": 250.0
+        },
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 270.0
+        },
+        {
+          "name": "Trainee+",
+          "color": "#F59D40",
+          "threshold": 290.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 310.0
+        },
+        {
+          "name": "Initiate+",
+          "color": "#F5CC50",
+          "threshold": 320.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 330.0
+        },
+        {
+          "name": "Adept+",
+          "color": "#7FC162",
+          "threshold": 340.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#6D9EEB",
+          "threshold": 350.0
+        },
+        {
+          "name": "Ascendant+",
+          "color": "#598CDC",
+          "threshold": 360.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 370.0
+        },
+        {
+          "name": "Virtuoso+",
+          "color": "#8570C2",
+          "threshold": 390.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 576.0
+        }
+      ]
+    }
+  ]
+}

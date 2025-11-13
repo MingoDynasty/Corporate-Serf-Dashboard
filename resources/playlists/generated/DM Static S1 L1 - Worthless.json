@@ -1,0 +1,1046 @@
+{
+  "name": "DM Static S1 L1 - Worthless",
+  "code": "KovaaKsSensingViscousPopcorn",
+  "scenarios": [
+    {
+      "name": "DM 1w3ts Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 760.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 860.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 960.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1660.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1760.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1860.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 830.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 930.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1730.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1810.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1910.0
+        }
+      ]
+    },
+    {
+      "name": "DM Tripleclick Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 940.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1740.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1880.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1980.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2040.0
+        }
+      ]
+    },
+    {
+      "name": "DM Tripleclick Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 990.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1790.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1930.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2030.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2090.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 820.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 920.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1620.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1720.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 870.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 970.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1670.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "DM Quadclick Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1730.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1830.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1970.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2070.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2130.0
+        }
+      ]
+    },
+    {
+      "name": "DM Quadclick Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1680.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1780.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1880.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2020.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2120.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2180.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 830.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 930.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1730.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1830.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1930.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 900.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1880.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1980.0
+        }
+      ]
+    },
+    {
+      "name": "DM Pentaclick Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2040.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2140.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2200.0
+        }
+      ]
+    },
+    {
+      "name": "DM Pentaclick Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2090.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2190.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 870.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 970.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1670.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 920.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1620.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1720.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1820.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "DM Hexaclick Pokeball Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2090.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2190.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "DM Hexaclick Level 1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2140.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2240.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2300.0
+        }
+      ]
+    }
+  ]
+}

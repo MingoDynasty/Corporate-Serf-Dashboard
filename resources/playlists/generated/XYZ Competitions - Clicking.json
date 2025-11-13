@@ -1,0 +1,86 @@
+{
+  "name": "XYZ Competitions - Clicking",
+  "code": "KovaaKsStrikingRareSniper",
+  "scenarios": [
+    {
+      "name": "XYZ EvolveClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ MixClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1870.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ DepthClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1860.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ XYZClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 990.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ 3DClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1430.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ StarClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 830.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AxisClick",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 940.0
+        }
+      ]
+    }
+  ]
+}

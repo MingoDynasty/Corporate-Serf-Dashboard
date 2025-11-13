@@ -1,0 +1,126 @@
+{
+  "name": "e1se Tracking Beginner",
+  "code": "KovaaKsResettingScaredShotgun",
+  "scenarios": [
+    {
+      "name": "Smoothness Training 60",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 22800.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 23000.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Tracking a+ Easy",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 10600.0
+        }
+      ]
+    },
+    {
+      "name": "e1se Smoothness EASY",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "GP Far Long Strafes Easy",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 5900.0
+        }
+      ]
+    },
+    {
+      "name": "GP Close Long Strafes Easy",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 5900.0
+        }
+      ]
+    },
+    {
+      "name": "e1se Auto Balanced Long EASY",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "Centering 90 Easy+ No Strafes",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 19000.0
+        }
+      ]
+    },
+    {
+      "name": "Centering I Easy",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 15600.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 17000.0
+        }
+      ]
+    }
+  ]
+}

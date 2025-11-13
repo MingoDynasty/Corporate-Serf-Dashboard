@@ -1,0 +1,966 @@
+{
+  "name": "AimSpeed Easy Benchmarks",
+  "code": "KovaaKsBobbingMaximumblueDeserteagle",
+  "scenarios": [
+    {
+      "name": "voxTargetSwitch Jumbo",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 120.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 125.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 130.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 140.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 150.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch Jumbo [Low TTK]",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 140.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 145.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 150.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 155.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 160.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 170.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox Jumbo",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 150.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 155.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 160.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 165.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 170.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 180.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 190.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS-Huge Jumbo static",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 160.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 165.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 170.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 175.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 180.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 190.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch easy NR",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 7600.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 10400.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetSwitch 90 easy",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 10960.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingPat 90 Jumbo",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 120.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 125.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 130.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 140.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 145.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch Jumbo",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 87.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 90.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 93.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 96.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 105.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch speed static",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 100.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 104.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 108.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 112.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 116.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 125.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS NR Easy",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 19800.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 20700.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 21600.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 22500.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 23400.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 25200.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 27000.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS NR Static",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 24000.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 25200.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 26400.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 27600.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 28800.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 30000.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 32100.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS V2 Static",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 24000.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 25200.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 26400.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 27600.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 28800.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 30000.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 32100.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated Easy",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 600.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 630.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 660.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 690.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 720.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 780.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 810.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static Easy",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 720.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 750.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 780.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 810.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 840.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 870.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 114.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 118.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 122.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 126.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 130.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 135.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto TE 60s",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 148.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 156.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 164.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 172.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 180.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 190.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Auto 1w2ts smallflicks",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 126.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 132.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 138.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 144.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 150.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 160.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "canTS",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 340.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 370.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 400.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 430.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 480.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 500.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 530.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 124.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 130.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 136.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 140.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 150.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 155.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS 30% Larger",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Bounce 180 Tracking Jumbo",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 99.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 103.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 107.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 111.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 115.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 125.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "3D Switching",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 450.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 480.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 510.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 550.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 600.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 625.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "Skeet Tracking Goated",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "Target Switching 90 static",
+      "ranks": [
+        {
+          "name": "Stagnant",
+          "color": "#F9CB9C",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Gradual",
+          "color": "#FFE599",
+          "threshold": 1680.0
+        },
+        {
+          "name": "Moderate",
+          "color": "#B6D7A8",
+          "threshold": 1760.0
+        },
+        {
+          "name": "Swift",
+          "color": "#A4C2F4",
+          "threshold": 1840.0
+        },
+        {
+          "name": "Exponential",
+          "color": "#B47AD6",
+          "threshold": 1960.0
+        },
+        {
+          "name": "Accelerated",
+          "color": "#3C78D8",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 2050.0
+        }
+      ]
+    }
+  ]
+}

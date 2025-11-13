@@ -1,0 +1,456 @@
+{
+  "name": "DM Poke Static S2 L6 - Worthless",
+  "code": "KovaaKsRocketingVioletController",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 780.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 880.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 980.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 920.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1540.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 830.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 930.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1630.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 870.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 970.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1490.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1670.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 900.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1520.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1660.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 920.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1540.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Pokeball Smaller",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1680.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1720.0
+        }
+      ]
+    }
+  ]
+}

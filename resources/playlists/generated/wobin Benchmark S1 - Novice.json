@@ -1,0 +1,426 @@
+{
+  "name": "wobin Benchmark S1 - Novice",
+  "code": "KovaaKsFeedingButteryPrism",
+  "scenarios": [
+    {
+      "name": "wobin 1w4ts Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "wobin ww6t Horizontal Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "wobin 1w2ts Micro Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 760.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 820.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 980.0
+        }
+      ]
+    },
+    {
+      "name": "wobinclick",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 850.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 950.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Sky Strafe Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "wobin BounceTrack Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Polarized Hell Dash Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Blinkstrafe Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Wobinorb Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 4350.0
+        }
+      ]
+    },
+    {
+      "name": "wobin RawControl Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "wobin DotTS Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 1330.0
+        }
+      ]
+    },
+    {
+      "name": "wobin WobTS Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 980.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 1180.0
+        }
+      ]
+    },
+    {
+      "name": "wobin CloudTS Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 540.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 580.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 630.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 680.0
+        }
+      ]
+    },
+    {
+      "name": "wobin RawControlTS Easy",
+      "ranks": [
+        {
+          "name": "Bluebell",
+          "color": "#A2D2FF",
+          "threshold": 440.0
+        },
+        {
+          "name": "Tulip",
+          "color": "#FEE18F",
+          "threshold": 480.0
+        },
+        {
+          "name": "Lily",
+          "color": "#FFAFCC",
+          "threshold": 520.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#FFB8AF",
+          "threshold": 560.0
+        },
+        {
+          "name": "Iris",
+          "color": "#CDB4DB",
+          "threshold": 600.0
+        }
+      ]
+    }
+  ]
+}

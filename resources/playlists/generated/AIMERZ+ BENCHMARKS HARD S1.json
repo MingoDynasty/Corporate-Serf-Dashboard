@@ -1,0 +1,726 @@
+{
+  "name": "AIMERZ+ BENCHMARKS HARD S1",
+  "code": "KovaaKsGriefingGoldenrodQuest",
+  "scenarios": [
+    {
+      "name": "Aimerz+ pipeClick Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 680.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 780.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 880.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 980.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopClick Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 680.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 780.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 880.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 1480.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ sunClick Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 390.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 460.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 530.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 620.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 740.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 860.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ ww2t Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 124.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 130.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 139.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 152.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 162.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 175.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 195.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w3ts Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 120.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 128.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 138.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 147.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 160.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 170.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 186.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 158.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 170.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 182.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 194.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 208.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 223.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 250.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Smoothbot Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 4750.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 5600.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PTI Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PreciseTrack Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PipeTrack Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VGS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VAS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 3725.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ pivoTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 102.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 110.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 117.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 126.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 133.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 141.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 156.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ nuTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 87.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 95.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 103.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 111.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 120.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 130.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 148.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ goaTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 81.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 87.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 95.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 103.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 111.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 120.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 128.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ cheaTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 51.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 56.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 62.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 67.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 71.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 75.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 82.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 50.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 58.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 64.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 70.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 78.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 85.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 97.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ caTS Hard S1",
+      "ranks": [
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 42.0
+        },
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 46.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 50.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 54.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 57.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 61.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#AFF9BD",
+          "threshold": 66.0
+        }
+      ]
+    }
+  ]
+}

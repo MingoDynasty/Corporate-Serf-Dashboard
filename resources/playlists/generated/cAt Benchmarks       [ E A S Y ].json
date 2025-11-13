@@ -1,0 +1,456 @@
+{
+  "name": "cAt Benchmarks       [ E A S Y ]",
+  "code": "KovaaKsBobbingPeachPrism",
+  "scenarios": [
+    {
+      "name": "cAt 3 cats wide",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 980.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 5 cats micro",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 4 cats",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 750.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 820.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 890.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "cAt purrClick Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 450.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 550.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 650.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 750.0
+        }
+      ]
+    },
+    {
+      "name": "cAt pawClick Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 420.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 480.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 540.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 600.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnClick Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 400.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 490.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 570.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "cAt laserTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "cAt meowTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 2170.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 2390.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 2600.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 2740.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 3130.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "cAt sausageTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 2100.0
+        }
+      ]
+    },
+    {
+      "name": "cAt fluffyTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "cAt furTrack Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "cAt mealSwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 850.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 920.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 990.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tabbySwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 850.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 950.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "cAt wobbleSwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 780.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 820.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 860.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tailSwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 320.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 350.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 370.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 390.0
+        }
+      ]
+    },
+    {
+      "name": "cAt snortSwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 300.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 330.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 360.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 390.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnSwitch Easy",
+      "ranks": [
+        {
+          "name": "Manul",
+          "color": "#334053",
+          "threshold": 420.0
+        },
+        {
+          "name": "Ocelot",
+          "color": "#B1D9EB",
+          "threshold": 460.0
+        },
+        {
+          "name": "Serval",
+          "color": "#49D8AC",
+          "threshold": 490.0
+        },
+        {
+          "name": "Caracal",
+          "color": "#F85B74",
+          "threshold": 520.0
+        }
+      ]
+    }
+  ]
+}

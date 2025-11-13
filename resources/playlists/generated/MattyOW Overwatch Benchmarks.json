@@ -1,0 +1,546 @@
+{
+  "name": "MattyOW Overwatch Benchmarks",
+  "code": "KovaaKsMainingScaredTag",
+  "scenarios": [
+    {
+      "name": "remClick - OW 85%",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 150.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 250.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 300.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 350.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 450.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 600.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 715.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu 360 Reload Goated",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 20.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 30.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 40.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 53.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 65.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 75.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 87.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 95.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Leapcorn",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 25.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 32.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 40.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 55.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 67.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 80.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 94.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Glider OW",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI rAim",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 600.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 850.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 2675.0
+        }
+      ]
+    },
+    {
+      "name": "odb MFSI",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 900.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 1175.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Amare",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 45.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 60.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 80.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 90.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 100.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 115.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 125.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Smaller rAim",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 25.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 32.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 45.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 55.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 67.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 75.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 85.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 92.0
+        }
+      ]
+    },
+    {
+      "name": "PasuTS 360 OW",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 160.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 225.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 275.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 325.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 375.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 420.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 480.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "Air Dodge",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 45.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 60.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 75.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 95.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 110.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 125.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 140.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 156.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetClick Dodge",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Leap 360 Reload Dodge",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#944B33",
+          "threshold": 16.0
+        },
+        {
+          "name": "Average",
+          "color": "#57656D",
+          "threshold": 24.0
+        },
+        {
+          "name": "Experienced",
+          "color": "#E48825",
+          "threshold": 30.0
+        },
+        {
+          "name": "Skilled",
+          "color": "#789BE1",
+          "threshold": 45.0
+        },
+        {
+          "name": "Adept",
+          "color": "#0DB68F",
+          "threshold": 57.0
+        },
+        {
+          "name": "Masterful",
+          "color": "#CA202C",
+          "threshold": 64.0
+        },
+        {
+          "name": "Inhuman",
+          "color": "#886BA5",
+          "threshold": 70.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#FEE264",
+          "threshold": 75.0
+        }
+      ]
+    }
+  ]
+}

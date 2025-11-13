@@ -1,0 +1,636 @@
+{
+  "name": "Voltaic Benchmarks (Advanced)",
+  "code": "KovaaKsFlashingFarFinisher",
+  "scenarios": [
+    {
+      "name": "Pasu Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 68.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 76.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 85.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 95.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 105.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 110.2
+        }
+      ]
+    },
+    {
+      "name": "B180 Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 78.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 88.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 98.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 108.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 115.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 220.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 260.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 320.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 390.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 440.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 450.0
+        }
+      ]
+    },
+    {
+      "name": "ww3t Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 130.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 138.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 148.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 160.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 170.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 172.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 115.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 120.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 130.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 142.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 152.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 156.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 152.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 160.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 175.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 192.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 210.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 213.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4134.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4226.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2588.0
+        }
+      ]
+    },
+    {
+      "name": "FuglaaXYZ Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 13800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 15200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 16840.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 862.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 870.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 880.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 888.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 894.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 896.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 850.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 860.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 872.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 883.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 887.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 890.7
+        }
+      ]
+    },
+    {
+      "name": "patTS Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 91.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 97.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 103.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 110.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 116.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 118.2
+        }
+      ]
+    },
+    {
+      "name": "psalmTS Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 85.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 90.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 98.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 107.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 114.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 117.5
+        }
+      ]
+    },
+    {
+      "name": "voxTS Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 102.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 110.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 118.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 125.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 131.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 133.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 65.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 72.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 79.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 84.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 88.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 91.0
+        }
+      ]
+    },
+    {
+      "name": "B180T Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 64.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 70.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 78.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 85.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 92.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 95.8
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot TS Voltaic",
+      "ranks": [
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 50.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 55.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 60.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 65.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 70.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 70.4
+        }
+      ]
+    }
+  ]
+}

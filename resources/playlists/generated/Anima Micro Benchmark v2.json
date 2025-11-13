@@ -1,0 +1,646 @@
+{
+  "name": "Anima Micro Benchmark v2",
+  "code": "KovaaKsGhostpeekingCobaltIntelligence",
+  "scenarios": [
+    {
+      "name": "Microshot Avasive",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 50.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 65.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 80.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 100.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 115.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 130.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 750.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 890.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 1175.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "Anima WavyClick",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 400.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 525.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 650.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 775.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 1025.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "Star Clicking Micro",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 300.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 400.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 500.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 800.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Static Click Angelic",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 100.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 112.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 123.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 135.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 147.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 158.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "RawMousima",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 2060.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 2280.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Animicro Dash",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 50.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 54.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 58.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 63.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 67.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 71.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire Voltaic 30% smaller",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 100.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 113.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 125.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 138.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 150.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 163.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 175.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 5150.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 7300.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 9500.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Hard",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 5875.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 7950.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 9000.0
+        }
+      ]
+    },
+    {
+      "name": "Swing Tracking",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 950.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 2350.0
+        }
+      ]
+    },
+    {
+      "name": "DomiSphere Micro",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Perfected",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 75.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 84.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 93.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 103.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 112.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 121.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Avasive",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 4350.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 4950.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 6700.0
+        }
+      ]
+    },
+    {
+      "name": "AvasiveTS Perfected",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 5750.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 6450.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 7150.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 8600.0
+        }
+      ]
+    },
+    {
+      "name": "vietTS Micro",
+      "ranks": [
+        {
+          "name": "Dust",
+          "color": "#A6FF94",
+          "threshold": 85.0
+        },
+        {
+          "name": "Cell",
+          "color": "#00FFFF",
+          "threshold": 95.0
+        },
+        {
+          "name": "Molecule",
+          "color": "#4A86E8",
+          "threshold": 104.0
+        },
+        {
+          "name": "Atom",
+          "color": "#FC95FC",
+          "threshold": 114.0
+        },
+        {
+          "name": "Nucleus",
+          "color": "#F25652",
+          "threshold": 123.0
+        },
+        {
+          "name": "Ion",
+          "color": "#FF9900",
+          "threshold": 133.0
+        },
+        {
+          "name": "Electron",
+          "color": "#FFFF00",
+          "threshold": 142.0
+        }
+      ]
+    }
+  ]
+}

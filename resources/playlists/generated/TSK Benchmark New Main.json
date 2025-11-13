@@ -1,0 +1,886 @@
+{
+  "name": "TSK Benchmark New Main",
+  "code": "KovaaKsCrankingCeruleanDuelist",
+  "scenarios": [
+    {
+      "name": "TSK - ST60 Thick",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - SYW",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 700.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 950.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1800.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Centering 90 Speed 2",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 350.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 450.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - 360 Turn",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 800.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - DVD Tracking Big",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - DVD Tracking",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2200.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Box Tracking",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 800.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Wavy Tracking",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 700.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 20",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2430.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 160",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 70",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1860.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2060.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2260.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2390.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 110",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1810.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2010.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2210.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2360.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - SYV Big",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - SYV",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 700.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2150.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - VSTP Soft Big",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - VSTP Soft",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 800.0
+        },
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2150.0
+        }
+      ]
+    }
+  ]
+}

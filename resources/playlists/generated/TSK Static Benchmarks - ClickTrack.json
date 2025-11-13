@@ -1,0 +1,1656 @@
+{
+  "name": "TSK Static Benchmarks - ClickTrack",
+  "code": "KovaaKsSnipingSaltyMomentum",
+  "scenarios": [
+    {
+      "name": "ClickTrack 3t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 52.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 58.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 64.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 70.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 76.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 82.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 88.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 94.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 100.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 102.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack 5t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 54.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 60.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 66.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 71.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 76.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 82.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 88.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 94.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 100.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 102.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 2t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 39.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 44.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 49.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 54.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 59.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 64.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 69.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 74.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 79.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 3t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 40.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 46.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 52.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 58.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 69.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 74.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 79.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 84.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 95.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 2t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 36.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 41.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 46.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 51.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 55.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 60.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 65.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 70.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 75.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 78.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 3t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 44.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 49.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 54.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 59.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 70.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 75.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 80.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 85.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 89.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 2t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 36.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 41.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 46.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 51.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 55.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 60.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 65.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 70.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 75.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 74.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 3t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 44.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 49.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 54.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 59.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 70.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 75.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 80.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 85.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 87.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 2t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 36.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 41.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 46.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 51.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 55.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 60.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 65.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 70.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 75.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 76.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 3t",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 44.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 49.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 54.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 59.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 70.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 75.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 80.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 85.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 87.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack 3t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 73.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 81.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 89.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 97.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 104.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 113.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 122.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 131.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 143.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 148.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack 5t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 62.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 69.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 76.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 83.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 89.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 97.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 105.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 113.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 124.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 132.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 2t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 63.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 71.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 79.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 87.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 94.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 103.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 112.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 121.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 133.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 142.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 3t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 68.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 76.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 84.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 92.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 99.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 108.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 117.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 126.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 138.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 147.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 2t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 68.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 77.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 86.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 103.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 112.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 121.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 130.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 142.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 146.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 3t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 76.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 86.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 96.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 106.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 114.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 123.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 133.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 142.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 154.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 157.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 2t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 68.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 77.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 86.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 103.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 112.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 121.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 130.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 142.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 3t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 76.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 86.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 96.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 106.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 114.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 123.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 133.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 142.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 154.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 2t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 68.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 77.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 86.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 103.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 112.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 121.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 130.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 142.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 142.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 3t Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 76.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 86.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 96.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 106.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 114.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 123.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 133.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 142.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 154.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack 3t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 28.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 32.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 36.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 40.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 44.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 48.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 52.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 56.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 60.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 64.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack 5t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 33.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 37.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 41.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 45.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 49.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 53.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 57.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 61.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 65.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 66.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 2t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 33.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 36.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 39.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 42.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 46.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 50.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 54.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 58.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 62.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 62.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Horizontal 3t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 36.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 40.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 44.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 48.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 52.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 57.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 62.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 67.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 72.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 2t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 29.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 33.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 37.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 41.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 45.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 48.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 52.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 56.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 60.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Diagonal 3t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 32.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 37.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 42.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 47.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 52.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 56.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 60.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 64.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 68.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 2t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 29.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 33.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 37.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 41.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 45.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 48.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 52.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 56.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 60.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 61.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack AntiDiagonal 3t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 32.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 37.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 42.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 47.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 52.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 56.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 60.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 64.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 68.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 67.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 2t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 31.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 35.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 39.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 43.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 47.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 50.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 54.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 58.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 62.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "ClickTrack Vertical 3t Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 34.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 39.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 44.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 49.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 54.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 58.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 62.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 66.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 70.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 71.0
+        }
+      ]
+    }
+  ]
+}

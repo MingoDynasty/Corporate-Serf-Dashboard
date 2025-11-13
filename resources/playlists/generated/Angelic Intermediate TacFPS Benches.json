@@ -1,0 +1,496 @@
+{
+  "name": "Angelic Intermediate TacFPS Benches",
+  "code": "KovaaKsClickingRandomEnrage",
+  "scenarios": [
+    {
+      "name": "beanClick Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 112.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 124.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 136.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 156.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 176.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 196.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 115.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 125.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 135.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 150.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 165.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bpes Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 96.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 108.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 120.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 132.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 144.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Static Click Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 110.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 120.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 130.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 142.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 157.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 172.0
+        }
+      ]
+    },
+    {
+      "name": "skyClick Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 90.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 110.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 121.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 133.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 146.0
+        }
+      ]
+    },
+    {
+      "name": "AmareTS Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 96.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 102.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 108.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 114.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 124.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 138.0
+        }
+      ]
+    },
+    {
+      "name": "skyTS Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 1520.0
+        }
+      ]
+    },
+    {
+      "name": "skyTS Static Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 91.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 96.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 101.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 107.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 115.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 1w2ts Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 106.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 114.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 122.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 130.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 142.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 103.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 112.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 121.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 129.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 141.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 153.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 110.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 117.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 124.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 135.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 146.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 158.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Click Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 94.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 101.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 108.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 120.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#D3D3D3",
+          "threshold": 72.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#757575",
+          "threshold": 80.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#CE695D",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#B3633E",
+          "threshold": 106.0
+        },
+        {
+          "name": "Champion",
+          "color": "#CFCFCF",
+          "threshold": 116.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#FFDC60",
+          "threshold": 136.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,456 @@
+{
+  "name": "cAt Benchmarks       [ N O R M A L ]",
+  "code": "KovaaKsBlinkingOrangeCrossfire",
+  "scenarios": [
+    {
+      "name": "cAt 3 cats wide",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1320.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 5 cats micro",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 4 cats",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1180.0
+        }
+      ]
+    },
+    {
+      "name": "cAt purrClick Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 520.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 650.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 780.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "cAt pawClick Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 470.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 530.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 600.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 670.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnClick Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 500.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 600.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 700.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "cAt laserTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "cAt meowTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 3240.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 3710.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 4180.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 4650.0
+        }
+      ]
+    },
+    {
+      "name": "cAt sausageTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "cAt fluffyTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 2650.0
+        }
+      ]
+    },
+    {
+      "name": "cAt furTrack Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 2100.0
+        }
+      ]
+    },
+    {
+      "name": "cAt mealSwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1250.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tabbySwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1230.0
+        }
+      ]
+    },
+    {
+      "name": "cAt wobbleSwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tailSwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 375.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 400.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 425.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 450.0
+        }
+      ]
+    },
+    {
+      "name": "cAt snortSwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 370.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 400.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 430.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 460.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnSwitch Normal",
+      "ranks": [
+        {
+          "name": "Lynx",
+          "color": "#DC8665",
+          "threshold": 530.0
+        },
+        {
+          "name": "Jaguar",
+          "color": "#6C5E82",
+          "threshold": 570.0
+        },
+        {
+          "name": "Lion",
+          "color": "#1E8F95",
+          "threshold": 610.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#EEB462",
+          "threshold": 650.0
+        }
+      ]
+    }
+  ]
+}

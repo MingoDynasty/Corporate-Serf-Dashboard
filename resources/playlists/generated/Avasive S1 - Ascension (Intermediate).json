@@ -1,0 +1,546 @@
+{
+  "name": "Avasive S1 - Ascension (Intermediate)",
+  "code": "KovaaKsTimewarpingPeachMomentum",
+  "scenarios": [
+    {
+      "name": "FreightTrack",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Glider",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 3925.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Intermediate",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 3425.0
+        }
+      ]
+    },
+    {
+      "name": "Airva Control",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 3375.0
+        }
+      ]
+    },
+    {
+      "name": "AvaTrack Ground Flicker",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 2525.0
+        }
+      ]
+    },
+    {
+      "name": "cuteTrack",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 2750.0
+        }
+      ]
+    },
+    {
+      "name": "SilkyTS",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 460.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 540.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 580.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 610.0
+        }
+      ]
+    },
+    {
+      "name": "TrixieSwitch",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 400.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 440.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 480.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 520.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 540.0
+        }
+      ]
+    },
+    {
+      "name": "AvomiTS",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 4375.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 4550.0
+        }
+      ]
+    },
+    {
+      "name": "avaSwitch",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 420.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 460.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 500.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 540.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 570.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Speed Switch",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 1280.0
+        }
+      ]
+    },
+    {
+      "name": "AviaTS",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 760.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 820.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 880.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 940.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 980.0
+        }
+      ]
+    },
+    {
+      "name": "Avomi ww4t",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive 1w3ts",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "miaoClick",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 420.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 470.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 520.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 570.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 610.0
+        }
+      ]
+    },
+    {
+      "name": "B180 Avasive",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 300.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 360.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 420.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 480.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "domiClick",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 460.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 520.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 580.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 640.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 680.0
+        }
+      ]
+    },
+    {
+      "name": "MadClick",
+      "ranks": [
+        {
+          "name": "Pigeon",
+          "color": "#E0AAFF",
+          "threshold": 600.0
+        },
+        {
+          "name": "Heron",
+          "color": "#C77DFF",
+          "threshold": 660.0
+        },
+        {
+          "name": "Owl",
+          "color": "#9D4EDD",
+          "threshold": 720.0
+        },
+        {
+          "name": "Hawk",
+          "color": "#7B2CBF",
+          "threshold": 780.0
+        },
+        {
+          "name": "Swan",
+          "color": "#5A189A",
+          "threshold": 820.0
+        }
+      ]
+    }
+  ]
+}

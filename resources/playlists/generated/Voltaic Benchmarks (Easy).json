@@ -1,0 +1,546 @@
+{
+  "name": "Voltaic Benchmarks (Easy)",
+  "code": "KovaaKsFlickingFastCashdrop",
+  "scenarios": [
+    {
+      "name": "Pasu Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 56.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 66.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "B180 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 52.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 61.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 70.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 77.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 86.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 150.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 250.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 310.0
+        }
+      ]
+    },
+    {
+      "name": "ww3t Voltaic",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 83.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 93.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 103.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 113.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Voltaic",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 70.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 82.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 91.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire Voltaic",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 95.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 108.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 120.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 132.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 142.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "FuglaaXYZ Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 835.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 845.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 855.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 870.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 880.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 775.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 825.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 852.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 865.0
+        }
+      ]
+    },
+    {
+      "name": "patTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 65.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 80.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 85.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 91.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 58.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 67.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 76.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 85.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 74.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 82.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 109.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 45.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 54.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 60.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 66.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 72.0
+        }
+      ]
+    },
+    {
+      "name": "B180T Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 51.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 60.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 69.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 77.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot TS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 35.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 42.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 46.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 50.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 54.0
+        }
+      ]
+    }
+  ]
+}

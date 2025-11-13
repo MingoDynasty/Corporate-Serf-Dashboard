@@ -1,0 +1,126 @@
+{
+  "name": "e1se Tracking lntermediate",
+  "code": "KovaaKsGhostpeekingBuggedMilestone",
+  "scenarios": [
+    {
+      "name": "Kindafar Long Strafes",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 18000.0
+        }
+      ]
+    },
+    {
+      "name": "Ascended Tracking 90 Smooth",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 22000.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 24000.0
+        }
+      ]
+    },
+    {
+      "name": "Humanoid Strafe Flat",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 83.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 88.0
+        }
+      ]
+    },
+    {
+      "name": "Houston Outlaws - Ground Tracking",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "e1se Far Angle Smoothness EASY",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 400.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 425.0
+        }
+      ]
+    },
+    {
+      "name": "fuglaaXYLongstrafes",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 490.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 510.0
+        }
+      ]
+    },
+    {
+      "name": "Overwatch 2 - Vertical Tracking",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 8000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Novice",
+      "ranks": [
+        {
+          "name": "Proficient",
+          "color": "#66FF94",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Master",
+          "color": "#FF8E86",
+          "threshold": 4500.0
+        }
+      ]
+    }
+  ]
+}

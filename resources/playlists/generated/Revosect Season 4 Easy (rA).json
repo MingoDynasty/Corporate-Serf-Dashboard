@@ -1,0 +1,636 @@
+{
+  "name": "Revosect Season 4 Easy (rA)",
+  "code": "KovaaKsExitFraggingWideCamp",
+  "scenarios": [
+    {
+      "name": "rA S4 THREESHOT EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 980.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1250.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 FIVEWIDE EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 950.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 FOURWIDE SMALL EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 850.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 890.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 930.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 970.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 SNAPCLICK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 450.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 500.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 550.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 600.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 XYCLICK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 500.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 550.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 600.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 650.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 700.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 BOUNCECLICK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 350.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 390.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 420.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 450.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 480.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 GLIDERTRACK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 CAPSULETRACK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2600.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 LEAPTRACK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 AIRTRACK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 REACTIVESPHERE EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 STRAFETRACK EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 WIDESWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 115.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 118.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 121.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 124.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 127.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 ORBSWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 105.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 108.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 111.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 114.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 117.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 XYSWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 75.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 77.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 79.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 81.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 83.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 85.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 LAYERSWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 79.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 82.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 85.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 88.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 91.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 94.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 EVASWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 43.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 46.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 49.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 52.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 55.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 58.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 SPACESWITCH EASY",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#FFE599",
+          "threshold": 38.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#C9DAF8",
+          "threshold": 40.0
+        },
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 42.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 43.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 45.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 47.0
+        }
+      ]
+    }
+  ]
+}

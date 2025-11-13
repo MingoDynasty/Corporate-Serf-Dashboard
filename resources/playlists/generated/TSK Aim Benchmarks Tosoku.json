@@ -1,0 +1,366 @@
+{
+  "name": "TSK Aim Benchmarks Tosoku",
+  "code": "KovaaKsHeadshottingKnockedBrain",
+  "scenarios": [
+    {
+      "name": "VSTP NotSmall TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "SYV Altered POV Easy Slow",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 6300.0
+        }
+      ]
+    },
+    {
+      "name": "SYV Altered POV Slow",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 1 Master TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 950.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 15 Master TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 950.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 1 Grandmaster TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 550.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 800.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 15 Grandmaster TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 550.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 800.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Extrasmooth TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 6200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 8000.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Extrasmooth Small TE",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafe Always Right",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafe Always Left",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "SYW (Smooth Your Wrist) Truly FIXED",
+      "ranks": [
+        {
+          "name": "Fundamental",
+          "color": "#93C47D",
+          "threshold": 380.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 450.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 520.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 570.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 620.0
+        }
+      ]
+    }
+  ]
+}

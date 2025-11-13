@@ -1,0 +1,886 @@
+{
+  "name": "TSK Strafes Benchmarks",
+  "code": "KovaaKsGlidingIndigoBloom",
+  "scenarios": [
+    {
+      "name": "Predictable Strafes Easy",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2660.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2750.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2830.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2900.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2970.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2998.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2450.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2650.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2800.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2920.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2938.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes r15",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1700.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1950.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2200.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2450.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2750.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2823.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Thin",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1250.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1750.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2000.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2200.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2383.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Long Easy",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2450.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2600.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2750.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2850.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2950.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2992.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Long",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2100.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2300.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2500.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2780.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2839.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Long r15",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 900.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1600.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1800.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2000.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2200.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2450.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2548.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Long Thin",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 900.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1300.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1500.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 1700.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 1900.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 1949.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Short Easy",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2660.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2750.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2830.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2900.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2970.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2998.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Short",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2150.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2350.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2650.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2850.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2920.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2967.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Short r15",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1800.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2050.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2350.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2650.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2750.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2868.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Short Thin",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1250.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1800.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2100.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2200.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2457.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Gauntlet Easy",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2450.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2600.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2750.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2920.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2958.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Gauntlet",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2100.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2300.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2500.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2750.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2837.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Gauntlet r15",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 900.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1400.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1600.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1800.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2050.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2400.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2597.0
+        }
+      ]
+    },
+    {
+      "name": "Predictable Strafes Gauntlet Thin",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 300.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 900.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1150.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1300.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 1500.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 1800.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2113.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "name": "DM Static S2 L7 - Worthless",
+  "code": "KovaaKsVibrating180Jump",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1380.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1520.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1430.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1610.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1470.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1680.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1520.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1660.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1700.0
+        }
+      ]
+    }
+  ]
+}

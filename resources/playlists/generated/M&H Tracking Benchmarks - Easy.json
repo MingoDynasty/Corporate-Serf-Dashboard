@@ -1,0 +1,306 @@
+{
+  "name": "M&H Tracking Benchmarks - Easy",
+  "code": "KovaaKsRoamingLongCashdrop",
+  "scenarios": [
+    {
+      "name": "Smoothsphere 80%",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 5550.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 6375.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 8025.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "Glidertrack Avasive Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 7600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl Larger + Slowed",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 7425.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 10750.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere 80%",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 10675.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 12250.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 5650.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 8500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3250.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Air Angelic Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 Invincible 5",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3350.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy Invincible 4 80%",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E68346",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CE8946",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Iron",
+          "color": "#D4D7D9",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 2900.0
+        }
+      ]
+    }
+  ]
+}

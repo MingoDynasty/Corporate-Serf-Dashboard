@@ -1,0 +1,426 @@
+{
+  "name": "wobin Benchmark S1 - Advanced",
+  "code": "KovaaKsFinishingCaffeinatedGamesense",
+  "scenarios": [
+    {
+      "name": "wobin 1w4ts",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "wobin ww5t Horizontal",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "wobin 1w2ts Micro",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 850.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 910.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 970.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 1090.0
+        }
+      ]
+    },
+    {
+      "name": "wobinclick ultra",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Sky Strafe",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "wobin BounceTrack",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 2550.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Polarized Hell Dash",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Blinkstrafe",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "wobin Wobinorb",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 4050.0
+        }
+      ]
+    },
+    {
+      "name": "wobin RawControl",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "wobin DotTS",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 1420.0
+        }
+      ]
+    },
+    {
+      "name": "wobin WobTS",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 1240.0
+        }
+      ]
+    },
+    {
+      "name": "wobin CloudTS",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 570.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 600.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 630.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 660.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 690.0
+        }
+      ]
+    },
+    {
+      "name": "wobin RawControlTS",
+      "ranks": [
+        {
+          "name": "Lilac",
+          "color": "#B9FBC0",
+          "threshold": 510.0
+        },
+        {
+          "name": "Rose",
+          "color": "#98F5E1",
+          "threshold": 540.0
+        },
+        {
+          "name": "Lotus",
+          "color": "#A3C4F3",
+          "threshold": 570.0
+        },
+        {
+          "name": "Hyacinth",
+          "color": "#CFBAF0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Aster",
+          "color": "#FB6F92",
+          "threshold": 630.0
+        }
+      ]
+    }
+  ]
+}

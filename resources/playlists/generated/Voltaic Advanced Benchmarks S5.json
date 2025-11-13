@@ -1,0 +1,456 @@
+{
+  "name": "Voltaic Advanced Benchmarks S5",
+  "code": "KovaaKsBobbingSepiaBuff",
+  "scenarios": [
+    {
+      "name": "VT Pasu Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 910.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1240.0
+        }
+      ]
+    },
+    {
+      "name": "VT Popcorn Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 680.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 910.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1020.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w2ts Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1620.0
+        }
+      ]
+    },
+    {
+      "name": "VT ww5t Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1720.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1860.0
+        }
+      ]
+    },
+    {
+      "name": "VT Frogtagon Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1490.0
+        }
+      ]
+    },
+    {
+      "name": "VT Floating Heads Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 740.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 830.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 920.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "VT PGT Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4050.0
+        }
+      ]
+    },
+    {
+      "name": "VT Snake Track Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4050.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3825.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3725.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3875.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4125.0
+        }
+      ]
+    },
+    {
+      "name": "VT DotTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "VT EddieTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1280.0
+        }
+      ]
+    },
+    {
+      "name": "VT DriftTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 430.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 470.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 510.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 540.0
+        }
+      ]
+    },
+    {
+      "name": "VT FlyTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 540.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 660.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 720.0
+        }
+      ]
+    },
+    {
+      "name": "VT ControlTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 450.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 490.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 520.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 550.0
+        }
+      ]
+    },
+    {
+      "name": "VT Penta Bounce Advanced S5",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 530.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 580.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 630.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 670.0
+        }
+      ]
+    }
+  ]
+}

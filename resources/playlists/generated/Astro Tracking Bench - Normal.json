@@ -1,0 +1,516 @@
+{
+  "name": "Astro Tracking Bench - Normal",
+  "code": "KovaaKsBoomstickingJitteryFragger",
+  "scenarios": [
+    {
+      "name": "Smoothsphere",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 6400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 7400.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Pauer Glider Novice",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Horizontal Track",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 10250.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothTrack Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "VT Snake Track Intermediate S5",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 10250.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Intermediate S5",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 15000.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 5750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 8750.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 6400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 7600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 8800.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Far Larger",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 10250.0
+        }
+      ]
+    },
+    {
+      "name": "AmareRawControl Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 7750.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 8500.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 837.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 848.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 859.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 870.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 881.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Intermediate S5",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic rAim Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 857.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 869.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 881.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 893.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 905.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky V3",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#c29785",
+          "threshold": 843.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c8ccd4",
+          "threshold": 854.0
+        },
+        {
+          "name": "Gold",
+          "color": "#d8b44f",
+          "threshold": 865.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#c3cae7",
+          "threshold": 876.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#a6e3ff",
+          "threshold": 887.0
+        }
+      ]
+    }
+  ]
+}

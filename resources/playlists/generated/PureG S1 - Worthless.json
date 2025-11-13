@@ -1,0 +1,776 @@
+{
+  "name": "PureG S1 - Worthless",
+  "code": "KovaaKsCounterstrafingButteryExitfrag",
+  "scenarios": [
+    {
+      "name": "Glider Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Bounce Tracking Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 65.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 115.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 135.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 160.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 172.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 187.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 196.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 203.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 213.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 221.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 800.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 830.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 845.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 860.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 869.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 880.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 890.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 895.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 899.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 903.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 810.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 835.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 845.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 855.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 865.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 875.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 884.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 886.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 888.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 892.0
+        }
+      ]
+    },
+    {
+      "name": "Horizontal Clicking Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 75.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 85.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 90.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 100.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 105.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 115.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 122.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 125.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 133.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "Leapcorn Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 25.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 35.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 40.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 45.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 50.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 55.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 62.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 66.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 70.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 78.0
+        }
+      ]
+    },
+    {
+      "name": "Static Clicking Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 215.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 226.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 230.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 235.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 239.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 243.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 247.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 249.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 251.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 253.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 70.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 78.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 84.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 90.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 95.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 100.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 105.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 108.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 112.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Switch Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 45.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 50.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 55.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 60.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 65.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 70.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 75.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 80.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 85.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 55.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 60.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 65.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 70.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 74.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 78.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 82.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 86.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 90.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 94.0
+        }
+      ]
+    },
+    {
+      "name": "Static Switching Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 84.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 94.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 102.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 110.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 118.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 124.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 136.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 142.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 148.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 96.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 104.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 110.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 116.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 122.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 128.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 138.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 142.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 146.0
+        }
+      ]
+    },
+    {
+      "name": "Pistol Strafe Gallery Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 145000.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 170000.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 190000.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 210000.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 230000.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 250000.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 270000.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 285000.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 300000.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 315000.0
+        }
+      ]
+    },
+    {
+      "name": "Strafe Tracking Pure",
+      "ranks": [
+        {
+          "name": "Division I",
+          "color": "#885157",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Division II",
+          "color": "#B89381",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Division III",
+          "color": "#6A6A6A",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Division IV",
+          "color": "#AEAEAE",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Division V",
+          "color": "#B09335",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Division VI",
+          "color": "#DDB845",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Division VII",
+          "color": "#B6D9FF",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Division VIII",
+          "color": "#5BC16B",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Division IX",
+          "color": "#A078F9",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Division X",
+          "color": "#E51C3E",
+          "threshold": 4500.0
+        }
+      ]
+    }
+  ]
+}

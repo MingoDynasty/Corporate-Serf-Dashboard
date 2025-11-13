@@ -1,0 +1,216 @@
+{
+  "name": "TSK Beginner Benchmark",
+  "code": "KovaaKsPoppingVermilionPrism",
+  "scenarios": [
+    {
+      "name": "TSK - Centering 90 Speed 2 MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - 360 Turn MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - DVD Tracking MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 20 MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - Hewchy's VAI 160 MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - SYV MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - VSTP Soft MASSIVE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 400.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 700.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#666666",
+          "threshold": 1800.0
+        }
+      ]
+    }
+  ]
+}

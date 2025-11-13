@@ -1,0 +1,486 @@
+{
+  "name": "Aimerz+ SpeedTS Benchmarks Easy",
+  "code": "KovaaKsUltingJitteryInventory",
+  "scenarios": [
+    {
+      "name": "StaticSwitchingVox xxSmall",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 96.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 101.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 106.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 112.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 117.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 123.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 153.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS 30% Larger",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Viscose Varied",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 86.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 94.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 106.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 112.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 120.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 80.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 96.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 102.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 108.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetSwitch 90 LowTTK",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 94.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 104.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 114.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 122.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 132.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 140.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 183.0
+        }
+      ]
+    },
+    {
+      "name": "Target Switching 360",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 12100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 13600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 14200.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 19600.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 83.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 92.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 102.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 111.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 117.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 125.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ goaTS Med S1",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 81.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 85.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 96.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 102.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 110.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ nuTS Med S1",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 80.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 86.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 92.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 98.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 106.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 112.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Week #5 - Static Switching",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 12900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 13400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 14200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 15800.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 19500.0
+        }
+      ]
+    },
+    {
+      "name": "360 Static TS",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Acolyte",
+          "color": "#FFA000",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3775.0
+        }
+      ]
+    }
+  ]
+}

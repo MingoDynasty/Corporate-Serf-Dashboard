@@ -1,0 +1,1326 @@
+{
+  "name": "XYZ Benchmarks - Hard",
+  "code": "KovaaKsChatfraggingClutchFrag",
+  "scenarios": [
+    {
+      "name": "XYZ EvolveClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 980.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1730.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ MixClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1670.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1870.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1970.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ DepthClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1820.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ XYZClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 730.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 770.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 840.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 910.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 980.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 490.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 520.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 580.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 640.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 710.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 790.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 890.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 990.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1280.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ 3DClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 780.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 820.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 890.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 960.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ StarClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 450.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 480.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 540.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 610.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 660.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 710.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 810.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 920.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 970.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1020.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AxisClick",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 500.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 530.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 590.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 650.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 730.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 810.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 910.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SmoothTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 4275.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4450.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ JagTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4350.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AirTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 4175.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4425.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ GroundTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ ReactiveTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ TwisterTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 4025.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ LeapTrack",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SwaySwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 950.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1520.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ FloatSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1680.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 720.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 760.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 810.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 860.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 930.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 1250.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AscendSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 520.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 550.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 570.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 600.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 620.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 650.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 680.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 710.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 760.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 810.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SnowSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 510.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 540.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 560.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 590.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 610.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 640.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 660.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 690.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 720.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 760.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WarpSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 550.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 580.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 610.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 640.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 660.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 690.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 710.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 740.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 800.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 860.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SlopeSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 590.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 620.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 640.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 670.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 690.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 710.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 720.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 740.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 790.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 840.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WideSwitch",
+      "ranks": [
+        {
+          "name": "Prodigy-",
+          "color": "#7663A7",
+          "threshold": 340.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 360.0
+        },
+        {
+          "name": "Prodigy+",
+          "color": "#5C3EA7",
+          "threshold": 390.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 420.0
+        },
+        {
+          "name": "Cerebral+",
+          "color": "#FC73EB",
+          "threshold": 440.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 470.0
+        },
+        {
+          "name": "Ethereal+",
+          "color": "#7B0101",
+          "threshold": 500.0
+        },
+        {
+          "name": "Savant",
+          "color": "#666666",
+          "threshold": 530.0
+        },
+        {
+          "name": "Savant+",
+          "color": "#434343",
+          "threshold": 560.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 590.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,846 @@
+{
+  "name": "Run and Gun Valorant Benchmarks - Hard",
+  "code": "KovaaKsJumpingCeruleanChat",
+  "scenarios": [
+    {
+      "name": "VAL 1w6ts reload",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 125.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 135.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 145.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 155.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 165.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 175.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 185.0
+        }
+      ]
+    },
+    {
+      "name": "VAL pressureWide",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 8000.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 9000.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "VAL smallflicks",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 145.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 155.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 165.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 175.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 190.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 200.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 215.0
+        }
+      ]
+    },
+    {
+      "name": "VAL 6 Sphere Hipfire",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 1550.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 2000.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "VAL devTS staticClick",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 160.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 170.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 180.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 190.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 200.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 210.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 220.0
+        }
+      ]
+    },
+    {
+      "name": "VAL 1w4ts Pasu Perfected",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 95.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 105.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 115.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 125.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 135.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 140.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "VAL beanClick Micro",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 120.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 130.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 145.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 145.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 155.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 160.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "VAL Floating Heads",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 610.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 660.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 710.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 760.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 810.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 860.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "VAL FloatTS Click",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 80.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 90.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 105.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 125.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 145.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 160.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 175.0
+        }
+      ]
+    },
+    {
+      "name": "VAL WavyClick",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 750.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 800.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 850.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 950.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 1010.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "VAL XYClick",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 800.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 850.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 900.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 950.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 990.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "VAL psalmClick",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 50.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 65.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 80.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 95.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 110.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 120.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "VAL Smooth",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 420.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 500.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 545.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 600.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 645.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 720.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 770.0
+        }
+      ]
+    },
+    {
+      "name": "VAL Consecutive Tracking",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 50.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 55.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 60.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 65.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 70.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 85.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "VAL MicroTrack",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 60000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 69000.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 75000.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 85000.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 91000.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 100000.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 115000.0
+        }
+      ]
+    },
+    {
+      "name": "VAL staticSwitch",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 970.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 1170.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 1370.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 2150.0
+        }
+      ]
+    },
+    {
+      "name": "VAL beanTS",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 65.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 75.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 85.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 95.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 110.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 125.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "VAL RaspberryTS",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 65.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 70.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 80.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 90.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 100.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 110.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "VAL Garf MicroTS",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 40.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 45.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 50.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 55.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 65.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 70.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "VAL tamTS control",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 30.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 40.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 45.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 50.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 55.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 60.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 65.0
+        }
+      ]
+    },
+    {
+      "name": "VAL SmoothsphereTS",
+      "ranks": [
+        {
+          "name": "Derke",
+          "color": "#00BCBC",
+          "threshold": 320.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#00CC6A",
+          "threshold": 380.0
+        },
+        {
+          "name": "Patmen",
+          "color": "#393B8F",
+          "threshold": 430.0
+        },
+        {
+          "name": "KangKang",
+          "color": "#4C3769",
+          "threshold": 480.0
+        },
+        {
+          "name": "Zellsis",
+          "color": "#1FC67C",
+          "threshold": 530.0
+        },
+        {
+          "name": "f0rsaken",
+          "color": "#563B4D",
+          "threshold": 570.0
+        },
+        {
+          "name": "Zekken",
+          "color": "#932324",
+          "threshold": 600.0
+        }
+      ]
+    }
+  ]
+}

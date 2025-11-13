@@ -1,0 +1,356 @@
+{
+  "name": "thundah precision tracking benchmarks",
+  "code": "KovaaKsClearingDynamicClass",
+  "scenarios": [
+    {
+      "name": "thundahTrack S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 450.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 850.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothundahsphere S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "thunsphere",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 600.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 975.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "dahTrack S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 850.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "thundahRawControl S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 500.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 950.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 1920.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 2880.0
+        }
+      ]
+    },
+    {
+      "name": "tunTrack S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "thundah angelic S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 700.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "thundahsphere S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "takiTrack S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 750.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "toonsTrack S1",
+      "ranks": [
+        {
+          "name": "Rat",
+          "color": "#B45F06",
+          "threshold": 650.0
+        },
+        {
+          "name": "Monkey",
+          "color": "#05696B",
+          "threshold": 850.0
+        },
+        {
+          "name": "Snake",
+          "color": "#3C78D8",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Tiger",
+          "color": "#FF0000",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#F1C232",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Goat",
+          "color": "#00FFFF",
+          "threshold": 2500.0
+        }
+      ]
+    }
+  ]
+}

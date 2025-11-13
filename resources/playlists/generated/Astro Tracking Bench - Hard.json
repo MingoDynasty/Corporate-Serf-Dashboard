@@ -1,0 +1,516 @@
+{
+  "name": "Astro Tracking Bench - Hard",
+  "code": "KovaaKsExitfraggingBaitedBomb",
+  "scenarios": [
+    {
+      "name": "Smoothsphere Master",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 6750.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 7550.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 7850.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Pauer Glider Intermediate",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 2350.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Horizontal Track Hard",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 10250.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 11375.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 11750.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothTrack",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 2750.0
+        }
+      ]
+    },
+    {
+      "name": "VT Snake Track Intermediate S5 Hard",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 10375.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 10750.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Hard 75%",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Intermediate S5 Hard",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Whisphere 80%",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 10750.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 12250.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 12750.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 13250.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Hard",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 4750.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 6750.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 7250.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 8000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Far",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 9750.0
+        }
+      ]
+    },
+    {
+      "name": "AmareRawControl",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 7850.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 8200.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 862.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 871.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 880.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 889.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 898.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Intermediate S5 Hard",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 891.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 902.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 913.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 919.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 925.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#3af09a",
+          "threshold": 860.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#ea8cff",
+          "threshold": 871.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ee3169",
+          "threshold": 882.0
+        },
+        {
+          "name": "Opal",
+          "color": "#f5fcff",
+          "threshold": 889.0
+        },
+        {
+          "name": "Cardboard",
+          "color": "#ffc8ab",
+          "threshold": 896.0
+        }
+      ]
+    }
+  ]
+}

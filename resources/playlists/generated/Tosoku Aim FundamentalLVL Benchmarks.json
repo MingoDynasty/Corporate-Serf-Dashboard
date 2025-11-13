@@ -1,0 +1,131 @@
+{
+  "name": "Tosoku Aim FundamentalLVL Benchmarks",
+  "code": "KovaaKsSensingDiagonalMain",
+  "scenarios": [
+    {
+      "name": "Vertical Smoothness Training Very Easy",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 5200.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 1 Easy TE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "VAI 15 Easy TE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Extrasmooth Easy TE",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 6600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 8200.0
+        }
+      ]
+    },
+    {
+      "name": "SYW (Smooth Your Wrist) Truly FIXED Easy",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#CCCCCC",
+          "threshold": 350.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#EAD1DC",
+          "threshold": 430.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D5A6BD",
+          "threshold": 510.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C27BA0",
+          "threshold": 600.0
+        }
+      ]
+    }
+  ]
+}

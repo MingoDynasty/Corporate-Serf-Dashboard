@@ -1,0 +1,426 @@
+{
+  "name": "SpeedTS Benchmarks",
+  "code": "KovaaKsChallengingFraggedBrush",
+  "scenarios": [
+    {
+      "name": "voxTS Viscose Varied",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 120.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 125.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 131.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 136.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 141.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 147.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 117.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 121.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 126.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 130.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 135.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "patTS NR",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 9700.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 30% Smaller",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 90.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 96.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 102.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 107.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 112.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 117.0
+        }
+      ]
+    },
+    {
+      "name": "Target Switching 360 Static",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 18500.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 18900.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 19200.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 19600.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 20000.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 20700.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy Flick 180",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 670.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 700.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 740.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 770.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 800.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 830.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 105.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 110.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 115.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 120.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 124.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch Jumbo",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 145.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 149.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 154.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 160.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 165.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 172.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Voltaic LowTTK",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 134.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 139.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 144.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 150.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 157.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR Static",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 10500.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetSwitch easy",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 11200.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#990000",
+          "threshold": 765.0
+        },
+        {
+          "name": "Empyreal",
+          "color": "#B45F06",
+          "threshold": 790.0
+        },
+        {
+          "name": "Reverent",
+          "color": "#354698",
+          "threshold": 820.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#38761D",
+          "threshold": 850.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#351C75",
+          "threshold": 890.0
+        },
+        {
+          "name": "Unans",
+          "color": "#666666",
+          "threshold": 930.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,636 @@
+{
+  "name": "Revosect Season 4 Hard (rA)",
+  "code": "KovaaKsChokingBadLowground",
+  "scenarios": [
+    {
+      "name": "rA S4 THREESHOT HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 FIVEWIDE HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 1580.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 FOURWIDE SMALL HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 SNAPCLICK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 450.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 520.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 590.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 670.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 740.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 XYCLICK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 540.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 610.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 680.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 760.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 830.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 BOUNCECLICK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 420.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 470.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 600.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 680.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 740.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 GLIDERTRACK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 CAPSULETRACK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 LEAPTRACK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 AIRTRACK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 2650.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 REACTIVESPHERE HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 STRAFETRACK HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 WIDESWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 128.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 133.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 138.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 145.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 150.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 ORBSWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 125.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 135.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 142.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 147.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 152.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 XYSWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 82.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 87.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 98.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 102.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 LAYERSWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 85.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 90.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 95.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 102.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 107.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 112.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 EVASWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 45.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 48.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 50.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 55.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 59.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 62.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 SPACESWITCH HARD",
+      "ranks": [
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 34.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#C36EFF",
+          "threshold": 37.0
+        },
+        {
+          "name": "Archon",
+          "color": "#FF0000",
+          "threshold": 40.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#91D7E4",
+          "threshold": 45.0
+        },
+        {
+          "name": "Divine",
+          "color": "#050000",
+          "threshold": 48.0
+        },
+        {
+          "name": "Omnipotent",
+          "color": "#00FF96",
+          "threshold": 50.0
+        }
+      ]
+    }
+  ]
+}

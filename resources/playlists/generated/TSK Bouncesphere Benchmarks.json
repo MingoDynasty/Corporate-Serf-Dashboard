@@ -1,0 +1,336 @@
+{
+  "name": "TSK Bouncesphere Benchmarks",
+  "code": "KovaaKsReloadingBrownCallout",
+  "scenarios": [
+    {
+      "name": "BounceSphere Big",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4500.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 4800.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 5000.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 5150.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 5300.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 5447.0
+        }
+      ]
+    },
+    {
+      "name": "BounceSphere",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 900.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2400.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2700.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 3100.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 3500.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3840.0
+        }
+      ]
+    },
+    {
+      "name": "BounceSphere High & Wide",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 300.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 900.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1700.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2000.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2300.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2700.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 3050.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3409.0
+        }
+      ]
+    },
+    {
+      "name": "Bouncesphere Smooth",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 3500.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 3800.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 4100.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 4400.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 4700.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 4957.0
+        }
+      ]
+    },
+    {
+      "name": "BounceSphere Always Left",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 800.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2100.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2300.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2600.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 3000.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 3400.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3654.0
+        }
+      ]
+    },
+    {
+      "name": "BounceSphere Always Right",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Adv.",
+          "color": "#D2BFFE",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2500.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2800.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 3200.0
+        },
+        {
+          "name": "SCOURGE",
+          "color": "#274E13",
+          "threshold": 3600.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3777.0
+        }
+      ]
+    }
+  ]
+}

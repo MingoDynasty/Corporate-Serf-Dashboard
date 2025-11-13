@@ -1,0 +1,406 @@
+{
+  "name": "Voltaic Advanced Benchmarks S4 - v1",
+  "code": "KovaaKsCrankingPulledGauntlet",
+  "scenarios": [
+    {
+      "name": "VT Pasu Rasp Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 940.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1270.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w3ts Rasp Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1580.0
+        }
+      ]
+    },
+    {
+      "name": "VT Multiclick 180 Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1890.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "VT AngleStrafe Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 880.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1230.0
+        }
+      ]
+    },
+    {
+      "name": "VT ArcStrafe Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 940.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1230.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "VT PatStrafe Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3240.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "VT AirStrafe Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3825.0
+        }
+      ]
+    },
+    {
+      "name": "VT psalmTS Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1330.0
+        }
+      ]
+    },
+    {
+      "name": "VT skyTS Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "VT evaTS Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 680.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 740.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 780.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 830.0
+        }
+      ]
+    },
+    {
+      "name": "VT bounceTS Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 820.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 970.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1050.0
+        }
+      ]
+    }
+  ]
+}

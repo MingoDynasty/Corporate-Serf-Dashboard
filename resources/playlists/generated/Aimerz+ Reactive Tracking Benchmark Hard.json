@@ -1,0 +1,426 @@
+{
+  "name": "Aimerz+ Reactive Tracking Benchmark Hard",
+  "code": "KovaaKsPickingSaltyRando",
+  "scenarios": [
+    {
+      "name": "Plink Plaza",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 550.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 575.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 595.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 625.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 660.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 710.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 3478 Fixed",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 952.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 955.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 958.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 962.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 966.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 970.0
+        }
+      ]
+    },
+    {
+      "name": "Air invincible 8 small",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 885.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 889.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 893.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 898.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 903.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 908.0
+        }
+      ]
+    },
+    {
+      "name": "Air Divine",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 878.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 884.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 889.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 894.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 899.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 906.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 868.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 874.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 880.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 887.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 894.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 902.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 12900.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 13400.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 14600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 15600.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Thin",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 4750.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Wide React",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "cAt sausageTrack Normal",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VGS Med S1",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere OW 150%",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 7600.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 9400.0
+        }
+      ]
+    }
+  ]
+}

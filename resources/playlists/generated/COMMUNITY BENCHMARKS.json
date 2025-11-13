@@ -1,0 +1,636 @@
+{
+  "name": "COMMUNITY BENCHMARKS",
+  "code": "KovaaKsBoomstickingSmallXur",
+  "scenarios": [
+    {
+      "name": "CB EvoClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1180.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1260.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1350.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1440.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1520.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "CB ThreeClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1330.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1420.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1520.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1650.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1730.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1800.0
+        }
+      ]
+    },
+    {
+      "name": "CB FiveClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1550.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1690.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1830.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1970.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 2110.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "CB XYClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 730.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 850.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 990.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1130.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1240.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1350.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 570.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 640.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 730.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 850.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 970.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1070.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpClick",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 680.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 750.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 830.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 930.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1050.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1170.0
+        }
+      ]
+    },
+    {
+      "name": "CB ControlTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 2100.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2400.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 2800.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 3300.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 3700.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 2100.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2450.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 2800.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 3200.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 3500.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 3850.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 2500.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2900.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 3300.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 3750.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 4150.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "CB StrafeTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1900.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2150.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 2400.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 2700.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 2925.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 3250.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 2150.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2400.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 2650.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 3000.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "CB SharpTrack",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 2000.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 2250.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 2500.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 2800.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 3100.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "CB StaticSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1150.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1200.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1250.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1300.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1350.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "CB FlatSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 1080.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1130.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1190.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1240.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1300.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1370.0
+        }
+      ]
+    },
+    {
+      "name": "CB WaveSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 950.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 1000.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 1050.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 1100.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 1150.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 500.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 560.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 620.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 680.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 740.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 460.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 500.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 540.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 570.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 600.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 640.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpSwitch",
+      "ranks": [
+        {
+          "name": "VETERAN",
+          "color": "#586289",
+          "threshold": 440.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#43004A",
+          "threshold": 500.0
+        },
+        {
+          "name": "ELITE",
+          "color": "#B09B72",
+          "threshold": 560.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#004749",
+          "threshold": 620.0
+        },
+        {
+          "name": "LEGEND",
+          "color": "#540000",
+          "threshold": 680.0
+        },
+        {
+          "name": "ETHEREAL",
+          "color": "#1D1D1D",
+          "threshold": 740.0
+        }
+      ]
+    }
+  ]
+}

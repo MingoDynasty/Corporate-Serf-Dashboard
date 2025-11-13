@@ -1,0 +1,656 @@
+{
+  "name": "DM Static S2 L4 - Worthless",
+  "code": "KovaaKsTimewarpingZonedEngram",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 570.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 670.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 770.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 870.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 970.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1590.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 710.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 810.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 910.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1730.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 620.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 720.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 820.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 920.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1640.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 900.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1780.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1820.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 660.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 760.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 860.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 960.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1680.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 840.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 940.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1740.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1820.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1860.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 690.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 790.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 890.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 990.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1670.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1710.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 870.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 970.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1670.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1890.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 710.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 810.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 910.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1730.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Level 4",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 890.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 990.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1790.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1870.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1910.0
+        }
+      ]
+    }
+  ]
+}

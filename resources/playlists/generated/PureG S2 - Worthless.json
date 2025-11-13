@@ -1,0 +1,1206 @@
+{
+  "name": "PureG S2 - Worthless",
+  "code": "KovaaKsCrackingCaffeinatedBuystation",
+  "scenarios": [
+    {
+      "name": "PureG Glider",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 480.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 720.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 960.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 1815.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 4500.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "PureG BounceSphere",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 450.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 675.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 900.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 1575.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 2525.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 4300.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Fuglaa React",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 420.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 630.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 840.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 1485.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 3950.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Thin Strafes",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 370.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 555.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 750.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 1235.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 3500.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Horizontal Clicking",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 20.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 30.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 70.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 80.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 88.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 92.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 96.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 104.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 112.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 120.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 130.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 140.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 150.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 165.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Leapcorn",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 12.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 18.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 24.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 32.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 36.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 60.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 65.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 70.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 75.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 80.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 86.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 92.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 98.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 104.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Static Clicking",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 20.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 30.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 55.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 60.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 72.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 120.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 140.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 150.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 160.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 170.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 180.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 190.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Pokeball",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 22.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 33.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 44.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 56.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 62.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 68.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 72.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 76.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 80.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 85.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 90.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 95.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 105.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 115.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 125.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 145.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 155.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Pasu Switch",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 12.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 18.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 24.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 32.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 36.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 43.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 46.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 50.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 60.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 69.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 74.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 79.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 84.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 89.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 94.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "PureG KinTS",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 14.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 21.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 28.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 34.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 37.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 43.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 46.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 50.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 60.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 64.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 69.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 74.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 79.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 84.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 89.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 94.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Static Switching",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 20.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 30.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 55.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 60.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 70.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 80.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 90.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 116.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 122.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 128.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 134.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 140.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 145.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 150.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Pill Switch",
+      "ranks": [
+        {
+          "name": "Copper III",
+          "color": "#885157",
+          "threshold": 20.0
+        },
+        {
+          "name": "Copper II",
+          "color": "#A0716B",
+          "threshold": 30.0
+        },
+        {
+          "name": "Copper I",
+          "color": "#B89381",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver III",
+          "color": "#6A6A6A",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver II",
+          "color": "#8C8C8C",
+          "threshold": 55.0
+        },
+        {
+          "name": "Silver I",
+          "color": "#AEAEAE",
+          "threshold": 60.0
+        },
+        {
+          "name": "Gold III",
+          "color": "#B09335",
+          "threshold": 67.0
+        },
+        {
+          "name": "Gold II",
+          "color": "#C7A63D",
+          "threshold": 74.0
+        },
+        {
+          "name": "Gold I",
+          "color": "#DDB845",
+          "threshold": 80.0
+        },
+        {
+          "name": "Mithril III",
+          "color": "#5878A5",
+          "threshold": 89.0
+        },
+        {
+          "name": "Mithril II",
+          "color": "#96B2D9",
+          "threshold": 98.0
+        },
+        {
+          "name": "Mithril I",
+          "color": "#B6D9FF",
+          "threshold": 106.0
+        },
+        {
+          "name": "Adamant III",
+          "color": "#0E7C01",
+          "threshold": 112.0
+        },
+        {
+          "name": "Adamant II",
+          "color": "#61CE61",
+          "threshold": 118.0
+        },
+        {
+          "name": "Adamant I",
+          "color": "#5BC16B",
+          "threshold": 124.0
+        },
+        {
+          "name": "Master III",
+          "color": "#8200F4",
+          "threshold": 130.0
+        },
+        {
+          "name": "Master II",
+          "color": "#9741F2",
+          "threshold": 135.0
+        },
+        {
+          "name": "Master I",
+          "color": "#A078F9",
+          "threshold": 140.0
+        },
+        {
+          "name": "PURE",
+          "color": "#E51C3E",
+          "threshold": 145.0
+        }
+      ]
+    }
+  ]
+}

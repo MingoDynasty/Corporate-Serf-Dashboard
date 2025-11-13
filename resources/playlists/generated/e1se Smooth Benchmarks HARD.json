@@ -1,0 +1,306 @@
+{
+  "name": "e1se Smooth Benchmarks HARD",
+  "code": "KovaaKsPoppingBurntorangeHeaven",
+  "scenarios": [
+    {
+      "name": "Centering I 180 no strafes",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 15150.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 16200.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 17090.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 11950.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 13980.0
+        }
+      ]
+    },
+    {
+      "name": "Thin Gauntlet",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 890.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 895.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 900.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 905.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Week #7 - Suavetrack",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 21500.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 23300.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 24900.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 26500.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Smooth",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 6440.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 6630.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 6880.0
+        }
+      ]
+    },
+    {
+      "name": "Far Angle Smoothness",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 280.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 315.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 335.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 350.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Controlsphere Pure",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 2255.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 2470.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 2680.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Smoothsphere Pure",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 700.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 785.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 876.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 960.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere weaker UFO",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 6560.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 7050.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 7450.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothBot Invincible Goated",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 3810.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 4080.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 4320.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 4560.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot 180",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 3160.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 3430.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 3680.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Advanced",
+      "ranks": [
+        {
+          "name": "Milk",
+          "color": "#B6D7A8",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Cream",
+          "color": "#B4A7D6",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Cheese",
+          "color": "#EA9999",
+          "threshold": 3460.0
+        },
+        {
+          "name": "Butter",
+          "color": "#F1C232",
+          "threshold": 3620.0
+        }
+      ]
+    }
+  ]
+}

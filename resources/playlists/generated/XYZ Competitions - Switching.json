@@ -1,0 +1,86 @@
+{
+  "name": "XYZ Competitions - Switching",
+  "code": "KovaaKsNamedroppingTurquoiseDeathball",
+  "scenarios": [
+    {
+      "name": "XYZ FloatSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1528.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SwaySwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1298.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ BounceSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 1130.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SnowSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 697.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AscendSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 718.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WarpSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 740.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ SlopeSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 791.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ WideSwitch",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 535.0
+        }
+      ]
+    }
+  ]
+}

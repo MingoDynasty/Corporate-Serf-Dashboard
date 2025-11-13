@@ -1,0 +1,406 @@
+{
+  "name": "Voltaic Intermediate Benchmarks S4 - v1",
+  "code": "KovaaKsCrackingPrismaticPull",
+  "scenarios": [
+    {
+      "name": "VT Pasu Rasp Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 750.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 850.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 950.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 800.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w5ts Rasp Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "VT Multiclick 120 Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1660.0
+        }
+      ]
+    },
+    {
+      "name": "VT AngleStrafe Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 740.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 830.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 920.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "VT ArcStrafe Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 660.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 750.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 850.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 940.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 2680.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2980.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3280.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 3530.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "VT PatStrafe Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 2260.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2620.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 3050.0
+        }
+      ]
+    },
+    {
+      "name": "VT AirStrafe Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "VT psalmTS Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 810.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 880.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 950.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1020.0
+        }
+      ]
+    },
+    {
+      "name": "VT skyTS Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "VT evaTS Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 550.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 650.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 700.0
+        }
+      ]
+    },
+    {
+      "name": "VT bounceTS Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 630.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 670.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 710.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 760.0
+        }
+      ]
+    }
+  ]
+}

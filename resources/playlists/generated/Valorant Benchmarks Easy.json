@@ -1,0 +1,531 @@
+{
+  "name": "Valorant Benchmarks Easy",
+  "code": "KovaaKsPlunderingSpringgreenBattlepass",
+  "scenarios": [
+    {
+      "name": "Valorant FHT Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant EddieClick Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 60.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 75.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 90.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Adjustshot Wide Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 25.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 35.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 55.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant DotTS Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant MiniPhase Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Fourshot Adaptive Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 30.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant 1w1t Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 30.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Wide Reflex Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 17.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 25.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 32.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 40.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant DevClick Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 55.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 70.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 85.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant AngleShot Micro Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Skyclick Multi Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 0.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 0.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 0.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 0.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant DevClick Static Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant WaldoTS Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Micro 2 Sphere Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 60.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 75.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 90.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant PeekShot Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 17.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 25.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 32.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 40.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Micropace Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 30.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Microcluster Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 60.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 75.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 90.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant ControlStrafes Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Peektrack Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Controlsphere Blink Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Angle Smoothing Easy",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#747473",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#bc7509",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#9ba4aa",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#9e8b3d",
+          "threshold": 3000.0
+        }
+      ]
+    }
+  ]
+}

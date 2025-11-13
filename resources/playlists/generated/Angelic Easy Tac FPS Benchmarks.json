@@ -1,0 +1,566 @@
+{
+  "name": "Angelic Easy Tac FPS Benchmarks",
+  "code": "KovaaKsClearingPulledModifier",
+  "scenarios": [
+    {
+      "name": "beanClick Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 48.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 60.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 75.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 90.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 105.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 120.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Micro Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 70.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 85.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 95.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 105.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 118.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 132.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bpes Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 45.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 58.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 72.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 86.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 102.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 112.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Static Click Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 60.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 70.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 80.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 95.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 110.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 125.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "AmareTS Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 65.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 77.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 88.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 97.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 105.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 113.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "skyTS Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 570.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 650.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 860.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 960.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "name": "skyTS Static Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 600.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 700.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 900.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 990.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 50.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 60.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 67.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 75.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 83.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 94.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 103.0
+        }
+      ]
+    },
+    {
+      "name": "1w6ts Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 68.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 77.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 88.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 95.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 107.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 64.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 74.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 82.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 88.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 94.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 100.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 108.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Click Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 40.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 48.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 58.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 68.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 78.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 88.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 6600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 8300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 9650.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 11400.0
+        }
+      ]
+    },
+    {
+      "name": "Centering Angelic Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#D3D3D3",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Iron",
+          "color": "#757575",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#CE695D",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#B3633E",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CFCFCF",
+          "threshold": 12200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFDC60",
+          "threshold": 13400.0
+        },
+        {
+          "name": "Apprentice",
+          "color": "#8ECEB8",
+          "threshold": 14800.0
+        }
+      ]
+    }
+  ]
+}

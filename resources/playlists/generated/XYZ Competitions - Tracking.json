@@ -1,0 +1,86 @@
+{
+  "name": "XYZ Competitions - Tracking",
+  "code": "KovaaKsEnragingBlueSupport",
+  "scenarios": [
+    {
+      "name": "XYZ BounceTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3721.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ JagTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4143.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ PreciseTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3598.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ GroundTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3778.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ AirTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3726.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ ReactiveTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3194.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ TwisterTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3502.0
+        }
+      ]
+    },
+    {
+      "name": "XYZ LeapTrack",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 3445.0
+        }
+      ]
+    }
+  ]
+}

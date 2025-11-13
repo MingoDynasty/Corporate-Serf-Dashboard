@@ -1,0 +1,846 @@
+{
+  "name": "XYZ SMOOTHNESS BENCHMARKS EASY",
+  "code": "KovaaKsTrollingSkyblueEngine",
+  "scenarios": [
+    {
+      "name": "Vertical Smoothing 60 Altered Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5502.0
+        }
+      ]
+    },
+    {
+      "name": "Vertical Smoothing 120 Altered Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1575.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4225.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5726.0
+        }
+      ]
+    },
+    {
+      "name": "VSTP Varied Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5022.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Vertical Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5358.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Altered Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1675.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5275.0
+        }
+      ]
+    },
+    {
+      "name": "FarmTrack Goated Close Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1925.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5607.0
+        }
+      ]
+    },
+    {
+      "name": "Farmtrack Goated Fixed Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1675.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5354.0
+        }
+      ]
+    },
+    {
+      "name": "FarmTrack Goated Far Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5092.0
+        }
+      ]
+    },
+    {
+      "name": "SYF Smooth Your Fingers Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5713.0
+        }
+      ]
+    },
+    {
+      "name": "SYW Smooth Your Wrist Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5816.0
+        }
+      ]
+    },
+    {
+      "name": "SYA Smooth Your Arm Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4575.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5727.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering I 90 Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4325.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5588.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering II 180 Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5182.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering III 240 Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1525.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4894.0
+        }
+      ]
+    },
+    {
+      "name": "Bipolar Centering 360 Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4225.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5144.0
+        }
+      ]
+    },
+    {
+      "name": "Anti-Centering Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1825.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5121.0
+        }
+      ]
+    },
+    {
+      "name": "GliderTrack Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4109.0
+        }
+      ]
+    },
+    {
+      "name": "Multi Angle Smoothness Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1575.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1975.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4726.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Close Small",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5310.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Small",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5149.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Very Far",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5454.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS TE",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5714.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Fast TE",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1975.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5281.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Small Fast",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4810.0
+        }
+      ]
+    }
+  ]
+}

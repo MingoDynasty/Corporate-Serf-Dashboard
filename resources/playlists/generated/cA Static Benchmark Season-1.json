@@ -1,0 +1,566 @@
+{
+  "name": "cA Static Benchmark Season-1",
+  "code": "KovaaKsPeekingVermilionEntryfrag",
+  "scenarios": [
+    {
+      "name": "cA x-axis flick",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 138.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 142.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 146.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 150.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "cA y-axis flick",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 138.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 142.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 146.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 150.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "cA 2ts wideflick",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 140.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 145.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 150.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 155.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 160.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 165.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "cA 4ts horizontal",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 138.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 142.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 146.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 150.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "cA micropressure",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 168.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 175.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 182.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 189.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 196.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 213.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 220.0
+        }
+      ]
+    },
+    {
+      "name": "cA 5ts vibrate",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 134.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 141.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 148.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 154.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 160.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 165.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "cA 1ts ruohong",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 710.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 750.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 790.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 830.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 870.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 910.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "cA fuglaapressure",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 160.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 165.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 170.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 175.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 180.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 185.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 190.0
+        }
+      ]
+    },
+    {
+      "name": "cA 3ts precise",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 142.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 147.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 152.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 157.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 162.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 167.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 172.0
+        }
+      ]
+    },
+    {
+      "name": "cA 4ts pokeball",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 120.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 125.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 130.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 135.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 140.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 145.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "cA 900targets",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 150.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 160.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 170.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 180.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 190.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 200.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 210.0
+        }
+      ]
+    },
+    {
+      "name": "cA sixshot",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 158.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 164.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 170.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 176.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 182.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 188.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 194.0
+        }
+      ]
+    },
+    {
+      "name": "cA voxTSs smaller",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 162.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 170.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 178.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 186.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 194.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 202.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 210.0
+        }
+      ]
+    },
+    {
+      "name": "cA 7ts pressure",
+      "ranks": [
+        {
+          "name": "Glacier",
+          "color": "#E1FCFF",
+          "threshold": 157.0
+        },
+        {
+          "name": "Rivulet",
+          "color": "#D9E6FF",
+          "threshold": 162.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#ABD5FC",
+          "threshold": 167.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#7CBD9B",
+          "threshold": 172.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#3F3380",
+          "threshold": 177.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#9C3B3B",
+          "threshold": 182.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#24DDD8",
+          "threshold": 187.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,636 @@
+{
+  "name": "AIMERZ+ BENCHMARKS EASY S1",
+  "code": "KovaaKsGearingGodlikeHipfire",
+  "scenarios": [
+    {
+      "name": "Aimerz+ pipeClick Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 350.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 440.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 530.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 620.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 710.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopClick Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 450.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 540.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 630.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 720.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 810.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 880.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ sunClick Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 320.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 390.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 460.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 530.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 580.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 680.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ ww2t Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 76.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 85.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 94.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 102.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 114.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 122.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w3ts Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 60.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 72.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 96.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 108.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 95.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 106.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 120.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 135.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 145.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Smoothbot Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PTI Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 1760.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2120.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2480.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2840.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PreciseTrack Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PipeTrack Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VGS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 2060.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2270.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2480.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2690.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VAS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 1760.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 2020.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 2280.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 2540.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ pivoTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 77.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 84.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 91.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 98.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 105.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 112.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ nuTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 65.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 72.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 79.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 86.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 93.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ goaTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 60.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 66.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 72.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 78.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 84.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ cheaTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 40.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 44.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 48.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 52.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 56.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 51.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 57.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 63.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 69.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ caTS Easy S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 35.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#A77138",
+          "threshold": 38.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C2D2D2",
+          "threshold": 42.0
+        },
+        {
+          "name": "Gold",
+          "color": "#C4A12A",
+          "threshold": 45.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00B3A5",
+          "threshold": 48.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81D1FF",
+          "threshold": 52.0
+        }
+      ]
+    }
+  ]
+}

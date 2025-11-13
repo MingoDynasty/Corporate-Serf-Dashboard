@@ -1,0 +1,546 @@
+{
+  "name": "Avasive S1 - Enlightenment (Advanced)",
+  "code": "KovaaKsTrackingPeriwinkleEntryfrag",
+  "scenarios": [
+    {
+      "name": "FreightTrack Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 4225.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Glider Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Advanced",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "Airva Control Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 3825.0
+        }
+      ]
+    },
+    {
+      "name": "AvaTrack Ground Flicker Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 3125.0
+        }
+      ]
+    },
+    {
+      "name": "cuteTrack Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 3525.0
+        }
+      ]
+    },
+    {
+      "name": "SilkyTS Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 560.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 600.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 640.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 680.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 720.0
+        }
+      ]
+    },
+    {
+      "name": "TrixieSwitch Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 450.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 490.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 540.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 570.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 610.0
+        }
+      ]
+    },
+    {
+      "name": "AvomiTS Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 4125.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 4775.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 5100.0
+        }
+      ]
+    },
+    {
+      "name": "avaSwitch Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 500.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 540.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 580.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 620.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 660.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Speed Switch Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 1360.0
+        }
+      ]
+    },
+    {
+      "name": "AviaTS Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 860.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 900.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 940.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 980.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 1020.0
+        }
+      ]
+    },
+    {
+      "name": "Avomi ww4t Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive 1w3ts Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 1740.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 1830.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 1920.0
+        }
+      ]
+    },
+    {
+      "name": "miaoClick Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 510.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 590.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 660.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 740.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 820.0
+        }
+      ]
+    },
+    {
+      "name": "B180 Avasive Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 420.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 500.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 580.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 660.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 740.0
+        }
+      ]
+    },
+    {
+      "name": "domiClick Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 600.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 700.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 900.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "MadClick Hard",
+      "ranks": [
+        {
+          "name": "Jezebel",
+          "color": "#FCC1D6",
+          "threshold": 640.0
+        },
+        {
+          "name": "Morpho",
+          "color": "#EE86A6",
+          "threshold": 720.0
+        },
+        {
+          "name": "Admiral",
+          "color": "#D65072",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#B42743",
+          "threshold": 880.0
+        },
+        {
+          "name": "Monarch",
+          "color": "#8B0B1E",
+          "threshold": 960.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1806 @@
+{
+  "name": "Hewchy's Smoothness - VAI Complete",
+  "code": "KovaaKsBoomstickingEggplantEsc",
+  "scenarios": [
+    {
+      "name": "Hewchy's VAI 0",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 5",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 10",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 15",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 20",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 25",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 30",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 35",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 40",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 45",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 50",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 55",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 60",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 65",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 70",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 75",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 80",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 85",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 90",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 95",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 100",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 105",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 110",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 115",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 120",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 125",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 130",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 135",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 140",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 145",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 150",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 155",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 160",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 165",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 170",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    },
+    {
+      "name": "Hewchy's VAI 175",
+      "ranks": [
+        {
+          "name": "Cobble",
+          "color": "#666666",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gravel",
+          "color": "#b7b7b7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Pumice",
+          "color": "#93c47d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sandstone",
+          "color": "#ffe57b",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Slate",
+          "color": "#f1c232",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Marble",
+          "color": "#d5a6bd",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Glass",
+          "color": "#134f5c",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Smooth",
+          "color": "#ff0000",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Paragon",
+          "color": "#ffff00",
+          "threshold": 2250.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,306 @@
+{
+  "name": "M&H Tracking Benchmarks - Hard",
+  "code": "KovaaKsScreamingMagentaMonster",
+  "scenarios": [
+    {
+      "name": "Extra Smoothsphere Better",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3550.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Glidertrack Avasive Hard",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Voltaic XSmall",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Hard",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 7950.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 8950.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl 30% small",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 9950.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Small & Slow",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 16800.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 18100.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 19550.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 21000.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 10800.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Thin",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 4475.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Air Angelic Hard",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 892.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 896.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 901.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 905.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawReactive",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 2800.0
+        }
+      ]
+    }
+  ]
+}

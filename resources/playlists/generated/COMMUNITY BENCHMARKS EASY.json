@@ -1,0 +1,636 @@
+{
+  "name": "COMMUNITY BENCHMARKS EASY",
+  "code": "KovaaKsPeekingSaltyPrecision",
+  "scenarios": [
+    {
+      "name": "CB EvoClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 720.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 800.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 880.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 960.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 1040.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 1120.0
+        }
+      ]
+    },
+    {
+      "name": "CB ThreeClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 880.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 960.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 1040.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 1120.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "CB FiveClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1050.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 1140.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 1230.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 1320.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 1410.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "CB XYClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 500.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 560.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 630.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 700.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 750.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 400.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 460.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 520.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 580.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 640.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 700.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpClick Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 500.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 560.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 620.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 680.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 740.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "CB ControlTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1750.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 2000.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2250.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2500.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 2750.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1800.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 2100.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2400.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2700.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 3000.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1600.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 1900.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2200.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2500.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "CB StrafeTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1700.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 1900.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2100.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2300.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1700.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 1900.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2100.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2300.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "CB SharpTrack Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 1950.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 2100.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 2250.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 2400.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 2550.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "CB StaticSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 850.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 900.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 950.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 1000.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "CB FlatSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 770.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 820.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 880.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 940.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 1020.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "name": "CB WaveSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 700.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 750.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 800.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 850.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 900.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 250.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 300.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 350.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 400.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 450.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 500.0
+        }
+      ]
+    },
+    {
+      "name": "CB SmoothSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 340.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 370.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 400.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 440.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 480.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "CB JumpSwitch Easy",
+      "ranks": [
+        {
+          "name": "ROOKIE",
+          "color": "#ED5314",
+          "threshold": 360.0
+        },
+        {
+          "name": "NOVICE",
+          "color": "#FFB92A",
+          "threshold": 400.0
+        },
+        {
+          "name": "SCOUT",
+          "color": "#FEEB51",
+          "threshold": 440.0
+        },
+        {
+          "name": "DOCENT",
+          "color": "#9BCA3E",
+          "threshold": 480.0
+        },
+        {
+          "name": "ADEPT",
+          "color": "#3ABBC9",
+          "threshold": 520.0
+        },
+        {
+          "name": "EXPERT",
+          "color": "#666DCB",
+          "threshold": 570.0
+        }
+      ]
+    }
+  ]
+}

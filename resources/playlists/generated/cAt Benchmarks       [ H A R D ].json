@@ -1,0 +1,456 @@
+{
+  "name": "cAt Benchmarks       [ H A R D ]",
+  "code": "KovaaKsBloomingPeachArena",
+  "scenarios": [
+    {
+      "name": "cAt 3 cats wide",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1620.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 5 cats micro",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1920.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 2080.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 2240.0
+        }
+      ]
+    },
+    {
+      "name": "cAt 4 cats",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "cAt purrClick Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 800.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 960.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "cAt pawClick Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 550.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 640.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 730.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 820.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnClick Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 660.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 790.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "cAt laserTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "cAt meowTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 4750.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "cAt sausageTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "cAt fluffyTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "cAt furTrack Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "cAt mealSwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tabbySwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1390.0
+        }
+      ]
+    },
+    {
+      "name": "cAt wobbleSwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 1570.0
+        }
+      ]
+    },
+    {
+      "name": "cAt tailSwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 380.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 460.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 540.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 620.0
+        }
+      ]
+    },
+    {
+      "name": "cAt snortSwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 430.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 480.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 530.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 560.0
+        }
+      ]
+    },
+    {
+      "name": "cAt yarnSwitch Hard",
+      "ranks": [
+        {
+          "name": "Tressym",
+          "color": "#49E6E6",
+          "threshold": 560.0
+        },
+        {
+          "name": "Chimera",
+          "color": "#C69AF1",
+          "threshold": 630.0
+        },
+        {
+          "name": "Sphinx",
+          "color": "#FFFFFF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Bastet",
+          "color": "#000000",
+          "threshold": 770.0
+        }
+      ]
+    }
+  ]
+}

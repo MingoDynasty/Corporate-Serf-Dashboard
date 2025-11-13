@@ -1,0 +1,636 @@
+{
+  "name": "Voltaic Benchmarks S5 Expanded - Elite",
+  "code": "KovaaKsMainingIndigoPatrol",
+  "scenarios": [
+    {
+      "name": "VT Pasu Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 900.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "VT Popcorn Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 540.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 640.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 740.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 840.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 900.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 930.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w2ts Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1570.0
+        }
+      ]
+    },
+    {
+      "name": "VT ww5t Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1620.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1710.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1780.0
+        }
+      ]
+    },
+    {
+      "name": "VT Frogtagon Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 940.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1360.0
+        }
+      ]
+    },
+    {
+      "name": "VT Floating Heads Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 680.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 800.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 900.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 950.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "VT PGT Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2525.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 3425.0
+        }
+      ]
+    },
+    {
+      "name": "VT Snake Track Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 3450.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 3275.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 3325.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 3275.0
+        }
+      ]
+    },
+    {
+      "name": "VT DotTS Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1410.0
+        }
+      ]
+    },
+    {
+      "name": "VT EddieTS Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 860.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 940.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 1190.0
+        }
+      ]
+    },
+    {
+      "name": "VT DriftTS Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 320.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 360.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 380.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 400.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 430.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 480.0
+        }
+      ]
+    },
+    {
+      "name": "VT FlyTS Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 450.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 510.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 570.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 600.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 630.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "VT ControlTS Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 360.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 390.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 420.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 440.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 460.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 480.0
+        }
+      ]
+    },
+    {
+      "name": "VT Penta Bounce Elite S5",
+      "ranks": [
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 420.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 480.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 530.0
+        },
+        {
+          "name": "Stellaris",
+          "color": "#979DDA",
+          "threshold": 560.0
+        },
+        {
+          "name": "Lunara",
+          "color": "#54418E",
+          "threshold": 580.0
+        },
+        {
+          "name": "Solara",
+          "color": "#FCFFA0",
+          "threshold": 600.0
+        }
+      ]
+    }
+  ]
+}

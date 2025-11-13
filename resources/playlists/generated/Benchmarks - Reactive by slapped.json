@@ -1,0 +1,666 @@
+{
+  "name": "Benchmarks - Reactive by slapped",
+  "code": "KovaaKsHipfiringWetWindow",
+  "scenarios": [
+    {
+      "name": "Smooth Thin Strafes Raspberry",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 5700.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 6700.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 7300.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 7850.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 8450.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 8900.0
+        }
+      ]
+    },
+    {
+      "name": "odb MFSI",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1650.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1850.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2050.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2350.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2650.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "LDDH Fixed",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 700.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1200.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1400.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 1550.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 1700.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 1850.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "MSS Raspberry v2",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 5250.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 6000.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 6700.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 7150.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 7850.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 8400.0
+        }
+      ]
+    },
+    {
+      "name": "MSS Insanity Raspberry",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 3850.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 4650.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 5500.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 6100.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 6550.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 7000.0
+        }
+      ]
+    },
+    {
+      "name": "MFSI v3 Raspberry",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 4700.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 5900.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 6800.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 7600.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 8500.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 8900.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible - Thin",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 7500.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 8600.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 9550.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 10500.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 11400.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 720.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 750.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 825.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 845.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 875.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 885.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 890.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 896.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 903.0
+        }
+      ]
+    },
+    {
+      "name": "Air invincible 8 small",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1850.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 2200.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2500.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2700.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2900.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Wide React",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 600.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 750.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 850.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 1250.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 1650.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 2000.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 2400.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 2700.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "ReactiveSphere",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 5550.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 6350.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 7050.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 7750.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 8400.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 8700.0
+        }
+      ]
+    },
+    {
+      "name": "Air Divine",
+      "ranks": [
+        {
+          "name": "Basic",
+          "color": "#93C47D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#FFE599",
+          "threshold": 750.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#FCC1C1",
+          "threshold": 810.0
+        },
+        {
+          "name": "Pre-Advanced",
+          "color": "#D2BFFE",
+          "threshold": 835.0
+        },
+        {
+          "name": "Advanced",
+          "color": "#B5D1FF",
+          "threshold": 850.0
+        },
+        {
+          "name": "BLESSED",
+          "color": "#E06666",
+          "threshold": 865.0
+        },
+        {
+          "name": "EXALTED",
+          "color": "#FBBC04",
+          "threshold": 875.0
+        },
+        {
+          "name": "UBER",
+          "color": "#351C75",
+          "threshold": 885.0
+        },
+        {
+          "name": "ARCADIA",
+          "color": "#274E13",
+          "threshold": 891.0
+        },
+        {
+          "name": "HORIZON",
+          "color": "#24DDD8",
+          "threshold": 898.0
+        }
+      ]
+    }
+  ]
+}

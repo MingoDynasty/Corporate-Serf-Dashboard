@@ -1,0 +1,256 @@
+{
+  "name": "DM Poke Static S2 L7 - Worthless",
+  "code": "KovaaKsScreamingViscousAntidive",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1330.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1470.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1380.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1560.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1420.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1630.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1470.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Pokeball Even Smaller",
+      "ranks": [
+        {
+          "name": "Elite",
+          "color": "#8A2293",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Legend",
+          "color": "#BA005C",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#BE3939",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#24DDD8",
+          "threshold": 1650.0
+        }
+      ]
+    }
+  ]
+}

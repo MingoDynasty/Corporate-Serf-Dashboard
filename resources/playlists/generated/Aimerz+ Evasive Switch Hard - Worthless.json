@@ -1,0 +1,426 @@
+{
+  "name": "Aimerz+ Evasive Switch Hard - Worthless",
+  "code": "KovaaKsFlankingSaltyFlank",
+  "scenarios": [
+    {
+      "name": "tamTargetSwitch Control Hard",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 39.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 41.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 43.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 46.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 50.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 55.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Smooth Hard",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 33.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 36.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 38.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 41.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 44.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 48.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere TS 30% Smaller 200% HP MORE BOTS",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 7950.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 8850.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 11100.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot TS Voltaic Regen Hasin",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 42.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 46.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 48.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 51.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 56.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 63.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Switch Wide Regen",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 580.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 660.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 740.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 820.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 900.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 1080.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 6300.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 6700.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 7700.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 8600.0
+        }
+      ]
+    },
+    {
+      "name": "Star Tracking Regen - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 32.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 35.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 38.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 41.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 45.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 51.0
+        }
+      ]
+    },
+    {
+      "name": "Trippez Smooth Switching Regen Slower + Smaller",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 270.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 290.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 320.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 350.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 380.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 430.0
+        }
+      ]
+    },
+    {
+      "name": "CircleTS",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 500.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 520.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 560.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 600.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 660.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 720.0
+        }
+      ]
+    },
+    {
+      "name": "darkSwitch",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 70.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 73.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 77.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 81.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 85.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 91.0
+        }
+      ]
+    },
+    {
+      "name": "Bounce 180 Tracking",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 99.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 105.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 111.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 118.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 125.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopTS Med S1",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 82.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 85.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 89.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 94.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 107.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,506 @@
+{
+  "name": "thundah precise tracking S2",
+  "code": "KovaaKsDodgingDynamicFov",
+  "scenarios": [
+    {
+      "name": "thundahTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2900.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "thundahRawControl",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 900.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2700.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "TrampolineTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2900.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "CastleTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 3900.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "SkyTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 3600.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "LeafTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 3500.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "AngelTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 700.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2400.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "TunnelTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 3200.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "CatTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 800.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2800.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "OrbTrack",
+      "ranks": [
+        {
+          "name": "Ape",
+          "color": "#804000",
+          "threshold": 900.0
+        },
+        {
+          "name": "Reptilian",
+          "color": "#73C960",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Neanderthal",
+          "color": "#BA8D5C",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Sentient",
+          "color": "#674EA7",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Human",
+          "color": "#F3E5AB",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Humanoid",
+          "color": "#A64D79",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cyborg",
+          "color": "#A90000",
+          "threshold": 2900.0
+        },
+        {
+          "name": "CPU",
+          "color": "#6AE5C8",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ai",
+          "color": "#E191FE",
+          "threshold": 3700.0
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,486 @@
+{
+  "name": "SuperbAim Benchmark S2 Advanced v2",
+  "code": "KovaaKsEnragingPeriwinkleAdventure",
+  "scenarios": [
+    {
+      "name": "FloatingClick SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 810.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 890.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 950.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 1060.0
+        }
+      ]
+    },
+    {
+      "name": "BounceClick SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 76.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 86.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 95.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 103.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 108.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 81.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 90.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 98.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 106.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 112.0
+        }
+      ]
+    },
+    {
+      "name": "CombinedClick SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 76.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 84.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 91.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 98.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "5 Dots SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 1220.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 1560.0
+        }
+      ]
+    },
+    {
+      "name": "3 Dots xyzAdjust SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 142.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 151.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 160.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 168.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 176.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothTrack SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 4000.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 5300.0
+        }
+      ]
+    },
+    {
+      "name": "LeapBot SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 2300.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "ReactiveStrafe SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 2600.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "AirReactive SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 2400.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "AirAngelic SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 2850.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 8100.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 11200.0
+        }
+      ]
+    },
+    {
+      "name": "VoxTS SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 1220.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 1460.0
+        }
+      ]
+    },
+    {
+      "name": "PsalmTS SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 90.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 98.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 107.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 114.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 118.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 72.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 78.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 83.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 88.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 91.0
+        }
+      ]
+    },
+    {
+      "name": "BounceTS SuperbAim",
+      "ranks": [
+        {
+          "name": "Master",
+          "color": "#C30D23",
+          "threshold": 72.0
+        },
+        {
+          "name": "GrandMaster",
+          "color": "#FFD97B",
+          "threshold": 79.0
+        },
+        {
+          "name": "Cyan",
+          "color": "#1F8784",
+          "threshold": 85.0
+        },
+        {
+          "name": "Blazar",
+          "color": "#002549",
+          "threshold": 90.0
+        },
+        {
+          "name": "Superb",
+          "color": "#24DDD8",
+          "threshold": 94.0
+        }
+      ]
+    }
+  ]
+}

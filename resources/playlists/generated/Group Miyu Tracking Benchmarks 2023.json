@@ -1,0 +1,326 @@
+{
+  "name": "Group Miyu Tracking Benchmarks 2023",
+  "code": "KovaaKsSensingSkyblueReset",
+  "scenarios": [
+    {
+      "name": "Long Strafes Humanoid Switch Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 10923.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 11760.0
+        }
+      ]
+    },
+    {
+      "name": "Jump Pad LS Humanoid Inv Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 18100.0
+        }
+      ]
+    },
+    {
+      "name": "Very Far Thin Long Strafes Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 15700.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 16380.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 17275.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 18100.0
+        }
+      ]
+    },
+    {
+      "name": "Fast Strafes Humanoid Switch Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 5883.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 6400.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 6723.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 7150.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 7563.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 8400.0
+        }
+      ]
+    },
+    {
+      "name": "Mid-range 3 Boxes Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 18400.0
+        }
+      ]
+    },
+    {
+      "name": "Box Sphere Unusual Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 8450.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 9750.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 11050.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 12700.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "S Humanoid Dodge Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 12700.0
+        }
+      ]
+    },
+    {
+      "name": "Tracking Heaven Miyu",
+      "ranks": [
+        {
+          "name": "Alpha",
+          "color": "#F1C232",
+          "threshold": 785.0
+        },
+        {
+          "name": "Beta",
+          "color": "#C27BA0",
+          "threshold": 795.0
+        },
+        {
+          "name": "Gamma",
+          "color": "#6AA84F",
+          "threshold": 810.0
+        },
+        {
+          "name": "Delta",
+          "color": "#9900FF",
+          "threshold": 820.0
+        },
+        {
+          "name": "Epsilon",
+          "color": "#CC0000",
+          "threshold": 835.0
+        },
+        {
+          "name": "Zeta",
+          "color": "#000000",
+          "threshold": 845.0
+        },
+        {
+          "name": "Eta",
+          "color": "#FFFFFF",
+          "threshold": 860.0
+        }
+      ]
+    }
+  ]
+}
