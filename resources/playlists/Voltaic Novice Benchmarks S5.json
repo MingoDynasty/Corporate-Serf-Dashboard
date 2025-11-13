@@ -1,454 +1,454 @@
 {
-  "playlist_name": "Voltaic Novice Benchmarks S5",
-  "playlist_code": "KovaaKsBouncingSilverBinding",
-  "scenario_list": [
+  "name": "Voltaic Novice Benchmarks S5",
+  "code": "KovaaKsBouncingSilverBinding",
+  "scenarios": [
     {
-      "scenario_name": "VT Pasu Novice S5",
-      "rank_data": [
+      "name": "VT Pasu Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 555.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 555.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 660.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 660.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 745.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 745.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 800.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 800.0
         }
       ]
     },
     {
-      "scenario_name": "VT Popcorn Novice S5",
-      "rank_data": [
+      "name": "VT Popcorn Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 390.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 390.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 500.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 500.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 600.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 600.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 720.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 720.0
         }
       ]
     },
     {
-      "scenario_name": "VT 1w4ts Novice S5",
-      "rank_data": [
+      "name": "VT 1w4ts Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 820.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 820.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 915.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 915.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 1010.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1010.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 1110.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1110.0
         }
       ]
     },
     {
-      "scenario_name": "VT ww5t Novice S5",
-      "rank_data": [
+      "name": "VT ww5t Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 990.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 990.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 1090.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1090.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 1190.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1190.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 1290.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1290.0
         }
       ]
     },
     {
-      "scenario_name": "VT Frogtagon Novice S5",
-      "rank_data": [
+      "name": "VT Frogtagon Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 620.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 620.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 740.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 740.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 850.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 850.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 980.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 980.0
         }
       ]
     },
     {
-      "scenario_name": "VT Floating Heads Novice S5",
-      "rank_data": [
+      "name": "VT Floating Heads Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 375.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 375.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 460.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 460.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 540.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 540.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 640.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 640.0
         }
       ]
     },
     {
-      "scenario_name": "VT PGT Novice S5",
-      "rank_data": [
+      "name": "VT PGT Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 1900.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1900.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 2325.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2325.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 2775.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2775.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 3050.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 3050.0
         }
       ]
     },
     {
-      "scenario_name": "VT Snake Track Novice S5",
-      "rank_data": [
+      "name": "VT Snake Track Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 2400.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2400.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 2750.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2750.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 3125.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 3125.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 3425.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 3425.0
         }
       ]
     },
     {
-      "scenario_name": "VT Aether Novice S5",
-      "rank_data": [
+      "name": "VT Aether Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 1525.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1525.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 1900.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1900.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 2250.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2250.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 2650.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2650.0
         }
       ]
     },
     {
-      "scenario_name": "VT Ground Novice S5",
-      "rank_data": [
+      "name": "VT Ground Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 2100.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2100.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 2500.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2500.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 2825.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2825.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 3100.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 3100.0
         }
       ]
     },
     {
-      "scenario_name": "VT Raw Control Novice S5",
-      "rank_data": [
+      "name": "VT Raw Control Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 2125.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2125.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 2550.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2550.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 2975.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2975.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 3450.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 3450.0
         }
       ]
     },
     {
-      "scenario_name": "VT Controlsphere Novice S5",
-      "rank_data": [
+      "name": "VT Controlsphere Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 1575.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1575.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 1950.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1950.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 2400.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2400.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 2900.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2900.0
         }
       ]
     },
     {
-      "scenario_name": "VT DotTS Novice S5",
-      "rank_data": [
+      "name": "VT DotTS Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 845.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 845.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 940.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 940.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 1030.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1030.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 1090.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1090.0
         }
       ]
     },
     {
-      "scenario_name": "VT EddieTS Novice S5",
-      "rank_data": [
+      "name": "VT EddieTS Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 640.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 640.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 730.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 730.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 810.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 810.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 890.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 890.0
         }
       ]
     },
     {
-      "scenario_name": "VT DriftTS Novice S5",
-      "rank_data": [
+      "name": "VT DriftTS Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 315.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 315.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 355.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 355.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 390.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 390.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 430.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 430.0
         }
       ]
     },
     {
-      "scenario_name": "VT FlyTS Novice S5",
-      "rank_data": [
+      "name": "VT FlyTS Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 420.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 420.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 460.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 460.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 500.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 500.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 535.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 535.0
         }
       ]
     },
     {
-      "scenario_name": "VT ControlTS Novice S5",
-      "rank_data": [
+      "name": "VT ControlTS Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 340.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 340.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 380.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 380.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 420.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 420.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 450.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 450.0
         }
       ]
     },
     {
-      "scenario_name": "VT Penta Bounce Novice S5",
-      "rank_data": [
+      "name": "VT Penta Bounce Novice S5",
+      "ranks": [
         {
-          "rank_name": "Iron",
-          "rank_color": "#999999",
-          "rank_threshold": 290.0
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 290.0
         },
         {
-          "rank_name": "Bronze",
-          "rank_color": "#FF9900",
-          "rank_threshold": 340.0
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 340.0
         },
         {
-          "rank_name": "Silver",
-          "rank_color": "#CBD9E6",
-          "rank_threshold": 390.0
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 390.0
         },
         {
-          "rank_name": "Gold",
-          "rank_color": "#CAB148",
-          "rank_threshold": 445.0
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 445.0
         }
       ]
     }

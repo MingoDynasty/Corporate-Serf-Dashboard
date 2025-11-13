@@ -1,1624 +1,1624 @@
 {
-  "playlist_name": "Viscose benchmarks easier scenarios",
-  "playlist_code": "KovaaKsRaidingMediumFaction",
-  "scenario_list": [
+  "name": "Viscose benchmarks easier scenarios",
+  "code": "KovaaKsRaidingMediumFaction",
+  "scenarios": [
     {
-      "scenario_name": "WhisphereRawControl Larger + Slowed",
-      "rank_data": [
+      "name": "WhisphereRawControl Larger + Slowed",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 5500.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 5500.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 6700.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 6700.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 7800.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 7800.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 8700.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 8700.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 9600.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 9600.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 10500.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 10500.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 11400.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 11400.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 12500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 12500.0
         }
       ]
     },
     {
-      "scenario_name": "Whisphere 80%",
-      "rank_data": [
+      "name": "Whisphere 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 6300.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 6300.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 7700.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 7700.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 9000.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 9000.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 10000.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 10000.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 11000.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 11000.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 12000.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 12000.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 13000.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 13000.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 14500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 14500.0
         }
       ]
     },
     {
-      "scenario_name": "SmoothBot Invincible Goated 75%",
-      "rank_data": [
+      "name": "SmoothBot Invincible Goated 75%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 1800.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1800.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 2250.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 2250.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 2650.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2650.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 2900.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2900.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 3150.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 3150.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 3400.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3400.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 3650.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3650.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 4000.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 4000.0
         }
       ]
     },
     {
-      "scenario_name": "Leaptrack Goated 60% Larger",
-      "rank_data": [
+      "name": "Leaptrack Goated 60% Larger",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 850.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 850.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 1200.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1200.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 1500.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1500.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1700.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1700.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1900.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1900.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 2100.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2100.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2250.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2250.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 2450.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2450.0
         }
       ]
     },
     {
-      "scenario_name": "Controlsphere rAim Easy 90%",
-      "rank_data": [
+      "name": "Controlsphere rAim Easy 90%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 6100.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 6100.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 6950.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 6950.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 7700.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 7700.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 8400.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 8400.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 9100.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 9100.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 9800.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 9800.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 10500.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 10500.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 11500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 11500.0
         }
       ]
     },
     {
-      "scenario_name": "VT Controlsphere Intermediate S5 80%",
-      "rank_data": [
+      "name": "VT Controlsphere Intermediate S5 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 1850.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1850.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 2300.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 2300.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 2700.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2700.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 3000.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 3000.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 3300.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 3300.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 3600.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3600.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 3850.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3850.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 4100.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 4100.0
         }
       ]
     },
     {
-      "scenario_name": "Air Angelic 4 Voltaic Easy 80% (Good Version)",
-      "rank_data": [
+      "name": "Air Angelic 4 Voltaic Easy 80% (Good Version)",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 1050.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1050.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 1600.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 2000.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2000.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 2400.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2400.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 2700.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2700.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 3000.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3000.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 3300.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3300.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 3600.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3600.0
         }
       ]
     },
     {
-      "scenario_name": "cloverRawControl Easy 80% Speed",
-      "rank_data": [
+      "name": "cloverRawControl Easy 80% Speed",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 3900.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 3900.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 4550.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 4550.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 5200.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 5200.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 5700.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 5700.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 6200.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 6200.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 6700.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 6700.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 7200.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 7200.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 7700.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 7700.0
         }
       ]
     },
     {
-      "scenario_name": "Controlsphere Far, Far Larger 90%",
-      "rank_data": [
+      "name": "Controlsphere Far, Far Larger 90%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 7600.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 7600.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 8150.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 8150.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 8700.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 8700.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 9200.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 9200.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 9800.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 9800.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 10200.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 10200.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 10900.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 10900.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 11500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 11500.0
         }
       ]
     },
     {
-      "scenario_name": "PGTI Voltaic Easy 80%",
-      "rank_data": [
+      "name": "PGTI Voltaic Easy 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 400.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 400.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 650.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 650.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 950.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 950.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1200.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1200.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1450.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1450.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 1700.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 1700.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2000.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2000.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 2350.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2350.0
         }
       ]
     },
     {
-      "scenario_name": "Air CELESTIAL No UFO Easy Slowed",
-      "rank_data": [
+      "name": "Air CELESTIAL No UFO Easy Slowed",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 820.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 820.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 835.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 835.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 850.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 850.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 861.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 861.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 870.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 870.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 878.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 878.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 884.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 884.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 890.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 890.0
         }
       ]
     },
     {
-      "scenario_name": "Whisphere Small & Slow 55%",
-      "rank_data": [
+      "name": "Whisphere Small & Slow 55%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 6000.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 6000.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 7500.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 7500.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 9000.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 9000.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 10000.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 10000.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 10750.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 10750.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 11500.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 11500.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 12250.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 12250.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 13500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 13500.0
         }
       ]
     },
     {
-      "scenario_name": "Air Voltaic Invincible 7 Easy 80%",
-      "rank_data": [
+      "name": "Air Voltaic Invincible 7 Easy 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 750.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 750.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 1200.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1200.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 1600.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1600.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1900.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1900.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 2200.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2200.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 2500.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2500.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2800.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2800.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 3200.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3200.0
         }
       ]
     },
     {
-      "scenario_name": "Controlsphere OW Long Strafes 90%",
-      "rank_data": [
+      "name": "Controlsphere OW Long Strafes 90%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 5400.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 5400.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 6100.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 6100.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 6700.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 6700.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 7200.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 7200.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 7600.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 7600.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 8000.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 8000.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 8300.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 8300.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 8700.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 8700.0
         }
       ]
     },
     {
-      "scenario_name": "Flicker Plaza rAim Easy Less Blinks",
-      "rank_data": [
+      "name": "Flicker Plaza rAim Easy Less Blinks",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 858.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 858.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 871.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 871.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 883.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 883.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 890.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 890.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 895.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 895.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 900.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 900.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 904.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 904.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 909.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 909.0
         }
       ]
     },
     {
-      "scenario_name": "Polarized Hell Easy 40% Slower",
-      "rank_data": [
+      "name": "Polarized Hell Easy 40% Slower",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 750.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 750.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 1100.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1100.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 1400.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1400.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1600.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1600.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1800.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1800.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 2000.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2000.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2150.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2150.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 2500.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2500.0
         }
       ]
     },
     {
-      "scenario_name": "Air Pure Intermediate Slower No UFO",
-      "rank_data": [
+      "name": "Air Pure Intermediate Slower No UFO",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 860.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 860.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 874.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 874.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 886.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 886.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 893.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 893.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 901.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 901.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 907.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 907.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 911.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 911.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 916.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 916.0
         }
       ]
     },
     {
-      "scenario_name": "Air Voltaic Easy Invincible 4 80%",
-      "rank_data": [
+      "name": "Air Voltaic Easy Invincible 4 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 1100.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1100.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 1600.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 2100.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2100.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 2450.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2450.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 2800.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2800.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 3150.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3150.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 3400.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3400.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 3800.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3800.0
         }
       ]
     },
     {
-      "scenario_name": "Pokeball Frenzy Auto TE Wide",
-      "rank_data": [
+      "name": "Pokeball Frenzy Auto TE Wide",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 650.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 650.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 950.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 950.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 1250.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1250.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1500.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1500.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1750.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1750.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 2000.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2000.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2300.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2300.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 2700.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2700.0
         }
       ]
     },
     {
-      "scenario_name": "1w3ts reload Larger",
-      "rank_data": [
+      "name": "1w3ts reload Larger",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 38.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 38.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 45.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 45.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 52.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 52.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 60.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 60.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 72.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 72.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 84.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 84.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 94.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 94.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 104.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 104.0
         }
       ]
     },
     {
-      "scenario_name": "voxTargetSwitch 2 Large",
-      "rank_data": [
+      "name": "voxTargetSwitch 2 Large",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 67.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 67.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 78.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 78.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 87.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 87.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 95.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 95.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 103.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 103.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 110.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 110.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 117.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 117.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 123.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 123.0
         }
       ]
     },
     {
-      "scenario_name": "beanTS Larger",
-      "rank_data": [
+      "name": "beanTS Larger",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 65.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 65.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 78.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 78.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 90.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 90.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 100.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 100.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 110.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 110.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 120.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 120.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 130.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 130.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 142.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 142.0
         }
       ]
     },
     {
-      "scenario_name": "FloatTS Angelic Easy Larger",
-      "rank_data": [
+      "name": "FloatTS Angelic Easy Larger",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 65.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 65.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 74.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 74.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 81.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 81.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 88.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 88.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 95.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 95.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 101.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 101.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 106.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 106.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 111.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 111.0
         }
       ]
     },
     {
-      "scenario_name": "waldoTS Novice",
-      "rank_data": [
+      "name": "waldoTS Novice",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 65.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 65.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 78.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 78.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 90.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 90.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 100.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 100.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 110.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 110.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 120.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 120.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 130.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 130.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 140.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 140.0
         }
       ]
     },
     {
-      "scenario_name": "devTS Goated NR Static 5Bot",
-      "rank_data": [
+      "name": "devTS Goated NR Static 5Bot",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 350.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 350.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 400.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 400.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 450.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 450.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 500.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 500.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 550.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 550.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 600.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 600.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 640.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 640.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 680.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 680.0
         }
       ]
     },
     {
-      "scenario_name": "domiSwitch Easy Slower",
-      "rank_data": [
+      "name": "domiSwitch Easy Slower",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 3200.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 3200.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 3700.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 3700.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 4200.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 4200.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 4600.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 4600.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 5000.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 5000.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 5400.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 5400.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 5800.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 5800.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 6300.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 6300.0
         }
       ]
     },
     {
-      "scenario_name": "tamTargetSwitch Smooth Easy",
-      "rank_data": [
+      "name": "tamTargetSwitch Smooth Easy",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 7.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 7.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 11.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 11.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 15.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 15.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 18.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 18.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 21.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 21.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 24.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 24.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 26.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 26.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 28.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 28.0
         }
       ]
     },
     {
-      "scenario_name": "1wall5targets_pasu slow",
-      "rank_data": [
+      "name": "1wall5targets_pasu slow",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 76.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 76.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 88.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 88.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 100.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 100.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 110.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 110.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 120.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 120.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 130.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 130.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 140.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 140.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 150.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 150.0
         }
       ]
     },
     {
-      "scenario_name": "B180 Voltaic Easy 92%",
-      "rank_data": [
+      "name": "B180 Voltaic Easy 92%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 26.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 26.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 38.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 38.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 50.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 50.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 58.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 58.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 65.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 65.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 72.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 72.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 78.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 78.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 87.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 87.0
         }
       ]
     },
     {
-      "scenario_name": "Controlsphere Click Easy",
-      "rank_data": [
+      "name": "Controlsphere Click Easy",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 15.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 15.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 21.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 21.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 27.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 27.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 33.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 33.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 39.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 39.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 45.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 45.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 50.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 50.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 55.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 55.0
         }
       ]
     },
     {
-      "scenario_name": "Popcorn MV Novice",
-      "rank_data": [
+      "name": "Popcorn MV Novice",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 50.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 50.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 100.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 100.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 150.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 150.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 190.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 190.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 230.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 230.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 270.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 270.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 300.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 300.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 330.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 330.0
         }
       ]
     },
     {
-      "scenario_name": "Pasu Angelic 20% Larger 80% Speed",
-      "rank_data": [
+      "name": "Pasu Angelic 20% Larger 80% Speed",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 51.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 51.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 58.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 58.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 65.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 65.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 72.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 72.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 78.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 78.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 84.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 84.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 90.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 90.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 97.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 97.0
         }
       ]
     },
     {
-      "scenario_name": "1w2ts Pasu Perfected Easy",
-      "rank_data": [
+      "name": "1w2ts Pasu Perfected Easy",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 58.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 58.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 69.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 69.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 80.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 80.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 87.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 87.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 93.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 93.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 99.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 99.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 105.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 105.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 110.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 110.0
         }
       ]
     },
     {
-      "scenario_name": "1w3ts Pasu Perfected Micro Goated Larger 80%",
-      "rank_data": [
+      "name": "1w3ts Pasu Perfected Micro Goated Larger 80%",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 600.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 600.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 700.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 700.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 800.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 800.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 900.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 900.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1000.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1000.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 1100.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 1100.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 1200.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 1200.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 1300.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 1300.0
         }
       ]
     },
     {
-      "scenario_name": "Floating Heads Timing 400% Larger",
-      "rank_data": [
+      "name": "Floating Heads Timing 400% Larger",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 400.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 400.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 700.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 700.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 1000.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1000.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 1350.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1350.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 1700.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1700.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 2050.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2050.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 2400.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2400.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 2750.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2750.0
         }
       ]
     },
     {
-      "scenario_name": "voxTargetSwitch Click",
-      "rank_data": [
+      "name": "voxTargetSwitch Click",
+      "ranks": [
         {
-          "rank_name": "Lemming",
-          "rank_color": "#C5C3F2",
-          "rank_threshold": 49.0
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 49.0
         },
         {
-          "rank_name": "Hare",
-          "rank_color": "#B2CBEA",
-          "rank_threshold": 59.0
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 59.0
         },
         {
-          "rank_name": "Ermine",
-          "rank_color": "#BAF6FC",
-          "rank_threshold": 67.0
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 67.0
         },
         {
-          "rank_name": "Penguin",
-          "rank_color": "#6B94DF",
-          "rank_threshold": 74.0
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 74.0
         },
         {
-          "rank_name": "Fox",
-          "rank_color": "#5558AA",
-          "rank_threshold": 81.0
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 81.0
         },
         {
-          "rank_name": "Mammoth",
-          "rank_color": "#6E3F98",
-          "rank_threshold": 88.0
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 88.0
         },
         {
-          "rank_name": "Orca",
-          "rank_color": "#C080E4",
-          "rank_threshold": 94.0
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 94.0
         },
         {
-          "rank_name": "Seal",
-          "rank_color": "#F5BDE8",
-          "rank_threshold": 100.0
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 100.0
         }
       ]
     }
