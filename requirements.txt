@@ -1,7 +1,7 @@
 dash-extensions~=2.0.4
 dash-iconify~=0.1.2
 dash-mantine-components~=2.4.0
-dash~=3.2.0
+dash~=3.3.0
 numpy~=2.3.4
 pandas~=2.3.3
 plotly~=6.4.0
