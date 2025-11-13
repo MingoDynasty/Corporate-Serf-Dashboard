@@ -3,7 +3,7 @@
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
     <option name="enabledOnSave" value="true" />
-    <option name="sdkName" value="Python 3.13 (Corporate-Serf-Dashboard)" />
+    <option name="sdkName" value="uv (Corporate-Serf-Dashboard)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="uv (Corporate-Serf-Dashboard)" project-jdk-type="Python SDK" />
 </project>

@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "black>=25.11.0",
     "dash>=3.3.0",
     "dash-extensions>=2.0.4",
     "dash-iconify>=0.1.2",
