@@ -1,6 +1,6 @@
-# Playlist Cache Generator
+# Playlist Generator
 
-Generates the cache in `resources/playlists/cache`
+Generates the playlist in `generated`
 
 ## General Flow
 
@@ -8,4 +8,4 @@ Generates the cache in `resources/playlists/cache`
 2. Each playlist code found,
     1. Query KovaaK's API for playlist data
     2. Query KovaaK's API for benchmarks data
-3. Merge all this data and store into `resources/playlists/cache`
+3. Merge all this data and store into `generated`

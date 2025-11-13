@@ -30,17 +30,17 @@ class ScenarioStats:
 
 
 class Rank(BaseModel):
-    rank_name: str
-    rank_color: str
-    rank_threshold: float
+    name: str
+    color: str
+    threshold: float
 
 
 class Scenario(BaseModel):
-    scenario_name: str
-    rank_data: Optional[List[Rank]] = None
+    name: str
+    ranks: Optional[List[Rank]]
 
 
 class PlaylistData(BaseModel):
-    playlist_name: str
-    playlist_code: str
-    scenario_list: List[Scenario]
+    name: str
+    code: str
+    scenarios: List[Scenario]

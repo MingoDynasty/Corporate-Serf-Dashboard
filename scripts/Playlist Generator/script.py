@@ -67,15 +67,18 @@ def main() -> None:
     for sharecode, evxl_database_item in evxl_database.items():
         counter += 1
 
-        if counter < 124:
-            continue
+        # if counter < 124:
+        #     continue
+
+        if counter >= 2:
+            break
 
         if sharecode in temp_skip_sharecodes:
             logger.debug(f"Skipping: {sharecode}")
             continue
 
         logger.debug(
-            f"Generating cache ({counter}/{len(evxl_database)}) for sharecode: {sharecode}"
+            f"Generating ({counter}/{len(evxl_database)}) for sharecode: {sharecode}"
         )
 
         # 2. Query KovaaK's API for playlist data
@@ -91,7 +94,7 @@ def main() -> None:
             # raise Exception(message)
             continue
         logger.debug(
-            f"Generating cache ({counter}/{len(evxl_database)}) for playlist: {playlist_response.data[0].playlistName.strip()}"
+            f"Generating ({counter}/{len(evxl_database)}) for playlist: {playlist_response.data[0].playlistName.strip()}"
         )
         # if len(playlist_response.data) > 1:
         #     message = f"Found more than one playlist from code: {sharecode}"
@@ -120,7 +123,7 @@ def main() -> None:
         ################################
         benchmark_response = BenchmarksAPIResponse.model_validate(response_json)
 
-        # 4. Merge all this data and store into `resources/playlists/cache`
+        # 4. Merge all this data and store into `generated`
         evxl_rank_data = list(evxl_database_item.rankColors.items())
         scenario_list: List[Scenario] = []
         for _, category in benchmark_response.categories.items():
@@ -137,28 +140,30 @@ def main() -> None:
                 for idx in range(len(benchmark_scenario.rank_maxes)):
                     ranks_data.append(
                         Rank(
-                            rank_name=evxl_rank_data[idx][0],
-                            rank_color=evxl_rank_data[idx][1],
-                            rank_threshold=benchmark_scenario.rank_maxes[idx],
+                            name=evxl_rank_data[idx][0],
+                            color=evxl_rank_data[idx][1],
+                            threshold=benchmark_scenario.rank_maxes[idx],
                         )
                     )
                 scenario_list.append(
                     Scenario(
-                        scenario_name=scenario_name,
-                        rank_data=ranks_data,
+                        name=scenario_name,
+                        ranks=ranks_data,
                     )
                 )
 
         playlist_data = PlaylistData(
-            playlist_name=playlist_response.data[0].playlistName.strip(),
-            playlist_code=sharecode,
-            scenario_list=scenario_list,
+            name=playlist_response.data[0].playlistName.strip(),
+            code=sharecode,
+            scenarios=scenario_list,
         )
 
         # Save to file
-        os.makedirs("cache", exist_ok=True)  # create the cache directory if not exist
-        cache_filename = Path("cache", playlist_data.playlist_name + ".json")
-        with open(cache_filename, "w") as file_handle:
+        os.makedirs(
+            "generated", exist_ok=True
+        )  # create the generated directory if not exist
+        generated_filename = Path("generated", playlist_data.name + ".json")
+        with open(generated_filename, "w") as file_handle:
             file_handle.write(playlist_data.model_dump_json(indent=2))
     return
 
