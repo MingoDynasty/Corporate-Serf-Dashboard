@@ -33,4 +33,4 @@ uv run python source/app.py
 
 ## Example
 
-![Corporate Serf Dashboard example](./assets/example.png "Corporate Serf Dashboard example")
+![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
