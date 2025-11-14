@@ -33,6 +33,8 @@ class NewFileHandler(FileSystemEventHandler):
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
+        if not file.endswith(".csv"):
+            return
 
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         run_data = extract_data_from_file(str(Path(config.stats_dir, file)))
