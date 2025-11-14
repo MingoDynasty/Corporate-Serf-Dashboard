@@ -28,6 +28,7 @@ def generate_plot(
     :param scenario_data: the scenario data to use for the plot.
     :param scenario_name: the name of the scenario to use for the plot.
     :param rank_overlay_switch: enable/disable rank overlay.
+    :param rank_data: an optional list of ranks to plot.
     :return: go.Figure Plot
     """
     if not scenario_data:
@@ -111,22 +112,37 @@ def generate_plot(
     figure_combined["data"][1]["showlegend"] = True
 
     if rank_overlay_switch and rank_data:
-        min_score = min(scatter_plot_data["Score"])
-        max_score = max(scatter_plot_data["Score"])
+        # Get the highest rank that is still below our lowest score
+        idx_lowest_rank = 0
+        for idx in range(1, len(rank_data)):
+            if rank_data[idx].threshold >= min(scatter_plot_data["Score"]):
+                break
+            idx_lowest_rank = idx
 
-        # TODO: percentages don't work that well.
-        #  Change to show highest rank below min_score, and lowest rank above max_score.
-        for rank in rank_data:
+        # Get the lowest rank that is still above our highest score
+        idx_highest_rank = len(rank_data) - 1
+        for idx in range(len(rank_data) - 2, -1, -1):
+            if rank_data[idx].threshold <= max(scatter_plot_data["Score"]):
+                break
+            idx_highest_rank = idx
+
+        # Show the ranks between "highest rank below min_score" and "lowest rank above max_score"
+        for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
             figure_combined.add_hline(
                 name=rank.name,
                 label=dict(
-                    text=f"{rank.name} ({format_decimal(rank.threshold)})",
+                    text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
                     textposition="end",
                 ),
                 y=rank.threshold,
                 line_dash="dash",
                 line_color=rank.color,
             )
+
+        # ensure slight padding in the highest rank displayed, so that the label text doesn't get cut off
+        figure_combined.update_yaxes(
+            autorangeoptions={"include": rank_data[idx_highest_rank].threshold * 1.02}
+        )
     return figure_combined
 
 
