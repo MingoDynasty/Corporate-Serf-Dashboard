@@ -1,9 +1,11 @@
+import json
 import logging
 from datetime import datetime
 from typing import Tuple
 
 import dash
 import dash_mantine_components as dmc
+import plotly.graph_objects as go
 from dash import (
     callback,
     Input,
@@ -38,11 +40,6 @@ from utilities.utilities import ordinal
 log_handler = NotificationsLogHandler()
 dash_logger = log_handler.setup_logger(__name__)
 logger = logging.getLogger(__name__)
-
-################################
-# TODO: Global variables best practices ?
-cached_plot = None
-################################
 
 dash.register_page(
     __name__,
@@ -95,65 +92,60 @@ def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
 
 
 @callback(
-    Output("graph-content", "figure"),
+    Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
     Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("top_n_scores", "value"),
     Input("date-picker", "value"),
-    Input("color-scheme-switch", "checked"),
     Input("rank-overlay-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
 )
-def update_graph(
+def generate_graph(
     do_update,
-    newly_selected_scenario,
+    selected_scenario,
     top_n_scores,
-    new_date,
-    dark_mode_switch,
+    selected_date,
     rank_overlay_switch,
     selected_playlist,
 ):
     """
     Updates to the graph.
     :param do_update: whether to do an update or not.
-    :param newly_selected_scenario: user-selected scenario name.
+    :param selected_scenario: user-selected scenario name.
     :param top_n_scores: user-selected top n scores.
-    :param new_date: user-selected date.
-    :param dark_mode_switch: dark mode switch. True=Dark, else Light.
-    :return: Figure, Notification
+    :param selected_date: user-selected date.
+    :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
+    :param selected_playlist: user-selected playlist name.
+    :return: Figure serialized to JSON, Notification
     """
-    global cached_plot
-    if not newly_selected_scenario or not top_n_scores or not new_date:
-        return cached_plot, no_update
+    if not selected_scenario or not top_n_scores or not selected_date:
+        return go.Figure().to_json(), no_update
 
-    if not is_scenario_in_database(newly_selected_scenario):
+    if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found.")
-        return cached_plot, no_update
+        return go.Figure().to_json(), no_update
 
     oldest_datetime = datetime.combine(
-        datetime.fromisoformat(new_date).date(), datetime.min.time()
+        datetime.fromisoformat(selected_date).date(), datetime.min.time()
     )
 
     sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
-        newly_selected_scenario, top_n_scores, oldest_datetime
+        selected_scenario, top_n_scores, oldest_datetime
     )
     if not sensitivities_vs_runs:
         logger.warning("No scenario data for the given date range.")
-        return cached_plot, no_update
+        return go.Figure().to_json(), no_update
 
     rank_data = None
     if selected_playlist:
-        rank_data = get_rank_data_from_playlist(
-            selected_playlist, newly_selected_scenario
-        )
+        rank_data = get_rank_data_from_playlist(selected_playlist, selected_scenario)
 
-    cached_plot = generate_plot(
-        sensitivities_vs_runs, newly_selected_scenario, rank_overlay_switch, rank_data
+    plot = generate_plot(
+        sensitivities_vs_runs, selected_scenario, rank_overlay_switch, rank_data
     )
 
-    # Default notification is simply notifying that the graph updated,
-    #  usually due to user input.
+    # Default notification is simply notifying that the graph updated.
     notification = {
         "action": "show",
         "title": "Notification",
@@ -167,7 +159,7 @@ def update_graph(
     if do_update and not message_queue.empty():
         message_data = message_queue.get()
         if (
-            newly_selected_scenario == message_data.scenario_name
+            selected_scenario == message_data.scenario_name
             and message_data.nth_score <= top_n_scores
         ):
             notification_message = (
@@ -183,23 +175,25 @@ def update_graph(
                 "icon": DashIconify(icon="fontisto:line-chart"),
                 "autoClose": 8000,
             }
-    return apply_light_dark_mode(cached_plot, dark_mode_switch), [notification]
+    return plot.to_json(), [notification]
 
 
 @callback(
-    Output("graph-content", "figure", allow_duplicate=True),
+    Output("graph-content", "figure"),
     Input("color-scheme-switch", "checked"),
+    Input("cached-plot", "data"),
     prevent_initial_call=True,
 )
-def apply_light_dark_theme_to_graph(switch_on):
+def apply_light_dark_theme_to_graph(switch_on, plot_json):
     """
     Applies the light or dark theme to the graph.
     :param switch_on: switch value.
+    :param plot_json: json object with plotted data.
     :return: Figure with theme applied.
     """
-    if not cached_plot:
-        return cached_plot
-    return apply_light_dark_mode(cached_plot, switch_on)
+    if not plot_json:
+        return plot_json
+    return apply_light_dark_mode(go.Figure(json.loads(plot_json)), switch_on)
 
 
 @callback(
@@ -264,6 +258,8 @@ dmc.add_figure_templates()
 def layout(**kwargs):
     return dmc.MantineProvider(
         [
+            dcc.Store(id="do_update"),  # used for Interval component
+            dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
             dmc.NotificationContainer(id="notification-container"),
             dcc.Interval(
                 id="interval-component", interval=config.polling_interval, n_intervals=0
@@ -352,7 +348,6 @@ def layout(**kwargs):
                                             ],
                                             size="sm",
                                         ),
-                                        # dmc.Text("<b>Default</b> text 2", size="sm"),
                                     ],
                                     w=300,
                                 ),
@@ -442,7 +437,7 @@ def layout(**kwargs):
                                     ),
                                     id="color-scheme-switch",
                                     persistence=True,
-                                    color="grey",
+                                    color="gray",
                                     mr="xl",
                                 ),
                             ],
@@ -459,10 +454,6 @@ def layout(**kwargs):
                 overflow="hidden",
             ),
             dcc.Graph(id="graph-content", style={"height": "80vh"}),
-            dcc.Store(
-                id="do_update",
-                storage_type="memory",
-            ),  # Stores data in browser's memory
         ]
         + log_handler.embed(),
     )
