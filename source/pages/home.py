@@ -429,17 +429,18 @@ def layout(**kwargs):
                                 dmc.Switch(
                                     offLabel=DashIconify(
                                         icon="radix-icons:sun",
-                                        width=15,
+                                        width=25,
                                         color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
                                     ),
                                     onLabel=DashIconify(
                                         icon="radix-icons:moon",
-                                        width=15,
+                                        width=25,
                                         color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
                                     ),
                                     id="color-scheme-switch",
                                     persistence=True,
                                     color="gray",
+                                    size="lg",
                                     mr="xl",
                                 ),
                             ],
