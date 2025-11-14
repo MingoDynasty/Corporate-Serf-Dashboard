@@ -35,9 +35,11 @@ from plot.plot_service import (
     generate_plot,
     apply_light_dark_mode,
 )
+from utilities.dash_utilities import get_custom_notification_log_writers
 from utilities.utilities import ordinal
 
 log_handler = NotificationsLogHandler()
+log_handler.log_writers = get_custom_notification_log_writers()
 dash_logger = log_handler.setup_logger(__name__)
 logger = logging.getLogger(__name__)
 
