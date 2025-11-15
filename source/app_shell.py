@@ -44,7 +44,19 @@ def layout(**kwargs):
                                                 size="sm",
                                                 opened=False,
                                             ),
-                                            dmc.Title("Corporate Serf Dashboard"),
+                                            dmc.Anchor(
+                                                children=[
+                                                    dmc.Title(
+                                                        "Corporate Serf Dashboard"
+                                                    )
+                                                ],
+                                                href="/",
+                                                target="_self",
+                                                underline="never",
+                                                style={
+                                                    "color": "var(--mantine-font-family-headings)"
+                                                },
+                                            ),
                                         ],
                                         h="100%",
                                         px="md",
