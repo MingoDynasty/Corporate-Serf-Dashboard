@@ -3,53 +3,96 @@ import logging
 import dash
 import dash_mantine_components as dmc
 from dash import Input, Output, State, callback
+from dash_iconify import DashIconify
 
 logger = logging.getLogger(__name__)
+
+discord_component = dmc.Tooltip(
+    dmc.Anchor(
+        DashIconify(
+            icon="logos:discord-icon",
+            width=40,
+        ),
+        href="https://discordapp.com/users/222910150636339211",
+    ),
+    label="Contact me via Discord: MingoDynasty",
+)
+
+github_component = dmc.Tooltip(
+    dmc.Anchor(
+        DashIconify(icon="ion:logo-github", width=40),
+        href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+    ),
+    label="View this app on GitHub",
+)
 
 
 def layout(**kwargs):
     return dmc.MantineProvider(
-        dmc.AppShell(
-            children=[
-                dmc.AppShellHeader(
-                    dmc.Group(
+        children=[
+            dmc.AppShell(
+                children=[
+                    dmc.NotificationContainer(id="notification-container"),
+                    dmc.AppShellHeader(
+                        dmc.Grid(
+                            children=[
+                                dmc.GridCol(
+                                    dmc.Group(
+                                        children=[
+                                            dmc.Burger(
+                                                id="burger",
+                                                size="sm",
+                                                opened=False,
+                                            ),
+                                            dmc.Title("Corporate Serf Dashboard"),
+                                        ],
+                                        h="100%",
+                                        px="md",
+                                    ),
+                                    span=6,
+                                ),
+                                dmc.GridCol(
+                                    dmc.Group(
+                                        children=[
+                                            discord_component,
+                                            github_component,
+                                        ],
+                                        h="100%",
+                                        px="md",
+                                        justify="flex-end",
+                                    ),
+                                    span=6,
+                                ),
+                            ],
+                        ),
+                        pt="0.5em",
+                    ),
+                    dmc.AppShellNavbar(
+                        id="navbar",
                         children=[
-                            dmc.Burger(
-                                id="burger",
-                                size="sm",
-                                opened=False,
-                            ),
-                            dmc.Title("Corporate Serf Dashboard"),
+                            "TODO: Navbar",
+                            *[
+                                dmc.Skeleton(height=28, mt="sm", animate=False)
+                                for _ in range(15)
+                            ],
                         ],
-                        h="100%",
-                        px="md",
-                    )
-                ),
-                dmc.AppShellNavbar(
-                    id="navbar",
-                    children=[
-                        "TODO: Navbar",
-                        *[
-                            dmc.Skeleton(height=28, mt="sm", animate=False)
-                            for _ in range(15)
-                        ],
-                    ],
-                    p="md",
-                ),
-                dmc.AppShellMain(dash.page_container),
-            ],
-            header={"height": 60},
-            padding="md",
-            navbar={
-                "width": 300,
-                "breakpoint": "sm",
-                "collapsed": {
-                    "mobile": True,
-                    "desktop": True,
+                        p="md",
+                    ),
+                    dmc.AppShellMain(dash.page_container),
+                ],
+                header={"height": "4em"},
+                padding="md",
+                navbar={
+                    "width": 300,
+                    "breakpoint": "sm",
+                    "collapsed": {
+                        "mobile": True,
+                        "desktop": True,
+                    },
                 },
-            },
-            id="appshell",
-        )
+                id="appshell",
+            )
+        ],
     )
 
 

@@ -261,7 +261,6 @@ def layout(**kwargs):
         [
             dcc.Store(id="do_update"),  # used for Interval component
             dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
-            dmc.NotificationContainer(id="notification-container"),
             dcc.Interval(
                 id="interval-component", interval=config.polling_interval, n_intervals=0
             ),
@@ -372,7 +371,7 @@ def layout(**kwargs):
                                             icon="clarity:settings-line", width=25
                                         ),
                                     ),
-                                    label="App Settings",
+                                    label="Settings",
                                 ),
                                 dmc.Modal(
                                     title="Settings",
@@ -407,22 +406,6 @@ def layout(**kwargs):
                                             persistence=True,
                                         ),
                                     ],
-                                ),
-                                dmc.Tooltip(
-                                    dmc.Anchor(
-                                        DashIconify(
-                                            icon="logos:discord-icon", width=40
-                                        ),
-                                        href="https://discordapp.com/users/222910150636339211",
-                                    ),
-                                    label="Contact me via Discord: MingoDynasty",
-                                ),
-                                dmc.Tooltip(
-                                    dmc.Anchor(
-                                        DashIconify(icon="ion:logo-github", width=40),
-                                        href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
-                                    ),
-                                    label="View this app on GitHub",
                                 ),
                                 dmc.Switch(
                                     offLabel=DashIconify(
