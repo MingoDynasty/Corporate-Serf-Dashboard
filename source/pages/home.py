@@ -277,7 +277,7 @@ def layout(**kwargs):
                                     data=get_playlists(),
                                     clearable=True,
                                     checkIconPosition="right",
-                                    miw=300,
+                                    miw=400,
                                     persistence=True,
                                     ml="xl",
                                 ),
