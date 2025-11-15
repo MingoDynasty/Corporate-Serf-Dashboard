@@ -287,7 +287,7 @@ def layout(**kwargs):
                                     id="scenario-dropdown-selection",
                                     data=get_unique_scenarios(config.stats_dir),
                                     searchable=True,
-                                    style={"min-width": "500px"},
+                                    miw=500,
                                     maxDropdownHeight="75vh",
                                     checkIconPosition="right",
                                     persistence=True,
