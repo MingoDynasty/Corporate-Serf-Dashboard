@@ -70,11 +70,21 @@ def layout(**kwargs):
                     dmc.AppShellNavbar(
                         id="navbar",
                         children=[
-                            "TODO: Navbar",
-                            *[
-                                dmc.Skeleton(height=28, mt="sm", animate=False)
-                                for _ in range(15)
-                            ],
+                            dmc.NavLink(
+                                label="Home",
+                                href="/",
+                                leftSection=DashIconify(
+                                    icon="bi:house-door-fill", height=32
+                                ),
+                            ),
+                            dmc.NavLink(
+                                label="Aim Training Journey",
+                                href="aim-training-journey",
+                                leftSection=DashIconify(
+                                    icon="game-icons:journey",
+                                    height=32,
+                                ),
+                            ),
                         ],
                         p="md",
                     ),
