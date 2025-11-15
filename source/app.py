@@ -5,10 +5,10 @@ Entrypoint to the Corporate Serf Dashboard app.
 import logging.config
 import sys
 
-import dash
 from dash_extensions.enrich import DashProxy
 from watchdog.observers import Observer
 
+from app_shell import layout
 from config.config_service import config
 from kovaaks.data_service import (
     initialize_kovaaks_data,
@@ -23,21 +23,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-APP_NAME = "Corporate Serf Dashboard v1.0.0"
+APP_NAME = "Corporate Serf Dashboard v1.0.0"  # TODO: is this used elsewhere in the app?
 app = DashProxy(
     title=APP_NAME,
     update_title=None,
     assets_folder="../assets",
-    use_pages=True,  # turn on Dash pages
+    use_pages=True,  # enable Dash pages
 )
-
-
-def serve_layout():
-    """Define the layout of the application"""
-    return dash.page_container
-
-
-app.layout = serve_layout  # set the layout to the serve_layout function
+app.layout = layout()  # layout logic encapsulated in another file
 
 
 def main() -> None:

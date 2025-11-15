@@ -12,7 +12,6 @@ from dash import (
     Output,
     clientside_callback,
     dcc,
-    html,
     no_update,
     State,
 )
@@ -266,7 +265,6 @@ def layout(**kwargs):
             dcc.Interval(
                 id="interval-component", interval=config.polling_interval, n_intervals=0
             ),
-            html.H1(children="APP_NAME", style={"textAlign": "center"}),
             dmc.Grid(
                 children=[
                     dmc.GridCol(
