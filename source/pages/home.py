@@ -304,20 +304,20 @@ def layout(**kwargs):
                                 dmc.Space(h="xl"),
                                 dmc.NumberInput(
                                     id="top_n_scores",
-                                    placeholder="Top N scores to consider...",
                                     label="Top N scores",
-                                    variant="default",
-                                    size="sm",
-                                    radius="sm",
                                     min=1,
                                     persistence=True,
+                                    placeholder="Top N scores to consider...",
+                                    radius="sm",
+                                    size="sm",
+                                    variant="default",
                                 ),
                                 dmc.DatePickerInput(
                                     id="date-picker",
                                     label="Oldest date to consider",
-                                    rightSection=DashIconify(icon="clarity:date-line"),
                                     maxDate=datetime.now(),
                                     persistence=True,
+                                    rightSection=DashIconify(icon="clarity:date-line"),
                                 ),
                                 dmc.Box(
                                     [
