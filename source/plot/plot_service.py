@@ -115,14 +115,14 @@ def generate_plot(
         # Get the highest rank that is still below our lowest score
         idx_lowest_rank = 0
         for idx in range(1, len(rank_data)):
-            if rank_data[idx].threshold >= min(scatter_plot_data["Score"]):
+            if rank_data[idx].threshold >= float(min(scatter_plot_data["Score"])):
                 break
             idx_lowest_rank = idx
 
         # Get the lowest rank that is still above our highest score
         idx_highest_rank = len(rank_data) - 1
         for idx in range(len(rank_data) - 2, -1, -1):
-            if rank_data[idx].threshold <= max(scatter_plot_data["Score"]):
+            if rank_data[idx].threshold <= float(max(scatter_plot_data["Score"])):
                 break
             idx_highest_rank = idx
 
