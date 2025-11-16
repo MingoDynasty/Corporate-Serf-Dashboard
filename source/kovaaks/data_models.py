@@ -37,7 +37,7 @@ class Rank(BaseModel):
 
 class Scenario(BaseModel):
     name: str
-    ranks: Optional[List[Rank]]
+    ranks: Optional[List[Rank]] = None
 
 
 class PlaylistData(BaseModel):

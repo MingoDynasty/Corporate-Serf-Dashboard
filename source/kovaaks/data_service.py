@@ -297,7 +297,7 @@ def load_playlists() -> None:
 
 def load_playlist_from_code(input_playlist_code: str) -> Optional[str]:
     response = get_playlist_data(input_playlist_code)
-    if not response:
+    if not response or not response.data:
         message = (
             f"Failed to load playlist data for playlist code: {input_playlist_code}"
         )
@@ -310,24 +310,26 @@ def load_playlist_from_code(input_playlist_code: str) -> Optional[str]:
         return message
 
     playlist_data = PlaylistData(
-        playlist_name=response.data[0].playlistName,
-        playlist_code=response.data[0].playlistCode,
-        scenario_list=[item.scenarioName for item in response.data[0].scenarioList],
+        name=response.data[0].playlistName,
+        code=response.data[0].playlistCode,
+        scenarios=[
+            Scenario(name=item.scenarioName) for item in response.data[0].scenarioList
+        ],
     )
 
-    if playlist_data.playlist_name in playlist_database:
-        message = f"Playlist already exists in database: {playlist_data.playlist_name}"
+    if playlist_data.name in playlist_database:
+        message = f"Playlist already exists in database: {playlist_data.name}"
         logger.warning(message)
         return message
     write_playlist_data_to_file(playlist_data)
-    playlist_database[playlist_data.playlist_name] = playlist_data.scenario_list
+    playlist_database[playlist_data.name] = playlist_data.scenarios
     return None
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
-    file_path = Path(PLAYLIST_DIRECTORY, playlist_data.playlist_name + ".json")
+    file_path = Path(PLAYLIST_DIRECTORY, playlist_data.name + ".json")
     with open(file_path, "w", encoding="utf-8") as file:
-        json_string = playlist_data.model_dump_json(indent=2)
+        json_string = playlist_data.model_dump_json(indent=2, exclude_none=True)
         file.write(json_string)
 
 
