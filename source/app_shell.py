@@ -107,7 +107,7 @@ def layout(**kwargs):
                                 label="Home",
                                 href="/",
                                 leftSection=DashIconify(
-                                    icon="bi:house-door-fill", height=32
+                                    icon="bi:house-door-fill", height=36
                                 ),
                             ),
                             dmc.NavLink(
@@ -115,7 +115,7 @@ def layout(**kwargs):
                                 href="aim-training-journey",
                                 leftSection=DashIconify(
                                     icon="game-icons:journey",
-                                    height=32,
+                                    height=36,
                                 ),
                             ),
                         ],
