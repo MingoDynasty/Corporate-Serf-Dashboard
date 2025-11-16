@@ -22,15 +22,32 @@ you keep playing and generating new scores, the plot will automatically update i
 
 ## Usage
 
-1. Run the app in your terminal:
+Step 1: Run the app in your terminal:
 
-```
+```shell
 uv sync
 uv run python source/app.py
 ```
 
-2. Open a browser and navigate to: http://localhost:8080/
+Step 2: Open a browser and navigate to: <http://localhost:8080/>
 
 ## Example
 
 ![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
+
+## Rank Data
+
+In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
+the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
+common benchmarks. These files are in `ressources/playlists/generated`. If you wish to include a specific benchmark into
+the app, then simply copy the desired JSON file from `resources/playlists/generated` to `resources/playlists`. Then
+restart the app.
+
+## Import Playlist
+
+In the `Settings` modal, there is an option to import a playlist via share code. This is the only part of the app that
+requires an internet connection, as the app queries the KovaaK's API with your input share code to retrieve the playlist
+data.
+
+Note that by importing playlists this way, the playlist will not include rank data. If you want to include rank data for
+the rank overlays, then see the **Rank Data** section.
