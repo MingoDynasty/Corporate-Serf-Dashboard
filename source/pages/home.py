@@ -35,7 +35,7 @@ from plot.plot_service import (
 from utilities.dash_logging import get_dash_logger
 from utilities.utilities import ordinal
 
-# logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 dash.register_page(
     __name__,
@@ -119,6 +119,7 @@ def generate_graph(
         return go.Figure().to_json(), no_update
 
     if not is_scenario_in_database(selected_scenario):
+        logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
         return go.Figure().to_json(), no_update
 
@@ -130,6 +131,11 @@ def generate_graph(
         selected_scenario, top_n_scores, oldest_datetime
     )
     if not sensitivities_vs_runs:
+        logger.warning(
+            "No scenario data found for (%s) for date range: %s",
+            selected_scenario,
+            oldest_datetime,
+        )
         dash_logger.warning("No scenario data for the given date range.")
         return go.Figure().to_json(), no_update
 
@@ -214,7 +220,7 @@ def import_playlist(_, playlist_to_import):
     if not playlist_to_import:
         return no_update
     playlist_to_import = playlist_to_import.strip()
-    dash_logger.debug("Importing playlist '%s'", playlist_to_import)
+    logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message = load_playlist_from_code(playlist_to_import)
     if error_message:
         notification = {
