@@ -9,14 +9,14 @@ from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
 
-from config.config_service import config
-from kovaaks.data_service import (
+from source.config.config_service import config
+from source.kovaaks.data_service import (
     extract_data_from_file,
     load_csv_file_into_database,
     is_scenario_in_database,
     get_sensitivities_vs_runs,
 )
-from my_queue.message_queue import message_queue, NewFileMessage
+from source.my_queue.message_queue import message_queue, NewFileMessage
 
 logger = logging.getLogger(__name__)
 

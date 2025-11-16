@@ -2,7 +2,8 @@
 <project version="4">
   <component name="MypySettings">
     <option name="arguments" value="--follow-imports silent --exclude \.pyi$ --cache-fine-grained" />
-    <option name="configFilePath" value="E:\GitRepositories\Corporate-Serf-Dashboard\mypy.ini" />
+    <option name="autoScrollToSource" value="true" />
+    <option name="configFilePath" value="E:\GitRepositories\Corporate-Serf-Dashboard\pyproject.toml" />
     <option name="mypyExecutable" value="E:\GitRepositories\Corporate-Serf-Dashboard\.venv\Scripts\mypy.exe" />
     <option name="projectDirectory" value="$PROJECT_DIR$" />
   </component>

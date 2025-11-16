@@ -8,12 +8,10 @@ import sys
 from dash_extensions.enrich import DashProxy
 from watchdog.observers import Observer
 
-from app_shell import layout
-from config.config_service import config
-from kovaaks.data_service import (
-    initialize_kovaaks_data,
-)
-from my_watchdog.file_watchdog import NewFileHandler
+from source.app_shell import layout
+from source.config.config_service import config
+from source.kovaaks.data_service import initialize_kovaaks_data
+from source.my_watchdog.file_watchdog import NewFileHandler
 
 # Logging setup
 logging.basicConfig(

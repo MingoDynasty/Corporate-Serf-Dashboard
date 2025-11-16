@@ -16,8 +16,8 @@ from dash import (
 )
 from dash_iconify import DashIconify
 
-from config.config_service import config
-from kovaaks.data_service import (
+from source.config.config_service import config
+from source.kovaaks.data_service import (
     get_unique_scenarios,
     get_scenario_stats,
     is_scenario_in_database,
@@ -27,13 +27,13 @@ from kovaaks.data_service import (
     get_sensitivities_vs_runs_filtered,
     get_rank_data_from_playlist,
 )
-from my_queue.message_queue import message_queue
-from plot.plot_service import (
+from source.my_queue.message_queue import message_queue
+from source.plot.plot_service import (
     generate_plot,
     apply_light_dark_mode,
 )
-from utilities.dash_logging import get_dash_logger
-from utilities.utilities import ordinal
+from source.utilities.dash_logging import get_dash_logger
+from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
