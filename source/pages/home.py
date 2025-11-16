@@ -311,13 +311,17 @@ def layout(**kwargs):
                                     radius="sm",
                                     size="sm",
                                     variant="default",
+                                    value=5,
                                 ),
                                 dmc.DatePickerInput(
                                     id="date-picker",
                                     label="Oldest date to consider",
-                                    maxDate=datetime.now(),
+                                    maxDate=datetime.now().isoformat(),
                                     persistence=True,
                                     rightSection=DashIconify(icon="clarity:date-line"),
+                                    value=datetime(
+                                        datetime.now().year, month=1, day=1
+                                    ).isoformat(),
                                 ),
                                 dmc.Box(
                                     [
