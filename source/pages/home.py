@@ -257,8 +257,8 @@ dmc.add_figure_templates()
 
 
 def layout(**kwargs):
-    return dmc.MantineProvider(
-        [
+    return dmc.Box(
+        children=[
             dcc.Store(id="do_update"),  # used for Interval component
             dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
             dcc.Interval(
