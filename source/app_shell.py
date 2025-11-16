@@ -2,7 +2,7 @@ import logging
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, callback, clientside_callback
 from dash_iconify import DashIconify
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,24 @@ github_component = dmc.Tooltip(
         href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
     ),
     label="View this app on GitHub",
+)
+
+theme_switch_component = dmc.Switch(
+    offLabel=DashIconify(
+        icon="radix-icons:sun",
+        width=25,
+        color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
+    ),
+    onLabel=DashIconify(
+        icon="radix-icons:moon",
+        width=25,
+        color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
+    ),
+    id="color-scheme-switch",
+    persistence=True,
+    color="gray",
+    size="lg",
+    mr="xl",
 )
 
 
@@ -68,6 +86,7 @@ def layout(**kwargs):
                                         children=[
                                             discord_component,
                                             github_component,
+                                            theme_switch_component,
                                         ],
                                         h="100%",
                                         px="md",
@@ -129,3 +148,15 @@ def toggle_navbar(opened, navbar):
         "desktop": not opened,
     }
     return navbar
+
+
+clientside_callback(
+    """
+    (switchOn) => {
+       document.documentElement.setAttribute('data-mantine-color-scheme', switchOn ? 'dark' : 'light');
+       return window.dash_clientside.no_update
+    }
+    """,
+    Output("color-scheme-switch", "id"),
+    Input("color-scheme-switch", "checked"),
+)
