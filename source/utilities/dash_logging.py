@@ -1,18 +1,15 @@
-"""
-This mimics dash_extensions.logging.py module, to allow for customization.
-It's a bit hacky, but it works.
-"""
-
 import logging
 import uuid
 from typing import Callable
 
 import dash_mantine_components as dmc
+from dash_extensions.logging import NotificationsLogHandler
 
 
 def get_custom_notification_log_writers() -> dict[int, Callable]:
     """
-    Log writers that target the Notification component from dash_mantine_components.
+    This mimics dash_extensions.logging.py module, to allow for customization.
+    It's a bit hacky, but it works.
     """
 
     def _default_kwargs(color, title, message):
@@ -45,3 +42,12 @@ def get_custom_notification_log_writers() -> dict[int, Callable]:
         logging.WARNING: log_warning,
         logging.ERROR: log_error,
     }
+
+
+def get_dash_logger(logger_name: str) -> logging.Logger:
+    """Get a logger that outputs notifications to the UI."""
+    return log_handler.setup_logger(logger_name + ".dash")
+
+
+log_handler = NotificationsLogHandler()
+log_handler.log_writers = get_custom_notification_log_writers()

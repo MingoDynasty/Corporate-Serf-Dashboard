@@ -10,12 +10,10 @@ from dash import (
     callback,
     Input,
     Output,
-    clientside_callback,
     dcc,
     no_update,
     State,
 )
-from dash_extensions.logging import NotificationsLogHandler
 from dash_iconify import DashIconify
 
 from config.config_service import config
@@ -34,14 +32,11 @@ from plot.plot_service import (
     generate_plot,
     apply_light_dark_mode,
 )
-from utilities.dash_utilities import get_custom_notification_log_writers
+from utilities.dash_logging import get_dash_logger
 from utilities.utilities import ordinal
 
-log_handler = NotificationsLogHandler()
-log_handler.log_writers = get_custom_notification_log_writers()
-dash_logger = log_handler.setup_logger(__name__)
-logger = logging.getLogger(__name__)
-
+# logger = logging.getLogger(__name__)
+dash_logger = get_dash_logger(__name__)
 dash.register_page(
     __name__,
     path="/",
@@ -124,7 +119,7 @@ def generate_graph(
         return go.Figure().to_json(), no_update
 
     if not is_scenario_in_database(selected_scenario):
-        logger.warning("No scenario data found.")
+        dash_logger.warning("No scenario data found.")
         return go.Figure().to_json(), no_update
 
     oldest_datetime = datetime.combine(
@@ -135,7 +130,7 @@ def generate_graph(
         selected_scenario, top_n_scores, oldest_datetime
     )
     if not sensitivities_vs_runs:
-        logger.warning("No scenario data for the given date range.")
+        dash_logger.warning("No scenario data for the given date range.")
         return go.Figure().to_json(), no_update
 
     rank_data = None
@@ -219,7 +214,7 @@ def import_playlist(_, playlist_to_import):
     if not playlist_to_import:
         return no_update
     playlist_to_import = playlist_to_import.strip()
-    logger.debug("Importing playlist '%s'", playlist_to_import)
+    dash_logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message = load_playlist_from_code(playlist_to_import)
     if error_message:
         notification = {
@@ -422,5 +417,4 @@ def layout(**kwargs):
             ),
             dcc.Graph(id="graph-content", style={"height": "80vh"}),
         ]
-        + log_handler.embed(),
     )

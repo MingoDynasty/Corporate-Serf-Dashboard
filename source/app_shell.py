@@ -5,6 +5,8 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, callback, clientside_callback
 from dash_iconify import DashIconify
 
+from utilities.dash_logging import log_handler
+
 logger = logging.getLogger(__name__)
 
 discord_component = dmc.Tooltip(
@@ -133,7 +135,8 @@ def layout(**kwargs):
                 },
                 id="appshell",
             )
-        ],
+        ]
+        + log_handler.embed(),
     )
 
 
