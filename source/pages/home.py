@@ -271,7 +271,10 @@ def layout(**kwargs):
                         dmc.Flex(
                             children=[
                                 dmc.Select(
+                                    allowDeselect=False,
+                                    autoSelectOnBlur=True,
                                     checkIconPosition="right",
+                                    clearSearchOnFocus=True,
                                     clearable=True,
                                     data=get_playlists(),
                                     id="playlist-dropdown-selection",
@@ -280,9 +283,13 @@ def layout(**kwargs):
                                     ml="xl",
                                     persistence=True,
                                     placeholder="Select a playlist...",
+                                    searchable=True,
                                 ),
                                 dmc.Select(
+                                    allowDeselect=False,
+                                    autoSelectOnBlur=True,
                                     checkIconPosition="right",
+                                    clearSearchOnFocus=True,
                                     data=get_unique_scenarios(config.stats_dir),
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
