@@ -68,14 +68,14 @@ def layout(**kwargs):  # noqa: ARG001
                                             dmc.Anchor(
                                                 children=[
                                                     dmc.Title(
-                                                        "Corporate Serf Dashboard"
-                                                    )
+                                                        "Corporate Serf Dashboard",
+                                                    ),
                                                 ],
                                                 href="/",
                                                 target="_self",
                                                 underline="never",
                                                 style={
-                                                    "color": "var(--mantine-font-family-headings)"
+                                                    "color": "var(--mantine-font-family-headings)",
                                                 },
                                             ),
                                         ],
@@ -138,7 +138,7 @@ def layout(**kwargs):  # noqa: ARG001
                     },
                 },
                 id="appshell",
-            )
+            ),
         ]
         + log_handler.embed(),
     )

@@ -77,7 +77,7 @@ def main() -> None:
             continue
 
         logger.debug(
-            f"Generating ({counter}/{len(evxl_database)}) for sharecode: {sharecode}"
+            f"Generating ({counter}/{len(evxl_database)}) for sharecode: {sharecode}",
         )
 
         # 2. Query KovaaK's API for playlist data
@@ -93,7 +93,7 @@ def main() -> None:
             # raise Exception(message)
             continue
         logger.debug(
-            f"Generating ({counter}/{len(evxl_database)}) for playlist: {playlist_response.data[0].playlistName.strip()}"
+            f"Generating ({counter}/{len(evxl_database)}) for playlist: {playlist_response.data[0].playlistName.strip()}",
         )
         # if len(playlist_response.data) > 1:
         #     message = f"Found more than one playlist from code: {sharecode}"
@@ -142,13 +142,13 @@ def main() -> None:
                             name=evxl_rank_data[idx][0],
                             color=evxl_rank_data[idx][1],
                             threshold=benchmark_scenario.rank_maxes[idx],
-                        )
+                        ),
                     )
                 scenario_list.append(
                     Scenario(
                         name=scenario_name,
                         ranks=ranks_data,
-                    )
+                    ),
                 )
 
         playlist_data = PlaylistData(
@@ -159,7 +159,7 @@ def main() -> None:
 
         # Save to file
         os.makedirs(
-            "generated", exist_ok=True
+            "generated", exist_ok=True,
         )  # create the generated directory if not exist
         generated_filename = Path("generated", playlist_data.name + ".json")
         with open(generated_filename, "w") as file_handle:

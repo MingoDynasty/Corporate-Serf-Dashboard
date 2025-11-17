@@ -24,17 +24,17 @@ def get_custom_notification_log_writers() -> dict[int, Callable]:
 
     def log_info(message, **kwargs):
         return dmc.Notification(
-            **{**_default_kwargs("blue", "Info", message), **kwargs}
+            **{**_default_kwargs("blue", "Info", message), **kwargs},
         )
 
     def log_warning(message, **kwargs):
         return dmc.Notification(
-            **{**_default_kwargs("yellow", "Warning", message), **kwargs}
+            **{**_default_kwargs("yellow", "Warning", message), **kwargs},
         )
 
     def log_error(message, **kwargs):
         return dmc.Notification(
-            **{**_default_kwargs("red", "Error", message), **kwargs}
+            **{**_default_kwargs("red", "Error", message), **kwargs},
         )
 
     return {

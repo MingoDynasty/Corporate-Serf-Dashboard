@@ -54,7 +54,7 @@ class NewFileHandler(FileSystemEventHandler):
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,
-                )
+                ),
             )
             load_csv_file_into_database(file)
             return
@@ -70,7 +70,7 @@ class NewFileHandler(FileSystemEventHandler):
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,
-                )
+                ),
             )
             load_csv_file_into_database(file)
             return
@@ -89,7 +89,7 @@ class NewFileHandler(FileSystemEventHandler):
                 scenario_name=run_data.scenario,
                 score=run_data.score,
                 sensitivity=sensitivity_key,
-            )
+            ),
         )
         load_csv_file_into_database(file)
         return

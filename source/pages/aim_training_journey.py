@@ -17,5 +17,5 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         [
             dmc.Text("TODO", size="xl"),
-        ]
+        ],
     )

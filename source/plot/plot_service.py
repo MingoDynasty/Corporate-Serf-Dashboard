@@ -48,10 +48,10 @@ def generate_plot(
         for run_data in runs_data:
             scatter_plot_data["Score"].append(run_data.score)
             scatter_plot_data["Sensitivity"].append(
-                f"{run_data.horizontal_sens} {run_data.sens_scale}"
+                f"{run_data.horizontal_sens} {run_data.sens_scale}",
             )
             scatter_plot_data["Datetime"].append(
-                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p")
+                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p"),
             )
             scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
         line_plot_data["Sensitivity"].append(sens)
@@ -140,7 +140,7 @@ def generate_plot(
 
         # ensure slight padding in the highest rank displayed, so that the label text doesn't get cut off
         figure_combined.update_yaxes(
-            autorangeoptions={"include": rank_data[idx_highest_rank].threshold * 1.02}
+            autorangeoptions={"include": rank_data[idx_highest_rank].threshold * 1.02},
         )
     return figure_combined
 

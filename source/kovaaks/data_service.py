@@ -48,7 +48,7 @@ def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
 
 
 def get_sensitivities_vs_runs_filtered(
-    scenario_name: str, top_n_scores: int, oldest_date: datetime
+    scenario_name: str, top_n_scores: int, oldest_date: datetime,
 ) -> dict[str, list[RunData]]:
     """
     Get sensitivities vs runs for a scenario, filtered by top N scores, and oldest date.
@@ -149,7 +149,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
     if run_data.scenario not in kovaaks_database:
         kovaaks_database[run_data.scenario] = {
             "scenario_stats": ScenarioStats(
-                date_last_played=run_data.datetime_object, number_of_runs=1
+                date_last_played=run_data.datetime_object, number_of_runs=1,
             ),
             # "raw_run_data": [run_data],
             "sensitivities_vs_runs": SortedDict(
@@ -167,7 +167,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
         scenario_stats = kovaaks_database[run_data.scenario]["scenario_stats"]
         scenario_stats.number_of_runs += 1
         scenario_stats.date_last_played = max(
-            scenario_stats.date_last_played, run_data.datetime_object
+            scenario_stats.date_last_played, run_data.datetime_object,
         )
 
         # Add to sensitivities_vs_runs
@@ -239,7 +239,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
                 str_horizontal_sens = line.split(",")[1].strip()
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
                 horizontal_sens = round(
-                    float(str_horizontal_sens), config.sens_round_decimal_places
+                    float(str_horizontal_sens), config.sens_round_decimal_places,
                 )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",")[1].strip()

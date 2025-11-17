@@ -45,7 +45,7 @@ def main() -> None:
     event_handler = NewFileHandler()
     observer = Observer()
     observer.schedule(
-        event_handler, config.stats_dir, recursive=False
+        event_handler, config.stats_dir, recursive=False,
     )  # Set recursive=True to monitor subdirectories
     observer.start()
     logger.info("Monitoring directory: %s", config.stats_dir)
