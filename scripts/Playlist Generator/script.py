@@ -6,7 +6,7 @@ from typing import Dict, List
 
 from kovaaks.api_models import BenchmarksAPIResponse
 from kovaaks.api_service import get_benchmark_json, get_playlist_data
-from kovaaks.data_models import PlaylistData, Scenario, Rank
+from kovaaks.data_models import PlaylistData, Rank, Scenario
 from models import EvxlData, EvxlDatabaseItem
 
 logging.basicConfig(

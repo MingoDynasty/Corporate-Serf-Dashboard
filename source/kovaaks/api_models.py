@@ -3,7 +3,7 @@ Pydantic models for Kovaak's API responses.
 """
 
 import datetime
-from typing import List, Dict
+from typing import Dict, List
 
 from pydantic import BaseModel
 

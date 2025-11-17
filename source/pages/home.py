@@ -7,30 +7,30 @@ import dash
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
 from dash import (
-    callback,
     Input,
     Output,
+    State,
+    callback,
     dcc,
     no_update,
-    State,
 )
 from dash_iconify import DashIconify
 
 from source.config.config_service import config
 from source.kovaaks.data_service import (
-    get_unique_scenarios,
+    get_playlists,
+    get_rank_data_from_playlist,
     get_scenario_stats,
+    get_scenarios_from_playlists,
+    get_sensitivities_vs_runs_filtered,
+    get_unique_scenarios,
     is_scenario_in_database,
     load_playlist_from_code,
-    get_scenarios_from_playlists,
-    get_playlists,
-    get_sensitivities_vs_runs_filtered,
-    get_rank_data_from_playlist,
 )
 from source.my_queue.message_queue import message_queue
 from source.plot.plot_service import (
-    generate_plot,
     apply_light_dark_mode,
+    generate_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal

@@ -6,7 +6,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
@@ -14,11 +14,11 @@ from sortedcontainers import SortedDict, SortedList
 from source.config.config_service import config
 from source.kovaaks.api_service import get_playlist_data
 from source.kovaaks.data_models import (
-    ScenarioStats,
-    RunData,
     PlaylistData,
-    Scenario,
     Rank,
+    RunData,
+    Scenario,
+    ScenarioStats,
 )
 from source.utilities.stopwatch import Stopwatch
 
