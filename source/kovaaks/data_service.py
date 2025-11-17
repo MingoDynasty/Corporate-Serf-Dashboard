@@ -258,7 +258,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
         logger.warning("Missing data from file: %s", full_file_path)
         return None
 
-    run_data = RunData(
+    return RunData(
         datetime_object=datetime_object,
         score=score,
         sens_scale=sens_scale,
@@ -266,7 +266,6 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
         scenario=scenario,
         accuracy=accuracy,
     )
-    return run_data
 
 
 def load_playlists() -> None:

@@ -256,7 +256,8 @@ def select_playlist(selected_playlist):
 dmc.add_figure_templates()
 
 
-def layout(**kwargs):
+# Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
+def layout(**kwargs):  # noqa: ARG001
     return dmc.Box(
         children=[
             dcc.Store(id="do_update"),  # used for Interval component

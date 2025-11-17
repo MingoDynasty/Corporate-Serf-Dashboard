@@ -47,7 +47,8 @@ theme_switch_component = dmc.Switch(
 )
 
 
-def layout(**kwargs):
+# Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
+def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         children=[
             dmc.AppShell(

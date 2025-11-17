@@ -12,7 +12,8 @@ dash.register_page(
 )
 
 
-def layout(**kwargs):
+# Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
+def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         [
             dmc.Text("TODO", size="xl"),
