@@ -129,10 +129,10 @@ def generate_plot(
         for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
             figure_combined.add_hline(
                 name=rank.name,
-                label=dict(
-                    text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
-                    textposition="end",
-                ),
+                label={
+                    "text": f"{rank.name} ({format_decimal(rank.threshold)}) ",
+                    "textposition": "end",
+                },
                 y=rank.threshold,
                 line_dash="dash",
                 line_color=rank.color,

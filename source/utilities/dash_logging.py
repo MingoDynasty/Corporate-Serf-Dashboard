@@ -13,14 +13,14 @@ def get_custom_notification_log_writers() -> dict[int, Callable]:
     """
 
     def _default_kwargs(color, title, message):
-        return dict(
-            color=color,
-            title=title,
-            message=message,
-            id=str(uuid.uuid4()),
-            action="show",
-            autoClose=8000,
-        )
+        return {
+            "color": color,
+            "title": title,
+            "message": message,
+            "id": str(uuid.uuid4()),
+            "action": "show",
+            "autoClose": 8000,
+        }
 
     def log_info(message, **kwargs):
         return dmc.Notification(

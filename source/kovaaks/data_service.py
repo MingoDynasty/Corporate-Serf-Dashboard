@@ -80,7 +80,7 @@ def get_sensitivities_vs_runs_filtered(
 
 def get_playlists() -> list[str]:
     """Get list of available playlists."""
-    return sorted(list(playlist_database.keys()))
+    return sorted(playlist_database.keys())
 
 
 def get_scenarios_from_playlists(playlist_name: str) -> list[str]:
@@ -195,7 +195,7 @@ def get_unique_scenarios(_dir: str) -> list:
     for file in csv_files:
         scenario_name = file.split("-")[0].strip()
         unique_scenarios.add(scenario_name)
-    return sorted(list(unique_scenarios))
+    return sorted(unique_scenarios)
 
 
 def extract_data_from_file(full_file_path: str) -> RunData | None:
