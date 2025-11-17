@@ -369,7 +369,7 @@ def layout(**kwargs):
                             direction="row",
                             wrap="wrap",
                         ),
-                        span=10,
+                        span=11,
                     ),
                     dmc.GridCol(
                         dmc.Flex(
