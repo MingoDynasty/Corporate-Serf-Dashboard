@@ -2,11 +2,10 @@
 Provides business logic for managing Kovaaks data.
 """
 
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
@@ -28,9 +27,9 @@ logger = logging.getLogger(__name__)
 
 # TODO: maybe at some point convert this to in-memory SQLite
 #  But a simple dictionary should suffice for now.
-kovaaks_database: Dict = {}
+kovaaks_database: dict = {}
 
-playlist_database: Dict[str, List[Scenario]] = {}
+playlist_database: dict[str, list[Scenario]] = {}
 
 
 def is_scenario_in_database(scenario_name: str) -> bool:
@@ -43,14 +42,14 @@ def get_scenario_stats(scenario_name: str) -> ScenarioStats:
     return kovaaks_database[scenario_name]["scenario_stats"]
 
 
-def get_sensitivities_vs_runs(scenario_name: str) -> Dict[str, List[RunData]]:
+def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
     """Get sensitivities vs runs for a scenario."""
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
 
 
 def get_sensitivities_vs_runs_filtered(
     scenario_name: str, top_n_scores: int, oldest_date: datetime
-) -> Dict[str, List[RunData]]:
+) -> dict[str, list[RunData]]:
     """
     Get sensitivities vs runs for a scenario, filtered by top N scores, and oldest date.
     :param scenario_name: the name of the scenario to filter by.
@@ -79,17 +78,17 @@ def get_sensitivities_vs_runs_filtered(
     return filtered_data
 
 
-def get_playlists() -> List[str]:
+def get_playlists() -> list[str]:
     """Get list of available playlists."""
     return sorted(list(playlist_database.keys()))
 
 
-def get_scenarios_from_playlists(playlist_name: str) -> List[str]:
+def get_scenarios_from_playlists(playlist_name: str) -> list[str]:
     """Get scenarios from a playlist."""
     return [item.name for item in playlist_database[playlist_name]]
 
 
-def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> List[Rank]:
+def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> list[Rank]:
     if playlist_name not in playlist_database:
         logger.warning(
             "Failed to get rank data for playlist (%s), scenario (%s)",
@@ -132,7 +131,6 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
         len(csv_files),
         round(stopwatch.elapsed(), 2),
     )
-    return
 
 
 def load_csv_file_into_database(csv_file: str) -> None:
@@ -200,7 +198,7 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(list(unique_scenarios))
 
 
-def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
+def extract_data_from_file(full_file_path: str) -> RunData | None:
     """
     Extracts data from a scenario CSV file.
     :param full_file_path: full file path of the file to extract data from.
@@ -216,7 +214,7 @@ def extract_data_from_file(full_file_path: str) -> Optional[RunData]:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
         datetime_object = datetime.strptime(splits[-1], "%Y.%m.%d-%H.%M.%S")
 
-        with open(full_file_path, "r", encoding="utf-8") as file:
+        with open(full_file_path, encoding="utf-8") as file:
             lines_list = file.readlines()  # Read all lines into a list
 
         sub_csv_line = False
@@ -279,7 +277,7 @@ def load_playlists() -> None:
                 playlist_files.append(entry.path)
     for playlist_file in playlist_files:
         try:
-            with open(playlist_file, "r", encoding="utf-8") as file:
+            with open(playlist_file, encoding="utf-8") as file:
                 json_data = file.read()
             playlist_data = PlaylistData.model_validate_json(json_data)
 
@@ -292,10 +290,9 @@ def load_playlists() -> None:
             playlist_database[playlist_data.name] = playlist_data.scenarios
         except ValidationError:
             logger.warning("Invalid JSON format in playlist file: %s", playlist_file)
-    return
 
 
-def load_playlist_from_code(input_playlist_code: str) -> Optional[str]:
+def load_playlist_from_code(input_playlist_code: str) -> str | None:
     response = get_playlist_data(input_playlist_code)
     if not response or not response.data:
         message = (

@@ -1,8 +1,7 @@
 import logging
 import os
-import sys
 from pathlib import Path
-from typing import Dict, List
+import sys
 
 from kovaaks.api_models import BenchmarksAPIResponse
 from kovaaks.api_service import get_benchmark_json, get_playlist_data
@@ -19,9 +18,9 @@ logger = logging.getLogger(__name__)
 EVXL_BENCHMARKS_JSON_FILE = "../../resources/evxl/benchmarks.json"
 
 
-def load_evxl_data() -> Dict[str, EvxlDatabaseItem]:
+def load_evxl_data() -> dict[str, EvxlDatabaseItem]:
     evxl_database = {}
-    with open(EVXL_BENCHMARKS_JSON_FILE, "r", encoding="utf-8") as file:
+    with open(EVXL_BENCHMARKS_JSON_FILE, encoding="utf-8") as file:
         json_data = file.read()
     evxl_data = EvxlData.model_validate_json(json_data)
     for evxl_benchmark in evxl_data.root:
@@ -125,7 +124,7 @@ def main() -> None:
 
         # 4. Merge all this data and store into `generated`
         evxl_rank_data = list(evxl_database_item.rankColors.items())
-        scenario_list: List[Scenario] = []
+        scenario_list: list[Scenario] = []
         for _, category in benchmark_response.categories.items():
             for scenario_name, benchmark_scenario in category.scenarios.items():
                 if len(benchmark_scenario.rank_maxes) != len(evxl_rank_data):
@@ -165,7 +164,6 @@ def main() -> None:
         generated_filename = Path("generated", playlist_data.name + ".json")
         with open(generated_filename, "w") as file_handle:
             file_handle.write(playlist_data.model_dump_json(indent=2))
-    return
 
 
 if __name__ == "__main__":

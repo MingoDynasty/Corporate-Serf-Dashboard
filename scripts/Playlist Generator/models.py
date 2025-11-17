@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List
 
 from pydantic import BaseModel, RootModel
 
@@ -7,18 +6,18 @@ from pydantic import BaseModel, RootModel
 @dataclass()
 class EvxlDatabaseItem:
     kovaaksBenchmarkId: int
-    rankColors: Dict[str, str]
+    rankColors: dict[str, str]
 
 
 class EvxlDifficulty(BaseModel):
     kovaaksBenchmarkId: int
     sharecode: str
-    rankColors: Dict[str, str]
+    rankColors: dict[str, str]
 
 
 class EvxlBenchmark(BaseModel):
-    difficulties: List[EvxlDifficulty]
+    difficulties: list[EvxlDifficulty]
 
 
 class EvxlData(RootModel):
-    root: List[EvxlBenchmark]
+    root: list[EvxlBenchmark]

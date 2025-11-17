@@ -56,7 +56,6 @@ def main() -> None:
     # Probably don't need this, but I kept it anyway
     observer.stop()
     observer.join()  # Wait until the observer thread terminates
-    return
 
 
 if __name__ == "__main__":

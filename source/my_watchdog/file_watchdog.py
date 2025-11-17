@@ -4,8 +4,8 @@ Business logic for monitoring a specified directory for newly created files.
 
 import datetime
 import logging
-import time
 from pathlib import Path
+import time
 
 from watchdog.events import FileSystemEventHandler
 

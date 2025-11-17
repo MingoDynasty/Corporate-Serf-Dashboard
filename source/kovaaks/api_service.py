@@ -3,7 +3,6 @@ Provides business logic for Kovaak's API.
 """
 
 import logging
-from typing import Optional
 
 import requests
 
@@ -26,7 +25,7 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
     return PlaylistAPIResponse.model_validate(response.json())
 
 
-def get_benchmark_json(benchmark_id: int, steam_id: Optional[int] = None) -> str:
+def get_benchmark_json(benchmark_id: int, steam_id: int | None = None) -> str:
     params = {
         "benchmarkId": benchmark_id,
         "steamId": steam_id or "00000000000000000",

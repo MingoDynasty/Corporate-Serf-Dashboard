@@ -1,9 +1,9 @@
 import logging
 
 import dash
-import dash_mantine_components as dmc
 from dash import Input, Output, State, callback, clientside_callback
 from dash_iconify import DashIconify
+import dash_mantine_components as dmc
 
 from source.utilities.dash_logging import log_handler
 

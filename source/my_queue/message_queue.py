@@ -2,9 +2,9 @@
 Shared message my_queue between UI and File Watchdog components.
 """
 
-import queue
 from dataclasses import dataclass
 from datetime import datetime
+import queue
 
 
 @dataclass(frozen=True)

@@ -2,9 +2,8 @@
 This module handles functions around plots.
 """
 
-import logging
 from datetime import datetime
-from typing import Dict, List, Union
+import logging
 
 import numpy as np
 import pandas as pd
@@ -18,10 +17,10 @@ logger = logging.getLogger(__name__)
 
 
 def generate_plot(
-    scenario_data: Dict[str, List[RunData]],
+    scenario_data: dict[str, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
-    rank_data: List[Rank],
+    rank_data: list[Rank],
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
@@ -34,13 +33,13 @@ def generate_plot(
     if not scenario_data:
         return go.Figure()
 
-    scatter_plot_data: Dict[str, List[Union[float, str]]] = {
+    scatter_plot_data: dict[str, list[float | str]] = {
         "Score": [],
         "Sensitivity": [],
         "Datetime": [],
         "Accuracy": [],
     }
-    line_plot_data: Dict[str, List[Union[float, str]]] = {
+    line_plot_data: dict[str, list[float | str]] = {
         "Score": [],
         "Sensitivity": [],
     }
@@ -64,7 +63,7 @@ def generate_plot(
     #     return
 
     current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
-    title = f"{scenario_name} (updated: {str(current_datetime)})"
+    title = f"{scenario_name} (updated: {current_datetime!s})"
     logger.debug("Generating plot for: %s", scenario_name)
 
     figure_scatter = px.scatter(

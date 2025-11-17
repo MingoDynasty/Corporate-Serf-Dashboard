@@ -3,7 +3,6 @@ Utility functions for the Corporate Serf app.
 """
 
 from decimal import Decimal
-from typing import Union
 
 
 def ordinal(number: int) -> str:
@@ -20,7 +19,7 @@ def ordinal(number: int) -> str:
     return str(number) + suffix
 
 
-def format_decimal(number) -> Union[Decimal, int]:
+def format_decimal(number) -> Decimal | int:
     """
     Remove trailing zeroes from a float.
     Examples: 10.0 -> 10,  10.5 -> 10.5
@@ -30,5 +29,4 @@ def format_decimal(number) -> Union[Decimal, int]:
     decimal = Decimal(str(number))  # Convert to Decimal
     if decimal == decimal.to_integral():
         return int(decimal)
-    else:
-        return decimal.normalize()
+    return decimal.normalize()

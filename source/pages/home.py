@@ -1,11 +1,8 @@
+from datetime import datetime
 import json
 import logging
-from datetime import datetime
-from typing import Tuple
 
 import dash
-import dash_mantine_components as dmc
-import plotly.graph_objects as go
 from dash import (
     Input,
     Output,
@@ -15,6 +12,8 @@ from dash import (
     no_update,
 )
 from dash_iconify import DashIconify
+import dash_mantine_components as dmc
+import plotly.graph_objects as go
 
 from source.config.config_service import config
 from source.kovaaks.data_service import (
@@ -68,7 +67,7 @@ def check_for_new_data(_):
     Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
 )
-def get_scenario_num_runs(_, selected_scenario) -> Tuple[int, str, str]:
+def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     """
     Updates the Scenario Stats on the UI.
     :param _: trigger from the interval component. Its actual value is not used.

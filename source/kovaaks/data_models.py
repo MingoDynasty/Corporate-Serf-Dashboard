@@ -2,9 +2,8 @@
 Pydantic models for various data classes.
 """
 
-import datetime
 from dataclasses import dataclass
-from typing import List, Optional
+import datetime
 
 from pydantic import BaseModel
 
@@ -37,10 +36,10 @@ class Rank(BaseModel):
 
 class Scenario(BaseModel):
     name: str
-    ranks: Optional[List[Rank]] = None
+    ranks: list[Rank] | None = None
 
 
 class PlaylistData(BaseModel):
     name: str
     code: str
-    scenarios: List[Scenario]
+    scenarios: list[Scenario]
