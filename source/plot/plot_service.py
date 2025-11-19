@@ -157,12 +157,15 @@ def apply_light_dark_mode(figure: go.Figure, dark_mode_switch) -> go.Figure:
     return figure
 
 
-def generate_aim_training_journey_plot(journey_data) -> go.Figure:
+def generate_aim_training_journey_plot(
+    journey_data: dict[str, dict[datetime, float]],
+    aim_training_checkpoints: dict[datetime, int],
+) -> go.Figure:
     figures = {}
 
     # loop through each playlist and data and build a line plot
     for idx, (playlist, journey) in enumerate(journey_data.items()):
-        line_plot_data: dict[str, list[float | str]] = {
+        line_plot_data: dict[str, list] = {
             "Date": [],
             "Percentage": [],
         }
@@ -201,4 +204,13 @@ def generate_aim_training_journey_plot(journey_data) -> go.Figure:
     for idx, playlist in enumerate(figures.keys()):
         figure_combined["data"][idx]["name"] = playlist
         figure_combined["data"][idx]["showlegend"] = True
+
+    # add vertical lines to display aim training hours as checkpoints
+    for date_obj, checkpoint in aim_training_checkpoints.items():
+        figure_combined.add_vline(
+            x=date_obj.timestamp() * 1000,
+            line_dash="dash",
+            annotation_text=f" {checkpoint} hours",
+        )
+
     return figure_combined

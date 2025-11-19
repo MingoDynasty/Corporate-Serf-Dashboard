@@ -39,7 +39,21 @@ run_database: SortedList = SortedList(
 playlist_database: dict[str, list[Scenario]] = {}
 
 
-def get_aim_training_journey_for_playlists(playlist_names: list[str]):
+def get_aim_training_checkpoints(checkpoint_threshold: int) -> dict[datetime, int]:
+    checkpoints = {}
+    threshold = checkpoint_threshold * 60
+    counter = 0
+    for idx, run_data in enumerate(run_database):
+        if idx % threshold != 0:
+            continue
+        checkpoints[run_data.datetime_object] = checkpoint_threshold * counter
+        counter += 1
+    return checkpoints
+
+
+def get_aim_training_journey_for_playlists(
+    playlist_names: list[str],
+) -> dict[str, dict[datetime, float]]:
     journey_data = dict.fromkeys(playlist_names)
     for playlist_name in playlist_names:
         journey_data[playlist_name] = get_aim_training_journey_for_playlist(
@@ -48,7 +62,7 @@ def get_aim_training_journey_for_playlists(playlist_names: list[str]):
     return journey_data
 
 
-def get_aim_training_journey_for_playlist(playlist_name: str):
+def get_aim_training_journey_for_playlist(playlist_name: str) -> dict[datetime, float]:
     scenarios = get_scenarios_from_playlists(playlist_name)
 
     # get the high scores for each scenario
@@ -57,7 +71,8 @@ def get_aim_training_journey_for_playlist(playlist_name: str):
         if run_data.scenario not in scenarios:
             continue
         high_scores[run_data.scenario] = max(
-            high_scores[run_data.scenario], run_data.score,
+            high_scores[run_data.scenario],
+            run_data.score,
         )
 
     journey_data = {}
@@ -68,7 +83,8 @@ def get_aim_training_journey_for_playlist(playlist_name: str):
         if run_data.score <= current_scores[run_data.scenario]:
             continue
         current_scores[run_data.scenario] = max(
-            current_scores[run_data.scenario], run_data.score,
+            current_scores[run_data.scenario],
+            run_data.score,
         )
 
         # wait until we have at least one score per scenario

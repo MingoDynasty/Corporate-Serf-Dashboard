@@ -7,6 +7,7 @@ from plot.plot_service import generate_aim_training_journey_plot
 from utilities.dash_logging import get_dash_logger
 
 from source.kovaaks.data_service import (
+    get_aim_training_checkpoints,
     get_aim_training_journey_for_playlists,
     get_playlists,
 )
@@ -34,7 +35,8 @@ def generate_graph(selected_playlist):
             message = f"Insufficient data for playlist: {playlist}"
             dash_logger.warning(message)
 
-    return generate_aim_training_journey_plot(journey_data)
+    aim_training_checkpoints = get_aim_training_checkpoints(20)
+    return generate_aim_training_journey_plot(journey_data, aim_training_checkpoints)
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
