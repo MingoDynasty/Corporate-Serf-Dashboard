@@ -2,7 +2,16 @@
     font-weight: bold;
 }
 
+.mantine-MultiSelect-label {
+    font-weight: bold;
+}
+
 .mantine-Select-option[data-checked] {
+    font-weight: bold;
+    background-color: rgb(229, 236, 246, 0.5);
+}
+
+.mantine-MultiSelect-option[data-checked] {
     font-weight: bold;
     background-color: rgb(229, 236, 246, 0.5);
 }
