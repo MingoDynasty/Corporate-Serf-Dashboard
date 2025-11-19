@@ -155,3 +155,50 @@ def apply_light_dark_mode(figure: go.Figure, dark_mode_switch) -> go.Figure:
     template = "mantine_dark" if dark_mode_switch else "mantine_light"
     figure.update_layout(template=template)
     return figure
+
+
+def generate_aim_training_journey_plot(journey_data) -> go.Figure:
+    figures = {}
+
+    # loop through each playlist and data and build a line plot
+    for idx, (playlist, journey) in enumerate(journey_data.items()):
+        line_plot_data: dict[str, list[float | str]] = {
+            "Date": [],
+            "Percentage": [],
+        }
+
+        for date_obj, percentage in journey.items():
+            line_plot_data["Date"].append(date_obj)
+            line_plot_data["Percentage"].append(round(100 * percentage, 2))
+
+        figure_line = px.line(
+            data_frame=pd.DataFrame(line_plot_data),
+            x="Date",
+            y="Percentage",
+            markers=True,
+            title=playlist,
+        )
+        figure_line.update_traces(
+            line_color=figure_line.layout.template.layout.colorway[idx],
+        )
+        figures[playlist] = figure_line
+
+    # combined the data for each line plot into a single plot
+    data = None
+    for figure in figures.values():
+        data = figure.data if data is None else data + figure.data
+
+    figure_combined = go.Figure(data=data)
+    figure_combined.update_layout(
+        title="Aim Training Journey",
+        xaxis={"title": "Datetime"},
+        yaxis={"title": "Percentage"},
+        font={
+            "size": 16,
+        },
+    )
+
+    for idx, playlist in enumerate(figures.keys()):
+        figure_combined["data"][idx]["name"] = playlist
+        figure_combined["data"][idx]["showlegend"] = True
+    return figure_combined

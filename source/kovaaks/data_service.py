@@ -7,6 +7,7 @@ import logging
 import os
 from pathlib import Path
 
+import numpy as np
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
@@ -29,7 +30,58 @@ logger = logging.getLogger(__name__)
 #  But a simple dictionary should suffice for now.
 kovaaks_database: dict = {}
 
+run_database: SortedList = SortedList(
+    [],
+    key=lambda item: item.datetime_object,
+)
+
+
 playlist_database: dict[str, list[Scenario]] = {}
+
+
+def get_aim_training_journey_for_playlists(playlist_names: list[str]):
+    journey_data = dict.fromkeys(playlist_names)
+    for playlist_name in playlist_names:
+        journey_data[playlist_name] = get_aim_training_journey_for_playlist(
+            playlist_name,
+        )
+    return journey_data
+
+
+def get_aim_training_journey_for_playlist(playlist_name: str):
+    scenarios = get_scenarios_from_playlists(playlist_name)
+
+    # get the high scores for each scenario
+    high_scores = dict.fromkeys(scenarios, 0)
+    for run_data in run_database:
+        if run_data.scenario not in scenarios:
+            continue
+        high_scores[run_data.scenario] = max(
+            high_scores[run_data.scenario], run_data.score,
+        )
+
+    journey_data = {}
+    current_scores = dict.fromkeys(scenarios, 0)
+    for run_data in run_database:
+        if run_data.scenario not in scenarios:
+            continue
+        if run_data.score <= current_scores[run_data.scenario]:
+            continue
+        current_scores[run_data.scenario] = max(
+            current_scores[run_data.scenario], run_data.score,
+        )
+
+        # wait until we have at least one score per scenario
+        if any(value == 0 for value in current_scores.values()):
+            continue
+
+        # Calculate the percentages of the current score vs max score. Each is treated as a data point.
+        # TODO: instead of doing percentages, we should calculate the rank, which is more useful and accurate.
+        percentages = []
+        for scenario in scenarios:
+            percentages.append(current_scores[scenario] / high_scores[scenario])
+        journey_data[run_data.datetime_object] = np.average(percentages)
+    return journey_data
 
 
 def is_scenario_in_database(scenario_name: str) -> bool:
@@ -48,7 +100,9 @@ def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
 
 
 def get_sensitivities_vs_runs_filtered(
-    scenario_name: str, top_n_scores: int, oldest_date: datetime,
+    scenario_name: str,
+    top_n_scores: int,
+    oldest_date: datetime,
 ) -> dict[str, list[RunData]]:
     """
     Get sensitivities vs runs for a scenario, filtered by top N scores, and oldest date.
@@ -143,13 +197,15 @@ def load_csv_file_into_database(csv_file: str) -> None:
     if not run_data:
         logger.warning("Failed to get run data for CSV file: %s", csv_file)
         return
-    # print(run_data)
+
+    run_database.add(run_data)
 
     sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
     if run_data.scenario not in kovaaks_database:
         kovaaks_database[run_data.scenario] = {
             "scenario_stats": ScenarioStats(
-                date_last_played=run_data.datetime_object, number_of_runs=1,
+                date_last_played=run_data.datetime_object,
+                number_of_runs=1,
             ),
             # "raw_run_data": [run_data],
             "sensitivities_vs_runs": SortedDict(
@@ -167,7 +223,8 @@ def load_csv_file_into_database(csv_file: str) -> None:
         scenario_stats = kovaaks_database[run_data.scenario]["scenario_stats"]
         scenario_stats.number_of_runs += 1
         scenario_stats.date_last_played = max(
-            scenario_stats.date_last_played, run_data.datetime_object,
+            scenario_stats.date_last_played,
+            run_data.datetime_object,
         )
 
         # Add to sensitivities_vs_runs
