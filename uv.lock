@@ -108,7 +108,7 @@ wheels = [
 [[package]]
 name = "corporate-serf-dashboard"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "black" },
     { name = "dash" },

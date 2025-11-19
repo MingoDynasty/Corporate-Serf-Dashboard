@@ -23,6 +23,17 @@ dependencies = [
     "watchdog>=6.0.0",
 ]
 
+#[project.scripts]
+#test = "scripts.test:main"
+
+[build-system]
+requires = ["uv_build"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "source"
+
 [tool.pylint.main]
 # Analyse import fallback blocks. This can be used to support both Python 2 and 3
 # compatible code, which means that the block might have code that exists only in
