@@ -108,7 +108,7 @@ persistent = true
 
 # Minimum Python version to use for version dependent checks. Will default to the
 # version used to run pylint.
-py-version = "3.13"
+py-version = "3.14"
 
 # Discover python modules and packages in the file system subtree.
 # recursive =
@@ -117,7 +117,7 @@ py-version = "3.13"
 # source root is an absolute path or a path relative to the current working
 # directory used to determine a package namespace for modules located under the
 # source root.
-# source-roots =
+source-roots = "Corporate-Serf-Dashboard/source"
 
 # Allow loading of arbitrary C extensions. Extensions are imported into the
 # active Python interpreter and may run arbitrary code.
