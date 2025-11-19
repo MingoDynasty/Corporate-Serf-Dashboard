@@ -24,10 +24,10 @@ dash.register_page(
 @callback(
     Output("aim-training-journey-graph", "figure"),
     Input("playlists-multi-select", "value"),
+    Input("checkpoint-hour", "value"),
 )
-def generate_graph(selected_playlist):
-    logger.debug("Selected playlists: %s", selected_playlist)
-    if not selected_playlist:
+def generate_graph(selected_playlist, checkpoint_hour):
+    if not selected_playlist or not checkpoint_hour:
         return None
     journey_data = get_aim_training_journey_for_playlists(selected_playlist)
     for playlist, data in journey_data.items():
@@ -35,7 +35,7 @@ def generate_graph(selected_playlist):
             message = f"Insufficient data for playlist: {playlist}"
             dash_logger.warning(message)
 
-    aim_training_checkpoints = get_aim_training_checkpoints(20)
+    aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)
     return generate_aim_training_journey_plot(journey_data, aim_training_checkpoints)
 
 
@@ -71,6 +71,17 @@ def layout(**kwargs):  # noqa: ARG001
                                     persistence=True,
                                     placeholder="Select a playlist...",
                                     searchable=True,
+                                ),
+                                dmc.NumberInput(
+                                    id="checkpoint-hour",
+                                    label="Checkpoint Hour",
+                                    min=1,
+                                    persistence=True,
+                                    # placeholder="Checkpoint Hour...",
+                                    radius="sm",
+                                    size="sm",
+                                    variant="default",
+                                    value=10,
                                 ),
                             ],
                             gap="md",
