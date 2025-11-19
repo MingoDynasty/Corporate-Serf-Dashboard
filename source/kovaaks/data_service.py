@@ -239,10 +239,11 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
                 str_horizontal_sens = line.split(",")[1].strip()
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
                 horizontal_sens = round(
-                    float(str_horizontal_sens), config.sens_round_decimal_places,
+                    float(str_horizontal_sens),
+                    config.sens_round_decimal_places,
                 )
             elif line.startswith("Scenario:"):
-                scenario = line.split(",")[1].strip()
+                scenario = line.split(",", 1)[1].strip()
     except ValueError:
         logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
         return None
