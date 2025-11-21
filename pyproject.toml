@@ -10,6 +10,7 @@ dependencies = [
     "dash-extensions>=2.0.4",
     "dash-iconify>=0.1.2",
     "dash-mantine-components>=2.4.0",
+    "datamodel-code-generator>=0.35.0",
     "mypy>=1.18.2",
     "numpy>=2.3.4",
     "pandas>=2.3.3",
