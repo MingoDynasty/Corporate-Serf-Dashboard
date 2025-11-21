@@ -171,7 +171,7 @@ def generate_graph(
         ):
             notification_message = (
                 f"{message_data.sensitivity} has a new "
-                f"{ordinal(message_data.nth_score)} place score: {message_data.score}"
+                f"{ordinal(message_data.nth_score)} place score: {message_data.score:.2f}"
             )
             notification = {
                 "action": "show",
