@@ -6,12 +6,13 @@ import logging
 
 import requests
 
-from source.kovaaks.api_models import PlaylistAPIResponse
+from source.kovaaks.api_models import LeaderboardAPIResponse, PlaylistAPIResponse
 
 BASE_URL = "https://kovaaks.com/webapp-backend"
 ENDPOINTS = {
-    "playlist": BASE_URL + "/playlist/playlists",
     "benchmarks": BASE_URL + "/benchmarks/player-progress-rank-benchmark",
+    "leaderboard": BASE_URL + "/leaderboard/scores/global",
+    "playlist": BASE_URL + "/playlist/playlists",
 }
 TIMEOUT = 10
 logger = logging.getLogger(__name__)
@@ -33,3 +34,10 @@ def get_benchmark_json(benchmark_id: int, steam_id: int | None = None) -> str:
     response = requests.get(ENDPOINTS["benchmarks"], params=params, timeout=TIMEOUT)
     response.raise_for_status()
     return response.json()
+
+
+def get_leaderboard_scores(leaderboard_id: int) -> LeaderboardAPIResponse:
+    params = {"page": 0, "max": 100, "leaderboardId": leaderboard_id}
+    response = requests.get(ENDPOINTS["leaderboard"], params=params, timeout=TIMEOUT)
+    response.raise_for_status()
+    return LeaderboardAPIResponse.model_validate(response.json())

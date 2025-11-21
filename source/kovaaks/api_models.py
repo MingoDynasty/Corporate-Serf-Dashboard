@@ -68,3 +68,45 @@ class BenchmarksAPIResponse(BaseModel):
     overall_rank: int
     categories: dict[str, Category]
     ranks: list[Rank]
+
+
+class Attributes(BaseModel):
+    fov: int
+    hash: str
+    cm360: float
+    epoch: int
+    kills: int
+    score: int
+    avgFps: float
+    avgTtk: int
+    fovScale: str
+    vertSens: float
+    horizSens: float
+    resolution: str
+    sensScale: str
+    pauseCount: int | None = None
+    pauseDuration: int | None = None
+    accuracyDamage: int
+    challengeStart: str
+    # modelOverrides: ModelOverrides
+    sensRandomizer: None
+    scenarioVersion: str
+    clientBuildVersion: str
+
+
+class RankingPlayer(BaseModel):
+    steamId: str
+    score: int
+    rank: int
+    steamAccountName: str
+    webappUsername: str | None
+    kovaaksPlusActive: bool
+    country: str | None
+    attributes: Attributes
+
+
+class LeaderboardAPIResponse(BaseModel):
+    page: int
+    max: int
+    total: int
+    data: list[RankingPlayer]
