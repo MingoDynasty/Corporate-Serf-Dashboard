@@ -71,37 +71,37 @@ class BenchmarksAPIResponse(BaseModel):
 
 
 class Attributes(BaseModel):
-    fov: int
-    hash: str
-    cm360: float
+    # fov: int
+    hash: str | None = None
+    cm360: float | None = None
     epoch: int
-    kills: int
-    score: int
-    avgFps: float
-    avgTtk: int
-    fovScale: str
-    vertSens: float
-    horizSens: float
-    resolution: str
-    sensScale: str
+    # kills: int
+    score: float | None = None
+    avgFps: float | None = None
+    avgTtk: float | None = None
+    fovScale: str | None = None
+    vertSens: float | None = None
+    horizSens: float | None = None
+    resolution: str | None = None
+    sensScale: str | None = None
     pauseCount: int | None = None
     pauseDuration: int | None = None
     accuracyDamage: int
-    challengeStart: str
+    challengeStart: str | None = None
     # modelOverrides: ModelOverrides
-    sensRandomizer: None
+    # sensRandomizer: None
     scenarioVersion: str
-    clientBuildVersion: str
+    # clientBuildVersion: str
 
 
 class RankingPlayer(BaseModel):
     steamId: str
-    score: int
+    score: float
     rank: int
-    steamAccountName: str
-    webappUsername: str | None
-    kovaaksPlusActive: bool
-    country: str | None
+    steamAccountName: str | None = None
+    webappUsername: str | None = None
+    kovaaksPlusActive: bool | None = None
+    country: str | None = None
     attributes: Attributes
 
 
