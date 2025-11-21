@@ -123,11 +123,14 @@ def generate_graph(
         return go.Figure().to_json(), no_update
 
     oldest_datetime = datetime.combine(
-        datetime.fromisoformat(selected_date).date(), datetime.min.time(),
+        datetime.fromisoformat(selected_date).date(),
+        datetime.min.time(),
     )
 
     sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
-        selected_scenario, top_n_scores, oldest_datetime,
+        selected_scenario,
+        top_n_scores,
+        oldest_datetime,
     )
     if not sensitivities_vs_runs:
         logger.warning(
@@ -143,7 +146,10 @@ def generate_graph(
         rank_data = get_rank_data_from_playlist(selected_playlist, selected_scenario)
 
     plot = generate_plot(
-        sensitivities_vs_runs, selected_scenario, rank_overlay_switch, rank_data,
+        sensitivities_vs_runs,
+        selected_scenario,
+        rank_overlay_switch,
+        rank_data,
     )
 
     # Default notification is simply notifying that the graph updated.
@@ -263,7 +269,9 @@ def layout(**kwargs):  # noqa: ARG001
             dcc.Store(id="do_update"),  # used for Interval component
             dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
             dcc.Interval(
-                id="interval-component", interval=config.polling_interval, n_intervals=0,
+                id="interval-component",
+                interval=config.polling_interval,
+                n_intervals=0,
             ),
             dmc.Grid(
                 children=[
@@ -320,7 +328,9 @@ def layout(**kwargs):  # noqa: ARG001
                                     persistence=True,
                                     rightSection=DashIconify(icon="clarity:date-line"),
                                     value=datetime(
-                                        datetime.now().year, month=1, day=1,
+                                        datetime.now().year,
+                                        month=1,
+                                        day=1,
                                     ).isoformat(),
                                 ),
                                 dmc.Box(
@@ -354,7 +364,8 @@ def layout(**kwargs):  # noqa: ARG001
                                                     span=True,
                                                 ),
                                                 dmc.Text(
-                                                    id="scenario_num_runs", span=True,
+                                                    id="scenario_num_runs",
+                                                    span=True,
                                                 ),
                                             ],
                                             size="sm",
@@ -380,7 +391,8 @@ def layout(**kwargs):  # noqa: ARG001
                                         id="settings-modal-open-button",
                                         variant="default",
                                         leftSection=DashIconify(
-                                            icon="clarity:settings-line", width=25,
+                                            icon="clarity:settings-line",
+                                            width=25,
                                         ),
                                     ),
                                     label="Settings",

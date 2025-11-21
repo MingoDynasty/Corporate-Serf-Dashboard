@@ -159,7 +159,8 @@ def main() -> None:
 
         # Save to file
         os.makedirs(
-            "generated", exist_ok=True,
+            "generated",
+            exist_ok=True,
         )  # create the generated directory if not exist
         generated_filename = Path("generated", playlist_data.name + ".json")
         with open(generated_filename, "w") as file_handle:

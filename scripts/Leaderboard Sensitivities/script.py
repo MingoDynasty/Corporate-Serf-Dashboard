@@ -1,14 +1,12 @@
-import logging
-import statistics
-import sys
 from dataclasses import dataclass
-
-import numpy as np
+import logging
+import sys
 
 from kovaaks.api_models import BenchmarksAPIResponse
-import pandas as pd
+from kovaaks.api_service import get_benchmark_json, get_leaderboard_scores
 from models import EvxlData
-from kovaaks.api_service import get_leaderboard_scores, get_benchmark_json
+import numpy as np
+import pandas as pd
 
 logging.basicConfig(
     stream=sys.stdout,
