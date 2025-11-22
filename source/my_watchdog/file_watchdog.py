@@ -82,7 +82,12 @@ class NewFileHandler(FileSystemEventHandler):
         for prev_run_data in sensitivities_vs_runs[sensitivity_key]:
             if prev_run_data.score > run_data.score:
                 nth_score += 1
-        logger.debug("New %s place score: %s", ordinal(nth_score), run_data.score)
+        logger.debug(
+            "%s has a new %s place score: %s",
+            sensitivity_key,
+            ordinal(nth_score),
+            run_data.score,
+        )
         message_queue.put(
             NewFileMessage(
                 datetime_created=datetime.datetime.now(),
