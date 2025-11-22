@@ -1,12 +1,14 @@
-from dataclasses import dataclass
 import logging
 import sys
+from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+from scipy import stats
 
 from kovaaks.api_models import BenchmarksAPIResponse
 from kovaaks.api_service import get_benchmark_json, get_leaderboard_scores
 from models import EvxlData
-import numpy as np
-import pandas as pd
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -16,6 +18,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 EVXL_BENCHMARKS_JSON_FILE = "../../resources/evxl/benchmarks.json"
+
+TARGET_BENCHMARK = "Viscose Benchmarks"
+TARGET_DIFFICULTY = "Hard"
 
 
 @dataclass()
@@ -38,10 +43,10 @@ def load_evxl_data():
         json_data = file.read()
     evxl_data = EvxlData.model_validate_json(json_data)
     for evxl_benchmark in evxl_data.root:
-        if evxl_benchmark.benchmarkName != "Viscose Benchmarks":
+        if evxl_benchmark.benchmarkName != TARGET_BENCHMARK:
             continue
         for evxl_difficulty in evxl_benchmark.difficulties:
-            if evxl_difficulty.difficultyName != "Easier":
+            if evxl_difficulty.difficultyName != TARGET_DIFFICULTY:
                 continue
             full_benchmark_name = (
                 f"{evxl_benchmark.benchmarkName} - {evxl_difficulty.difficultyName}"
@@ -52,23 +57,45 @@ def load_evxl_data():
     return benchmark_name_to_id
 
 
-def calculate_stats(leaderboard_id: int) -> Stats:
+def get_sens_list(leaderboard_id: int) -> list[float]:
     sensitivities = []
-    response = get_leaderboard_scores(leaderboard_id)
+    response = get_leaderboard_scores(leaderboard_id, use_cache=True)
     for ranking_player in response.data:
         if not ranking_player.attributes.cm360:
-            logger.warning(
+            logger.debug(
                 f"Skipping empty cm360 for player: {ranking_player.steamAccountName}"
             )
             continue
         sensitivities.append(ranking_player.attributes.cm360)
+    return sensitivities
+
+
+def filter_with_iqr(sensitivities: list[float]) -> list[float]:
+    # exclude outliers that are below (Q1 - 1.5 * IQR) and above (Q3 + 1.5 * IQR)
+    data = np.array(sensitivities)
+    q1 = np.percentile(data, 25)
+    q3 = np.percentile(data, 75)
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    return data[(data >= lower_bound) & (data <= upper_bound)]
+
+
+def filter_with_zscore(sensitivities: list[float], threshold: int = 3) -> list[float]:
+    # exclude outliers that are 3 or more standard deviations away
+    data = np.array(sensitivities)
+    z_scores = np.abs(stats.zscore(data))
+    return data[z_scores < threshold]
+
+
+def get_stats(data: list[float]) -> Stats:
     return Stats(
-        minimum=min(sensitivities),
-        q1=float(np.quantile(sensitivities, 0.25)),  # Calculate Q1 (25th percentile)
-        median=float(np.median(sensitivities)),
-        mean=float(np.mean(sensitivities)),
-        q3=float(np.quantile(sensitivities, 0.75)),  # Calculate Q3 (75th percentile)
-        maximum=max(sensitivities),
+        minimum=min(data),
+        q1=float(np.quantile(data, 0.25)),  # Calculate Q1 (25th percentile)
+        median=float(np.median(data)),
+        mean=float(np.mean(data)),
+        q3=float(np.quantile(data, 0.75)),  # Calculate Q3 (75th percentile)
+        maximum=max(data),
     )
 
 
@@ -83,25 +110,29 @@ def main() -> None:
     # for each benchmark, call the benchmarks API to get the list of scenarios, and leaderboard ID per scenario
     for benchmark_name, benchmark_id in benchmark_names_to_id.items():
         logger.debug(f"benchmark_id={benchmark_id}, benchmark_name={benchmark_name}")
-        response_json = get_benchmark_json(benchmark_id, None)
+        response_json = get_benchmark_json(benchmark_id, steam_id=None, use_cache=True)
         benchmark_response = BenchmarksAPIResponse.model_validate(response_json)
         for _, category in benchmark_response.categories.items():
             for scenario_name, benchmark_scenario in category.scenarios.items():
                 benchmarks_to_scenario_name_and_leaderboard_id[benchmark_name][
                     scenario_name
                 ] = benchmark_scenario.leaderboard_id
+        #     break  # TODO: debug only
         # break  # TODO: debug only
 
     # Build a dictionary to be later converted to Pandas dataframe
-    data = {
-        "Scenario Name": [],
-        "Minimum": [],
-        "Q1": [],
-        "Median": [],
-        "Mean": [],
-        "Q3": [],
-        "Maximum": [],
-    }
+    keys = [
+        "Scenario Name",
+        "Minimum",
+        "Q1",
+        "Median",
+        "Mean",
+        "Q3",
+        "Maximum",
+        "Number of Sensitivities",
+    ]
+    data_iqr = {key: [] for key in keys}
+    data_zscore = {key: [] for key in keys}
     for (
         benchmark_name,
         scenario_data,
@@ -111,21 +142,41 @@ def main() -> None:
             logger.debug(
                 "leaderboard_id: %s, scenario_name: %s", leaderboard_id, scenario_name
             )
-            stats = calculate_stats(leaderboard_id)
-            logger.debug(f"{scenario_name} : {stats}")
+            sensitivities = get_sens_list(leaderboard_id)
+            # logger.info("Original sens: %s", sensitivities)
 
-            data["Scenario Name"].append(scenario_name)
-            data["Minimum"].append(stats.minimum)
-            data["Q1"].append(stats.q1)
-            data["Median"].append(stats.median)
-            data["Mean"].append(stats.mean)
-            data["Q3"].append(stats.q3)
-            data["Maximum"].append(stats.maximum)
-        #     break
-        # break
+            sensitivities_iqr_filtered = filter_with_iqr(sensitivities)
+            stats_iqr = get_stats(sensitivities_iqr_filtered)
+            logger.debug(f"{scenario_name} : {stats_iqr}")
+            data_iqr["Scenario Name"].append(scenario_name)
+            data_iqr["Minimum"].append(stats_iqr.minimum)
+            data_iqr["Q1"].append(stats_iqr.q1)
+            data_iqr["Median"].append(stats_iqr.median)
+            data_iqr["Mean"].append(stats_iqr.mean)
+            data_iqr["Q3"].append(stats_iqr.q3)
+            data_iqr["Maximum"].append(stats_iqr.maximum)
+            data_iqr["Number of Sensitivities"].append(len(sensitivities))
 
-    df = pd.DataFrame(data)
-    df.to_csv("my_data_pandas.csv", index=False)
+            sensitivities_zscore_filtered = filter_with_zscore(sensitivities)
+            # logger.info("Filtered sens: %s", sensitivities_zscore_filtered)
+            stats_zscore = get_stats(sensitivities_zscore_filtered)
+            # logger.debug(f"{scenario_name} : {stats_iqr}")
+            data_zscore["Scenario Name"].append(scenario_name)
+            data_zscore["Minimum"].append(stats_zscore.minimum)
+            data_zscore["Q1"].append(stats_zscore.q1)
+            data_zscore["Median"].append(stats_zscore.median)
+            data_zscore["Mean"].append(stats_zscore.mean)
+            data_zscore["Q3"].append(stats_zscore.q3)
+            data_zscore["Maximum"].append(stats_zscore.maximum)
+            data_zscore["Number of Sensitivities"].append(len(sensitivities))
+        #     break  # TODO: debug only
+        # break  # TODO: debug only
+
+    df_iqr = pd.DataFrame(data_iqr)
+    df_iqr.to_csv(f"pandas_df_iqr_{TARGET_DIFFICULTY}.csv", index=False)
+
+    df_zscore = pd.DataFrame(data_zscore)
+    df_zscore.to_csv(f"pandas_df_zscore_{TARGET_DIFFICULTY}.csv", index=False)
 
 
 if __name__ == "__main__":
