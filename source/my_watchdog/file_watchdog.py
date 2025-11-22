@@ -17,6 +17,7 @@ from source.kovaaks.data_service import (
     load_csv_file_into_database,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +82,7 @@ class NewFileHandler(FileSystemEventHandler):
         for prev_run_data in sensitivities_vs_runs[sensitivity_key]:
             if prev_run_data.score > run_data.score:
                 nth_score += 1
-        logger.debug("Nth score: %s", nth_score)
+        logger.debug("New %s place score: %s", ordinal(nth_score), run_data.score)
         message_queue.put(
             NewFileMessage(
                 datetime_created=datetime.datetime.now(),
