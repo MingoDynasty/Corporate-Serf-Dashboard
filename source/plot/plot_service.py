@@ -129,19 +129,11 @@ def generate_plot(
         for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
             figure_combined.add_hline(
                 name=rank.name,
-                label={
-                    "text": f"{rank.name} ({format_decimal(rank.threshold)}) ",
-                    "textposition": "end",
-                },
+                annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
                 y=rank.threshold,
                 line_dash="dash",
                 line_color=rank.color,
             )
-
-        # ensure slight padding in the highest rank displayed, so that the label text doesn't get cut off
-        figure_combined.update_yaxes(
-            autorangeoptions={"include": rank_data[idx_highest_rank].threshold * 1.02},
-        )
     return figure_combined
 
 
