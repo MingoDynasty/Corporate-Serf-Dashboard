@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 import time
 
+from utilities.utilities import ordinal
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import config
@@ -17,7 +18,6 @@ from source.kovaaks.data_service import (
     load_csv_file_into_database,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
-from utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 

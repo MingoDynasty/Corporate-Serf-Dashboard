@@ -24,7 +24,7 @@ CACHE_DIR = "cache"
 
 
 def make_cache():
-    for endpoint in ENDPOINTS.keys():
+    for endpoint in ENDPOINTS:
         os.makedirs(Path(CACHE_DIR, endpoint), exist_ok=True)
     return
 
@@ -42,7 +42,7 @@ def get_benchmark_json(
 ) -> str:
     cache_file = Path(CACHE_DIR, "benchmarks", f"{benchmark_id}.json")
     if use_cache and os.path.exists(cache_file):
-        with open(cache_file, "r") as file:
+        with open(cache_file) as file:
             return json.load(file)
 
     params = {
@@ -67,7 +67,7 @@ def get_leaderboard_scores(
 ) -> LeaderboardAPIResponse:
     cache_file = Path(CACHE_DIR, "leaderboard", f"{leaderboard_id}.json")
     if use_cache and os.path.exists(cache_file):
-        with open(cache_file, "r") as file:
+        with open(cache_file) as file:
             data = json.load(file)
             return LeaderboardAPIResponse.model_validate(data)
 
