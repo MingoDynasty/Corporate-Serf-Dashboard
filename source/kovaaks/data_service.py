@@ -148,6 +148,33 @@ def get_sensitivities_vs_runs_filtered(
     return filtered_data
 
 
+def get_time_vs_runs(
+    scenario_name: str,
+    top_n_scores: int,
+    oldest_date: datetime,
+) -> dict[str, list[RunData]]:
+    # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
+    #  Besides, this logic might get blown away if/when we migrate to SQLite.
+
+    # 1. Build a dictionary with <Date, [RunData]>
+    data = {}
+    for run_data in kovaaks_database[scenario_name]["time_vs_runs"]:
+        if run_data.datetime_object < oldest_date:
+            continue
+
+        date_obj = run_data.datetime_object.date()
+        if date_obj not in data:
+            data[date_obj] = []
+        data[date_obj].append(run_data)
+
+    # 2. Filter the data down to the Top N Scores
+    filtered_data = {}
+    for date_obj, runs_data in data.items():
+        sorted_list = sorted(runs_data, key=lambda item: item.score)
+        filtered_data[date_obj] = sorted_list[-top_n_scores:]
+    return filtered_data
+
+
 def get_playlists() -> list[str]:
     """Get list of available playlists."""
     return sorted(playlist_database.keys())
@@ -223,7 +250,10 @@ def load_csv_file_into_database(csv_file: str) -> None:
                 date_last_played=run_data.datetime_object,
                 number_of_runs=1,
             ),
-            # "raw_run_data": [run_data],
+            "time_vs_runs": SortedList(
+                [run_data],
+                key=lambda item: item.datetime_object,
+            ),
             "sensitivities_vs_runs": SortedDict(
                 lambda item: float(item.split(" ")[0]),
                 {
@@ -250,6 +280,9 @@ def load_csv_file_into_database(csv_file: str) -> None:
                 key=lambda item: item.score,
             )
         sens_vs_runs[sensitivity_key].add(run_data)
+
+        # Add to time_vs_runs
+        kovaaks_database[run_data.scenario]["time_vs_runs"].add(run_data)
     return
 
 

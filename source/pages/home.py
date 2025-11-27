@@ -22,6 +22,7 @@ from source.kovaaks.data_service import (
     get_scenario_stats,
     get_scenarios_from_playlists,
     get_sensitivities_vs_runs_filtered,
+    get_time_vs_runs,
     get_unique_scenarios,
     is_scenario_in_database,
     load_playlist_from_code,
@@ -29,7 +30,8 @@ from source.kovaaks.data_service import (
 from source.my_queue.message_queue import message_queue
 from source.plot.plot_service import (
     apply_light_dark_mode,
-    generate_plot,
+    generate_sensitivity_plot,
+    generate_time_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
@@ -93,6 +95,7 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     Input("scenario-dropdown-selection", "value"),
     Input("top_n_scores", "value"),
     Input("date-picker", "value"),
+    Input("x-axis-radiogroup", "value"),
     Input("rank-overlay-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
 )
@@ -101,6 +104,7 @@ def generate_graph(
     selected_scenario,
     top_n_scores,
     selected_date,
+    x_axis_radiogroup,
     rank_overlay_switch,
     selected_playlist,
 ):
@@ -110,6 +114,7 @@ def generate_graph(
     :param selected_scenario: user-selected scenario name.
     :param top_n_scores: user-selected top n scores.
     :param selected_date: user-selected date.
+    :param x_axis_radiogroup: user-selected x-axis radio group.
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
     :param selected_playlist: user-selected playlist name.
     :return: Figure serialized to JSON, Notification
@@ -127,30 +132,63 @@ def generate_graph(
         datetime.min.time(),
     )
 
-    sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
-        selected_scenario,
-        top_n_scores,
-        oldest_datetime,
-    )
-    if not sensitivities_vs_runs:
-        logger.warning(
-            "No scenario data found for (%s) for date range: %s",
+    plot = go.Figure()
+    if x_axis_radiogroup == "score_vs_sensitivity":
+        sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
             selected_scenario,
+            top_n_scores,
             oldest_datetime,
         )
-        dash_logger.warning("No scenario data for the given date range.")
-        return go.Figure().to_json(), no_update
+        if not sensitivities_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return go.Figure().to_json(), no_update
 
-    rank_data = None
-    if selected_playlist:
-        rank_data = get_rank_data_from_playlist(selected_playlist, selected_scenario)
+        rank_data = None
+        if selected_playlist:
+            rank_data = get_rank_data_from_playlist(
+                selected_playlist, selected_scenario
+            )
 
-    plot = generate_plot(
-        sensitivities_vs_runs,
-        selected_scenario,
-        rank_overlay_switch,
-        rank_data,
-    )
+        plot = generate_sensitivity_plot(
+            sensitivities_vs_runs,
+            selected_scenario,
+            rank_overlay_switch,
+            rank_data,
+        )
+    elif x_axis_radiogroup == "score_vs_time":
+        time_vs_runs = get_time_vs_runs(
+            selected_scenario,
+            top_n_scores,
+            oldest_datetime,
+        )
+        if not time_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return go.Figure().to_json(), no_update
+
+        rank_data = None
+        if selected_playlist:
+            rank_data = get_rank_data_from_playlist(
+                selected_playlist, selected_scenario
+            )
+
+        plot = generate_time_plot(
+            time_vs_runs,
+            selected_scenario,
+            rank_overlay_switch,
+            rank_data,
+        )
+    else:
+        logger.error("Unsupported radio option: %s", x_axis_radiogroup)
 
     # Default notification is simply notifying that the graph updated.
     notification = {
@@ -381,11 +419,29 @@ def layout(**kwargs):  # noqa: ARG001
                             direction="row",
                             wrap="wrap",
                         ),
-                        span=11,
+                        span=10,
                     ),
                     dmc.GridCol(
                         dmc.Flex(
                             children=[
+                                dmc.RadioGroup(
+                                    children=dmc.Stack(
+                                        [
+                                            dmc.Radio(label, value=value)
+                                            for value, label in [
+                                                [
+                                                    "score_vs_sensitivity",
+                                                    "Score vs Sensitivity",
+                                                ],
+                                                ["score_vs_time", "Score vs Time"],
+                                            ]
+                                        ],
+                                    ),
+                                    id="x-axis-radiogroup",
+                                    value="score_vs_sensitivity",
+                                    persistence=True,
+                                ),
+                                dmc.Space(h="xl"),
                                 dmc.Tooltip(
                                     dmc.Button(
                                         "Settings",
