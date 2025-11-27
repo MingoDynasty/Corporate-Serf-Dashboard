@@ -287,6 +287,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     data=get_playlists(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
+                                    maxDropdownHeight="75vh",
                                     miw=400,
                                     ml="xl",
                                     persistence=True,
