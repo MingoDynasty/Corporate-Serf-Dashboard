@@ -2,9 +2,9 @@
 Shared message my_queue between UI and File Watchdog components.
 """
 
+from collections import deque
 from dataclasses import dataclass
 from datetime import datetime
-import queue
 
 
 @dataclass(frozen=True)
@@ -18,4 +18,4 @@ class NewFileMessage:
     sensitivity: str
 
 
-message_queue: queue.Queue[NewFileMessage] = queue.Queue()
+message_queue: deque[NewFileMessage] = deque()

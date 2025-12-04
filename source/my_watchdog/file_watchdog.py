@@ -13,6 +13,7 @@ from watchdog.events import FileSystemEventHandler
 from source.config.config_service import config
 from source.kovaaks.data_service import (
     extract_data_from_file,
+    get_high_score,
     get_sensitivities_vs_runs,
     is_scenario_in_database,
     load_csv_file_into_database,
@@ -88,7 +89,21 @@ class NewFileHandler(FileSystemEventHandler):
             ordinal(nth_score),
             run_data.score,
         )
-        message_queue.put(
+
+        high_score = get_high_score(run_data.scenario)
+        score_threshold = 0.95 * high_score
+        pct_diff = (run_data.score / high_score - 1) * 100
+        logger.debug(
+            f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
+        )
+        if run_data.score > score_threshold:
+            logger.debug(
+                "Successfully passed the score threshold! Ready to move onto the next scenario."
+            )
+        else:
+            logger.debug("Failed to meet the score threshold. Keep grinding...")
+
+        message_queue.append(
             NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 nth_score=nth_score,

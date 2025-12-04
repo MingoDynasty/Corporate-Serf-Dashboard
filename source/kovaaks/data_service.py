@@ -115,6 +115,10 @@ def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]
 
 
+def get_high_score(scenario_name: str) -> float:
+    return get_scenario_stats(scenario_name).high_score
+
+
 def get_sensitivities_vs_runs_filtered(
     scenario_name: str,
     top_n_scores: int,
@@ -249,6 +253,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
             "scenario_stats": ScenarioStats(
                 date_last_played=run_data.datetime_object,
                 number_of_runs=1,
+                high_score=run_data.score,
             ),
             "time_vs_runs": SortedList(
                 [run_data],
@@ -272,6 +277,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
             scenario_stats.date_last_played,
             run_data.datetime_object,
         )
+        scenario_stats.high_score = max(scenario_stats.high_score, run_data.score)
 
         # Add to sensitivities_vs_runs
         sens_vs_runs = kovaaks_database[run_data.scenario]["sensitivities_vs_runs"]

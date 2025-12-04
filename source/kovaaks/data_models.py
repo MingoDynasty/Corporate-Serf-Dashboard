@@ -26,6 +26,7 @@ class ScenarioStats:
 
     date_last_played: datetime.datetime
     number_of_runs: int
+    high_score: float
 
 
 class Rank(BaseModel):

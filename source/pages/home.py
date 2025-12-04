@@ -49,15 +49,21 @@ dash.register_page(
 @callback(
     Output("do_update", "data", allow_duplicate=True),
     Input("interval-component", "n_intervals"),
+    State("scenario-dropdown-selection", "value"),
     prevent_initial_call=True,
 )
-def check_for_new_data(_):
+def check_for_new_data(_, selected_scenario):
     """
     Simple periodic trigger function to check for new data. If so then forward to interested functions.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
+    :param selected_scenario: name of the currently selected scenario.
     :return: True if we have data, else no_update.
     """
-    if message_queue.empty():
+    if len(message_queue) == 0:
+        return no_update
+
+    if message_queue[0].scenario_name != selected_scenario:
+        message_queue.pop()
         return no_update
     return True
 
