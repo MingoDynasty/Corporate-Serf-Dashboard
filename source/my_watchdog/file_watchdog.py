@@ -107,6 +107,7 @@ class NewFileHandler(FileSystemEventHandler):
             NewFileMessage(
                 datetime_created=datetime.datetime.now(),
                 nth_score=nth_score,
+                previous_high_score=high_score,
                 scenario_name=run_data.scenario,
                 score=run_data.score,
                 sensitivity=sensitivity_key,

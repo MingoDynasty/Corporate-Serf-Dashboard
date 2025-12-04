@@ -51,11 +51,13 @@ dash.register_page(
 
 @callback(
     Output("do_update", "data", allow_duplicate=True),
+    Output("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
-    State("scenario-dropdown-selection", "value"),
+    Input("automatically-change-scenario-switch", "checked"),
+    Input("scenario-dropdown-selection", "value"),
     prevent_initial_call=True,
 )
-def check_for_new_data(_, selected_scenario):
+def check_for_new_data(_, automatically_change_scenario, selected_scenario):
     """
     Simple periodic trigger function to check for new data. If so then forward to interested functions.
     :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
@@ -63,12 +65,15 @@ def check_for_new_data(_, selected_scenario):
     :return: True if we have data, else no_update.
     """
     if len(message_queue) == 0:
-        return no_update
+        return no_update, no_update
 
     if message_queue[0].scenario_name != selected_scenario:
-        message_queue.pop()
-        return no_update
-    return True
+        if automatically_change_scenario:
+            return True, message_queue[0].scenario_name
+        else:
+            message_queue.pop()
+            return no_update, no_update
+    return True, no_update
 
 
 @callback(
@@ -109,6 +114,7 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     Input("high-score-overlay-switch", "checked"),
     Input("score-threshold-overlay-switch", "checked"),
     Input("score-threshold-percentage", "value"),
+    Input("score-threshold-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
 )
 def generate_graph(
@@ -121,6 +127,7 @@ def generate_graph(
     high_score_overlay_switch,
     score_threshold_overlay_switch,
     score_threshold_percentage,
+    score_threshold_notification_switch,
     selected_playlist,
 ):
     """
@@ -209,21 +216,11 @@ def generate_graph(
     if high_score_overlay_switch:
         plot = add_high_score_overlay(plot, high_score)
 
+    score_threshold = high_score * score_threshold_percentage / 100
     if score_threshold_overlay_switch:
-        plot = add_score_threshold_overlay(
-            plot, score_threshold_percentage / 100 * high_score
-        )
+        plot = add_score_threshold_overlay(plot, score_threshold)
 
-    # Default notification is simply notifying that the graph updated.
-    notification = {
-        "action": "show",
-        "title": "Notification",
-        "message": "Graph updated!",
-        "color": "blue",
-        "id": "graph-updated-notification",
-        "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-    }
-
+    notifications = []
     # Display a custom notification if we detected a new Top N score.
     if do_update and len(message_queue) > 0:
         message_data = message_queue.popleft()
@@ -235,16 +232,62 @@ def generate_graph(
                 f"{message_data.sensitivity} has a new "
                 f"{ordinal(message_data.nth_score)} place score: {message_data.score:.2f}"
             )
-            notification = {
-                "action": "show",
-                "title": "Notification",
-                "message": notification_message,
-                "color": "green",
-                "id": "new-top-n-score-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
-                "autoClose": 8000,
-            }
-    return plot.to_json(), [notification]
+            notifications.append(
+                {
+                    "action": "show",
+                    "title": "Notification",
+                    "message": notification_message,
+                    "color": "green",
+                    "id": "new-top-n-score-notification",
+                    "icon": DashIconify(icon="fontisto:line-chart"),
+                    "autoClose": 8000,
+                }
+            )
+
+        if score_threshold_notification_switch:
+            # In case this is a new high score, use the previous high score for calculations
+            percentage = message_data.score / message_data.previous_high_score * 100
+            if message_data.score > score_threshold:
+                logger.debug(
+                    "Successfully passed the score threshold! Ready to move onto the next scenario."
+                )
+                notifications.append(
+                    {
+                        "action": "show",
+                        "title": "Score Threshold",
+                        "message": f"Current score percentage ({percentage:.1f}%) successfully passed the score threshold! Ready to move onto the next scenario.",
+                        "color": "green",
+                        "id": "score-threshold-notification",
+                        "icon": DashIconify(icon="material-symbols:check"),
+                        "autoClose": 8000,
+                    }
+                )
+            else:
+                logger.debug("Failed to meet the score threshold. Keep grinding...")
+                notifications.append(
+                    {
+                        "action": "show",
+                        "title": "Score Threshold",
+                        "message": f"Current score percentage ({percentage:.1f}%) failed to meet score threshold. Keep grinding...",
+                        "color": "yellow",
+                        "id": "score-threshold-notification",
+                        "icon": DashIconify(icon="material-symbols:warning-outline"),
+                        "autoClose": 8000,
+                    }
+                )
+        else:
+            # Default notification is simply notifying that the graph updated.
+            notifications.append(
+                {
+                    "action": "show",
+                    "title": "Notification",
+                    "message": "Graph updated!",
+                    "color": "blue",
+                    "id": "graph-updated-notification",
+                    "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+                }
+            )
+    return plot.to_json(), notifications
 
 
 @callback(
@@ -504,6 +547,14 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Title("Display Settings", order=4),
                                         dmc.Space(h="xs"),
                                         dmc.Switch(
+                                            id="automatically-change-scenario-switch",
+                                            labelPosition="right",
+                                            label="Automatically Change Scenario",
+                                            checked=True,
+                                            persistence=True,
+                                        ),
+                                        dmc.Space(h="xs"),
+                                        dmc.Switch(
                                             id="rank-overlay-switch",
                                             labelPosition="right",
                                             label="Rank Overlay",
@@ -538,6 +589,14 @@ def layout(**kwargs):  # noqa: ARG001
                                             variant="default",
                                             value=95,
                                             w="12em",
+                                        ),
+                                        dmc.Space(h="xs"),
+                                        dmc.Switch(
+                                            id="score-threshold-notification-switch",
+                                            labelPosition="right",
+                                            label="Score Threshold Notification",
+                                            checked=True,
+                                            persistence=True,
                                         ),
                                     ],
                                 ),

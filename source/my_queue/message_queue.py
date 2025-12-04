@@ -13,6 +13,7 @@ class NewFileMessage:
 
     datetime_created: datetime
     nth_score: int
+    previous_high_score: float
     scenario_name: str
     score: float
     sensitivity: str
