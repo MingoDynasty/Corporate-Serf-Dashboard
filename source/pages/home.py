@@ -207,8 +207,8 @@ def generate_graph(
     }
 
     # Display a custom notification if we detected a new Top N score.
-    if do_update and not message_queue.empty():
-        message_data = message_queue.get()
+    if do_update and len(message_queue) > 0:
+        message_data = message_queue.popleft()
         if (
             selected_scenario == message_data.scenario_name
             and message_data.nth_score <= top_n_scores
