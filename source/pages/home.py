@@ -26,12 +26,15 @@ from source.kovaaks.data_service import (
     get_unique_scenarios,
     is_scenario_in_database,
     load_playlist_from_code,
+    get_high_score,
 )
 from source.my_queue.message_queue import message_queue
 from source.plot.plot_service import (
     apply_light_dark_mode,
     generate_sensitivity_plot,
     generate_time_plot,
+    add_high_score_overlay,
+    add_score_threshold_overlay,
 )
 from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
@@ -103,6 +106,9 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     Input("date-picker", "value"),
     Input("x-axis-radiogroup", "value"),
     Input("rank-overlay-switch", "checked"),
+    Input("high-score-overlay-switch", "checked"),
+    Input("score-threshold-overlay-switch", "checked"),
+    Input("score-threshold-percentage", "value"),
     State("playlist-dropdown-selection", "value"),
 )
 def generate_graph(
@@ -112,6 +118,9 @@ def generate_graph(
     selected_date,
     x_axis_radiogroup,
     rank_overlay_switch,
+    high_score_overlay_switch,
+    score_threshold_overlay_switch,
+    score_threshold_percentage,
     selected_playlist,
 ):
     """
@@ -195,6 +204,15 @@ def generate_graph(
         )
     else:
         logger.error("Unsupported radio option: %s", x_axis_radiogroup)
+
+    high_score = get_high_score(selected_scenario)
+    if high_score_overlay_switch:
+        plot = add_high_score_overlay(plot, high_score)
+
+    if score_threshold_overlay_switch:
+        plot = add_score_threshold_overlay(
+            plot, score_threshold_percentage / 100 * high_score
+        )
 
     # Default notification is simply notifying that the graph updated.
     notification = {
@@ -491,6 +509,35 @@ def layout(**kwargs):  # noqa: ARG001
                                             label="Rank Overlay",
                                             checked=True,
                                             persistence=True,
+                                        ),
+                                        dmc.Space(h="xs"),
+                                        dmc.Switch(
+                                            id="high-score-overlay-switch",
+                                            labelPosition="right",
+                                            label="High Score Overlay",
+                                            checked=True,
+                                            persistence=True,
+                                        ),
+                                        dmc.Space(h="xs"),
+                                        dmc.Switch(
+                                            id="score-threshold-overlay-switch",
+                                            labelPosition="right",
+                                            label="Score Threshold Overlay",
+                                            checked=True,
+                                            persistence=True,
+                                        ),
+                                        dmc.Space(h="xs"),
+                                        dmc.NumberInput(
+                                            id="score-threshold-percentage",
+                                            label="Score Threshold Percentage",
+                                            min=1,
+                                            persistence=True,
+                                            placeholder="Score Percentage...",
+                                            radius="sm",
+                                            size="sm",
+                                            variant="default",
+                                            value=95,
+                                            w="12em",
                                         ),
                                     ],
                                 ),

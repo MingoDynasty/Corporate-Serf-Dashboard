@@ -16,6 +16,26 @@ from source.utilities.utilities import format_decimal
 logger = logging.getLogger(__name__)
 
 
+def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
+    figure.add_hline(
+        name="High Score",
+        annotation_text=f"High Score ({format_decimal(high_score):.2f})",
+        y=high_score,
+        line_dash="dash",
+    )
+    return figure
+
+
+def add_score_threshold_overlay(figure: go.Figure, score_threshold: float) -> go.Figure:
+    figure.add_hline(
+        name="Score Threshold",
+        annotation_text=f"Score Threshold ({format_decimal(score_threshold):.2f})",
+        y=score_threshold,
+        line_dash="dash",
+    )
+    return figure
+
+
 def generate_sensitivity_plot(
     scenario_data: dict[str, list[RunData]],
     scenario_name: str,
