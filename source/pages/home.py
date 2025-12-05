@@ -248,9 +248,6 @@ def generate_graph(
             # In case this is a new high score, use the previous high score for calculations
             percentage = message_data.score / message_data.previous_high_score * 100
             if message_data.score > score_threshold:
-                logger.debug(
-                    "Successfully passed the score threshold! Ready to move onto the next scenario."
-                )
                 notifications.append(
                     {
                         "action": "show",
@@ -263,7 +260,6 @@ def generate_graph(
                     }
                 )
             else:
-                logger.debug("Failed to meet the score threshold. Keep grinding...")
                 notifications.append(
                     {
                         "action": "show",
