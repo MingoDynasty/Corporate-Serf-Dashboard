@@ -31,10 +31,10 @@ class NewFileHandler(FileSystemEventHandler):
     def on_created(self, event):
         if event.is_directory:  # Check if it's a file, not a directory
             return
-        logger.debug("Detected new file: %s", event.src_path)
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
+        logger.debug("Detected new file: %s", Path(file).name)
         if not file.endswith(".csv"):
             return
 
