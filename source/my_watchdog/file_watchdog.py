@@ -49,7 +49,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug("Found new scenario: %s", run_data.scenario)
-            message_queue.put(
+            message_queue.append(
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
@@ -65,7 +65,7 @@ class NewFileHandler(FileSystemEventHandler):
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
         if sensitivity_key not in sensitivities_vs_runs:
             logger.debug("Found new sensitivity: %s", sensitivity_key)
-            message_queue.put(
+            message_queue.append(
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
