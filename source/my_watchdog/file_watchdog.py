@@ -61,6 +61,8 @@ class NewFileHandler(FileSystemEventHandler):
             load_csv_file_into_database(file)
             return
 
+        high_score = get_high_score(run_data.scenario)
+
         # Case 2: new sensitivity.
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
         if sensitivity_key not in sensitivities_vs_runs:
@@ -69,6 +71,7 @@ class NewFileHandler(FileSystemEventHandler):
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
+                    previous_high_score=high_score,
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,
@@ -90,8 +93,7 @@ class NewFileHandler(FileSystemEventHandler):
             run_data.score,
         )
 
-        high_score = get_high_score(run_data.scenario)
-        score_threshold = 0.95 * high_score
+        score_threshold = 0.95 * high_score  # TODO: isn't this supposed to come from UI ?
         pct_diff = (run_data.score / high_score - 1) * 100
         logger.debug(
             f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
