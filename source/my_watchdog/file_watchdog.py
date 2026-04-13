@@ -34,6 +34,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
+        logger.debug("")
         logger.debug("Detected new file: %s", Path(file).name)
         if not file.endswith(".csv"):
             return
@@ -53,6 +54,7 @@ class NewFileHandler(FileSystemEventHandler):
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
+                    previous_high_score=0,  # TODO: perhaps this should be None instead?
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,
@@ -62,6 +64,20 @@ class NewFileHandler(FileSystemEventHandler):
             return
 
         high_score = get_high_score(run_data.scenario)
+
+        score_threshold = (
+            0.95 * high_score
+        )  # TODO: isn't this supposed to come from UI ?
+        pct_diff = (run_data.score / high_score - 1) * 100
+        logger.debug(
+            f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
+        )
+        if run_data.score > score_threshold:
+            logger.debug(
+                "Successfully passed the score threshold! Ready to move onto the next scenario."
+            )
+        else:
+            logger.debug("Failed to meet the score threshold. Keep grinding...")
 
         # Case 2: new sensitivity.
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
@@ -92,18 +108,6 @@ class NewFileHandler(FileSystemEventHandler):
             ordinal(nth_score),
             run_data.score,
         )
-
-        score_threshold = 0.95 * high_score  # TODO: isn't this supposed to come from UI ?
-        pct_diff = (run_data.score / high_score - 1) * 100
-        logger.debug(
-            f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
-        )
-        if run_data.score > score_threshold:
-            logger.debug(
-                "Successfully passed the score threshold! Ready to move onto the next scenario."
-            )
-        else:
-            logger.debug("Failed to meet the score threshold. Keep grinding...")
 
         message_queue.append(
             NewFileMessage(
