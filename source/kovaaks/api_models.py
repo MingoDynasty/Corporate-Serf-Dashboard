@@ -110,3 +110,19 @@ class LeaderboardAPIResponse(BaseModel):
     max: int
     total: int
     data: list[RankingPlayer]
+
+
+class SearchScenarioAPIResponse(BaseModel):
+    page: int
+    max: int
+    total: int
+    data: list[SearchedScenario]
+
+
+class SearchedScenario(BaseModel):
+    rank: int
+    leaderboardId: int
+    scenarioName: str
+    # scenario: Scenario
+    # counts: Counts
+    # topScore: TopScore

@@ -9,13 +9,18 @@ from pathlib import Path
 
 import requests
 
-from source.kovaaks.api_models import LeaderboardAPIResponse, PlaylistAPIResponse
+from source.kovaaks.api_models import (
+    LeaderboardAPIResponse,
+    PlaylistAPIResponse,
+    SearchScenarioAPIResponse,
+)
 
 BASE_URL = "https://kovaaks.com/webapp-backend"
 ENDPOINTS = {
     "benchmarks": BASE_URL + "/benchmarks/player-progress-rank-benchmark",
     "leaderboard": BASE_URL + "/leaderboard/scores/global",
     "playlist": BASE_URL + "/playlist/playlists",
+    "search_scenario": BASE_URL + "/scenario/popular",
 }
 TIMEOUT = 10
 logger = logging.getLogger(__name__)
@@ -80,6 +85,26 @@ def get_leaderboard_scores(
         json.dump(response.json(), file, indent=2)
 
     return LeaderboardAPIResponse.model_validate(response.json())
+
+
+def search_scenario(scenario_name: str, use_cache: bool = False):
+    cache_file = Path(CACHE_DIR, "search_scenario", f"{scenario_name}.json")
+    if use_cache and os.path.exists(cache_file):
+        with open(cache_file) as file:
+            data = json.load(file)
+            return SearchScenarioAPIResponse.model_validate(data)
+
+    params = {"page": 0, "max": 1, "scenarioNameSearch": scenario_name}
+    response = requests.get(
+        ENDPOINTS["search_scenario"], params=params, timeout=TIMEOUT
+    )
+    response.raise_for_status()
+
+    # save to cache
+    with open(cache_file, "w") as file:
+        json.dump(response.json(), file, indent=2)
+
+    return SearchScenarioAPIResponse.model_validate(response.json())
 
 
 make_cache()
