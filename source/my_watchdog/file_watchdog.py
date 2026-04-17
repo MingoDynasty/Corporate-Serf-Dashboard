@@ -50,6 +50,10 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug("Found new scenario: %s", run_data.scenario)
+            new_score_threshold = 0.95 * run_data.score  # TODO: come from UI ?
+            logger.debug(
+                f"Current score ({run_data.score:.2f}) sets the score threshold at ({new_score_threshold:.2f})"
+            )
             message_queue.append(
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
