@@ -34,7 +34,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
-        logger.debug("")
+        print()
         logger.debug("Detected new file: %s", Path(file).name)
         if not file.endswith(".csv"):
             return
