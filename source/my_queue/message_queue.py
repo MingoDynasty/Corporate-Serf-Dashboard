@@ -5,6 +5,7 @@ Shared message my_queue between UI and File Watchdog components.
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -13,7 +14,7 @@ class NewFileMessage:
 
     datetime_created: datetime
     nth_score: int
-    previous_high_score: float
+    previous_high_score: Optional[float]
     scenario_name: str
     score: float
     sensitivity: str
