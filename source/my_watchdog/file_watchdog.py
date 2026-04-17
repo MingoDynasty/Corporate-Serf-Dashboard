@@ -74,7 +74,7 @@ class NewFileHandler(FileSystemEventHandler):
         if run_data.score > high_score:
             new_score_threshold = pct_threshold * run_data.score
             logger.debug(
-                f"Score threshold increased from {score_threshold:.2f} to {new_score_threshold:.2f}"
+                f"Score threshold increased from ({score_threshold:.2f}) to ({new_score_threshold:.2f})"
             )
         if run_data.score > score_threshold:
             logger.debug(
