@@ -65,13 +65,17 @@ class NewFileHandler(FileSystemEventHandler):
 
         high_score = get_high_score(run_data.scenario)
 
-        score_threshold = (
-            0.95 * high_score
-        )  # TODO: isn't this supposed to come from UI ?
+        pct_threshold = 0.95  # TODO: isn't this supposed to come from UI ?
+        score_threshold = pct_threshold * high_score
         pct_diff = (run_data.score / high_score - 1) * 100
         logger.debug(
-            f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
+            f"Current score ({run_data.score:g}) is {pct_diff:+.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
         )
+        if run_data.score > high_score:
+            new_score_threshold = pct_threshold * run_data.score
+            logger.debug(
+                f"Score threshold increased from {score_threshold:.2f} to {new_score_threshold:.2f}"
+            )
         if run_data.score > score_threshold:
             logger.debug(
                 "Successfully passed the score threshold! Ready to move onto the next scenario."
