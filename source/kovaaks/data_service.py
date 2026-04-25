@@ -23,7 +23,12 @@ from source.kovaaks.data_models import (
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_DIRECTORY = "resources/playlists"
-SUB_CSV_HEADER = "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation"  # pylint: disable=line-too-long
+POSSIBLE_SUB_CSV_HEADERS = [
+    # Latest CSV header
+    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # pylint: disable=line-too-long
+    # Old CSV header
+    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale",
+]
 logger = logging.getLogger(__name__)
 
 # TODO: maybe at some point convert this to in-memory SQLite
@@ -333,7 +338,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
         for line in lines_list:
             line = line.strip()
             # If we encounter this specific line, then the next line is a specific CSV line
-            if line == SUB_CSV_HEADER:
+            if line in POSSIBLE_SUB_CSV_HEADERS:
                 sub_csv_line = True
                 continue
             if sub_csv_line:
