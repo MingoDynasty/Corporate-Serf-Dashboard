@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from enum import StrEnum
 
 import requests
 
@@ -15,29 +16,34 @@ from source.kovaaks.api_models import (
     SearchScenarioAPIResponse,
 )
 
-BASE_URL = "https://kovaaks.com/webapp-backend"
-ENDPOINTS = {
-    "benchmarks": BASE_URL + "/benchmarks/player-progress-rank-benchmark",
-    "leaderboard": BASE_URL + "/leaderboard/scores/global",
-    "playlist": BASE_URL + "/playlist/playlists",
-    "search_scenario": BASE_URL + "/scenario/popular",
-}
 TIMEOUT = 10
 logger = logging.getLogger(__name__)
 
 CACHE_DIR = "cache"
 
 
+class Endpoints(StrEnum):
+    def __new__(cls, path: str):
+        base = "https://kovaaks.com/webapp-backend"
+        obj = str.__new__(cls, base + path)  # type: ignore
+        obj._value_ = base + path
+        return obj
+
+    BENCHMARKS = "/benchmarks/player-progress-rank-benchmark"
+    LEADERBOARD = "/leaderboard/scores/global"
+    PLAYLIST = "/playlist/playlists"
+
+
 def make_cache():
-    for endpoint in ENDPOINTS:
-        os.makedirs(Path(CACHE_DIR, endpoint), exist_ok=True)
+    for endpoint in Endpoints:
+        os.makedirs(Path(CACHE_DIR, endpoint.name.lower()), exist_ok=True)
     return
 
 
 def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 
-    response = requests.get(ENDPOINTS["playlist"], params=params, timeout=TIMEOUT)
+    response = requests.get(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
     response.raise_for_status()
     return PlaylistAPIResponse.model_validate(response.json())
 
@@ -54,7 +60,7 @@ def get_benchmark_json(
         "benchmarkId": benchmark_id,
         "steamId": steam_id or "00000000000000000",
     }
-    response = requests.get(ENDPOINTS["benchmarks"], params=params, timeout=TIMEOUT)
+    response = requests.get(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
     response.raise_for_status()
 
     print(type(response))
@@ -77,7 +83,7 @@ def get_leaderboard_scores(
             return LeaderboardAPIResponse.model_validate(data)
 
     params = {"page": 0, "max": 100, "leaderboardId": leaderboard_id}
-    response = requests.get(ENDPOINTS["leaderboard"], params=params, timeout=TIMEOUT)
+    response = requests.get(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
     response.raise_for_status()
 
     # save to cache
