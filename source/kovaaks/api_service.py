@@ -32,6 +32,7 @@ class Endpoints(StrEnum):
     BENCHMARKS = "/benchmarks/player-progress-rank-benchmark"
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
+    SEARCH_SCENARIO = "/scenario/popular"
 
 
 def make_cache():
@@ -101,9 +102,7 @@ def search_scenario(scenario_name: str, use_cache: bool = False):
             return SearchScenarioAPIResponse.model_validate(data)
 
     params = {"page": 0, "max": 1, "scenarioNameSearch": scenario_name}
-    response = requests.get(
-        ENDPOINTS["search_scenario"], params=params, timeout=TIMEOUT
-    )
+    response = requests.get(Endpoints.SEARCH_SCENARIO, params=params, timeout=TIMEOUT)
     response.raise_for_status()
 
     # save to cache
