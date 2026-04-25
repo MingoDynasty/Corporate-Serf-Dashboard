@@ -5,6 +5,7 @@
     "abbreviation": "VT",
     "color": "#02A2DA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU",
+    "dateAdded": "2025-07-09",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -75,6 +76,7 @@
     "abbreviation": "VT",
     "color": "#02A2DA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1yHj87rQNW2WsuH24UoKZajNwNpI6CVyUjR3AwBMbnnY",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Intermediate",
@@ -209,6 +211,7 @@
     "abbreviation": "VT",
     "color": "#02A2DA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1qUzF2KHcfs_FgsaDFRfGsLgHhoC1Md5bzMOUbsYzSjg",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Novice",
@@ -412,6 +415,79 @@
             ]
           }
         ]
+      },
+      {
+        "difficultyName": "Elite (Unofficial)",
+        "kovaaksBenchmarkId": 1977,
+        "sharecode": "KovaaKsCrackingSalmonCallout",
+        "rankColors": {
+          "Grandmaster": "#FFD700",
+          "Nova": "#7900FF",
+          "Astra": "#FF2262",
+          "Celestial": "#24DDD8",
+          "Ascended": "#FFABBA",
+          "Eclipse": "#351C75"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 2,
+                "color": "#E06666"
+              },
+              {
+                "subcategoryName": "Strafe",
+                "scenarioCount": 2,
+                "color": "#FC74FC"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#1155CC",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 2,
+                "color": "#45818E"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 2,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "Strafe",
+                "scenarioCount": 2,
+                "color": "#FC74FC"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#351C75",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 2,
+                "color": "#A64D79"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 2,
+                "color": "#674EA7"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -421,6 +497,7 @@
     "abbreviation": "VT",
     "color": "#02A2DA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1RjVJi9AdWLXIOkKR8z6mhmRo_SNokJPxKtLXHWk12Z4",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Novice",
@@ -731,11 +808,99 @@
     ]
   },
   {
+    "benchmarkName": "Voltaic S5.5",
+    "rankCalculation": "vt-energy",
+    "abbreviation": "VT",
+    "color": "#02A2DA",
+    "spreadsheetURL": "",
+    "hidden": true,
+    "dateAdded": "2026-03-03",
+    "difficulties": [
+      {
+        "difficultyName": "Advanced",
+        "kovaaksBenchmarkId": 2070,
+        "sharecode": "KovaaKsFinishingBrickredClip",
+        "rankColors": {
+          "Grandmaster": "#FFD700",
+          "Nova": "#7900FF",
+          "Astra": "#FF2262",
+          "Celestial": "#24DDD8"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 2,
+                "color": "#E06666"
+              },
+              {
+                "subcategoryName": "Linear",
+                "scenarioCount": 2,
+                "color": "#FF8A45"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#1155CC",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 2,
+                "color": "#45818E"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 2,
+                "color": "#42A5FF"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#351C75",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 4,
+                "color": "#A64D79"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 2,
+                "color": "#674EA7"
+              },
+              {
+                "subcategoryName": "Stability",
+                "scenarioCount": 2,
+                "color": "#B4A3FF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "benchmarkName": "Revosect S1",
     "rankCalculation": "basic",
     "abbreviation": "rA",
     "color": "#EF4444",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1MQujX14dooQWcHu4mvvP5fetHVIr7Apg1taR96hSho0",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -871,6 +1036,7 @@
     "abbreviation": "rA",
     "color": "#EF4444",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1ST4_MKPUe7p0x1mAqzdEqAFKNqyB9CAbD450IK-hJIM",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -1026,6 +1192,7 @@
     "abbreviation": "A+",
     "color": "#E1E0E1",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1z-XwvdEXZ7rip2ZJ9aVff0-YqrnX6Yluf89f9LBbroc",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -1162,6 +1329,7 @@
     "abbreviation": "CB",
     "color": "#10B981",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1X43zejitcxnCwN6DJmInrouG4m-eNup8sBqCOdk93eg",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -1297,11 +1465,12 @@
     "abbreviation": "cA",
     "color": "#ABD5FC",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/u/0/d/18YMQQZs7qy2xKxCEwHkTG4DeQTuEr0Z05cmAIvuuieE",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "All",
         "kovaaksBenchmarkId": 535,
-        "sharecode": "KovaaKsPeekingVermilionEntryfrag",
+        "sharecode": "KovaaKsCrouchingInvincibleFalldamage",
         "rankColors": {
           "Glacier": "#E1FCFF",
           "Rivulet": "#D9E6FF",
@@ -1353,6 +1522,7 @@
     "abbreviation": "TSK",
     "color": "#90B17C",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1QlmPnGcQ9joO49Fx3wVmEGyYIWzEGlPgDdpfAulAu-E",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Beginner",
@@ -1733,9 +1903,10 @@
   {
     "benchmarkName": "thundah Precise Tracking",
     "rankCalculation": "tpt",
-    "abbreviation": "t",
+    "abbreviation": "TPT",
     "color": "#F2F2B2",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1Ya61uCCy5YcRqmCQvCpr3-qbDubVvo_NX9kfIre6d4A",
+    "dateAdded": "2025-05-30",
     "difficulties": [
       {
         "difficultyName": "Season 1",
@@ -1810,6 +1981,7 @@
     "abbreviation": "sA",
     "color": "#FF3968",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1u3aMTs-jM1zvXdsjtXh5hWSGnANJG7nUWCidQyvWQw4",
+    "dateAdded": "2025-06-11",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -1963,6 +2135,7 @@
     "abbreviation": "A",
     "color": "#A2D4DE",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1H8WPvDyOGtSb9f-lNocNxULRDhptG5PlE2mcpyxnaSY",
+    "dateAdded": "2025-07-16",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -2009,6 +2182,7 @@
     "abbreviation": "A",
     "color": "#A2D4DE",
     "spreadsheetURL": "https://t.co/3h621dLfcM",
+    "dateAdded": "2025-07-16",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -2060,6 +2234,7 @@
     "abbreviation": "AS",
     "color": "#14B8A6",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1V3UE_NltXh8YL0gYueJ6jarVZy8lxH7xcYT9K_9Z-Jo",
+    "dateAdded": "2025-06-11",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -2130,12 +2305,13 @@
     "rankCalculation": "aplus-alt",
     "abbreviation": "A+",
     "color": "#E1E0E1",
-    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1D__fiAekJWnENvRyWNGJsCX-19kj7xQrzy5RZB9yv6k",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1HGXrHC-3aMi0F0bmfN7rZE6j2oLGJsvGn3r6uKDrp70",
+    "dateAdded": "2025-07-05",
     "difficulties": [
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 582,
-        "sharecode": "KovaaKsBaitingEggplantLamp",
+        "sharecode": "KovaaKsTrackingPlumAfk",
         "rankColors": {
           "Bronze": "#A77138",
           "Silver": "#C2D2D2",
@@ -2217,7 +2393,7 @@
       {
         "difficultyName": "Hard",
         "kovaaksBenchmarkId": 583,
-        "sharecode": "KovaaKsBackflippingEasyStatus",
+        "sharecode": "KovaaKsTrollingPlumPlunder",
         "rankColors": {
           "Prophet": "#9E0059",
           "Saint": "#5A189A",
@@ -2302,12 +2478,13 @@
     "rankCalculation": "aplus-alt",
     "abbreviation": "A+",
     "color": "#E1E0E1",
-    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1qIfjnm0N2ETL79r1QhkxKP0nvzx2YlM5EWkVgOtDZ2I",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1-9-RQ5-a78HF49eMsYcf7PjBkpbgIahpBwTLYSu9RK4/edit?gid=373225919#gid=373225919",
+    "dateAdded": "2025-07-05",
     "difficulties": [
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 584,
-        "sharecode": "KovaaKsUltingJitteryInventory",
+        "sharecode": "KovaaKsTimewarpingPickedClutch",
         "rankColors": {
           "Bronze": "#A77138",
           "Silver": "#C2D2D2",
@@ -2389,7 +2566,7 @@
       {
         "difficultyName": "Hard",
         "kovaaksBenchmarkId": 585,
-        "sharecode": "KovaaKsVibratingJumboDoghouse",
+        "sharecode": "KovaaKsTaggingPeriwinkleRando",
         "rankColors": {
           "Prophet": "#9E0059",
           "Saint": "#5A189A",
@@ -2474,7 +2651,8 @@
     "rankCalculation": "aplus-alt",
     "abbreviation": "A+",
     "color": "#E1E0E1",
-    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1PDi9tnvP2hJL0KbdFNlZMFK226GxscRpQUJ_u8c8E5E",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1czvuvgks1SoMNUH_aevVPm5lOgqCQHa_UVR8izpUxfg/edit?gid=373225919#gid=373225919",
+    "dateAdded": "2025-07-09",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -2646,12 +2824,13 @@
     "rankCalculation": "aplus-alt",
     "abbreviation": "A+",
     "color": "#E1E0E1",
-    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1OLGbhKGtcH1VTQ7v0YF29CxduPm6N3bWET8k-DdOn5I",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1kxI184tdhT55k98gsfCHy_CRBznu84aaJP8PAJg6-dU/edit?gid=0#gid=0",
+    "dateAdded": "2025-07-09",
     "difficulties": [
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 596,
-        "sharecode": "KovaaKsFinishingSalmonPerk",
+        "sharecode": "KovaaKsUltingPrismaticFov",
         "rankColors": {
           "Bronze": "#A77138",
           "Silver": "#C2D2D2",
@@ -2733,7 +2912,7 @@
       {
         "difficultyName": "Hard",
         "kovaaksBenchmarkId": 597,
-        "sharecode": "KovaaKsFlankingSaltyFlank",
+        "sharecode": "KovaaKsVibratingPulledChat",
         "rankColors": {
           "Prophet": "#9E0059",
           "Saint": "#5A189A",
@@ -2818,12 +2997,13 @@
     "rankCalculation": "aplus-alt",
     "abbreviation": "A+",
     "color": "#E1E0E1",
-    "spreadsheetURL": "",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/15VloIkv-V-B3oq4JTbSnIKwsPMwccx2sQEwTohqlprw/edit?gid=0#gid=0",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "Hard",
         "kovaaksBenchmarkId": 730,
-        "sharecode": "KovaaKsPickingSaltyRando",
+        "sharecode": "KovaaKsWinningPulledWindow",
         "rankColors": {
           "Prophet": "#9E0059",
           "Saint": "#5A189A",
@@ -2909,6 +3089,7 @@
     "abbreviation": "A+",
     "color": "#E1E0E1",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1rvrijNj9JY4WHhrWrojtk_Q2hvsFzO2-laUsPHxOMSs/edit?gid=0#gid=0",
+    "dateAdded": "2025-10-10",
     "difficulties": [
       {
         "difficultyName": "Hard",
@@ -2999,6 +3180,7 @@
     "abbreviation": "w",
     "color": "#8BA9E4",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1XhuTL78YAP4KIR7LfE6w66efKIvICGGmET6wU8zg5fE",
+    "dateAdded": "2025-07-05",
     "difficulties": [
       {
         "difficultyName": "Novice",
@@ -3142,6 +3324,7 @@
     "abbreviation": "V",
     "color": "#828DC7",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1bFAlt6g_Gm8P9RBkcAoObpbIGFwVS5gXIdIK9B_YyZE",
+    "dateAdded": "2025-07-07",
     "difficulties": [
       {
         "difficultyName": "Easier",
@@ -3477,11 +3660,94 @@
     ]
   },
   {
+    "benchmarkName": "negative Aim",
+    "rankCalculation": "basic",
+    "abbreviation": "nA",
+    "color": "#c384c8",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-04-11",
+    "difficulties": [
+      {
+        "difficultyName": "negative benchmarks",
+        "kovaaksBenchmarkId": 2252,
+        "sharecode": "KovaaKsSwitchingMehDoor",
+        "rankColors": {
+          "Siamese": "#B2CBEA",
+          "Persian": "#4988ca",
+          "Sphynx": "#BAF6FC",
+          "Maine Coon": "#6B94DF",
+          "Abyssinian": "#5558AA",
+          "Savannah": "#6E3F98",
+          "Ragdoll": "#C080E4",
+          "Bengal": "#ecbcf5"
+        },
+        "categories": [
+          {
+            "categoryName": "Smooth",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 2,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "Control Tracking",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 8,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "Reactive Tracking",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 4,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "Flick Tech",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "Flick",
+                "scenarioCount": 7,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "Clicking",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "Clicking",
+                "scenarioCount": 5,
+                "color": "#404074"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "benchmarkName": "PureG S2",
     "rankCalculation": "basic",
     "abbreviation": "PG",
     "color": "#EB1B3D",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU",
+    "dateAdded": "2025-07-09",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -3567,6 +3833,7 @@
     "abbreviation": "PG",
     "color": "#EB1B3D",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU",
+    "dateAdded": "2025-07-09",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -3641,8 +3908,9 @@
     "benchmarkName": "MIRA S1",
     "rankCalculation": "mira",
     "abbreviation": "MIR",
-    "color": "#940104",
+    "color": "#C13F3E",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1t_cR_2k4_7ZFqjqGceJgvgdwMSqAtc5dLq4try7EBiA",
+    "dateAdded": "2025-11-17",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -3771,12 +4039,49 @@
     ]
   },
   {
-    "benchmarkName": "xyz Smoothness S2",
+    "benchmarkName": "xyz Smoothness S3",
     "rankCalculation": "xyz",
     "abbreviation": "xyz",
     "color": "#A2A9AA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1mBWoSdJrGTroeAdGyXzz0PyHJjF_yt8IJEo5bCubL30",
+    "dateAdded": "2025-11-02",
     "difficulties": [
+      {
+        "difficultyName": "Newcomer",
+        "kovaaksBenchmarkId": 1908,
+        "sharecode": "KovaaKsRocketingCleared1x1",
+        "rankColors": {
+          "Level 1": "#F3F3F3",
+          "Level 2": "#E3E3E3",
+          "Level 3": "#D2D2D2",
+          "Level 4": "#C2C2C2",
+          "Level 5": "#B2B2B2",
+          "Bonus": "#999999"
+        },
+        "categories": [
+          {
+            "categoryName": "Smoothness",
+            "color": "#666666",
+            "subcategories": [
+              {
+                "subcategoryName": "Vertical",
+                "scenarioCount": 4,
+                "color": "#E6E6E6"
+              },
+              {
+                "subcategoryName": "Horizontal",
+                "scenarioCount": 4,
+                "color": "#C6C6C6"
+              },
+              {
+                "subcategoryName": "XYZ",
+                "scenarioCount": 4,
+                "color": "#A6A6A6"
+              }
+            ]
+          }
+        ]
+      },
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 603,
@@ -3856,16 +4161,17 @@
     "abbreviation": "MH",
     "color": "#C566B6",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1QfpGtToGe5AaqekHeUhoxcadNlg7hlaHzyoMTR40PFk/edit?gid=727474704#gid=727474704",
+    "dateAdded": "2025-07-25",
     "difficulties": [
       {
         "difficultyName": "Easy",
         "kovaaksBenchmarkId": 644,
-        "sharecode": "KovaaKsRoamingLongCashdrop",
+        "sharecode": "KovaaKsZoningTaggedBfg",
         "rankColors": {
-          "Copper": "#E68346",
-          "Bronze": "#CE8946",
-          "Iron": "#D4D7D9",
-          "Silver": "#C0C0C0"
+          "Copper": "#E56352",
+          "Bronze": "#D99652",
+          "Iron": "#5B5B5B",
+          "Silver": "#C0D1D4"
         },
         "categories": [
           {
@@ -3892,13 +4198,13 @@
         ]
       },
       {
-        "difficultyName": "Normal",
+        "difficultyName": "Medium",
         "kovaaksBenchmarkId": 645,
-        "sharecode": "KovaaKsRocketingLongUfo",
+        "sharecode": "KovaaKsAcingTaggedReset",
         "rankColors": {
-          "Gold": "#D4AF37",
-          "Platinum": "#8DD0D0",
-          "Diamond": "#B9F2FF",
+          "Gold": "#EFBF04",
+          "Platinum": "#5990B3",
+          "Diamond": "#00E7EB",
           "Emerald": "#50C878"
         },
         "categories": [
@@ -3928,12 +4234,13 @@
       {
         "difficultyName": "Hard",
         "kovaaksBenchmarkId": 646,
-        "sharecode": "KovaaKsScreamingMagentaMonster",
+        "sharecode": "KovaaKsAdsingTanHalfbuy",
         "rankColors": {
           "Ruby": "#E0115F",
           "Sapphire": "#0F52BA",
           "Amethyst": "#9966CC",
-          "Obsidian": "#4D004D"
+          "Obsidian": "#4D004D",
+          "Zenith": "#47B7BE"
         },
         "categories": [
           {
@@ -3962,11 +4269,137 @@
     ]
   },
   {
+    "benchmarkName": "m0narcS & hizku Reactive Tracking",
+    "rankCalculation": "generic-energy-uncapped",
+    "abbreviation": "MH",
+    "color": "#C566B6",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1yMUbGLOwbwhsfwtXjbDQoDOQ_NFpcI-REu-kfCZsbRI/edit?usp=sharing",
+    "dateAdded": "2026-03-17",
+    "difficulties": [
+      {
+        "difficultyName": "Easier",
+        "kovaaksBenchmarkId": 2108,
+        "sharecode": "KovaaKsRaidingInvincibleXur",
+        "rankColors": {
+          "Copper": "#E56352",
+          "Bronze": "#D99652",
+          "Iron": "#5B5B5B",
+          "Silver": "#C0D1D4",
+          "Gold": "#EFBF04",
+          "Platinum": "#5990B3",
+          "Diamond": "#00E7EB"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#A20053",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#AE3774"
+              },
+              {
+                "subcategoryName": "Traditional",
+                "scenarioCount": 3,
+                "color": "#972F65"
+              },
+              {
+                "subcategoryName": "Raw",
+                "scenarioCount": 3,
+                "color": "#AE3774"
+              }
+            ]
+          },
+          {
+            "categoryName": "Air",
+            "color": "#6300A6",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#7C19BF"
+              },
+              {
+                "subcategoryName": "Traditional",
+                "scenarioCount": 3,
+                "color": "#6A15A4"
+              },
+              {
+                "subcategoryName": "Raw",
+                "scenarioCount": 3,
+                "color": "#7C19BF"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Main",
+        "kovaaksBenchmarkId": 2109,
+        "sharecode": "KovaaKsReloadingJebaitedOfftank",
+        "rankColors": {
+          "Emerald": "#50C878",
+          "Ruby": "#E0115F",
+          "Sapphire": "#0F52BA",
+          "Amethyst": "#9966CC",
+          "Obsidian": "#4D004D",
+          "Zenith": "#47B7BE"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#A20053",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#AE3774"
+              },
+              {
+                "subcategoryName": "Traditional",
+                "scenarioCount": 3,
+                "color": "#972F65"
+              },
+              {
+                "subcategoryName": "Raw",
+                "scenarioCount": 3,
+                "color": "#AE3774"
+              }
+            ]
+          },
+          {
+            "categoryName": "Air",
+            "color": "#6300A6",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#7C19BF"
+              },
+              {
+                "subcategoryName": "Traditional",
+                "scenarioCount": 3,
+                "color": "#6A15A4"
+              },
+              {
+                "subcategoryName": "Raw",
+                "scenarioCount": 3,
+                "color": "#7C19BF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "benchmarkName": "xyz Comps",
     "rankCalculation": "basic",
     "abbreviation": "xyz",
     "color": "#A2A9AA",
     "spreadsheetURL": "https://tinyurl.com/XYZClickingComp",
+    "dateAdded": "2025-08-10",
     "difficulties": [
       {
         "difficultyName": "#1 Clicking",
@@ -4048,9 +4481,71 @@
                 "color": "#E6E6E6"
               },
               {
-                "subcategoryName": "Track",
-                "scenarioCount": 1,
+                "subcategoryName": "Elusive",
+                "scenarioCount": 3,
                 "color": "#D6D6D6"
+              },
+              {
+                "subcategoryName": "Track",
+                "scenarioCount": 2,
+                "color": "#C6C6C6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "#4 Revamp",
+        "kovaaksBenchmarkId": 752,
+        "sharecode": "KovaaKsHipfiringApricotLostsector",
+        "rankColors": {
+          "World Record": "#65F0D8"
+        },
+        "categories": [
+          {
+            "categoryName": "Revamp",
+            "color": "#666666",
+            "subcategories": [
+              {
+                "subcategoryName": "Click",
+                "scenarioCount": 1,
+                "color": "#E6E6E6"
+              },
+              {
+                "subcategoryName": "Track",
+                "scenarioCount": 5,
+                "color": "#D6D6D6"
+              },
+              {
+                "subcategoryName": "Switch",
+                "scenarioCount": 2,
+                "color": "#C6C6C6"
+              },
+              {
+                "subcategoryName": "+",
+                "scenarioCount": 1,
+                "color": "#C6C6C6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "#5 Ground",
+        "kovaaksBenchmarkId": 924,
+        "sharecode": "KovaaKsAscendingPulledDodge",
+        "rankColors": {
+          "World Record": "#65F0D8"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#666666",
+            "subcategories": [
+              {
+                "subcategoryName": "Tracking",
+                "scenarioCount": 6,
+                "color": "#E6E6E6"
               }
             ]
           }
@@ -4064,6 +4559,7 @@
     "abbreviation": "TNT",
     "color": "#ea3e46",
     "spreadsheetURL": "https://kovaaks.com/kovaaks/benchmark-tracker",
+    "dateAdded": "2025-08-23",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -4286,6 +4782,7 @@
     "abbreviation": "R&G",
     "color": "#F1DB1A",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1_aNlav6lZpbg_T-oYg2SaBL83mFS6fcZjyRi6Ropygs",
+    "dateAdded": "2025-08-11",
     "difficulties": [
       {
         "difficultyName": "Normal",
@@ -4407,6 +4904,7 @@
     "abbreviation": "e",
     "color": "#D3E3FD",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1KxW46nYH3pVZoCK-dtWHISbYC41X6O_o8h5KnSFICys/edit?gid=1512712393#gid=1512712393",
+    "dateAdded": "2025-08-17",
     "difficulties": [
       {
         "difficultyName": "Beginner",
@@ -4587,6 +5085,7 @@
     "abbreviation": "e",
     "color": "#D3E3FD",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1IXyjASZHs8yaVgS_os0wMLuvHIdZ2L8wrah_ShjXQ7w/edit?gid=0#gid=0",
+    "dateAdded": "2025-08-17",
     "difficulties": [
       {
         "difficultyName": "Normal",
@@ -4674,6 +5173,7 @@
     "abbreviation": "ATB",
     "color": "#1E90FF",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1KXrXJpCl8xnoa3JuFcthE306Q9R9MOAJWhXj_xXzLOQ/edit?gid=788802502#gid=788802502",
+    "dateAdded": "2025-08-19",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -4802,6 +5302,7 @@
     "abbreviation": "M",
     "color": "#24DDD8",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1VghaJEuior07gMWdrOuClJe1bLLiUrES8I0EXQHsX5E/edit?gid=0#gid=0",
+    "dateAdded": "2025-08-23",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -4854,6 +5355,7 @@
     "abbreviation": "AOI",
     "color": "#EAD1DC",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1O_QCjzY5wZYqNIUtY49Ka7cQTJJ9_TltmTqRcOkOOGc/edit?gid=0#gid=0",
+    "dateAdded": "2025-08-25",
     "difficulties": [
       {
         "difficultyName": "S1",
@@ -4968,6 +5470,7 @@
     "abbreviation": "HEW",
     "color": "#434343",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1eBcoW2pOSWSw3GR9MJky6djd3Ziv1fZuPMQRqtnvLmg",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -5006,6 +5509,7 @@
     "abbreviation": "m",
     "color": "#68D8D6",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1eeqbyKWL-kKBTpP343WHekcOi1LL9mnk9wIgnsKC97Q/edit?gid=727474704#gid=727474704",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "Genesis",
@@ -5246,6 +5750,7 @@
     "abbreviation": "ATF",
     "color": "#434343",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1svrLb0RP3-N8D6fTqwhrnZg6DrB1QaPUoQO4PbKM8Iw/edit?gid=1819721167#gid=1819721167",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -5333,6 +5838,7 @@
     "abbreviation": "Ssb",
     "color": "#1E90FF",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1wk82oO5wSNhaY-6LZncODfHhwdGJDqrldFYqsr-g8Zc/edit?gid=1913649934#gid=1913649934",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "Normal",
@@ -5420,6 +5926,7 @@
     "abbreviation": "VR",
     "color": "#1E90FF",
     "spreadsheetURL": "",
+    "dateAdded": "2025-09-14",
     "difficulties": [
       {
         "difficultyName": "Normal",
@@ -5464,10 +5971,11 @@
   },
   {
     "benchmarkName": "Dark & Rafal SpeedTS",
-    "rankCalculation": "dark-rafal",
+    "rankCalculation": "generic-energy-alt",
     "abbreviation": "D&R",
     "color": "#674EA7",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1nTPhEmNRql6kjDXASk-MCFScOlqZkG1RcgHho50Sdf0/edit?gid=719155858#gid=719155858",
+    "dateAdded": "2025-10-10",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -5503,6 +6011,7 @@
     "abbreviation": "GM",
     "color": "#000000",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1Ky2ZBgavCflp47yqJZQuey1BbUbu4Dic-Y2GPKHPO54/edit?gid=1999399850#gid=1999399850",
+    "dateAdded": "2025-10-10",
     "difficulties": [
       {
         "difficultyName": "2023",
@@ -5549,6 +6058,7 @@
     "abbreviation": "xyz",
     "color": "#A2A9AA",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/16bthmIDupD0VJxFfF7kIM3bgIs1sOjqYF-MjwHwBQZc",
+    "dateAdded": "2025-09-24",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -5724,10 +6234,11 @@
     "abbreviation": "rA",
     "color": "#EF4444",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1aHN2bdUehBtmx5COqsMT1q8SN_JImQYUfsSN73uQyEE/edit?usp=sharing",
+    "dateAdded": "2025-10-10",
     "difficulties": [
       {
         "difficultyName": "Entry",
-        "kovaaksBenchmarkId": 825,
+        "kovaaksBenchmarkId": 823,
         "sharecode": "KovaaKsAfkingSalmonNuns",
         "rankColors": {
           "Bronze": "#E69138",
@@ -5918,6 +6429,7 @@
     "abbreviation": "cAt",
     "color": "#FFE1F0",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/16n-JQwZ7qz1fKG-qU--H_15o_HTwWtDvyEnNaeK8NCw/edit?gid=691629364#gid=691629364",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Easy",
@@ -6110,6 +6622,7 @@
     "abbreviation": "VT",
     "color": "#02A2DA",
     "spreadsheetURL": "",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "All",
@@ -6178,6 +6691,7 @@
     "abbreviation": "roa",
     "color": "#f8c0ed",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1SQhvO7tFJrliCSFK7LtMiNrl9nKBeAezFjxmPqBfZkQ/",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "roa Ultimate",
@@ -6257,6 +6771,7 @@
     "abbreviation": "WH",
     "color": "#D9D9D9",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1XKaBVvt_zoSnFsyO5IDHa4jDLSOWh6g1-8xLhWEFuRY/edit?gid=1278376541#gid=1278376541",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Wallhack",
@@ -6317,6 +6832,7 @@
     "abbreviation": "DM",
     "color": "#CC0000",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1CXpRFmKdAPqvzvsUXjMdMY9uRmesu-3bsNEu-Oismzg/edit?gid=1947681947#gid=1947681947",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Level 1",
@@ -6604,6 +7120,7 @@
     "abbreviation": "DM",
     "color": "#CC0000",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU/edit?gid=1302520006#gid=1302520006",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Level 1",
@@ -6949,6 +7466,7 @@
     "abbreviation": "DM",
     "color": "#CC0000",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU/edit?gid=1199164241#gid=1199164241",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Level 1",
@@ -7289,11 +7807,638 @@
     ]
   },
   {
+    "benchmarkName": "Deadman's Static Benchmarks S3",
+    "rankCalculation": "dm-s3",
+    "abbreviation": "DM",
+    "color": "#6B0000",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1oxP2QuV0pV1hBDvWzXTLwln29sVBTAQztiQNvDd3vkE",
+    "dateAdded": "2026-03-18",
+    "difficulties": [
+      {
+        "difficultyName": "Pokeball Level 1",
+        "kovaaksBenchmarkId": 2110,
+        "sharecode": "KovaaKsHeadshottingDesertsandDuelist",
+        "rankColors": {
+          "Iron": "#999999",
+          "Bronze": "#FF9900",
+          "Silver": "#CBD9E6",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Level 1",
+        "kovaaksBenchmarkId": 2111,
+        "sharecode": "KovaaKsHipfiringDiagonalBottomfrag",
+        "rankColors": {
+          "Iron": "#999999",
+          "Bronze": "#FF9900",
+          "Silver": "#CBD9E6",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Level 2",
+        "kovaaksBenchmarkId": 2112,
+        "sharecode": "KovaaKsImpactingDiagonalShard",
+        "rankColors": {
+          "Gold": "#CAB148",
+          "Ruby": "#CC0000",
+          "Opal": "#4A86E8",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Level 2",
+        "kovaaksBenchmarkId": 2113,
+        "sharecode": "KovaaKsJigglepeekingDinkedImpact",
+        "rankColors": {
+          "Gold": "#CAB148",
+          "Ruby": "#CC0000",
+          "Opal": "#4A86E8",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Level 3",
+        "kovaaksBenchmarkId": 2114,
+        "sharecode": "KovaaKsJumpingDownedDiff",
+        "rankColors": {
+          "Amethyst": "#9900FF",
+          "Emerald": "#85FA85",
+          "Obsidian": "#8A2293",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Level 3",
+        "kovaaksBenchmarkId": 2115,
+        "sharecode": "KovaaKsKillstreakingDynamicBait",
+        "rankColors": {
+          "Amethyst": "#9900FF",
+          "Emerald": "#85FA85",
+          "Obsidian": "#8A2293",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Level 4",
+        "kovaaksBenchmarkId": 2116,
+        "sharecode": "KovaaKsLosingDynamicRando",
+        "rankColors": {
+          "Caterium": "#F1C232",
+          "Bauxite": "#B45F06",
+          "Uranium": "#6AA84F",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Level 4",
+        "kovaaksBenchmarkId": 2117,
+        "sharecode": "KovaaKsMainingEasyGod",
+        "rankColors": {
+          "Caterium": "#F1C232",
+          "Bauxite": "#B45F06",
+          "Uranium": "#6AA84F",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Boss",
+        "kovaaksBenchmarkId": 2118,
+        "sharecode": "KovaaKsFlashingCornflowerVehicle",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Boss",
+        "kovaaksBenchmarkId": 2119,
+        "sharecode": "KovaaKsFlickingCrackedNano",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Boss+",
+        "kovaaksBenchmarkId": 2120,
+        "sharecode": "KovaaKsGearingDandelionExitfrag",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Boss+",
+        "kovaaksBenchmarkId": 2121,
+        "sharecode": "KovaaKsGhostpeekingDefaultBuystation",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Pokeball Boss++",
+        "kovaaksBenchmarkId": 2122,
+        "sharecode": "KovaaKsGlidingDefaultTacmap",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Boss++",
+        "kovaaksBenchmarkId": 2123,
+        "sharecode": "KovaaKsGriefingDenimLowground",
+        "rankColors": {
+          "Elite ": "#A64D79",
+          "Legend": "#BA005C",
+          "Ascendant": "#BE3939",
+          "Vortex": "#6B0000"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#B80000",
+            "subcategories": [
+              {
+                "subcategoryName": "2 Target",
+                "scenarioCount": 2,
+                "color": "#FF9900"
+              },
+              {
+                "subcategoryName": "3 Target",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "4 Target",
+                "scenarioCount": 2,
+                "color": "#76A5AF"
+              },
+              {
+                "subcategoryName": "5 Target",
+                "scenarioCount": 2,
+                "color": "#6AA84F"
+              },
+              {
+                "subcategoryName": "6 Target",
+                "scenarioCount": 2,
+                "color": "#8E7CC3"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
     "benchmarkName": "cR Main Benchmark",
     "rankCalculation": "basic",
     "abbreviation": "cR",
     "color": "#005a7a",
     "spreadsheetURL": "",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Main",
@@ -7388,6 +8533,7 @@
     "abbreviation": "sA",
     "color": "#a20606",
     "spreadsheetURL": "",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Demonic",
@@ -7438,6 +8584,7 @@
     "abbreviation": "ETB",
     "color": "#4400ff",
     "spreadsheetURL": "",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "Evil",
@@ -7478,26 +8625,27 @@
     ]
   },
   {
-    "benchmarkName": "Pasu Track DOJO é“å ´",
+    "benchmarkName": "Pasu Track DOJO 道場",
     "rankCalculation": "dojo",
     "abbreviation": "xyz",
     "color": "#999999",
     "spreadsheetURL": "http://docs.google.com/spreadsheets/d/1uy9WuMwD8lr8C3YmNXzbTPiPI8fhwkOs_Are7i7TCnY/edit?gid=0#gid=0",
+    "dateAdded": "2025-11-02",
     "difficulties": [
       {
         "difficultyName": "All",
         "kovaaksBenchmarkId": 880,
         "sharecode": "KovaaKsSensing360Button",
         "rankColors": {
-          "White Belt ç™½å¸¯": "#FFFFFF",
-          "Yellow Belt é»„å¸¯": "#E4E428",
-          "Orange Belt æ©™å¸¯": "#D89925",
-          "Green Belt ç·‘å¸¯": "#13A513",
-          "Blue Belt é’å¸¯": "#4176CB",
-          "Purple Belt ç´«å¸¯": "#5E259B",
-          "Brown Belt èŒ¶å¸¯": "#964B00",
-          "Red Belt èµ¤å¸¯": "#9B1B0A",
-          "Black Belt é»’å¸¯": "#434343"
+          "White Belt|白帯": "#FFFFFF",
+          "Yellow Belt|黄帯": "#E4E428",
+          "Orange Belt|橙帯": "#D89925",
+          "Green Belt|緑帯": "#13A513",
+          "Blue Belt|青帯": "#4176CB",
+          "Purple Belt|紫帯": "#5E259B",
+          "Brown Belt|茶帯": "#964B00",
+          "Red Belt|赤帯": "#9B1B0A",
+          "Black Belt|黒帯": "#434343"
         },
         "categories": [
           {
@@ -7505,8 +8653,47 @@
             "color": "#7300ff",
             "subcategories": [
               {
-                "subcategoryName": "Pasu Track DOJO é“å ´",
+                "subcategoryName": "Pasu Track DOJO 道場",
                 "scenarioCount": 8,
+                "color": "#ECECEC"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Ground Track DOJO 道場",
+    "rankCalculation": "dojo2",
+    "abbreviation": "xyz",
+    "color": "#999999",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1lL4Ln0YVoRIgg22y_R5Sk9dh3HHMcUhXo7s_qvTEDlU/edit?gid=0#gid=0",
+    "dateAdded": "2025-11-30",
+    "difficulties": [
+      {
+        "difficultyName": "All",
+        "kovaaksBenchmarkId": 977,
+        "sharecode": "KovaaKsBouncingPrismaticCamper",
+        "rankColors": {
+          "White Belt|白帯": "#FFFFFF",
+          "Yellow Belt|黄帯": "#E4E428",
+          "Orange Belt|橙帯": "#D89925",
+          "Green Belt|緑帯": "#13A513",
+          "Blue Belt|青帯": "#4176CB",
+          "Purple Belt|紫帯": "#5E259B",
+          "Brown Belt|茶帯": "#964B00",
+          "Red Belt|赤帯": "#9B1B0A",
+          "Black Belt|黒帯": "#434343"
+        },
+        "categories": [
+          {
+            "categoryName": "",
+            "color": "#7300ff",
+            "subcategories": [
+              {
+                "subcategoryName": "Ground Track DOJO 道場",
+                "scenarioCount": 6,
                 "color": "#ECECEC"
               }
             ]
@@ -7521,6 +8708,7 @@
     "abbreviation": "TZY",
     "color": "#c2004e",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1VTqtGx_qMWL1mGxR32jpsR0YoUADyHbcuIQWnwsVK04/edit?usp=sharing",
+    "dateAdded": "2025-11-17",
     "difficulties": [
       {
         "difficultyName": "Advanced",
@@ -7568,8 +8756,9 @@
     "benchmarkName": "MIRA x Apex - Improvement Benchmark",
     "rankCalculation": "mira-apex",
     "abbreviation": "MIR",
-    "color": "#940104",
+    "color": "#C13F3E",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1Iy6P7nKNdc8QmtbrTbLvTZKZG7sCDVxub3iVahAHNtY/",
+    "dateAdded": "2025-11-17",
     "difficulties": [
       {
         "difficultyName": "Improvement Bench",
@@ -7628,6 +8817,2404 @@
                 "subcategoryName": "Strafe",
                 "scenarioCount": 2,
                 "color": "#f2c6ec"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "✯ Stellar - Speed Clicking Benchmarks",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "STR",
+    "color": "#4631ff",
+    "spreadsheetURL": "",
+    "dateAdded": "2025-11-17",
+    "difficulties": [
+      {
+        "difficultyName": "Normal",
+        "kovaaksBenchmarkId": 918,
+        "sharecode": "KovaaKsStrikingRoyalpurpleArmor",
+        "rankColors": {
+          "Eclipse": "#ffff00",
+          "Cosmic": "#ff0550",
+          "Pulsar": "#0544ff",
+          "Lunar": "#ff0000",
+          "Aether": "#339cff",
+          "Astral": "#ff00ea",
+          "Nebula": "#5500ff",
+          "Divine": "#00eeff",
+          "Stellar": "#000000"
+        },
+        "categories": [
+          {
+            "categoryName": "Raw",
+            "color": "#20124d",
+            "subcategories": [
+              {
+                "subcategoryName": "Steady",
+                "scenarioCount": 2,
+                "color": "#351c75"
+              },
+              {
+                "subcategoryName": "Reaction",
+                "scenarioCount": 2,
+                "color": "#674ea7"
+              },
+              {
+                "subcategoryName": "CPS",
+                "scenarioCount": 2,
+                "color": "#8e7cc3"
+              }
+            ]
+          },
+          {
+            "categoryName": "Controlled",
+            "color": "#134f5c",
+            "subcategories": [
+              {
+                "subcategoryName": "Mass",
+                "scenarioCount": 2,
+                "color": "#45818e"
+              },
+              {
+                "subcategoryName": "Fluidity",
+                "scenarioCount": 2,
+                "color": "#76a5af"
+              },
+              {
+                "subcategoryName": "Micro",
+                "scenarioCount": 2,
+                "color": "#a2c4c9"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "pAim Benchmarks ",
+    "rankCalculation": "basic",
+    "abbreviation": "pA",
+    "color": "#ffff00",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/11feomzIFIwkcoxZ_32CyFNNBnXFtVP_7GXWT3J0uLXQ/edit?gid=716047487#gid=716047487",
+    "dateAdded": "2025-11-18",
+    "difficulties": [
+      {
+        "difficultyName": "Intermediate",
+        "kovaaksBenchmarkId": 920,
+        "sharecode": "KovaaKsClickingBurntorangeVehicle",
+        "rankColors": {
+          "Amber": "#c68801",
+          "Ruby": "#ff0000",
+          "Sapphire": "#054ebd",
+          "Amethyst": "#60048b",
+          "Emerald": "#62f500"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#0042db",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#db7b7b"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#d38f50"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#460075",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 3,
+                "color": "#e9eb6f"
+              },
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#63af18"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#fd4949",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 3,
+                "color": "#3963a2"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#594686"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Advanced",
+        "kovaaksBenchmarkId": 923,
+        "sharecode": "KovaaKsClearingBurntorangeChaingun",
+        "rankColors": {
+          "Topaz": "#bb7007",
+          "Zircon": "#584a32",
+          "Obsidian": "#5e2ce8",
+          "Umbra": "#3e091e",
+          "Visceral": "#ff0000"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#0042db",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#db7b7b"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#d38f50"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#460075",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 3,
+                "color": "#e9eb6f"
+              },
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 3,
+                "color": "#63af18"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#fd4949",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 3,
+                "color": "#3963a2"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#594686"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "rxn",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "rxn",
+    "color": "#02A2DA",
+    "spreadsheetURL": "",
+    "dateAdded": "2025-11-19",
+    "difficulties": [
+      {
+        "difficultyName": "all",
+        "kovaaksBenchmarkId": 928,
+        "sharecode": "KovaaKsNerfingFuchsiaInitiator",
+        "rankColors": {
+          "white": "#FFFFFF",
+          "red": "#ff0000",
+          "orange": "#ff9500",
+          "yellow": "#fbff00",
+          "green": "#04ff00",
+          "black": "#000000"
+        },
+        "categories": [
+          {
+            "categoryName": "wrist",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "speed",
+                "scenarioCount": 3,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "ctrl",
+                "scenarioCount": 2,
+                "color": "#E06666"
+              },
+              {
+                "subcategoryName": "rxn",
+                "scenarioCount": 2,
+                "color": "#FF8A45"
+              }
+            ]
+          },
+          {
+            "categoryName": "arm",
+            "color": "#1155CC",
+            "subcategories": [
+              {
+                "subcategoryName": "speed",
+                "scenarioCount": 3,
+                "color": "#45818E"
+              },
+              {
+                "subcategoryName": "rxn",
+                "scenarioCount": 3,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "path",
+                "scenarioCount": 2,
+                "color": "#42A5FF"
+              },
+              {
+                "subcategoryName": "ctrl",
+                "scenarioCount": 1,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "blend",
+            "color": "#351C75",
+            "subcategories": [
+              {
+                "subcategoryName": "speed",
+                "scenarioCount": 6,
+                "color": "#A64D79"
+              },
+              {
+                "subcategoryName": "stability",
+                "scenarioCount": 5,
+                "color": "#674EA7"
+              },
+              {
+                "subcategoryName": "evasive",
+                "scenarioCount": 5,
+                "color": "#B4A3FF"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "R Bench Easy",
+    "rankCalculation": "rbe",
+    "abbreviation": "RBE",
+    "color": "#1E90FF",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1QrJosAzzQ5X4GkmUrcy8xpMrulELVCg8-uXlE0NLupw/edit?gid=1625790126#gid=1625790126",
+    "dateAdded": "2025-11-19",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 929,
+        "sharecode": "KovaaKsAcingFuchsiaEngine",
+        "rankColors": {
+          "Beginner": "#6aa84f",
+          "Gold": "#f1c232",
+          "Platinum": "#38b9ff",
+          "Master": "#6f00ff",
+          "Qualified": "#ff3100"
+        },
+        "categories": [
+          {
+            "categoryName": "Reactive",
+            "color": "#d9d9d9",
+            "subcategories": [
+              {
+                "subcategoryName": "Fast",
+                "scenarioCount": 3,
+                "color": "#6d9eeb"
+              },
+              {
+                "subcategoryName": "Thin",
+                "scenarioCount": 3,
+                "color": "#f6b26b"
+              },
+              {
+                "subcategoryName": "Plaza",
+                "scenarioCount": 3,
+                "color": "#cc4125"
+              },
+              {
+                "subcategoryName": "Bonus",
+                "scenarioCount": 3,
+                "color": "#a64d79"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "R Bench Normal",
+    "rankCalculation": "complete",
+    "abbreviation": "RBN",
+    "color": "#5b4c76",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-03-16",
+    "difficulties": [
+      {
+        "difficultyName": "Normal",
+        "kovaaksBenchmarkId": 2093,
+        "sharecode": "KovaaKsSwitchingBlueUfo",
+        "rankColors": {
+          "Beginner": "#9cf7ae",
+          "Gold": "#f4ec10",
+          "Platinum": "#0bb9d0",
+          "Master": "#c007f2",
+          "Qualified": "#f00528"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#1e2743",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 5,
+                "color": "#1e2743"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#347f47",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 5,
+                "color": "#347f47"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#571414",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 5,
+                "color": "#571414"
+              }
+            ]
+          },
+          {
+            "categoryName": "Dodge",
+            "color": "#796415",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 3,
+                "color": "#796415"
+              }
+            ]
+          },
+          {
+            "categoryName": "Other",
+            "color": "#8d4f92",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 3,
+                "color": "#8d4f92"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "mH benchmarks",
+    "rankCalculation": "basic",
+    "abbreviation": "mHb",
+    "color": "#1E90FF",
+    "spreadsheetURL": "",
+    "dateAdded": "2025-11-26",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 963,
+        "sharecode": "KovaaKsFlankingSmallArena",
+        "rankColors": {
+          "jubilant": "#77a5eb",
+          "whimsical": "#3d85c6",
+          "joyous": "#0000a6",
+          "ecstatic": "#d19df4",
+          "happy": "#ff00ff",
+          "cheerful": "#674ea7",
+          "blissful": "#741b47"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#cc0000",
+            "subcategories": [
+              {
+                "subcategoryName": "static",
+                "scenarioCount": 2,
+                "color": "#ea9999"
+              },
+              {
+                "subcategoryName": "dynamic",
+                "scenarioCount": 2,
+                "color": "#ea9999"
+              }
+            ]
+          },
+          {
+            "categoryName": "tracking",
+            "color": "#3c78d8",
+            "subcategories": [
+              {
+                "subcategoryName": "smooth",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              },
+              {
+                "subcategoryName": "reactive",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              },
+              {
+                "subcategoryName": "control",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              }
+            ]
+          },
+          {
+            "categoryName": "switching",
+            "color": "#351c75",
+            "subcategories": [
+              {
+                "subcategoryName": "speed",
+                "scenarioCount": 2,
+                "color": "#b4a7d6"
+              },
+              {
+                "subcategoryName": "evasive",
+                "scenarioCount": 2,
+                "color": "#b4a7d6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 966,
+        "sharecode": "KovaaKsLosingThinLoadout",
+        "rankColors": {
+          "nettspend": "#8e7cc3",
+          "glaive": "#c079cb",
+          "underscores": "#8ac3bb",
+          "2hollis": "#68a3ba",
+          "blxty": "#9ac3cd",
+          "jane remover": "#d78eb9",
+          "mental": "#ba7171"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#da72bc",
+            "subcategories": [
+              {
+                "subcategoryName": "static",
+                "scenarioCount": 3,
+                "color": "#e69bd0"
+              },
+              {
+                "subcategoryName": "dynamic",
+                "scenarioCount": 3,
+                "color": "#e69bd0"
+              },
+              {
+                "subcategoryName": "pokeball",
+                "scenarioCount": 2,
+                "color": "#e69bd0"
+              }
+            ]
+          },
+          {
+            "categoryName": "tracking",
+            "color": "#3c78d8",
+            "subcategories": [
+              {
+                "subcategoryName": "smooth",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              },
+              {
+                "subcategoryName": "reactive",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              },
+              {
+                "subcategoryName": "control",
+                "scenarioCount": 2,
+                "color": "#a4c2f4"
+              }
+            ]
+          },
+          {
+            "categoryName": "switching",
+            "color": "#a7a8ad",
+            "subcategories": [
+              {
+                "subcategoryName": "speed",
+                "scenarioCount": 2,
+                "color": "#cdced4"
+              },
+              {
+                "subcategoryName": "evasive",
+                "scenarioCount": 2,
+                "color": "#cdced4"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Jade Palace Ground",
+    "rankCalculation": "jade-palace-ground",
+    "abbreviation": "JP",
+    "color": "#00ff40",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/131tMwNmJY-lJPVdddpOWKY9uajDWWe3I5ym-UzmF0QE/edit?gid=0#gid=0",
+    "dateAdded": "2025-12-04",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 962,
+        "sharecode": "KovaaKsStartingLavenderArmorshard",
+        "rankColors": {
+          "Diamond": "#B9F2FF",
+          "Jade": "#85FA85",
+          "Master": "#cd30c1",
+          "Grandmaster": "#feeb01",
+          "Nova": "#6f1d89"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#ffffff",
+            "subcategories": [
+              {
+                "subcategoryName": "Reading",
+                "scenarioCount": 6,
+                "color": "#ff8000"
+              },
+              {
+                "subcategoryName": "Hybrid",
+                "scenarioCount": 6,
+                "color": "#ff0080"
+              },
+              {
+                "subcategoryName": "Technique",
+                "scenarioCount": 6,
+                "color": "#00ffff"
+              },
+              {
+                "subcategoryName": "Fluidity",
+                "scenarioCount": 2,
+                "color": "#400080"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 959,
+        "sharecode": "KovaaKsScreamingJumpyBlueberry",
+        "rankColors": {
+          "Grandmaster": "#feeb01",
+          "Nova": "#6f1d89",
+          "Astra": "#c4065b",
+          "Celestial": "#56e4fe",
+          "Transcendent": "#faa0fc"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#ffffff",
+            "subcategories": [
+              {
+                "subcategoryName": "Reading",
+                "scenarioCount": 6,
+                "color": "#ff8000"
+              },
+              {
+                "subcategoryName": "Hybrid",
+                "scenarioCount": 6,
+                "color": "#ff0080"
+              },
+              {
+                "subcategoryName": "Technique",
+                "scenarioCount": 6,
+                "color": "#00ffff"
+              },
+              {
+                "subcategoryName": "Fluidity",
+                "scenarioCount": 2,
+                "color": "#400080"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Fundamentals",
+        "kovaaksBenchmarkId": 988,
+        "sharecode": "KovaaKsGriefingLightvenetianredFalldamage",
+        "rankColors": {
+          "Iron": "#999999",
+          "Bronze": "#FF9900",
+          "Silver": "#CBD9E6",
+          "Gold": "#CAB148",
+          "Platinum": "#2FCFC2",
+          "Diamond": "#B9F2FF",
+          "Jade": "#85FA85",
+          "Master": "#cd30c1"
+        },
+        "categories": [
+          {
+            "categoryName": "Ground",
+            "color": "#ffffff",
+            "subcategories": [
+              {
+                "subcategoryName": "Entry",
+                "scenarioCount": 2,
+                "color": "#f5abdb"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Aimerz+ S0",
+    "rankCalculation": "aplus-s1",
+    "abbreviation": "A+",
+    "color": "#E1E0E1",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1UttTs6aNPzwAWCEKnRUc8hC0AzbZI2esLq4x8ngcVpU/edit?gid=876421041#gid=876421041",
+    "dateAdded": "2025-12-20",
+    "difficulties": [
+      {
+        "difficultyName": "Medium",
+        "kovaaksBenchmarkId": 1823,
+        "sharecode": "KovaaKsGearingScarletMouse",
+        "rankColors": {
+          "Iron": "#999999",
+          "Bronze": "#a77138",
+          "Silver": "#c2d2d2",
+          "Gold": "#c4a12a",
+          "Platinum": "#00b3a5",
+          "Diamond": "#81d1ff"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#5b0f00",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#ba4832"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#da5555"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#0039c9",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 3,
+                "color": "#1559c9"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#14759e"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#257b33",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 3,
+                "color": "#239436"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 3,
+                "color": "#35aa48"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 1822,
+        "sharecode": "KovaaKsFlashingScaredCd",
+        "rankColors": {
+          "Acolyte": "#FFa000",
+          "Prophet": "#9e0059",
+          "Saint": "#5a189a",
+          "Angelic": "#0f4c5c",
+          "Seraphic": "#590d22",
+          "Cherubim": "#03071e"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#5b0f00",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#ba4832"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#da5555"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#0039c9",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 3,
+                "color": "#1559c9"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#14759e"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#257b33",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 3,
+                "color": "#239436"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 3,
+                "color": "#35aa48"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Lemon Static Benchmark",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "LEM",
+    "color": "#F4DB1F",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1V9lt5BjKLpzoKBPd-4WgStzhKv-javTWaNcISaLJERg",
+    "dateAdded": "2025-12-22",
+    "difficulties": [
+      {
+        "difficultyName": "Intermediate",
+        "kovaaksBenchmarkId": 2277,
+        "sharecode": "KovaaksBottingRockyBm",
+        "rankColors": {
+          "Berry": "#A60000",
+          "Peach": "#A66300",
+          "Cherry": "#A6A600",
+          "Pear": "#00A600",
+          "Kiwi": "#00A6A6",
+          "Durian": "#305797"
+        },
+        "categories": [
+          {
+            "categoryName": "Static",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Stability",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Micro",
+                "scenarioCount": 3,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Wide Wall",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Isolated",
+                "scenarioCount": 3,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "1 Wall",
+                "scenarioCount": 4,
+                "color": "#B4A7D6"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Advanced",
+        "kovaaksBenchmarkId": 1829,
+        "sharecode": "KovaaKsCrossfiringSpringgreenTacmap",
+        "rankColors": {
+          "Yuzu": "#FF0000",
+          "Snake": "#FF9900",
+          "Mango": "#FFFF00",
+          "Lime": "#00FF00",
+          "Star": "#00FFFF",
+          "Guava": "#4A86E8",
+          "Dragon": "#0000FF"
+        },
+        "categories": [
+          {
+            "categoryName": "Static",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Stability",
+                "scenarioCount": 3,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Micro",
+                "scenarioCount": 4,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Wide Wall",
+                "scenarioCount": 3,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Isolated",
+                "scenarioCount": 3,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Pressure",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Chaining",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "1 Wall",
+                "scenarioCount": 4,
+                "color": "#B4A7D6"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Slopcore Funmax Benchmark",
+    "rankCalculation": "basic",
+    "abbreviation": "SFB",
+    "color": "#e6a7e4",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1Wy0mBJbB3aAl6a9kAGddQYicgUfqqt4vWwkUR3Iv5eo/edit?gid=788802502#gid=788802502",
+    "dateAdded": "2025-12-29",
+    "difficulties": [
+      {
+        "difficultyName": "FUNMAX!",
+        "kovaaksBenchmarkId": 1854,
+        "sharecode": "KovaaKsBoomstickingRoyalpurpleSuper",
+        "rankColors": {
+          "Chud": "#f50000",
+          "Lowjennually": "#ff8442",
+          "VRChat Aimer": "#FFD700",
+          "Zergling": "#82bb81",
+          "Barbie Girl": "#1af0ff",
+          "Six": "#6e85e2",
+          "Seven": "#0400ff",
+          "Gem": "#a03cb4",
+          "Sillyyyy": "#d400ff",
+          "Slop Enjoyer": "#000000",
+          "Estrogen": "#FFFFFF"
+        },
+        "categories": [
+          {
+            "categoryName": "Click",
+            "color": "#92dcdd",
+            "subcategories": [
+              {
+                "subcategoryName": "Have",
+                "scenarioCount": 6,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "Hold",
+            "color": "#e3e196",
+            "subcategories": [
+              {
+                "subcategoryName": "Fun",
+                "scenarioCount": 4,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "No Aim",
+            "color": "#ca6868",
+            "subcategories": [
+              {
+                "subcategoryName": "Playing!",
+                "scenarioCount": 3,
+                "color": "#EEEEEE"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "m0narcS - Euphoric TacFPS Benchmarks",
+    "rankCalculation": "basic",
+    "abbreviation": "M",
+    "color": "#C566B6",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1fkJ6gvswsWlbtMUT97WXxsc7OGg2GajUsh1N0VABCWk/edit?usp=sharing",
+    "dateAdded": "2026-02-01",
+    "difficulties": [
+      {
+        "difficultyName": "Novice",
+        "kovaaksBenchmarkId": 2158,
+        "sharecode": "KovaaKsDunkingAngelicClient",
+        "rankColors": {
+          "Copper": "#E56352",
+          "Iron": "#5B5B5B",
+          "Bronze": "#D99652",
+          "Silver": "#C0D1D4",
+          "Gold": "#EFBF04",
+          "Platinum": "#5990B3"
+        },
+        "categories": [
+          {
+            "categoryName": " Flick Tech",
+            "color": "#E63A84",
+            "subcategories": [
+              {
+                "subcategoryName": "Sta",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Elu",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Ref",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              }
+            ]
+          },
+          {
+            "categoryName": " Micros",
+            "color": "#44BCB9",
+            "subcategories": [
+              {
+                "subcategoryName": "Flu",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Pre",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Ref",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              }
+            ]
+          },
+          {
+            "categoryName": " Tracking",
+            "color": "#7D22D7",
+            "subcategories": [
+              {
+                "subcategoryName": "Ten",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Rea",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Hyb",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Basic",
+        "kovaaksBenchmarkId": 1870,
+        "sharecode": "KovaaKsLosingLongHalfbuy",
+        "rankColors": {
+          "Iron": "#5B5B5B",
+          "Bronze": "#D99652",
+          "Silver": "#C0D1D4",
+          "Gold": "#EFBF04",
+          "Platinum": "#5990B3",
+          "Diamond": "#00E7EB"
+        },
+        "categories": [
+          {
+            "categoryName": " Flick Tech",
+            "color": "#E63A84",
+            "subcategories": [
+              {
+                "subcategoryName": "Sta",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Elu",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Ref",
+                "scenarioCount": 1,
+                "color": "#E575A5"
+              }
+            ]
+          },
+          {
+            "categoryName": " Micros",
+            "color": "#44BCB9",
+            "subcategories": [
+              {
+                "subcategoryName": "Flu",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Pre",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Ref",
+                "scenarioCount": 1,
+                "color": "#6ABEBB"
+              }
+            ]
+          },
+          {
+            "categoryName": " Tracking",
+            "color": "#7D22D7",
+            "subcategories": [
+              {
+                "subcategoryName": "Ten",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Rea",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Hyb",
+                "scenarioCount": 1,
+                "color": "#9657D5"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Main",
+        "kovaaksBenchmarkId": 1871,
+        "sharecode": "KovaaKsKillstreakingLightvenetianredReset",
+        "rankColors": {
+          "Emerald": "#50C878",
+          "Champion": "#3A035E",
+          "Supreme": "#0F52BA",
+          "Spectral": "#9966CC",
+          "Divine": "#E13CDC",
+          "Omniscient": "#F1076B"
+        },
+        "categories": [
+          {
+            "categoryName": " Flick Tech",
+            "color": "#E63A84",
+            "subcategories": [
+              {
+                "subcategoryName": "Stability",
+                "scenarioCount": 2,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Elusive",
+                "scenarioCount": 2,
+                "color": "#E575A5"
+              },
+              {
+                "subcategoryName": "Reflex",
+                "scenarioCount": 2,
+                "color": "#E575A5"
+              }
+            ]
+          },
+          {
+            "categoryName": " Micros",
+            "color": "#44BCB9",
+            "subcategories": [
+              {
+                "subcategoryName": "Fluidity",
+                "scenarioCount": 2,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Precision",
+                "scenarioCount": 2,
+                "color": "#6ABEBB"
+              },
+              {
+                "subcategoryName": "Reflex",
+                "scenarioCount": 2,
+                "color": "#6ABEBB"
+              }
+            ]
+          },
+          {
+            "categoryName": " Tracking",
+            "color": "#7D22D7",
+            "subcategories": [
+              {
+                "subcategoryName": "Tension",
+                "scenarioCount": 2,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Reading",
+                "scenarioCount": 2,
+                "color": "#9657D5"
+              },
+              {
+                "subcategoryName": "Hybrid",
+                "scenarioCount": 2,
+                "color": "#9657D5"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "RXZU - Valorant",
+    "rankCalculation": "RXZU",
+    "abbreviation": "RXZU",
+    "color": "#e5061c",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-01-07",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 985,
+        "sharecode": "KovaaKsChattingJebaitedFieldupgrade",
+        "rankColors": {
+          "WORM": "#999999",
+          "MICROCHEL": "#a27c44",
+          "PUPPIS": "#b8b31e",
+          "PISCIS": "#f0c000",
+          "POPUS": "#a33838",
+          "PIVO": "#751515",
+          "CHAMP": "#c70000",
+          "BOSS": "#199eb8",
+          "TITAN": "#3d87ff",
+          "IMMORTAL": "#f000b0",
+          "RADIANT": "#08fdec"
+        },
+        "categories": [
+          {
+            "categoryName": "CLICKING",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "DYNAMIC",
+                "scenarioCount": 5,
+                "color": "#ff0000"
+              }
+            ]
+          },
+          {
+            "categoryName": "CLICKING",
+            "color": "#5900ff",
+            "subcategories": [
+              {
+                "subcategoryName": "REFLEX",
+                "scenarioCount": 5,
+                "color": "#7300ff"
+              }
+            ]
+          },
+          {
+            "categoryName": "TRACKING",
+            "color": "#00faf6",
+            "subcategories": [
+              {
+                "subcategoryName": "SMOOTH",
+                "scenarioCount": 5,
+                "color": "#00ffee"
+              }
+            ]
+          },
+          {
+            "categoryName": "SPECIFIC",
+            "color": "#37ff00",
+            "subcategories": [
+              {
+                "subcategoryName": "MULTIFORM",
+                "scenarioCount": 5,
+                "color": "#4dff00"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 1883,
+        "sharecode": "KovaaKsCheatingJitteryCash",
+        "rankColors": {
+          "AIMSTAR": "#806c00",
+          "ORION": "#ffea00",
+          "VEGA": "#7496fb",
+          "ASTARTES": "#007bff",
+          "ANGELIC": "#0008ff",
+          "NOVA": "#5500bd",
+          "ASTRUM": "#a700f5",
+          "PHANTOM": "#00fffb",
+          "SUPREME": "#660a00",
+          "DIVINE": "#e60039",
+          "DEMONIC": "#ff0000",
+          "BIOMASCHINE": "#ff00f7",
+          "AIMBEAST": "#000000"
+        },
+        "categories": [
+          {
+            "categoryName": "CLICKING",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "DYNAMIC",
+                "scenarioCount": 5,
+                "color": "#f00000"
+              }
+            ]
+          },
+          {
+            "categoryName": "CLICKING",
+            "color": "#ae00ff",
+            "subcategories": [
+              {
+                "subcategoryName": "REFLEX",
+                "scenarioCount": 5,
+                "color": "#8c00ff"
+              }
+            ]
+          },
+          {
+            "categoryName": "TRACKING",
+            "color": "#00fffb",
+            "subcategories": [
+              {
+                "subcategoryName": "SMOOTH",
+                "scenarioCount": 5,
+                "color": "#00bfff"
+              }
+            ]
+          },
+          {
+            "categoryName": "SPECIFIC",
+            "color": "#00ff11",
+            "subcategories": [
+              {
+                "subcategoryName": "MULTIFORM",
+                "scenarioCount": 5,
+                "color": "#1eff00"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Amare's Quest",
+    "rankCalculation": "aimbeast",
+    "abbreviation": "AQ!",
+    "color": "#DBE9F4",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-01-23",
+    "difficulties": [
+      {
+        "difficultyName": "2026",
+        "kovaaksBenchmarkId": 1927,
+        "sharecode": "KovaaKsChatfraggingVibrantSupport",
+        "rankColors": {
+          "Desire": "#FFFFFF",
+          "Doll": "#feffc7",
+          "Pixie": "#f4bdff",
+          "Fairy": "#ff99df",
+          "Fantasy": "#f2274c",
+          "Star": "#ffdd00",
+          "Twilight": "#2d2c6d",
+          "Queen": "#4a0d87",
+          "Goddess": "#000000"
+        },
+        "categories": [
+          {
+            "categoryName": "Smooth",
+            "color": "#c2d1ff",
+            "subcategories": [
+              {
+                "subcategoryName": "Raw",
+                "scenarioCount": 1,
+                "color": "#9eb6ff"
+              },
+              {
+                "subcategoryName": "Basic",
+                "scenarioCount": 1,
+                "color": "#85a3ff"
+              }
+            ]
+          },
+          {
+            "categoryName": "Control",
+            "color": "#ffbde7",
+            "subcategories": [
+              {
+                "subcategoryName": "Fing",
+                "scenarioCount": 1,
+                "color": "#ffa8df"
+              },
+              {
+                "subcategoryName": "Stability",
+                "scenarioCount": 2,
+                "color": "#ff8fd6"
+              }
+            ]
+          },
+          {
+            "categoryName": "Speed",
+            "color": "#feffd6",
+            "subcategories": [
+              {
+                "subcategoryName": "Pokeball",
+                "scenarioCount": 2,
+                "color": "#feffb8"
+              },
+              {
+                "subcategoryName": "Pure",
+                "scenarioCount": 1,
+                "color": "#e9ea9f"
+              }
+            ]
+          },
+          {
+            "categoryName": "Micro",
+            "color": "#ccffe0",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 4,
+                "color": "#a8ffcb"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 1,
+                "color": "#8affb9"
+              }
+            ]
+          },
+          {
+            "categoryName": "Transfer",
+            "color": "#e3ccff",
+            "subcategories": [
+              {
+                "subcategoryName": "Acquire",
+                "scenarioCount": 2,
+                "color": "#cda3ff"
+              },
+              {
+                "subcategoryName": "Stra",
+                "scenarioCount": 1,
+                "color": "#b980ff"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "pixo v1",
+    "rankCalculation": "basic",
+    "abbreviation": "pnv1",
+    "color": "#E1E0E1",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-01-26",
+    "difficulties": [
+      {
+        "difficultyName": "Base v1",
+        "kovaaksBenchmarkId": 1950,
+        "sharecode": "KovaaKsClearingJumpyBomb",
+        "rankColors": {
+          "No Thumbs": "#C2D2D2",
+          "Haiden on Alt": "#a53131",
+          "SlyGL": "#d6d930",
+          "Mophead": "#60c62a",
+          "Slime": "#0065b3",
+          "LeToothless": "#8816d4"
+        },
+        "categories": [
+          {
+            "categoryName": "Switching",
+            "color": "#5B0F00",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 2,
+                "color": "#5B0F00"
+              }
+            ]
+          },
+          {
+            "categoryName": "Clicking",
+            "color": "#179737",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 2,
+                "color": "#2bfd39"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#077000"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#14759E",
+            "subcategories": [
+              {
+                "subcategoryName": "Precision + Reactive",
+                "scenarioCount": 7,
+                "color": "#14759E"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Nubars Benchmark",
+    "rankCalculation": "basic",
+    "abbreviation": "MCB",
+    "color": "#1E90FF",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-02-28",
+    "difficulties": [
+      {
+        "difficultyName": "Main",
+        "kovaaksBenchmarkId": 2060,
+        "sharecode": "KovaaKsChallengingCamouflagedHell",
+        "rankColors": {
+          "Bronze": "#e87400",
+          "Silver": "#afc2e7",
+          "Gold": "#e1cf4d",
+          "Plat": "#7bbcc1",
+          "LETS GOOOO": "#45efef"
+        },
+        "categories": [
+          {
+            "categoryName": "Tracking",
+            "color": "#f99ff0",
+            "subcategories": [
+              {
+                "subcategoryName": "1",
+                "scenarioCount": 5,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "TS",
+            "color": "#adb1eb",
+            "subcategories": [
+              {
+                "subcategoryName": "2",
+                "scenarioCount": 2,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "Clicking",
+            "color": "#abedb0",
+            "subcategories": [
+              {
+                "subcategoryName": "3",
+                "scenarioCount": 3,
+                "color": "#EEEEEE"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Triad Benchmarks",
+    "rankCalculation": "dojo2",
+    "abbreviation": "RVG",
+    "color": "#990000",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1RADs2QZGemcPpKQWugbOSPDb_SujyOeephg4obiCznw/edit?gid=0#gid=0",
+    "dateAdded": "2026-03-01",
+    "difficulties": [
+      {
+        "difficultyName": "Triad",
+        "kovaaksBenchmarkId": 2064,
+        "sharecode": "KovaaKsDinkingScaredSniper",
+        "rankColors": {
+          "Origin": "#A6611A",
+          "Vector": "#DFC27D",
+          "Axis": "#80CDC1",
+          "Orbit": "#018571",
+          "Vertex": "#422246",
+          "Nexus": "#A7568F",
+          "Apex": "#B4A5BA",
+          "Oculus": "#094A93"
+        },
+        "categories": [
+          {
+            "categoryName": "Triad",
+            "color": "#666666",
+            "subcategories": [
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#999999"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#888888"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#777777"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#545454"
+              },
+              {
+                "subcategoryName": "",
+                "scenarioCount": 1,
+                "color": "#434343"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Henwood Benchmarks",
+    "rankCalculation": "basic",
+    "abbreviation": "HB",
+    "color": "#dd0000",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-03-13",
+    "difficulties": [
+      {
+        "difficultyName": "Henwood Benchmarks",
+        "kovaaksBenchmarkId": 2046,
+        "sharecode": "KovaaKsSnipingEggplantArmor",
+        "rankColors": {
+          "Sub Human": "#FF9900",
+          "Sub 5 Chud": "#CBD9E6",
+          "Chud": "#CAB148",
+          "LTN": "#5fddeb",
+          "MTN": "#2569b4",
+          "HTN": "#96e151",
+          "Chad Lite": "#dc3fd8",
+          "Chad": "#a79b0a",
+          "True Adam": "#6b2987"
+        },
+        "categories": [
+          {
+            "categoryName": "Henwood Benchmarks",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#ffffff"
+              },
+              {
+                "subcategoryName": "Linear",
+                "scenarioCount": 3,
+                "color": "#ffffff"
+              },
+              {
+                "subcategoryName": "TA",
+                "scenarioCount": 3,
+                "color": "#ffffff"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#ffffff"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "773TS Main β3.0",
+    "rankCalculation": "complete",
+    "abbreviation": "773TS",
+    "color": "#C493ff",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1uT2mRdtQjFe_UPh7yyto5YxXX93OsKHnquKaykE6oq0/edit?gid=0#gid=0",
+    "dateAdded": "2026-03-27",
+    "difficulties": [
+      {
+        "difficultyName": "Normal",
+        "kovaaksBenchmarkId": 2005,
+        "sharecode": "KovaaKsClearingBraveRaid",
+        "rankColors": {
+          "Fast": "#f0e3ff",
+          "Quick": "#e6d1ff",
+          "Swift": "#dcbfff",
+          "Rpaid": "#c493ff"
+        },
+        "categories": [
+          {
+            "categoryName": "Target Switching",
+            "color": "#c493ff",
+            "subcategories": [
+              {
+                "subcategoryName": "One  step",
+                "scenarioCount": 6,
+                "color": "#c493ff"
+              },
+              {
+                "subcategoryName": "Two  steps",
+                "scenarioCount": 4,
+                "color": "#c493ff"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "AimSpeed Benchmarks 2.0",
+    "rankCalculation": "generic-energy-alt",
+    "abbreviation": "AS",
+    "color": "#14B8A6",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-03-28",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 2168,
+        "sharecode": "KovaaKsJumpingMagentaAp",
+        "rankColors": {
+          "Stagnant": "#F9CB9C",
+          "Gradual": "#FFE599",
+          "Moderate": "#B6D7A8",
+          "Swift": "#A4C2F4",
+          "Exponential": "#B47AD6",
+          "Accelerated": "#AAAAAA",
+          "Speed": "#050000"
+        },
+        "categories": [
+          {
+            "categoryName": "Switching",
+            "color": "#434343",
+            "subcategories": [
+              {
+                "subcategoryName": "voxTS",
+                "scenarioCount": 3,
+                "color": "#F9CB9C"
+              },
+              {
+                "subcategoryName": "patTS",
+                "scenarioCount": 3,
+                "color": "#FFE599"
+              },
+              {
+                "subcategoryName": "xenTS",
+                "scenarioCount": 2,
+                "color": "#B6D7A8"
+              },
+              {
+                "subcategoryName": "devTS",
+                "scenarioCount": 2,
+                "color": "#A2C4C9"
+              },
+              {
+                "subcategoryName": "floatTS",
+                "scenarioCount": 2,
+                "color": "#9FC5E8"
+              },
+              {
+                "subcategoryName": "Varied",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Assorted",
+                "scenarioCount": 2,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "Diverse",
+                "scenarioCount": 2,
+                "color": "#1559C9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Normal",
+        "kovaaksBenchmarkId": 2175,
+        "sharecode": "KovaaKsLosingMahoganyFullbuy",
+        "rankColors": {
+          "Steady": "#F5A351",
+          "Progressive": "#FFD24D",
+          "Brisk": "#8ABF73",
+          "Rapid": "#6093EB",
+          "Surging": "#9440C4",
+          "Blazing": "#CCCCCC",
+          "Speed": "#050000"
+        },
+        "categories": [
+          {
+            "categoryName": "Switching",
+            "color": "#CCCCCC",
+            "subcategories": [
+              {
+                "subcategoryName": "voxTS",
+                "scenarioCount": 3,
+                "color": "#F9CB9C"
+              },
+              {
+                "subcategoryName": "patTS",
+                "scenarioCount": 3,
+                "color": "#FFE599"
+              },
+              {
+                "subcategoryName": "xenTS",
+                "scenarioCount": 2,
+                "color": "#B6D7A8"
+              },
+              {
+                "subcategoryName": "devTS",
+                "scenarioCount": 2,
+                "color": "#A2C4C9"
+              },
+              {
+                "subcategoryName": "floatTS",
+                "scenarioCount": 2,
+                "color": "#9FC5E8"
+              },
+              {
+                "subcategoryName": "Varied",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Assorted",
+                "scenarioCount": 2,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "Diverse",
+                "scenarioCount": 2,
+                "color": "#1559C9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 2176,
+        "sharecode": "KovaaKsMainingMaroonChopper",
+        "rankColors": {
+          "Instant": "#EC7D0E",
+          "Burst": "#FFBF00",
+          "Overdrive": "#629D48",
+          "Ascendant": "#1C65E3",
+          "Luminous": "#692B8C",
+          "Zenith": "#EEEEEE",
+          "Speed": "#050000"
+        },
+        "categories": [
+          {
+            "categoryName": "Switching",
+            "color": "#CCCCCC",
+            "subcategories": [
+              {
+                "subcategoryName": "voxTS",
+                "scenarioCount": 3,
+                "color": "#F9CB9C"
+              },
+              {
+                "subcategoryName": "patTS",
+                "scenarioCount": 3,
+                "color": "#FFE599"
+              },
+              {
+                "subcategoryName": "xenTS",
+                "scenarioCount": 2,
+                "color": "#B6D7A8"
+              },
+              {
+                "subcategoryName": "devTS",
+                "scenarioCount": 2,
+                "color": "#A2C4C9"
+              },
+              {
+                "subcategoryName": "floatTS",
+                "scenarioCount": 2,
+                "color": "#9FC5E8"
+              },
+              {
+                "subcategoryName": "Varied",
+                "scenarioCount": 2,
+                "color": "#B4A7D6"
+              },
+              {
+                "subcategoryName": "Assorted",
+                "scenarioCount": 2,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "Diverse",
+                "scenarioCount": 2,
+                "color": "#1559C9"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "EpicMemer412 Benchmarks",
+    "rankCalculation": "generic-energy-uncapped",
+    "abbreviation": "EMB",
+    "color": "#ff1e1e",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-04-08",
+    "difficulties": [
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 2223,
+        "sharecode": "KovaaKsCrankingLongCubby",
+        "rankColors": {
+          "Dzhura": "#E2C275",
+          "Cossack": "#DC143C",
+          "Otaman": "#007FFF",
+          "Hetman": "#FFD700"
+        },
+        "categories": [
+          {
+            "categoryName": "Control and Smooth Tracking",
+            "color": "#FF5733",
+            "subcategories": [
+              {
+                "subcategoryName": "R Smth",
+                "scenarioCount": 2,
+                "color": "#FFC300"
+              },
+              {
+                "subcategoryName": "App Smth",
+                "scenarioCount": 2,
+                "color": "#ebdb1b"
+              },
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 2,
+                "color": "#ece777"
+              },
+              {
+                "subcategoryName": "Ctrl",
+                "scenarioCount": 3,
+                "color": "#86ce71"
+              },
+              {
+                "subcategoryName": "M Ctrl",
+                "scenarioCount": 2,
+                "color": "#afc79a"
+              }
+            ]
+          },
+          {
+            "categoryName": "Reactive and Anti Movement",
+            "color": "#b1d8e7",
+            "subcategories": [
+              {
+                "subcategoryName": "C Rct",
+                "scenarioCount": 3,
+                "color": "#8b94f8"
+              },
+              {
+                "subcategoryName": "Rct",
+                "scenarioCount": 2,
+                "color": "#6568e0"
+              },
+              {
+                "subcategoryName": "R Rct",
+                "scenarioCount": 2,
+                "color": "#3932cd"
+              },
+              {
+                "subcategoryName": "Anti M",
+                "scenarioCount": 4,
+                "color": "#5af3e4"
+              }
+            ]
+          },
+          {
+            "categoryName": "Flicking",
+            "color": "#f3a5de",
+            "subcategories": [
+              {
+                "subcategoryName": "Regen",
+                "scenarioCount": 2,
+                "color": "#51da4e"
+              },
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 2,
+                "color": "#4acaba"
+              }
+            ]
+          },
+          {
+            "categoryName": "Clicking",
+            "color": "#f0a8a8",
+            "subcategories": [
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 2,
+                "color": "#ed7070"
+              },
+              {
+                "subcategoryName": "Parabola",
+                "scenarioCount": 2,
+                "color": "#b58b53"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Catburg Benchmark",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "catburg",
+    "color": "#3f003f",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-04-08",
+    "difficulties": [
+      {
+        "difficultyName": "catburg",
+        "kovaaksBenchmarkId": 2174,
+        "sharecode": "KovaaKsPatrollingNerfedMouse",
+        "rankColors": {
+          "Cedar": "#ce98e6",
+          "Teak": "#c066c2",
+          "Acacia": "#9a3c97",
+          "Willow": "#922f7d",
+          "Orchid": "#78175e",
+          "Catburg": "#3f003f"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#3f003f",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 3,
+                "color": "#fe5ddb"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#fe5ddb"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#3f003f",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 4,
+                "color": "#fe5ddb"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 2,
+                "color": "#fe5ddb"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#3f003f",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 3,
+                "color": "#fe5ddb"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 3,
+                "color": "#fe5ddb"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "zhker's Benchmark",
+    "rankCalculation": "basic",
+    "abbreviation": "ZAC",
+    "color": "#8008f7",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-04-12",
+    "difficulties": [
+      {
+        "difficultyName": "Easy",
+        "kovaaksBenchmarkId": 2256,
+        "sharecode": "KovaaKsBackflippingSeagreenHero",
+        "rankColors": {
+          "Novum": "#c96e7c",
+          "Isthmius": "#7a84cd",
+          "Robustus": "#cfc27d",
+          "Aesopi": "#2fb16e",
+          "Sirasakae": "#62e4fe"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#ffb8a8",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 4,
+                "color": "#db7680"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 3,
+                "color": "#ba4a4a"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#82f8ea",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 6,
+                "color": "#14c29f"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#0b605a"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#fbc88e",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 2,
+                "color": "#b67a25"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 2,
+                "color": "#703c00"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Point Zero [Aim Academy] - Valorant S1",
+    "rankCalculation": "basic",
+    "abbreviation": "ZERO",
+    "color": "#1E90FF",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-04-17",
+    "difficulties": [
+      {
+        "difficultyName": "intermediate",
+        "kovaaksBenchmarkId": 2264,
+        "sharecode": "KovaaKsBaitingMediumSniper",
+        "rankColors": {
+          "Platinum": "#4d9aff",
+          "Diamond": "#ed5ef7",
+          "Ascendant": "#5dca3f",
+          "Immortal": "#ff0000",
+          "Radiant": "#f0f0f0"
+        },
+        "categories": [
+          {
+            "categoryName": "FLICK TECH",
+            "color": "#ff0011",
+            "subcategories": [
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              },
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              },
+              {
+                "subcategoryName": "Linear",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              }
+            ]
+          },
+          {
+            "categoryName": "Reflex",
+            "color": "#f74545",
+            "subcategories": [
+              {
+                "subcategoryName": "Flick",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              },
+              {
+                "subcategoryName": "Micro",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#f3404a",
+            "subcategories": [
+              {
+                "subcategoryName": "Precise",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              },
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 2,
+                "color": "#ff0000"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "s2 electric boogaloo",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "TOL",
+    "color": "#80ffff",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1RjVJi9AdWLXIOkKR8z6mhmRo_SNokJPxKtLXHWk12Z4",
+    "dateAdded": "2025-05-30",
+    "difficulties": [
+      {
+        "difficultyName": "Trials V2",
+        "kovaaksBenchmarkId": 2285,
+        "sharecode": "KovaaKsTaggingDinkedBait",
+        "rankColors": {
+          "peasent": "#6a4015",
+          "soldier": "#8a5e1c",
+          "knight": "#949494",
+          "warrior": "#000066",
+          "champion": "#006a00",
+          "warlord": "#6900d2",
+          "emperor": "#b00000",
+          "divine": "#ecec00",
+          "angelic": "#da1057"
+        },
+        "categories": [
+          {
+            "categoryName": "Clicking",
+            "color": "#CC0000",
+            "subcategories": [
+              {
+                "subcategoryName": "Dynamic",
+                "scenarioCount": 2,
+                "color": "#F1C232"
+              },
+              {
+                "subcategoryName": "Static",
+                "scenarioCount": 2,
+                "color": "#E06666"
+              },
+              {
+                "subcategoryName": "Linear",
+                "scenarioCount": 2,
+                "color": "#FF8A45"
+              }
+            ]
+          },
+          {
+            "categoryName": "Tracking",
+            "color": "#1155CC",
+            "subcategories": [
+              {
+                "subcategoryName": "smooth",
+                "scenarioCount": 2,
+                "color": "#45818E"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 2,
+                "color": "#3C78D8"
+              },
+              {
+                "subcategoryName": "strafe",
+                "scenarioCount": 2,
+                "color": "#42A5FF"
+              }
+            ]
+          },
+          {
+            "categoryName": "Switching",
+            "color": "#351C75",
+            "subcategories": [
+              {
+                "subcategoryName": "Speed",
+                "scenarioCount": 2,
+                "color": "#A64D79"
+              },
+              {
+                "subcategoryName": "Evasive",
+                "scenarioCount": 2,
+                "color": "#674EA7"
+              },
+              {
+                "subcategoryName": "control",
+                "scenarioCount": 2,
+                "color": "#B4A3FF"
               }
             ]
           }

@@ -34,7 +34,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Add your custom logic here to process the new file
         # For example, you could read its content, move it, or trigger another function.
         file = event.src_path
-        logger.debug("")
+        print()
         logger.debug("Detected new file: %s", Path(file).name)
         if not file.endswith(".csv"):
             return
@@ -50,6 +50,10 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug("Found new scenario: %s", run_data.scenario)
+            new_score_threshold = 0.95 * run_data.score  # TODO: come from UI ?
+            logger.debug(
+                f"Current score ({run_data.score:.2f}) sets the score threshold at ({new_score_threshold:.2f})"
+            )
             message_queue.append(
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
@@ -65,13 +69,17 @@ class NewFileHandler(FileSystemEventHandler):
 
         high_score = get_high_score(run_data.scenario)
 
-        score_threshold = (
-            0.95 * high_score
-        )  # TODO: isn't this supposed to come from UI ?
+        pct_threshold = 0.95  # TODO: isn't this supposed to come from UI ?
+        score_threshold = pct_threshold * high_score
         pct_diff = (run_data.score / high_score - 1) * 100
         logger.debug(
-            f"Current score ({run_data.score:g}) is {pct_diff:.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
+            f"Current score ({run_data.score:g}) is {pct_diff:+.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
         )
+        if run_data.score > high_score:
+            new_score_threshold = pct_threshold * run_data.score
+            logger.debug(
+                f"Score threshold increased from ({score_threshold:.2f}) to ({new_score_threshold:.2f})"
+            )
         if run_data.score > score_threshold:
             logger.debug(
                 "Successfully passed the score threshold! Ready to move onto the next scenario."
@@ -87,7 +95,7 @@ class NewFileHandler(FileSystemEventHandler):
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
-                    previous_high_score=high_score,
+                    previous_high_score=None,
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,
