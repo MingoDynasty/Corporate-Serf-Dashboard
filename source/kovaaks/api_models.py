@@ -110,3 +110,22 @@ class LeaderboardAPIResponse(BaseModel):
     max: int
     total: int
     data: list[RankingPlayer]
+
+
+class UserScenarioCounts(BaseModel):
+    plays: int
+
+
+class UserScenarioTotalPlayItem(BaseModel):
+    leaderboardId: str
+    scenarioName: str
+    counts: UserScenarioCounts
+    rank: int
+    score: float | None = None
+
+
+class UserScenarioTotalPlayAPIResponse(BaseModel):
+    page: int
+    max: int
+    total: int
+    data: list[UserScenarioTotalPlayItem]

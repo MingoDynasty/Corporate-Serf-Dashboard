@@ -7,10 +7,15 @@ import logging
 import os
 from pathlib import Path
 from enum import StrEnum
+from datetime import datetime, timedelta
 
 import requests
 
-from source.kovaaks.api_models import LeaderboardAPIResponse, PlaylistAPIResponse
+from source.kovaaks.api_models import (
+    LeaderboardAPIResponse,
+    PlaylistAPIResponse,
+    UserScenarioTotalPlayAPIResponse,
+)
 
 TIMEOUT = 10
 logger = logging.getLogger(__name__)
@@ -28,6 +33,7 @@ class Endpoints(StrEnum):
     BENCHMARKS = "/benchmarks/player-progress-rank-benchmark"
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
+    USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
 def make_cache():
@@ -87,6 +93,80 @@ def get_leaderboard_scores(
         json.dump(response.json(), file, indent=2)
 
     return LeaderboardAPIResponse.model_validate(response.json())
+
+
+def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
+    if ttl_hours <= 0 or not os.path.exists(cache_file):
+        return False
+
+    modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime)
+    return datetime.now() - modified_at < timedelta(hours=ttl_hours)
+
+
+def get_user_scenario_total_play(
+    username: str,
+    cache_ttl_hours: int = 24,
+) -> UserScenarioTotalPlayAPIResponse:
+    cache_file = Path(CACHE_DIR, "user_scenario_total_play", f"{username}.json")
+    if _is_cache_fresh(cache_file, cache_ttl_hours):
+        with open(cache_file) as file:
+            return UserScenarioTotalPlayAPIResponse.model_validate(json.load(file))
+
+    page = 0
+    max_results = 100
+    data = []
+    total = 0
+    try:
+        while page == 0 or len(data) < total:
+            params = {
+                "username": username,
+                "page": page,
+                "max": max_results,
+                "sort_param[]": "count",
+            }
+            response = requests.get(
+                Endpoints.USER_SCENARIO_TOTAL_PLAY,
+                params=params,
+                timeout=TIMEOUT,
+            )
+            response.raise_for_status()
+
+            response_json = response.json()
+            total = response_json["total"]
+            data.extend(response_json["data"])
+            page += 1
+    except requests.RequestException:
+        if os.path.exists(cache_file):
+            logger.warning("Using stale scenario rank cache for %s", username)
+            with open(cache_file) as file:
+                return UserScenarioTotalPlayAPIResponse.model_validate(json.load(file))
+        raise
+
+    cached_response = {
+        "page": 0,
+        "max": max_results,
+        "total": total,
+        "data": data,
+    }
+    with open(cache_file, "w") as file:
+        json.dump(cached_response, file, indent=2)
+
+    return UserScenarioTotalPlayAPIResponse.model_validate(cached_response)
+
+
+def get_user_scenario_rank(
+    username: str | None,
+    scenario_name: str,
+    cache_ttl_hours: int = 24,
+) -> int | None:
+    if not username:
+        return None
+
+    response = get_user_scenario_total_play(username, cache_ttl_hours)
+    for scenario in response.data:
+        if scenario.scenarioName == scenario_name:
+            return scenario.rank
+    return None
 
 
 make_cache()

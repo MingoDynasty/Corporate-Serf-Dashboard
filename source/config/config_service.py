@@ -18,6 +18,8 @@ class ConfigData:
     port: int
     sens_round_decimal_places: int
     debug: bool = False
+    kovaaks_username: str | None = None
+    scenario_rank_cache_ttl_hours: int = 24
 
 
 def load_config() -> ConfigData:
