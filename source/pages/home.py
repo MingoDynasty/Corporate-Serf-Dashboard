@@ -521,6 +521,13 @@ def layout(**kwargs):  # noqa: ARG001
                                                         id="scenario_rank",
                                                         span=True,
                                                     ),
+                                                    parent_style={
+                                                        "display": "inline-block",
+                                                        "verticalAlign": "baseline",
+                                                    },
+                                                    style={
+                                                        "display": "inline-block",
+                                                    },
                                                 ),
                                             ],
                                             size="sm",
