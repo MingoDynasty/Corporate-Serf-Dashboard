@@ -398,6 +398,24 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_cache_file_helpers_share_username_sanitization(monkeypatch):
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    username = "Mingo Dynasty/Bad:Name"
+    safe_username = api_service._safe_cache_key(username)
+
+    assert safe_username == "Mingo_Dynasty_Bad_Name"
+    assert api_service._user_scenario_total_play_cache_file(username) == (
+        TEST_CACHE_DIR / "user_scenario_total_play" / f"{safe_username}.json"
+    )
+    assert api_service._user_scenario_total_play_page_cache_file(username, 0) == (
+        TEST_CACHE_DIR / "user_scenario_total_play" / safe_username / "page_0.json"
+    )
+    assert api_service._rank_cache_file(98330, username) == (
+        TEST_CACHE_DIR / "leaderboard_user_rank" / f"98330_{safe_username}.json"
+    )
+
+
 def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)

@@ -416,11 +416,11 @@ def resolve_leaderboard_id(
 
 
 def _rank_cache_file(leaderboard_id: int, username: str) -> Path:
-    safe_username = "".join(
-        char if char.isalnum() or char in ("-", "_") else "_"
-        for char in username
+    return Path(
+        CACHE_DIR,
+        "leaderboard_user_rank",
+        f"{leaderboard_id}_{_safe_cache_key(username)}.json",
     )
-    return Path(CACHE_DIR, "leaderboard_user_rank", f"{leaderboard_id}_{safe_username}.json")
 
 
 def get_cached_scenario_rank(
