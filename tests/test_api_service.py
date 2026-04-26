@@ -95,6 +95,82 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    api_service._write_json(
+        cache_file,
+        {
+            "page": 0,
+            "max": 100,
+            "total": 2,
+            "data": [
+                {
+                    "leaderboardId": "1",
+                    "scenarioName": "Cached First Page Only",
+                    "counts": {"plays": 10},
+                    "rank": 12,
+                    "score": 100,
+                },
+            ],
+        },
+    )
+
+    responses = [
+        {
+            "page": 0,
+            "max": 100,
+            "total": 2,
+            "data": [
+                {
+                    "leaderboardId": "10",
+                    "scenarioName": "Fresh First",
+                    "counts": {"plays": 10},
+                    "rank": 12,
+                    "score": 100,
+                },
+            ],
+        },
+        {
+            "page": 1,
+            "max": 100,
+            "total": 2,
+            "data": [
+                {
+                    "leaderboardId": "20",
+                    "scenarioName": "Fresh Second",
+                    "counts": {"plays": 5},
+                    "rank": 34,
+                    "score": 200,
+                },
+            ],
+        },
+    ]
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        return FakeResponse(responses[params["page"]])
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    api_service.hydrate_leaderboard_id_cache("MingoDynasty")
+
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["total"] == 2
+    assert [scenario["scenarioName"] for scenario in cached_data["data"]] == [
+        "Fresh First",
+        "Fresh Second",
+    ]
+    assert api_service.get_cached_leaderboard_id("Fresh First") == 10
+    assert api_service.get_cached_leaderboard_id("Fresh Second") == 20
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
