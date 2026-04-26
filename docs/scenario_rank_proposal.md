@@ -133,7 +133,8 @@ New fields in `config.toml` / `example.toml`:
 # KovaaK's webapp username. Leave empty to disable rank lookups.
 kovaaks_username = ""
 
-# Optional Steam ID. If present, this is the preferred identity check.
+# Optional Steam ID. Preferred when username search is ambiguous, such as when
+# your username is a substring of another player's username.
 steam_id = ""
 
 # How long to cache total-play metadata, in hours.

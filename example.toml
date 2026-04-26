@@ -23,7 +23,8 @@ sens_round_decimal_places = 1
 # Leave unset or empty to disable scenario rank lookups.
 kovaaks_username = ""
 
-# Optional Steam ID. If present, this is the preferred identity check.
+# Optional Steam ID. Preferred when username search is ambiguous, such as when
+# your username is a substring of another player's username.
 steam_id = ""
 
 # How long to reuse total-play metadata before fetching it again.
