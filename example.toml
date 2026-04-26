@@ -23,5 +23,11 @@ sens_round_decimal_places = 1
 # Leave unset or empty to disable scenario rank lookups.
 kovaaks_username = ""
 
+# Optional Steam ID. If present, this is the preferred identity check.
+steam_id = ""
+
+# How long to reuse total-play metadata before fetching it again.
+scenario_metadata_cache_ttl_hours = 24
+
 # How long to reuse cached scenario rank data before fetching it again.
-scenario_rank_cache_ttl_hours = 24
+scenario_rank_cache_ttl_hours = 168

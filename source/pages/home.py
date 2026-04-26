@@ -14,10 +14,10 @@ from dash import (
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
-import requests
 
 from source.config.config_service import config
-from source.kovaaks.api_service import get_user_scenario_rank
+from source.kovaaks.api_models import ScenarioRankStatus
+from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
     get_playlists,
     get_rank_data_from_playlist,
@@ -80,13 +80,12 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 
 @callback(
     Output("scenario_num_runs", "children"),
-    Output("scenario_rank", "children"),
     Output("scenario_datetime_last_played", "children"),
     Output("last-played-tooltip", "label"),
     Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
 )
-def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str, str]:
+def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     """
     Updates the Scenario Stats on the UI.
     :param _: trigger from the interval component. Its actual value is not used.
@@ -94,28 +93,46 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str, str]:
     :return: Scenario Stats data
     """
     if not selected_scenario or not is_scenario_in_database(selected_scenario):
-        return 0, "N/A", "N/A", "N/A"
+        return 0, "N/A", "N/A"
     scenario_stats = get_scenario_stats(selected_scenario)
 
     days_ago = abs((scenario_stats.date_last_played - datetime.now()).days)
-    scenario_rank = "N/A"
-    try:
-        rank = get_user_scenario_rank(
-            config.kovaaks_username,
-            selected_scenario,
-            config.scenario_rank_cache_ttl_hours,
-        )
-        if rank:
-            scenario_rank = f"#{rank}"
-    except requests.RequestException:
-        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
-
     return (
         scenario_stats.number_of_runs,
-        scenario_rank,
         f"{days_ago} days ago",
         scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
     )
+
+
+@callback(
+    Output("scenario_rank", "children"),
+    Input("do_update", "data"),
+    Input("scenario-dropdown-selection", "value"),
+)
+def get_scenario_rank(_, selected_scenario) -> str:
+    if not selected_scenario or not is_scenario_in_database(selected_scenario):
+        return "N/A"
+
+    try:
+        rank_info = get_scenario_rank_info(
+            selected_scenario,
+            config.kovaaks_username,
+            config.steam_id,
+            config.scenario_metadata_cache_ttl_hours,
+            config.scenario_rank_cache_ttl_hours,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
+        return "N/A"
+
+    match rank_info.status:
+        case ScenarioRankStatus.RANKED:
+            return f"#{rank_info.rank}"
+        case ScenarioRankStatus.UNRANKED:
+            return "Unranked"
+        case ScenarioRankStatus.UNKNOWN:
+            return "N/A"
+    return "N/A"
 
 
 @callback(
@@ -499,9 +516,11 @@ def layout(**kwargs):  # noqa: ARG001
                                                     fw=700,
                                                     span=True,
                                                 ),
-                                                dmc.Text(
-                                                    id="scenario_rank",
-                                                    span=True,
+                                                dcc.Loading(
+                                                    dmc.Text(
+                                                        id="scenario_rank",
+                                                        span=True,
+                                                    ),
                                                 ),
                                             ],
                                             size="sm",

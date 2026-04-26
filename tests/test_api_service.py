@@ -2,6 +2,12 @@ import json
 import shutil
 from pathlib import Path
 
+from source.kovaaks.api_models import (
+    LeaderboardAPIResponse,
+    RankingPlayer,
+    ScenarioRankInfo,
+    ScenarioRankStatus,
+)
 from source.kovaaks import api_service
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
@@ -74,28 +80,18 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def test_get_user_scenario_rank_reads_fresh_cache(monkeypatch):
+def test_get_user_scenario_rank_reads_fresh_rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
-    cache_dir = TEST_CACHE_DIR / "user_scenario_total_play"
-    cache_dir.mkdir(parents=True)
-    cache_file = cache_dir / "MingoDynasty.json"
-    cache_file.write_text(
-        json.dumps(
-            {
-                "page": 0,
-                "max": 100,
-                "total": 1,
-                "data": [
-                    {
-                        "leaderboardId": "1",
-                        "scenarioName": "Cached Scenario",
-                        "counts": {"plays": 10},
-                        "rank": 99,
-                        "score": 100,
-                    },
-                ],
-            },
+    api_service.make_cache()
+    api_service.save_leaderboard_id("Cached Scenario", 1, "test")
+    api_service.save_scenario_rank(
+        1,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=99,
+            leaderboard_id=1,
         ),
     )
 
@@ -108,7 +104,110 @@ def test_get_user_scenario_rank_reads_fresh_cache(monkeypatch):
         api_service.get_user_scenario_rank(
             "MingoDynasty",
             "Cached Scenario",
+            cache_ttl_hours=168,
         )
         == 99
     )
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_fetch_scenario_rank_prefers_exact_steam_id(monkeypatch):
+    players = [
+        RankingPlayer(
+            steamId="wrong-steam-id",
+            score=100,
+            rank=1,
+            webappUsername="MingoDynasty",
+            steamAccountName="MingoDynasty",
+        ),
+        RankingPlayer(
+            steamId="right-steam-id",
+            score=200,
+            rank=2,
+            webappUsername="SomeoneElse",
+            steamAccountName="SomeoneElse",
+        ),
+    ]
+
+    def fake_get_leaderboard_scores(*_args, **_kwargs):
+        return LeaderboardAPIResponse(page=0, max=50, total=2, data=players)
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    rank_info = api_service.fetch_scenario_rank(
+        98330,
+        "MingoDynasty",
+        "right-steam-id",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 2
+    assert rank_info.score == 200
+
+
+def test_fetch_scenario_rank_returns_unranked_without_exact_match(monkeypatch):
+    players = [
+        RankingPlayer(
+            steamId="765",
+            score=100,
+            rank=1,
+            webappUsername="Domingo",
+            steamAccountName="Domingo",
+        ),
+    ]
+
+    def fake_get_leaderboard_scores(*_args, **_kwargs):
+        return LeaderboardAPIResponse(page=0, max=50, total=1, data=players)
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    rank_info = api_service.fetch_scenario_rank(98330, "MingoDynasty")
+
+    assert rank_info.status == ScenarioRankStatus.UNRANKED
+    assert rank_info.rank is None
+
+
+def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fake_get(_url, params, timeout):
+        assert params["scenarioNameSearch"] == "VT Pasu Intermediate S5"
+        assert params["max"] == 100
+        assert timeout == api_service.TIMEOUT
+        return FakeResponse(
+            {
+                "page": 0,
+                "max": 100,
+                "total": 2,
+                "data": [
+                    {
+                        "rank": 1,
+                        "leaderboardId": 98330,
+                        "scenarioName": "VT Pasu Intermediate S5",
+                    },
+                    {
+                        "rank": 2,
+                        "leaderboardId": 106278,
+                        "scenarioName": "VT Pasu Intermediate S5 Multi",
+                    },
+                ],
+            },
+        )
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    leaderboard_id = api_service.search_scenario_exact("VT Pasu Intermediate S5")
+
+    assert leaderboard_id == 98330
+    assert api_service.get_cached_leaderboard_id("VT Pasu Intermediate S5") == 98330
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)

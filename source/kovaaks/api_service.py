@@ -7,13 +7,17 @@ import logging
 import os
 from pathlib import Path
 from enum import StrEnum
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import requests
 
 from source.kovaaks.api_models import (
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
+    RankingPlayer,
+    ScenarioRankInfo,
+    ScenarioRankStatus,
+    ScenarioSearchAPIResponse,
     UserScenarioTotalPlayAPIResponse,
 )
 
@@ -33,12 +37,20 @@ class Endpoints(StrEnum):
     BENCHMARKS = "/benchmarks/player-progress-rank-benchmark"
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
+    SEARCH_SCENARIO = "/scenario/popular"
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
 def make_cache():
     for endpoint in Endpoints:
         os.makedirs(Path(CACHE_DIR, endpoint.name.lower()), exist_ok=True)
+    for directory in (
+        "scenario_leaderboards",
+        "user_scenario_total_play",
+        "leaderboard_user_rank",
+        "leaderboard_totals",
+    ):
+        os.makedirs(Path(CACHE_DIR, directory), exist_ok=True)
     return
 
 
@@ -76,21 +88,30 @@ def get_benchmark_json(
 
 
 def get_leaderboard_scores(
-    leaderboard_id: int, use_cache: bool = False
+    leaderboard_id: int,
+    use_cache: bool = False,
+    username_search: str | None = None,
 ) -> LeaderboardAPIResponse:
     cache_file = Path(CACHE_DIR, "leaderboard", f"{leaderboard_id}.json")
-    if use_cache and os.path.exists(cache_file):
+    if use_cache and not username_search and os.path.exists(cache_file):
         with open(cache_file) as file:
             data = json.load(file)
             return LeaderboardAPIResponse.model_validate(data)
 
-    params = {"page": 0, "max": 100, "leaderboardId": leaderboard_id}
+    params = {
+        "page": 0,
+        "max": 50 if username_search else 100,
+        "leaderboardId": leaderboard_id,
+    }
+    if username_search:
+        params["usernameSearch"] = username_search
     response = requests.get(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
     response.raise_for_status()
 
     # save to cache
-    with open(cache_file, "w") as file:
-        json.dump(response.json(), file, indent=2)
+    if not username_search:
+        with open(cache_file, "w") as file:
+            json.dump(response.json(), file, indent=2)
 
     return LeaderboardAPIResponse.model_validate(response.json())
 
@@ -103,13 +124,78 @@ def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
     return datetime.now() - modified_at < timedelta(hours=ttl_hours)
 
 
+def _read_json(cache_file: Path) -> dict | list | None:
+    try:
+        with open(cache_file, encoding="utf-8") as file:
+            return json.load(file)
+    except (OSError, json.JSONDecodeError):
+        logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
+        return None
+
+
+def _write_json(cache_file: Path, data: dict | list) -> None:
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(cache_file, "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
+
+
+def _leaderboard_mapping_file() -> Path:
+    return Path(CACHE_DIR, "scenario_leaderboards", "scenario_name_to_leaderboard_id.json")
+
+
+def get_cached_leaderboard_id(scenario_name: str) -> int | None:
+    cache_data = _read_json(_leaderboard_mapping_file())
+    if not isinstance(cache_data, dict):
+        return None
+
+    scenario_data = cache_data.get(scenario_name)
+    if not isinstance(scenario_data, dict):
+        return None
+
+    leaderboard_id = scenario_data.get("leaderboard_id")
+    if leaderboard_id is None:
+        return None
+    return int(leaderboard_id)
+
+
+def save_leaderboard_id(
+    scenario_name: str,
+    leaderboard_id: int,
+    source: str,
+) -> None:
+    cache_file = _leaderboard_mapping_file()
+    cache_data = _read_json(cache_file)
+    mappings = cache_data if isinstance(cache_data, dict) else {}
+
+    existing = mappings.get(scenario_name)
+    if isinstance(existing, dict) and existing.get("leaderboard_id") not in (
+        None,
+        leaderboard_id,
+    ):
+        logger.warning(
+            "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
+            scenario_name,
+            existing.get("leaderboard_id"),
+            leaderboard_id,
+            source,
+        )
+        return
+
+    mappings[scenario_name] = {
+        "leaderboard_id": int(leaderboard_id),
+        "source": source,
+        "fetched_at": datetime.now(UTC).isoformat(),
+    }
+    _write_json(cache_file, mappings)
+
+
 def get_user_scenario_total_play(
     username: str,
     cache_ttl_hours: int = 24,
 ) -> UserScenarioTotalPlayAPIResponse:
     cache_file = Path(CACHE_DIR, "user_scenario_total_play", f"{username}.json")
     if _is_cache_fresh(cache_file, cache_ttl_hours):
-        with open(cache_file) as file:
+        with open(cache_file, encoding="utf-8") as file:
             return UserScenarioTotalPlayAPIResponse.model_validate(json.load(file))
 
     page = 0
@@ -137,8 +223,8 @@ def get_user_scenario_total_play(
             page += 1
     except requests.RequestException:
         if os.path.exists(cache_file):
-            logger.warning("Using stale scenario rank cache for %s", username)
-            with open(cache_file) as file:
+            logger.warning("Using stale total-play cache for %s", username)
+            with open(cache_file, encoding="utf-8") as file:
                 return UserScenarioTotalPlayAPIResponse.model_validate(json.load(file))
         raise
 
@@ -148,10 +234,203 @@ def get_user_scenario_total_play(
         "total": total,
         "data": data,
     }
-    with open(cache_file, "w") as file:
-        json.dump(cached_response, file, indent=2)
+    _write_json(cache_file, cached_response)
 
     return UserScenarioTotalPlayAPIResponse.model_validate(cached_response)
+
+
+def hydrate_leaderboard_id_cache(
+    username: str | None,
+    cache_ttl_hours: int = 24,
+) -> None:
+    if not username:
+        return
+
+    response = get_user_scenario_total_play(username, cache_ttl_hours)
+    for scenario in response.data:
+        save_leaderboard_id(
+            scenario.scenarioName,
+            int(scenario.leaderboardId),
+            "total-play",
+        )
+
+
+def search_scenario_exact(scenario_name: str) -> int | None:
+    params = {"page": 0, "max": 100, "scenarioNameSearch": scenario_name}
+    response = requests.get(Endpoints.SEARCH_SCENARIO, params=params, timeout=TIMEOUT)
+    response.raise_for_status()
+
+    search_response = ScenarioSearchAPIResponse.model_validate(response.json())
+    matches = [
+        scenario
+        for scenario in search_response.data
+        if scenario.scenarioName == scenario_name
+    ]
+    if len(matches) == 1:
+        leaderboard_id = int(matches[0].leaderboardId)
+        save_leaderboard_id(scenario_name, leaderboard_id, "scenario-search")
+        return leaderboard_id
+    if len(matches) > 1:
+        logger.warning(
+            "Found multiple exact scenario search matches for %s: %s",
+            scenario_name,
+            [match.leaderboardId for match in matches],
+        )
+    return None
+
+
+def resolve_leaderboard_id(
+    scenario_name: str,
+    username: str | None = None,
+    metadata_cache_ttl_hours: int = 24,
+) -> int | None:
+    leaderboard_id = get_cached_leaderboard_id(scenario_name)
+    if leaderboard_id is not None:
+        return leaderboard_id
+
+    if username:
+        hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
+        leaderboard_id = get_cached_leaderboard_id(scenario_name)
+        if leaderboard_id is not None:
+            return leaderboard_id
+
+    return search_scenario_exact(scenario_name)
+
+
+def _rank_cache_file(leaderboard_id: int, username: str) -> Path:
+    safe_username = "".join(
+        char if char.isalnum() or char in ("-", "_") else "_"
+        for char in username
+    )
+    return Path(CACHE_DIR, "leaderboard_user_rank", f"{leaderboard_id}_{safe_username}.json")
+
+
+def get_cached_scenario_rank(
+    leaderboard_id: int,
+    username: str,
+    cache_ttl_hours: int = 168,
+) -> ScenarioRankInfo | None:
+    cache_file = _rank_cache_file(leaderboard_id, username)
+    if not _is_cache_fresh(cache_file, cache_ttl_hours):
+        return None
+
+    cache_data = _read_json(cache_file)
+    if not isinstance(cache_data, dict):
+        return None
+    return ScenarioRankInfo.model_validate(cache_data)
+
+
+def save_scenario_rank(
+    leaderboard_id: int,
+    username: str,
+    rank_info: ScenarioRankInfo,
+) -> None:
+    _write_json(
+        _rank_cache_file(leaderboard_id, username),
+        rank_info.model_dump(mode="json", exclude_none=True),
+    )
+
+
+def _find_matching_player(
+    players: list[RankingPlayer],
+    username: str,
+    steam_id: str | None = None,
+) -> RankingPlayer | None:
+    if steam_id:
+        for player in players:
+            if player.steamId == steam_id:
+                return player
+
+    for player in players:
+        if player.webappUsername == username:
+            return player
+
+    for player in players:
+        if player.steamAccountName == username:
+            return player
+
+    return None
+
+
+def fetch_scenario_rank(
+    leaderboard_id: int,
+    username: str,
+    steam_id: str | None = None,
+) -> ScenarioRankInfo:
+    leaderboard_response = get_leaderboard_scores(
+        leaderboard_id,
+        username_search=username,
+    )
+    player = _find_matching_player(leaderboard_response.data, username, steam_id)
+    if not player:
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNRANKED,
+            leaderboard_id=leaderboard_id,
+            fetched_at=datetime.now(UTC),
+        )
+
+    return ScenarioRankInfo(
+        status=ScenarioRankStatus.RANKED,
+        rank=player.rank,
+        leaderboard_id=leaderboard_id,
+        score=player.score,
+        fetched_at=datetime.now(UTC),
+    )
+
+
+def get_scenario_rank_info(
+    scenario_name: str,
+    username: str | None,
+    steam_id: str | None = None,
+    metadata_cache_ttl_hours: int = 24,
+    rank_cache_ttl_hours: int = 168,
+    force_refresh: bool = False,
+) -> ScenarioRankInfo:
+    if not username:
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="KovaaK's username is not configured.",
+        )
+
+    leaderboard_id = resolve_leaderboard_id(
+        scenario_name,
+        username,
+        metadata_cache_ttl_hours,
+    )
+    if leaderboard_id is None:
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message=f"Could not resolve leaderboard for {scenario_name}.",
+        )
+
+    if not force_refresh:
+        cached_rank = get_cached_scenario_rank(
+            leaderboard_id,
+            username,
+            rank_cache_ttl_hours,
+        )
+        if cached_rank:
+            return cached_rank
+
+    rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+    save_scenario_rank(leaderboard_id, username, rank_info)
+    return rank_info
+
+
+def refresh_scenario_rank(
+    scenario_name: str,
+    username: str,
+    steam_id: str | None = None,
+    metadata_cache_ttl_hours: int = 24,
+) -> ScenarioRankInfo:
+    return get_scenario_rank_info(
+        scenario_name,
+        username,
+        steam_id,
+        metadata_cache_ttl_hours,
+        rank_cache_ttl_hours=0,
+        force_refresh=True,
+    )
 
 
 def get_user_scenario_rank(
@@ -159,13 +438,13 @@ def get_user_scenario_rank(
     scenario_name: str,
     cache_ttl_hours: int = 24,
 ) -> int | None:
-    if not username:
-        return None
-
-    response = get_user_scenario_total_play(username, cache_ttl_hours)
-    for scenario in response.data:
-        if scenario.scenarioName == scenario_name:
-            return scenario.rank
+    rank_info = get_scenario_rank_info(
+        scenario_name,
+        username,
+        rank_cache_ttl_hours=cache_ttl_hours,
+    )
+    if rank_info.status == ScenarioRankStatus.RANKED:
+        return rank_info.rank
     return None
 
 

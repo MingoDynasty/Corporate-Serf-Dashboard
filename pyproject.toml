@@ -609,5 +609,6 @@ disable_error_code = ["import-untyped"]
 
 [dependency-groups]
 dev = [
+    "pylint>=4.0.5",
     "ruff>=0.14.5",
 ]
