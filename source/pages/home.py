@@ -131,6 +131,9 @@ def get_scenario_rank(_, selected_scenario) -> str:
         case ScenarioRankStatus.UNRANKED:
             return "Unranked"
         case ScenarioRankStatus.UNKNOWN:
+            if rank_info.error_message:
+                logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
+                dash_logger.error(rank_info.error_message)
             return "N/A"
     return "N/A"
 

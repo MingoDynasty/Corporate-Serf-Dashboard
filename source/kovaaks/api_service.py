@@ -27,6 +27,10 @@ logger = logging.getLogger(__name__)
 CACHE_DIR = "cache"
 
 
+class UnknownKovaaksUserError(ValueError):
+    """Raised when KovaaK's returns no user for the configured username."""
+
+
 class Endpoints(StrEnum):
     def __new__(cls, path: str):
         base = "https://kovaaks.com/webapp-backend"
@@ -184,6 +188,10 @@ def _has_terminal_user_scenario_total_play_page(
     return False
 
 
+def _is_unknown_username_total_play_response(cache_data: dict | list | None) -> bool:
+    return isinstance(cache_data, dict) and cache_data.get("error") == "unknown_username"
+
+
 def _is_complete_paginated_response(
     cache_data: dict | list | None,
     max_results: int,
@@ -261,6 +269,10 @@ def get_user_scenario_total_play(
     cache_file = _user_scenario_total_play_cache_file(username)
     if _is_cache_fresh(cache_file, cache_ttl_hours):
         cache_data = _read_json(cache_file)
+        if _is_unknown_username_total_play_response(cache_data):
+            raise UnknownKovaaksUserError(
+                f"KovaaK's username '{username}' was not found."
+            )
         if _is_complete_paginated_response(
             cache_data,
             max_results,
@@ -289,12 +301,22 @@ def get_user_scenario_total_play(
 
             response_json = response.json()
             if response_json is None:
-                response_json = {
+                unknown_user_response = {
                     "page": page,
                     "max": max_results,
                     "total": 0,
                     "data": [],
+                    "error": "unknown_username",
+                    "username": username,
                 }
+                _write_json(
+                    _user_scenario_total_play_page_cache_file(username, page),
+                    unknown_user_response,
+                )
+                _write_json(cache_file, unknown_user_response)
+                raise UnknownKovaaksUserError(
+                    f"KovaaK's username '{username}' was not found."
+                )
             _write_json(
                 _user_scenario_total_play_page_cache_file(username, page),
                 response_json,
@@ -481,11 +503,18 @@ def get_scenario_rank_info(
             error_message="KovaaK's username is not configured.",
         )
 
-    leaderboard_id = resolve_leaderboard_id(
-        scenario_name,
-        username,
-        metadata_cache_ttl_hours,
-    )
+    try:
+        leaderboard_id = resolve_leaderboard_id(
+            scenario_name,
+            username,
+            metadata_cache_ttl_hours,
+        )
+    except UnknownKovaaksUserError as exc:
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            scenario_name=scenario_name,
+            error_message=str(exc),
+        )
     if leaderboard_id is None:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -507,6 +536,16 @@ def get_scenario_rank_info(
             return cached_rank
 
     rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+    if rank_info.status == ScenarioRankStatus.UNRANKED:
+        try:
+            get_user_scenario_total_play(username, metadata_cache_ttl_hours)
+        except UnknownKovaaksUserError as exc:
+            return ScenarioRankInfo(
+                status=ScenarioRankStatus.UNKNOWN,
+                leaderboard_id=leaderboard_id,
+                scenario_name=scenario_name,
+                error_message=str(exc),
+            )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)
     return rank_info

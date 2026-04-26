@@ -2,6 +2,8 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
+
 from source.kovaaks.api_models import (
     LeaderboardAPIResponse,
     RankingPlayer,
@@ -179,11 +181,10 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
 
     monkeypatch.setattr(api_service.requests, "get", fake_get)
 
-    response = api_service.get_user_scenario_total_play("UnknownUser")
+    with pytest.raises(api_service.UnknownKovaaksUserError):
+        api_service.get_user_scenario_total_play("UnknownUser")
 
     assert fetched_pages == [0]
-    assert response.total == 0
-    assert response.data == []
 
     cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
@@ -192,6 +193,8 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "max": 100,
         "total": 0,
         "data": [],
+        "error": "unknown_username",
+        "username": "UnknownUser",
     }
 
     page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser" / "page_0.json"
@@ -200,6 +203,8 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "max": 100,
         "total": 0,
         "data": [],
+        "error": "unknown_username",
+        "username": "UnknownUser",
     }
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -390,6 +395,45 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_get_leaderboard_scores(*_args, **_kwargs):
+        return LeaderboardAPIResponse(page=0, max=50, total=0, data=[])
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        assert params["username"] == "UnknownUser"
+        return FakeResponse(None)
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "UnknownUser",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNKNOWN
+    assert rank_info.rank is None
+    assert rank_info.error_message == "KovaaK's username 'UnknownUser' was not found."
+
+    rank_cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_UnknownUser.json"
+    )
+    assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
