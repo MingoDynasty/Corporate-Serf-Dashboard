@@ -400,7 +400,14 @@ def resolve_leaderboard_id(
         return leaderboard_id
 
     if username:
-        hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
+        try:
+            hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
+        except requests.RequestException:
+            logger.warning(
+                "Failed to hydrate leaderboard metadata from total-play for %s",
+                username,
+                exc_info=True,
+            )
         leaderboard_id = get_cached_leaderboard_id(scenario_name)
         if leaderboard_id is not None:
             return leaderboard_id

@@ -437,6 +437,71 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_resolve_leaderboard_id_falls_back_to_search_after_total_play_failure(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fail_hydrate(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    searched_scenarios = []
+
+    def fake_search_scenario_exact(scenario_name):
+        searched_scenarios.append(scenario_name)
+        return 98330
+
+    monkeypatch.setattr(
+        api_service,
+        "hydrate_leaderboard_id_cache",
+        fail_hydrate,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "search_scenario_exact",
+        fake_search_scenario_exact,
+    )
+
+    leaderboard_id = api_service.resolve_leaderboard_id(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert leaderboard_id == 98330
+    assert searched_scenarios == ["VT Pasu Intermediate S5"]
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_resolve_leaderboard_id_does_not_hide_unknown_username(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fail_hydrate(*_args, **_kwargs):
+        raise api_service.UnknownKovaaksUserError(
+            "KovaaK's username 'UnknownUser' was not found."
+        )
+
+    def fail_search(*_args, **_kwargs):
+        raise AssertionError("unknown username should stop fallback")
+
+    monkeypatch.setattr(
+        api_service,
+        "hydrate_leaderboard_id_cache",
+        fail_hydrate,
+    )
+    monkeypatch.setattr(api_service, "search_scenario_exact", fail_search)
+
+    with pytest.raises(api_service.UnknownKovaaksUserError):
+        api_service.resolve_leaderboard_id(
+            "VT Pasu Intermediate S5",
+            "UnknownUser",
+        )
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_fetch_scenario_rank_prefers_exact_steam_id(monkeypatch):
     players = [
         RankingPlayer(
