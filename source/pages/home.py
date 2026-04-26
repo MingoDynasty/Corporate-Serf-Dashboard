@@ -16,7 +16,7 @@ import dash_mantine_components as dmc
 import plotly.graph_objects as go
 
 from source.config.config_service import config
-from source.kovaaks.api_models import ScenarioRankStatus
+from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
     get_playlists,
@@ -49,6 +49,22 @@ dash.register_page(
     title="Corporate Serf Dashboard",
     redirect_from=["/home", "/index"],
 )
+
+
+def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:
+    """Format the compact Scenario Stats rank value shown after the fixed label."""
+    match rank_info.status:
+        case ScenarioRankStatus.RANKED:
+            if rank_info.rank is None:
+                return "N/A"
+            if rank_info.total_players is not None:
+                return f"{rank_info.rank} of {rank_info.total_players:,}"
+            return f"{rank_info.rank}"
+        case ScenarioRankStatus.UNRANKED:
+            return "Unranked"
+        case ScenarioRankStatus.UNKNOWN:
+            return "N/A"
+    return "N/A"
 
 
 @callback(
@@ -120,6 +136,7 @@ def get_scenario_rank(_, selected_scenario) -> str:
             config.steam_id,
             config.scenario_metadata_cache_ttl_hours,
             config.scenario_rank_cache_ttl_hours,
+            config.leaderboard_total_cache_ttl_hours,
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
@@ -130,14 +147,14 @@ def get_scenario_rank(_, selected_scenario) -> str:
             if rank_info.warning_message:
                 logger.warning("Scenario rank warning: %s", rank_info.warning_message)
                 dash_logger.warning(rank_info.warning_message)
-            return f"#{rank_info.rank}"
+            return format_scenario_rank(rank_info)
         case ScenarioRankStatus.UNRANKED:
-            return "Unranked"
+            return format_scenario_rank(rank_info)
         case ScenarioRankStatus.UNKNOWN:
             if rank_info.error_message:
                 logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
                 dash_logger.error(rank_info.error_message)
-            return "N/A"
+            return format_scenario_rank(rank_info)
     return "N/A"
 
 
