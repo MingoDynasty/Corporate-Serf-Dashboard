@@ -46,6 +46,7 @@ class Endpoints(StrEnum):
 
 
 def make_cache():
+    """Create non-user-specific cache directories and permanent index files."""
     for endpoint in Endpoints:
         os.makedirs(Path(CACHE_DIR, endpoint.name.lower()), exist_ok=True)
     for directory in (
@@ -153,6 +154,7 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
 
 
 def _safe_cache_key(value: str) -> str:
+    """Normalize user-provided values before embedding them in cache paths."""
     return "".join(
         char if char.isalnum() or char in ("-", "_") else "_"
         for char in value
@@ -176,6 +178,13 @@ def _has_terminal_user_scenario_total_play_page(
     username: str,
     max_results: int,
 ) -> bool:
+    """
+    Return whether cached total-play page files include a final short page.
+
+    The merged total-play cache alone is ambiguous when it has exactly a full page
+    of rows. A raw page with fewer than `max_results` rows is our signal that we
+    actually reached the end of pagination.
+    """
     page_dir = Path(CACHE_DIR, "user_scenario_total_play", _safe_cache_key(username))
     for page_file in page_dir.glob("page_*.json"):
         cache_data = _read_json(page_file)
@@ -189,6 +198,7 @@ def _has_terminal_user_scenario_total_play_page(
 
 
 def _is_unknown_username_total_play_response(cache_data: dict | list | None) -> bool:
+    """Detect our cached marker for KovaaK's literal-null unknown-user response."""
     return isinstance(cache_data, dict) and cache_data.get("error") == "unknown_username"
 
 
@@ -197,6 +207,13 @@ def _is_complete_paginated_response(
     max_results: int,
     terminal_page_seen: bool,
 ) -> bool:
+    """
+    Validate that a merged paginated cache represents a complete fetch.
+
+    `total-play` can report a `total` that does not force us to probe the next
+    page. If the merged row count lands exactly on a page boundary, require a
+    cached terminal page before trusting the merged file.
+    """
     if not isinstance(cache_data, dict):
         return False
 
@@ -235,6 +252,7 @@ def save_leaderboard_id(
     leaderboard_id: int,
     source: str,
 ) -> None:
+    """Upsert a scenario-name to leaderboard-ID mapping unless it conflicts."""
     cache_file = _leaderboard_mapping_file()
     cache_data = _read_json(cache_file)
     mappings = cache_data if isinstance(cache_data, dict) else {}
@@ -265,6 +283,13 @@ def get_user_scenario_total_play(
     username: str,
     cache_ttl_hours: int = 24,
 ) -> UserScenarioTotalPlayAPIResponse:
+    """
+    Fetch and cache total-play metadata for a user.
+
+    This endpoint is used only as metadata for discovering scenario leaderboard
+    IDs. It is not authoritative for current score or rank, so callers should not
+    use the returned `rank` field for UI rank display.
+    """
     max_results = 100
     cache_file = _user_scenario_total_play_cache_file(username)
     if _is_cache_fresh(cache_file, cache_ttl_hours):
@@ -301,6 +326,8 @@ def get_user_scenario_total_play(
 
             response_json = response.json()
             if response_json is None:
+                # KovaaK's returns literal null when the username does not exist.
+                # Cache a structured marker so later lookups fail explicitly.
                 unknown_user_response = {
                     "page": page,
                     "max": max_results,
@@ -327,6 +354,9 @@ def get_user_scenario_total_play(
             data.extend(response_data)
             page += 1
             total = max(total, len(data))
+            # Keep fetching while the API says more rows exist, and also probe
+            # one extra page when the current page is full. Some observed
+            # responses under-report `total`.
             if not response_data:
                 break
             if len(response_data) < max_results and len(data) >= total:
@@ -354,6 +384,7 @@ def hydrate_leaderboard_id_cache(
     username: str | None,
     cache_ttl_hours: int = 24,
 ) -> None:
+    """Use total-play metadata to enrich the permanent leaderboard mapping cache."""
     if not username:
         return
 
@@ -367,6 +398,12 @@ def hydrate_leaderboard_id_cache(
 
 
 def search_scenario_exact(scenario_name: str) -> int | None:
+    """
+    Resolve a scenario by exact name through KovaaK's scenario search endpoint.
+
+    The API returns fuzzy/prefix matches, so `data[0]` is not safe. Only a single
+    exact `scenarioName` match is accepted.
+    """
     params = {"page": 0, "max": 100, "scenarioNameSearch": scenario_name}
     response = requests.get(Endpoints.SEARCH_SCENARIO, params=params, timeout=TIMEOUT)
     response.raise_for_status()
@@ -395,6 +432,13 @@ def resolve_leaderboard_id(
     username: str | None = None,
     metadata_cache_ttl_hours: int = 24,
 ) -> int | None:
+    """
+    Resolve a selected scenario name to a leaderboard ID.
+
+    The total-play cache is a best-effort metadata source. If it is unavailable,
+    continue to exact scenario search rather than treating cache failure as a
+    user-facing rank failure.
+    """
     leaderboard_id = get_cached_leaderboard_id(scenario_name)
     if leaderboard_id is not None:
         return leaderboard_id
@@ -454,6 +498,7 @@ def _find_matching_player(
     username: str,
     steam_id: str | None = None,
 ) -> RankingPlayer | None:
+    """Choose the exact player from a partial-match leaderboard search result."""
     if steam_id:
         for player in players:
             if player.steamId == steam_id:
@@ -475,6 +520,12 @@ def fetch_scenario_rank(
     username: str,
     steam_id: str | None = None,
 ) -> ScenarioRankInfo:
+    """
+    Fetch the user's current rank from the authoritative leaderboard endpoint.
+
+    `usernameSearch` is partial-match, so the response is filtered again by
+    Steam ID or exact username before it is trusted.
+    """
     leaderboard_response = get_leaderboard_scores(
         leaderboard_id,
         username_search=username,
@@ -504,6 +555,12 @@ def get_scenario_rank_info(
     rank_cache_ttl_hours: int = 168,
     force_refresh: bool = False,
 ) -> ScenarioRankInfo:
+    """
+    Main rank lookup entry point for UI and background refresh callers.
+
+    Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
+    code can display N/A without knowing endpoint or cache details.
+    """
     if not username:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -568,6 +625,9 @@ def get_scenario_rank_info(
             error_message=f"Failed to fetch scenario rank for {scenario_name}.",
         )
     if rank_info.status == ScenarioRankStatus.UNRANKED:
+        # A missing leaderboard row normally means the user has not played the
+        # scenario. Because an invalid configured username can look the same,
+        # ask total-play to explicitly confirm whether the user exists.
         try:
             get_user_scenario_total_play(username, metadata_cache_ttl_hours)
         except UnknownKovaaksUserError as exc:
