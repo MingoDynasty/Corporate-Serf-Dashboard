@@ -289,9 +289,19 @@ def get_user_scenario_total_play(
     This endpoint is used only as metadata for discovering scenario leaderboard
     IDs. It is not authoritative for current score or rank, so callers should not
     use the returned `rank` field for UI rank display.
+
+    High-level flow:
+    1. Trust a fresh merged cache only if it looks complete.
+    2. Otherwise fetch and cache each raw API page.
+    3. Write a merged cache response for simple future reads.
+    4. Fall back to stale merged cache only when the API itself is unavailable.
     """
     max_results = 100
     cache_file = _user_scenario_total_play_cache_file(username)
+
+    # Fast path: use the merged cache only when it has enough evidence that all
+    # pages were fetched. This avoids getting stuck forever with a page-0-only
+    # cache file from an earlier buggy or interrupted run.
     if _is_cache_fresh(cache_file, cache_ttl_hours):
         cache_data = _read_json(cache_file)
         if _is_unknown_username_total_play_response(cache_data):
@@ -310,6 +320,9 @@ def get_user_scenario_total_play(
     data = []
     total = 0
     try:
+        # Slow path: collect raw pages first, then synthesize the merged cache.
+        # Keeping the page files makes API behavior inspectable without forcing
+        # every caller to understand pagination.
         while True:
             params = {
                 "username": username,
@@ -362,6 +375,8 @@ def get_user_scenario_total_play(
             if len(response_data) < max_results and len(data) >= total:
                 break
     except requests.RequestException:
+        # A network failure is not proof that the user has no plays. Reuse stale
+        # metadata if we have it; otherwise let the caller decide how to degrade.
         if os.path.exists(cache_file):
             logger.warning("Using stale total-play cache for %s", username)
             cache_data = _read_json(cache_file)
@@ -369,6 +384,8 @@ def get_user_scenario_total_play(
                 return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
         raise
 
+    # The merged cache is the app-facing snapshot. Individual page files are
+    # retained only for debuggability and cache-completeness checks.
     cached_response = {
         "page": 0,
         "max": max_results,
@@ -384,7 +401,12 @@ def hydrate_leaderboard_id_cache(
     username: str | None,
     cache_ttl_hours: int = 24,
 ) -> None:
-    """Use total-play metadata to enrich the permanent leaderboard mapping cache."""
+    """
+    Use total-play metadata to enrich the permanent leaderboard mapping cache.
+
+    This is deliberately an upsert-only metadata operation. It should never be
+    treated as current rank or score truth.
+    """
     if not username:
         return
 
@@ -438,12 +460,20 @@ def resolve_leaderboard_id(
     The total-play cache is a best-effort metadata source. If it is unavailable,
     continue to exact scenario search rather than treating cache failure as a
     user-facing rank failure.
+
+    Fallback order:
+    1. Permanent local mapping cache.
+    2. User total-play metadata hydration.
+    3. Exact-name scenario search.
     """
+    # The permanent cache is the cheapest and most trusted source once learned.
     leaderboard_id = get_cached_leaderboard_id(scenario_name)
     if leaderboard_id is not None:
         return leaderboard_id
 
     if username:
+        # Hydration is opportunistic: it can fill many mappings at once, but
+        # failure should not block exact search for the selected scenario.
         try:
             hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
         except requests.RequestException:
@@ -456,6 +486,7 @@ def resolve_leaderboard_id(
         if leaderboard_id is not None:
             return leaderboard_id
 
+    # Last resort: ask KovaaK's scenario search and accept only exact matches.
     return search_scenario_exact(scenario_name)
 
 
@@ -560,6 +591,13 @@ def get_scenario_rank_info(
 
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
     code can display N/A without knowing endpoint or cache details.
+
+    Result states:
+    - RANKED: leaderboard exists and the exact user has a score.
+    - UNRANKED: leaderboard exists and the configured user appears valid, but no
+      score was found.
+    - UNKNOWN: missing config, invalid username, unresolved leaderboard, or API
+      failure.
     """
     if not username:
         return ScenarioRankInfo(
@@ -567,6 +605,8 @@ def get_scenario_rank_info(
             error_message="KovaaK's username is not configured.",
         )
 
+    # First resolve scenario name -> leaderboard ID. Everything after this point
+    # can use the stable numeric leaderboard identifier.
     try:
         leaderboard_id = resolve_leaderboard_id(
             scenario_name,
@@ -596,6 +636,8 @@ def get_scenario_rank_info(
             error_message=f"Could not resolve leaderboard for {scenario_name}.",
         )
 
+    # Rank cache is intentionally long-lived. New high-score detection refreshes
+    # this cache, so normal scenario switching should avoid leaderboard calls.
     if not force_refresh:
         cached_rank = get_cached_scenario_rank(
             leaderboard_id,
@@ -610,6 +652,8 @@ def get_scenario_rank_info(
                 save_scenario_rank(leaderboard_id, username, cached_rank)
             return cached_rank
 
+    # Fresh rank lookup is the authoritative path for current rank. total-play
+    # is not used here because it can lag behind the leaderboard endpoint.
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException:
