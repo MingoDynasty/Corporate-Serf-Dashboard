@@ -127,6 +127,9 @@ def get_scenario_rank(_, selected_scenario) -> str:
 
     match rank_info.status:
         case ScenarioRankStatus.RANKED:
+            if rank_info.warning_message:
+                logger.warning("Scenario rank warning: %s", rank_info.warning_message)
+                dash_logger.warning(rank_info.warning_message)
             return f"#{rank_info.rank}"
         case ScenarioRankStatus.UNRANKED:
             return "Unranked"

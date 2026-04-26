@@ -528,22 +528,36 @@ def _find_matching_player(
     players: list[RankingPlayer],
     username: str,
     steam_id: str | None = None,
-) -> RankingPlayer | None:
+) -> tuple[RankingPlayer, str | None] | None:
     """Choose the exact player from a partial-match leaderboard search result."""
     if steam_id:
         for player in players:
             if player.steamId == steam_id:
-                return player
+                return player, None
 
     for player in players:
         if player.webappUsername == username:
-            return player
+            return player, _steam_id_mismatch_warning(username, steam_id, player)
 
     for player in players:
         if player.steamAccountName == username:
-            return player
+            return player, _steam_id_mismatch_warning(username, steam_id, player)
 
     return None
+
+
+def _steam_id_mismatch_warning(
+    username: str,
+    configured_steam_id: str | None,
+    matched_player: RankingPlayer,
+) -> str | None:
+    if not configured_steam_id or matched_player.steamId == configured_steam_id:
+        return None
+
+    return (
+        f"Configured Steam ID '{configured_steam_id}' does not match "
+        f"KovaaK's user '{username}' (actual Steam ID: {matched_player.steamId})."
+    )
 
 
 def fetch_scenario_rank(
@@ -561,20 +575,22 @@ def fetch_scenario_rank(
         leaderboard_id,
         username_search=username,
     )
-    player = _find_matching_player(leaderboard_response.data, username, steam_id)
-    if not player:
+    match = _find_matching_player(leaderboard_response.data, username, steam_id)
+    if not match:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNRANKED,
             leaderboard_id=leaderboard_id,
             fetched_at=datetime.now(UTC),
         )
 
+    player, warning_message = match
     return ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
         rank=player.rank,
         leaderboard_id=leaderboard_id,
         score=player.score,
         fetched_at=datetime.now(UTC),
+        warning_message=warning_message,
     )
 
 

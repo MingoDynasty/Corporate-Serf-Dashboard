@@ -177,3 +177,4 @@ class ScenarioRankInfo(BaseModel):
     score: float | None = None
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
+    warning_message: str | None = None

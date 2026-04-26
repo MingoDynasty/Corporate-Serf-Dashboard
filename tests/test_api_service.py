@@ -662,6 +662,42 @@ def test_fetch_scenario_rank_prefers_exact_steam_id(monkeypatch):
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 2
     assert rank_info.score == 200
+    assert rank_info.warning_message is None
+
+
+def test_fetch_scenario_rank_warns_when_steam_id_falls_back_to_username(monkeypatch):
+    players = [
+        RankingPlayer(
+            steamId="actual-steam-id",
+            score=200,
+            rank=2,
+            webappUsername="MingoDynasty",
+            steamAccountName="MingoDynasty",
+        ),
+    ]
+
+    def fake_get_leaderboard_scores(*_args, **_kwargs):
+        return LeaderboardAPIResponse(page=0, max=50, total=1, data=players)
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    rank_info = api_service.fetch_scenario_rank(
+        98330,
+        "MingoDynasty",
+        "wrong-steam-id",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 2
+    assert rank_info.score == 200
+    assert rank_info.warning_message == (
+        "Configured Steam ID 'wrong-steam-id' does not match "
+        "KovaaK's user 'MingoDynasty' (actual Steam ID: actual-steam-id)."
+    )
 
 
 def test_fetch_scenario_rank_returns_unranked_without_exact_match(monkeypatch):
