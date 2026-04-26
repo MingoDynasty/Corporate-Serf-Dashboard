@@ -23,6 +23,7 @@ dependencies = [
     "sortedcontainers>=2.4.0",
     "tomli-w>=1.2.0",
     "tzdata>=2025.2",
+    "waitress>=3.0.2",
     "watchdog>=6.0.0",
 ]
 
@@ -608,5 +609,7 @@ disable_error_code = ["import-untyped"]
 
 [dependency-groups]
 dev = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
     "ruff>=0.14.5",
 ]
