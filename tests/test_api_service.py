@@ -390,10 +390,12 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty.json"
+        / "98330_MingoDynasty_right-steam-id.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
+    assert cached_data["matched_steam_id"] == "right-steam-id"
+    assert "warning_message" not in cached_data
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -411,7 +413,14 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
         TEST_CACHE_DIR / "user_scenario_total_play" / safe_username / "page_0.json"
     )
     assert api_service._rank_cache_file(98330, username) == (
-        TEST_CACHE_DIR / "leaderboard_user_rank" / f"98330_{safe_username}.json"
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / f"98330_{safe_username}_no_steam_id.json"
+    )
+    assert api_service._rank_cache_file(98330, username, "765/123") == (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / f"98330_{safe_username}_765_123.json"
     )
 
 
@@ -448,7 +457,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     rank_cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_UnknownUser.json"
+        / "98330_UnknownUser_no_steam_id.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -519,7 +528,7 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     rank_cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty.json"
+        / "98330_MingoDynasty_no_steam_id.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -662,10 +671,13 @@ def test_fetch_scenario_rank_prefers_exact_steam_id(monkeypatch):
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 2
     assert rank_info.score == 200
+    assert rank_info.matched_steam_id == "right-steam-id"
     assert rank_info.warning_message is None
 
 
-def test_fetch_scenario_rank_warns_when_steam_id_falls_back_to_username(monkeypatch):
+def test_fetch_scenario_rank_records_matched_steam_id_for_username_fallback(
+    monkeypatch,
+):
     players = [
         RankingPlayer(
             steamId="actual-steam-id",
@@ -694,10 +706,120 @@ def test_fetch_scenario_rank_warns_when_steam_id_falls_back_to_username(monkeypa
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 2
     assert rank_info.score == 200
+    assert rank_info.matched_steam_id == "actual-steam-id"
+    assert rank_info.warning_message is None
+
+
+def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            leaderboard_id=98330,
+            matched_steam_id="actual-steam-id",
+        ),
+        steam_id="wrong-steam-id",
+    )
+
+    def fail_fetch_scenario_rank(*_args, **_kwargs):
+        raise AssertionError("fresh rank fetch should not run")
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fail_fetch_scenario_rank,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="wrong-steam-id",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11266
     assert rank_info.warning_message == (
         "Configured Steam ID 'wrong-steam-id' does not match "
         "KovaaK's user 'MingoDynasty' (actual Steam ID: actual-steam-id)."
     )
+
+    cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_MingoDynasty_wrong-steam-id.json"
+    )
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["matched_steam_id"] == "actual-steam-id"
+    assert "warning_message" not in cached_data
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_does_not_reuse_cache_from_different_steam_id(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            leaderboard_id=98330,
+            matched_steam_id="actual-steam-id",
+        ),
+        steam_id="wrong-steam-id",
+    )
+    fetched = False
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        nonlocal fetched
+        fetched = True
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11265,
+            leaderboard_id=98330,
+            matched_steam_id="actual-steam-id",
+        )
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="actual-steam-id",
+    )
+
+    assert fetched is True
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11265
+    assert rank_info.warning_message is None
+
+    stale_cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_MingoDynasty_wrong-steam-id.json"
+    )
+    fresh_cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_MingoDynasty_actual-steam-id.json"
+    )
+    assert stale_cache_file.exists()
+    assert fresh_cache_file.exists()
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
 def test_fetch_scenario_rank_returns_unranked_without_exact_match(monkeypatch):

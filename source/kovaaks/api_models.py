@@ -5,7 +5,7 @@ Pydantic models for Kovaak's API responses.
 import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Scenario(BaseModel):
@@ -175,6 +175,7 @@ class ScenarioRankInfo(BaseModel):
     leaderboard_id: int | None = None
     scenario_name: str | None = None
     score: float | None = None
+    matched_steam_id: str | None = None
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
-    warning_message: str | None = None
+    warning_message: str | None = Field(default=None, exclude=True)

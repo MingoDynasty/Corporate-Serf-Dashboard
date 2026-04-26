@@ -170,7 +170,8 @@ cache/
       page_1.json                         # raw total-play API page
 
   leaderboard_user_rank/
-    98330_MingoDynasty.json                # current rank, 168h TTL
+    98330_MingoDynasty_76561197986713986.json  # current rank, 168h TTL
+    98330_MingoDynasty_no_steam_id.json         # current rank without Steam ID configured
 
   leaderboard_totals/
     98330.json                             # total players, 24h TTL, Phase 2
@@ -236,7 +237,7 @@ Conflict behavior:
 
 ### Current Rank Cache
 
-`leaderboard_user_rank/{leaderboard_id}_{username}.json` stores current rank data:
+`leaderboard_user_rank/{leaderboard_id}_{username}_{steam_id_or_no_steam_id}.json` stores current rank data:
 
 ```json
 {
@@ -245,6 +246,7 @@ Conflict behavior:
   "leaderboard_id": 98330,
   "scenario_name": "VT Pasu Intermediate S5",
   "score": 863.93,
+  "matched_steam_id": "76561197986713986",
   "fetched_at": "2026-04-26T03:30:00Z"
 }
 ```
@@ -252,10 +254,11 @@ Conflict behavior:
 Rules:
 
 - TTL: `scenario_rank_cache_ttl_hours`, default 168 hours.
-- Cache key includes username to avoid stale data after config changes.
+- Cache key includes username and configured Steam ID, or `no_steam_id`, to avoid stale identity assumptions after config changes.
 - Automatically refresh on a new high score for that scenario.
 - Serialize rank status with stable `StrEnum` values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`.
-- Cache files may include `scenario_name`, `score`, `error_message`, and `warning_message` for debuggability and UI notifications.
+- Cache files may include `scenario_name`, `score`, `matched_steam_id`, and `error_message` for debuggability.
+- `warning_message` is not stored. It is derived at read time from the current configured Steam ID and cached `matched_steam_id`, then surfaced through the UI if needed.
 
 Rationale:
 
@@ -335,7 +338,10 @@ The long rank TTL still helps here. Once the cached rank expires, the app will r
 ## Internal Models
 
 ```python
+from datetime import datetime
 from enum import StrEnum
+
+from pydantic import BaseModel, Field
 
 
 class ScenarioRankStatus(StrEnum):
@@ -350,15 +356,18 @@ class ScenarioRankInfo(BaseModel):
     leaderboard_id: int | None = None
     scenario_name: str | None = None
     score: float | None = None
+    matched_steam_id: str | None = None
     fetched_at: datetime | None = None
     error_message: str | None = None
-    warning_message: str | None = None
+    warning_message: str | None = Field(default=None, exclude=True)
     total_players: int | None = None  # populated in Phase 2
 ```
 
 The UI callback consumes only `ScenarioRankInfo`. No endpoint-specific logic belongs in `home.py`.
 
 When writing `ScenarioRankInfo` to JSON, use the stable `ScenarioRankStatus` string values directly. Cache files should contain readable values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`. When reading from JSON, reconstruct with `ScenarioRankStatus(raw_status)`.
+
+`matched_steam_id` is the stable fact captured from the leaderboard response. `warning_message` is intentionally transient: the service layer derives it from the current config each time rank info is returned. This prevents stale warnings from surviving a config correction.
 
 Expected KovaaK's API/domain failures should be converted to `ScenarioRankInfo(status=UNKNOWN, error_message=...)` inside `api_service.py`. Unexpected application bugs may still raise and can be handled by UI/background safety nets.
 

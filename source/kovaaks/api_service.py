@@ -490,11 +490,21 @@ def resolve_leaderboard_id(
     return search_scenario_exact(scenario_name)
 
 
-def _rank_cache_file(leaderboard_id: int, username: str) -> Path:
+def _rank_identity_cache_key(username: str, steam_id: str | None = None) -> str:
+    identity_parts = [_safe_cache_key(username)]
+    identity_parts.append(_safe_cache_key(steam_id) if steam_id else "no_steam_id")
+    return "_".join(identity_parts)
+
+
+def _rank_cache_file(
+    leaderboard_id: int,
+    username: str,
+    steam_id: str | None = None,
+) -> Path:
     return Path(
         CACHE_DIR,
         "leaderboard_user_rank",
-        f"{leaderboard_id}_{_safe_cache_key(username)}.json",
+        f"{leaderboard_id}_{_rank_identity_cache_key(username, steam_id)}.json",
     )
 
 
@@ -502,8 +512,9 @@ def get_cached_scenario_rank(
     leaderboard_id: int,
     username: str,
     cache_ttl_hours: int = 168,
+    steam_id: str | None = None,
 ) -> ScenarioRankInfo | None:
-    cache_file = _rank_cache_file(leaderboard_id, username)
+    cache_file = _rank_cache_file(leaderboard_id, username, steam_id)
     if not _is_cache_fresh(cache_file, cache_ttl_hours):
         return None
 
@@ -517,9 +528,10 @@ def save_scenario_rank(
     leaderboard_id: int,
     username: str,
     rank_info: ScenarioRankInfo,
+    steam_id: str | None = None,
 ) -> None:
     _write_json(
-        _rank_cache_file(leaderboard_id, username),
+        _rank_cache_file(leaderboard_id, username, steam_id),
         rank_info.model_dump(mode="json", exclude_none=True),
     )
 
@@ -528,20 +540,20 @@ def _find_matching_player(
     players: list[RankingPlayer],
     username: str,
     steam_id: str | None = None,
-) -> tuple[RankingPlayer, str | None] | None:
+) -> RankingPlayer | None:
     """Choose the exact player from a partial-match leaderboard search result."""
     if steam_id:
         for player in players:
             if player.steamId == steam_id:
-                return player, None
+                return player
 
     for player in players:
         if player.webappUsername == username:
-            return player, _steam_id_mismatch_warning(username, steam_id, player)
+            return player
 
     for player in players:
         if player.steamAccountName == username:
-            return player, _steam_id_mismatch_warning(username, steam_id, player)
+            return player
 
     return None
 
@@ -549,14 +561,35 @@ def _find_matching_player(
 def _steam_id_mismatch_warning(
     username: str,
     configured_steam_id: str | None,
-    matched_player: RankingPlayer,
+    matched_steam_id: str | None,
 ) -> str | None:
-    if not configured_steam_id or matched_player.steamId == configured_steam_id:
+    if (
+        not configured_steam_id
+        or not matched_steam_id
+        or matched_steam_id == configured_steam_id
+    ):
         return None
 
     return (
         f"Configured Steam ID '{configured_steam_id}' does not match "
-        f"KovaaK's user '{username}' (actual Steam ID: {matched_player.steamId})."
+        f"KovaaK's user '{username}' (actual Steam ID: {matched_steam_id})."
+    )
+
+
+def _with_derived_rank_warning(
+    rank_info: ScenarioRankInfo,
+    username: str,
+    steam_id: str | None = None,
+) -> ScenarioRankInfo:
+    """Attach transient UI warnings derived from current config and cached facts."""
+    return rank_info.model_copy(
+        update={
+            "warning_message": _steam_id_mismatch_warning(
+                username,
+                steam_id,
+                rank_info.matched_steam_id,
+            )
+        }
     )
 
 
@@ -575,22 +608,21 @@ def fetch_scenario_rank(
         leaderboard_id,
         username_search=username,
     )
-    match = _find_matching_player(leaderboard_response.data, username, steam_id)
-    if not match:
+    player = _find_matching_player(leaderboard_response.data, username, steam_id)
+    if not player:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNRANKED,
             leaderboard_id=leaderboard_id,
             fetched_at=datetime.now(UTC),
         )
 
-    player, warning_message = match
     return ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
         rank=player.rank,
         leaderboard_id=leaderboard_id,
         score=player.score,
+        matched_steam_id=player.steamId,
         fetched_at=datetime.now(UTC),
-        warning_message=warning_message,
     )
 
 
@@ -659,14 +691,15 @@ def get_scenario_rank_info(
             leaderboard_id,
             username,
             rank_cache_ttl_hours,
+            steam_id,
         )
         if cached_rank:
             if cached_rank.scenario_name is None:
                 cached_rank = cached_rank.model_copy(
                     update={"scenario_name": scenario_name}
                 )
-                save_scenario_rank(leaderboard_id, username, cached_rank)
-            return cached_rank
+                save_scenario_rank(leaderboard_id, username, cached_rank, steam_id)
+            return _with_derived_rank_warning(cached_rank, username, steam_id)
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
     # is not used here because it can lag behind the leaderboard endpoint.
@@ -704,8 +737,8 @@ def get_scenario_rank_info(
                 exc_info=True,
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-    save_scenario_rank(leaderboard_id, username, rank_info)
-    return rank_info
+    save_scenario_rank(leaderboard_id, username, rank_info, steam_id)
+    return _with_derived_rank_warning(rank_info, username, steam_id)
 
 
 def refresh_scenario_rank(
