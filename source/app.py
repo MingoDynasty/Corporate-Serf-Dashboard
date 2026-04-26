@@ -53,7 +53,12 @@ def main() -> None:
     logger.info("Monitoring directory: %s", config.stats_dir)
 
     # Run the Dash app
-    app.run(debug=True, use_reloader=False, host="localhost", port=config.port)
+    app.run(
+        debug=config.debug,
+        use_reloader=False,
+        host="localhost",
+        port=config.port,
+    )
 
     # Probably don't need this, but I kept it anyway
     observer.stop()

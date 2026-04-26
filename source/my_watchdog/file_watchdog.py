@@ -7,7 +7,6 @@ import logging
 from pathlib import Path
 import time
 
-from utilities.utilities import ordinal
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import config
@@ -19,6 +18,7 @@ from source.kovaaks.data_service import (
     load_csv_file_into_database,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ class NewFileHandler(FileSystemEventHandler):
                 NewFileMessage(
                     datetime_created=datetime.datetime.now(),
                     nth_score=1,
-                    previous_high_score=0,  # TODO: perhaps this should be None instead?
+                    previous_high_score=None,
                     scenario_name=run_data.scenario,
                     score=run_data.score,
                     sensitivity=sensitivity_key,

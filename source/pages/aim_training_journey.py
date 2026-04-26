@@ -3,14 +3,14 @@ import logging
 import dash
 from dash import Input, Output, callback, dcc
 import dash_mantine_components as dmc
-from plot.plot_service import generate_aim_training_journey_plot
-from utilities.dash_logging import get_dash_logger
 
 from source.kovaaks.data_service import (
     get_aim_training_checkpoints,
     get_aim_training_journey_for_playlists,
     get_playlists,
 )
+from source.plot.plot_service import generate_aim_training_journey_plot
+from source.utilities.dash_logging import get_dash_logger
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
