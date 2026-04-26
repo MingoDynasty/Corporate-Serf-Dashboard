@@ -148,13 +148,59 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
         json.dump(data, file, indent=2)
 
 
-def _is_complete_paginated_response(cache_data: dict | list | None) -> bool:
+def _safe_cache_key(value: str) -> str:
+    return "".join(
+        char if char.isalnum() or char in ("-", "_") else "_"
+        for char in value
+    )
+
+
+def _user_scenario_total_play_cache_file(username: str) -> Path:
+    return Path(CACHE_DIR, "user_scenario_total_play", f"{_safe_cache_key(username)}.json")
+
+
+def _user_scenario_total_play_page_cache_file(username: str, page: int) -> Path:
+    return Path(
+        CACHE_DIR,
+        "user_scenario_total_play",
+        _safe_cache_key(username),
+        f"page_{page}.json",
+    )
+
+
+def _has_terminal_user_scenario_total_play_page(
+    username: str,
+    max_results: int,
+) -> bool:
+    page_dir = Path(CACHE_DIR, "user_scenario_total_play", _safe_cache_key(username))
+    for page_file in page_dir.glob("page_*.json"):
+        cache_data = _read_json(page_file)
+        if not isinstance(cache_data, dict):
+            continue
+
+        data = cache_data.get("data")
+        if isinstance(data, list) and len(data) < max_results:
+            return True
+    return False
+
+
+def _is_complete_paginated_response(
+    cache_data: dict | list | None,
+    max_results: int,
+    terminal_page_seen: bool,
+) -> bool:
     if not isinstance(cache_data, dict):
         return False
 
     data = cache_data.get("data")
     total = cache_data.get("total")
-    return isinstance(data, list) and isinstance(total, int) and len(data) >= total
+    if not isinstance(data, list) or not isinstance(total, int):
+        return False
+    if len(data) < total:
+        return False
+    if len(data) >= max_results and len(data) % max_results == 0:
+        return terminal_page_seen
+    return True
 
 
 def _leaderboard_mapping_file() -> Path:
@@ -211,19 +257,23 @@ def get_user_scenario_total_play(
     username: str,
     cache_ttl_hours: int = 24,
 ) -> UserScenarioTotalPlayAPIResponse:
-    cache_file = Path(CACHE_DIR, "user_scenario_total_play", f"{username}.json")
+    max_results = 100
+    cache_file = _user_scenario_total_play_cache_file(username)
     if _is_cache_fresh(cache_file, cache_ttl_hours):
         cache_data = _read_json(cache_file)
-        if _is_complete_paginated_response(cache_data):
+        if _is_complete_paginated_response(
+            cache_data,
+            max_results,
+            _has_terminal_user_scenario_total_play_page(username, max_results),
+        ):
             return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
         logger.warning("Ignoring incomplete total-play cache for %s", username)
 
     page = 0
-    max_results = 100
     data = []
     total = 0
     try:
-        while page == 0 or len(data) < total:
+        while True:
             params = {
                 "username": username,
                 "page": page,
@@ -238,9 +288,20 @@ def get_user_scenario_total_play(
             response.raise_for_status()
 
             response_json = response.json()
-            total = response_json["total"]
-            data.extend(response_json["data"])
+            _write_json(
+                _user_scenario_total_play_page_cache_file(username, page),
+                response_json,
+            )
+
+            response_data = response_json["data"]
+            total = max(total, response_json["total"])
+            data.extend(response_data)
             page += 1
+            total = max(total, len(data))
+            if not response_data:
+                break
+            if len(response_data) < max_results and len(data) >= total:
+                break
     except requests.RequestException:
         if os.path.exists(cache_file):
             logger.warning("Using stale total-play cache for %s", username)

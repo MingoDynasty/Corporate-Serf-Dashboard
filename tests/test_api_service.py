@@ -92,6 +92,76 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     cached_data = json.loads(cache_file.read_text())
     assert cached_data["total"] == 2
     assert len(cached_data["data"]) == 2
+
+    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
+    assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    first_page_data = [
+        {
+            "leaderboardId": str(index),
+            "scenarioName": f"Scenario {index}",
+            "counts": {"plays": index},
+            "rank": index,
+            "score": index * 10,
+        }
+        for index in range(100)
+    ]
+    second_page_data = [
+        {
+            "leaderboardId": "100",
+            "scenarioName": "Scenario 100",
+            "counts": {"plays": 100},
+            "rank": 100,
+            "score": 1000,
+        },
+    ]
+    responses = [
+        {
+            "page": 0,
+            "max": 100,
+            "total": 100,
+            "data": first_page_data,
+        },
+        {
+            "page": 1,
+            "max": 100,
+            "total": 100,
+            "data": second_page_data,
+        },
+    ]
+    fetched_pages = []
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        fetched_pages.append(params["page"])
+        return FakeResponse(responses[params["page"]])
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    response = api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert fetched_pages == [0, 1]
+    assert response.total == 101
+    assert len(response.data) == 101
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["total"] == 101
+    assert len(cached_data["data"]) == 101
+
+    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
+    assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -166,6 +236,10 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
         "Fresh First",
         "Fresh Second",
     ]
+    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
+    assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
     assert api_service.get_cached_leaderboard_id("Fresh First") == 10
     assert api_service.get_cached_leaderboard_id("Fresh Second") == 20
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
