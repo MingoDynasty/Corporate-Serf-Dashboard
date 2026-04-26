@@ -6,6 +6,7 @@ import logging.config
 import sys
 
 from dash_extensions.enrich import DashProxy
+from waitress import serve
 from watchdog.observers import Observer
 
 from source.app_shell import layout
@@ -52,13 +53,17 @@ def main() -> None:
     observer.start()
     logger.info("Monitoring directory: %s", config.stats_dir)
 
-    # Run the Dash app
-    app.run(
-        debug=config.debug,
-        use_reloader=False,
-        host="localhost",
-        port=config.port,
-    )
+    # Run the Dash app. `app.run()` uses Flask's development server even when
+    # debug is disabled, so switch to Waitress for non-debug runs.
+    if config.debug:
+        app.run(
+            debug=True,
+            use_reloader=False,
+            host="localhost",
+            port=config.port,
+        )
+    else:
+        serve(app.server, host="127.0.0.1", port=config.port)
 
     # Probably don't need this, but I kept it anyway
     observer.stop()
