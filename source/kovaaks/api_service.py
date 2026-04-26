@@ -104,15 +104,8 @@ def get_benchmark_json(
 
 def get_leaderboard_scores(
     leaderboard_id: int,
-    use_cache: bool = False,
     username_search: str | None = None,
 ) -> LeaderboardAPIResponse:
-    cache_file = Path(CACHE_DIR, "leaderboard", f"{leaderboard_id}.json")
-    if use_cache and not username_search and os.path.exists(cache_file):
-        with open(cache_file) as file:
-            data = json.load(file)
-            return LeaderboardAPIResponse.model_validate(data)
-
     params = {
         "page": 0,
         "max": 50 if username_search else 100,
@@ -122,11 +115,6 @@ def get_leaderboard_scores(
         params["usernameSearch"] = username_search
     response = requests.get(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
     response.raise_for_status()
-
-    # save to cache
-    if not username_search:
-        with open(cache_file, "w") as file:
-            json.dump(response.json(), file, indent=2)
 
     return LeaderboardAPIResponse.model_validate(response.json())
 
