@@ -16,6 +16,8 @@ import dash_mantine_components as dmc
 import plotly.graph_objects as go
 
 from source.config.config_service import config
+from source.kovaaks.api_models import ScenarioRankStatus
+from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
     get_playlists,
     get_rank_data_from_playlist,
@@ -100,6 +102,43 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
         f"{days_ago} days ago",
         scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
     )
+
+
+@callback(
+    Output("scenario_rank", "children"),
+    Input("do_update", "data"),
+    Input("scenario-dropdown-selection", "value"),
+)
+def get_scenario_rank(_, selected_scenario) -> str:
+    if not selected_scenario or not is_scenario_in_database(selected_scenario):
+        return "N/A"
+
+    try:
+        rank_info = get_scenario_rank_info(
+            selected_scenario,
+            config.kovaaks_username,
+            config.steam_id,
+            config.scenario_metadata_cache_ttl_hours,
+            config.scenario_rank_cache_ttl_hours,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
+        return "N/A"
+
+    match rank_info.status:
+        case ScenarioRankStatus.RANKED:
+            if rank_info.warning_message:
+                logger.warning("Scenario rank warning: %s", rank_info.warning_message)
+                dash_logger.warning(rank_info.warning_message)
+            return f"#{rank_info.rank}"
+        case ScenarioRankStatus.UNRANKED:
+            return "Unranked"
+        case ScenarioRankStatus.UNKNOWN:
+            if rank_info.error_message:
+                logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
+                dash_logger.error(rank_info.error_message)
+            return "N/A"
+    return "N/A"
 
 
 @callback(
@@ -472,6 +511,29 @@ def layout(**kwargs):  # noqa: ARG001
                                                 dmc.Text(
                                                     id="scenario_num_runs",
                                                     span=True,
+                                                ),
+                                            ],
+                                            size="sm",
+                                        ),
+                                        dmc.Text(
+                                            [
+                                                dmc.Text(
+                                                    "Rank: ",
+                                                    fw=700,
+                                                    span=True,
+                                                ),
+                                                dcc.Loading(
+                                                    dmc.Text(
+                                                        id="scenario_rank",
+                                                        span=True,
+                                                    ),
+                                                    parent_style={
+                                                        "display": "inline-block",
+                                                        "verticalAlign": "baseline",
+                                                    },
+                                                    style={
+                                                        "display": "inline-block",
+                                                    },
                                                 ),
                                             ],
                                             size="sm",

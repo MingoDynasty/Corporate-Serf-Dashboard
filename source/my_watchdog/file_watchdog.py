@@ -2,6 +2,7 @@
 Business logic for monitoring a specified directory for newly created files.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import datetime
 import logging
 from pathlib import Path
@@ -17,10 +18,36 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
     load_csv_file_into_database,
 )
+from source.kovaaks.api_service import refresh_scenario_rank
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
+dash_logger = get_dash_logger(__name__)
+rank_refresh_executor = ThreadPoolExecutor(max_workers=2)
+
+
+def _handle_rank_refresh_result(future) -> None:
+    try:
+        future.result()
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to refresh scenario rank after new high score.")
+        dash_logger.error("Failed to refresh scenario rank after new high score.")
+
+
+def _refresh_rank_after_high_score(scenario_name: str) -> None:
+    if not config.kovaaks_username:
+        return
+
+    future = rank_refresh_executor.submit(
+        refresh_scenario_rank,
+        scenario_name,
+        config.kovaaks_username,
+        config.steam_id,
+        config.scenario_metadata_cache_ttl_hours,
+    )
+    future.add_done_callback(_handle_rank_refresh_result)
 
 
 class NewFileHandler(FileSystemEventHandler):
@@ -65,9 +92,11 @@ class NewFileHandler(FileSystemEventHandler):
                 ),
             )
             load_csv_file_into_database(file)
+            _refresh_rank_after_high_score(run_data.scenario)
             return
 
         high_score = get_high_score(run_data.scenario)
+        is_new_high_score = run_data.score > high_score
 
         pct_threshold = 0.95  # TODO: isn't this supposed to come from UI ?
         score_threshold = pct_threshold * high_score
@@ -75,7 +104,7 @@ class NewFileHandler(FileSystemEventHandler):
         logger.debug(
             f"Current score ({run_data.score:g}) is {pct_diff:+.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
         )
-        if run_data.score > high_score:
+        if is_new_high_score:
             new_score_threshold = pct_threshold * run_data.score
             logger.debug(
                 f"Score threshold increased from ({score_threshold:.2f}) to ({new_score_threshold:.2f})"
@@ -102,6 +131,8 @@ class NewFileHandler(FileSystemEventHandler):
                 ),
             )
             load_csv_file_into_database(file)
+            if is_new_high_score:
+                _refresh_rank_after_high_score(run_data.scenario)
             return
 
         # Case 3: existing scenario and existing sensitivity, find nth score.
@@ -128,4 +159,6 @@ class NewFileHandler(FileSystemEventHandler):
             ),
         )
         load_csv_file_into_database(file)
+        if is_new_high_score:
+            _refresh_rank_after_high_score(run_data.scenario)
         return

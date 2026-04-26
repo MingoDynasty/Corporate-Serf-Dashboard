@@ -18,6 +18,10 @@ class ConfigData:
     port: int
     sens_round_decimal_places: int
     debug: bool = False
+    kovaaks_username: str | None = None
+    steam_id: str | None = None
+    scenario_metadata_cache_ttl_hours: int = 24
+    scenario_rank_cache_ttl_hours: int = 168
 
 
 def load_config() -> ConfigData:

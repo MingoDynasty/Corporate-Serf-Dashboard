@@ -18,3 +18,17 @@ debug = false
 # How many decimal places to round the Sensitivity. The smaller the number, the more the Sensitivities are grouped.
 # For example, if Sensitivity=40.159, rounded to one digit -> 40.2
 sens_round_decimal_places = 1
+
+# KovaaK's webapp username used to fetch cached scenario rank data.
+# Leave unset or empty to disable scenario rank lookups.
+kovaaks_username = ""
+
+# Optional Steam ID. Preferred when username search is ambiguous, such as when
+# your username is a substring of another player's username.
+steam_id = ""
+
+# How long to reuse total-play metadata before fetching it again.
+scenario_metadata_cache_ttl_hours = 24
+
+# How long to reuse cached scenario rank data before fetching it again.
+scenario_rank_cache_ttl_hours = 168
