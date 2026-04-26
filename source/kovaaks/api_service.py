@@ -708,19 +708,4 @@ def refresh_scenario_rank(
     )
 
 
-def get_user_scenario_rank(
-    username: str | None,
-    scenario_name: str,
-    cache_ttl_hours: int = 24,
-) -> int | None:
-    rank_info = get_scenario_rank_info(
-        scenario_name,
-        username,
-        rank_cache_ttl_hours=cache_ttl_hours,
-    )
-    if rank_info.status == ScenarioRankStatus.RANKED:
-        return rank_info.rank
-    return None
-
-
 make_cache()

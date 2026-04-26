@@ -321,7 +321,7 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def test_get_user_scenario_rank_reads_fresh_rank_cache(monkeypatch):
+def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
@@ -341,14 +341,13 @@ def test_get_user_scenario_rank_reads_fresh_rank_cache(monkeypatch):
 
     monkeypatch.setattr(api_service.requests, "get", fail_get)
 
-    assert (
-        api_service.get_user_scenario_rank(
-            "MingoDynasty",
-            "Cached Scenario",
-            cache_ttl_hours=168,
-        )
-        == 99
+    rank_info = api_service.get_scenario_rank_info(
+        "Cached Scenario",
+        "MingoDynasty",
+        rank_cache_ttl_hours=168,
     )
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 99
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
