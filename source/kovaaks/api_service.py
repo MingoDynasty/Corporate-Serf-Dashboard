@@ -431,9 +431,15 @@ def get_scenario_rank_info(
             rank_cache_ttl_hours,
         )
         if cached_rank:
+            if cached_rank.scenario_name is None:
+                cached_rank = cached_rank.model_copy(
+                    update={"scenario_name": scenario_name}
+                )
+                save_scenario_rank(leaderboard_id, username, cached_rank)
             return cached_rank
 
     rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+    rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)
     return rank_info
 

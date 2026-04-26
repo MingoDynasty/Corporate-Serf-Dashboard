@@ -234,6 +234,52 @@ def test_get_user_scenario_rank_reads_fresh_rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_get_leaderboard_scores(*_args, **_kwargs):
+        return LeaderboardAPIResponse(
+            page=0,
+            max=50,
+            total=1,
+            data=[
+                RankingPlayer(
+                    steamId="right-steam-id",
+                    score=863.93,
+                    rank=11266,
+                    webappUsername="MingoDynasty",
+                    steamAccountName="MingoDynasty",
+                ),
+            ],
+        )
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="right-steam-id",
+    )
+
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+
+    cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_MingoDynasty.json"
+    )
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_fetch_scenario_rank_prefers_exact_steam_id(monkeypatch):
     players = [
         RankingPlayer(

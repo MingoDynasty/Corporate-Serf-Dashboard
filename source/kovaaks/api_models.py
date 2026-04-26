@@ -173,6 +173,7 @@ class ScenarioRankInfo(BaseModel):
     status: ScenarioRankStatus
     rank: int | None = None
     leaderboard_id: int | None = None
+    scenario_name: str | None = None
     score: float | None = None
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
