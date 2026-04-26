@@ -401,6 +401,8 @@ Generate the initial response models for `/user/scenario/total-play` and `/scena
 
 Add functions behind a clean abstraction. UI callbacks should only call `get_scenario_rank_info`; all cache and endpoint logic stays in this layer.
 
+`get_leaderboard_scores(...)` should remain a thin KovaaK's API wrapper. It should not read or write raw leaderboard cache files. Cache behavior belongs in domain-specific helpers such as current-rank cache and, later, leaderboard-total cache.
+
 ```python
 # leaderboardId mapping cache
 get_cached_leaderboard_id(scenario_name: str) -> int | None
