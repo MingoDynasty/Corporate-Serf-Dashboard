@@ -121,7 +121,7 @@ class UserScenarioTotalPlayItem(BaseModel):
     leaderboardId: str
     scenarioName: str
     counts: UserScenarioCounts
-    rank: int
+    rank: int | None = None
     score: float | None = None
 
 

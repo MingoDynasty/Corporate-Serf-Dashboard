@@ -80,6 +80,38 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        return FakeResponse(
+            {
+                "page": 0,
+                "max": 100,
+                "total": 1,
+                "data": [
+                    {
+                        "leaderboardId": "1",
+                        "scenarioName": "Unranked Scenario",
+                        "counts": {"plays": 10},
+                        "rank": None,
+                        "score": None,
+                    },
+                ],
+            },
+        )
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    response = api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert response.data[0].rank is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_user_scenario_rank_reads_fresh_rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
