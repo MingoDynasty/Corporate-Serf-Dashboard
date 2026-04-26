@@ -165,6 +165,45 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    fetched_pages = []
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        fetched_pages.append(params["page"])
+        return FakeResponse(None)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    response = api_service.get_user_scenario_total_play("UnknownUser")
+
+    assert fetched_pages == [0]
+    assert response.total == 0
+    assert response.data == []
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data == {
+        "page": 0,
+        "max": 100,
+        "total": 0,
+        "data": [],
+    }
+
+    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser" / "page_0.json"
+    assert json.loads(page_0_file.read_text(encoding="utf-8")) == {
+        "page": 0,
+        "max": 100,
+        "total": 0,
+        "data": [],
+    }
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
     monkeypatch,
 ):

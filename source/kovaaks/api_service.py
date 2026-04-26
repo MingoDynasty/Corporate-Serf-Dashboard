@@ -288,6 +288,13 @@ def get_user_scenario_total_play(
             response.raise_for_status()
 
             response_json = response.json()
+            if response_json is None:
+                response_json = {
+                    "page": page,
+                    "max": max_results,
+                    "total": 0,
+                    "data": [],
+                }
             _write_json(
                 _user_scenario_total_play_page_cache_file(username, page),
                 response_json,
