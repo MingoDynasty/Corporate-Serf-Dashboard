@@ -522,6 +522,17 @@ def get_scenario_rank_info(
             scenario_name=scenario_name,
             error_message=str(exc),
         )
+    except requests.RequestException:
+        logger.warning(
+            "Failed to resolve leaderboard for %s",
+            scenario_name,
+            exc_info=True,
+        )
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            scenario_name=scenario_name,
+            error_message=f"Failed to resolve leaderboard for {scenario_name}.",
+        )
     if leaderboard_id is None:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -542,7 +553,20 @@ def get_scenario_rank_info(
                 save_scenario_rank(leaderboard_id, username, cached_rank)
             return cached_rank
 
-    rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+    try:
+        rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+    except requests.RequestException:
+        logger.warning(
+            "Failed to fetch scenario rank for %s",
+            scenario_name,
+            exc_info=True,
+        )
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            error_message=f"Failed to fetch scenario rank for {scenario_name}.",
+        )
     if rank_info.status == ScenarioRankStatus.UNRANKED:
         try:
             get_user_scenario_total_play(username, metadata_cache_ttl_hours)
@@ -552,6 +576,12 @@ def get_scenario_rank_info(
                 leaderboard_id=leaderboard_id,
                 scenario_name=scenario_name,
                 error_message=str(exc),
+            )
+        except requests.RequestException:
+            logger.warning(
+                "Failed to validate KovaaK's username through total-play for %s",
+                username,
+                exc_info=True,
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)

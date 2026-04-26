@@ -455,6 +455,113 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_scenario_rank_info_returns_unknown_when_scenario_search_fails(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fail_hydrate(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    def fail_search(*_args, **_kwargs):
+        raise api_service.requests.RequestException("scenario search unavailable")
+
+    monkeypatch.setattr(
+        api_service,
+        "hydrate_leaderboard_id_cache",
+        fail_hydrate,
+    )
+    monkeypatch.setattr(api_service, "search_scenario_exact", fail_search)
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNKNOWN
+    assert rank_info.rank is None
+    assert (
+        rank_info.error_message
+        == "Failed to resolve leaderboard for VT Pasu Intermediate S5."
+    )
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fail_fetch_scenario_rank(*_args, **_kwargs):
+        raise api_service.requests.RequestException("leaderboard unavailable")
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fail_fetch_scenario_rank,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNKNOWN
+    assert rank_info.rank is None
+    assert rank_info.leaderboard_id == 98330
+    assert (
+        rank_info.error_message
+        == "Failed to fetch scenario rank for VT Pasu Intermediate S5."
+    )
+
+    rank_cache_file = (
+        TEST_CACHE_DIR
+        / "leaderboard_user_rank"
+        / "98330_MingoDynasty.json"
+    )
+    assert not rank_cache_file.exists()
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_keeps_unranked_when_username_validation_fails(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNRANKED,
+            leaderboard_id=98330,
+        )
+
+    def fail_total_play(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+    monkeypatch.setattr(api_service, "get_user_scenario_total_play", fail_total_play)
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNRANKED
+    assert rank_info.rank is None
+    assert rank_info.leaderboard_id == 98330
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_resolve_leaderboard_id_falls_back_to_search_after_total_play_failure(
     monkeypatch,
 ):
