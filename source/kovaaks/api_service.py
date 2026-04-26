@@ -5,6 +5,7 @@ Provides business logic for Kovaak's API.
 import json
 import logging
 import os
+import threading
 from pathlib import Path
 from enum import StrEnum
 from datetime import UTC, datetime, timedelta
@@ -23,6 +24,7 @@ from source.kovaaks.api_models import (
 
 TIMEOUT = 10
 logger = logging.getLogger(__name__)
+_CACHE_IO_LOCK = threading.RLock()
 
 CACHE_DIR = "cache"
 
@@ -63,8 +65,7 @@ def make_cache():
         "scenario_name_to_leaderboard_id.json",
     )
     if not leaderboard_mapping_file.exists():
-        with open(leaderboard_mapping_file, "w", encoding="utf-8") as file:
-            json.dump({}, file, indent=2)
+        _write_json(leaderboard_mapping_file, {})
     return
 
 
@@ -139,18 +140,31 @@ def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
 
 
 def _read_json(cache_file: Path) -> dict | list | None:
-    try:
-        with open(cache_file, encoding="utf-8") as file:
-            return json.load(file)
-    except (OSError, json.JSONDecodeError):
-        logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
-        return None
+    with _CACHE_IO_LOCK:
+        try:
+            with open(cache_file, encoding="utf-8") as file:
+                return json.load(file)
+        except (OSError, json.JSONDecodeError):
+            logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
+            return None
 
 
 def _write_json(cache_file: Path, data: dict | list) -> None:
-    cache_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(cache_file, "w", encoding="utf-8") as file:
-        json.dump(data, file, indent=2)
+    with _CACHE_IO_LOCK:
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        temp_file = cache_file.with_name(
+            f".{cache_file.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+        )
+        try:
+            with open(temp_file, "w", encoding="utf-8") as file:
+                json.dump(data, file, indent=2)
+                file.write("\n")
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(temp_file, cache_file)
+        finally:
+            if temp_file.exists():
+                temp_file.unlink()
 
 
 def _safe_cache_key(value: str) -> str:
@@ -253,30 +267,31 @@ def save_leaderboard_id(
     source: str,
 ) -> None:
     """Upsert a scenario-name to leaderboard-ID mapping unless it conflicts."""
-    cache_file = _leaderboard_mapping_file()
-    cache_data = _read_json(cache_file)
-    mappings = cache_data if isinstance(cache_data, dict) else {}
+    with _CACHE_IO_LOCK:
+        cache_file = _leaderboard_mapping_file()
+        cache_data = _read_json(cache_file)
+        mappings = cache_data if isinstance(cache_data, dict) else {}
 
-    existing = mappings.get(scenario_name)
-    if isinstance(existing, dict) and existing.get("leaderboard_id") not in (
-        None,
-        leaderboard_id,
-    ):
-        logger.warning(
-            "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
-            scenario_name,
-            existing.get("leaderboard_id"),
+        existing = mappings.get(scenario_name)
+        if isinstance(existing, dict) and existing.get("leaderboard_id") not in (
+            None,
             leaderboard_id,
-            source,
-        )
-        return
+        ):
+            logger.warning(
+                "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
+                scenario_name,
+                existing.get("leaderboard_id"),
+                leaderboard_id,
+                source,
+            )
+            return
 
-    mappings[scenario_name] = {
-        "leaderboard_id": int(leaderboard_id),
-        "source": source,
-        "fetched_at": datetime.now(UTC).isoformat(),
-    }
-    _write_json(cache_file, mappings)
+        mappings[scenario_name] = {
+            "leaderboard_id": int(leaderboard_id),
+            "source": source,
+            "fetched_at": datetime.now(UTC).isoformat(),
+        }
+        _write_json(cache_file, mappings)
 
 
 def get_user_scenario_total_play(

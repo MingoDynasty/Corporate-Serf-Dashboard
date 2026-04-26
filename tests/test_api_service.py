@@ -1,5 +1,6 @@
 import json
 import shutil
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
@@ -38,6 +39,34 @@ def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
         / "scenario_name_to_leaderboard_id.json"
     )
     assert json.loads(mapping_file.read_text(encoding="utf-8")) == {}
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_save_leaderboard_id_handles_concurrent_upserts(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    scenarios = [f"Scenario {index}" for index in range(20)]
+
+    def save_mapping(index_scenario):
+        index, scenario_name = index_scenario
+        api_service.save_leaderboard_id(scenario_name, index, "test")
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        list(executor.map(save_mapping, enumerate(scenarios)))
+
+    mapping_file = (
+        TEST_CACHE_DIR
+        / "scenario_leaderboards"
+        / "scenario_name_to_leaderboard_id.json"
+    )
+    mappings = json.loads(mapping_file.read_text(encoding="utf-8"))
+    assert {
+        scenario_name: mappings[scenario_name]["leaderboard_id"]
+        for scenario_name in scenarios
+    } == {scenario_name: index for index, scenario_name in enumerate(scenarios)}
+    assert not list(mapping_file.parent.glob("*.tmp"))
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 

@@ -197,6 +197,8 @@ Rules:
 
 - No TTL.
 - Any source that reveals a mapping upserts this file.
+- Upserts should hold a process-local cache lock across the full read-modify-write.
+- Writes should go to a temporary JSON file first, then atomically replace the target file so concurrent readers never see a partially written mapping.
 - `source` is for debuggability only.
 - Possible sources: `/user/scenario/total-play`, scenario search, benchmark data when available.
 - Not a source: `/playlist/playlists`, because the observed response does not include `leaderboardId`.
@@ -291,6 +293,8 @@ def _is_cache_fresh(cache_file: Path, ttl_seconds: int) -> bool:
 ```
 
 All cache reads should be wrapped in `try/except`. A missing or malformed file should fall back to a fresh API fetch, not crash the app.
+
+All JSON cache writes should be atomic: write the complete JSON payload to a temporary file in the same directory, flush it, then replace the destination with `os.replace(...)`. This prevents UI/background refresh races from reading an empty or half-written JSON file.
 
 ### Leaderboard ID Type
 
