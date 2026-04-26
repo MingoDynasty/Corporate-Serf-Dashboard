@@ -490,21 +490,15 @@ def resolve_leaderboard_id(
     return search_scenario_exact(scenario_name)
 
 
-def _rank_identity_cache_key(username: str, steam_id: str | None = None) -> str:
-    identity_parts = [_safe_cache_key(username)]
-    identity_parts.append(_safe_cache_key(steam_id) if steam_id else "no_steam_id")
-    return "_".join(identity_parts)
-
-
 def _rank_cache_file(
     leaderboard_id: int,
     username: str,
-    steam_id: str | None = None,
 ) -> Path:
     return Path(
         CACHE_DIR,
         "leaderboard_user_rank",
-        f"{leaderboard_id}_{_rank_identity_cache_key(username, steam_id)}.json",
+        _safe_cache_key(username),
+        f"{leaderboard_id}.json",
     )
 
 
@@ -512,9 +506,8 @@ def get_cached_scenario_rank(
     leaderboard_id: int,
     username: str,
     cache_ttl_hours: int = 168,
-    steam_id: str | None = None,
 ) -> ScenarioRankInfo | None:
-    cache_file = _rank_cache_file(leaderboard_id, username, steam_id)
+    cache_file = _rank_cache_file(leaderboard_id, username)
     if not _is_cache_fresh(cache_file, cache_ttl_hours):
         return None
 
@@ -528,10 +521,9 @@ def save_scenario_rank(
     leaderboard_id: int,
     username: str,
     rank_info: ScenarioRankInfo,
-    steam_id: str | None = None,
 ) -> None:
     _write_json(
-        _rank_cache_file(leaderboard_id, username, steam_id),
+        _rank_cache_file(leaderboard_id, username),
         rank_info.model_dump(mode="json", exclude_none=True),
     )
 
@@ -691,14 +683,13 @@ def get_scenario_rank_info(
             leaderboard_id,
             username,
             rank_cache_ttl_hours,
-            steam_id,
         )
         if cached_rank:
             if cached_rank.scenario_name is None:
                 cached_rank = cached_rank.model_copy(
                     update={"scenario_name": scenario_name}
                 )
-                save_scenario_rank(leaderboard_id, username, cached_rank, steam_id)
+                save_scenario_rank(leaderboard_id, username, cached_rank)
             return _with_derived_rank_warning(cached_rank, username, steam_id)
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
@@ -737,7 +728,7 @@ def get_scenario_rank_info(
                 exc_info=True,
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-    save_scenario_rank(leaderboard_id, username, rank_info, steam_id)
+    save_scenario_rank(leaderboard_id, username, rank_info)
     return _with_derived_rank_warning(rank_info, username, steam_id)
 
 

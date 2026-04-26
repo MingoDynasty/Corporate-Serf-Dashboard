@@ -390,7 +390,8 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty_right-steam-id.json"
+        / "MingoDynasty"
+        / "98330.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
@@ -415,12 +416,8 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     assert api_service._rank_cache_file(98330, username) == (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / f"98330_{safe_username}_no_steam_id.json"
-    )
-    assert api_service._rank_cache_file(98330, username, "765/123") == (
-        TEST_CACHE_DIR
-        / "leaderboard_user_rank"
-        / f"98330_{safe_username}_765_123.json"
+        / safe_username
+        / "98330.json"
     )
 
 
@@ -457,7 +454,8 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     rank_cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_UnknownUser_no_steam_id.json"
+        / "UnknownUser"
+        / "98330.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -528,7 +526,8 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     rank_cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty_no_steam_id.json"
+        / "MingoDynasty"
+        / "98330.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -724,7 +723,6 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
             leaderboard_id=98330,
             matched_steam_id="actual-steam-id",
         ),
-        steam_id="wrong-steam-id",
     )
 
     def fail_fetch_scenario_rank(*_args, **_kwargs):
@@ -752,7 +750,8 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
     cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty_wrong-steam-id.json"
+        / "MingoDynasty"
+        / "98330.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["matched_steam_id"] == "actual-steam-id"
@@ -760,7 +759,7 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def test_get_scenario_rank_info_does_not_reuse_cache_from_different_steam_id(
+def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_fix(
     monkeypatch,
 ):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -776,7 +775,6 @@ def test_get_scenario_rank_info_does_not_reuse_cache_from_different_steam_id(
             leaderboard_id=98330,
             matched_steam_id="actual-steam-id",
         ),
-        steam_id="wrong-steam-id",
     )
     fetched = False
 
@@ -802,23 +800,18 @@ def test_get_scenario_rank_info_does_not_reuse_cache_from_different_steam_id(
         steam_id="actual-steam-id",
     )
 
-    assert fetched is True
+    assert fetched is False
     assert rank_info.status == ScenarioRankStatus.RANKED
-    assert rank_info.rank == 11265
+    assert rank_info.rank == 11266
     assert rank_info.warning_message is None
 
-    stale_cache_file = (
+    rank_cache_file = (
         TEST_CACHE_DIR
         / "leaderboard_user_rank"
-        / "98330_MingoDynasty_wrong-steam-id.json"
+        / "MingoDynasty"
+        / "98330.json"
     )
-    fresh_cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard_user_rank"
-        / "98330_MingoDynasty_actual-steam-id.json"
-    )
-    assert stale_cache_file.exists()
-    assert fresh_cache_file.exists()
+    assert rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 

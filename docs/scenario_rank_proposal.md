@@ -170,8 +170,8 @@ cache/
       page_1.json                         # raw total-play API page
 
   leaderboard_user_rank/
-    98330_MingoDynasty_76561197986713986.json  # current rank, 168h TTL
-    98330_MingoDynasty_no_steam_id.json         # current rank without Steam ID configured
+    MingoDynasty/
+      98330.json                         # current rank, 168h TTL
 
   leaderboard_totals/
     98330.json                             # total players, 24h TTL, Phase 2
@@ -237,7 +237,7 @@ Conflict behavior:
 
 ### Current Rank Cache
 
-`leaderboard_user_rank/{leaderboard_id}_{username}_{steam_id_or_no_steam_id}.json` stores current rank data:
+`leaderboard_user_rank/{safe_username}/{leaderboard_id}.json` stores current rank data:
 
 ```json
 {
@@ -254,7 +254,9 @@ Conflict behavior:
 Rules:
 
 - TTL: `scenario_rank_cache_ttl_hours`, default 168 hours.
-- Cache key includes username and configured Steam ID, or `no_steam_id`, to avoid stale identity assumptions after config changes.
+- Cache key includes the sanitized username as a directory and the leaderboard ID as the filename.
+- Username sanitization should replace characters that are invalid or awkward in Windows paths before writing cache files.
+- The configured Steam ID is not part of the path. Identity facts live in the JSON payload via `matched_steam_id`.
 - Automatically refresh on a new high score for that scenario.
 - Serialize rank status with stable `StrEnum` values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`.
 - Cache files may include `scenario_name`, `score`, `matched_steam_id`, and `error_message` for debuggability.
