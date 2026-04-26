@@ -6,6 +6,7 @@ from datetime import datetime
 import logging
 import os
 from pathlib import Path
+import re
 
 import numpy as np
 from pydantic import ValidationError
@@ -23,6 +24,7 @@ from source.kovaaks.data_models import (
 from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_DIRECTORY = "resources/playlists"
+PLAYLIST_DIRECTORY_PATH = Path(PLAYLIST_DIRECTORY).resolve()
 POSSIBLE_SUB_CSV_HEADERS = [
     # Latest CSV header
     "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # pylint: disable=line-too-long
@@ -42,6 +44,19 @@ run_database: SortedList = SortedList(
 
 
 playlist_database: dict[str, list[Scenario]] = {}
+
+
+def get_playlist_file_path(playlist_name: str) -> Path:
+    """Build a safe file path for a playlist JSON file."""
+    sanitized_name = re.sub(r'[^A-Za-z0-9 ._()-]+', "_", playlist_name).strip()
+    sanitized_name = sanitized_name.rstrip(". ")
+    if not sanitized_name:
+        msg = f"Invalid playlist name: {playlist_name!r}"
+        raise ValueError(msg)
+
+    file_path = (PLAYLIST_DIRECTORY_PATH / f"{sanitized_name}.json").resolve()
+    file_path.relative_to(PLAYLIST_DIRECTORY_PATH)
+    return file_path
 
 
 def get_aim_training_checkpoints(checkpoint_threshold: int) -> dict[datetime, int]:
@@ -435,13 +450,18 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
         message = f"Playlist already exists in database: {playlist_data.name}"
         logger.warning(message)
         return message
-    write_playlist_data_to_file(playlist_data)
+    try:
+        write_playlist_data_to_file(playlist_data)
+    except ValueError:
+        message = f"Invalid playlist name returned by API: {playlist_data.name}"
+        logger.warning(message)
+        return message
     playlist_database[playlist_data.name] = playlist_data.scenarios
     return None
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
-    file_path = Path(PLAYLIST_DIRECTORY, playlist_data.name + ".json")
+    file_path = get_playlist_file_path(playlist_data.name)
     with open(file_path, "w", encoding="utf-8") as file:
         json_string = playlist_data.model_dump_json(indent=2, exclude_none=True)
         file.write(json_string)

@@ -71,7 +71,7 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
         if automatically_change_scenario:
             return True, message_queue[0].scenario_name
         else:
-            message_queue.pop()
+            message_queue.popleft()
             return no_update, no_update
     return True, no_update
 
@@ -244,7 +244,11 @@ def generate_graph(
                 }
             )
 
-        if score_threshold_notification_switch:
+        if (
+            score_threshold_notification_switch
+            and message_data.previous_high_score is not None
+            and message_data.previous_high_score > 0
+        ):
             # In case this is a new high score, use the previous high score for calculations
             percentage = message_data.score / message_data.previous_high_score * 100
             if message_data.score > score_threshold:

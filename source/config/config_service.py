@@ -17,6 +17,7 @@ class ConfigData:
     polling_interval: int
     port: int
     sens_round_decimal_places: int
+    debug: bool = False
 
 
 def load_config() -> ConfigData:
