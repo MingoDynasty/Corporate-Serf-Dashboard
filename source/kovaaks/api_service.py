@@ -51,6 +51,15 @@ def make_cache():
         "leaderboard_totals",
     ):
         os.makedirs(Path(CACHE_DIR, directory), exist_ok=True)
+
+    leaderboard_mapping_file = Path(
+        CACHE_DIR,
+        "scenario_leaderboards",
+        "scenario_name_to_leaderboard_id.json",
+    )
+    if not leaderboard_mapping_file.exists():
+        with open(leaderboard_mapping_file, "w", encoding="utf-8") as file:
+            json.dump({}, file, indent=2)
     return
 
 

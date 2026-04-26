@@ -24,6 +24,21 @@ class FakeResponse:
         return self._data
 
 
+def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    api_service.make_cache()
+
+    mapping_file = (
+        TEST_CACHE_DIR
+        / "scenario_leaderboards"
+        / "scenario_name_to_leaderboard_id.json"
+    )
+    assert json.loads(mapping_file.read_text(encoding="utf-8")) == {}
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     monkeypatch,
 ):
