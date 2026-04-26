@@ -71,6 +71,8 @@ The endpoint performs partial matching. For example, searching `Mingo` can retur
 
 `steam_id` is included in Milestone 1 because it guarantees we select the correct player even when `usernameSearch` returns multiple partial matches.
 
+If a configured `steam_id` does not match any returned player, but exact username matching does find a player, the app should still use the username match so rank lookup can continue. In that case, attach a warning to the rank result and surface it through `dash_logger.warning(...)` so the user knows their configured Steam ID is probably wrong.
+
 ### Scenario To Leaderboard ID
 
 Resolve the selected scenario name to a `leaderboardId` via this fallback chain:
@@ -162,7 +164,10 @@ cache/
     scenario_name_to_leaderboard_id.json   # permanent mapping, no TTL
 
   user_scenario_total_play/
-    MingoDynasty.json                      # seeding metadata, 24h TTL
+    MingoDynasty.json                      # merged seeding metadata, 24h TTL
+    MingoDynasty/
+      page_0.json                         # raw total-play API page
+      page_1.json                         # raw total-play API page
 
   leaderboard_user_rank/
     98330_MingoDynasty.json                # current rank, 168h TTL
@@ -197,7 +202,7 @@ Rules:
 
 ### Total-Play Cache
 
-`user_scenario_total_play/{username}.json` stores the raw paginated response from `/user/scenario/total-play`.
+`user_scenario_total_play/{username}.json` stores a merged app-facing snapshot from `/user/scenario/total-play`. Raw API pages are also cached under `user_scenario_total_play/{username}/page_{n}.json`.
 
 Purpose:
 
@@ -214,10 +219,14 @@ Not trusted for:
 Initialization behavior:
 
 - If the `total-play` metadata cache is missing or stale and `kovaaks_username` is configured, fetch `/user/scenario/total-play`.
+- Fetch and cache each raw page, then write a merged `{username}.json` response for simple future reads.
+- Treat a full page as ambiguous and probe the next page. This avoids trusting a page-0-only cache when the API under-reports `total`.
 - After each successful `total-play` fetch, upsert all discovered `scenarioName -> leaderboardId` mappings into the permanent mapping cache.
 - If the permanent cache already has entries, preserve them and add newly discovered scenarios.
 - This makes `total-play` a recurring metadata hydrator, not just a one-time initializer.
 - `total-play` should only upsert metadata. It should not overwrite current rank or current score values.
+- If KovaaK's returns literal `null` for the configured username, cache a structured unknown-user marker and return `UNKNOWN` rank state rather than `UNRANKED`.
+- If total-play metadata hydration fails due to network/API failure, log it and continue to exact scenario search. A metadata cache miss should not block the fallback chain.
 
 Conflict behavior:
 
@@ -234,6 +243,8 @@ Conflict behavior:
   "status": "RANKED",
   "rank": 11263,
   "leaderboard_id": 98330,
+  "scenario_name": "VT Pasu Intermediate S5",
+  "score": 863.93,
   "fetched_at": "2026-04-26T03:30:00Z"
 }
 ```
@@ -244,6 +255,7 @@ Rules:
 - Cache key includes username to avoid stale data after config changes.
 - Automatically refresh on a new high score for that scenario.
 - Serialize rank status with stable `StrEnum` values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`.
+- Cache files may include `scenario_name`, `score`, `error_message`, and `warning_message` for debuggability and UI notifications.
 
 Rationale:
 
@@ -336,12 +348,19 @@ class ScenarioRankInfo(BaseModel):
     status: ScenarioRankStatus
     rank: int | None = None
     leaderboard_id: int | None = None
+    scenario_name: str | None = None
+    score: float | None = None
+    fetched_at: datetime | None = None
+    error_message: str | None = None
+    warning_message: str | None = None
     total_players: int | None = None  # populated in Phase 2
 ```
 
 The UI callback consumes only `ScenarioRankInfo`. No endpoint-specific logic belongs in `home.py`.
 
 When writing `ScenarioRankInfo` to JSON, use the stable `ScenarioRankStatus` string values directly. Cache files should contain readable values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`. When reading from JSON, reconstruct with `ScenarioRankStatus(raw_status)`.
+
+Expected KovaaK's API/domain failures should be converted to `ScenarioRankInfo(status=UNKNOWN, error_message=...)` inside `api_service.py`. Unexpected application bugs may still raise and can be handled by UI/background safety nets.
 
 ## Expected Code Changes
 
@@ -425,10 +444,14 @@ Recommended behavior:
 ```python
 match rank_info.status:
     case ScenarioRankStatus.RANKED:
+        if rank_info.warning_message:
+            dash_logger.warning(rank_info.warning_message)
         return f"Rank: #{rank_info.rank}"
     case ScenarioRankStatus.UNRANKED:
         return "Rank: Unranked"
     case ScenarioRankStatus.UNKNOWN:
+        if rank_info.error_message:
+            dash_logger.error(rank_info.error_message)
         return "Rank: N/A"
 ```
 
