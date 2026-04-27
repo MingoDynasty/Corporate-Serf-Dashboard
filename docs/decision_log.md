@@ -70,16 +70,6 @@ Why: This matches the KovaaK's-style percentile behavior we agreed to use.
 
 Consequences: Percentile is display-only metadata derived when rank info is returned. It is not stored in rank cache. No tiny-leaderboard special casing is planned, so `rank 1 of 1` displays `50.00%`.
 
-## 2026-04-27: Mirror Local Validation In GitHub Actions
-
-Status: Accepted
-
-Decision: Run the standard validation suite in GitHub Actions for pull requests and pushes to `main`.
-
-Why: Local checks are useful, but CI gives every PR a consistent remote gate and makes review less dependent on whoever last ran commands locally.
-
-Consequences: The CI workflow should stay aligned with `AGENTS.md`: `uv run pytest tests`, `uv run ruff check source tests`, and `uv run python -m compileall source tests`. The workflow uses uv with Python 3.14 to match the project requirement.
-
 ## 2026-04-27: Keep KovaaK's API Findings In A Dedicated Notes File
 
 Status: Accepted
