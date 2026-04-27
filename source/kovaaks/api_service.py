@@ -11,6 +11,7 @@ from enum import StrEnum
 from datetime import UTC, datetime, timedelta
 
 import requests
+from pydantic import ValidationError
 
 from source.kovaaks.api_models import (
     LeaderboardAPIResponse,
@@ -652,7 +653,7 @@ def _with_leaderboard_total(
             rank_info.leaderboard_id,
             leaderboard_total_cache_ttl_hours,
         )
-    except requests.RequestException:
+    except (requests.RequestException, ValidationError, OSError, ValueError):
         logger.warning(
             "Failed to fetch leaderboard total for %s",
             rank_info.leaderboard_id,

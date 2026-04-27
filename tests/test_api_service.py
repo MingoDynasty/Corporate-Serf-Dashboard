@@ -697,6 +697,48 @@ def test_get_scenario_rank_info_keeps_rank_when_total_fetch_fails(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_scenario_rank_info_keeps_rank_when_total_validation_fails(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            leaderboard_id=98330,
+            matched_steam_id="right-steam-id",
+        )
+
+    def fail_get_leaderboard_total(*_args, **_kwargs):
+        LeaderboardAPIResponse.model_validate({"unexpected": "schema"})
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_total",
+        fail_get_leaderboard_total,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="right-steam-id",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11266
+    assert rank_info.total_players is None
+    assert rank_info.percentile is None
+    assert rank_info.error_message is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
 
