@@ -28,6 +28,16 @@ Codex <codex@local>
 
 - PRs opened through the GitHub connector may still show as opened by `MingoDynasty` because the connector uses the user's GitHub authorization.
 
+## Documentation Habits
+
+- Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
+- Use proposal docs, such as `docs/scenario_rank_proposal.md`, for active feature design.
+- Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
+- Do not log every small implementation choice as a decision.
+- When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
+- If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
+- When fixing a bug, add or update a regression test unless there is a clear reason not to; explain the exception in the handoff.
+
 ## Cache Conventions
 
 - Runtime cache files live under `cache/` and should not be committed.
