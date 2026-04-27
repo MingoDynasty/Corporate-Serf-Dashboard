@@ -54,8 +54,8 @@ def make_cache():
     for directory in (
         "scenario_leaderboards",
         "user_scenario_total_play",
-        "leaderboard_user_rank",
-        "leaderboard_totals",
+        Path("leaderboard", "user_rank"),
+        Path("leaderboard", "totals"),
     ):
         os.makedirs(Path(CACHE_DIR, directory), exist_ok=True)
 
@@ -506,7 +506,8 @@ def _rank_cache_file(
 ) -> Path:
     return Path(
         CACHE_DIR,
-        "leaderboard_user_rank",
+        "leaderboard",
+        "user_rank",
         _safe_cache_key(username),
         f"{leaderboard_id}.json",
     )
@@ -542,7 +543,7 @@ def save_scenario_rank(
 
 
 def _leaderboard_total_cache_file(leaderboard_id: int) -> Path:
-    return Path(CACHE_DIR, "leaderboard_totals", f"{leaderboard_id}.json")
+    return Path(CACHE_DIR, "leaderboard", "totals", f"{leaderboard_id}.json")
 
 
 def get_cached_leaderboard_total(

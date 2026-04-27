@@ -172,12 +172,12 @@ cache/
       page_0.json                         # raw total-play API page
       page_1.json                         # raw total-play API page
 
-  leaderboard_user_rank/
-    MingoDynasty/
-      98330.json                         # current rank, 168h TTL
-
-  leaderboard_totals/
-    98330.json                             # total players, 24h TTL
+  leaderboard/
+    user_rank/
+      MingoDynasty/
+        98330.json                         # current rank, 168h TTL
+    totals/
+      98330.json                           # total players, 24h TTL
 ```
 
 Rank and total are stored in separate files because they have different TTLs and are fetched via different calls. Coupling them would force a total re-fetch every time the short-lived rank cache expires.
@@ -242,7 +242,7 @@ Conflict behavior:
 
 ### Current Rank Cache
 
-`leaderboard_user_rank/{safe_username}/{leaderboard_id}.json` stores current rank data:
+`leaderboard/user_rank/{safe_username}/{leaderboard_id}.json` stores current rank data:
 
 ```json
 {
@@ -278,7 +278,7 @@ If stale rank data becomes a real user-facing issue, revisit the TTL without cha
 
 ### Leaderboard Total Cache
 
-`leaderboard_totals/{leaderboard_id}.json` stores the total ranked-player count:
+`leaderboard/totals/{leaderboard_id}.json` stores the total ranked-player count:
 
 ```json
 {

@@ -72,6 +72,8 @@ def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
         / "scenario_name_to_leaderboard_id.json"
     )
     assert json.loads(mapping_file.read_text(encoding="utf-8")) == {}
+    assert (TEST_CACHE_DIR / "leaderboard" / "user_rank").is_dir()
+    assert (TEST_CACHE_DIR / "leaderboard" / "totals").is_dir()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -420,7 +422,7 @@ def test_get_leaderboard_total_fetches_missing_cache_and_writes_payload(monkeypa
 
     assert api_service.get_leaderboard_total(98330, cache_ttl_hours=24) == 18342
 
-    cache_file = TEST_CACHE_DIR / "leaderboard_totals" / "98330.json"
+    cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["leaderboard_id"] == 98330
     assert cached_data["total_players"] == 18342
@@ -433,7 +435,7 @@ def test_get_leaderboard_total_refreshes_stale_cache(monkeypatch):
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
     api_service.save_leaderboard_total(98330, 100)
-    cache_file = TEST_CACHE_DIR / "leaderboard_totals" / "98330.json"
+    cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
     stale_timestamp = time.time() - (25 * 60 * 60)
     os.utime(cache_file, (stale_timestamp, stale_timestamp))
 
@@ -524,7 +526,8 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
 
     cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
@@ -635,12 +638,13 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     )
     assert api_service._rank_cache_file(98330, username) == (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / safe_username
         / "98330.json"
     )
     assert api_service._leaderboard_total_cache_file(98330) == (
-        TEST_CACHE_DIR / "leaderboard_totals" / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
     )
 
 
@@ -676,7 +680,8 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "UnknownUser"
         / "98330.json"
     )
@@ -748,7 +753,8 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
@@ -973,7 +979,8 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
 
     cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
@@ -1032,7 +1039,8 @@ def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_f
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
