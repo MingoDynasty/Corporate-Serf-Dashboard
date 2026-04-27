@@ -59,6 +59,9 @@ def test_get_leaderboard_scores_rejects_invalid_pagination():
     with pytest.raises(ValueError, match="max_results"):
         api_service.get_leaderboard_scores(98330, max_results=0)
 
+    with pytest.raises(ValueError, match="max_results"):
+        api_service.get_leaderboard_scores(98330, max_results=101)
+
 
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)

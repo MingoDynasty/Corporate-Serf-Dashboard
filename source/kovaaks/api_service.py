@@ -112,6 +112,8 @@ def get_leaderboard_scores(
         raise ValueError("page must be greater than or equal to 0")
     if max_results <= 0:
         raise ValueError("max_results must be greater than 0")
+    if max_results > 100:
+        raise ValueError("max_results must be less than or equal to 100")
 
     params = {
         "page": page,
@@ -624,7 +626,7 @@ def _with_leaderboard_total(
             rank_info.leaderboard_id,
             leaderboard_total_cache_ttl_hours,
         )
-    except Exception:  # noqa: BLE001
+    except requests.RequestException:
         logger.warning(
             "Failed to fetch leaderboard total for %s",
             rank_info.leaderboard_id,
