@@ -7,8 +7,8 @@ Display the user's current leaderboard rank for the selected scenario under the 
 Current display:
 
 ```text
-Rank: 11263 of 18,342
-Rank: 11263
+Rank: 11,263 of 18,342
+Rank: 11,263
 Rank: Unranked
 Rank: N/A
 ```
@@ -45,7 +45,7 @@ Conclusion: `total-play` must not be used as the source of truth for current ran
 
 | State | Meaning | Display |
 |---|---|---|
-| `RANKED` | Leaderboard exists; user has a score on it | `Rank: 11263 of 18,342` when total is available, otherwise `Rank: 11263` |
+| `RANKED` | Leaderboard exists; user has a score on it | `Rank: 11,263 of 18,342` when total is available, otherwise `Rank: 11,263` |
 | `UNRANKED` | Leaderboard exists; user has no score | `Rank: Unranked` |
 | `UNKNOWN` | Could not resolve leaderboard, or API failed | `Rank: N/A` |
 
@@ -128,7 +128,7 @@ GET /leaderboard/scores/global?leaderboardId={leaderboard_id}&page=0&max=1
 
 The unfiltered response `total` field is the number of ranked players. Do not use `total` from the `usernameSearch` response, because that represents search matches.
 
-This milestone displays the total as `Rank: 11263 of 18,342`. Percentile math remains deferred.
+This milestone displays the total as `Rank: 11,263 of 18,342`. Percentile math remains deferred.
 
 ## Configuration
 
@@ -413,7 +413,7 @@ Generate the initial response models for `/user/scenario/total-play` and `/scena
 
 Add functions behind a clean abstraction. UI callbacks should only call `get_scenario_rank_info`; all cache and endpoint logic stays in this layer.
 
-`get_leaderboard_scores(...)` should remain a thin KovaaK's API wrapper. It should not read or write raw leaderboard cache files. Cache behavior belongs in domain-specific helpers such as current-rank cache and, later, leaderboard-total cache.
+`get_leaderboard_scores(...)` should remain a thin KovaaK's API wrapper. It should accept pagination arguments (`page`, `max_results`) with sensible defaults, but it should not read or write raw leaderboard cache files. Cache behavior belongs in domain-specific helpers such as current-rank cache and leaderboard-total cache.
 
 ```python
 # leaderboardId mapping cache
@@ -483,8 +483,8 @@ match rank_info.status:
         if rank_info.warning_message:
             dash_logger.warning(rank_info.warning_message)
         if rank_info.total_players is not None:
-            return f"{rank_info.rank} of {rank_info.total_players:,}"
-        return f"{rank_info.rank}"
+            return f"{rank_info.rank:,} of {rank_info.total_players:,}"
+        return f"{rank_info.rank:,}"
     case ScenarioRankStatus.UNRANKED:
         return "Unranked"
     case ScenarioRankStatus.UNKNOWN:
@@ -539,7 +539,7 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 - Hydrate that cache from `total-play` whenever the `total-play` metadata cache is stale
 - `resolve_leaderboard_id` fallback chain: permanent cache -> total-play -> exact scenario search
 - Fetch and cache rank via `usernameSearch` with exact identity matching
-- Display `Rank: #...`, `Rank: Unranked`, or `Rank: N/A`
+- Display `Rank: 11,263`, `Rank: Unranked`, or `Rank: N/A`
 - Separate UI callback with `dcc.Loading`
 
 ### Milestone 2: High-Score Rank Refresh
@@ -554,7 +554,7 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 
 - Config: `leaderboard_total_cache_ttl_hours`
 - Fetch and cache leaderboard total
-- Display ranked users as `Rank: 11263 of 18,342`
+- Display ranked users as `Rank: 11,263 of 18,342`
 - If total fetch fails, keep displaying the current rank by itself
 
 ### Milestone 3b: Percentile

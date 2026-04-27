@@ -105,15 +105,17 @@ def get_benchmark_json(
 def get_leaderboard_scores(
     leaderboard_id: int,
     username_search: str | None = None,
-    max_results: int | None = None,
+    page: int = 0,
+    max_results: int = 100,
 ) -> LeaderboardAPIResponse:
+    if page < 0:
+        raise ValueError("page must be greater than or equal to 0")
+    if max_results <= 0:
+        raise ValueError("max_results must be greater than 0")
+
     params = {
-        "page": 0,
-        "max": (
-            max_results
-            if max_results is not None
-            else (50 if username_search else 100)
-        ),
+        "page": page,
+        "max": max_results,
         "leaderboardId": leaderboard_id,
     }
     if username_search:
@@ -702,6 +704,7 @@ def fetch_scenario_rank(
     leaderboard_response = get_leaderboard_scores(
         leaderboard_id,
         username_search=username,
+        max_results=50,
     )
     player = _find_matching_player(leaderboard_response.data, username, steam_id)
     if not player:

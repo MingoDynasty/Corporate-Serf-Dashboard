@@ -58,8 +58,8 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:
             if rank_info.rank is None:
                 return "N/A"
             if rank_info.total_players is not None:
-                return f"{rank_info.rank} of {rank_info.total_players:,}"
-            return f"{rank_info.rank}"
+                return f"{rank_info.rank:,} of {rank_info.total_players:,}"
+            return f"{rank_info.rank:,}"
         case ScenarioRankStatus.UNRANKED:
             return "Unranked"
         case ScenarioRankStatus.UNKNOWN:
@@ -142,20 +142,13 @@ def get_scenario_rank(_, selected_scenario) -> str:
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
         return "N/A"
 
-    match rank_info.status:
-        case ScenarioRankStatus.RANKED:
-            if rank_info.warning_message:
-                logger.warning("Scenario rank warning: %s", rank_info.warning_message)
-                dash_logger.warning(rank_info.warning_message)
-            return format_scenario_rank(rank_info)
-        case ScenarioRankStatus.UNRANKED:
-            return format_scenario_rank(rank_info)
-        case ScenarioRankStatus.UNKNOWN:
-            if rank_info.error_message:
-                logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
-                dash_logger.error(rank_info.error_message)
-            return format_scenario_rank(rank_info)
-    return "N/A"
+    if rank_info.warning_message:
+        logger.warning("Scenario rank warning: %s", rank_info.warning_message)
+        dash_logger.warning(rank_info.warning_message)
+    if rank_info.error_message:
+        logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
+        dash_logger.error(rank_info.error_message)
+    return format_scenario_rank(rank_info)
 
 
 @callback(

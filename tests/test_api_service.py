@@ -29,21 +29,35 @@ class FakeResponse:
         return self._data
 
 
-def test_get_leaderboard_scores_allows_custom_request_size(monkeypatch):
+def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
     def fake_get(_url, params, timeout):
         assert timeout == api_service.TIMEOUT
         assert params == {
-            "page": 0,
-            "max": 1,
+            "page": 2,
+            "max": 25,
             "leaderboardId": 98330,
+            "usernameSearch": "MingoDynasty",
         }
-        return FakeResponse({"page": 0, "max": 1, "total": 18342, "data": []})
+        return FakeResponse({"page": 2, "max": 25, "total": 18342, "data": []})
 
     monkeypatch.setattr(api_service.requests, "get", fake_get)
 
-    response = api_service.get_leaderboard_scores(98330, max_results=1)
+    response = api_service.get_leaderboard_scores(
+        98330,
+        username_search="MingoDynasty",
+        page=2,
+        max_results=25,
+    )
 
     assert response.total == 18342
+
+
+def test_get_leaderboard_scores_rejects_invalid_pagination():
+    with pytest.raises(ValueError, match="page"):
+        api_service.get_leaderboard_scores(98330, page=-1)
+
+    with pytest.raises(ValueError, match="max_results"):
+        api_service.get_leaderboard_scores(98330, max_results=0)
 
 
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):

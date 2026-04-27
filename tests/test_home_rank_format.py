@@ -14,7 +14,7 @@ def test_format_scenario_rank_with_total_players():
         total_players=18342,
     )
 
-    assert format_scenario_rank(rank_info) == "11266 of 18,342"
+    assert format_scenario_rank(rank_info) == "11,266 of 18,342"
 
 
 def test_format_scenario_rank_without_total_players():
@@ -23,7 +23,7 @@ def test_format_scenario_rank_without_total_players():
         rank=11266,
     )
 
-    assert format_scenario_rank(rank_info) == "11266"
+    assert format_scenario_rank(rank_info) == "11,266"
 
 
 def test_format_scenario_rank_unranked_and_unknown():
