@@ -1,5 +1,7 @@
 import json
+import os
 import shutil
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -27,6 +29,40 @@ class FakeResponse:
         return self._data
 
 
+def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.TIMEOUT
+        assert params == {
+            "page": 2,
+            "max": 25,
+            "leaderboardId": 98330,
+            "usernameSearch": "MingoDynasty",
+        }
+        return FakeResponse({"page": 2, "max": 25, "total": 18342, "data": []})
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    response = api_service.get_leaderboard_scores(
+        98330,
+        username_search="MingoDynasty",
+        page=2,
+        max_results=25,
+    )
+
+    assert response.total == 18342
+
+
+def test_get_leaderboard_scores_rejects_invalid_pagination():
+    with pytest.raises(ValueError, match="page"):
+        api_service.get_leaderboard_scores(98330, page=-1)
+
+    with pytest.raises(ValueError, match="max_results"):
+        api_service.get_leaderboard_scores(98330, max_results=0)
+
+    with pytest.raises(ValueError, match="max_results"):
+        api_service.get_leaderboard_scores(98330, max_results=101)
+
+
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
@@ -39,6 +75,10 @@ def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
         / "scenario_name_to_leaderboard_id.json"
     )
     assert json.loads(mapping_file.read_text(encoding="utf-8")) == {}
+    assert (TEST_CACHE_DIR / "benchmarks").is_dir()
+    assert (TEST_CACHE_DIR / "user_scenario_total_play").is_dir()
+    assert (TEST_CACHE_DIR / "leaderboard" / "user_rank").is_dir()
+    assert (TEST_CACHE_DIR / "leaderboard" / "totals").is_dir()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -350,6 +390,77 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def test_get_leaderboard_total_reads_fresh_cache(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_total(98330, 18342)
+
+    def fail_get_leaderboard_scores(*_args, **_kwargs):
+        raise AssertionError("fresh total cache should avoid network calls")
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fail_get_leaderboard_scores,
+    )
+
+    assert api_service.get_leaderboard_total(98330, cache_ttl_hours=24) == 18342
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_leaderboard_total_fetches_missing_cache_and_writes_payload(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def fake_get_leaderboard_scores(leaderboard_id, **kwargs):
+        assert leaderboard_id == 98330
+        assert kwargs["max_results"] == 1
+        return LeaderboardAPIResponse(page=0, max=1, total=18342, data=[])
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    assert api_service.get_leaderboard_total(98330, cache_ttl_hours=24) == 18342
+
+    cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["leaderboard_id"] == 98330
+    assert cached_data["total_players"] == 18342
+    assert "fetched_at" in cached_data
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_leaderboard_total_refreshes_stale_cache(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_total(98330, 100)
+    cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fake_get_leaderboard_scores(leaderboard_id, **kwargs):
+        assert leaderboard_id == 98330
+        assert kwargs["max_results"] == 1
+        return LeaderboardAPIResponse(page=0, max=1, total=18342, data=[])
+
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_scores",
+        fake_get_leaderboard_scores,
+    )
+
+    assert api_service.get_leaderboard_total(98330, cache_ttl_hours=24) == 18342
+    cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
+    assert cached_data["total_players"] == 18342
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
@@ -364,6 +475,7 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
             leaderboard_id=1,
         ),
     )
+    api_service.save_leaderboard_total(1, 123)
 
     def fail_get(*_args, **_kwargs):
         raise AssertionError("fresh cache should avoid network calls")
@@ -377,6 +489,7 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     )
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 99
+    assert rank_info.total_players == 123
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -418,14 +531,111 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
 
     cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
     assert cached_data["matched_steam_id"] == "right-steam-id"
+    assert "total_players" not in cached_data
     assert "warning_message" not in cached_data
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+@pytest.mark.parametrize(
+    ("status", "expected_rank"),
+    [
+        (ScenarioRankStatus.RANKED, 11266),
+        (ScenarioRankStatus.UNRANKED, None),
+    ],
+)
+def test_get_scenario_rank_info_adds_total_players_for_resolved_result(
+    monkeypatch,
+    status,
+    expected_rank,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=status,
+            rank=expected_rank,
+            leaderboard_id=98330,
+            matched_steam_id="right-steam-id",
+        )
+
+    def fake_get_leaderboard_total(leaderboard_id, cache_ttl_hours):
+        assert leaderboard_id == 98330
+        assert cache_ttl_hours == 24
+        return 18342
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_total",
+        fake_get_leaderboard_total,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="right-steam-id",
+        leaderboard_total_cache_ttl_hours=24,
+    )
+
+    assert rank_info.status == status
+    assert rank_info.rank == expected_rank
+    assert rank_info.total_players == 18342
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_keeps_rank_when_total_fetch_fails(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            leaderboard_id=98330,
+            matched_steam_id="right-steam-id",
+        )
+
+    def fail_get_leaderboard_total(*_args, **_kwargs):
+        raise api_service.requests.RequestException("leaderboard total unavailable")
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_total",
+        fail_get_leaderboard_total,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        steam_id="right-steam-id",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11266
+    assert rank_info.total_players is None
+    assert rank_info.error_message is None
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -444,9 +654,13 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     )
     assert api_service._rank_cache_file(98330, username) == (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / safe_username
         / "98330.json"
+    )
+    assert api_service._leaderboard_total_cache_file(98330) == (
+        TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
     )
 
 
@@ -482,7 +696,8 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "UnknownUser"
         / "98330.json"
     )
@@ -554,7 +769,8 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
@@ -753,6 +969,7 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
             matched_steam_id="actual-steam-id",
         ),
     )
+    api_service.save_leaderboard_total(98330, 18342)
 
     def fail_fetch_scenario_rank(*_args, **_kwargs):
         raise AssertionError("fresh rank fetch should not run")
@@ -778,7 +995,8 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
 
     cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )
@@ -805,6 +1023,7 @@ def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_f
             matched_steam_id="actual-steam-id",
         ),
     )
+    api_service.save_leaderboard_total(98330, 18342)
     fetched = False
 
     def fake_fetch_scenario_rank(*_args, **_kwargs):
@@ -836,7 +1055,8 @@ def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_f
 
     rank_cache_file = (
         TEST_CACHE_DIR
-        / "leaderboard_user_rank"
+        / "leaderboard"
+        / "user_rank"
         / "MingoDynasty"
         / "98330.json"
     )

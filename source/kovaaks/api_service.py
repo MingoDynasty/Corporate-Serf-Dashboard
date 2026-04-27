@@ -49,13 +49,12 @@ class Endpoints(StrEnum):
 
 def make_cache():
     """Create non-user-specific cache directories and permanent index files."""
-    for endpoint in Endpoints:
-        os.makedirs(Path(CACHE_DIR, endpoint.name.lower()), exist_ok=True)
     for directory in (
+        "benchmarks",
         "scenario_leaderboards",
         "user_scenario_total_play",
-        "leaderboard_user_rank",
-        "leaderboard_totals",
+        Path("leaderboard", "user_rank"),
+        Path("leaderboard", "totals"),
     ):
         os.makedirs(Path(CACHE_DIR, directory), exist_ok=True)
 
@@ -105,10 +104,19 @@ def get_benchmark_json(
 def get_leaderboard_scores(
     leaderboard_id: int,
     username_search: str | None = None,
+    page: int = 0,
+    max_results: int = 100,
 ) -> LeaderboardAPIResponse:
+    if page < 0:
+        raise ValueError("page must be greater than or equal to 0")
+    if max_results <= 0:
+        raise ValueError("max_results must be greater than 0")
+    if max_results > 100:
+        raise ValueError("max_results must be less than or equal to 100")
+
     params = {
-        "page": 0,
-        "max": 50 if username_search else 100,
+        "page": page,
+        "max": max_results,
         "leaderboardId": leaderboard_id,
     }
     if username_search:
@@ -499,7 +507,8 @@ def _rank_cache_file(
 ) -> Path:
     return Path(
         CACHE_DIR,
-        "leaderboard_user_rank",
+        "leaderboard",
+        "user_rank",
         _safe_cache_key(username),
         f"{leaderboard_id}.json",
     )
@@ -517,7 +526,9 @@ def get_cached_scenario_rank(
     cache_data = _read_json(cache_file)
     if not isinstance(cache_data, dict):
         return None
-    return ScenarioRankInfo.model_validate(cache_data)
+    return ScenarioRankInfo.model_validate(cache_data).model_copy(
+        update={"total_players": None}
+    )
 
 
 def save_scenario_rank(
@@ -525,10 +536,103 @@ def save_scenario_rank(
     username: str,
     rank_info: ScenarioRankInfo,
 ) -> None:
+    rank_cache_data = rank_info.model_copy(update={"total_players": None})
     _write_json(
         _rank_cache_file(leaderboard_id, username),
-        rank_info.model_dump(mode="json", exclude_none=True),
+        rank_cache_data.model_dump(mode="json", exclude_none=True),
     )
+
+
+def _leaderboard_total_cache_file(leaderboard_id: int) -> Path:
+    return Path(CACHE_DIR, "leaderboard", "totals", f"{leaderboard_id}.json")
+
+
+def get_cached_leaderboard_total(
+    leaderboard_id: int,
+    cache_ttl_hours: int = 24,
+) -> int | None:
+    """Read a fresh cached total player count for a leaderboard."""
+    cache_file = _leaderboard_total_cache_file(leaderboard_id)
+    if not _is_cache_fresh(cache_file, cache_ttl_hours):
+        return None
+
+    cache_data = _read_json(cache_file)
+    if not isinstance(cache_data, dict):
+        return None
+
+    total_players = cache_data.get("total_players")
+    if not isinstance(total_players, int):
+        return None
+    return total_players
+
+
+def save_leaderboard_total(leaderboard_id: int, total_players: int) -> None:
+    """Cache the total number of ranked players for a leaderboard."""
+    _write_json(
+        _leaderboard_total_cache_file(leaderboard_id),
+        {
+            "leaderboard_id": int(leaderboard_id),
+            "total_players": int(total_players),
+            "fetched_at": datetime.now(UTC).isoformat(),
+        },
+    )
+
+
+def fetch_leaderboard_total(leaderboard_id: int) -> int:
+    """
+    Fetch the total ranked-player count using the leaderboard endpoint.
+
+    The API returns the total row count with every leaderboard response, so
+    requesting one row keeps this cheap while still using the authoritative
+    leaderboard source.
+    """
+    leaderboard_response = get_leaderboard_scores(leaderboard_id, max_results=1)
+    return int(leaderboard_response.total)
+
+
+def get_leaderboard_total(
+    leaderboard_id: int,
+    cache_ttl_hours: int = 24,
+) -> int:
+    """Return a cached leaderboard total, refreshing it when stale or missing."""
+    cached_total = get_cached_leaderboard_total(leaderboard_id, cache_ttl_hours)
+    if cached_total is not None:
+        return cached_total
+
+    total_players = fetch_leaderboard_total(leaderboard_id)
+    save_leaderboard_total(leaderboard_id, total_players)
+    return total_players
+
+
+def _with_leaderboard_total(
+    rank_info: ScenarioRankInfo,
+    leaderboard_total_cache_ttl_hours: int = 24,
+) -> ScenarioRankInfo:
+    """
+    Best-effort attach total ranked-player count to a resolved leaderboard.
+
+    Total-count freshness has its own short TTL. A failure here should degrade to
+    showing the rank/unranked state by itself, because that result is still valid.
+    """
+    if (
+        rank_info.status not in (ScenarioRankStatus.RANKED, ScenarioRankStatus.UNRANKED)
+        or rank_info.leaderboard_id is None
+    ):
+        return rank_info
+
+    try:
+        total_players = get_leaderboard_total(
+            rank_info.leaderboard_id,
+            leaderboard_total_cache_ttl_hours,
+        )
+    except requests.RequestException:
+        logger.warning(
+            "Failed to fetch leaderboard total for %s",
+            rank_info.leaderboard_id,
+            exc_info=True,
+        )
+        return rank_info
+    return rank_info.model_copy(update={"total_players": total_players})
 
 
 def _find_matching_player(
@@ -602,6 +706,7 @@ def fetch_scenario_rank(
     leaderboard_response = get_leaderboard_scores(
         leaderboard_id,
         username_search=username,
+        max_results=50,
     )
     player = _find_matching_player(leaderboard_response.data, username, steam_id)
     if not player:
@@ -627,6 +732,7 @@ def get_scenario_rank_info(
     steam_id: str | None = None,
     metadata_cache_ttl_hours: int = 24,
     rank_cache_ttl_hours: int = 168,
+    leaderboard_total_cache_ttl_hours: int = 24,
     force_refresh: bool = False,
 ) -> ScenarioRankInfo:
     """
@@ -693,6 +799,10 @@ def get_scenario_rank_info(
                     update={"scenario_name": scenario_name}
                 )
                 save_scenario_rank(leaderboard_id, username, cached_rank)
+            cached_rank = _with_leaderboard_total(
+                cached_rank,
+                leaderboard_total_cache_ttl_hours,
+            )
             return _with_derived_rank_warning(cached_rank, username, steam_id)
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
@@ -732,6 +842,10 @@ def get_scenario_rank_info(
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)
+    rank_info = _with_leaderboard_total(
+        rank_info,
+        leaderboard_total_cache_ttl_hours,
+    )
     return _with_derived_rank_warning(rank_info, username, steam_id)
 
 
@@ -740,6 +854,7 @@ def refresh_scenario_rank(
     username: str,
     steam_id: str | None = None,
     metadata_cache_ttl_hours: int = 24,
+    leaderboard_total_cache_ttl_hours: int = 24,
 ) -> ScenarioRankInfo:
     return get_scenario_rank_info(
         scenario_name,
@@ -747,6 +862,7 @@ def refresh_scenario_rank(
         steam_id,
         metadata_cache_ttl_hours,
         rank_cache_ttl_hours=0,
+        leaderboard_total_cache_ttl_hours=leaderboard_total_cache_ttl_hours,
         force_refresh=True,
     )
 

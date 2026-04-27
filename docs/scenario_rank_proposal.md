@@ -4,15 +4,17 @@
 
 Display the user's current leaderboard rank for the selected scenario under the Scenario Stats section of the home page.
 
-Phase 1 display:
+Current display:
 
 ```text
-Rank: #11263
+Rank: 11,263 of 18,342
+Rank: 11,263
+Rank: Unranked (18,342 ranked)
 Rank: Unranked
 Rank: N/A
 ```
 
-Phase 2 display:
+Later percentile display:
 
 ```text
 Rank: 11263/18342 (38.6% Percentile)
@@ -44,8 +46,8 @@ Conclusion: `total-play` must not be used as the source of truth for current ran
 
 | State | Meaning | Display |
 |---|---|---|
-| `RANKED` | Leaderboard exists; user has a score on it | `Rank: #11263` |
-| `UNRANKED` | Leaderboard exists; user has no score | `Rank: Unranked` |
+| `RANKED` | Leaderboard exists; user has a score on it | `Rank: 11,263 of 18,342` when total is available, otherwise `Rank: 11,263` |
+| `UNRANKED` | Leaderboard exists; user has no score | `Rank: Unranked (18,342 ranked)` when total is available, otherwise `Rank: Unranked` |
 | `UNKNOWN` | Could not resolve leaderboard, or API failed | `Rank: N/A` |
 
 `Unranked` and `N/A` are intentionally different. `Unranked` is a known state. `N/A` means something went wrong or the leaderboard could not be found.
@@ -119,13 +121,15 @@ Playlist metadata can still help the app know which scenario names belong to an 
 
 ### Leaderboard Total
 
-This is Phase 2 only:
+Use the same leaderboard endpoint without `usernameSearch`:
 
 ```text
 GET /leaderboard/scores/global?leaderboardId={leaderboard_id}&page=0&max=1
 ```
 
 The unfiltered response `total` field is the number of ranked players. Do not use `total` from the `usernameSearch` response, because that represents search matches.
+
+This milestone displays the total as `Rank: 11,263 of 18,342`. Percentile math remains deferred.
 
 ## Configuration
 
@@ -146,7 +150,7 @@ scenario_metadata_cache_ttl_hours = 24
 # A long TTL is acceptable because new high scores trigger immediate refreshes.
 scenario_rank_cache_ttl_hours = 168
 
-# How long to cache leaderboard totals, in hours. Used for percentile in Phase 2.
+# How long to cache leaderboard totals, in hours.
 leaderboard_total_cache_ttl_hours = 24
 ```
 
@@ -169,12 +173,12 @@ cache/
       page_0.json                         # raw total-play API page
       page_1.json                         # raw total-play API page
 
-  leaderboard_user_rank/
-    MingoDynasty/
-      98330.json                         # current rank, 168h TTL
-
-  leaderboard_totals/
-    98330.json                             # total players, 24h TTL, Phase 2
+  leaderboard/
+    user_rank/
+      MingoDynasty/
+        98330.json                         # current rank, 168h TTL
+    totals/
+      98330.json                           # total players, 24h TTL
 ```
 
 Rank and total are stored in separate files because they have different TTLs and are fetched via different calls. Coupling them would force a total re-fetch every time the short-lived rank cache expires.
@@ -239,7 +243,7 @@ Conflict behavior:
 
 ### Current Rank Cache
 
-`leaderboard_user_rank/{safe_username}/{leaderboard_id}.json` stores current rank data:
+`leaderboard/user_rank/{safe_username}/{leaderboard_id}.json` stores current rank data:
 
 ```json
 {
@@ -275,13 +279,23 @@ If stale rank data becomes a real user-facing issue, revisit the TTL without cha
 
 ### Leaderboard Total Cache
 
-`leaderboard_totals/{leaderboard_id}.json` is Phase 2 only.
+`leaderboard/totals/{leaderboard_id}.json` stores the total ranked-player count:
+
+```json
+{
+  "leaderboard_id": 98330,
+  "total_players": 18342,
+  "fetched_at": "2026-04-26T03:30:00Z"
+}
+```
 
 Rules:
 
 - TTL: `leaderboard_total_cache_ttl_hours`, default 24 hours.
 - Stores the unfiltered leaderboard `total`.
 - Separate from rank cache because total has a different freshness requirement.
+- Total fetch failure is non-fatal. If rank lookup succeeds but total lookup fails, display the rank by itself.
+- Totals may be displayed for unranked scenarios too so users can see scenario popularity before trying them.
 
 ### TTL And Corruption Handling
 
@@ -366,7 +380,7 @@ class ScenarioRankInfo(BaseModel):
     fetched_at: datetime | None = None
     error_message: str | None = None
     warning_message: str | None = Field(default=None, exclude=True)
-    total_players: int | None = None  # populated in Phase 2
+    total_players: int | None = None
 ```
 
 The UI callback consumes only `ScenarioRankInfo`. No endpoint-specific logic belongs in `home.py`.
@@ -401,7 +415,7 @@ Generate the initial response models for `/user/scenario/total-play` and `/scena
 
 Add functions behind a clean abstraction. UI callbacks should only call `get_scenario_rank_info`; all cache and endpoint logic stays in this layer.
 
-`get_leaderboard_scores(...)` should remain a thin KovaaK's API wrapper. It should not read or write raw leaderboard cache files. Cache behavior belongs in domain-specific helpers such as current-rank cache and, later, leaderboard-total cache.
+`get_leaderboard_scores(...)` should remain a thin KovaaK's API wrapper. It should accept pagination arguments (`page`, `max_results`) with sensible defaults, but it should not read or write raw leaderboard cache files. Cache behavior belongs in domain-specific helpers such as current-rank cache and leaderboard-total cache.
 
 ```python
 # leaderboardId mapping cache
@@ -422,11 +436,17 @@ resolve_leaderboard_id(scenario_name: str, username: str | None) -> int | None
 get_cached_scenario_rank(leaderboard_id: int, username: str) -> ScenarioRankInfo | None
 save_scenario_rank(leaderboard_id: int, username: str, rank_info: ScenarioRankInfo) -> None
 
+# leaderboard total cache
+get_cached_leaderboard_total(leaderboard_id: int) -> int | None
+save_leaderboard_total(leaderboard_id: int, total_players: int) -> None
+fetch_leaderboard_total(leaderboard_id: int) -> int
+get_leaderboard_total(leaderboard_id: int) -> int
+
 # live rank fetch
 fetch_scenario_rank(leaderboard_id: int, username: str, steam_id: str | None = None) -> ScenarioRankInfo
 
 # main entry points
-get_scenario_rank_info(scenario_name: str, username: str | None, steam_id: str | None = None) -> ScenarioRankInfo
+get_scenario_rank_info(scenario_name: str, username: str | None, steam_id: str | None = None, leaderboard_total_cache_ttl_hours: int = 24) -> ScenarioRankInfo
 refresh_scenario_rank(scenario_name: str, username: str, steam_id: str | None = None) -> ScenarioRankInfo
 ```
 
@@ -455,7 +475,9 @@ Add a separate Dash callback for rank, independent of `get_scenario_num_runs`, s
 Recommended behavior:
 
 - Wrap the rank display in `dcc.Loading`.
-- Callback does one thing: `get_scenario_rank_info(selected_scenario, config.kovaaks_username, config.steam_id)`.
+- Keep the visible label fixed as `Rank: ` and let the callback return only the value.
+- Callback does one thing: `get_scenario_rank_info(selected_scenario, config.kovaaks_username, config.steam_id, ...)`.
+- Do not require the selected scenario to exist in the local stats database; unplayed playlist scenarios can still resolve leaderboard totals from KovaaK's.
 - Render based on `ScenarioRankInfo.status`.
 
 ```python
@@ -463,18 +485,22 @@ match rank_info.status:
     case ScenarioRankStatus.RANKED:
         if rank_info.warning_message:
             dash_logger.warning(rank_info.warning_message)
-        return f"Rank: #{rank_info.rank}"
+        if rank_info.total_players is not None:
+            return f"{rank_info.rank:,} of {rank_info.total_players:,}"
+        return f"{rank_info.rank:,}"
     case ScenarioRankStatus.UNRANKED:
-        return "Rank: Unranked"
+        if rank_info.total_players is not None:
+            return f"Unranked ({rank_info.total_players:,} ranked)"
+        return "Unranked"
     case ScenarioRankStatus.UNKNOWN:
         if rank_info.error_message:
             dash_logger.error(rank_info.error_message)
-        return "Rank: N/A"
+        return "N/A"
 ```
 
 ## Percentile Calculation
 
-Phase 2 needs:
+The later percentile milestone needs:
 
 ```text
 current_rank
@@ -507,7 +533,7 @@ If rank 1 should display `100%` instead of `90%`, use:
 percentile = ((total_ranked_players - current_rank + 1) / total_ranked_players) * 100
 ```
 
-That would make rank `2/10` display as `90%`, so it does not match the original example. Confirm before implementing Phase 2.
+That would make rank `2/10` display as `90%`, so it does not match the original example. Confirm before implementing percentile display.
 
 ## Milestones
 
@@ -518,7 +544,7 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 - Hydrate that cache from `total-play` whenever the `total-play` metadata cache is stale
 - `resolve_leaderboard_id` fallback chain: permanent cache -> total-play -> exact scenario search
 - Fetch and cache rank via `usernameSearch` with exact identity matching
-- Display `Rank: #...`, `Rank: Unranked`, or `Rank: N/A`
+- Display `Rank: 11,263`, `Rank: Unranked`, or `Rank: N/A`
 - Separate UI callback with `dcc.Loading`
 
 ### Milestone 2: High-Score Rank Refresh
@@ -529,10 +555,16 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 - Surface refreshed rank to UI on next update cycle
 - Surface refresh failures to the UI through `dash_logger.error(...)`
 
-### Milestone 3: Percentile
+### Milestone 3a: Leaderboard Total Display
 
 - Config: `leaderboard_total_cache_ttl_hours`
 - Fetch and cache leaderboard total
+- Display ranked users as `Rank: 11,263 of 18,342`
+- Display unranked users as `Rank: Unranked (18,342 ranked)` when total is available
+- If total fetch fails, keep displaying the current rank or unranked state by itself
+
+### Milestone 3b: Percentile
+
 - Percentile calculation and display
 
 ### Milestone 4: Optional Rank History
