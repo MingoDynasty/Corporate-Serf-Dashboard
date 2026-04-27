@@ -610,13 +610,13 @@ def _with_leaderboard_total(
     leaderboard_total_cache_ttl_hours: int = 24,
 ) -> ScenarioRankInfo:
     """
-    Best-effort attach total ranked-player count to a ranked result.
+    Best-effort attach total ranked-player count to a resolved leaderboard.
 
     Total-count freshness has its own short TTL. A failure here should degrade to
-    showing just the rank, because the rank result itself is still valid.
+    showing the rank/unranked state by itself, because that result is still valid.
     """
     if (
-        rank_info.status != ScenarioRankStatus.RANKED
+        rank_info.status not in (ScenarioRankStatus.RANKED, ScenarioRankStatus.UNRANKED)
         or rank_info.leaderboard_id is None
     ):
         return rank_info

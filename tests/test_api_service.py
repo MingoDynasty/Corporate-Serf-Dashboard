@@ -542,7 +542,18 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def test_get_scenario_rank_info_adds_total_players_for_ranked_result(monkeypatch):
+@pytest.mark.parametrize(
+    ("status", "expected_rank"),
+    [
+        (ScenarioRankStatus.RANKED, 11266),
+        (ScenarioRankStatus.UNRANKED, None),
+    ],
+)
+def test_get_scenario_rank_info_adds_total_players_for_resolved_result(
+    monkeypatch,
+    status,
+    expected_rank,
+):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
@@ -550,8 +561,8 @@ def test_get_scenario_rank_info_adds_total_players_for_ranked_result(monkeypatch
 
     def fake_fetch_scenario_rank(*_args, **_kwargs):
         return ScenarioRankInfo(
-            status=ScenarioRankStatus.RANKED,
-            rank=11266,
+            status=status,
+            rank=expected_rank,
             leaderboard_id=98330,
             matched_steam_id="right-steam-id",
         )
@@ -579,8 +590,8 @@ def test_get_scenario_rank_info_adds_total_players_for_ranked_result(monkeypatch
         leaderboard_total_cache_ttl_hours=24,
     )
 
-    assert rank_info.status == ScenarioRankStatus.RANKED
-    assert rank_info.rank == 11266
+    assert rank_info.status == status
+    assert rank_info.rank == expected_rank
     assert rank_info.total_players == 18342
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 

@@ -9,6 +9,7 @@ Current display:
 ```text
 Rank: 11,263 of 18,342
 Rank: 11,263
+Rank: Unranked (18,342 ranked)
 Rank: Unranked
 Rank: N/A
 ```
@@ -46,7 +47,7 @@ Conclusion: `total-play` must not be used as the source of truth for current ran
 | State | Meaning | Display |
 |---|---|---|
 | `RANKED` | Leaderboard exists; user has a score on it | `Rank: 11,263 of 18,342` when total is available, otherwise `Rank: 11,263` |
-| `UNRANKED` | Leaderboard exists; user has no score | `Rank: Unranked` |
+| `UNRANKED` | Leaderboard exists; user has no score | `Rank: Unranked (18,342 ranked)` when total is available, otherwise `Rank: Unranked` |
 | `UNKNOWN` | Could not resolve leaderboard, or API failed | `Rank: N/A` |
 
 `Unranked` and `N/A` are intentionally different. `Unranked` is a known state. `N/A` means something went wrong or the leaderboard could not be found.
@@ -294,6 +295,7 @@ Rules:
 - Stores the unfiltered leaderboard `total`.
 - Separate from rank cache because total has a different freshness requirement.
 - Total fetch failure is non-fatal. If rank lookup succeeds but total lookup fails, display the rank by itself.
+- Totals may be displayed for unranked scenarios too so users can see scenario popularity before trying them.
 
 ### TTL And Corruption Handling
 
@@ -486,6 +488,8 @@ match rank_info.status:
             return f"{rank_info.rank:,} of {rank_info.total_players:,}"
         return f"{rank_info.rank:,}"
     case ScenarioRankStatus.UNRANKED:
+        if rank_info.total_players is not None:
+            return f"Unranked ({rank_info.total_players:,} ranked)"
         return "Unranked"
     case ScenarioRankStatus.UNKNOWN:
         if rank_info.error_message:
@@ -555,7 +559,8 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 - Config: `leaderboard_total_cache_ttl_hours`
 - Fetch and cache leaderboard total
 - Display ranked users as `Rank: 11,263 of 18,342`
-- If total fetch fails, keep displaying the current rank by itself
+- Display unranked users as `Rank: Unranked (18,342 ranked)` when total is available
+- If total fetch fails, keep displaying the current rank or unranked state by itself
 
 ### Milestone 3b: Percentile
 

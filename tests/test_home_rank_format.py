@@ -26,6 +26,15 @@ def test_format_scenario_rank_without_total_players():
     assert format_scenario_rank(rank_info) == "11,266"
 
 
+def test_format_scenario_rank_unranked_with_total_players():
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.UNRANKED,
+        total_players=63870,
+    )
+
+    assert format_scenario_rank(rank_info) == "Unranked (63,870 ranked)"
+
+
 def test_format_scenario_rank_unranked_and_unknown():
     assert (
         format_scenario_rank(ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED))

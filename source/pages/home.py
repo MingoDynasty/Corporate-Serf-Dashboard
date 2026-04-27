@@ -61,6 +61,8 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:
                 return f"{rank_info.rank:,} of {rank_info.total_players:,}"
             return f"{rank_info.rank:,}"
         case ScenarioRankStatus.UNRANKED:
+            if rank_info.total_players is not None:
+                return f"Unranked ({rank_info.total_players:,} ranked)"
             return "Unranked"
         case ScenarioRankStatus.UNKNOWN:
             return "N/A"
