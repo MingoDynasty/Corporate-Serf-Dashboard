@@ -58,6 +58,11 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:
             if rank_info.rank is None:
                 return "N/A"
             if rank_info.total_players is not None:
+                if rank_info.percentile is not None:
+                    return (
+                        f"{rank_info.rank:,} of {rank_info.total_players:,} "
+                        f"({rank_info.percentile:.2f}% Percentile)"
+                    )
                 return f"{rank_info.rank:,} of {rank_info.total_players:,}"
             return f"{rank_info.rank:,}"
         case ScenarioRankStatus.UNRANKED:

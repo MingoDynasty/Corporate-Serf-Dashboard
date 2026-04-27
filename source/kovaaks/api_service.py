@@ -527,7 +527,7 @@ def get_cached_scenario_rank(
     if not isinstance(cache_data, dict):
         return None
     return ScenarioRankInfo.model_validate(cache_data).model_copy(
-        update={"total_players": None}
+        update={"total_players": None, "percentile": None}
     )
 
 
@@ -536,7 +536,9 @@ def save_scenario_rank(
     username: str,
     rank_info: ScenarioRankInfo,
 ) -> None:
-    rank_cache_data = rank_info.model_copy(update={"total_players": None})
+    rank_cache_data = rank_info.model_copy(
+        update={"total_players": None, "percentile": None}
+    )
     _write_json(
         _rank_cache_file(leaderboard_id, username),
         rank_cache_data.model_dump(mode="json", exclude_none=True),
@@ -590,6 +592,11 @@ def fetch_leaderboard_total(leaderboard_id: int) -> int:
     return int(leaderboard_response.total)
 
 
+def calculate_percentile(rank: int, total_players: int) -> float:
+    """Calculate the KovaaK's-style midpoint percentile for a leaderboard rank."""
+    return ((total_players - rank + 0.5) / total_players) * 100
+
+
 def get_leaderboard_total(
     leaderboard_id: int,
     cache_ttl_hours: int = 24,
@@ -602,6 +609,26 @@ def get_leaderboard_total(
     total_players = fetch_leaderboard_total(leaderboard_id)
     save_leaderboard_total(leaderboard_id, total_players)
     return total_players
+
+
+def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
+    """Attach display-only percentile when rank and leaderboard total are known."""
+    if (
+        rank_info.status != ScenarioRankStatus.RANKED
+        or rank_info.rank is None
+        or rank_info.total_players is None
+        or rank_info.total_players <= 0
+    ):
+        return rank_info
+
+    return rank_info.model_copy(
+        update={
+            "percentile": calculate_percentile(
+                rank_info.rank,
+                rank_info.total_players,
+            )
+        }
+    )
 
 
 def _with_leaderboard_total(
@@ -632,7 +659,8 @@ def _with_leaderboard_total(
             exc_info=True,
         )
         return rank_info
-    return rank_info.model_copy(update={"total_players": total_players})
+    rank_info = rank_info.model_copy(update={"total_players": total_players})
+    return _with_percentile(rank_info)
 
 
 def _find_matching_player(

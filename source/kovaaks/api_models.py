@@ -177,6 +177,7 @@ class ScenarioRankInfo(BaseModel):
     score: float | None = None
     matched_steam_id: str | None = None
     total_players: int | None = None
+    percentile: float | None = None
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
     warning_message: str | None = Field(default=None, exclude=True)

@@ -14,9 +14,10 @@ def test_format_scenario_rank_with_total_players():
         status=ScenarioRankStatus.RANKED,
         rank=11266,
         total_players=18342,
+        percentile=38.58,
     )
 
-    assert format_scenario_rank(rank_info) == "11,266 of 18,342"
+    assert format_scenario_rank(rank_info) == "11,266 of 18,342 (38.58% Percentile)"
 
 
 def test_format_scenario_rank_without_total_players():

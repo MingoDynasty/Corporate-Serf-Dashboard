@@ -63,6 +63,57 @@ def test_get_leaderboard_scores_rejects_invalid_pagination():
         api_service.get_leaderboard_scores(98330, max_results=101)
 
 
+@pytest.mark.parametrize(
+    ("rank", "total_players", "expected_percentile"),
+    [
+        (11290, 63892, 82.33),
+        (78, 196, 60.46),
+        (116, 224, 48.44),
+        (1, 10, 95.00),
+        (2, 10, 85.00),
+        (10, 10, 5.00),
+        (1, 1, 50.00),
+        (1, 18342, 100.00),
+    ],
+)
+def test_calculate_percentile(rank, total_players, expected_percentile):
+    assert round(api_service.calculate_percentile(rank, total_players), 2) == (
+        expected_percentile
+    )
+
+
+@pytest.mark.parametrize(
+    "rank_info",
+    [
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.UNRANKED,
+            leaderboard_id=98330,
+            total_players=100,
+        ),
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            rank=None,
+            total_players=100,
+        ),
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            rank=10,
+            total_players=None,
+        ),
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            leaderboard_id=98330,
+            rank=10,
+            total_players=0,
+        ),
+    ],
+)
+def test_with_percentile_omits_incomplete_or_unranked_results(rank_info):
+    assert api_service._with_percentile(rank_info).percentile is None
+
+
 def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
@@ -490,6 +541,7 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 99
     assert rank_info.total_players == 123
+    assert round(rank_info.percentile, 2) == 19.92
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -540,6 +592,7 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
     assert cached_data["matched_steam_id"] == "right-steam-id"
     assert "total_players" not in cached_data
+    assert "percentile" not in cached_data
     assert "warning_message" not in cached_data
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -595,6 +648,10 @@ def test_get_scenario_rank_info_adds_total_players_for_resolved_result(
     assert rank_info.status == status
     assert rank_info.rank == expected_rank
     assert rank_info.total_players == 18342
+    if status == ScenarioRankStatus.RANKED:
+        assert round(rank_info.percentile, 2) == 38.58
+    else:
+        assert rank_info.percentile is None
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -635,6 +692,7 @@ def test_get_scenario_rank_info_keeps_rank_when_total_fetch_fails(monkeypatch):
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 11266
     assert rank_info.total_players is None
+    assert rank_info.percentile is None
     assert rank_info.error_message is None
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
