@@ -128,7 +128,7 @@ def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
     Input("scenario-dropdown-selection", "value"),
 )
 def get_scenario_rank(_, selected_scenario) -> str:
-    if not selected_scenario or not is_scenario_in_database(selected_scenario):
+    if not selected_scenario:
         return "N/A"
 
     try:

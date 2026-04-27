@@ -477,6 +477,7 @@ Recommended behavior:
 - Wrap the rank display in `dcc.Loading`.
 - Keep the visible label fixed as `Rank: ` and let the callback return only the value.
 - Callback does one thing: `get_scenario_rank_info(selected_scenario, config.kovaaks_username, config.steam_id, ...)`.
+- Do not require the selected scenario to exist in the local stats database; unplayed playlist scenarios can still resolve leaderboard totals from KovaaK's.
 - Render based on `ScenarioRankInfo.status`.
 
 ```python
