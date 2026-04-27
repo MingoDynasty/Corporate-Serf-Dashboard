@@ -75,6 +75,8 @@ def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
         / "scenario_name_to_leaderboard_id.json"
     )
     assert json.loads(mapping_file.read_text(encoding="utf-8")) == {}
+    assert (TEST_CACHE_DIR / "benchmarks").is_dir()
+    assert (TEST_CACHE_DIR / "user_scenario_total_play").is_dir()
     assert (TEST_CACHE_DIR / "leaderboard" / "user_rank").is_dir()
     assert (TEST_CACHE_DIR / "leaderboard" / "totals").is_dir()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)

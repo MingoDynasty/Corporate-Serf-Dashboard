@@ -49,9 +49,8 @@ class Endpoints(StrEnum):
 
 def make_cache():
     """Create non-user-specific cache directories and permanent index files."""
-    for endpoint in Endpoints:
-        os.makedirs(Path(CACHE_DIR, endpoint.name.lower()), exist_ok=True)
     for directory in (
+        "benchmarks",
         "scenario_leaderboards",
         "user_scenario_total_play",
         Path("leaderboard", "user_rank"),
