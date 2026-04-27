@@ -33,6 +33,7 @@ Codex <codex@local>
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
 - Use proposal docs, such as `docs/scenario_rank_proposal.md`, for active feature design.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
+- Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Do not log every small implementation choice as a decision.
 - When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
@@ -48,6 +49,7 @@ Codex <codex@local>
 ## Scenario Rank Feature
 
 The source of truth for detailed design is `docs/scenario_rank_proposal.md`.
+Endpoint behavior and quirks are tracked in `docs/kovaaks_api_notes.md`.
 
 Current agreed behavior:
 
