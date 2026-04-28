@@ -1,0 +1,158 @@
+"""Per-playlist scenario table page."""
+
+import dash
+from dash import Input, Output, State, callback, dcc, no_update
+import dash_ag_grid as dag
+import dash_mantine_components as dmc
+
+from source.config.config_service import config
+from source.kovaaks.data_service import get_playlist_by_code
+from source.kovaaks.playlist_scenarios_service import (
+    PlaylistRankLookupConfig,
+    build_playlist_scenario_rank_rows,
+)
+from source.pages.playlist_components import playlist_selector
+
+dash.register_page(
+    __name__,
+    path_template="/playlists/<playlist_code>",
+    title="Playlist Scenarios",
+)
+
+TABLE_COLUMN_DEFS = [
+    {
+        "headerName": "Scenario",
+        "field": "scenario",
+        "sortable": True,
+        "flex": 2,
+        "minWidth": 280,
+    },
+    {
+        "headerName": "Rank",
+        "field": "rank_sort",
+        "valueFormatter": {"function": "params.data.rank_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 120,
+    },
+    {
+        "headerName": "Total",
+        "field": "total_sort",
+        "valueFormatter": {"function": "params.data.total_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 120,
+    },
+    {
+        "headerName": "Percentile",
+        "field": "percentile_sort",
+        "valueFormatter": {"function": "params.data.percentile_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 140,
+    },
+]
+
+
+def _lookup_config() -> PlaylistRankLookupConfig:
+    return PlaylistRankLookupConfig(
+        username=config.kovaaks_username,
+        steam_id=config.steam_id,
+        scenario_metadata_cache_ttl_hours=config.scenario_metadata_cache_ttl_hours,
+        scenario_rank_cache_ttl_hours=config.scenario_rank_cache_ttl_hours,
+        leaderboard_total_cache_ttl_hours=config.leaderboard_total_cache_ttl_hours,
+    )
+
+
+def _selected_playlist_code(playlist_code: str | None) -> str | None:
+    if playlist_code and get_playlist_by_code(playlist_code):
+        return playlist_code
+    return None
+
+
+@callback(
+    Output("playlist-scenarios-location", "pathname"),
+    Input("playlist-scenarios-selector", "value"),
+    State("playlist-scenarios-location", "pathname"),
+    prevent_initial_call=True,
+)
+def route_to_selected_playlist(playlist_code, current_pathname):
+    if not playlist_code:
+        return no_update
+
+    pathname = f"/playlists/{playlist_code}"
+    if pathname == current_pathname:
+        return no_update
+    return pathname
+
+
+@callback(
+    Output("playlist-scenarios-grid", "rowData"),
+    Output("playlist-scenarios-title", "children"),
+    Output("playlist-scenarios-status", "children"),
+    Input("playlist-scenarios-selector", "value"),
+)
+def load_playlist_scenario_rows(playlist_code):
+    if not playlist_code:
+        return [], "Playlist not found", "Select a playlist from the Playlists page."
+
+    playlist = get_playlist_by_code(playlist_code)
+    if playlist is None:
+        return [], "Playlist not found", "The selected playlist is not imported."
+
+    rows = build_playlist_scenario_rank_rows(playlist_code, _lookup_config())
+    return rows, playlist.name, ""
+
+
+def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
+    selected_playlist_code = _selected_playlist_code(playlist_code)
+    playlist = get_playlist_by_code(selected_playlist_code) if selected_playlist_code else None
+
+    return dmc.Stack(
+        children=[
+            dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
+            dmc.Group(
+                children=[
+                    dmc.Title(
+                        playlist.name if playlist else "Playlist not found",
+                        id="playlist-scenarios-title",
+                        order=2,
+                    ),
+                    playlist_selector(
+                        "playlist-scenarios-selector",
+                        value=selected_playlist_code,
+                    ),
+                ],
+                align="flex-end",
+                justify="space-between",
+            ),
+            dmc.Text(
+                "" if playlist else "The selected playlist is not imported.",
+                c="dimmed",
+                id="playlist-scenarios-status",
+            ),
+            dcc.Loading(
+                dag.AgGrid(
+                    id="playlist-scenarios-grid",
+                    className="ag-theme-quartz playlist-scenarios-grid",
+                    columnDefs=TABLE_COLUMN_DEFS,
+                    rowData=[],
+                    defaultColDef={
+                        "resizable": True,
+                        "sortable": True,
+                    },
+                    dashGridOptions={
+                        "animateRows": False,
+                        "domLayout": "autoHeight",
+                    },
+                    columnSize="responsiveSizeToFit",
+                    dangerously_allow_code=True,
+                    style={"width": "100%"},
+                )
+            ),
+        ],
+        gap="md",
+    )

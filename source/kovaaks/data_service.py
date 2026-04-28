@@ -43,7 +43,7 @@ run_database: SortedList = SortedList(
 )
 
 
-playlist_database: dict[str, list[Scenario]] = {}
+playlist_database: dict[str, PlaylistData] = {}
 
 
 def get_playlist_file_path(playlist_name: str) -> Path:
@@ -204,9 +204,37 @@ def get_playlists() -> list[str]:
     return sorted(playlist_database.keys())
 
 
+def get_playlist_selector_options() -> list[dict[str, str]]:
+    """Get playlist dropdown options with display names and URL-safe codes."""
+    playlists = sorted(playlist_database.values(), key=lambda playlist: playlist.name)
+    return [
+        {
+            "label": playlist.name,
+            "value": playlist.code,
+        }
+        for playlist in playlists
+    ]
+
+
+def get_playlist_by_code(playlist_code: str) -> PlaylistData | None:
+    """Find a locally imported playlist by its KovaaK's playlist code."""
+    for playlist in playlist_database.values():
+        if playlist.code == playlist_code:
+            return playlist
+    return None
+
+
 def get_scenarios_from_playlists(playlist_name: str) -> list[str]:
     """Get scenarios from a playlist."""
-    return [item.name for item in playlist_database[playlist_name]]
+    return [item.name for item in playlist_database[playlist_name].scenarios]
+
+
+def get_scenarios_from_playlist_code(playlist_code: str) -> list[str]:
+    """Get scenario names from a playlist selected by URL playlist code."""
+    playlist = get_playlist_by_code(playlist_code)
+    if playlist is None:
+        return []
+    return [item.name for item in playlist.scenarios]
 
 
 def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> list[Rank]:
@@ -217,7 +245,7 @@ def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> list[
             scenario_name,
         )
         return []
-    scenarios = playlist_database[playlist_name]
+    scenarios = playlist_database[playlist_name].scenarios
     for scenario in scenarios:
         if scenario.name != scenario_name:
             continue
@@ -419,7 +447,7 @@ def load_playlists() -> None:
                     playlist_data.name,
                 )
                 continue
-            playlist_database[playlist_data.name] = playlist_data.scenarios
+            playlist_database[playlist_data.name] = playlist_data
         except ValidationError:
             logger.warning("Invalid JSON format in playlist file: %s", playlist_file)
 
@@ -456,7 +484,7 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
         message = f"Invalid playlist name returned by API: {playlist_data.name}"
         logger.warning(message)
         return message
-    playlist_database[playlist_data.name] = playlist_data.scenarios
+    playlist_database[playlist_data.name] = playlist_data
     return None
 
 
