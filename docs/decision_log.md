@@ -6,6 +6,13 @@ Use this log for decisions that are hard to reverse, cross-cutting, based on ext
 
 When a decision changes, keep the old entry and mark it `Superseded`. Add a new entry explaining what changed, why, and any migration notes.
 
+## Status Values
+
+- `Proposed`: under consideration, not yet agreed.
+- `Accepted`: current agreed decision.
+- `Superseded`: replaced by a newer decision.
+- `Rejected`: considered and intentionally not chosen.
+
 ## 2026-04-27: Use JSON Files For Runtime API Caches
 
 Status: Accepted

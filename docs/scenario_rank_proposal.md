@@ -382,6 +382,8 @@ When writing `ScenarioRankInfo` to JSON, use the stable `ScenarioRankStatus` str
 
 `percentile` is display-only metadata derived from `rank` and the leaderboard total when rank info is returned. It should not be stored in the user-rank cache.
 
+`rank`, `total_players`, and `percentile` stay as separate fields so future UI can render them independently, such as a table with separate current rank, total ranks, and percentile columns.
+
 `matched_steam_id` is the stable fact captured from the leaderboard response. `warning_message` is intentionally transient: the service layer derives it from the current config each time rank info is returned. This prevents stale warnings from surviving a config correction.
 
 Expected KovaaK's API/domain failures should be converted to `ScenarioRankInfo(status=UNKNOWN, error_message=...)` inside `api_service.py`. Unexpected application bugs may still raise and can be handled by UI/background safety nets.
