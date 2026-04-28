@@ -3,6 +3,8 @@ import os
 import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from pathlib import Path
 
 import pytest
@@ -19,18 +21,145 @@ TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
 
 class FakeResponse:
-    def __init__(self, data):
+    def __init__(self, data, status_code=200, headers=None):
         self._data = data
+        self.status_code = status_code
+        self.headers = headers or {}
 
     def raise_for_status(self):
+        if self.status_code >= 400:
+            raise api_service.requests.HTTPError(response=self)
         return None
 
     def json(self):
         return self._data
 
 
+def test_get_with_retry_retries_once_on_429(monkeypatch):
+    responses = [
+        FakeResponse({"error": "rate limited"}, status_code=429),
+        FakeResponse({"ok": True}),
+    ]
+    calls = []
+    sleeps = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    response = api_service._get_with_retry("https://example.test", params={"a": 1})
+
+    assert response.json() == {"ok": True}
+    assert len(calls) == 2
+    assert calls[0] == calls[1]
+    assert sleeps == [api_service.DEFAULT_RETRY_AFTER_SECONDS]
+
+
+@pytest.mark.parametrize(
+    ("headers", "expected_delay"),
+    [
+        ({"Retry-After": "1.25"}, 1.25),
+        ({"Retry-After": "60"}, api_service.MAX_RETRY_AFTER_SECONDS),
+        ({"Retry-After": "nonsense"}, api_service.DEFAULT_RETRY_AFTER_SECONDS),
+        ({}, api_service.DEFAULT_RETRY_AFTER_SECONDS),
+    ],
+)
+def test_get_with_retry_uses_bounded_retry_after(headers, expected_delay, monkeypatch):
+    responses = [
+        FakeResponse({"error": "rate limited"}, status_code=429, headers=headers),
+        FakeResponse({"ok": True}),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    api_service._get_with_retry("https://example.test")
+
+    assert sleeps == [expected_delay]
+
+
+def test_get_with_retry_caps_http_date_retry_after(monkeypatch):
+    retry_after = format_datetime(datetime.now(UTC) + timedelta(minutes=1))
+    responses = [
+        FakeResponse(
+            {"error": "rate limited"},
+            status_code=429,
+            headers={"Retry-After": retry_after},
+        ),
+        FakeResponse({"ok": True}),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    api_service._get_with_retry("https://example.test")
+
+    assert sleeps == [api_service.MAX_RETRY_AFTER_SECONDS]
+
+
+def test_get_with_retry_does_not_retry_non_429_http_errors(monkeypatch):
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        return FakeResponse({"error": "not found"}, status_code=404)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    with pytest.raises(api_service.requests.HTTPError):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 1
+
+
+def test_get_with_retry_gives_up_after_second_429(monkeypatch):
+    responses = [
+        FakeResponse({"error": "rate limited"}, status_code=429),
+        FakeResponse({"error": "still rate limited"}, status_code=429),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    with pytest.raises(api_service.requests.HTTPError):
+        api_service._get_with_retry("https://example.test")
+
+    assert sleeps == [api_service.DEFAULT_RETRY_AFTER_SECONDS]
+    assert responses == []
+
+
+def test_get_with_retry_propagates_non_http_exceptions(monkeypatch):
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ConnectionError("network unavailable")
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+
+    with pytest.raises(api_service.requests.ConnectionError):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 1
+
+
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
-    def fake_get(_url, params, timeout):
+    def fake_get_with_retry(_url, params, timeout):
         assert timeout == api_service.TIMEOUT
         assert params == {
             "page": 2,
@@ -40,7 +169,7 @@ def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
         }
         return FakeResponse({"page": 2, "max": 25, "total": 18342, "data": []})
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get_with_retry)
 
     response = api_service.get_leaderboard_scores(
         98330,
