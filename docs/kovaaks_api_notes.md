@@ -10,6 +10,19 @@ Base URL:
 https://kovaaks.com/webapp-backend
 ```
 
+## Rate Limiting
+
+KovaaK's may return HTTP `429 Too Many Requests` during bursty access patterns, especially cold-cache playlist table loads that fetch many scenario ranks and totals.
+
+Project retry policy:
+
+- Retry GET requests once on HTTP `429`.
+- Honor `Retry-After` when present.
+- Fall back to a short default delay when `Retry-After` is absent or invalid.
+- Cap the retry delay so the UI does not stall for a long server-requested wait.
+- Do not retry non-429 HTTP failures or non-HTTP exceptions by default.
+- Do not show a UI notification for a recovered retry. If the retry also fails, normal service-layer failure handling applies.
+
 ## Endpoint Summary
 
 | Endpoint | Project Use | Authoritative For Current Rank? | Notes |

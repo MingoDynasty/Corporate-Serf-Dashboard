@@ -6,6 +6,8 @@ import json
 import logging
 import os
 import threading
+import time
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from enum import StrEnum
 from datetime import UTC, datetime, timedelta
@@ -24,6 +26,8 @@ from source.kovaaks.api_models import (
 )
 
 TIMEOUT = 10
+DEFAULT_RETRY_AFTER_SECONDS = 0.5
+MAX_RETRY_AFTER_SECONDS = 5.0
 logger = logging.getLogger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 
@@ -69,11 +73,64 @@ def make_cache():
     return
 
 
+def _parse_retry_after(raw_retry_after: str) -> float:
+    try:
+        return float(raw_retry_after)
+    except (TypeError, ValueError):
+        pass
+
+    try:
+        retry_at = parsedate_to_datetime(raw_retry_after)
+    except (TypeError, ValueError, IndexError, OverflowError):
+        return DEFAULT_RETRY_AFTER_SECONDS
+
+    if retry_at.tzinfo is None:
+        retry_at = retry_at.replace(tzinfo=UTC)
+    return (retry_at - datetime.now(UTC)).total_seconds()
+
+
+def _retry_after_seconds(response: requests.Response) -> float:
+    raw_retry_after = response.headers.get("Retry-After")
+    delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
+
+    if raw_retry_after:
+        delay_seconds = _parse_retry_after(raw_retry_after)
+
+    delay_seconds = max(0.0, delay_seconds)
+    return min(delay_seconds, MAX_RETRY_AFTER_SECONDS)
+
+
+def _get_with_retry(url: str, **kwargs) -> requests.Response:
+    """
+    Make a KovaaK's GET request with one automatic retry on HTTP 429.
+
+    Transient rate limits are retried quietly. If the second attempt fails, the
+    normal caller-level error handling decides whether the UI sees UNKNOWN/N/A.
+    """
+    kwargs.setdefault("timeout", TIMEOUT)
+
+    response = requests.get(url, **kwargs)
+    if response.status_code != 429:
+        response.raise_for_status()
+        return response
+
+    delay_seconds = _retry_after_seconds(response)
+    logger.warning(
+        "Rate limited by KovaaK's at %s; retrying once after %.2fs",
+        url,
+        delay_seconds,
+    )
+    time.sleep(delay_seconds)
+
+    response = requests.get(url, **kwargs)
+    response.raise_for_status()
+    return response
+
+
 def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 
-    response = requests.get(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
-    response.raise_for_status()
+    response = _get_with_retry(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
     return PlaylistAPIResponse.model_validate(response.json())
 
 
@@ -89,11 +146,7 @@ def get_benchmark_json(
         "benchmarkId": benchmark_id,
         "steamId": steam_id or "00000000000000000",
     }
-    response = requests.get(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
-    response.raise_for_status()
-
-    print(type(response))
-    print(type(response.json()))
+    response = _get_with_retry(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
 
     # save to cache
     with open(cache_file, "w") as file:
@@ -122,8 +175,7 @@ def get_leaderboard_scores(
     }
     if username_search:
         params["usernameSearch"] = username_search
-    response = requests.get(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
-    response.raise_for_status()
+    response = _get_with_retry(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
 
     return LeaderboardAPIResponse.model_validate(response.json())
 
@@ -342,7 +394,7 @@ def get_user_scenario_total_play(
                 "max": max_results,
                 "sort_param[]": "count",
             }
-            response = requests.get(
+            response = _get_with_retry(
                 Endpoints.USER_SCENARIO_TOTAL_PLAY,
                 params=params,
                 timeout=TIMEOUT,
@@ -439,8 +491,11 @@ def search_scenario_exact(scenario_name: str) -> int | None:
     exact `scenarioName` match is accepted.
     """
     params = {"page": 0, "max": 100, "scenarioNameSearch": scenario_name}
-    response = requests.get(Endpoints.SEARCH_SCENARIO, params=params, timeout=TIMEOUT)
-    response.raise_for_status()
+    response = _get_with_retry(
+        Endpoints.SEARCH_SCENARIO,
+        params=params,
+        timeout=TIMEOUT,
+    )
 
     search_response = ScenarioSearchAPIResponse.model_validate(response.json())
     matches = [

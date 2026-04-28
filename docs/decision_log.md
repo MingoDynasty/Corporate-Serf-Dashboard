@@ -86,3 +86,13 @@ Decision: Track KovaaK's endpoint behavior, relied-upon fields, and discovered q
 Why: We are probing unofficial or lightly documented API behavior across multiple milestones. Keeping API lore in one living document helps future agents avoid rediscovering endpoint semantics from chat history.
 
 Consequences: When new endpoint behavior or failure modes are discovered, update the notes file and add regression coverage when practical.
+
+## 2026-04-28: Retry KovaaK's GET 429s Once
+
+Status: Accepted
+
+Decision: KovaaK's GET requests should retry exactly once on HTTP `429 Too Many Requests`, honoring `Retry-After` when present and capping the wait.
+
+Why: Playlist scenario overview can create bursty cold-cache rank and total lookups. A single bounded retry handles transient rate limiting without turning the retry helper into a full scheduler or hiding unrelated failures.
+
+Consequences: Retry remains GET-only. Non-429 HTTP failures and non-HTTP exceptions continue through the existing service-layer error handling. Recovered retries are logged but are not user-facing notifications.
