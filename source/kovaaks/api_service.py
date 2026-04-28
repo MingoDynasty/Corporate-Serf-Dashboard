@@ -25,9 +25,9 @@ from source.kovaaks.api_models import (
     UserScenarioTotalPlayAPIResponse,
 )
 
-TIMEOUT = 10
-DEFAULT_RETRY_AFTER_SECONDS = 0.5
-MAX_RETRY_AFTER_SECONDS = 5.0
+TIMEOUT = 10  # Default timeout for KovaaK's API requests.
+DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
+MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
 logger = logging.getLogger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 
@@ -73,28 +73,22 @@ def make_cache():
     return
 
 
-def _parse_retry_after(raw_retry_after: str) -> float:
-    try:
-        return float(raw_retry_after)
-    except (TypeError, ValueError):
-        pass
-
-    try:
-        retry_at = parsedate_to_datetime(raw_retry_after)
-    except (TypeError, ValueError, IndexError, OverflowError):
-        return DEFAULT_RETRY_AFTER_SECONDS
-
-    if retry_at.tzinfo is None:
-        retry_at = retry_at.replace(tzinfo=UTC)
-    return (retry_at - datetime.now(UTC)).total_seconds()
-
-
 def _retry_after_seconds(response: requests.Response) -> float:
     raw_retry_after = response.headers.get("Retry-After")
     delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
 
     if raw_retry_after:
-        delay_seconds = _parse_retry_after(raw_retry_after)
+        try:
+            delay_seconds = float(raw_retry_after)
+        except (TypeError, ValueError):
+            try:
+                retry_at = parsedate_to_datetime(raw_retry_after)
+            except (TypeError, ValueError, IndexError, OverflowError):
+                delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
+            else:
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=UTC)
+                delay_seconds = (retry_at - datetime.now(UTC)).total_seconds()
 
     delay_seconds = max(0.0, delay_seconds)
     return min(delay_seconds, MAX_RETRY_AFTER_SECONDS)

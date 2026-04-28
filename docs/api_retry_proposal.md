@@ -1,4 +1,4 @@
-# API Retry Helper Proposal v2 (M0)
+# API Retry Helper Proposal (M0)
 
 ## Goal
 
@@ -96,13 +96,23 @@ def _retry_after_seconds(response: requests.Response) -> float:
     delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
 
     if raw_retry_after:
-        delay_seconds = _parse_retry_after(raw_retry_after)
+        try:
+            delay_seconds = float(raw_retry_after)
+        except (TypeError, ValueError):
+            try:
+                retry_at = parsedate_to_datetime(raw_retry_after)
+            except (TypeError, ValueError, IndexError, OverflowError):
+                delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
+            else:
+                if retry_at.tzinfo is None:
+                    retry_at = retry_at.replace(tzinfo=UTC)
+                delay_seconds = (retry_at - datetime.now(UTC)).total_seconds()
 
     delay_seconds = max(0.0, delay_seconds)
     return min(delay_seconds, MAX_RETRY_AFTER_SECONDS)
 ```
 
-Implementation detail: `_parse_retry_after(...)` can use simple float parsing for numeric values and `email.utils.parsedate_to_datetime(...)` for HTTP-date values. Invalid values should fall back to `DEFAULT_RETRY_AFTER_SECONDS`.
+Implementation detail: keep parsing, fallback, and clamping inside `_retry_after_seconds(...)`. It can use simple float parsing for numeric values and `email.utils.parsedate_to_datetime(...)` for HTTP-date values. Invalid values should fall back to `DEFAULT_RETRY_AFTER_SECONDS`.
 
 ### Refactor Targets
 

@@ -3,6 +3,8 @@ import os
 import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime, timedelta
+from email.utils import format_datetime
 from pathlib import Path
 
 import pytest
@@ -81,6 +83,29 @@ def test_get_with_retry_uses_bounded_retry_after(headers, expected_delay, monkey
     api_service._get_with_retry("https://example.test")
 
     assert sleeps == [expected_delay]
+
+
+def test_get_with_retry_caps_http_date_retry_after(monkeypatch):
+    retry_after = format_datetime(datetime.now(UTC) + timedelta(minutes=1))
+    responses = [
+        FakeResponse(
+            {"error": "rate limited"},
+            status_code=429,
+            headers={"Retry-After": retry_after},
+        ),
+        FakeResponse({"ok": True}),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    api_service._get_with_retry("https://example.test")
+
+    assert sleeps == [api_service.MAX_RETRY_AFTER_SECONDS]
 
 
 def test_get_with_retry_does_not_retry_non_429_http_errors(monkeypatch):
