@@ -7,17 +7,9 @@ Display the user's current leaderboard rank for the selected scenario under the 
 Current display:
 
 ```text
-Rank: 11,263 of 18,342
+Rank: 11,290 of 63,892 (82.33% Percentile)
 Rank: 11,263
 Rank: Unranked (18,342 ranked)
-Rank: Unranked
-Rank: N/A
-```
-
-Later percentile display:
-
-```text
-Rank: 11263/18342 (38.6% Percentile)
 Rank: Unranked
 Rank: N/A
 ```
@@ -129,7 +121,7 @@ GET /leaderboard/scores/global?leaderboardId={leaderboard_id}&page=0&max=1
 
 The unfiltered response `total` field is the number of ranked players. Do not use `total` from the `usernameSearch` response, because that represents search matches.
 
-This milestone displays the total as `Rank: 11,263 of 18,342`. Percentile math remains deferred.
+Ranked scenarios display the total and derived percentile as `Rank: 11,290 of 63,892 (82.33% Percentile)`.
 
 ## Configuration
 
@@ -377,15 +369,20 @@ class ScenarioRankInfo(BaseModel):
     scenario_name: str | None = None
     score: float | None = None
     matched_steam_id: str | None = None
+    total_players: int | None = None
+    percentile: float | None = None
     fetched_at: datetime | None = None
     error_message: str | None = None
     warning_message: str | None = Field(default=None, exclude=True)
-    total_players: int | None = None
 ```
 
 The UI callback consumes only `ScenarioRankInfo`. No endpoint-specific logic belongs in `home.py`.
 
 When writing `ScenarioRankInfo` to JSON, use the stable `ScenarioRankStatus` string values directly. Cache files should contain readable values such as `"RANKED"`, `"UNRANKED"`, and `"UNKNOWN"`. When reading from JSON, reconstruct with `ScenarioRankStatus(raw_status)`.
+
+`percentile` is display-only metadata derived from `rank` and the leaderboard total when rank info is returned. It should not be stored in the user-rank cache.
+
+`rank`, `total_players`, and `percentile` stay as separate fields so future UI can render them independently, such as a table with separate current rank, total ranks, and percentile columns.
 
 `matched_steam_id` is the stable fact captured from the leaderboard response. `warning_message` is intentionally transient: the service layer derives it from the current config each time rank info is returned. This prevents stale warnings from surviving a config correction.
 
@@ -486,6 +483,11 @@ match rank_info.status:
         if rank_info.warning_message:
             dash_logger.warning(rank_info.warning_message)
         if rank_info.total_players is not None:
+            if rank_info.percentile is not None:
+                return (
+                    f"{rank_info.rank:,} of {rank_info.total_players:,} "
+                    f"({rank_info.percentile:.2f}% Percentile)"
+                )
             return f"{rank_info.rank:,} of {rank_info.total_players:,}"
         return f"{rank_info.rank:,}"
     case ScenarioRankStatus.UNRANKED:
@@ -500,40 +502,31 @@ match rank_info.status:
 
 ## Percentile Calculation
 
-The later percentile milestone needs:
+Percentile is derived when rank info is returned and only for ranked users with a known rank and `total_players > 0`. It is not persisted in the rank cache.
 
-```text
-current_rank
-total_ranked_players
-```
-
-Formula matching the original example:
+Formula:
 
 ```python
-percentile = ((total_ranked_players - current_rank) / total_ranked_players) * 100
+percentile = ((total_ranked_players - current_rank + 0.5) / total_ranked_players) * 100
 ```
 
-Example:
+Display with exactly two decimal places:
 
 ```text
-rank = 2
-total = 10
-percentile = 80
+Rank: 11,290 of 63,892 (82.33% Percentile)
 ```
 
-Display:
+Examples:
 
 ```text
-Rank: 2/10 (80% Percentile)
+rank 1 of 10 -> 95.00%
+rank 2 of 10 -> 85.00%
+rank 10 of 10 -> 5.00%
+rank 1 of 1 -> 50.00%
+rank 1 of 18,342 -> 100.00%
 ```
 
-If rank 1 should display `100%` instead of `90%`, use:
-
-```python
-percentile = ((total_ranked_players - current_rank + 1) / total_ranked_players) * 100
-```
-
-That would make rank `2/10` display as `90%`, so it does not match the original example. Confirm before implementing percentile display.
+No tiny-leaderboard special casing is planned.
 
 ## Milestones
 
@@ -565,7 +558,10 @@ That would make rank `2/10` display as `90%`, so it does not match the original 
 
 ### Milestone 3b: Percentile
 
-- Percentile calculation and display
+- Add `percentile` to `ScenarioRankInfo` as derived, display-only metadata
+- Compute the KovaaK's-style midpoint percentile after leaderboard totals are attached
+- Display ranked users as `Rank: 11,290 of 63,892 (82.33% Percentile)`
+- Do not display percentile for unranked or unknown states
 
 ### Milestone 4: Optional Rank History
 
