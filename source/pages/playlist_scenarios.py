@@ -82,8 +82,7 @@ def load_playlist_scenario_rows(playlist_code):
     if playlist is None:
         return [], f"Playlist code is not imported: {playlist_code}"
 
-    rows = build_playlist_scenario_rank_rows(playlist_code)
-    return rows, ""
+    return build_playlist_scenario_rank_rows(playlist_code), ""
 
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
