@@ -73,6 +73,19 @@ def _selected_playlist_code(playlist_code: str | None) -> str | None:
     return None
 
 
+def _playlist_code_from_pathname(pathname: str | None) -> str | None:
+    """Extract the playlist code from /playlists/<playlist_code>."""
+    if not pathname:
+        return None
+
+    prefix = "/playlists/"
+    if not pathname.startswith(prefix):
+        return None
+
+    playlist_code = pathname.removeprefix(prefix).strip("/")
+    return playlist_code or None
+
+
 @callback(
     Output("playlist-scenarios-location", "pathname"),
     Input("playlist-scenarios-selector", "value"),
@@ -92,9 +105,10 @@ def route_to_selected_playlist(playlist_code, current_pathname):
 @callback(
     Output("playlist-scenarios-grid", "rowData"),
     Output("playlist-scenarios-status", "children"),
-    Input("playlist-scenarios-selector", "value"),
+    Input("playlist-scenarios-location", "pathname"),
 )
-def load_playlist_scenario_rows(playlist_code):
+def load_playlist_scenario_rows(pathname):
+    playlist_code = _playlist_code_from_pathname(pathname)
     if not playlist_code:
         return [], "Select a playlist from the Playlists page."
 
