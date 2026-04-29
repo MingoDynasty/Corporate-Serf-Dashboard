@@ -67,12 +67,6 @@ def _lookup_config() -> PlaylistRankLookupConfig:
     )
 
 
-def _selected_playlist_code(playlist_code: str | None) -> str | None:
-    if playlist_code and get_playlist_by_code(playlist_code):
-        return playlist_code
-    return None
-
-
 @callback(
     Output("playlist-scenarios-location", "pathname"),
     Input("playlist-scenarios-selector", "value"),
@@ -107,10 +101,8 @@ def load_playlist_scenario_rows(playlist_code):
 
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
-    selected_playlist_code = _selected_playlist_code(playlist_code)
-    playlist = (
-        get_playlist_by_code(selected_playlist_code) if selected_playlist_code else None
-    )
+    playlist = get_playlist_by_code(playlist_code) if playlist_code else None
+    selected_playlist_code = playlist_code if playlist else None
 
     return dmc.Stack(
         children=[
