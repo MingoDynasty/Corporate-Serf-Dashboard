@@ -101,8 +101,10 @@ def load_playlist_scenario_rows(playlist_code):
 
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
+    # Keep the raw route code for error handling, but only pass the selector a
+    # value that exists in its options list.
     playlist = get_playlist_by_code(playlist_code) if playlist_code else None
-    selected_playlist_code = playlist_code if playlist else None
+    playlist_selector_value = playlist_code if playlist else None
 
     return dmc.Stack(
         children=[
@@ -116,7 +118,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 children=[
                     playlist_selector(
                         "playlist-scenarios-selector",
-                        value=selected_playlist_code,
+                        value=playlist_selector_value,
                     ),
                 ],
                 align="flex-end",
