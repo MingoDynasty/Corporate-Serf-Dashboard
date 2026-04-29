@@ -39,6 +39,10 @@ Codex <codex@local>
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
 - When fixing a bug, add or update a regression test unless there is a clear reason not to; explain the exception in the handoff.
 
+## Testing Philosophy
+
+- Shape production code around clarity, domain behavior, and maintainability. Tests should adapt via fixtures, monkeypatching, or small fakes where reasonable. Add explicit test seams to production code only when they also improve the design, or when testing would otherwise become brittle, slow, or unreliable in a meaningful way.
+
 ## Cache Conventions
 
 - Runtime cache files live under `cache/` and should not be committed.
