@@ -1,4 +1,4 @@
-"""Build playlist scenario table rows for the M1 playlist overview page."""
+"""Build playlist scenario table rows for the playlist overview page."""
 
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
