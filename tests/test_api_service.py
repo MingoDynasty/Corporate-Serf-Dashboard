@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
@@ -35,6 +36,60 @@ class FakeResponse:
         return self._data
 
 
+def test_get_with_retry_reuses_session_within_thread(monkeypatch):
+    created_sessions = []
+
+    class FakeSession:
+        def __init__(self):
+            self.calls = []
+            created_sessions.append(self)
+
+        def get(self, url, **kwargs):
+            self.calls.append((url, kwargs))
+            return FakeResponse({"ok": len(self.calls)})
+
+    monkeypatch.setattr(api_service, "_HTTP_SESSION_LOCAL", threading.local())
+    monkeypatch.setattr(api_service.requests, "Session", FakeSession)
+
+    api_service._get_with_retry("https://example.test/first")
+    api_service._get_with_retry("https://example.test/second", params={"a": 1})
+
+    assert len(created_sessions) == 1
+    assert created_sessions[0].calls == [
+        (
+            "https://example.test/first",
+            {"timeout": api_service.TIMEOUT},
+        ),
+        (
+            "https://example.test/second",
+            {"params": {"a": 1}, "timeout": api_service.TIMEOUT},
+        ),
+    ]
+
+
+def test_get_thread_session_is_thread_local(monkeypatch):
+    created_sessions = []
+
+    class FakeSession:
+        def __init__(self):
+            created_sessions.append(self)
+
+    monkeypatch.setattr(api_service, "_HTTP_SESSION_LOCAL", threading.local())
+    monkeypatch.setattr(api_service.requests, "Session", FakeSession)
+
+    barrier = threading.Barrier(2)
+
+    def get_session_id(_index):
+        barrier.wait(timeout=5)
+        return id(api_service._get_thread_session())
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        session_ids = list(executor.map(get_session_id, range(2)))
+
+    assert len(set(session_ids)) == 2
+    assert len(created_sessions) == 2
+
+
 def test_get_with_retry_retries_once_on_429(monkeypatch):
     responses = [
         FakeResponse({"error": "rate limited"}, status_code=429),
@@ -47,7 +102,7 @@ def test_get_with_retry_retries_once_on_429(monkeypatch):
         calls.append((url, kwargs))
         return responses.pop(0)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     response = api_service._get_with_retry("https://example.test", params={"a": 1})
@@ -77,7 +132,7 @@ def test_get_with_retry_uses_bounded_retry_after(headers, expected_delay, monkey
     def fake_get(*_args, **_kwargs):
         return responses.pop(0)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     api_service._get_with_retry("https://example.test")
@@ -100,7 +155,7 @@ def test_get_with_retry_caps_http_date_retry_after(monkeypatch):
     def fake_get(*_args, **_kwargs):
         return responses.pop(0)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     api_service._get_with_retry("https://example.test")
@@ -115,7 +170,7 @@ def test_get_with_retry_does_not_retry_non_429_http_errors(monkeypatch):
         calls.append(True)
         return FakeResponse({"error": "not found"}, status_code=404)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     with pytest.raises(api_service.requests.HTTPError):
         api_service._get_with_retry("https://example.test")
@@ -133,7 +188,7 @@ def test_get_with_retry_gives_up_after_second_429(monkeypatch):
     def fake_get(*_args, **_kwargs):
         return responses.pop(0)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     with pytest.raises(api_service.requests.HTTPError):
@@ -143,16 +198,61 @@ def test_get_with_retry_gives_up_after_second_429(monkeypatch):
     assert responses == []
 
 
-def test_get_with_retry_propagates_non_http_exceptions(monkeypatch):
+@pytest.mark.parametrize(
+    "transient_exception",
+    [
+        api_service.requests.ReadTimeout("read timed out"),
+        api_service.requests.ConnectTimeout("connect timed out"),
+        api_service.requests.ConnectionError("connection dropped"),
+    ],
+)
+def test_get_with_retry_retries_once_on_transient_exceptions(
+    transient_exception,
+    monkeypatch,
+):
+    responses = [transient_exception, FakeResponse({"ok": True})]
     calls = []
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ConnectionError("network unavailable")
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
-    with pytest.raises(api_service.requests.ConnectionError):
+    response = api_service._get_with_retry("https://example.test")
+
+    assert response.json() == {"ok": True}
+    assert len(calls) == 2
+
+
+def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("still slow")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with pytest.raises(api_service.requests.ReadTimeout):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 2
+
+
+def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise ValueError("unexpected failure")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with pytest.raises(ValueError):
         api_service._get_with_retry("https://example.test")
 
     assert len(calls) == 1
@@ -332,7 +432,7 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
         assert timeout == api_service.TIMEOUT
         return FakeResponse(responses[params["page"]])
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     response = api_service.get_user_scenario_total_play("MingoDynasty")
 
@@ -396,7 +496,7 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
         fetched_pages.append(params["page"])
         return FakeResponse(responses[params["page"]])
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     response = api_service.get_user_scenario_total_play("MingoDynasty")
 
@@ -428,7 +528,7 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         fetched_pages.append(params["page"])
         return FakeResponse(None)
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     with pytest.raises(api_service.UnknownKovaaksUserError):
         api_service.get_user_scenario_total_play("UnknownUser")
@@ -519,7 +619,7 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
         assert timeout == api_service.TIMEOUT
         return FakeResponse(responses[params["page"]])
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     api_service.hydrate_leaderboard_id_cache("MingoDynasty")
 
@@ -562,7 +662,7 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
             },
         )
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     response = api_service.get_user_scenario_total_play("MingoDynasty")
 
@@ -660,7 +760,7 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     def fail_get(*_args, **_kwargs):
         raise AssertionError("fresh cache should avoid network calls")
 
-    monkeypatch.setattr(api_service.requests, "get", fail_get)
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
 
     rank_info = api_service.get_scenario_rank_info(
         "Cached Scenario",
@@ -912,7 +1012,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
         "get_leaderboard_scores",
         fake_get_leaderboard_scores,
     )
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     rank_info = api_service.get_scenario_rank_info(
         "VT Pasu Intermediate S5",
@@ -1348,7 +1448,7 @@ def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
             },
         )
 
-    monkeypatch.setattr(api_service.requests, "get", fake_get)
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     leaderboard_id = api_service.search_scenario_exact("VT Pasu Intermediate S5")
 

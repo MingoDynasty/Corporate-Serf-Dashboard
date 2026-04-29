@@ -97,15 +97,15 @@ Why: We are probing unofficial or lightly documented API behavior across multipl
 
 Consequences: When new endpoint behavior or failure modes are discovered, update the notes file and add regression coverage when practical.
 
-## 2026-04-28: Retry KovaaK's GET 429s Once
+## 2026-04-28: Retry KovaaK's GET Transient Failures Once
 
 Status: Accepted
 
-Decision: KovaaK's GET requests should retry exactly once on HTTP `429 Too Many Requests`, honoring `Retry-After` when present and capping the wait.
+Decision: KovaaK's GET requests should retry exactly once on HTTP `429 Too Many Requests`, `requests.Timeout`, and `requests.ConnectionError`. `429` retries should honor `Retry-After` when present and cap the wait.
 
-Why: Playlist scenario overview can create bursty cold-cache rank and total lookups. A single bounded retry handles transient rate limiting without turning the retry helper into a full scheduler or hiding unrelated failures.
+Why: Playlist scenario overview can create bursty cold-cache rank and total lookups. KovaaK's can also occasionally exceed the current read timeout for one row while adjacent requests succeed. A single bounded retry handles transient failures without turning the retry helper into a full scheduler or hiding unrelated failures.
 
-Consequences: Retry remains GET-only. Non-429 HTTP failures and non-HTTP exceptions continue through the existing service-layer error handling. Recovered retries are logged but are not user-facing notifications.
+Consequences: Retry remains GET-only. Non-429 HTTP failures and unexpected exceptions continue through the existing service-layer error handling. Recovered retries are logged but are not user-facing notifications.
 
 ## 2026-04-29: Drive Playlist Table Loads From Mounted Route State
 
@@ -126,3 +126,13 @@ Decision: Playlist scenario AG Grid tables may use repo-owned JavaScript compara
 Why: AG Grid sorting runs in the browser. The playlist table needs `NULLS LAST` behavior for rank, total, and percentile columns so unknown values do not sort ahead of real numeric values.
 
 Consequences: Only reference controlled functions committed under `assets/`. Do not generate JavaScript strings from user input. If additional custom grid behavior is needed, prefer adding named functions to `assets/dashAgGridFunctions.js` rather than embedding ad hoc code in page callbacks.
+
+## 2026-04-29: Use Thread-Local Sessions For KovaaK's GET Requests
+
+Status: Accepted
+
+Decision: KovaaK's GET requests should go through a reusable `requests.Session` scoped to the current worker thread.
+
+Why: Cold-cache playlist table loads make many small HTTPS calls. Reusing sessions lets Requests keep connections alive and avoid repeated TCP/TLS setup. Keeping sessions thread-local avoids sharing one mutable `Session` object across the playlist table's concurrent worker threads.
+
+Consequences: `_get_with_retry()` should call the thread-local session wrapper instead of `requests.get(...)` directly. Tests should patch that wrapper when faking HTTP responses. If we later add async HTTP or a centralized rate limiter, revisit this decision.
