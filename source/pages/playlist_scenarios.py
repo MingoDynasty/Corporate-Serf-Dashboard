@@ -124,11 +124,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 align="flex-end",
                 justify="space-between",
             ),
-            dmc.Text(
-                "" if playlist else "The selected playlist is not imported.",
-                c="dimmed",
-                id="playlist-scenarios-status",
-            ),
+            dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
             dcc.Loading(
                 dag.AgGrid(
                     id="playlist-scenarios-grid",
