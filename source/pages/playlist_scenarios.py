@@ -94,7 +94,7 @@ def load_playlist_scenario_rows(playlist_code):
 
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
-        return [], "The selected playlist is not imported."
+        return [], f"Playlist code is not imported: {playlist_code}"
 
     rows = build_playlist_scenario_rank_rows(playlist_code, _lookup_config())
     return rows, ""

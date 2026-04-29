@@ -58,7 +58,7 @@ def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):
     rows, status = playlist_scenarios.load_playlist_scenario_rows("MissingCode")
 
     assert rows == []
-    assert status == "The selected playlist is not imported."
+    assert status == "Playlist code is not imported: MissingCode"
 
 
 def test_playlist_scenarios_page_handles_missing_playlist_code():
