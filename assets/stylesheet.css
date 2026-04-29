@@ -54,6 +54,10 @@
     --ag-wrapper-border-radius: var(--mantine-radius-sm);
 }
 
+.playlist-scenarios-grid .ag-header-cell-text {
+    font-weight: bold;
+}
+
 :root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-dark-7);
     --ag-border-color: var(--mantine-color-dark-4);

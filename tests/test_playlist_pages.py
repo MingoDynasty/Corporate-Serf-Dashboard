@@ -45,12 +45,9 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
         fake_build_rows,
     )
 
-    rows, title, status = playlist_scenarios.load_playlist_scenario_rows(
-        "KovaaKsTestCode"
-    )
+    rows, status = playlist_scenarios.load_playlist_scenario_rows("KovaaKsTestCode")
 
     assert rows == expected_rows
-    assert title == "Voltaic Benchmarks"
     assert status == ""
     assert playlist_scenarios.layout("KovaaKsTestCode") is not None
 
@@ -58,8 +55,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
 def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):
     monkeypatch.setattr(data_service, "playlist_database", {})
 
-    rows, title, status = playlist_scenarios.load_playlist_scenario_rows("MissingCode")
+    rows, status = playlist_scenarios.load_playlist_scenario_rows("MissingCode")
 
     assert rows == []
-    assert title == "Playlist not found"
     assert status == "The selected playlist is not imported."
