@@ -63,6 +63,16 @@ Why: Total players and percentile are enrichment data. If total lookup fails bec
 
 Consequences: `_with_leaderboard_total()` catches expected total-enrichment failures, logs them, and returns the original `ScenarioRankInfo`.
 
+## 2026-04-29: Cache Leaderboard Totals For One Week
+
+Status: Accepted
+
+Decision: `leaderboard_total_cache_ttl_hours` defaults to `168`, matching `scenario_rank_cache_ttl_hours`.
+
+Why: Leaderboard total player counts are expected to increase slowly. For large leaderboards, a mildly stale total count changes displayed percentile by less than the UI's two-decimal precision in most cases, while avoiding daily cold-cache total fetches across every playlist scenario.
+
+Consequences: Total-count freshness remains configurable. If users notice stale total counts causing misleading displays, revisit the TTL or add a targeted refresh flow.
+
 ## 2026-04-27: Use The Midpoint Percentile Formula
 
 Status: Accepted

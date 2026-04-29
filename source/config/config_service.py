@@ -22,7 +22,7 @@ class ConfigData:
     steam_id: str | None = None
     scenario_metadata_cache_ttl_hours: int = 24
     scenario_rank_cache_ttl_hours: int = 168
-    leaderboard_total_cache_ttl_hours: int = 24
+    leaderboard_total_cache_ttl_hours: int = 168
 
 
 def load_config() -> ConfigData:

@@ -143,7 +143,8 @@ scenario_metadata_cache_ttl_hours = 24
 scenario_rank_cache_ttl_hours = 168
 
 # How long to cache leaderboard totals, in hours.
-leaderboard_total_cache_ttl_hours = 24
+# Totals usually move slowly, so this matches the rank cache default.
+leaderboard_total_cache_ttl_hours = 168
 ```
 
 An empty `kovaaks_username` disables rank lookups. An empty `steam_id` falls back to exact username matching.
@@ -170,10 +171,10 @@ cache/
       MingoDynasty/
         98330.json                         # current rank, 168h TTL
     totals/
-      98330.json                           # total players, 24h TTL
+      98330.json                           # total players, 168h TTL
 ```
 
-Rank and total are stored in separate files because they have different TTLs and are fetched via different calls. Coupling them would force a total re-fetch every time the short-lived rank cache expires.
+Rank and total are stored in separate files because they are fetched independently and have different payload shapes. Coupling them would make cache refreshes less targeted.
 
 ### Permanent Mapping Cache
 
@@ -283,9 +284,9 @@ If stale rank data becomes a real user-facing issue, revisit the TTL without cha
 
 Rules:
 
-- TTL: `leaderboard_total_cache_ttl_hours`, default 24 hours.
+- TTL: `leaderboard_total_cache_ttl_hours`, default 168 hours.
 - Stores the unfiltered leaderboard `total`.
-- Separate from rank cache because total has a different freshness requirement.
+- Separate from rank cache because total is fetched independently.
 - Total fetch failure is non-fatal. If rank lookup succeeds but total lookup fails, display the rank by itself.
 - Totals may be displayed for unranked scenarios too so users can see scenario popularity before trying them.
 
@@ -443,7 +444,7 @@ get_leaderboard_total(leaderboard_id: int) -> int
 fetch_scenario_rank(leaderboard_id: int, username: str, steam_id: str | None = None) -> ScenarioRankInfo
 
 # main entry points
-get_scenario_rank_info(scenario_name: str, username: str | None, steam_id: str | None = None, leaderboard_total_cache_ttl_hours: int = 24) -> ScenarioRankInfo
+get_scenario_rank_info(scenario_name: str, username: str | None, steam_id: str | None = None, leaderboard_total_cache_ttl_hours: int = 168) -> ScenarioRankInfo
 refresh_scenario_rank(scenario_name: str, username: str, steam_id: str | None = None) -> ScenarioRankInfo
 ```
 

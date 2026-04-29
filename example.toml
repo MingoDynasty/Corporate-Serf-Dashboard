@@ -34,4 +34,4 @@ scenario_metadata_cache_ttl_hours = 24
 scenario_rank_cache_ttl_hours = 168
 
 # How long to reuse cached leaderboard total player counts before fetching them again.
-leaderboard_total_cache_ttl_hours = 24
+leaderboard_total_cache_ttl_hours = 168

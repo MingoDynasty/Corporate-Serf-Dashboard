@@ -601,7 +601,7 @@ def _leaderboard_total_cache_file(leaderboard_id: int) -> Path:
 
 def get_cached_leaderboard_total(
     leaderboard_id: int,
-    cache_ttl_hours: int = 24,
+    cache_ttl_hours: int = 168,
 ) -> int | None:
     """Read a fresh cached total player count for a leaderboard."""
     cache_file = _leaderboard_total_cache_file(leaderboard_id)
@@ -649,7 +649,7 @@ def calculate_percentile(rank: int, total_players: int) -> float:
 
 def get_leaderboard_total(
     leaderboard_id: int,
-    cache_ttl_hours: int = 24,
+    cache_ttl_hours: int = 168,
 ) -> int:
     """Return a cached leaderboard total, refreshing it when stale or missing."""
     cached_total = get_cached_leaderboard_total(leaderboard_id, cache_ttl_hours)
@@ -683,7 +683,7 @@ def _with_percentile(rank_info: ScenarioRankInfo) -> ScenarioRankInfo:
 
 def _with_leaderboard_total(
     rank_info: ScenarioRankInfo,
-    leaderboard_total_cache_ttl_hours: int = 24,
+    leaderboard_total_cache_ttl_hours: int = 168,
 ) -> ScenarioRankInfo:
     """
     Best-effort attach total ranked-player count to a resolved leaderboard.
@@ -810,7 +810,7 @@ def get_scenario_rank_info(
     steam_id: str | None = None,
     metadata_cache_ttl_hours: int = 24,
     rank_cache_ttl_hours: int = 168,
-    leaderboard_total_cache_ttl_hours: int = 24,
+    leaderboard_total_cache_ttl_hours: int = 168,
     force_refresh: bool = False,
 ) -> ScenarioRankInfo:
     """
@@ -932,7 +932,7 @@ def refresh_scenario_rank(
     username: str,
     steam_id: str | None = None,
     metadata_cache_ttl_hours: int = 24,
-    leaderboard_total_cache_ttl_hours: int = 24,
+    leaderboard_total_cache_ttl_hours: int = 168,
 ) -> ScenarioRankInfo:
     return get_scenario_rank_info(
         scenario_name,

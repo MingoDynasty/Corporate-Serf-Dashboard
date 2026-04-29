@@ -62,7 +62,7 @@ Current agreed behavior:
 - `/scenario/popular` is an exact-name fallback for resolving `scenarioName -> leaderboardId`.
 - `ScenarioRankStatus` uses `StrEnum` with stable JSON values.
 - `scenario_rank_cache_ttl_hours` defaults to `168`.
-- `leaderboard_total_cache_ttl_hours` defaults to `24`.
+- `leaderboard_total_cache_ttl_hours` defaults to `168`.
 - New high scores trigger background rank refresh through `ThreadPoolExecutor(max_workers=2)`.
 - Background refresh failures should notify the UI through `dash_logger.error(...)`.
 - Leaderboard total enrichment is best-effort. If total lookup fails, preserve the valid rank/unranked result.
