@@ -41,7 +41,7 @@ Codex <codex@local>
 
 ## Testing Philosophy
 
-- Shape production code around clarity, domain behavior, and maintainability. Tests should adapt via fixtures, monkeypatching, or small fakes where reasonable. Add explicit test seams to production code only when they also improve the design, or when testing would otherwise become brittle, slow, or unreliable in a meaningful way.
+- Prefer simple production APIs that reflect the app's real behavior. Do not add parameters, classes, or abstractions only for tests. Tests should usually adapt with fixtures, monkeypatching, or small fakes. Add explicit test seams only when they also improve the production design, or when testing would otherwise require brittle, slow, or unreliable workarounds.
 
 ## Cache Conventions
 

@@ -96,3 +96,23 @@ Decision: KovaaK's GET requests should retry exactly once on HTTP `429 Too Many 
 Why: Playlist scenario overview can create bursty cold-cache rank and total lookups. A single bounded retry handles transient rate limiting without turning the retry helper into a full scheduler or hiding unrelated failures.
 
 Consequences: Retry remains GET-only. Non-429 HTTP failures and non-HTTP exceptions continue through the existing service-layer error handling. Recovered retries are logged but are not user-facing notifications.
+
+## 2026-04-29: Drive Playlist Table Loads From Mounted Route State
+
+Status: Accepted
+
+Decision: Playlist scenario table loads should be driven by state created in the mounted `/playlists/<playlist_code>` layout, not directly by selector changes or URL-change callbacks.
+
+Why: When the playlist selector changes the route, Dash Pages can briefly have the old page instance responding to the URL update before the new route layout finishes mounting. If the expensive table load listens directly to that navigation event, one user selection can trigger duplicate cache/API loads.
+
+Consequences: Keep the selector callback navigation-only. The route layout should publish the resolved playlist code through a lightweight mounted component, currently `dcc.Store(id="playlist-scenarios-code")`, and the table-loading callback should use that mounted state as its trigger.
+
+## 2026-04-29: Use Controlled AG Grid JS For Null-Aware Sorting
+
+Status: Accepted
+
+Decision: Playlist scenario AG Grid tables may use repo-owned JavaScript comparators from `assets/dashAgGridFunctions.js` with `dangerously_allow_code=True` when AG Grid requires client-side sort behavior that Python cannot provide directly.
+
+Why: AG Grid sorting runs in the browser. The playlist table needs `NULLS LAST` behavior for rank, total, and percentile columns so unknown values do not sort ahead of real numeric values.
+
+Consequences: Only reference controlled functions committed under `assets/`. Do not generate JavaScript strings from user input. If additional custom grid behavior is needed, prefer adding named functions to `assets/dashAgGridFunctions.js` rather than embedding ad hoc code in page callbacks.
