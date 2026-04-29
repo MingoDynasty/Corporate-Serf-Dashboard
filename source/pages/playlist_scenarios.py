@@ -5,12 +5,8 @@ from dash import Input, Output, State, callback, dcc, no_update
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
 
-from source.config.config_service import config
 from source.kovaaks.data_service import get_playlist_by_code
-from source.kovaaks.playlist_scenarios_service import (
-    PlaylistRankLookupConfig,
-    build_playlist_scenario_rank_rows,
-)
+from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
 from source.pages.playlist_components import playlist_selector
 
 dash.register_page(
@@ -57,16 +53,6 @@ TABLE_COLUMN_DEFS = [
 ]
 
 
-def _lookup_config() -> PlaylistRankLookupConfig:
-    return PlaylistRankLookupConfig(
-        username=config.kovaaks_username,
-        steam_id=config.steam_id,
-        scenario_metadata_cache_ttl_hours=config.scenario_metadata_cache_ttl_hours,
-        scenario_rank_cache_ttl_hours=config.scenario_rank_cache_ttl_hours,
-        leaderboard_total_cache_ttl_hours=config.leaderboard_total_cache_ttl_hours,
-    )
-
-
 @callback(
     Output("playlist-scenarios-location", "pathname"),
     Input("playlist-scenarios-selector", "value"),
@@ -96,7 +82,7 @@ def load_playlist_scenario_rows(playlist_code):
     if playlist is None:
         return [], f"Playlist code is not imported: {playlist_code}"
 
-    rows = build_playlist_scenario_rank_rows(playlist_code, _lookup_config())
+    rows = build_playlist_scenario_rank_rows(playlist_code)
     return rows, ""
 
 

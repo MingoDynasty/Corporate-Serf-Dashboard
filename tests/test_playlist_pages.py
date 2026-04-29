@@ -35,7 +35,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
     ]
     monkeypatch.setattr(data_service, "playlist_database", {playlist.name: playlist})
 
-    def fake_build_rows(playlist_code, _lookup_config):
+    def fake_build_rows(playlist_code):
         assert playlist_code == "KovaaKsTestCode"
         return expected_rows
 

@@ -2,9 +2,9 @@
 
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
 import logging
 
+from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import get_playlist_by_code
@@ -16,18 +16,6 @@ RankLookup = Callable[
     [str, str | None, str | None, int, int, int],
     ScenarioRankInfo,
 ]
-
-
-@dataclass(frozen=True)
-class PlaylistRankLookupConfig:
-    """Configuration needed to look up scenario ranks for a playlist table."""
-
-    username: str | None
-    steam_id: str | None
-    scenario_metadata_cache_ttl_hours: int
-    scenario_rank_cache_ttl_hours: int
-    leaderboard_total_cache_ttl_hours: int
-    max_workers: int = PLAYLIST_RANK_MAX_WORKERS
 
 
 def _format_int(value: int | None) -> str:
@@ -77,16 +65,15 @@ def format_playlist_scenario_rank_row(
 
 def _lookup_rank_info(
     scenario_name: str,
-    lookup_config: PlaylistRankLookupConfig,
     rank_lookup: RankLookup,
 ) -> ScenarioRankInfo:
     return rank_lookup(
         scenario_name,
-        lookup_config.username,
-        lookup_config.steam_id,
-        lookup_config.scenario_metadata_cache_ttl_hours,
-        lookup_config.scenario_rank_cache_ttl_hours,
-        lookup_config.leaderboard_total_cache_ttl_hours,
+        config.kovaaks_username,
+        config.steam_id,
+        config.scenario_metadata_cache_ttl_hours,
+        config.scenario_rank_cache_ttl_hours,
+        config.leaderboard_total_cache_ttl_hours,
     )
 
 
@@ -105,7 +92,6 @@ def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
 
 def build_playlist_scenario_rank_rows(
     playlist_code: str,
-    lookup_config: PlaylistRankLookupConfig,
     rank_lookup: RankLookup = get_scenario_rank_info,
 ) -> list[dict[str, str | int | float | None]]:
     """
@@ -118,7 +104,7 @@ def build_playlist_scenario_rank_rows(
     if playlist is None:
         return []
 
-    max_workers = max(1, lookup_config.max_workers)
+    max_workers = max(1, PLAYLIST_RANK_MAX_WORKERS)
     rows: list[dict[str, str | int | float | None] | None] = [
         None for _ in playlist.scenarios
     ]
@@ -128,7 +114,6 @@ def build_playlist_scenario_rank_rows(
             executor.submit(
                 _lookup_rank_info,
                 scenario.name,
-                lookup_config,
                 rank_lookup,
             ): (index, scenario.name)
             for index, scenario in enumerate(playlist.scenarios)

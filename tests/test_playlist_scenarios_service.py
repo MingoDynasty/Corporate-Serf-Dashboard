@@ -1,8 +1,10 @@
+from types import SimpleNamespace
+
 from source.kovaaks import data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.kovaaks import playlist_scenarios_service
 from source.kovaaks.playlist_scenarios_service import (
-    PlaylistRankLookupConfig,
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
 )
@@ -94,6 +96,17 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         ],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.name: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "config",
+        SimpleNamespace(
+            kovaaks_username="MingoDynasty",
+            steam_id="steam-id",
+            scenario_metadata_cache_ttl_hours=24,
+            scenario_rank_cache_ttl_hours=168,
+            leaderboard_total_cache_ttl_hours=24,
+        ),
+    )
     seen = []
 
     def fake_rank_lookup(
@@ -121,14 +134,6 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
 
     rows = build_playlist_scenario_rank_rows(
         "KovaaKsTestCode",
-        PlaylistRankLookupConfig(
-            username="MingoDynasty",
-            steam_id="steam-id",
-            scenario_metadata_cache_ttl_hours=24,
-            scenario_rank_cache_ttl_hours=168,
-            leaderboard_total_cache_ttl_hours=24,
-            max_workers=2,
-        ),
         rank_lookup=fake_rank_lookup,
     )
 
@@ -142,15 +147,6 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
 
 
 def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():
-    rows = build_playlist_scenario_rank_rows(
-        "MissingCode",
-        PlaylistRankLookupConfig(
-            username="MingoDynasty",
-            steam_id=None,
-            scenario_metadata_cache_ttl_hours=24,
-            scenario_rank_cache_ttl_hours=168,
-            leaderboard_total_cache_ttl_hours=24,
-        ),
-    )
+    rows = build_playlist_scenario_rank_rows("MissingCode")
 
     assert rows == []
