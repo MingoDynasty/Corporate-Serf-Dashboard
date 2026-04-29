@@ -28,7 +28,6 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.Stack(
         children=[
             dcc.Location(id="playlists-location", refresh="callback-nav"),
-            dmc.Title("Playlists", order=2),
             playlist_selector("playlists-selector"),
             dmc.Text("Select a playlist to view its scenarios.", c="dimmed"),
         ],

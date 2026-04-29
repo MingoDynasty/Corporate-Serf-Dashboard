@@ -28,7 +28,7 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 280,
     },
     {
-        "headerName": "Rank",
+        "headerName": "Current Rank",
         "field": "rank_sort",
         "valueFormatter": {"function": "params.data.rank_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
@@ -37,7 +37,7 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 120,
     },
     {
-        "headerName": "Total",
+        "headerName": "Total Ranks",
         "field": "total_sort",
         "valueFormatter": {"function": "params.data.total_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
@@ -91,36 +91,32 @@ def route_to_selected_playlist(playlist_code, current_pathname):
 
 @callback(
     Output("playlist-scenarios-grid", "rowData"),
-    Output("playlist-scenarios-title", "children"),
     Output("playlist-scenarios-status", "children"),
     Input("playlist-scenarios-selector", "value"),
 )
 def load_playlist_scenario_rows(playlist_code):
     if not playlist_code:
-        return [], "Playlist not found", "Select a playlist from the Playlists page."
+        return [], "Select a playlist from the Playlists page."
 
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
-        return [], "Playlist not found", "The selected playlist is not imported."
+        return [], "The selected playlist is not imported."
 
     rows = build_playlist_scenario_rank_rows(playlist_code, _lookup_config())
-    return rows, playlist.name, ""
+    return rows, ""
 
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
     selected_playlist_code = _selected_playlist_code(playlist_code)
-    playlist = get_playlist_by_code(selected_playlist_code) if selected_playlist_code else None
+    playlist = (
+        get_playlist_by_code(selected_playlist_code) if selected_playlist_code else None
+    )
 
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
             dmc.Group(
                 children=[
-                    dmc.Title(
-                        playlist.name if playlist else "Playlist not found",
-                        id="playlist-scenarios-title",
-                        order=2,
-                    ),
                     playlist_selector(
                         "playlist-scenarios-selector",
                         value=selected_playlist_code,
