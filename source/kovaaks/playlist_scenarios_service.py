@@ -1,6 +1,5 @@
 """Build playlist scenario table rows for the playlist overview page."""
 
-from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 
@@ -11,11 +10,6 @@ from source.kovaaks.data_service import get_playlist_by_code
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 logger = logging.getLogger(__name__)
-
-RankLookup = Callable[
-    [str, str | None, str | None, int, int, int],
-    ScenarioRankInfo,
-]
 
 
 def _format_int(value: int | None) -> str:
@@ -65,9 +59,8 @@ def format_playlist_scenario_rank_row(
 
 def _lookup_rank_info(
     scenario_name: str,
-    rank_lookup: RankLookup,
 ) -> ScenarioRankInfo:
-    return rank_lookup(
+    return get_scenario_rank_info(
         scenario_name,
         config.kovaaks_username,
         config.steam_id,
@@ -92,7 +85,6 @@ def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
 
 def build_playlist_scenario_rank_rows(
     playlist_code: str,
-    rank_lookup: RankLookup = get_scenario_rank_info,
 ) -> list[dict[str, str | int | float | None]]:
     """
     Build all rank table rows for a playlist.
@@ -114,7 +106,6 @@ def build_playlist_scenario_rank_rows(
             executor.submit(
                 _lookup_rank_info,
                 scenario.name,
-                rank_lookup,
             ): (index, scenario.name)
             for index, scenario in enumerate(playlist.scenarios)
         }

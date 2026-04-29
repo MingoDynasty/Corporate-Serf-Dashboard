@@ -132,10 +132,13 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             percentile=90.5 if scenario_name == "First" else 70.5,
         )
 
-    rows = build_playlist_scenario_rank_rows(
-        "KovaaKsTestCode",
-        rank_lookup=fake_rank_lookup,
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_rank_info",
+        fake_rank_lookup,
     )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
 
     assert {row["scenario"] for row in rows} == {"First", "Second", "Third"}
     assert set(seen) == {"First", "Second", "Third"}
