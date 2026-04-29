@@ -1,7 +1,7 @@
 import logging
 
 import dash
-from dash import Input, Output, State, callback, clientside_callback
+from dash import Input, Output, State, callback, clientside_callback, dcc
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 
@@ -45,6 +45,26 @@ theme_switch_component = dmc.Switch(
     size="lg",
     mr="xl",
 )
+
+
+def nav_link(label: str, href: str, icon: str) -> dcc.Link:
+    """Build Dash-native navbar links around Mantine's visual NavLink."""
+    return dcc.Link(
+        dmc.NavLink(
+            label=label,
+            leftSection=dmc.ThemeIcon(
+                DashIconify(icon=icon, height=36),
+                size="lg",
+                variant="outline",
+            ),
+        ),
+        href=href,
+        refresh=False,
+        style={
+            "color": "inherit",
+            "textDecoration": "none",
+        },
+    )
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
@@ -104,23 +124,16 @@ def layout(**kwargs):  # noqa: ARG001
                     dmc.AppShellNavbar(
                         id="navbar",
                         children=[
-                            dmc.NavLink(
-                                label="Home",
-                                href="/",
-                                leftSection=dmc.ThemeIcon(
-                                    DashIconify(icon="bi:house-door-fill", height=36),
-                                    size="lg",
-                                    variant="outline",
-                                ),
+                            nav_link("Home", "/", "bi:house-door-fill"),
+                            nav_link(
+                                "Aim Training Journey",
+                                "/aim-training-journey",
+                                "game-icons:journey",
                             ),
-                            dmc.NavLink(
-                                label="Aim Training Journey",
-                                href="aim-training-journey",
-                                leftSection=dmc.ThemeIcon(
-                                    DashIconify(icon="game-icons:journey", height=36),
-                                    size="lg",
-                                    variant="outline",
-                                ),
+                            nav_link(
+                                "Playlists",
+                                "/playlists",
+                                "material-symbols:playlist-play",
                             ),
                         ],
                         p="md",
