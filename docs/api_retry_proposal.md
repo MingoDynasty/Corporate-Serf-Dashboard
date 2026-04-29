@@ -2,7 +2,7 @@
 
 ## Goal
 
-Add a single retry layer for KovaaK's GET requests so transient `429 Too Many Requests` responses degrade gracefully instead of immediately failing user-facing operations.
+Add a single retry layer for KovaaK's GET requests so transient `429 Too Many Requests` responses and narrow network failures degrade gracefully instead of immediately failing user-facing operations.
 
 This is a small infrastructure milestone that should ship before the Playlist Scenarios Overview page.
 
@@ -23,15 +23,17 @@ The M1 plan already limits this with:
 
 Even so, a short burst can still hit KovaaK's rate limiting. A low-level 429 retry means the existing single-scenario rank lookup and the upcoming playlist table both inherit the same protection.
 
-This is not a full rate-limit strategy. It is a narrow seatbelt for transient 429s.
+This is not a full rate-limit strategy. It is a narrow seatbelt for transient 429s, timeouts, and dropped connections.
 
 ## Scope
 
 ### In
 
 - Add a `_get_with_retry(url, **kwargs)` helper in `source/kovaaks/api_service.py`.
+- Route GETs through a thread-local `requests.Session` so repeated calls can reuse keep-alive connections.
 - Retry only GET requests, because every current KovaaK's API caller is GET-only.
 - Retry exactly once when the response status is `429`.
+- Retry exactly once on `requests.Timeout` and `requests.ConnectionError`.
 - Honor `Retry-After` when KovaaK's provides it.
 - Fall back to a short default delay when `Retry-After` is absent or invalid.
 - Cap retry delay to avoid freezing the app for a long server-requested wait.
@@ -44,7 +46,7 @@ This is not a full rate-limit strategy. It is a narrow seatbelt for transient 42
 
 - Retrying non-GET methods.
 - Retrying non-429 HTTP failures.
-- Retrying timeouts, DNS failures, connection failures, or other non-HTTP exceptions.
+- Retrying unexpected exceptions or broad `requests.RequestException` failures.
 - Exponential backoff, circuit breakers, token buckets, or a centralized rate limiter.
 - M1's parallel playlist-table fetch executor.
 - Changing user-facing failure states. If the retry also fails, callers should continue through the existing `UNKNOWN` / `N/A` behavior.
@@ -62,28 +64,36 @@ DEFAULT_RETRY_AFTER_SECONDS = 0.5
 
 def _get_with_retry(url: str, **kwargs) -> requests.Response:
     """
-    Make a KovaaK's GET request with one automatic retry on HTTP 429.
+    Make a KovaaK's GET request with one automatic retry for transient failures.
 
-    All kwargs pass through to `requests.get(...)`.
+    All kwargs pass through to the current thread's `requests.Session.get(...)`.
     """
     kwargs.setdefault("timeout", TIMEOUT)
 
-    response = requests.get(url, **kwargs)
-    if response.status_code != 429:
-        response.raise_for_status()
-        return response
+    for attempt in range(2):
+        try:
+            response = _session_get(url, **kwargs)
+        except (requests.Timeout, requests.ConnectionError):
+            if attempt == 0:
+                logger.warning(
+                    "Transient KovaaK's GET failure at %s; retrying once",
+                    url,
+                    exc_info=True,
+                )
+                continue
+            raise
 
-    delay_seconds = _retry_after_seconds(response)
-    logger.warning(
-        "Rate limited by KovaaK's at %s; retrying once after %.2fs",
-        url,
-        delay_seconds,
-    )
-    time.sleep(delay_seconds)
+        if response.status_code != 429 or attempt == 1:
+            response.raise_for_status()
+            return response
 
-    response = requests.get(url, **kwargs)
-    response.raise_for_status()
-    return response
+        delay_seconds = _retry_after_seconds(response)
+        logger.warning(
+            "Rate limited by KovaaK's at %s; retrying once after %.2fs",
+            url,
+            delay_seconds,
+        )
+        time.sleep(delay_seconds)
 ```
 
 ### `Retry-After` Parsing
@@ -124,7 +134,7 @@ Replace existing `requests.get(...)` calls in `source/kovaaks/api_service.py`:
 - `get_user_scenario_total_play` pagination loop
 - `search_scenario_exact`
 
-Because `_get_with_retry(...)` still calls `requests.get(...)`, many existing tests that monkeypatch `api_service.requests.get` should continue to work with minimal changes. Tests that inspect response shape may need `FakeResponse.status_code = 200` and `FakeResponse.headers = {}` defaults.
+Because `_get_with_retry(...)` calls the session wrapper, tests that fake HTTP responses should monkeypatch `api_service._session_get(...)`. Tests that inspect response shape may need `FakeResponse.status_code = 200` and `FakeResponse.headers = {}` defaults.
 
 ### Opportunistic Cleanup
 
@@ -154,7 +164,7 @@ Add tests in `tests/test_api_service.py`.
    - First response has `status_code = 429`.
    - Second response has `status_code = 200`.
    - Helper returns the second response.
-   - `requests.get` is called twice.
+   - the session GET wrapper is called twice.
    - `time.sleep` is called with the expected delay.
 
 2. **Honors numeric `Retry-After`**
@@ -172,19 +182,29 @@ Add tests in `tests/test_api_service.py`.
 5. **Does not retry non-429 4xx**
    - Response has `status_code = 404`.
    - Helper raises `HTTPError`.
-   - `requests.get` is called once.
+   - the session GET wrapper is called once.
 
 6. **Gives up after second 429**
    - Both responses have `status_code = 429`.
    - Helper raises `HTTPError`.
-   - `requests.get` is called twice.
+   - the session GET wrapper is called twice.
 
-7. **Non-HTTP exceptions still propagate**
-   - `requests.get` raises `requests.ConnectionError`.
+7. **Retries transient request exceptions once**
+   - the session GET wrapper raises `requests.ReadTimeout`, `requests.ConnectTimeout`, or `requests.ConnectionError`.
+   - Helper retries once.
+   - A successful second response is returned.
+
+8. **Gives up after second transient request exception**
+   - the session GET wrapper raises a transient exception twice.
+   - Helper propagates the second exception.
+   - the session GET wrapper is called twice.
+
+9. **Unexpected exceptions still propagate**
+   - the session GET wrapper raises a non-requests exception.
    - Helper propagates the exception.
    - No retry attempt occurs.
 
-8. **Existing wrapper calls use retry helper**
+10. **Existing wrapper calls use retry helper**
    - At least one endpoint wrapper test verifies `get_leaderboard_scores(...)` goes through `_get_with_retry(...)` and preserves params/timeout.
 
 Run:
@@ -203,14 +223,14 @@ uv run python -m compileall source tests
 | GET-only helper | Method-agnostic `_request_with_retry` | Current callers are GET-only; retrying non-idempotent methods should be a future decision. |
 | Single retry | Multiple retries / exponential backoff | Smallest useful guardrail for transient bursts. Avoids long UI stalls. |
 | Honor `Retry-After` with cap | Fixed sleep only | More respectful of API guidance while keeping app latency bounded. |
-| Retry 429 only | Retry 5xx/network errors too | 429 has clear "try later" semantics. Broader retries can mask unrelated failures. |
+| Retry 429 plus narrow transient request exceptions | Retry all `RequestException` or 5xx/network errors broadly | 429, timeouts, and dropped connections are the observed/recoverable failures. Broader retries can mask unrelated failures. |
 | Module logger only on recovered retry | UI notification | A recovered retry is not user-actionable. If retry fails, existing service-layer error handling reaches the UI where appropriate. |
 | Keep M1 executor separate | Put worker throttling in retry helper | Retry handles one request. M1 controls burst size and duplicate work. |
 
 ## Documentation Updates If Implemented
 
-- Add a KovaaK's API notes section for 429 behavior and retry policy.
-- Add a decision-log entry: "Retry KovaaK's GET 429s Once".
+- Add a KovaaK's API notes section for transient GET failure behavior and retry policy.
+- Add a decision-log entry: "Retry KovaaK's GET Transient Failures Once".
 - Remove the `get_benchmark_json` debug-print tech-debt entry if cleaned up in the implementation PR.
 
 ## Open Questions
