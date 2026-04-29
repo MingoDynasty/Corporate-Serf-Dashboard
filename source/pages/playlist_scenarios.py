@@ -73,19 +73,6 @@ def _selected_playlist_code(playlist_code: str | None) -> str | None:
     return None
 
 
-def _playlist_code_from_pathname(pathname: str | None) -> str | None:
-    """Extract the playlist code from /playlists/<playlist_code>."""
-    if not pathname:
-        return None
-
-    prefix = "/playlists/"
-    if not pathname.startswith(prefix):
-        return None
-
-    playlist_code = pathname.removeprefix(prefix).strip("/")
-    return playlist_code or None
-
-
 @callback(
     Output("playlist-scenarios-location", "pathname"),
     Input("playlist-scenarios-selector", "value"),
@@ -105,10 +92,9 @@ def route_to_selected_playlist(playlist_code, current_pathname):
 @callback(
     Output("playlist-scenarios-grid", "rowData"),
     Output("playlist-scenarios-status", "children"),
-    Input("playlist-scenarios-location", "pathname"),
+    Input("playlist-scenarios-code", "data"),
 )
-def load_playlist_scenario_rows(pathname):
-    playlist_code = _playlist_code_from_pathname(pathname)
+def load_playlist_scenario_rows(playlist_code):
     if not playlist_code:
         return [], "Select a playlist from the Playlists page."
 
@@ -129,6 +115,11 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
+            # The table load is intentionally driven by this layout-bound store
+            # instead of the URL. When the selector changes, Dash Pages first
+            # navigates and rebuilds the page, then this store triggers exactly
+            # one load for the new playlist.
+            dcc.Store(id="playlist-scenarios-code", data=playlist_code),
             dmc.Group(
                 children=[
                     playlist_selector(

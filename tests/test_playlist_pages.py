@@ -45,9 +45,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
         fake_build_rows,
     )
 
-    rows, status = playlist_scenarios.load_playlist_scenario_rows(
-        "/playlists/KovaaKsTestCode"
-    )
+    rows, status = playlist_scenarios.load_playlist_scenario_rows("KovaaKsTestCode")
 
     assert rows == expected_rows
     assert status == ""
@@ -57,16 +55,14 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
 def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):
     monkeypatch.setattr(data_service, "playlist_database", {})
 
-    rows, status = playlist_scenarios.load_playlist_scenario_rows(
-        "/playlists/MissingCode"
-    )
+    rows, status = playlist_scenarios.load_playlist_scenario_rows("MissingCode")
 
     assert rows == []
     assert status == "The selected playlist is not imported."
 
 
-def test_playlist_scenarios_page_ignores_selector_only_path():
-    rows, status = playlist_scenarios.load_playlist_scenario_rows("/playlists")
+def test_playlist_scenarios_page_handles_missing_playlist_code():
+    rows, status = playlist_scenarios.load_playlist_scenario_rows(None)
 
     assert rows == []
     assert status == "Select a playlist from the Playlists page."
