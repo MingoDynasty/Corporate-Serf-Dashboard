@@ -28,8 +28,10 @@ from source.kovaaks.api_models import (
 TIMEOUT = 10  # Default timeout for KovaaK's API requests.
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
+TRANSIENT_GET_EXCEPTIONS = (requests.Timeout, requests.ConnectionError)  # Safe GET-only retry failures.
 logger = logging.getLogger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
+_HTTP_SESSION_LOCAL = threading.local()
 
 CACHE_DIR = "cache"
 
@@ -94,31 +96,56 @@ def _retry_after_seconds(response: requests.Response) -> float:
     return min(delay_seconds, MAX_RETRY_AFTER_SECONDS)
 
 
+def _get_thread_session() -> requests.Session:
+    """Return one reusable HTTP session per worker thread."""
+    session = getattr(_HTTP_SESSION_LOCAL, "session", None)
+    if session is None:
+        session = requests.Session()
+        _HTTP_SESSION_LOCAL.session = session
+    return session
+
+
+def _session_get(url: str, **kwargs) -> requests.Response:
+    """Make a GET request through the current thread's reusable session."""
+    return _get_thread_session().get(url, **kwargs)
+
+
 def _get_with_retry(url: str, **kwargs) -> requests.Response:
     """
-    Make a KovaaK's GET request with one automatic retry on HTTP 429.
+    Make a KovaaK's GET request with one automatic retry for transient failures.
 
-    Transient rate limits are retried quietly. If the second attempt fails, the
-    normal caller-level error handling decides whether the UI sees UNKNOWN/N/A.
+    Rate limits and narrow network failures can happen during cold-cache playlist
+    loads. If the second attempt fails, normal caller-level error handling
+    decides whether the UI sees UNKNOWN/N/A.
     """
     kwargs.setdefault("timeout", TIMEOUT)
 
-    response = requests.get(url, **kwargs)
-    if response.status_code != 429:
-        response.raise_for_status()
-        return response
+    for attempt in range(2):
+        try:
+            response = _session_get(url, **kwargs)
+        except TRANSIENT_GET_EXCEPTIONS:
+            if attempt == 0:
+                logger.warning(
+                    "Transient KovaaK's GET failure at %s; retrying once",
+                    url,
+                    exc_info=True,
+                )
+                continue
+            raise
 
-    delay_seconds = _retry_after_seconds(response)
-    logger.warning(
-        "Rate limited by KovaaK's at %s; retrying once after %.2fs",
-        url,
-        delay_seconds,
-    )
-    time.sleep(delay_seconds)
+        if response.status_code != 429 or attempt == 1:
+            response.raise_for_status()
+            return response
 
-    response = requests.get(url, **kwargs)
-    response.raise_for_status()
-    return response
+        delay_seconds = _retry_after_seconds(response)
+        logger.warning(
+            "Rate limited by KovaaK's at %s; retrying once after %.2fs",
+            url,
+            delay_seconds,
+        )
+        time.sleep(delay_seconds)
+
+    raise RuntimeError("unreachable retry state")
 
 
 def get_playlist_data(playlist_code) -> PlaylistAPIResponse:

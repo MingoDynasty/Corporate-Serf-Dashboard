@@ -17,11 +17,17 @@ KovaaK's may return HTTP `429 Too Many Requests` during bursty access patterns, 
 Project retry policy:
 
 - Retry GET requests once on HTTP `429`.
+- Retry GET requests once on narrow transient network failures: `requests.Timeout` and `requests.ConnectionError`.
 - Honor `Retry-After` when present.
 - Fall back to a short default delay when `Retry-After` is absent or invalid.
 - Cap the retry delay so the UI does not stall for a long server-requested wait.
-- Do not retry non-429 HTTP failures or non-HTTP exceptions by default.
+- Do not retry non-429 HTTP failures or unexpected exceptions.
 - Do not show a UI notification for a recovered retry. If the retry also fails, normal service-layer failure handling applies.
+
+Connection reuse:
+
+- KovaaK's GET requests use one `requests.Session` per worker thread.
+- Thread-local sessions allow keep-alive connection pooling during cold-cache playlist table loads without sharing one mutable `Session` across concurrent workers.
 
 ## Endpoint Summary
 
