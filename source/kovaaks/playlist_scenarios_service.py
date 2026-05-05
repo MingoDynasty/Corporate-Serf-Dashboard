@@ -1,12 +1,18 @@
 """Build playlist scenario table rows for the playlist overview page."""
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 import logging
 
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
-from source.kovaaks.data_service import get_playlist_by_code
+from source.kovaaks.data_models import ScenarioStats
+from source.kovaaks.data_service import (
+    get_playlist_by_code,
+    get_scenario_stats,
+    is_scenario_in_database,
+)
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 logger = logging.getLogger(__name__)
@@ -24,12 +30,39 @@ def _format_percentile(value: float | None) -> str:
     return f"{value:.2f}%"
 
 
+def _format_score(value: float | None) -> str:
+    if value is None:
+        return "N/A"
+    return f"{value:,.2f}".rstrip("0").rstrip(".")
+
+
+def _format_last_played(value: datetime | None) -> str:
+    if value is None:
+        return "N/A"
+    return value.strftime("%Y-%m-%d")
+
+
+def _get_local_stats(scenario_name: str) -> ScenarioStats | None:
+    if not is_scenario_in_database(scenario_name):
+        return None
+    return get_scenario_stats(scenario_name)
+
+
 def format_playlist_scenario_rank_row(
     scenario_name: str,
     playlist_order: int,
     rank_info: ScenarioRankInfo,
+    scenario_stats: ScenarioStats | None = None,
 ) -> dict[str, str | int | float | None]:
     """Create one AG Grid row with separate display and numeric sort values."""
+    date_last_played = None
+    number_of_runs = 0
+    high_score = None
+    if scenario_stats is not None:
+        date_last_played = scenario_stats.date_last_played
+        number_of_runs = scenario_stats.number_of_runs
+        high_score = scenario_stats.high_score
+
     row: dict[str, str | int | float | None] = {
         "scenario": scenario_name,
         "playlist_order": playlist_order,
@@ -40,6 +73,14 @@ def format_playlist_scenario_rank_row(
         "total_sort": None,
         "percentile_display": "N/A",
         "percentile_sort": None,
+        "last_played_display": _format_last_played(date_last_played),
+        "last_played_sort": date_last_played.timestamp()
+        if date_last_played is not None
+        else None,
+        "runs_display": _format_int(number_of_runs),
+        "runs_sort": number_of_runs,
+        "high_score_display": _format_score(high_score),
+        "high_score_sort": high_score,
     }
 
     if rank_info.status == ScenarioRankStatus.RANKED:
@@ -119,6 +160,7 @@ def build_playlist_scenario_rank_rows(
                 scenario_name,
                 index,
                 rank_info,
+                _get_local_stats(scenario_name),
             )
 
     return [row for row in rows if row is not None]

@@ -50,6 +50,33 @@ TABLE_COLUMN_DEFS = [
         "flex": 1,
         "minWidth": 140,
     },
+    {
+        "headerName": "Last Played",
+        "field": "last_played_sort",
+        "valueFormatter": {"function": "params.data.last_played_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 130,
+    },
+    {
+        "headerName": "Runs",
+        "field": "runs_sort",
+        "valueFormatter": {"function": "params.data.runs_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 100,
+    },
+    {
+        "headerName": "High Score",
+        "field": "high_score_sort",
+        "valueFormatter": {"function": "params.data.high_score_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 120,
+    },
 ]
 
 
