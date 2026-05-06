@@ -8,12 +8,12 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 7400.0
+          "threshold": 7300.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 8000.0
+          "threshold": 7950.0
         },
         {
           "name": "Angelic",
@@ -28,7 +28,7 @@
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 9600.0
+          "threshold": 9400.0
         },
         {
           "name": "Transcendent",
@@ -43,32 +43,32 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 138.0
+          "threshold": 133.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 145.0
+          "threshold": 141.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 152.0
+          "threshold": 149.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 158.0
+          "threshold": 157.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 167.0
+          "threshold": 164.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 180.0
+          "threshold": 186.0
         }
       ]
     },
@@ -78,7 +78,7 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 8600.0
+          "threshold": 8500.0
         },
         {
           "name": "Saint",
@@ -88,7 +88,7 @@
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 9800.0
+          "threshold": 9850.0
         },
         {
           "name": "Seraphic",
@@ -103,7 +103,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 12000.0
+          "threshold": 12200.0
         }
       ]
     },
@@ -113,12 +113,12 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 127.0
+          "threshold": 120.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 136.0
+          "threshold": 132.0
         },
         {
           "name": "Angelic",
@@ -128,17 +128,17 @@
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 160.0
+          "threshold": 162.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 175.0
+          "threshold": 178.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 190.0
+          "threshold": 205.0
         }
       ]
     },
@@ -148,32 +148,32 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 132.0
+          "threshold": 126.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 137.0
+          "threshold": 133.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 143.0
+          "threshold": 140.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 152.0
+          "threshold": 148.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 160.0
+          "threshold": 156.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 172.0
+          "threshold": 176.0
         }
       ]
     },
@@ -183,32 +183,32 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 1540.0
+          "threshold": 1500.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 1620.0
+          "threshold": 1580.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 1700.0
+          "threshold": 1660.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 1830.0
+          "threshold": 1740.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 1950.0
+          "threshold": 1820.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 2100.0
+          "threshold": 2040.0
         }
       ]
     },
@@ -218,27 +218,27 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 1350.0
+          "threshold": 1320.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 1450.0
+          "threshold": 1420.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 1550.0
+          "threshold": 1520.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 1650.0
+          "threshold": 1620.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 1750.0
+          "threshold": 1720.0
         },
         {
           "name": "Transcendent",
@@ -253,27 +253,27 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 136.0
+          "threshold": 130.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 142.0
+          "threshold": 137.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 148.0
+          "threshold": 144.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 156.0
+          "threshold": 152.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 166.0
+          "threshold": 161.0
         },
         {
           "name": "Transcendent",
@@ -288,17 +288,17 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 142.0
+          "threshold": 136.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 148.0
+          "threshold": 143.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 156.0
+          "threshold": 151.0
         },
         {
           "name": "Seraphic",
@@ -308,12 +308,12 @@
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 174.0
+          "threshold": 173.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 188.0
+          "threshold": 190.0
         }
       ]
     },
@@ -323,12 +323,12 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 108.0
+          "threshold": 106.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 113.0
+          "threshold": 112.0
         },
         {
           "name": "Angelic",
@@ -338,17 +338,17 @@
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 125.0
+          "threshold": 124.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 133.0
+          "threshold": 130.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 145.0
+          "threshold": 146.0
         }
       ]
     },
@@ -358,32 +358,32 @@
         {
           "name": "Prophet",
           "color": "#9E0059",
-          "threshold": 2850.0
+          "threshold": 2670.0
         },
         {
           "name": "Saint",
           "color": "#5A189A",
-          "threshold": 3000.0
+          "threshold": 2850.0
         },
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 3120.0
+          "threshold": 3030.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 3240.0
+          "threshold": 3180.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 3480.0
+          "threshold": 3390.0
         },
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 3690.0
+          "threshold": 3810.0
         }
       ]
     },
@@ -403,17 +403,17 @@
         {
           "name": "Angelic",
           "color": "#0F4C5C",
-          "threshold": 1580.0
+          "threshold": 1560.0
         },
         {
           "name": "Seraphic",
           "color": "#590D22",
-          "threshold": 1700.0
+          "threshold": 1660.0
         },
         {
           "name": "Cherubim",
           "color": "#03071E",
-          "threshold": 1820.0
+          "threshold": 1760.0
         },
         {
           "name": "Transcendent",

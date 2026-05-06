@@ -43,32 +43,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 14500.0
+          "threshold": 14000.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 15750.0
+          "threshold": 15250.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 17000.0
+          "threshold": 16500.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 18500.0
+          "threshold": 18000.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 20000.0
+          "threshold": 19500.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 21000.0
+          "threshold": 20500.0
         }
       ]
     },
@@ -78,32 +78,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 2800.0
+          "threshold": 2700.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 3300.0
+          "threshold": 3200.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 3550.0
+          "threshold": 3450.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 3950.0
+          "threshold": 3850.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 4300.0
+          "threshold": 4200.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 4600.0
+          "threshold": 4450.0
         }
       ]
     },
@@ -323,32 +323,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 1450.0
+          "threshold": 1350.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 1750.0
+          "threshold": 1650.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 2000.0
+          "threshold": 1900.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 2250.0
+          "threshold": 2150.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 2500.0
+          "threshold": 2400.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 2750.0
+          "threshold": 2700.0
         }
       ]
     },
@@ -478,17 +478,17 @@
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 8500.0
+          "threshold": 8525.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 8900.0
+          "threshold": 8950.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 9450.0
+          "threshold": 9500.0
         }
       ]
     },
@@ -673,32 +673,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 110.0
+          "threshold": 106.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 118.0
+          "threshold": 114.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 125.0
+          "threshold": 121.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 131.0
+          "threshold": 127.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 137.0
+          "threshold": 133.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 142.0
+          "threshold": 138.0
         }
       ]
     },
@@ -708,32 +708,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 102.0
+          "threshold": 103.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 110.0
+          "threshold": 111.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 115.0
+          "threshold": 116.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 120.0
+          "threshold": 121.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 126.0
+          "threshold": 127.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 132.0
+          "threshold": 133.0
         }
       ]
     },
@@ -828,17 +828,17 @@
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 168.0
+          "threshold": 166.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 175.0
+          "threshold": 173.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 180.0
+          "threshold": 178.0
         }
       ]
     },
@@ -883,32 +883,32 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 5500.0
+          "threshold": 5550.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 5900.0
+          "threshold": 5950.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 6200.0
+          "threshold": 6250.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 6500.0
+          "threshold": 6550.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 6800.0
+          "threshold": 6850.0
         },
         {
           "name": "Silk",
           "color": "#2E6F8A",
-          "threshold": 7100.0
+          "threshold": 7200.0
         }
       ]
     },
@@ -988,27 +988,27 @@
         {
           "name": "Wool",
           "color": "#F1ECEB",
-          "threshold": 740.0
+          "threshold": 730.0
         },
         {
           "name": "Linen",
           "color": "#EED3CE",
-          "threshold": 800.0
+          "threshold": 790.0
         },
         {
           "name": "Velvet",
           "color": "#ECA1B0",
-          "threshold": 860.0
+          "threshold": 850.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 920.0
+          "threshold": 910.0
         },
         {
           "name": "Satin",
           "color": "#5CA9C6",
-          "threshold": 960.0
+          "threshold": 950.0
         },
         {
           "name": "Silk",

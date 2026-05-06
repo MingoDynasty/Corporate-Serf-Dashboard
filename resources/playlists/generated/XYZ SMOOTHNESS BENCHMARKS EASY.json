@@ -8,32 +8,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1375.0
+          "threshold": 2150.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2125.0
+          "threshold": 2325.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2775.0
+          "threshold": 2500.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3325.0
+          "threshold": 2675.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4000.0
+          "threshold": 2850.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5502.0
+          "threshold": 5592.0
         }
       ]
     },
@@ -43,32 +43,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1575.0
+          "threshold": 2650.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2250.0
+          "threshold": 2850.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2850.0
+          "threshold": 3075.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3500.0
+          "threshold": 3300.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4225.0
+          "threshold": 3500.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5726.0
+          "threshold": 5798.0
         }
       ]
     },
@@ -78,17 +78,17 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1400.0
+          "threshold": 2225.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2000.0
+          "threshold": 2400.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2375.0
+          "threshold": 2600.0
         },
         {
           "name": "Ascendant",
@@ -98,7 +98,7 @@
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3375.0
+          "threshold": 2975.0
         },
         {
           "name": "Prismatic",
@@ -113,27 +113,27 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1850.0
+          "threshold": 2275.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2350.0
+          "threshold": 2450.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2800.0
+          "threshold": 2625.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3225.0
+          "threshold": 2825.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3700.0
+          "threshold": 3000.0
         },
         {
           "name": "Prismatic",
@@ -148,27 +148,27 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1675.0
+          "threshold": 1800.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2100.0
+          "threshold": 1950.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2575.0
+          "threshold": 2100.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3000.0
+          "threshold": 2250.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3500.0
+          "threshold": 2400.0
         },
         {
           "name": "Prismatic",
@@ -183,27 +183,27 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1925.0
+          "threshold": 2525.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2600.0
+          "threshold": 2725.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 3100.0
+          "threshold": 2925.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3575.0
+          "threshold": 3150.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4100.0
+          "threshold": 3350.0
         },
         {
           "name": "Prismatic",
@@ -218,27 +218,27 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1675.0
+          "threshold": 1925.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2250.0
+          "threshold": 2075.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2775.0
+          "threshold": 2225.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3125.0
+          "threshold": 2400.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3700.0
+          "threshold": 2550.0
         },
         {
           "name": "Prismatic",
@@ -253,32 +253,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1725.0
+          "threshold": 2200.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2250.0
+          "threshold": 2375.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2775.0
+          "threshold": 2550.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3200.0
+          "threshold": 2750.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3725.0
+          "threshold": 2925.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5092.0
+          "threshold": 5166.0
         }
       ]
     },
@@ -288,32 +288,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2400.0
+          "threshold": 2425.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2975.0
+          "threshold": 2600.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 3375.0
+          "threshold": 2800.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3775.0
+          "threshold": 3025.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4200.0
+          "threshold": 3225.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5713.0
+          "threshold": 5848.0
         }
       ]
     },
@@ -323,77 +323,7 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2850.0
-        },
-        {
-          "name": "Initiate",
-          "color": "#FFD966",
-          "threshold": 3425.0
-        },
-        {
-          "name": "Adept",
-          "color": "#93C47D",
-          "threshold": 3850.0
-        },
-        {
-          "name": "Ascendant",
-          "color": "#A4C2F4",
-          "threshold": 4200.0
-        },
-        {
-          "name": "Virtuoso",
-          "color": "#8E7CC3",
-          "threshold": 4650.0
-        },
-        {
-          "name": "Prismatic",
-          "color": "#65F0D8",
-          "threshold": 5816.0
-        }
-      ]
-    },
-    {
-      "name": "SYA Smooth Your Arm Easy",
-      "ranks": [
-        {
-          "name": "Trainee",
-          "color": "#F6B26B",
-          "threshold": 2675.0
-        },
-        {
-          "name": "Initiate",
-          "color": "#FFD966",
-          "threshold": 3250.0
-        },
-        {
-          "name": "Adept",
-          "color": "#93C47D",
-          "threshold": 3775.0
-        },
-        {
-          "name": "Ascendant",
-          "color": "#A4C2F4",
-          "threshold": 4150.0
-        },
-        {
-          "name": "Virtuoso",
-          "color": "#8E7CC3",
-          "threshold": 4575.0
-        },
-        {
-          "name": "Prismatic",
-          "color": "#65F0D8",
-          "threshold": 5727.0
-        }
-      ]
-    },
-    {
-      "name": "Spherical Centering I 90 Easy",
-      "ranks": [
-        {
-          "name": "Trainee",
-          "color": "#F6B26B",
-          "threshold": 2400.0
+          "threshold": 2775.0
         },
         {
           "name": "Initiate",
@@ -403,22 +333,92 @@
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 3525.0
+          "threshold": 3225.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3825.0
+          "threshold": 3475.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4325.0
+          "threshold": 3700.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5588.0
+          "threshold": 5892.0
+        }
+      ]
+    },
+    {
+      "name": "SYA Smooth Your Arm Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5785.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering I 90 Easy",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 3375.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#A4C2F4",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Virtuoso",
+          "color": "#8E7CC3",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5778.0
         }
       ]
     },
@@ -428,32 +428,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1700.0
+          "threshold": 2275.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2200.0
+          "threshold": 2450.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2750.0
+          "threshold": 2650.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3125.0
+          "threshold": 2850.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3600.0
+          "threshold": 3025.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5182.0
+          "threshold": 5232.0
         }
       ]
     },
@@ -463,32 +463,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1525.0
+          "threshold": 2100.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 1900.0
+          "threshold": 2275.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2325.0
+          "threshold": 2450.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 2725.0
+          "threshold": 2625.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3150.0
+          "threshold": 2800.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 4894.0
+          "threshold": 4958.0
         }
       ]
     },
@@ -498,32 +498,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2850.0
+          "threshold": 2550.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 3275.0
+          "threshold": 2750.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 3650.0
+          "threshold": 2950.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3950.0
+          "threshold": 3175.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4225.0
+          "threshold": 3375.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5144.0
+          "threshold": 5163.0
         }
       ]
     },
@@ -533,32 +533,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1825.0
+          "threshold": 2200.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2325.0
+          "threshold": 2375.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2800.0
+          "threshold": 2550.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3150.0
+          "threshold": 2750.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3575.0
+          "threshold": 2925.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5121.0
+          "threshold": 5226.0
         }
       ]
     },
@@ -568,7 +568,7 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1300.0
+          "threshold": 1600.0
         },
         {
           "name": "Initiate",
@@ -578,17 +578,17 @@
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2100.0
+          "threshold": 1850.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 2450.0
+          "threshold": 2000.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 2800.0
+          "threshold": 2125.0
         },
         {
           "name": "Prismatic",
@@ -603,17 +603,17 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1225.0
+          "threshold": 1900.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 1575.0
+          "threshold": 2050.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 1975.0
+          "threshold": 2200.0
         },
         {
           "name": "Ascendant",
@@ -623,12 +623,12 @@
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 2825.0
+          "threshold": 2525.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 4726.0
+          "threshold": 4735.0
         }
       ]
     },
@@ -638,12 +638,12 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2050.0
+          "threshold": 2650.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2650.0
+          "threshold": 2850.0
         },
         {
           "name": "Adept",
@@ -653,17 +653,17 @@
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3600.0
+          "threshold": 3300.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4000.0
+          "threshold": 3500.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5310.0
+          "threshold": 5479.0
         }
       ]
     },
@@ -673,32 +673,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1750.0
+          "threshold": 2350.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2225.0
+          "threshold": 2525.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2650.0
+          "threshold": 2725.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3125.0
+          "threshold": 2925.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3525.0
+          "threshold": 3125.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5149.0
+          "threshold": 5174.0
         }
       ]
     },
@@ -708,32 +708,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2250.0
+          "threshold": 2450.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2900.0
+          "threshold": 2650.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 3300.0
+          "threshold": 2850.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3675.0
+          "threshold": 3075.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4150.0
+          "threshold": 3275.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5454.0
+          "threshold": 5519.0
         }
       ]
     },
@@ -743,32 +743,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 2975.0
+          "threshold": 2875.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 3600.0
+          "threshold": 3100.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 4000.0
+          "threshold": 3325.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 4450.0
+          "threshold": 3575.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 4800.0
+          "threshold": 3800.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5714.0
+          "threshold": 5931.0
         }
       ]
     },
@@ -778,32 +778,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1975.0
+          "threshold": 2375.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2425.0
+          "threshold": 2550.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2950.0
+          "threshold": 2750.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3450.0
+          "threshold": 2950.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3950.0
+          "threshold": 3150.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 5281.0
+          "threshold": 5317.0
         }
       ]
     },
@@ -813,32 +813,32 @@
         {
           "name": "Trainee",
           "color": "#F6B26B",
-          "threshold": 1550.0
+          "threshold": 2000.0
         },
         {
           "name": "Initiate",
           "color": "#FFD966",
-          "threshold": 2000.0
+          "threshold": 2150.0
         },
         {
           "name": "Adept",
           "color": "#93C47D",
-          "threshold": 2475.0
+          "threshold": 2325.0
         },
         {
           "name": "Ascendant",
           "color": "#A4C2F4",
-          "threshold": 3000.0
+          "threshold": 2500.0
         },
         {
           "name": "Virtuoso",
           "color": "#8E7CC3",
-          "threshold": 3400.0
+          "threshold": 2650.0
         },
         {
           "name": "Prismatic",
           "color": "#65F0D8",
-          "threshold": 4810.0
+          "threshold": 4800.0
         }
       ]
     }
