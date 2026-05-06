@@ -53,42 +53,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 6000.0
+          "threshold": 5750.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 8500.0
+          "threshold": 8250.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 11000.0
+          "threshold": 10750.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 13500.0
+          "threshold": 13250.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 15500.0
+          "threshold": 15250.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 17500.0
+          "threshold": 17250.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 19500.0
+          "threshold": 19250.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 20750.0
+          "threshold": 20500.0
         }
       ]
     },
@@ -278,42 +278,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 2100.0
+          "threshold": 1900.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 2500.0
+          "threshold": 2300.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 2850.0
+          "threshold": 2650.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 3200.0
+          "threshold": 3000.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 3600.0
+          "threshold": 3400.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 3950.0
+          "threshold": 3750.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 4300.0
+          "threshold": 4100.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 4650.0
+          "threshold": 4450.0
         }
       ]
     },
@@ -413,42 +413,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 900.0
+          "threshold": 800.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 1200.0
+          "threshold": 1100.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 1500.0
+          "threshold": 1400.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 1800.0
+          "threshold": 1700.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 2100.0
+          "threshold": 2000.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 2400.0
+          "threshold": 2300.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 2850.0
+          "threshold": 2750.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 3300.0
+          "threshold": 3200.0
         }
       ]
     },
@@ -728,42 +728,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 850.0
+          "threshold": 847.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 865.0
+          "threshold": 862.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 878.0
+          "threshold": 876.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 890.0
+          "threshold": 886.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 898.0
+          "threshold": 895.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 905.0
+          "threshold": 902.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 909.0
+          "threshold": 906.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 913.0
+          "threshold": 910.0
         }
       ]
     },
@@ -773,42 +773,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 1900.0
+          "threshold": 1800.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 2250.0
+          "threshold": 2150.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 2600.0
+          "threshold": 2500.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 3050.0
+          "threshold": 2950.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 3450.0
+          "threshold": 3350.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 3850.0
+          "threshold": 3750.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 4250.0
+          "threshold": 4150.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 4550.0
+          "threshold": 4450.0
         }
       ]
     },
@@ -863,42 +863,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 68.0
+          "threshold": 66.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 78.0
+          "threshold": 76.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 88.0
+          "threshold": 86.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 98.0
+          "threshold": 96.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 108.0
+          "threshold": 106.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 118.0
+          "threshold": 116.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 128.0
+          "threshold": 126.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 137.0
+          "threshold": 135.0
         }
       ]
     },
@@ -953,42 +953,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 90.0
+          "threshold": 88.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 105.0
+          "threshold": 103.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 117.0
+          "threshold": 115.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 129.0
+          "threshold": 127.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 138.0
+          "threshold": 136.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 145.0
+          "threshold": 143.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 151.0
+          "threshold": 149.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 158.0
+          "threshold": 156.0
         }
       ]
     },
@@ -1268,42 +1268,42 @@
         {
           "name": "Cinnabar",
           "color": "#A71112",
-          "threshold": 560.0
+          "threshold": 550.0
         },
         {
           "name": "Vermillion",
           "color": "#F85939",
-          "threshold": 650.0
+          "threshold": 640.0
         },
         {
           "name": "Saffron",
           "color": "#F1C338",
-          "threshold": 730.0
+          "threshold": 720.0
         },
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 790.0
+          "threshold": 780.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 860.0
+          "threshold": 850.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 910.0
+          "threshold": 900.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 990.0
+          "threshold": 980.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 1070.0
+          "threshold": 1060.0
         }
       ]
     },

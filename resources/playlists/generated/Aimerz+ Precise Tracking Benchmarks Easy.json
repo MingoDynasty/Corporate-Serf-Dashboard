@@ -38,7 +38,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 5400.0
+          "threshold": 6000.0
         }
       ]
     },
@@ -78,7 +78,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 4700.0
+          "threshold": 4800.0
         }
       ]
     },
@@ -158,7 +158,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 16500.0
+          "threshold": 17100.0
         }
       ]
     },
@@ -198,7 +198,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 20000.0
+          "threshold": 20500.0
         }
       ]
     },
@@ -278,7 +278,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 19500.0
+          "threshold": 19000.0
         }
       ]
     },
@@ -318,7 +318,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 3200.0
+          "threshold": 3250.0
         }
       ]
     },
@@ -438,7 +438,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 5100.0
+          "threshold": 5050.0
         }
       ]
     },

@@ -413,42 +413,42 @@
         {
           "name": "Lemming",
           "color": "#C5C3F2",
-          "threshold": 400.0
+          "threshold": 350.0
         },
         {
           "name": "Hare",
           "color": "#B2CBEA",
-          "threshold": 650.0
+          "threshold": 550.0
         },
         {
           "name": "Ermine",
           "color": "#BAF6FC",
-          "threshold": 950.0
+          "threshold": 850.0
         },
         {
           "name": "Penguin",
           "color": "#6B94DF",
-          "threshold": 1200.0
+          "threshold": 1100.0
         },
         {
           "name": "Fox",
           "color": "#5558AA",
-          "threshold": 1450.0
+          "threshold": 1350.0
         },
         {
           "name": "Mammoth",
           "color": "#6E3F98",
-          "threshold": 1700.0
+          "threshold": 1600.0
         },
         {
           "name": "Orca",
           "color": "#C080E4",
-          "threshold": 2000.0
+          "threshold": 1900.0
         },
         {
           "name": "Seal",
           "color": "#F5BDE8",
-          "threshold": 2350.0
+          "threshold": 2250.0
         }
       ]
     },
@@ -863,42 +863,42 @@
         {
           "name": "Lemming",
           "color": "#C5C3F2",
-          "threshold": 38.0
+          "threshold": 36.0
         },
         {
           "name": "Hare",
           "color": "#B2CBEA",
-          "threshold": 45.0
+          "threshold": 54.0
         },
         {
           "name": "Ermine",
           "color": "#BAF6FC",
-          "threshold": 52.0
+          "threshold": 50.0
         },
         {
           "name": "Penguin",
           "color": "#6B94DF",
-          "threshold": 60.0
+          "threshold": 58.0
         },
         {
           "name": "Fox",
           "color": "#5558AA",
-          "threshold": 72.0
+          "threshold": 70.0
         },
         {
           "name": "Mammoth",
           "color": "#6E3F98",
-          "threshold": 84.0
+          "threshold": 82.0
         },
         {
           "name": "Orca",
           "color": "#C080E4",
-          "threshold": 94.0
+          "threshold": 92.0
         },
         {
           "name": "Seal",
           "color": "#F5BDE8",
-          "threshold": 104.0
+          "threshold": 102.0
         }
       ]
     },
