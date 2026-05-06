@@ -44,25 +44,6 @@ def main() -> None:
     logger.info(f"Found {len(evxl_database)} evxl benchmarks.")
     counter = 0
 
-    temp_skip_sharecodes = [
-        "KovaaKsCarryingSlowGauntlet",  # "data": []
-        "KovaaKsChallengingSmallClass",  # "data": []
-        "KovaaKsHeadshottingAquamarineCapture",  # "data": []
-        "KovaaKsReloadingCaffeinatedStrike",  # "data": []
-        "KovaaKsAfkingSalmonNuns",  # "data": [null]
-        "KovaaKsAdventuringRoyalpurpleWindow",  # "data": [null]
-        "KovaaKsAdsingRoyalpurpleChat",  # "data": [null]
-        "KovaaKsTeleportingGoatedBlueberry",  # "data": [null]
-        "KovaaKsTrackingEasyBattlepass",  # "data": [null]
-        "KovaaKsDroppingMahoganyChallenge",  # "data": [null]
-        "KovaaKsCarryingCloseMomentum",  # "data": [null]
-        "KovaaKsGriefingFlawlessGoat",  # "data": [null]
-        "KovaaKsPlunderingGreenGunsmith",  # "data": [null]
-        "KovaaKsSensing360Button",  # "data": [null]
-        "KovaaKsEntryfraggingBuggedLowground",  # "data": [null]
-        "KovaaKsMainingForestgreenCallout",  # "data": [null]
-    ]
-
     for sharecode, evxl_database_item in evxl_database.items():
         counter += 1
 
@@ -72,8 +53,7 @@ def main() -> None:
         if counter >= 2:
             break
 
-        if sharecode in temp_skip_sharecodes:
-            logger.debug(f"Skipping: {sharecode}")
+        if sharecode != "KovaaKsScreamingPulledEgg":  # Viscose Season 2 - Easier
             continue
 
         logger.debug(
@@ -90,15 +70,10 @@ def main() -> None:
         if not playlist:
             message = f"Failed to find playlist from code: {sharecode}"
             logger.warning(message)
-            # raise Exception(message)
             continue
         logger.debug(
             f"Generating ({counter}/{len(evxl_database)}) for playlist: {playlist_response.data[0].playlistName.strip()}",
         )
-        # if len(playlist_response.data) > 1:
-        #     message = f"Found more than one playlist from code: {sharecode}"
-        #     logger.warning(message)
-        #     continue
 
         ################################
         # TODO: debugging only
@@ -111,7 +86,9 @@ def main() -> None:
         ################################
 
         # 3. Query KovaaK's API for benchmarks data
-        response_json = get_benchmark_json(evxl_database_item.kovaaksBenchmarkId, None)
+        response_json = get_benchmark_json(
+            evxl_database_item.kovaaksBenchmarkId, None, True
+        )
         ################################
         # TODO: debugging only
         # benchmark_filename = "benchmark_" + expected_file
