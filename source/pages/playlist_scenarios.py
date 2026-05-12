@@ -24,6 +24,24 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 280,
     },
     {
+        "headerName": "Last Played",
+        "field": "last_played_sort",
+        "valueFormatter": {"function": "params.data.last_played_display"},
+        "comparator": {"function": "dagfuncs.nullsFirstComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 130,
+    },
+    {
+        "headerName": "Runs",
+        "field": "runs_sort",
+        "valueFormatter": {"function": "params.data.runs_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 100,
+    },
+    {
         "headerName": "Current Rank",
         "field": "rank_sort",
         "valueFormatter": {"function": "params.data.rank_display"},
@@ -49,6 +67,15 @@ TABLE_COLUMN_DEFS = [
         "sortable": True,
         "flex": 1,
         "minWidth": 140,
+    },
+    {
+        "headerName": "High Score",
+        "field": "high_score_sort",
+        "valueFormatter": {"function": "params.data.high_score_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "flex": 1,
+        "minWidth": 120,
     },
 ]
 

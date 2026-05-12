@@ -1,8 +1,9 @@
+from datetime import datetime
 from types import SimpleNamespace
 
 from source.kovaaks import data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
-from source.kovaaks.data_models import PlaylistData, Scenario
+from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
 from source.kovaaks import playlist_scenarios_service
 from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
@@ -38,8 +39,18 @@ def test_format_playlist_scenario_rank_row_ranked():
         total_players=63892,
         percentile=82.33,
     )
+    scenario_stats = ScenarioStats(
+        date_last_played=datetime(2026, 4, 28, 21, 30, 0),
+        number_of_runs=1234,
+        high_score=3180,
+    )
 
-    row = format_playlist_scenario_rank_row("VT Pasu Intermediate S5", 3, rank_info)
+    row = format_playlist_scenario_rank_row(
+        "VT Pasu Intermediate S5",
+        3,
+        rank_info,
+        scenario_stats,
+    )
 
     assert row == {
         "scenario": "VT Pasu Intermediate S5",
@@ -51,6 +62,12 @@ def test_format_playlist_scenario_rank_row_ranked():
         "total_sort": 63892,
         "percentile_display": "82.33%",
         "percentile_sort": 82.33,
+        "last_played_display": "2026-04-28",
+        "last_played_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
+        "runs_display": "1,234",
+        "runs_sort": 1234,
+        "high_score_display": "3,180",
+        "high_score_sort": 3180,
     }
 
 
@@ -68,12 +85,28 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["total_sort"] == 63892
     assert row["percentile_display"] == "N/A"
     assert row["percentile_sort"] is None
+    assert row["last_played_display"] == "N/A"
+    assert row["last_played_sort"] is None
+    assert row["runs_display"] == "0"
+    assert row["runs_sort"] == 0
+    assert row["high_score_display"] == "N/A"
+    assert row["high_score_sort"] is None
 
 
 def test_format_playlist_scenario_rank_row_unknown():
     rank_info = ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN)
+    scenario_stats = ScenarioStats(
+        date_last_played=datetime(2026, 5, 1, 8, 15, 0),
+        number_of_runs=3,
+        high_score=863.935,
+    )
 
-    row = format_playlist_scenario_rank_row("Unknown Scenario", 0, rank_info)
+    row = format_playlist_scenario_rank_row(
+        "Unknown Scenario",
+        0,
+        rank_info,
+        scenario_stats,
+    )
 
     assert row["rank_display"] == "N/A"
     assert row["rank_sort"] is None
@@ -81,6 +114,11 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["total_sort"] is None
     assert row["percentile_display"] == "N/A"
     assert row["percentile_sort"] is None
+    assert row["last_played_display"] == "2026-05-01"
+    assert row["runs_display"] == "3"
+    assert row["runs_sort"] == 3
+    assert row["high_score_display"] == "863.93"
+    assert row["high_score_sort"] == 863.935
 
 
 def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures(
@@ -137,6 +175,28 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         "get_scenario_rank_info",
         fake_rank_lookup,
     )
+    local_stats = {
+        "First": ScenarioStats(
+            date_last_played=datetime(2026, 4, 1, 12, 0, 0),
+            number_of_runs=10,
+            high_score=1000,
+        ),
+        "Third": ScenarioStats(
+            date_last_played=datetime(2026, 4, 3, 12, 0, 0),
+            number_of_runs=30,
+            high_score=3000.5,
+        ),
+    }
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "is_scenario_in_database",
+        lambda scenario_name: scenario_name in local_stats,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_stats",
+        local_stats.__getitem__,
+    )
 
     rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
 
@@ -146,7 +206,13 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[0]["rank_display"] == "10"
     assert rows[1]["rank_display"] == "N/A"
     assert rows[1]["status"] == "UNKNOWN"
+    assert rows[1]["last_played_display"] == "N/A"
+    assert rows[1]["runs_display"] == "0"
+    assert rows[1]["high_score_display"] == "N/A"
     assert rows[2]["rank_display"] == "30"
+    assert rows[2]["last_played_display"] == "2026-04-03"
+    assert rows[2]["runs_display"] == "30"
+    assert rows[2]["high_score_display"] == "3,000.5"
 
 
 def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():

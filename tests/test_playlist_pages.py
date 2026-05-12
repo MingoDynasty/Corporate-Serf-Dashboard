@@ -66,3 +66,11 @@ def test_playlist_scenarios_page_handles_missing_playlist_code():
 
     assert rows == []
     assert status == "Select a playlist from the Playlists page."
+
+
+def test_playlist_scenarios_table_includes_local_stat_columns():
+    fields = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
+
+    assert "last_played_sort" in fields
+    assert "runs_sort" in fields
+    assert "high_score_sort" in fields
