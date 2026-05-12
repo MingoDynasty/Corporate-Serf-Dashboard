@@ -18,6 +18,7 @@ class RunData:
     horizontal_sens: float
     scenario: str
     accuracy: float
+    damage_accuracy: float | None = None
 
 
 @dataclass()

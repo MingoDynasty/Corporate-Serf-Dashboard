@@ -22,7 +22,7 @@ def test_extract_data_from_file_parses_valid_file() -> None:
                     "Horiz Sens:,2.3456",
                     "Scenario:,1w4ts",
                     SUB_CSV_HEADER,
-                    "Rifle,100,50,0,0,,Overwatch,2.3456,0,0,0,0,0,0,0,0,0,0",
+                    "Rifle,100,50,75,100,,Overwatch,2.3456,0,0,0,0,0,0,0,0,0,0",
                     "",
                 ]
             ),
@@ -37,5 +37,6 @@ def test_extract_data_from_file_parses_valid_file() -> None:
         assert run.horizontal_sens == 2.35
         assert run.scenario == "1w4ts"
         assert run.accuracy == 0.5
+        assert run.damage_accuracy == 0.75
     finally:
         file_path.unlink(missing_ok=True)
