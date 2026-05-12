@@ -74,3 +74,43 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
     assert "last_played_sort" in fields
     assert "runs_sort" in fields
     assert "high_score_sort" in fields
+
+
+def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
+    column = next(
+        column
+        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        if column["field"] == "last_played_sort"
+    )
+
+    assert column["comparator"] == {"function": "dagfuncs.nullsLastComparator"}
+
+
+def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
+    columns = {
+        column["field"]: column for column in playlist_scenarios.TABLE_COLUMN_DEFS
+    }
+
+    assert columns["pb_cm360_sort"]["headerName"] == "PB cm/360"
+    assert columns["pb_accuracy_sort"]["headerName"] == "PB Accuracy"
+
+
+def test_playlist_scenarios_grid_uses_content_auto_size():
+    grid = playlist_scenarios.layout("KovaaKsTestCode")
+    loading = grid.children[-1]
+    ag_grid = loading.children
+
+    assert ag_grid.columnSize == "autoSize"
+    assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
+
+
+def test_playlist_scenarios_scenario_column_fills_remaining_width():
+    column = next(
+        column
+        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        if column["field"] == "scenario"
+    )
+
+    assert column["flex"] == 1
+    assert column["maxWidth"] == 400
+    assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS

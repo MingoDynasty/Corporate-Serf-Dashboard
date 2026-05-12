@@ -7,9 +7,10 @@ import logging
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
-from source.kovaaks.data_models import ScenarioStats
+from source.kovaaks.data_models import RunData, ScenarioStats
 from source.kovaaks.data_service import (
     get_playlist_by_code,
+    get_personal_best_run,
     get_scenario_stats,
     is_scenario_in_database,
 )
@@ -42,10 +43,43 @@ def _format_last_played(value: datetime | None) -> str:
     return value.strftime("%Y-%m-%d")
 
 
+def _format_accuracy(value: float | None) -> str:
+    if value is None:
+        return "N/A"
+    return f"{value:.2f}%"
+
+
 def _get_local_stats(scenario_name: str) -> ScenarioStats | None:
     if not is_scenario_in_database(scenario_name):
         return None
     return get_scenario_stats(scenario_name)
+
+
+def _get_personal_best_run(scenario_name: str) -> RunData | None:
+    if not is_scenario_in_database(scenario_name):
+        return None
+    return get_personal_best_run(scenario_name)
+
+
+def _personal_best_cm360(run_data: RunData | None) -> float | None:
+    # Local CSVs only expose cm360 directly when the run was recorded with the
+    # cm/360 sensitivity scale. Other scales stay unknown instead of mislabeled.
+    if run_data is None or run_data.sens_scale != "cm/360":
+        return None
+    return run_data.horizontal_sens
+
+
+def _personal_best_accuracy(run_data: RunData | None) -> float | None:
+    if run_data is None:
+        return None
+    # Prefer damage accuracy because it most closely matches KovaaK's
+    # leaderboard metadata; fall back to hit accuracy for older/incomplete CSVs.
+    accuracy = (
+        run_data.damage_accuracy
+        if run_data.damage_accuracy is not None
+        else run_data.accuracy
+    )
+    return round(accuracy * 100, 2)
 
 
 def format_playlist_scenario_rank_row(
@@ -53,6 +87,7 @@ def format_playlist_scenario_rank_row(
     playlist_order: int,
     rank_info: ScenarioRankInfo,
     scenario_stats: ScenarioStats | None = None,
+    personal_best_run: RunData | None = None,
 ) -> dict[str, str | int | float | None]:
     """Create one AG Grid row with separate display and numeric sort values."""
     date_last_played = None
@@ -63,6 +98,8 @@ def format_playlist_scenario_rank_row(
         number_of_runs = scenario_stats.number_of_runs
         high_score = scenario_stats.high_score
 
+    personal_best_cm360 = _personal_best_cm360(personal_best_run)
+    personal_best_accuracy = _personal_best_accuracy(personal_best_run)
     row: dict[str, str | int | float | None] = {
         "scenario": scenario_name,
         "playlist_order": playlist_order,
@@ -81,6 +118,10 @@ def format_playlist_scenario_rank_row(
         "runs_sort": number_of_runs,
         "high_score_display": _format_score(high_score),
         "high_score_sort": high_score,
+        "pb_cm360_display": _format_score(personal_best_cm360),
+        "pb_cm360_sort": personal_best_cm360,
+        "pb_accuracy_display": _format_accuracy(personal_best_accuracy),
+        "pb_accuracy_sort": personal_best_accuracy,
     }
 
     if rank_info.status == ScenarioRankStatus.RANKED:
@@ -161,6 +202,7 @@ def build_playlist_scenario_rank_rows(
                 index,
                 rank_info,
                 _get_local_stats(scenario_name),
+                _get_personal_best_run(scenario_name),
             )
 
     return [row for row in rows if row is not None]

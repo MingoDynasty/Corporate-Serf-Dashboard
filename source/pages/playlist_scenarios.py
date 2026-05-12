@@ -15,21 +15,37 @@ dash.register_page(
     title="Playlist Scenarios",
 )
 
+AUTO_SIZE_COLUMN_KEYS = [
+    "last_played_sort",
+    "runs_sort",
+    "rank_sort",
+    "total_sort",
+    "percentile_sort",
+    "high_score_sort",
+    "pb_cm360_sort",
+    "pb_accuracy_sort",
+]
+
+COLUMN_SIZE_OPTIONS: dag.AgGrid.ColumnSizeOptions = {
+    "keys": AUTO_SIZE_COLUMN_KEYS,
+    "skipHeader": False,
+}
+
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Scenario",
         "field": "scenario",
         "sortable": True,
-        "flex": 2,
+        "flex": 1,
         "minWidth": 280,
+        "maxWidth": 400,
     },
     {
         "headerName": "Last Played",
         "field": "last_played_sort",
         "valueFormatter": {"function": "params.data.last_played_display"},
-        "comparator": {"function": "dagfuncs.nullsFirstComparator"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
         "minWidth": 130,
     },
     {
@@ -38,8 +54,7 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "params.data.runs_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
-        "minWidth": 100,
+        "minWidth": 80,
     },
     {
         "headerName": "Current Rank",
@@ -47,7 +62,6 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "params.data.rank_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
         "minWidth": 120,
     },
     {
@@ -56,7 +70,6 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "params.data.total_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
         "minWidth": 120,
     },
     {
@@ -65,7 +78,6 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "params.data.percentile_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
         "minWidth": 140,
     },
     {
@@ -74,8 +86,23 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "params.data.high_score_display"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
-        "flex": 1,
         "minWidth": 120,
+    },
+    {
+        "headerName": "PB cm/360",
+        "field": "pb_cm360_sort",
+        "valueFormatter": {"function": "params.data.pb_cm360_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 95,
+    },
+    {
+        "headerName": "PB Accuracy",
+        "field": "pb_accuracy_sort",
+        "valueFormatter": {"function": "params.data.pb_accuracy_display"},
+        "comparator": {"function": "dagfuncs.nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 130,
     },
 ]
 
@@ -151,7 +178,8 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                         "animateRows": False,
                         "domLayout": "autoHeight",
                     },
-                    columnSize="responsiveSizeToFit",
+                    columnSize="autoSize",
+                    columnSizeOptions=COLUMN_SIZE_OPTIONS,
                     dangerously_allow_code=True,
                     style={"width": "100%"},
                 )
