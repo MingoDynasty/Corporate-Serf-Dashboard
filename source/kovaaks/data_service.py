@@ -139,6 +139,15 @@ def get_high_score(scenario_name: str) -> float:
     return get_scenario_stats(scenario_name).high_score
 
 
+def get_personal_best_run(scenario_name: str) -> RunData | None:
+    """Return the highest-score local run for a scenario, if it has local runs."""
+    if scenario_name not in kovaaks_database:
+        return None
+
+    runs = kovaaks_database[scenario_name]["time_vs_runs"]
+    return max(runs, key=lambda item: item.score, default=None)
+
+
 def get_sensitivities_vs_runs_filtered(
     scenario_name: str,
     top_n_scores: int,
@@ -365,6 +374,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
     :return: RunData object
     """
     accuracy = None
+    damage_accuracy = None
     horizontal_sens = None
     scenario = None
     score = None
@@ -385,9 +395,15 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
                 sub_csv_line = True
                 continue
             if sub_csv_line:
-                shots = int(line.split(",")[1].strip())
-                hits = int(line.split(",")[2].strip())
-                accuracy = hits / shots
+                values = [item.strip() for item in line.split(",")]
+                shots = int(values[1])
+                hits = int(values[2])
+                damage_done = float(values[3])
+                damage_possible = float(values[4])
+                if shots > 0:
+                    accuracy = hits / shots
+                if damage_possible > 0:
+                    damage_accuracy = damage_done / damage_possible
                 sub_csv_line = False
                 continue
 
@@ -426,6 +442,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
         horizontal_sens=horizontal_sens,
         scenario=scenario,
         accuracy=accuracy,
+        damage_accuracy=damage_accuracy,
     )
 
 

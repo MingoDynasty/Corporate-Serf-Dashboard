@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 from source.kovaaks import data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
-from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
+from source.kovaaks.data_models import PlaylistData, RunData, Scenario, ScenarioStats
 from source.kovaaks import playlist_scenarios_service
 from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
@@ -32,6 +32,33 @@ def test_playlist_helpers_find_playlist_by_code(monkeypatch):
     ]
 
 
+def test_get_personal_best_run_returns_highest_score(monkeypatch):
+    lower_score = RunData(
+        datetime_object=datetime(2026, 4, 1, 12, 0, 0),
+        score=900,
+        sens_scale="cm/360",
+        horizontal_sens=42,
+        scenario="First",
+        accuracy=0.5,
+    )
+    higher_score = RunData(
+        datetime_object=datetime(2026, 4, 2, 12, 0, 0),
+        score=1000,
+        sens_scale="cm/360",
+        horizontal_sens=45,
+        scenario="First",
+        accuracy=0.6,
+    )
+    monkeypatch.setattr(
+        data_service,
+        "kovaaks_database",
+        {"First": {"time_vs_runs": [higher_score, lower_score]}},
+    )
+
+    assert data_service.get_personal_best_run("First") == higher_score
+    assert data_service.get_personal_best_run("Missing") is None
+
+
 def test_format_playlist_scenario_rank_row_ranked():
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
@@ -44,12 +71,22 @@ def test_format_playlist_scenario_rank_row_ranked():
         number_of_runs=1234,
         high_score=3180,
     )
+    personal_best_run = RunData(
+        datetime_object=datetime(2026, 4, 28, 21, 30, 0),
+        score=3180,
+        sens_scale="cm/360",
+        horizontal_sens=45,
+        scenario="VT Pasu Intermediate S5",
+        accuracy=0.67,
+        damage_accuracy=0.7615,
+    )
 
     row = format_playlist_scenario_rank_row(
         "VT Pasu Intermediate S5",
         3,
         rank_info,
         scenario_stats,
+        personal_best_run,
     )
 
     assert row == {
@@ -68,6 +105,10 @@ def test_format_playlist_scenario_rank_row_ranked():
         "runs_sort": 1234,
         "high_score_display": "3,180",
         "high_score_sort": 3180,
+        "pb_cm360_display": "45",
+        "pb_cm360_sort": 45,
+        "pb_accuracy_display": "76.15%",
+        "pb_accuracy_sort": 76.15,
     }
 
 
@@ -91,6 +132,10 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["runs_sort"] == 0
     assert row["high_score_display"] == "N/A"
     assert row["high_score_sort"] is None
+    assert row["pb_cm360_display"] == "N/A"
+    assert row["pb_cm360_sort"] is None
+    assert row["pb_accuracy_display"] == "N/A"
+    assert row["pb_accuracy_sort"] is None
 
 
 def test_format_playlist_scenario_rank_row_unknown():
@@ -119,6 +164,34 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["runs_sort"] == 3
     assert row["high_score_display"] == "863.93"
     assert row["high_score_sort"] == 863.935
+    assert row["pb_cm360_display"] == "N/A"
+    assert row["pb_cm360_sort"] is None
+    assert row["pb_accuracy_display"] == "N/A"
+    assert row["pb_accuracy_sort"] is None
+
+
+def test_format_playlist_scenario_rank_row_uses_hit_accuracy_fallback():
+    rank_info = ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN)
+    personal_best_run = RunData(
+        datetime_object=datetime(2026, 4, 28, 21, 30, 0),
+        score=1000,
+        sens_scale="Overwatch",
+        horizontal_sens=6,
+        scenario="Unknown Scenario",
+        accuracy=0.5,
+    )
+
+    row = format_playlist_scenario_rank_row(
+        "Unknown Scenario",
+        0,
+        rank_info,
+        personal_best_run=personal_best_run,
+    )
+
+    assert row["pb_cm360_display"] == "N/A"
+    assert row["pb_cm360_sort"] is None
+    assert row["pb_accuracy_display"] == "50.00%"
+    assert row["pb_accuracy_sort"] == 50
 
 
 def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures(
@@ -187,6 +260,26 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             high_score=3000.5,
         ),
     }
+    personal_best_runs = {
+        "First": RunData(
+            datetime_object=datetime(2026, 4, 1, 12, 0, 0),
+            score=1000,
+            sens_scale="cm/360",
+            horizontal_sens=42.5,
+            scenario="First",
+            accuracy=0.65,
+            damage_accuracy=0.8125,
+        ),
+        "Third": RunData(
+            datetime_object=datetime(2026, 4, 3, 12, 0, 0),
+            score=3000.5,
+            sens_scale="cm/360",
+            horizontal_sens=45,
+            scenario="Third",
+            accuracy=0.72,
+            damage_accuracy=0.8234,
+        ),
+    }
     monkeypatch.setattr(
         playlist_scenarios_service,
         "is_scenario_in_database",
@@ -196,6 +289,11 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         playlist_scenarios_service,
         "get_scenario_stats",
         local_stats.__getitem__,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_personal_best_run",
+        personal_best_runs.__getitem__,
     )
 
     rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
@@ -209,10 +307,14 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[1]["last_played_display"] == "N/A"
     assert rows[1]["runs_display"] == "0"
     assert rows[1]["high_score_display"] == "N/A"
+    assert rows[1]["pb_cm360_display"] == "N/A"
+    assert rows[1]["pb_accuracy_display"] == "N/A"
     assert rows[2]["rank_display"] == "30"
     assert rows[2]["last_played_display"] == "2026-04-03"
     assert rows[2]["runs_display"] == "30"
     assert rows[2]["high_score_display"] == "3,000.5"
+    assert rows[2]["pb_cm360_display"] == "45"
+    assert rows[2]["pb_accuracy_display"] == "82.34%"
 
 
 def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():
