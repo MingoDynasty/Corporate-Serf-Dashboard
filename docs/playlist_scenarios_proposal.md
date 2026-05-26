@@ -88,7 +88,10 @@ Add columns sourced from the personal-best run file:
 - cm360 (from PB run's `attributes.cm360`)
 - Accuracy (from PB run's `attributes.accuracyDamage`)
 
-Requires identifying the run with the highest score for a given scenario and pulling specific fields from its attributes — more involved than existing helpers.
+Requires identifying the local run with the highest score for a given scenario and pulling PB-specific metadata from that run. The local CSV data does not expose KovaaK's full API `attributes` object, so implementation uses parsed local equivalents:
+
+- PB cm360 is available when the PB file uses `cm/360` as the sensitivity scale.
+- PB Accuracy uses damage accuracy when `Damage Done / Damage Possible` is available, with hit accuracy as a fallback for older or incomplete files.
 
 ## Out of Scope For M1a
 
@@ -138,7 +141,7 @@ Forward-looking notes for when M2 ships, captured here so M1 implementation does
 
 ## Assumptions
 
-- Sub-M1a is the next implementation target, not the full M1 column set.
+- M1 ships incrementally across sub-milestones rather than as one large change.
 - `dash-ag-grid` will be added as a project dependency.
 - The first page version renders complete table data in one shot rather than progressively updating rows.
 - Playlist code remains the URL identity, while playlist name remains display text.
