@@ -1,9 +1,9 @@
 """Per-playlist scenario table page."""
 
 import dash
-from dash import Input, Output, State, callback, dcc, no_update
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
+from dash import Input, Output, State, callback, dcc, no_update
 
 from source.kovaaks.data_service import get_playlist_by_code
 from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
@@ -43,7 +43,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Last Played",
         "field": "last_played_sort",
-        "valueFormatter": {"function": "params.data.last_played_display"},
+        "valueFormatter": {"function": "dagfuncs.relativeTime(params.value, 'Never')"},
+        "tooltipValueGetter": {
+            "function": "dagfuncs.absoluteTime(params.value, 'Never')"
+        },
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
         "minWidth": 130,
