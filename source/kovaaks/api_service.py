@@ -189,7 +189,7 @@ def get_leaderboard_scores(
     if max_results > 100:
         raise ValueError("max_results must be less than or equal to 100")
 
-    params = {
+    params: dict[str, int | str] = {
         "page": page,
         "max": max_results,
         "leaderboardId": leaderboard_id,
