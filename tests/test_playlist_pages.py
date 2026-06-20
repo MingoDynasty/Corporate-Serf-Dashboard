@@ -83,7 +83,7 @@ def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
         if column["field"] == "last_played_sort"
     )
 
-    assert column["comparator"] == {"function": "dagfuncs.nullsLastComparator"}
+    assert column["comparator"] == {"function": "nullsLastComparator"}
 
 
 def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
