@@ -43,10 +43,8 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Last Played",
         "field": "last_played_sort",
-        "valueFormatter": {"function": "dagfuncs.relativeTime(params.value, 'Never')"},
-        "tooltipValueGetter": {
-            "function": "dagfuncs.absoluteTime(params.value, 'Never')"
-        },
+        "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
+        "tooltipValueGetter": {"function": "absoluteTime(params.value, 'Never')"},
         "comparator": {"function": "dagfuncs.nullsLastComparator"},
         "sortable": True,
         "minWidth": 130,
