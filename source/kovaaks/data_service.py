@@ -74,7 +74,7 @@ def get_aim_training_checkpoints(checkpoint_threshold: int) -> dict[datetime, in
 def get_aim_training_journey_for_playlists(
     playlist_names: list[str],
 ) -> dict[str, dict[datetime, float]]:
-    journey_data = dict.fromkeys(playlist_names)
+    journey_data: dict[str, dict[datetime, float]] = {}
     for playlist_name in playlist_names:
         journey_data[playlist_name] = get_aim_training_journey_for_playlist(
             playlist_name,
@@ -95,7 +95,7 @@ def get_aim_training_journey_for_playlist(playlist_name: str) -> dict[datetime, 
             run_data.score,
         )
 
-    journey_data = {}
+    journey_data: dict[datetime, float] = {}
     current_scores = dict.fromkeys(scenarios, 0)
     for run_data in run_database:
         if run_data.scenario not in scenarios:
@@ -116,7 +116,7 @@ def get_aim_training_journey_for_playlist(playlist_name: str) -> dict[datetime, 
         percentages = []
         for scenario in scenarios:
             percentages.append(current_scores[scenario] / high_scores[scenario])
-        journey_data[run_data.datetime_object] = np.average(percentages)
+        journey_data[run_data.datetime_object] = float(np.average(percentages))
     return journey_data
 
 
@@ -161,7 +161,7 @@ def get_sensitivities_vs_runs_filtered(
     """
     # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
     #  Besides, this logic might get blown away if/when we migrate to SQLite.
-    filtered_data = {}
+    filtered_data: dict[str, list[RunData]] = {}
     for key, runs_data in kovaaks_database[scenario_name][
         "sensitivities_vs_runs"
     ].items():
@@ -190,7 +190,7 @@ def get_time_vs_runs(
     #  Besides, this logic might get blown away if/when we migrate to SQLite.
 
     # 1. Build a dictionary with <Date, [RunData]>
-    data = {}
+    data: dict[str, list[RunData]] = {}
     for run_data in kovaaks_database[scenario_name]["time_vs_runs"]:
         if run_data.datetime_object < oldest_date:
             continue
@@ -258,7 +258,7 @@ def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> list[
     for scenario in scenarios:
         if scenario.name != scenario_name:
             continue
-        return scenario.ranks
+        return scenario.ranks or []
     logger.warning(
         "Failed to get rank data for playlist (%s), scenario (%s)",
         playlist_name,
