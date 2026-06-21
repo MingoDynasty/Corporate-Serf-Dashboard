@@ -1,4 +1,16 @@
-# Scenario Rank Eventual Consistency Proposal (v4)
+# Scenario Rank Eventual Consistency Proposal (v7)
+
+> v7 changes over v6: tighten the read-path arbitration introduced in v6.
+> (1) Require the watchdog to mark the loop active *before* the UI-visible
+> `message_queue.append` on PB paths, so the interval callback cannot trigger the
+> read path before the in-flight guard is set (closes an ordering race).
+> (2) Also guard the cache-*hit* scenario-name backfill while a loop is active, so
+> no read-path write refreshes a stale entry's TTL during the window. (3) Fix the
+> stale operation table that still called `get_scenario_rank_info` an
+> unconditional cache writer.
+>
+> (v6 changes over v5: in-flight loop counter for read-path arbitration;
+> unresolved-leaderboard is warning-only, not a toast; transient-resolver test.)
 
 ## Summary
 
@@ -67,10 +79,24 @@ Why score-based, not rank-based:
 The tolerance is applied only as downward slack on the threshold
 (`expected_score - 0.01`), never as a symmetric `±` band. This is deliberate.
 
-The tolerance exists for exactly one purpose: absorbing floating-point /
-rounding differences when the API reports a score that is *marginally below*
-the local CSV value but is really the same run. Scores are typically in the
-hundreds, so 0.01 is well below any meaningful precision.
+The tolerance exists for exactly one purpose: absorbing KovaaK's **truncation
+of leaderboard scores to two decimal places**. The leaderboard endpoint reports
+the user's score floored to `0.01`, so a fully caught-up board score sits
+*marginally below* the local CSV value by up to (just under) one hundredth —
+e.g. local `913.419861` is reported as `913.41`, never `913.42`. This was
+verified empirically against real data (see [Testing](#testing)): across 445 of
+the user's ranked scenarios the board score is the local score truncated to 2
+dp, with a maximum observed shortfall of `0.00999`.
+
+`0.01` is therefore sized to *exactly one truncation step* — not merely
+float noise, and not "well below any meaningful precision." The value must stay
+`>= 0.01`: tightening it (e.g. to `0.001`, on the mistaken belief that `0.01` is
+loose) would reintroduce the bug, because a genuinely caught-up board would then
+be rejected as stale and every PB on such a scenario would poll to exhaustion.
+The guarantee holds structurally because 2-dp truncation error is always
+strictly `< 0.01`, so `board >= expected - 0.01` is satisfied for every
+caught-up score (worst-case real margin ~6e-6; float noise at these magnitudes
+is ~1e-10, far below it).
 
 A score **higher** than expected must always be accepted, so the upper bound
 stays open:
@@ -121,19 +147,22 @@ file_watchdog (new high score detected)
     v
 schedule_rank_freshness_refresh(scenario, expected_score)
     |
+    +-- mark scenario's loop active   # read path stops persisting its own fetch
     +-- schedule attempt #0 at now + 30s via threading.Timer
             |
             v
-    on each scheduled tick (whole body wrapped in a broad guard):
+    on each scheduled tick (broad guard; chain marks the loop done on the
+                            tick that terminates it — via _run_attempt's finally):
         result = fetch_scenario_rank(...)
         if _score_is_fresh(result, expected_score):
             if _save_rank_if_fresher(...):   # monotonic: never regress
                 force-refresh leaderboard total
-            done
+            done                              # terminal -> mark loop done
         elif attempts_remaining > 0:
-            schedule next attempt
+            schedule next attempt             # NOT terminal -> loop stays active
         else:
             validate username; emit accurate dash_logger.error; preserve cache
+                                              # terminal -> mark loop done
 ```
 
 ### Why a new function (in `api_service.py`), gated on cache writes
@@ -150,8 +179,12 @@ The reason it is a *separate function* rather than a flag on
 semantics**, not async behavior:
 
 - `get_scenario_rank_info` writes whatever the API returns to the rank cache,
-  unconditionally ([`api_service.py:949`](../source/kovaaks/api_service.py:949)).
-  That is correct for a read-through "give me current truth" lookup.
+  without conditioning on freshness
+  ([`api_service.py:949`](../source/kovaaks/api_service.py:949)). That is correct
+  for a read-through "give me current truth" lookup. (The v7 read-path
+  arbitration adds an *external* gate — skip the write while a loop owns the
+  scenario — but it does not give the function any freshness-based write logic of
+  its own; that orthogonal gate is the point of the next two sections.)
 - The freshness loop must do the opposite: write *only* when the result passes
   `_score_is_fresh` **and** would not regress a higher score already cached, and
   otherwise leave the existing cache untouched. Folding that conditional-write
@@ -182,9 +215,10 @@ callers. Delete it.
 
 The capability it provided — "bypass the cache and fetch current truth right
 now" — is not lost. It was always a one-line wrapper, and any future caller
-that genuinely needs an unconditional, synchronous, cache-overwriting fetch
-(e.g. a manual-refresh button, should we add one) can call
-`get_scenario_rank_info(force_refresh=True)` directly. Keeping a dedicated
+that needs a synchronous, cache-overwriting fetch (e.g. a manual-refresh button,
+should we add one) can call `get_scenario_rank_info(force_refresh=True)` directly
+— which now also inherits the read-path arbitration, so it overwrites the cache
+*unless* a freshness loop is mid-flight for that scenario. Keeping a dedicated
 wrapper around for a hypothetical second caller is a YAGNI trap: it would sit
 unused, and a future caller is one trivial line away regardless.
 
@@ -192,7 +226,7 @@ This leaves two clearly distinguished rank operations:
 
 | Operation | Function | Cache write | Returns | Use |
 |---|---|---|---|---|
-| Read current truth | `get_scenario_rank_info` (optionally `force_refresh=True`) | Unconditional | `ScenarioRankInfo` synchronously | UI lookups; any future on-demand "refresh now" |
+| Read current truth | `get_scenario_rank_info` (optionally `force_refresh=True`) | Unconditional, **except suppressed while a freshness loop is active** for the scenario ([read-path arbitration](#read-path-arbitration-in-flight-loop-counter)) | `ScenarioRankInfo` synchronously | UI lookups; any future on-demand "refresh now" |
 | Poll until fresh after a PB | `schedule_rank_freshness_refresh` | Gated on `_score_is_fresh` + monotonic guard | `None` (fire-and-forget) | Watchdog post-high-score |
 
 ### Why `threading.Timer` instead of the executor
@@ -306,9 +340,132 @@ age). It can be a thin read over `_read_json(_rank_cache_file(...))` returning
 `score`, or `get_cached_scenario_rank(..., cache_ttl_hours=<effectively
 unbounded>).score`; the former is clearer.
 
+**Scope of the no-regression guarantee.** The monotonic save protects
+loop-versus-loop races, but it is *not* the only writer of the rank cache. The
+UI read path [`get_scenario_rank_info`](../source/kovaaks/api_service.py:834)
+writes unconditionally and *without* `_rank_save_lock` on a cache miss/expiry
+([`api_service.py:949`](../source/kovaaks/api_service.py:949)) — and that write
+is exactly the hazard this whole proposal exists to stop. After a PB, `do_update`
+fires [`get_scenario_rank`](../source/pages/home.py:131); on a cold or expired
+cache the read path fetches the *lagging* leaderboard value (`UNRANKED` or a
+lower score) and persists it, possibly seconds after the PB and well before the
+freshness loop's first attempt at +30s. Because that write refreshes the cache
+mtime, later views inside the 168h TTL return the stale value without
+re-fetching; the loop repairs it on a successful save, but on exhaustion or
+app-exit mid-loop the stale entry survives the full TTL.
+
+(v5 wrongly called this read-path write "freshly-fetched server truth
+(monotonic from KovaaK's)" and therefore safe. It is *not* monotonic — the whole
+premise of this proposal is that the leaderboard endpoint lags a fresh PB, so the
+read path's fetch can be lower than the local high.)
+
+The fix is **read-path arbitration via an in-flight loop counter** (next
+subsection): while a freshness loop owns a scenario, the read path still
+*displays* its fetch but does not *persist* it, leaving the loop's gated,
+monotonic save as the sole cache writer for that scenario during the window. This
+also subsumes the earlier **deferred manual-refresh button** concern: any future
+`get_scenario_rank_info(force_refresh=True)` caller reaches the same guarded save
+at line 949, so it too is suppressed while a loop is active and cannot regress a
+running loop's higher score.
+
 The forced leaderboard-total refresh runs only when the save actually happened.
 A skipped (regression-avoided) save means a fresher loop already wrote the rank
 and forced its own total refresh, so repeating it would be a wasted API call.
+
+### Read-path arbitration (in-flight loop counter)
+
+`_save_rank_if_fresher` stops one loop from regressing another, but it does not
+stop the UI read path from persisting a lagging fetch during the window (the
+hazard described above). A small in-flight registry closes that: a process-wide
+counter of scenarios with a live freshness loop, consulted by the read path
+before it persists.
+
+```python
+_active_loops_lock = threading.Lock()
+_active_rank_loops: collections.Counter[tuple[str, str]] = collections.Counter()
+
+
+def _mark_loop_active(username: str, scenario_name: str) -> None:
+    with _active_loops_lock:
+        _active_rank_loops[(username, scenario_name)] += 1
+
+
+def _mark_loop_done(username: str, scenario_name: str) -> None:
+    with _active_loops_lock:
+        key = (username, scenario_name)
+        _active_rank_loops[key] -= 1
+        if _active_rank_loops[key] <= 0:
+            del _active_rank_loops[key]
+
+
+def _has_active_rank_loop(username: str, scenario_name: str) -> bool:
+    with _active_loops_lock:
+        return _active_rank_loops[(username, scenario_name)] > 0
+```
+
+Design notes:
+
+- **Keyed by `(username, scenario_name)`, not `leaderboard_id`.** A loop is
+  scheduled before it has resolved a leaderboard id, but it already knows the
+  scenario name — and so does the read path (it is the dropdown selection / the
+  callback argument). Keying on the name lets both sides agree without waiting
+  for resolution. One scenario maps to one leaderboard, so the two keyings are
+  equivalent in practice.
+- **A counter, not a set.** Dense grinding can start several loops for the same
+  scenario; the read path must stay suppressed until the *last* of them
+  finishes.
+- **Lifecycle: increment once, decrement once per chain.**
+  `schedule_rank_freshness_refresh` increments before scheduling attempt #0.
+  Whether that actually covers the window from PB detection depends on the
+  watchdog marking active before it makes the run UI-visible — see [Call-site
+  ordering](#call-site-ordering-mark-active-before-the-run-is-ui-visible). Each
+  chain decrements exactly once, on whichever attempt *terminates* it — success,
+  exhaustion, a terminal error, or the broad guard — and never when an attempt
+  reschedules. The `_run_attempt` pseudocode enforces this with a `rescheduled`
+  flag and a `finally` (see [API Shape](#api-shape)).
+
+The read path skips **both** of its rank-cache writes while a loop is active, not
+just the cache-miss save. Concretely:
+
+- The cache-miss/`force_refresh` save at
+  [`api_service.py:949`](../source/kovaaks/api_service.py:949):
+
+```python
+rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
+if not _has_active_rank_loop(username, scenario_name):
+    save_scenario_rank(leaderboard_id, username, rank_info)
+# Total attach + warning derivation are unchanged; the fetched rank is still
+# returned for display whether or not it was persisted.
+```
+
+- The cache-*hit* `scenario_name` backfill at
+  [`api_service.py:906`](../source/kovaaks/api_service.py:906):
+
+```python
+if cached_rank.scenario_name is None and not _has_active_rank_loop(username, scenario_name):
+    cached_rank = cached_rank.model_copy(update={"scenario_name": scenario_name})
+    save_scenario_rank(leaderboard_id, username, cached_rank)
+```
+
+The backfill never *lowers* the score (it re-writes the cached value), but it
+does refresh the file `mtime`, which would extend a stale entry's 168h TTL right
+when a PB has made it stale — defeating the very TTL-expiry that would otherwise
+let the stale entry self-heal on the next view. Guarding it keeps the invariant
+clean: **no read-path write touches the rank cache while a loop owns the
+scenario.** (This only ever fires for legacy entries written before
+`scenario_name` existed, so it is a minor, transitional case — but guarding it is
+one extra clause and removes the inconsistency.) For display, the in-memory
+`model_copy` still attaches `scenario_name`; only the persistence is skipped.
+
+The check is **advisory**: there is a tiny window between `_has_active_rank_loop`
+returning `False` and the save in which a loop could start and the read path
+could still persist one lagging value. The consequence is benign — the loop's
+monotonic save remains authoritative and corrects the cache on its next
+successful attempt, after which the read path is suppressed. Making it airtight
+would mean holding `_active_loops_lock` across the file write (lock-ordering it
+ahead of `_CACHE_IO_LOCK`); not worth the nesting for a race the existing
+machinery already heals. `_active_loops_lock` is never nested with
+`_rank_save_lock` or `_CACHE_IO_LOCK`, so it introduces no deadlock risk.
 
 ### Leaderboard Total Refresh
 
@@ -357,9 +514,15 @@ with no UI signal.
 
 Two distinct error classes, handled differently:
 
-- **Transient (retry):** `fetch_scenario_rank` raising `requests.RequestException`
-  is treated as "not yet"; the loop continues to its next scheduled attempt.
-  The inner `_get_with_retry` has already retried once at the HTTP layer.
+- **Transient (retry):** a `requests.RequestException` from *either*
+  `resolve_leaderboard_id` **or** `fetch_scenario_rank` is treated as "not yet";
+  the loop continues to its next scheduled attempt. The inner `_get_with_retry`
+  has already retried once at the HTTP layer. `resolve_leaderboard_id` is
+  included deliberately: the **new-scenario / first-PB path** has no cached
+  leaderboard mapping yet, so resolution must hit the network
+  (`search_scenario_exact`), and a blip there must retry rather than terminate.
+  This is distinct from `resolve_leaderboard_id` returning `None`, which is
+  terminal (the scenario genuinely has no leaderboard — see below).
 - **Terminal (stop + notify):** anything that will fail identically on retry —
   most notably `UnknownKovaaksUserError` from
   [`resolve_leaderboard_id`](../source/kovaaks/api_service.py:540) (it can
@@ -367,6 +530,14 @@ Two distinct error classes, handled differently:
   wraps it at [`api_service.py:870`](../source/kovaaks/api_service.py:870)), and
   any unexpected exception. These stop the loop and emit `dash_logger.error`.
   Retrying a bad username five times would just delay the same failure.
+
+A third, quieter case sits between these: `resolve_leaderboard_id` returning
+`None` (the scenario has no KovaaK's leaderboard at all). This stops the loop but
+is **logged at warning level only, with no `dash_logger` toast.** `None` is the
+normal state for local/custom scenarios that were never uploaded to KovaaK's, so
+a user-facing notification on every such PB would cry wolf. "Never die silently"
+is satisfied by the log line; toasts are reserved for conditions the user can act
+on (a misconfigured username) or genuinely unexpected failures.
 
 The entire attempt body is therefore wrapped in a broad last-resort guard so no
 Timer thread can die silently.
@@ -393,6 +564,20 @@ def schedule_rank_freshness_refresh(
     On a successful (non-regressing) save, also force-refreshes the leaderboard
     total so the displayed percentile stays pinned to KovaaK's truth.
     """
+    # Mark the loop active *before* scheduling so the read path stops persisting
+    # its own (possibly lagging) fetch from the first attempt at +30s onward. The
+    # chain releases this in _run_attempt's finally (see below). NOTE: this only
+    # covers the window from PB detection if the watchdog calls this function
+    # before it makes the new run UI-visible — see "Call-site ordering" below.
+    _mark_loop_active(username, scenario_name)
+    try:
+        _schedule_attempt(
+            scenario_name, username, steam_id, expected_score,
+            metadata_cache_ttl_hours, attempt_index=0,
+        )
+    except Exception:  # noqa: BLE001 — failed to even schedule the first tick
+        _mark_loop_done(username, scenario_name)
+        raise
 ```
 
 Called from
@@ -424,6 +609,37 @@ has no remaining users. **Remove it** along with `_handle_rank_refresh_result`
 `_run_attempt`). Scheduling is no longer the watchdog's concern; it just fires
 `schedule_rank_freshness_refresh` and returns.
 
+#### Call-site ordering (mark active before the run is UI-visible)
+
+The in-flight guard only protects the read path if the loop is marked active
+*before* the new run becomes visible to the UI. Today every PB call site appends
+to `message_queue` first and schedules the refresh last
+([`file_watchdog.py:84`](../source/my_watchdog/file_watchdog.py:84) then
+[`:95`](../source/my_watchdog/file_watchdog.py:95)). The 1s interval callback
+[`check_for_new_data`](../source/pages/home.py:85) can observe that queue entry,
+flip `do_update`, and fire [`get_scenario_rank`](../source/pages/home.py:131) in
+the gap **before** `_mark_loop_active` runs — so the read path persists a lagging
+fetch and the guard never fired. (In practice the local mark usually wins the
+race against the read path's networked fetch, but "usually" is not the
+guarantee.)
+
+The fix is an ordering requirement at each PB call site: call
+`_refresh_rank_after_high_score(...)` (which marks the loop active) **before** the
+`message_queue.append(...)` for that run. The CSV-load can stay where it is — the
+freshness loop does not read the local DB. Concretely, each of the three PB paths
+(new scenario; new sensitivity with new PB; existing scenario with new PB)
+becomes:
+
+```python
+if is_new_high_score:                       # unconditional in the new-scenario case
+    _refresh_rank_after_high_score(run_data.scenario, run_data.score)
+message_queue.append(NewFileMessage(...))   # only now is the run UI-visible
+load_csv_file_into_database(file)
+```
+
+`_refresh_rank_after_high_score` only marks/schedules; it is non-blocking
+(microseconds), so moving it ahead of the append does not delay the PB toast.
+
 ### Pseudocode for one attempt
 
 ```python
@@ -436,7 +652,9 @@ def _run_attempt(
     attempt_index: int,
 ) -> None:
     # Broad last-resort guard: a Timer thread must never die silently.
+    rescheduled = False
     try:
+        rank_info = None
         try:
             leaderboard_id = resolve_leaderboard_id(
                 scenario_name, username, metadata_cache_ttl_hours,
@@ -448,15 +666,24 @@ def _run_attempt(
                 "KovaaK's username may be misconfigured."
             )
             return  # terminal: do not retry a bad username
-
-        if leaderboard_id is None:
-            logger.warning("Could not resolve leaderboard for %s", scenario_name)
-            return  # terminal: cannot poll without a leaderboard id
-
-        try:
-            rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
         except requests.RequestException:
-            rank_info = None  # transient; fall through to retry
+            # Transient: resolve_leaderboard_id swallows its own hydration
+            # RequestExceptions, but search_scenario_exact (the cold-cache,
+            # first-PB path) can still raise. Fall through to the retry tail
+            # rather than letting the broad guard kill the loop.
+            logger.warning(
+                "Transient failure resolving leaderboard for %s; will retry",
+                scenario_name, exc_info=True,
+            )
+            leaderboard_id = None  # NOT terminal — distinct from a resolved None
+        else:
+            if leaderboard_id is None:
+                logger.warning("Could not resolve leaderboard for %s", scenario_name)
+                return  # terminal: scenario genuinely has no leaderboard
+            try:
+                rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+            except requests.RequestException:
+                rank_info = None  # transient; fall through to retry
 
         if rank_info is not None and _score_is_fresh(rank_info, expected_score):
             rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
@@ -478,18 +705,30 @@ def _run_attempt(
             scenario_name, username, steam_id, expected_score,
             metadata_cache_ttl_hours, next_index,
         )
+        rescheduled = True  # chain continues; the next tick owns the decrement
     except Exception:  # noqa: BLE001 — last-resort guard for the Timer thread
         logger.exception("Unexpected error during rank refresh for %s", scenario_name)
         dash_logger.error(f"Rank update for {scenario_name} failed unexpectedly.")
         # Do not reschedule: an unexpected error will most likely recur.
+    finally:
+        # Exactly one decrement per chain. Every terminal exit (success,
+        # exhaustion, terminal error, broad guard) reaches here with
+        # rescheduled=False; a rescheduled tick skips it. If _schedule_attempt
+        # itself raised, rescheduled is still False, so the chain is correctly
+        # released here.
+        if not rescheduled:
+            _mark_loop_done(username, scenario_name)
 
 
 def _notify_exhaustion(
     scenario_name: str, username: str, metadata_cache_ttl_hours: int,
 ) -> None:
     logger.warning("Rank freshness refresh exhausted for %s", scenario_name)
-    # One validation call (failure path only) to choose an accurate message:
-    # distinguish genuine API lag from a misconfigured username.
+    # Always validate on exhaustion (one call, failure path only) to choose an
+    # accurate message: distinguish genuine API lag from a misconfigured
+    # username. We do not track whether a RANKED result was ever seen to skip
+    # this call — that state isn't worth threading through the Timer chain for a
+    # single saved call on a rare path (see Resolved Decisions).
     try:
         get_user_scenario_total_play(username, metadata_cache_ttl_hours)
     except UnknownKovaaksUserError:
@@ -520,18 +759,56 @@ Minimum viable:
 - The existing
   [`dcc.Loading`](../source/pages/home.py:542) wrapping the rank text remains
   as-is. It only spins when the UI callback is running, which is the right
-  behavior — the freshness loop runs in the background and the user keeps
-  seeing the cached value until the next polling tick after a successful refresh.
+  behavior — the freshness loop runs in the background and the rank widget keeps
+  showing the cached value until the callback re-runs (see the trigger note
+  below).
 - No new "Updating..." text. The user has already seen the PB notification
   toast; the rank widget can lag behind by a minute or two without being
   confusing.
 
+### How (and when) the widget actually picks up the refreshed cache
+
+The freshness loop only writes the cache; it does not push to the UI. The rank
+text is rendered by [`get_scenario_rank`](../source/pages/home.py:130), whose
+only inputs are the `do_update` store and the scenario dropdown. `do_update` is
+**not** a periodic tick: [`check_for_new_data`](../source/pages/home.py:85) runs
+on the 1s interval but flips `do_update` only when `message_queue` holds an entry
+for the *currently-selected* scenario (or auto-switch changes the dropdown). So
+the rank widget re-renders on **the next run for the selected scenario, or on a
+scenario re-selection** — never on a plain timer.
+
+Consequences:
+
+- **During an active grind on the same scenario:** self-heals. The next rep
+  flips `do_update`, the callback re-reads the now-fresh cache, and the updated
+  rank appears. (It updates on the first rep *after* the loop's successful save,
+  not instantly.)
+- **Residual gap — the last PB before stopping or switching away:** the loop
+  writes the correct cache 30s–12min later, but nothing re-renders, so the
+  widget shows the stale rank until the user re-selects that scenario. Narrow,
+  but real. The proposal's earlier "next polling tick" framing was inaccurate:
+  there is no periodic re-read of the rank cache.
+
+This is acceptable for the minimum-viable cut (the cache is *correct* the moment
+the user next looks; no blocking fetch happens in the callback). If live update
+is wanted, the scoped fix is to give the rank callback its own periodic trigger
+— add `Input("interval-component", "n_intervals")` to `get_scenario_rank` so it
+re-reads the (cheap, cache-only) rank each tick. **Caveat:** that callback also
+emits `dash_logger.warning`/`error` for `warning_message`/`error_message`
+([home.py:152-157](../source/pages/home.py:152)); firing it every second would
+spam those toasts for users in a persistent warning/error state (e.g. Steam-ID
+mismatch). So the live-update variant must first move or guard that notification
+emission so it fires only on change, not on every tick. Deferred unless the
+residual gap proves annoying in practice.
+
 Failure surfaces via `dash_logger.error(...)` directly from the freshness
 function — the same `dash_logger` channel the watchdog uses today. There are
-three trigger points, all non-blocking: a terminal error (bad username /
-unresolved leaderboard), an unexpected exception caught by the broad guard, and
-retry exhaustion (with the message tuned by the username-validation check). The
-old `_handle_rank_refresh_result` callback is removed because the freshness
+three trigger points, all non-blocking: a terminal bad-username error, an
+unexpected exception caught by the broad guard, and retry exhaustion (with the
+message tuned by the username-validation check). An unresolved leaderboard
+(`resolve_leaderboard_id` → `None`) is **not** one of them: it stops the loop
+with a `logger.warning` only, no toast (see [Error Handling](#error-handling)).
+The old `_handle_rank_refresh_result` callback is removed because the freshness
 function now emits these notifications itself.
 
 ## Failure Modes And Edge Cases
@@ -541,10 +818,12 @@ function now emits these notifications itself.
 | API never reports the new score within 12.5 min | Preserve previous cache. `_notify_exhaustion` validates the username, then emits "still catching up" (valid user) via `dash_logger.error`. User sees stale rank with no spinner. |
 | API reports `RANKED` with score *higher* than expected | Accept as fresh. Save (monotonic) and exit loop. |
 | API reports `UNRANKED` | Do not save. Continue retries. After exhaustion, `_notify_exhaustion` distinguishes lag from a misconfigured username. Previous cache preserved. |
-| Multiple PBs for the same scenario in succession | Each schedules its own independent loop. The monotonic `_save_rank_if_fresher` prevents a slower lower-score loop from overwriting a higher score already cached by a faster loop. |
+| Multiple PBs for the same scenario in succession | Each schedules its own independent loop. The monotonic `_save_rank_if_fresher` prevents a slower lower-score loop from overwriting a higher score already cached by a faster loop. The in-flight counter holds the read path suppressed until the *last* of these loops finishes. |
+| UI read callback (`get_scenario_rank`) fires during the freshness window (new-scenario + auto-switch, or expired cache + PB) | Read path fetches the lagging value and *displays* it, but **does not persist** it — `_has_active_rank_loop` is true. The loop's gated, monotonic save is the only writer until it finishes. Closes the v5 read-path stale-write hole. |
 | `fetch_scenario_rank` raises `RequestException` | Treat as transient; continue retries. The inner `_get_with_retry` has already retried once at the HTTP layer. |
 | `resolve_leaderboard_id` raises `UnknownKovaaksUserError` | Terminal. Stop the loop immediately; emit a "username may be misconfigured" `dash_logger.error`. No retries. |
-| `resolve_leaderboard_id` returns `None` | Cannot poll without a leaderboard ID. Stop the loop with a warning. |
+| `resolve_leaderboard_id` raises `requests.RequestException` (e.g. `search_scenario_exact` network blip on the first-PB cold-cache path) | Transient. Treat like a failed fetch: continue retries, exhaust if it never resolves. Distinct from a resolved `None`. |
+| `resolve_leaderboard_id` returns `None` | Terminal: the scenario has no leaderboard on KovaaK's (normal for local/custom scenarios). Stop the loop with a `logger.warning` only — **no `dash_logger` toast**, which would cry wolf on every PB of an unranked custom scenario. |
 | Any unexpected exception inside an attempt | Caught by the broad guard. Logged with traceback; emits a generic `dash_logger.error`. Loop stops (no reschedule). |
 | App shuts down mid-loop | Daemon Timers die with the process. Next app start relies on the long cache TTL until either the cache expires or a new PB triggers a new freshness refresh. Acceptable. |
 | User configures `kovaaks_username = ""` mid-session | New PBs no-op the refresh path. Existing in-flight Timer chains finish under their original username — harmless. |
@@ -581,6 +860,17 @@ Unit tests for the freshness function in `api_service.py`, mocking
   raising `UnknownKovaaksUserError` stops the loop on the first attempt, emits a
   "username may be misconfigured" `dash_logger.error`, and schedules no further
   Timer.
+- **Transient resolver error retries (no notify, no write):** mock
+  `resolve_leaderboard_id` raising `requests.RequestException` on the first
+  attempt; assert it **schedules the next attempt**, emits **no** `dash_logger`
+  notification (it is not the broad guard, not terminal), and writes **nothing**
+  to the rank cache. On a later attempt where resolution succeeds and the score
+  is fresh, it saves normally. This is the branch v6 fixed but v5 left untested.
+- **Unresolved leaderboard is warning-only:** `resolve_leaderboard_id` returning
+  `None` stops the loop, schedules no further Timer, writes nothing, and emits a
+  `logger.warning` but **no `dash_logger` toast** — distinct from both the
+  transient-`RequestException` branch (which retries) and the
+  `UnknownKovaaksUserError` branch (which toasts).
 - **Broad guard:** an unexpected exception inside an attempt is caught, logged
   with a traceback, surfaces via `dash_logger.error`, and does not reschedule.
 - Exhausts all 5 attempts when API never catches up; previous rank cache file
@@ -593,16 +883,53 @@ Unit tests for the freshness function in `api_service.py`, mocking
 - Two concurrent loops for the same scenario at different expected scores both
   exit cleanly when the API catches up (no cache corruption, no exception, no
   regression of the higher score).
+- **Read-path suppression while a loop is active, both write sites (the v6/v7
+  fix):** with `_has_active_rank_loop(username, scenario)` true, assert
+  `get_scenario_rank_info` persists nothing — neither (a) the cache-miss/`force_refresh`
+  save (seed an empty cache, fetch a lagging value, assert no `save_scenario_rank`
+  and the cache file stays absent) nor (b) the cache-hit `scenario_name` backfill
+  (seed a fresh cached entry with `scenario_name=None`, assert the file `mtime`
+  does **not** advance). With no active loop, both paths persist as before.
+- **In-flight counter lifecycle:** `schedule_rank_freshness_refresh` marks the
+  scenario active; the counter returns to empty after a terminal exit (assert for
+  each of success, exhaustion, terminal error, and broad guard) and stays
+  non-zero across a reschedule. Two overlapping loops for one scenario drop the
+  count to zero only after **both** finish, so the read path stays suppressed
+  until the last one exits.
 
-Watchdog-level test: assert that
+Watchdog-level tests: assert that
 [`NewFileHandler.on_created`](../source/my_watchdog/file_watchdog.py) calls
 the new `schedule_rank_freshness_refresh` with `expected_score=run_data.score`
-on new-high-score paths, and not on non-PB paths.
+on new-high-score paths, and not on non-PB paths. **Plus a call-site-ordering
+test that fails against the current code:** with `schedule_rank_freshness_refresh`
+and `message_queue.append` both mocked, assert the refresh (active mark) is
+invoked **before** the append on every PB path — e.g. record call order on a
+shared mock and assert `schedule_rank_freshness_refresh` precedes `append`.
 
 Avoid live API tests in CI. The freshness gating, monotonic save, error
 classification, and Timer chaining are the new risk surface; the underlying HTTP
 call is already covered by
 [`test_api_service.py`](../tests/test_api_service.py).
+
+### Verifying the score-precision assumption (offline)
+
+The freshness test assumes the leaderboard `score` is directly comparable to the
+local CSV `score` within the `0.01` tolerance. This is not unit-tested (it is a
+property of KovaaK's data, not our code), but it can be checked offline against
+real cached data and **should be re-checked if KovaaK's ever changes score
+formatting**. Method: for each `RANKED` rank-cache entry
+(`cache/leaderboard/user_rank/<user>/<id>.json` → `score`), join it with the
+local high score for the same scenario (max `Score:` across that scenario's
+stats CSVs) and measure `local_high - board_score`.
+
+Observed result (445 ranked scenarios on the author's machine): 443 within
+`±0.01`; the board score is consistently the local score **truncated to 2 dp**
+(max shortfall `0.00999`, e.g. local `913.419861` → board `913.41`). The 2
+outliers had the local score genuinely ahead of the board by `+5.1` and `+180`
+— real leaderboard staleness, i.e. exactly the lag this proposal polls through,
+not a precision artifact. Conclusion: the tolerance is correctly sized to one
+truncation step and the assumption holds (see [Why the tolerance is
+one-sided](#why-the-tolerance-is-one-sided)).
 
 Manual end-to-end verification: copy a CSV file into the watched stats
 directory with the `Score:` field manually adjusted. Setting the score above
@@ -614,21 +941,35 @@ score (or until exhaustion).
 ## Implementation Steps
 
 1. Add to `source/kovaaks/api_service.py`: the module constants
-   (`ATTEMPT_DELAYS_SECONDS`, `SCORE_FRESHNESS_TOLERANCE`), the
-   `_rank_save_lock`, and the functions `schedule_rank_freshness_refresh`,
+   (`ATTEMPT_DELAYS_SECONDS`, `SCORE_FRESHNESS_TOLERANCE`), the locks
+   (`_rank_save_lock`, `_active_loops_lock`), the in-flight registry
+   (`_active_rank_loops` + `_mark_loop_active` / `_mark_loop_done` /
+   `_has_active_rank_loop`), and the functions `schedule_rank_freshness_refresh`,
    `_run_attempt`, `_schedule_attempt`, `_notify_exhaustion`, `_score_is_fresh`,
    `_save_rank_if_fresher`, and `_cached_rank_score`.
-2. Delete `refresh_scenario_rank` from `api_service.py`. Confirm it has no
-   remaining callers (its only caller was the watchdog, updated in step 3).
-3. Replace the body of `_refresh_rank_after_high_score` in `file_watchdog.py`
-   to call the new function with `run_data.score`. Update the three call sites
-   (new scenario, new sensitivity with new PB, existing scenario with new PB)
-   to thread `expected_score` through.
-4. Remove the now-unused `rank_refresh_executor` and `_handle_rank_refresh_result`
+2. Guard **both** read-path rank-cache writes in `get_scenario_rank_info` with
+   `if not _has_active_rank_loop(username, scenario_name):` — the
+   cache-miss/`force_refresh` save at
+   [`api_service.py:949`](../source/kovaaks/api_service.py:949) **and** the
+   cache-hit `scenario_name` backfill at
+   [`api_service.py:906`](../source/kovaaks/api_service.py:906). The fetched/cached
+   rank is still returned for display; only the persistence is skipped.
+3. Delete `refresh_scenario_rank` from `api_service.py`. Confirm it has no
+   remaining callers (its only caller was the watchdog, updated in step 4).
+4. In `file_watchdog.py`, rewrite `_refresh_rank_after_high_score` to take and
+   thread `expected_score` (= `run_data.score`) into `schedule_rank_freshness_refresh`,
+   and update the three PB call sites (new scenario; new sensitivity with new PB;
+   existing scenario with new PB). **Order matters:** call
+   `_refresh_rank_after_high_score(...)` *before* the `message_queue.append(...)`
+   for that run, so the loop is marked active before the run is UI-visible (see
+   [Call-site ordering](#call-site-ordering-mark-active-before-the-run-is-ui-visible)).
+5. Remove the now-unused `rank_refresh_executor` and `_handle_rank_refresh_result`
    from `file_watchdog.py`.
-5. Add unit tests for the freshness function, including the monotonic-save,
+6. Add unit tests for the freshness function, including the monotonic-save,
+   read-path-suppression (both write sites), in-flight-counter lifecycle,
+   call-site-ordering (active mark precedes the queue append),
    error-classification, and exhaustion-message cases above.
-6. Smoke-test by intentionally returning stale scores from a patched
+7. Smoke-test by intentionally returning stale scores from a patched
    `fetch_scenario_rank` to confirm retries fire on schedule and the cache
    stays untouched on exhaustion.
 
@@ -639,16 +980,35 @@ score (or until exhaustion).
   cache writes (write only on a fresh result that does not lower the cached
   score), which is the opposite of that function's unconditional write-through
   behavior.
+- **The read path is arbitrated against in-flight loops, not just other loops.**
+  The monotonic save only covers loop-versus-loop; the bigger hazard is the UI
+  read-through (`get_scenario_rank_info`) persisting a lagging fetch right after a
+  PB. A process-wide in-flight counter keyed by `(username, scenario_name)` lets
+  the read path skip its own save while a freshness loop owns the scenario, so
+  the loop's gated save is the sole writer during the window. This is the v6 fix
+  for a hole v5 left open; see [Read-path
+  arbitration](#read-path-arbitration-in-flight-loop-counter). Both read-path
+  writes (cache-miss save *and* cache-hit `scenario_name` backfill) are gated, so
+  no read-path write touches the rank cache while a loop is active (v7).
+- **The watchdog marks the loop active before the run is UI-visible (v7).** The
+  in-flight guard is only effective if `_mark_loop_active` runs before the new run
+  reaches the UI. Each PB call site therefore calls `_refresh_rank_after_high_score`
+  *before* `message_queue.append`, closing the race where the 1s interval callback
+  could fire the read path in the gap. See [Call-site
+  ordering](#call-site-ordering-mark-active-before-the-run-is-ui-visible).
 - **Concurrency is handled by a monotonic conditional save, not supersession.**
   `_save_rank_if_fresher` under a process-wide lock prevents a slower
   lower-score loop from clobbering a higher score, while keeping the
   "independent, uncoordinated loops" design. This is deliberately lighter than
   cancelling/superseding pending loops.
-- **Background errors never die silently.** Terminal errors
-  (`UnknownKovaaksUserError`, unresolved leaderboard) stop the loop and notify;
-  transient `RequestException` retries; everything else is caught by a broad
-  last-resort guard that logs and notifies. This restores the all-exceptions
-  safety the old executor callback provided.
+- **Background errors never die silently.** A terminal `UnknownKovaaksUserError`
+  stops the loop and notifies; transient `RequestException` (from resolve or
+  fetch) retries; everything else is caught by a broad last-resort guard that
+  logs and notifies. The one terminal case that is logged but **not** toasted is
+  an unresolved leaderboard (`resolve_leaderboard_id` → `None`): it is the normal
+  state for local/custom scenarios, so a toast would cry wolf (see [Error
+  Handling](#error-handling)). This restores the all-exceptions safety the old
+  executor callback provided without manufacturing false alarms.
 - **Timer trade-off acknowledged honestly.** A `threading.Timer` is a sleeping
   thread; the win is keeping the long poll off the bounded executor, at the cost
   of one daemon thread per pending attempt (bounded, acceptable).
@@ -665,25 +1025,37 @@ score (or until exhaustion).
 - No "rank is being checked" notification is emitted on attempt #0. The user
   already saw the PB toast. Only terminal/unexpected failure and
   after-exhaustion are surfaced via `dash_logger.error(...)`.
-- On exhaustion, a single total-play validation distinguishes genuine API lag
-  from a misconfigured username so the user-facing message is accurate. This is
-  one extra call on the failure path only.
+- On exhaustion, `_notify_exhaustion` **always** runs a single total-play
+  validation to distinguish genuine API lag from a misconfigured username, so
+  the user-facing message is accurate. This is one extra call on the failure
+  path only. We deliberately do *not* skip it when a RANKED result was seen
+  earlier (which would prove the username valid): tracking that would mean
+  threading mutable state through the fire-and-forget Timer chain, a permanent
+  complexity cost to save one call on a rare path. Simplicity wins here.
 - **Manual-refresh button: deferred.** Not built in this change. The 168h rank
   cache self-heals on the next view of a stale scenario (any cache miss/expiry
   triggers a fresh read-through via `get_scenario_rank_info`), and PBs already
   trigger the freshness loop. An on-demand "refresh now" button only buys
   immediacy for the niche case of wanting fresher-than-cached data without
-  having set a PB — not worth the UI surface yet. If added later, it should
-  call `get_scenario_rank_info(force_refresh=True)` directly; no new backend
-  function is needed.
+  having set a PB — not worth the UI surface yet. If added later it can reuse
+  `get_scenario_rank_info(force_refresh=True)` (no new backend function needed),
+  and the [read-path arbitration](#read-path-arbitration-in-flight-loop-counter)
+  already protects it: that force-refresh reaches the same guarded save at line
+  949, so it is suppressed while a freshness loop is in flight and cannot regress
+  a running loop's higher score.
 - **Rank cache TTL: unchanged at 168h.** Kept as-is for now. Revisit only if
   real staleness complaints surface. New PBs remain the primary refresh signal,
   and that path is exactly what this proposal makes reliable.
 
 ## What's Not Changing
 
-- `get_scenario_rank_info` (read path used by UI callbacks) is unchanged. The
-  UI continues to read whatever is in the rank cache.
+- `get_scenario_rank_info` keeps its read/display behavior. The *only* change is
+  that **both** of its rank-cache writes — the cache-miss/`force_refresh` save and
+  the cache-hit `scenario_name` backfill — now skip while a freshness loop is
+  active for that scenario
+  ([read-path arbitration](#read-path-arbitration-in-flight-loop-counter)). It
+  still returns the fetched/cached rank for display either way; only the
+  persistence is gated.
 - `save_scenario_rank` itself is unchanged; the freshness path wraps it with
   `_save_rank_if_fresher` rather than modifying its unconditional behavior,
   which the read-through path still relies on.
