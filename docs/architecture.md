@@ -30,8 +30,9 @@ KovaaK's writes a new "<scenario> ... .csv" into stats_dir
       |  (watchdog observer thread)
       v
 NewFileHandler  (my_watchdog/file_watchdog.py)
-  - extract_data_from_file -> load run into in-memory DBs (data_service.py)
-  - message_queue.append(NewFileMessage)
+  - extract_data_from_file       parse the CSV -> RunData, classify the score
+  - message_queue.append(...)    enqueue a NewFileMessage (UI notification)
+  - load_csv_file_into_database  load the run into the in-memory stores
   - if new high score and kovaaks_username is set:
         rank_refresh_executor.submit(refresh_scenario_rank)  -> updates rank cache
       |
@@ -42,8 +43,11 @@ home.py callbacks
   - get_scenario_rank   reads ScenarioRankInfo from api_service (cache-first)
 ```
 
-The `message_queue` `deque` is the only hand-off between the watchdog thread and
-the UI; the UI is otherwise pull-based via `dcc.Interval`.
+The watchdog and UI share two channels: `message_queue` (a `deque`) carries
+*notifications* that new data exists, while the run data itself is shared through
+the `data_service.py` module-global stores the UI reads directly. Note the order
+above — the message is appended *before* the run is loaded into the stores. The
+UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
 
 ## State
 
@@ -105,6 +109,13 @@ the UI; the UI is otherwise pull-based via `dcc.Interval`.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`).
 
+### Browser assets
+- `assets/dashAgGridFunctions.js` — repo-owned client-side AG Grid functions
+  (e.g. `nullsLastComparator` for NULLS-LAST sorting). The playlist overview grid
+  references these from its column defs and runs with `dangerously_allow_code=True`
+  in `playlist_scenarios.py`. Custom grid sort/format behavior belongs here — see
+  the decision log.
+
 ## Where to look first
 
 | To change... | Start in |
@@ -113,6 +124,6 @@ the UI; the UI is otherwise pull-based via `dcc.Interval`.
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Any plot/figure | `plot/plot_service.py` |
-| The playlist overview table | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py` |
+| The playlist overview table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Config / settings | `config/config_service.py` (+ `example.toml`) |
