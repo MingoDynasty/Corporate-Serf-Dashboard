@@ -42,11 +42,13 @@ that same registry; **no new global is needed.** The two call sites run in
 different JS contexts, which is the one thing to get right:
 
 - **Grid** (`valueFormatter` / `tooltipValueGetter`): dash-ag-grid evaluates
-  these with `dagfuncs` available as a bare name →
-  `dagfuncs.relativeTime(params.value, "Never")`.
+  these against a constructed scope that spreads the registry's *contents* in as
+  bare names (confirmed in the installed 35.2.0 bundle — there is **no** `dagfuncs`
+  object in that scope) → call `relativeTime(params.value, "Never")` directly.
 - **Home** (`clientside_callback`, a plain inline function in browser global
-  scope where `dagfuncs` is *not* a bare global) → call the full path
-  `window.dashAgGridFunctions.relativeTime(value, "N/A")`.
+  scope) → call the full path
+  `window.dashAgGridFunctions.relativeTime(value, "N/A")` (the registry functions
+  are not bare globals there).
 
 (The existing color-mode clientside callback in `app_shell.py:173` is also a
 plain inline string, so this matches the current style.)
@@ -185,12 +187,12 @@ ISO" is moot here — `last_played_sort` is already epoch seconds. The work is:
 
 1. **Cell text** — change the column's `valueFormatter` from
    `params.data.last_played_display` to
-   `dagfuncs.relativeTime(params.value, "Never")` (`params.value` is
+   `relativeTime(params.value, "Never")` (`params.value` is
    `last_played_sort`, in seconds). `relativeTime` returns the sentinel when the
    value is null, so `nullsLastComparator` sorting is unaffected (it sorts on the
    raw number, not the formatted text).
 2. **Tooltip** — add `tooltipValueGetter`:
-   `dagfuncs.absoluteTime(params.value, "Never")` (full timestamp). This replaces
+   `absoluteTime(params.value, "Never")` (full timestamp). This replaces
    the need for the `"YYYY-MM-DD"` `last_played_display` string entirely.
 3. **`last_played_display` — dropped (decided).** Remove it from the row dict and
    let `absoluteTime` format the tooltip, so both pages share one JS formatter
@@ -382,8 +384,8 @@ stay green.
 
 **Location 2 (playlists):**
 
-5. Column `valueFormatter` → `dagfuncs.relativeTime(params.value, "Never")`; add
-   `tooltipValueGetter` → `dagfuncs.absoluteTime(params.value, "Never")`.
+5. Column `valueFormatter` → `relativeTime(params.value, "Never")`; add
+   `tooltipValueGetter` → `absoluteTime(params.value, "Never")`.
 6. Drop `last_played_display` from `format_playlist_scenario_rank_row` and update
    the affected service tests. (No grid auto-refresh — that's Phase 2.)
 
@@ -420,8 +422,11 @@ No new Python dependency.
    gauge, not a reference date.
 8. **Accessibility:** tooltip-only (hover) access to the exact timestamp,
    consciously waived for this local single-user app.
-9. **Helper exposure:** single `dagfuncs` / `window.dashAgGridFunctions`
-   registry; grid uses the bare name, home uses the full `window.` path.
+9. **Helper exposure:** single `window.dashAgGridFunctions` registry (the
+   `assets/` file aliases it as `dagfuncs` only to *define* the functions). In
+   grid `{"function": ...}` strings, call the registry functions by **bare name**
+   (dash-ag-grid spreads the registry into the eval scope); the home
+   `clientside_callback` uses the full `window.dashAgGridFunctions.` path.
 10. **`now` injection:** `relativeTime`'s testability hook is `nowMs` (a
     millisecond number, default `Date.now()`); `Date` objects are derived
     internally. `absoluteTime` takes no `now`.
