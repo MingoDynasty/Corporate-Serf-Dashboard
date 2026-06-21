@@ -24,6 +24,7 @@ from source.kovaaks.api_models import (
     ScenarioSearchAPIResponse,
     UserScenarioTotalPlayAPIResponse,
 )
+from source.kovaaks.request_logging import request_exception_summary
 
 TIMEOUT = 10  # Default timeout for KovaaK's API requests.
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
@@ -110,27 +111,6 @@ def _session_get(url: str, **kwargs) -> requests.Response:
     return _get_thread_session().get(url, **kwargs)
 
 
-def _request_exception_summary(exc: requests.RequestException) -> str:
-    """Return a concise description for expected remote API failures."""
-    details = str(exc)
-    if details:
-        return details
-
-    response = getattr(exc, "response", None)
-    status_code = getattr(response, "status_code", None)
-    if status_code is None:
-        return exc.__class__.__name__
-
-    reason = getattr(response, "reason", "")
-    url = getattr(response, "url", "")
-    summary = f"HTTP {status_code}"
-    if reason:
-        summary = f"{summary} {reason}"
-    if url:
-        summary = f"{summary} for {url}"
-    return summary
-
-
 def _get_with_retry(url: str, **kwargs) -> requests.Response:
     """
     Make a KovaaK's GET request with one automatic retry for transient failures.
@@ -149,7 +129,7 @@ def _get_with_retry(url: str, **kwargs) -> requests.Response:
                 logger.warning(
                     "Transient KovaaK's GET failure at %s; retrying once: %s",
                     url,
-                    _request_exception_summary(exc),
+                    request_exception_summary(exc),
                 )
                 continue
             raise
@@ -487,7 +467,7 @@ def get_user_scenario_total_play(
             logger.warning(
                 "Using stale total-play cache for %s after failed request: %s",
                 username,
-                _request_exception_summary(exc),
+                request_exception_summary(exc),
             )
             cache_data = _read_json(cache_file)
             if isinstance(cache_data, dict):
@@ -593,7 +573,7 @@ def resolve_leaderboard_id(
             logger.warning(
                 "Failed to hydrate leaderboard metadata from total-play for %s: %s",
                 username,
-                _request_exception_summary(exc),
+                request_exception_summary(exc),
             )
         leaderboard_id = get_cached_leaderboard_id(scenario_name)
         if leaderboard_id is not None:
@@ -758,7 +738,7 @@ def _with_leaderboard_total(
         logger.warning(
             "Failed to fetch leaderboard total for %s: %s",
             rank_info.leaderboard_id,
-            _request_exception_summary(exc),
+            request_exception_summary(exc),
         )
         return rank_info
     except (ValidationError, OSError, ValueError):
@@ -909,7 +889,7 @@ def get_scenario_rank_info(
         logger.warning(
             "Failed to resolve leaderboard for %s: %s",
             scenario_name,
-            _request_exception_summary(exc),
+            request_exception_summary(exc),
         )
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -950,7 +930,7 @@ def get_scenario_rank_info(
         logger.warning(
             "Failed to fetch scenario rank for %s: %s",
             scenario_name,
-            _request_exception_summary(exc),
+            request_exception_summary(exc),
         )
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -975,7 +955,7 @@ def get_scenario_rank_info(
             logger.warning(
                 "Failed to validate KovaaK's username through total-play for %s: %s",
                 username,
-                _request_exception_summary(exc),
+                request_exception_summary(exc),
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)

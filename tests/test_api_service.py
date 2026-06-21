@@ -953,7 +953,11 @@ def test_get_scenario_rank_info_logs_total_request_failure_without_traceback(
             reason="Service Unavailable",
             url="https://kovaaks.com/webapp-backend/leaderboard/scores/global",
         )
-        raise api_service.requests.HTTPError(response=response)
+        raise api_service.requests.HTTPError(
+            "503 Server Error: Service Unavailable for url: "
+            "https://kovaaks.com/webapp-backend/leaderboard/scores/global",
+            response=response,
+        )
 
     monkeypatch.setattr(
         api_service,
@@ -983,7 +987,10 @@ def test_get_scenario_rank_info_logs_total_request_failure_without_traceback(
     assert rank_info.rank == 11266
     assert rank_info.total_players is None
     assert len(matching_records) == 1
-    assert "HTTP 503 Service Unavailable" in matching_records[0].getMessage()
+    assert (
+        "503 Server Error: Service Unavailable for url:"
+        in matching_records[0].getMessage()
+    )
     assert matching_records[0].exc_info is None
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
