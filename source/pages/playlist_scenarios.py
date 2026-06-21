@@ -3,7 +3,7 @@
 import dash
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, dcc, no_update
+from dash import Input, Output, State, callback, clientside_callback, dcc, no_update
 
 from source.kovaaks.data_service import get_playlist_by_code
 from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
@@ -140,6 +140,27 @@ def load_playlist_scenario_rows(playlist_code):
     return build_playlist_scenario_rank_rows(playlist_code), ""
 
 
+clientside_callback(
+    """
+    async (_nIntervals) => {
+        if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+            return window.dash_clientside.no_update;
+        }
+
+        try {
+            const gridApi = await window.dash_ag_grid.getApiAsync("playlist-scenarios-grid");
+            gridApi.refreshCells({force: true, columns: ["last_played_sort"]});
+        } catch (error) {
+            console.warn("Failed to refresh playlist scenario relative timestamps.", error);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("playlist-scenarios-relative-time-refresh", "data"),
+    Input("playlist-scenarios-relative-time-interval", "n_intervals"),
+)
+
+
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
     # Keep the raw route code for error handling, but only pass the selector a
     # value that exists in its options list.
@@ -154,6 +175,12 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
             # navigates and rebuilds the page, then this store triggers exactly
             # one load for the new playlist.
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
+            dcc.Store(id="playlist-scenarios-relative-time-refresh"),
+            dcc.Interval(
+                id="playlist-scenarios-relative-time-interval",
+                interval=30_000,
+                n_intervals=0,
+            ),
             dmc.Group(
                 children=[
                     playlist_selector(
