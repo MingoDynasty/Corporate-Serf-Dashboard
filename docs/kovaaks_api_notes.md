@@ -75,6 +75,7 @@ Failure handling:
 
 - Rank lookup failures should produce `ScenarioRankInfo(status=UNKNOWN, error_message=...)`.
 - Leaderboard total lookup is enrichment only. If total lookup fails, preserve the valid ranked/unranked result.
+- Expected HTTP/network request failures should be logged as concise operation failures without tracebacks. Keep tracebacks for local cache, schema, or other unexpected processing failures.
 
 ## `/user/scenario/total-play`
 

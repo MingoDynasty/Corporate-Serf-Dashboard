@@ -110,6 +110,27 @@ def _session_get(url: str, **kwargs) -> requests.Response:
     return _get_thread_session().get(url, **kwargs)
 
 
+def _request_exception_summary(exc: requests.RequestException) -> str:
+    """Return a concise description for expected remote API failures."""
+    details = str(exc)
+    if details:
+        return details
+
+    response = getattr(exc, "response", None)
+    status_code = getattr(response, "status_code", None)
+    if status_code is None:
+        return exc.__class__.__name__
+
+    reason = getattr(response, "reason", "")
+    url = getattr(response, "url", "")
+    summary = f"HTTP {status_code}"
+    if reason:
+        summary = f"{summary} {reason}"
+    if url:
+        summary = f"{summary} for {url}"
+    return summary
+
+
 def _get_with_retry(url: str, **kwargs) -> requests.Response:
     """
     Make a KovaaK's GET request with one automatic retry for transient failures.
@@ -123,12 +144,12 @@ def _get_with_retry(url: str, **kwargs) -> requests.Response:
     for attempt in range(2):
         try:
             response = _session_get(url, **kwargs)
-        except TRANSIENT_GET_EXCEPTIONS:
+        except TRANSIENT_GET_EXCEPTIONS as exc:
             if attempt == 0:
                 logger.warning(
-                    "Transient KovaaK's GET failure at %s; retrying once",
+                    "Transient KovaaK's GET failure at %s; retrying once: %s",
                     url,
-                    exc_info=True,
+                    _request_exception_summary(exc),
                 )
                 continue
             raise
@@ -459,11 +480,15 @@ def get_user_scenario_total_play(
                 break
             if len(response_data) < max_results and len(data) >= total:
                 break
-    except requests.RequestException:
+    except requests.RequestException as exc:
         # A network failure is not proof that the user has no plays. Reuse stale
         # metadata if we have it; otherwise let the caller decide how to degrade.
         if os.path.exists(cache_file):
-            logger.warning("Using stale total-play cache for %s", username)
+            logger.warning(
+                "Using stale total-play cache for %s after failed request: %s",
+                username,
+                _request_exception_summary(exc),
+            )
             cache_data = _read_json(cache_file)
             if isinstance(cache_data, dict):
                 return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
@@ -564,11 +589,11 @@ def resolve_leaderboard_id(
         # failure should not block exact search for the selected scenario.
         try:
             hydrate_leaderboard_id_cache(username, metadata_cache_ttl_hours)
-        except requests.RequestException:
+        except requests.RequestException as exc:
             logger.warning(
-                "Failed to hydrate leaderboard metadata from total-play for %s",
+                "Failed to hydrate leaderboard metadata from total-play for %s: %s",
                 username,
-                exc_info=True,
+                _request_exception_summary(exc),
             )
         leaderboard_id = get_cached_leaderboard_id(scenario_name)
         if leaderboard_id is not None:
@@ -729,9 +754,16 @@ def _with_leaderboard_total(
             rank_info.leaderboard_id,
             leaderboard_total_cache_ttl_hours,
         )
-    except (requests.RequestException, ValidationError, OSError, ValueError):
+    except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch leaderboard total for %s",
+            "Failed to fetch leaderboard total for %s: %s",
+            rank_info.leaderboard_id,
+            _request_exception_summary(exc),
+        )
+        return rank_info
+    except (ValidationError, OSError, ValueError):
+        logger.warning(
+            "Failed to process leaderboard total for %s",
             rank_info.leaderboard_id,
             exc_info=True,
         )
@@ -873,11 +905,11 @@ def get_scenario_rank_info(
             scenario_name=scenario_name,
             error_message=str(exc),
         )
-    except requests.RequestException:
+    except requests.RequestException as exc:
         logger.warning(
-            "Failed to resolve leaderboard for %s",
+            "Failed to resolve leaderboard for %s: %s",
             scenario_name,
-            exc_info=True,
+            _request_exception_summary(exc),
         )
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -914,11 +946,11 @@ def get_scenario_rank_info(
     # is not used here because it can lag behind the leaderboard endpoint.
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
-    except requests.RequestException:
+    except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch scenario rank for %s",
+            "Failed to fetch scenario rank for %s: %s",
             scenario_name,
-            exc_info=True,
+            _request_exception_summary(exc),
         )
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -939,11 +971,11 @@ def get_scenario_rank_info(
                 scenario_name=scenario_name,
                 error_message=str(exc),
             )
-        except requests.RequestException:
+        except requests.RequestException as exc:
             logger.warning(
-                "Failed to validate KovaaK's username through total-play for %s",
+                "Failed to validate KovaaK's username through total-play for %s: %s",
                 username,
-                exc_info=True,
+                _request_exception_summary(exc),
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
     save_scenario_rank(leaderboard_id, username, rank_info)
