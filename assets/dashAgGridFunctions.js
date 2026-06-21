@@ -24,8 +24,13 @@ dagfuncs.nullsLastComparator = function (
 };
 
 // Shared relative/absolute timestamp formatters. Pure (no DOM access) and used
-// from two contexts: the AG Grid colDefs (bare `dagfuncs` name) and the home
-// page clientside callback (full `window.dashAgGridFunctions` path).
+// from two contexts: AG Grid colDef `{"function": ...}` strings, where dash-ag-grid
+// spreads this registry's contents into scope as BARE names -- call
+// `relativeTime(...)` directly, NOT `dagfuncs.relativeTime(...)` (there is no
+// `dagfuncs` in that scope) -- and the home page clientside callback, which runs
+// in real browser global scope and uses the full `window.dashAgGridFunctions` path.
+// See docs/decision_log.md (2026-06-20: Reference dash-ag-grid Grid Functions By
+// Bare Name).
 //
 // `seconds` is epoch *seconds* (the grid already carries this; the home Store
 // emits it too); both guard null/empty -> the caller-supplied sentinel before
