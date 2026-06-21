@@ -15,8 +15,8 @@ There is no CI workflow — these local gates are the merge bar. Run all three
 before calling a change done or approving a PR.
 
 ## Layout
-- `source/app.py` — entry point; `source/pages/` — Dash pages;
-  `source/kovaaks/` — Kovaak's API client and data services
+- `source/` — application code. See `docs/architecture.md` for the module map
+  and runtime data flow (the "where does X live" index).
 - `tests/` — pytest suite
 - `resources/playlists/` — benchmark playlist JSON (files under `generated/`
   are machine-generated; don't hand-edit)
