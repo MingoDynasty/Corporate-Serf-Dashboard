@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import shutil
 import threading
@@ -22,10 +23,12 @@ TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
 
 class FakeResponse:
-    def __init__(self, data, status_code=200, headers=None):
+    def __init__(self, data, status_code=200, headers=None, reason="", url=""):
         self._data = data
         self.status_code = status_code
         self.headers = headers or {}
+        self.reason = reason
+        self.url = url
 
     def raise_for_status(self):
         if self.status_code >= 400:
@@ -923,6 +926,72 @@ def test_get_scenario_rank_info_keeps_rank_when_total_fetch_fails(monkeypatch):
     assert rank_info.total_players is None
     assert rank_info.percentile is None
     assert rank_info.error_message is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_logs_total_request_failure_without_traceback(
+    monkeypatch,
+    caplog,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+
+    def fake_fetch_scenario_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=11266,
+            leaderboard_id=98330,
+            matched_steam_id="right-steam-id",
+        )
+
+    def fail_get_leaderboard_total(*_args, **_kwargs):
+        response = FakeResponse(
+            {"error": "unavailable"},
+            status_code=503,
+            reason="Service Unavailable",
+            url="https://kovaaks.com/webapp-backend/leaderboard/scores/global",
+        )
+        raise api_service.requests.HTTPError(
+            "503 Server Error: Service Unavailable for url: "
+            "https://kovaaks.com/webapp-backend/leaderboard/scores/global",
+            response=response,
+        )
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fake_fetch_scenario_rank,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "get_leaderboard_total",
+        fail_get_leaderboard_total,
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        rank_info = api_service.get_scenario_rank_info(
+            "VT Pasu Intermediate S5",
+            "MingoDynasty",
+            steam_id="right-steam-id",
+        )
+
+    matching_records = [
+        record
+        for record in caplog.records
+        if "Failed to fetch leaderboard total" in record.getMessage()
+    ]
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 11266
+    assert rank_info.total_players is None
+    assert len(matching_records) == 1
+    assert (
+        "503 Server Error: Service Unavailable for url:"
+        in matching_records[0].getMessage()
+    )
+    assert matching_records[0].exc_info is None
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
