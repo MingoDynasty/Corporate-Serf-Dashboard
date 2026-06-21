@@ -1,24 +1,26 @@
-from datetime import datetime
 import json
 import logging
+from datetime import datetime
 
 import dash
+import dash_mantine_components as dmc
+import plotly.graph_objects as go
 from dash import (
     Input,
     Output,
     State,
     callback,
+    clientside_callback,
     dcc,
     no_update,
 )
 from dash_iconify import DashIconify
-import dash_mantine_components as dmc
-import plotly.graph_objects as go
 
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
+    get_high_score,
     get_playlists,
     get_rank_data_from_playlist,
     get_scenario_stats,
@@ -28,15 +30,14 @@ from source.kovaaks.data_service import (
     get_unique_scenarios,
     is_scenario_in_database,
     load_playlist_from_code,
-    get_high_score,
 )
 from source.my_queue.message_queue import message_queue
 from source.plot.plot_service import (
+    add_high_score_overlay,
+    add_score_threshold_overlay,
     apply_light_dark_mode,
     generate_sensitivity_plot,
     generate_time_plot,
-    add_high_score_overlay,
-    add_score_threshold_overlay,
 )
 from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
@@ -103,28 +104,47 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 
 @callback(
     Output("scenario_num_runs", "children"),
-    Output("scenario_datetime_last_played", "children"),
+    Output("last-played-ts", "data"),
     Output("last-played-tooltip", "label"),
     Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
 )
-def get_scenario_num_runs(_, selected_scenario) -> tuple[int, str, str]:
+def get_scenario_num_runs(_, selected_scenario) -> tuple[int, float | None, str]:
     """
     Updates the Scenario Stats on the UI.
+
+    The relative "Last played" string is rendered client-side from the raw epoch
+    written to the ``last-played-ts`` store; this callback owns the store and the
+    tooltip label, while a clientside callback owns the visible ``children``.
     :param _: trigger from the interval component. Its actual value is not used.
     :param selected_scenario: user-selected scenario name.
     :return: Scenario Stats data
     """
     if not selected_scenario or not is_scenario_in_database(selected_scenario):
-        return 0, "N/A", "N/A"
+        return 0, None, "N/A"
     scenario_stats = get_scenario_stats(selected_scenario)
 
-    days_ago = abs((scenario_stats.date_last_played - datetime.now()).days)
     return (
         scenario_stats.number_of_runs,
-        f"{days_ago} days ago",
+        scenario_stats.date_last_played.timestamp(),
         scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
     )
+
+
+# The visible "Last played" text is recomputed in the browser on each store
+# change and on every 30s interval tick, so the relative string stays current
+# without a reload. Home uses the full window.* path (dagfuncs is not a bare
+# global here) and the "N/A" sentinel.
+clientside_callback(
+    """
+    (seconds, _nIntervals) => {
+        return window.dashAgGridFunctions.relativeTime(seconds, "N/A");
+    }
+    """,
+    Output("scenario_datetime_last_played", "children"),
+    Input("last-played-ts", "data"),
+    Input("relative-time-interval", "n_intervals"),
+)
 
 
 @callback(
@@ -429,9 +449,20 @@ def layout(**kwargs):  # noqa: ARG001
         children=[
             dcc.Store(id="do_update"),  # used for Interval component
             dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
+            dcc.Store(
+                id="last-played-ts"
+            ),  # raw epoch for the relative "Last played" text
             dcc.Interval(
                 id="interval-component",
                 interval=config.polling_interval,
+                n_intervals=0,
+            ),
+            # Dedicated 30s tick for the relative "Last played" text, decoupled
+            # from polling_interval so display cadence is right-sized for minute
+            # granularity and never coupled to data-polling cadence.
+            dcc.Interval(
+                id="relative-time-interval",
+                interval=30_000,
                 n_intervals=0,
             ),
             dmc.Grid(
@@ -508,6 +539,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Text(
+                                                        "N/A",
                                                         id="scenario_datetime_last_played",
                                                         span=True,
                                                         size="sm",

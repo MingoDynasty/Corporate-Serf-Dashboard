@@ -1,10 +1,9 @@
 from datetime import datetime
 from types import SimpleNamespace
 
-from source.kovaaks import data_service
+from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, RunData, Scenario, ScenarioStats
-from source.kovaaks import playlist_scenarios_service
 from source.kovaaks.playlist_scenarios_service import (
     build_playlist_scenario_rank_rows,
     format_playlist_scenario_rank_row,
@@ -99,7 +98,6 @@ def test_format_playlist_scenario_rank_row_ranked():
         "total_sort": 63892,
         "percentile_display": "82.33%",
         "percentile_sort": 82.33,
-        "last_played_display": "2026-04-28",
         "last_played_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
         "runs_display": "1,234",
         "runs_sort": 1234,
@@ -126,7 +124,6 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["total_sort"] == 63892
     assert row["percentile_display"] == "N/A"
     assert row["percentile_sort"] is None
-    assert row["last_played_display"] == "N/A"
     assert row["last_played_sort"] is None
     assert row["runs_display"] == "0"
     assert row["runs_sort"] == 0
@@ -159,7 +156,6 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["total_sort"] is None
     assert row["percentile_display"] == "N/A"
     assert row["percentile_sort"] is None
-    assert row["last_played_display"] == "2026-05-01"
     assert row["runs_display"] == "3"
     assert row["runs_sort"] == 3
     assert row["high_score_display"] == "863.93"
@@ -304,13 +300,11 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[0]["rank_display"] == "10"
     assert rows[1]["rank_display"] == "N/A"
     assert rows[1]["status"] == "UNKNOWN"
-    assert rows[1]["last_played_display"] == "N/A"
     assert rows[1]["runs_display"] == "0"
     assert rows[1]["high_score_display"] == "N/A"
     assert rows[1]["pb_cm360_display"] == "N/A"
     assert rows[1]["pb_accuracy_display"] == "N/A"
     assert rows[2]["rank_display"] == "30"
-    assert rows[2]["last_played_display"] == "2026-04-03"
     assert rows[2]["runs_display"] == "30"
     assert rows[2]["high_score_display"] == "3,000.5"
     assert rows[2]["pb_cm360_display"] == "45"

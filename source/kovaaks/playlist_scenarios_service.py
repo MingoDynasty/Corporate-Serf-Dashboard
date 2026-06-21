@@ -1,16 +1,15 @@
 """Build playlist scenario table rows for the playlist overview page."""
 
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import RunData, ScenarioStats
 from source.kovaaks.data_service import (
-    get_playlist_by_code,
     get_personal_best_run,
+    get_playlist_by_code,
     get_scenario_stats,
     is_scenario_in_database,
 )
@@ -35,12 +34,6 @@ def _format_score(value: float | None) -> str:
     if value is None:
         return "N/A"
     return f"{value:,.2f}".rstrip("0").rstrip(".")
-
-
-def _format_last_played(value: datetime | None) -> str:
-    if value is None:
-        return "N/A"
-    return value.strftime("%Y-%m-%d")
 
 
 def _format_accuracy(value: float | None) -> str:
@@ -110,10 +103,9 @@ def format_playlist_scenario_rank_row(
         "total_sort": None,
         "percentile_display": "N/A",
         "percentile_sort": None,
-        "last_played_display": _format_last_played(date_last_played),
-        "last_played_sort": date_last_played.timestamp()
-        if date_last_played is not None
-        else None,
+        "last_played_sort": (
+            date_last_played.timestamp() if date_last_played is not None else None
+        ),
         "runs_display": _format_int(number_of_runs),
         "runs_sort": number_of_runs,
         "high_score_display": _format_score(high_score),
