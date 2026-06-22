@@ -104,6 +104,17 @@ def test_playlist_scenarios_grid_uses_content_auto_size():
     assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
 
 
+def test_playlist_scenarios_layout_includes_relative_time_refresh_interval():
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    children_by_id = {getattr(child, "id", None): child for child in page.children}
+
+    interval = children_by_id["playlist-scenarios-relative-time-interval"]
+
+    assert "playlist-scenarios-relative-time-refresh" in children_by_id
+    assert interval.interval == 30_000
+    assert interval.n_intervals == 0
+
+
 def test_playlist_scenarios_scenario_column_fills_remaining_width():
     column = next(
         column
