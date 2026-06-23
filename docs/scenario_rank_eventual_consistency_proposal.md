@@ -19,8 +19,10 @@ exactly once, so a single unlucky timing can cache stale or `UNRANKED` data
 until the long `scenario_rank_cache_ttl_hours` (default 168h) expires.
 
 The fix is to convert that single-shot refresh into a **bounded score-aware
-poll**: keep refreshing until the returned leaderboard `score` is at least the
-local high score, with a hard ceiling on attempts. Cache writes are gated on
+poll**: keep refreshing until the returned leaderboard `score` reaches the local
+high score's 2-dp leaderboard value (KovaaK's truncates board scores to 2 dp, so
+that floored value — not the full-precision local score — is the reachable target),
+with a hard ceiling on attempts. Cache writes are gated on
 freshness *and* guarded against regression, and the background scheduler never
 lets an error die silently.
 
@@ -379,14 +381,16 @@ def _is_forward(existing: ScenarioRankInfo, candidate: ScenarioRankInfo) -> bool
     if candidate_ranked and not existing_ranked:
         return True   # a real rank supersedes a cached UNRANKED
     if existing_ranked and candidate_ranked:
-        if existing.score is not None and candidate.score is not None:
-            # Both are BOARD scores (already 2-dp-truncated by KovaaK's), so there
-            # is no truncation gap to absorb here: require strict non-decrease. Equal
-            # is allowed (idempotent re-confirm / scenario_name backfill); SCORE_EPSILON
-            # is float-noise slack only — NOT the one-cent SCORE_FRESHNESS_TOLERANCE,
-            # which would let a stale 99.99 overwrite a cached 100.00 (v17 fix, P1).
-            return candidate.score >= existing.score - SCORE_EPSILON
-        return True
+        if existing.score is None:
+            return True   # nothing scored to protect; take the candidate
+        if candidate.score is None:
+            return False  # never drop a known score to a scoreless RANKED
+        # Both are BOARD scores (already 2-dp-truncated by KovaaK's), so there
+        # is no truncation gap to absorb here: require strict non-decrease. Equal
+        # is allowed (idempotent re-confirm / scenario_name backfill); SCORE_EPSILON
+        # is float-noise slack only — NOT the one-cent SCORE_FRESHNESS_TOLERANCE,
+        # which would let a stale 99.99 overwrite a cached 100.00 (v17 fix, P1).
+        return candidate.score >= existing.score - SCORE_EPSILON
     return True  # both non-RANKED: nothing to protect
 ```
 
@@ -406,6 +410,13 @@ Rule rationale:
   noise — *not* a one-cent tolerance, since both scores are already-truncated board
   values) — this is the loop-vs-loop *and* read-vs-loop regression guard, in one
   comparison.
+- **A scoreless RANKED candidate is rejected when the existing entry has a score.**
+  `ScenarioRankInfo.score` is optional, so a RANKED entry *can* carry `score=None`.
+  No current writer produces that shape against a scored entry (`fetch_scenario_rank`
+  always sets a score on RANKED, and the `scenario_name` backfill re-saves the same
+  entry), but the model permits it, so the central monotonic-write invariant handles
+  it explicitly rather than trusting every present and future caller. (Symmetric case:
+  a scored candidate over a scoreless existing entry is a forward move and is written.)
 - **Equal or higher is written**, refreshing `mtime`. Equal writes are how the
   cache-hit `scenario_name` backfill persists (same score, now carrying the name)
   and how a successful loop re-confirms freshness.
@@ -1032,6 +1043,11 @@ table-driven over candidate-vs-existing:
   (v17 P1 guard):** the sub-cent regression the old `existing - 0.01` tolerance let
   through. Assert the cache still reads `100.00` and its `mtime` did not advance;
 - existing RANKED, candidate UNRANKED → rejected (never regress a known rank);
+- existing RANKED **with a score**, candidate RANKED **scoreless** (`score=None`) →
+  rejected (never drop a known score; assert the cache keeps the scored entry and its
+  `mtime` did not advance);
+- existing RANKED **scoreless**, candidate RANKED **with a score** → writes (forward
+  move; the candidate is strictly more informative);
 - existing UNRANKED, candidate RANKED → writes;
 - equal score (within `SCORE_EPSILON`) → writes (idempotent; e.g. `scenario_name`
   backfill persists and refreshes `mtime`).
