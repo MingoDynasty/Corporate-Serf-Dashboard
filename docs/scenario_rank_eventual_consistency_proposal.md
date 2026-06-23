@@ -1313,7 +1313,9 @@ reviewability and de-risking, not a correctness requirement.
   re-narrowed v13).** The rank widget re-reads the cache on the existing
   `dcc.Interval`, reflecting the loop's write within ~1s without waiting for another
   run. The interval-triggered read is **cache-only** via `allow_network=False` plus
-  a `ctx.triggered_id` branch. v12 tried to drop both, reasoning that removing lazy
+  a `ctx.triggered` sole-interval check (the `any()` form — *not* `ctx.triggered_id`,
+  which would drop the initial-`.`-sentinel and co-fire cases; see the UI snippet).
+  v12 tried to drop both, reasoning that removing lazy
   staleness removed all reason to fetch on a tick — but resolution of *unresolved*
   scenarios is a second, independent reason: without the flag, sitting on a custom
   scenario fires `search_scenario_exact` (a `/scenario/popular` GET) every second
