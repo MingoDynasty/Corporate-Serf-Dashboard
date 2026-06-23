@@ -5,7 +5,7 @@ Pydantic models for Kovaak's API responses.
 import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class Scenario(BaseModel):
@@ -37,6 +37,13 @@ class PlaylistAPIResponse(BaseModel):
     max: int
     total: int
     data: list[Playlist]
+
+    @field_validator("data", mode="before")
+    @classmethod
+    def ignore_null_playlist_items(cls, value):
+        if isinstance(value, list):
+            return [item for item in value if item is not None]
+        return value
 
 
 class BenchmarkScenario(BaseModel):

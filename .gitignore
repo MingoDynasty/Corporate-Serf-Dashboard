@@ -510,5 +510,6 @@ __marimo__/
 
 config.toml
 cache/
+data/
 ignore/
 .claude/

@@ -13,6 +13,7 @@ from source.kovaaks.data_service import (
     get_scenario_stats,
     is_scenario_in_database,
 )
+from source.utilities.stopwatch import Stopwatch
 
 PLAYLIST_RANK_MAX_WORKERS = 4
 logger = logging.getLogger(__name__)
@@ -175,6 +176,9 @@ def build_playlist_scenario_rank_rows(
         None for _ in playlist.scenarios
     ]
 
+    # TODO: Back Stopwatch with time.perf_counter() so elapsed timings are monotonic.
+    stopwatch = Stopwatch()
+    stopwatch.start()
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(
@@ -197,4 +201,11 @@ def build_playlist_scenario_rank_rows(
                 _get_personal_best_run(scenario_name),
             )
 
+    stopwatch.stop()
+    logger.info(
+        "Loaded playlist scenario rows for %s (%d scenarios) in %.2f seconds",
+        playlist.name,
+        len(playlist.scenarios),
+        stopwatch.elapsed(),
+    )
     return [row for row in rows if row is not None]
