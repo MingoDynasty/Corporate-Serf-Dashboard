@@ -2,8 +2,10 @@
 Entrypoint to the Corporate Serf Dashboard app.
 """
 
-import logging.config
+import logging
 import sys
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 from dash_extensions.enrich import DashProxy
 from waitress import serve
@@ -15,11 +17,43 @@ from source.kovaaks.data_service import initialize_kovaaks_data
 from source.my_watchdog.file_watchdog import NewFileHandler
 
 # Logging setup
-logging.basicConfig(
-    stream=sys.stdout,
-    level=logging.DEBUG,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-)
+LOG_DIR = Path("data") / "logs"
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+LOG_MAX_BYTES = 5 * 1024 * 1024
+LOG_BACKUP_COUNT = 3
+
+
+def make_file_handler(filename: str, level: int) -> RotatingFileHandler:
+    handler = RotatingFileHandler(
+        LOG_DIR / filename,
+        maxBytes=LOG_MAX_BYTES,
+        backupCount=LOG_BACKUP_COUNT,
+        encoding="utf-8",
+        delay=True,
+    )
+    handler.setLevel(level)
+    return handler
+
+
+def configure_logging() -> None:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.DEBUG)
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format=LOG_FORMAT,
+        handlers=[
+            console_handler,
+            make_file_handler("debug.log", logging.DEBUG),
+            make_file_handler("info.log", logging.INFO),
+        ],
+        force=True,
+    )
+
+
+configure_logging()
+
 logger = logging.getLogger(__name__)
 
 APP_NAME = "Corporate Serf Dashboard v1.0.0"  # TODO: is this used elsewhere in the app?

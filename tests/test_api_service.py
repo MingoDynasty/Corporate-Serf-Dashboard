@@ -13,6 +13,7 @@ import pytest
 
 from source.kovaaks.api_models import (
     LeaderboardAPIResponse,
+    PlaylistAPIResponse,
     RankingPlayer,
     ScenarioRankInfo,
     ScenarioRankStatus,
@@ -37,6 +38,46 @@ class FakeResponse:
 
     def json(self):
         return self._data
+
+
+def test_playlist_api_response_ignores_null_playlist_items():
+    response = PlaylistAPIResponse.model_validate(
+        {
+            "page": 0,
+            "max": 20,
+            "total": 2,
+            "data": [
+                None,
+                {
+                    "playlistName": "Voltaic Benchmarks",
+                    "subscribers": 100,
+                    "scenarioList": [
+                        {
+                            "author": "KovaaKs",
+                            "aimType": "Clicking",
+                            "playCount": 1234,
+                            "scenarioName": "VT Pasu Intermediate S5",
+                            "webappUsername": "creator",
+                            "steamAccountName": "creator",
+                        },
+                    ],
+                    "playlistCode": "KovaaKsTestCode",
+                    "playlistId": 1,
+                    "published": "2026-06-22T12:00:00Z",
+                    "steamId": 123,
+                    "steamAccountName": "creator",
+                    "webappUsername": "creator",
+                    "description": "Test playlist",
+                    "aimType": "Clicking",
+                    "playlistDuration": 60,
+                },
+            ],
+        },
+    )
+
+    assert len(response.data) == 1
+    assert response.data[0].playlistName == "Voltaic Benchmarks"
+    assert response.data[0].scenarioList[0].scenarioName == "VT Pasu Intermediate S5"
 
 
 def test_get_with_retry_reuses_session_within_thread(monkeypatch):
