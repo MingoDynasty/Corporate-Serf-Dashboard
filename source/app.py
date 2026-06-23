@@ -24,6 +24,7 @@ LOG_BACKUP_COUNT = 3
 
 
 def make_file_handler(filename: str, level: int) -> RotatingFileHandler:
+    """Create a rotating file handler for one app log file."""
     handler = RotatingFileHandler(
         LOG_DIR / filename,
         maxBytes=LOG_MAX_BYTES,
@@ -36,6 +37,7 @@ def make_file_handler(filename: str, level: int) -> RotatingFileHandler:
 
 
 def configure_logging() -> None:
+    """Configure stdout and rotating file logging for the app process."""
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.DEBUG)
