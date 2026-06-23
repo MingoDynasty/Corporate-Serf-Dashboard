@@ -1,133 +1,13 @@
-# Scenario Rank Eventual Consistency Proposal (v17)
+# Scenario Rank Eventual Consistency Proposal
 
-> **v17 reopens the design — the v12 freeze ends here.** Codex's v16 review found
-> two real correctness bugs (P1) in the score-comparison math, plus two doc-accuracy
-> slips (P3). The fixes change the freshness/monotonic logic, so this is a design
-> change, not just wording.
->
-> 1. **Freshness accepted a stale cent-below score (P1).** `_score_is_fresh` used
->    `board >= expected_score - 0.01`. Subtracting a one-cent
->    `SCORE_FRESHNESS_TOLERANCE` is too lenient by up to a full cent: when `expected`
->    lands exactly on a 2-dp boundary (e.g. a scenario scoring `100.00` flat), it
->    accepts a stale `99.99`, so the loop stops early and caches a stale rank. **Fix:**
->    compare against the 2-dp **floor** of the local score —
->    `board >= _floor_2dp(expected) - SCORE_EPSILON` — modeling KovaaK's truncation
->    where it happens instead of approximating it with a blanket subtraction.
-> 2. **The monotonic guard reused that one-cent tolerance (P1).** `_is_forward` did
->    `candidate >= existing - 0.01`, so a cached `100.00` could be regressed by a
->    later stale `99.99` — a one-cent hole in the central "never regress" invariant.
->    Both operands are already-truncated board values, so **fix:** require strict
->    non-decrease (`candidate >= existing - SCORE_EPSILON`, float-noise slack only).
-> 3. **(P3)** Removed "re-selects the scenario" from the residual heal list — a
->    re-selection is a cache hit and does **not** re-fetch (matches the failure
->    table and the read path).
-> 4. **(P3)** Reworded the leaderboard-total failure note: today's rank save already
->    survives a total-fetch failure (rank is saved before total enrichment), so the
->    forced refresh adds *percentile accuracy*, not rank persistence.
->
-> Root cause of the two P1s: `SCORE_FRESHNESS_TOLERANCE` (a *local-vs-board
-> truncation* constant) was applied to two comparisons that are not local-vs-board.
-> v17 retires it, introduces `SCORE_EPSILON` (float noise) + `_floor_2dp` (Decimal
-> truncation), and keeps each where it belongs. New sub-cent tests guard both.
->
-> ---
->
-> **v16 added a rollout plan; no design or code change from v15.** The
-> implementation now ships as **three sequential PRs** instead of one — see
-> [Rollout / PR Staging](#rollout--pr-staging). The split de-risks each landing,
-> keeps diffs reviewable (local gates are the merge bar; no CI), and isolates the
-> backend-concurrency surface from the Dash UI wiring. It is cheap because every
-> intermediate state is shippable with no regression. The same 10 implementation
-> steps are unchanged — the rollout section just groups them: PR 1 = monotonic
-> write (foundation), PR 2 = freshness loop, PR 3 = cache-only interval poll +
-> manual refresh.
->
-> ---
->
-> **v15 was test-wording only** (one P3 fix from Codex's v14 review); no design
-> change from v14.
->
-> - **Corrected the "interval does not re-toast" test.** It said to "seed a cached
->   rank carrying a Steam-ID-mismatch `warning_message`," but `warning_message` is
->   `Field(..., exclude=True)` ([api_models.py:190](../source/kovaaks/api_models.py:190))
->   and is never serialized — it is *derived at read time* by
->   `_with_derived_rank_warning` from the persisted `matched_steam_id` plus the
->   configured Steam ID. v15 rewords the test to seed a mismatched
->   `matched_steam_id` and assert interval-triggered reads do not call
->   `dash_logger.warning` while selection-triggered reads do.
->
-> (Dependency note from the same review round: confirmed `dcc.Loading.delay_show`
-> /`delay_hide` are present on the pinned **Dash 4.1.0**, so the v14 spinner fix
-> works as-is; a 4.1.0 → 4.3.0 upgrade is neutral for this proposal — no change
-> needed either way.)
->
-> ---
->
-> **v14 was doc-accuracy only** (two P2 fixes from Codex's v13 review); no design
-> change from v13.
->
-> 1. **Removed a stale "delete `allow_network`" sentence.** The manual-refresh
->    section still claimed the design "lets us delete the entire `allow_network` /
->    cache-only-branch machinery" — a leftover from v12 that contradicted v13's own
->    API Shape and Implementation Steps. Rescoped to: lazy-staleness /
->    `local_high_score` fetching is deleted; the narrowed `allow_network=False`
->    interval read remains.
-> 2. **Softened the `dcc.Loading` "no spinner" claim.** `dcc.Loading` keys off
->    whether a wrapped output's callback is *in flight*, not off network I/O — so
->    once the 1s interval is an input to `get_scenario_rank`, a cache-only tick can
->    still flicker the spinner every second. v14 specifies the actual mitigation
->    (`delay_show` on the rank `dcc.Loading`), adds a spinner-flicker QA check, and
->    notes an optional `no_update` short-circuit. Claim reworded from "no spinner"
->    to "spinner suppressed on fast cache-only ticks via `delay_show`."
->
-> ---
->
-> **v13 fixed two gaps in v12's UI wiring** (caught in review by Claude and
-> Codex), both at the read/poll boundary — the backend design from v12 is
-> unchanged.
->
-> 1. **The interval poll is *not* zero-network for unresolved scenarios.** v12
->    claimed deleting `allow_network` was safe because "a plain interval read
->    serves from cache." That is false for any scenario without a KovaaK's
->    leaderboard (every custom scenario): `get_scenario_rank_info` must resolve
->    the leaderboard id *before* it can read the rank cache, and an unresolved
->    scenario has **no cached mapping and no negative cache**, so resolution falls
->    through to `search_scenario_exact` — a network call — on *every* read. With
->    the interval added as a direct input and `polling_interval = 1000`, selecting
->    a custom scenario would fire one `/scenario/popular` GET **every second**.
->    v13 **reinstates a narrowed cache-only interval read** (`allow_network=False`
->    + a `ctx.triggered_id` branch). This is *not* a full revert: the reason it is
->    needed is leaderboard *resolution* of unranked scenarios, a cause independent
->    of the lazy-staleness fetching v10/v11 used it for. Lazy staleness stays gone.
-> 2. **The manual refresh button silently dropped warnings/errors.** v12's
->    `refresh_rank` snippet returned only formatted rank text, so a forced-lookup
->    failure (bad username, fetch error) became a bare "N/A" with no toast. v13
->    routes both the manual refresh and the non-interval read through a shared
->    `_emit_rank_messages` helper, and pins down the emission policy: **emit on
->    user/data events (selection, `do_update`, manual refresh); stay silent on
->    interval ticks** (which is how "fire on change, not every tick" is realized —
->    a cache-only tick produces no new condition worth re-toasting per second).
->
-> What v13 keeps from v12: the manual refresh button replacing the lazy staleness
-> check, the centralized monotonic write, and the bounded score-aware poll.
->
-> v12 **removed the lazy staleness check** (and the auto-re-fetch it drove) and
-> replaced it with a **manual refresh button**. Why: a locally-generated high
-> score may *never* reach KovaaK's — the user played offline, or the server was
-> down at PB time — so `cached < local_high` stays true forever and the lazy check
-> would re-fetch on every view, hammering the API for scenarios where re-fetching
-> can never help. A user-clicked refresh limits API calls to when the user
-> actually wants fresh data. Dropping lazy staleness removed it as a *reason for
-> the interval poll to fetch* — but, as the v13 fix above notes, it was not the
-> *only* reason, so the cache-only read is narrowed rather than deleted.
->
-> (v9 was the big simplification — centralized monotonic write replacing the
-> in-flight loop counter, the `(2,4,8,16,32)` schedule, interval polling. v10/v11
-> built the lazy-staleness + `allow_network` design; v12 retired lazy staleness;
-> v13 keeps a narrowed `allow_network` for resolution avoidance; v14 is doc-accuracy
-> only; v15 is test-wording only; v16 adds the three-PR rollout plan; v17 fixes two
-> P1 score-comparison bugs (floor the local score; strict monotonic non-decrease).
-> Full deltas in git.)
+> **Status:** in review. The latest substantive change fixes two P1 score-comparison
+> bugs found in the prior draft: freshness now floors the local score to the board's
+> 2-dp resolution (`board >= _floor_2dp(expected) - SCORE_EPSILON`) instead of
+> subtracting a one-cent tolerance, and the monotonic cache write requires a strict
+> non-decrease between two already-truncated board scores (`candidate >= existing -
+> SCORE_EPSILON`). The retired `SCORE_FRESHNESS_TOLERANCE` (0.01) had been doing both
+> jobs and was wrong for each. Earlier revision history (the v5-v17 drafts and their
+> rationale) lives in git log.
 
 ## Summary
 
@@ -150,15 +30,15 @@ Refresh on high score today:
 
 1. [`NewFileHandler.on_created`](../source/my_watchdog/file_watchdog.py) sees a
    CSV file, detects a new high score.
-2. [`_refresh_rank_after_high_score`](../source/my_watchdog/file_watchdog.py:39)
+2. [`_refresh_rank_after_high_score`](../source/my_watchdog/file_watchdog.py)
    submits `refresh_scenario_rank` to a shared `ThreadPoolExecutor(max_workers=2)`.
-3. [`refresh_scenario_rank`](../source/kovaaks/api_service.py:957) calls
-   [`get_scenario_rank_info`](../source/kovaaks/api_service.py:834) with
+3. [`refresh_scenario_rank`](../source/kovaaks/api_service.py) calls
+   [`get_scenario_rank_info`](../source/kovaaks/api_service.py) with
    `force_refresh=True`.
 4. `get_scenario_rank_info` calls
-   [`fetch_scenario_rank`](../source/kovaaks/api_service.py:800), then
+   [`fetch_scenario_rank`](../source/kovaaks/api_service.py), then
    unconditionally calls
-   [`save_scenario_rank`](../source/kovaaks/api_service.py:611) (line 949) and
+   [`save_scenario_rank`](../source/kovaaks/api_service.py) and
    `save_leaderboard_total`.
 
 Steps 3 and 4 are the problem. They run exactly once, and step 4 has no concept
@@ -195,10 +75,10 @@ Why score-based, not rank-based:
 - The user's rank can stay the same after a PB if the score doesn't pass
   another player. Rank-equality is therefore not a freshness signal.
 - `RankingPlayer.score` from
-  [`/leaderboard/scores/global`](../source/kovaaks/api_service.py:179) is
+  [`/leaderboard/scores/global`](../source/kovaaks/api_service.py) is
   exactly what `fetch_scenario_rank` already captures into
   `ScenarioRankInfo.score`
-  ([`api_service.py:828`](../source/kovaaks/api_service.py:828)).
+  ([`api_service.py`](../source/kovaaks/api_service.py)).
   No new endpoint or model work needed.
 
 ### Why we floor the local score (instead of subtracting a tolerance)
@@ -240,7 +120,7 @@ stays open:
 
 - KovaaK's stores a player's *personal best* on a leaderboard, and
   `fetch_scenario_rank` filters to the exact matched player by Steam ID /
-  username ([`api_service.py:816`](../source/kovaaks/api_service.py:816)). So
+  username ([`api_service.py`](../source/kovaaks/api_service.py)). So
   `rank_info.score` is definitively the user's own high-water mark — never
   another player's.
 - A higher server score therefore means the user has a better score on
@@ -286,7 +166,7 @@ We accept that rather than auto-rechecking, which would hammer the API for score
 that never reach KovaaK's at all (offline play / server down) — see that section.
 
 Each attempt makes one `fetch_scenario_rank` call. The inner
-[`_get_with_retry`](../source/kovaaks/api_service.py:113) already handles 429s
+[`_get_with_retry`](../source/kovaaks/api_service.py) already handles 429s
 and transient network errors with a single retry, so the outer loop never has
 to think about HTTP-level politeness — the two concerns are deliberately
 layered.
@@ -331,7 +211,7 @@ files, the same HTTP client, and the same `resolve_leaderboard_id` mapping. A
 separate module would only add an import boundary without isolating anything.
 
 The reason it is a *separate function* rather than a flag on
-[`get_scenario_rank_info`](../source/kovaaks/api_service.py:834) is **polling
+[`get_scenario_rank_info`](../source/kovaaks/api_service.py) is **polling
 behavior**, not cache-write semantics:
 
 - `get_scenario_rank_info` is a synchronous, single "give me current truth"
@@ -356,7 +236,7 @@ So the new function composes the existing low-level pieces directly, bypassing
 - `resolve_leaderboard_id` (scenario → leaderboardId)
 
 The existing thin wrapper
-[`refresh_scenario_rank`](../source/kovaaks/api_service.py:957) (which is just
+[`refresh_scenario_rank`](../source/kovaaks/api_service.py) (which is just
 `get_scenario_rank_info(force_refresh=True, rank_cache_ttl_hours=0)`) is
 **deleted** as part of this change — see [Removing
 `refresh_scenario_rank`](#removing-refresh_scenario_rank) below.
@@ -603,7 +483,7 @@ def refresh_rank(_, selected_scenario):
 ```
 
 `_emit_rank_messages` is the shared helper extracted from today's inline block in
-`get_scenario_rank` ([home.py:172-177](../source/pages/home.py:172)):
+`get_scenario_rank` ([home.py](../source/pages/home.py)):
 
 ```python
 def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
@@ -631,7 +511,7 @@ narrowed `allow_network=False` interval path remains, see [UI Behavior](#ui-beha
 On every successful freshness save, also force a fresh fetch of the
 leaderboard total — bypassing its normal `leaderboard_total_cache_ttl_hours`
 TTL — and overwrite
-[`leaderboard/totals/{leaderboard_id}.json`](../source/kovaaks/api_service.py:625).
+[`leaderboard/totals/{leaderboard_id}.json`](../source/kovaaks/api_service.py).
 
 Why force a refresh even though the total moves slowly:
 
@@ -648,10 +528,10 @@ Why force a refresh even though the total moves slowly:
   accuracy.
 
 Implementation: pass `leaderboard_total_cache_ttl_hours=0` to
-[`_with_leaderboard_total`](../source/kovaaks/api_service.py:711) inside the
+[`_with_leaderboard_total`](../source/kovaaks/api_service.py) inside the
 freshness path. That bypasses the cache freshness check and triggers
-[`fetch_leaderboard_total`](../source/kovaaks/api_service.py:660) +
-[`save_leaderboard_total`](../source/kovaaks/api_service.py:648).
+[`fetch_leaderboard_total`](../source/kovaaks/api_service.py) +
+[`save_leaderboard_total`](../source/kovaaks/api_service.py).
 
 The freshness function does not expose the total TTL as a parameter — it always
 forces a refresh on a successful save. Callers (e.g. the watchdog) don't need to
@@ -661,7 +541,7 @@ If the total fetch itself fails (transient API failure), the rank save still
 succeeds. The user sees the new rank without an updated total/percentile until
 the next normal lookup refreshes the total. This matches today's degradation, which
 is correct: `get_scenario_rank_info` already saves the rank *before* total
-enrichment ([api_service.py:961](../source/kovaaks/api_service.py:961)) and
+enrichment ([api_service.py](../source/kovaaks/api_service.py)) and
 `_with_leaderboard_total` degrades on a request failure without raising, so the rank
 persists regardless of the total. The value the forced refresh adds is *percentile
 accuracy* (pinning the total to KovaaK's truth on a PB), not rank persistence —
@@ -670,7 +550,7 @@ which was never at risk.
 ## Error Handling
 
 The background loop must never let an error vanish. Today's executor path wraps
-every refresh in [`_handle_rank_refresh_result`](../source/my_watchdog/file_watchdog.py:31),
+every refresh in [`_handle_rank_refresh_result`](../source/my_watchdog/file_watchdog.py),
 which catches **any** `Exception` from the background work and surfaces it via
 `dash_logger.error`. Moving scheduling to Timers must preserve that safety net,
 because an exception raised inside a Timer's target dies in that Timer thread
@@ -689,9 +569,9 @@ Two distinct error classes, handled differently:
   terminal (the scenario genuinely has no leaderboard — see below).
 - **Terminal (stop + notify):** anything that will fail identically on retry —
   most notably `UnknownKovaaksUserError` from
-  [`resolve_leaderboard_id`](../source/kovaaks/api_service.py:540) (it can
+  [`resolve_leaderboard_id`](../source/kovaaks/api_service.py) (it can
   propagate from the total-play hydration path; `get_scenario_rank_info` already
-  wraps it at [`api_service.py:870`](../source/kovaaks/api_service.py:870)), and
+  wraps it at [`api_service.py`](../source/kovaaks/api_service.py)), and
   any unexpected exception. These stop the loop and emit `dash_logger.error`.
   Retrying a bad username five times would just delay the same failure.
 
@@ -754,7 +634,7 @@ scenarios). Two call sites change:
   miss — it skips both the total-play hydration fetch and `search_scenario_exact`.
 - `get_scenario_rank_info`, when `allow_network=False`, threads it into
   `resolve_leaderboard_id`, then takes the existing cached-rank branch
-  ([api_service.py:907](../source/kovaaks/api_service.py:907)) but **does not fall
+  ([api_service.py](../source/kovaaks/api_service.py)) but **does not fall
   through to `fetch_scenario_rank` on a miss** — it returns the UNKNOWN/N/A state
   instead. The leaderboard total likewise stays on `get_cached_leaderboard_total`
   (no forced fetch).
@@ -764,7 +644,7 @@ scenarios). Two call sites change:
 the interval poll uses `allow_network=False`. No caller sets both.
 
 Called from
-[`_refresh_rank_after_high_score`](../source/my_watchdog/file_watchdog.py:39),
+[`_refresh_rank_after_high_score`](../source/my_watchdog/file_watchdog.py),
 which gains an `expected_score` argument. The watchdog already knows the new
 high score (`run_data.score`) at the point it decides to call the refresh, so
 threading the value through is mechanical.
@@ -915,9 +795,9 @@ the requirement is specifically: the rank widget must reflect the freshness loop
 cache write without waiting for the next run.
 
 **Why today's wiring doesn't.** The rank text is rendered by
-[`get_scenario_rank`](../source/pages/home.py:130), whose only inputs are the
+[`get_scenario_rank`](../source/pages/home.py), whose only inputs are the
 `do_update` store and the scenario dropdown. `do_update` is **not** a periodic
-tick: [`check_for_new_data`](../source/pages/home.py:85) runs on the 1s interval
+tick: [`check_for_new_data`](../source/pages/home.py) runs on the 1s interval
 but flips `do_update` only when `message_queue` holds an entry for the selected
 scenario. So the widget re-renders on the next run or a scenario re-selection —
 never on a plain timer. The freshness loop writes the cache in the background, but
@@ -927,7 +807,7 @@ nothing re-renders until the user acts. That is the gap to close.
 blocking).
 
 - **Add the interval as an Input.** Add `Input("interval-component", "n_intervals")`
-  to [`get_scenario_rank`](../source/pages/home.py:150). The widget re-reads the
+  to [`get_scenario_rank`](../source/pages/home.py). The widget re-reads the
   cache each tick and reflects the loop's background write within ~1s — no extra
   run needed. Surfacing what the loop wrote is the poll's *only* job.
 - **The interval read must be cache-only — and that needs a flag (v13 correction).**
@@ -935,10 +815,10 @@ blocking).
   for a *resolved* scenario (its mapping, rank, and total caches were populated by
   the selection read) but **fails for any scenario without a KovaaK's leaderboard**.
   `get_scenario_rank_info` resolves the leaderboard id *before* it can read the
-  rank cache (the rank cache is keyed by id — [api_service.py:876](../source/kovaaks/api_service.py:876)
-  then [:907](../source/kovaaks/api_service.py:907)), and an unresolved scenario
+  rank cache (the rank cache is keyed by id — see [api_service.py](../source/kovaaks/api_service.py)),
+  and an unresolved scenario
   has no cached mapping and **no negative cache** (`save_leaderboard_id` is only
-  written on an exact match — [api_service.py:534](../source/kovaaks/api_service.py:534)).
+  written on an exact match — [api_service.py](../source/kovaaks/api_service.py)).
   So `resolve_leaderboard_id` falls through to `search_scenario_exact`, a network
   GET, on *every* call. With `polling_interval = 1000`, sitting on a custom
   scenario would fire one `/scenario/popular` request **per second** — wasteful and
@@ -957,7 +837,10 @@ blocking).
           return "N/A"
       # Cache-only when the interval is the SOLE trigger. A selection / do_update
       # (real user or data event) may resolve + fetch as today; if either co-fires
-      # with the tick, err toward allowing network.
+      # with the tick, err toward allowing network. On initial load ctx.triggered
+      # holds the "." sentinel (!= the interval), so a persisted selection still
+      # resolves + fetches as today — the any() form is deliberate here, not
+      # ctx.triggered_id, which would drop the co-fire and initial-load cases.
       allow_network = any(
           t["prop_id"] != "interval-component.n_intervals" for t in ctx.triggered
       )
@@ -993,7 +876,7 @@ blocking).
   gets re-pulled, so the app never hammers the API on the user's behalf.
 - **Notification emission policy (v13).** `get_scenario_rank` emits
   `dash_logger.warning`/`error` from `warning_message`/`error_message`
-  ([home.py:172-177](../source/pages/home.py:172)). Firing those every second would
+  ([home.py](../source/pages/home.py)). Firing those every second would
   spam toasts for users in a persistent warning/error state (e.g. Steam-ID
   mismatch). v13 realizes "fire on change, not every tick" as: **emit only on
   non-interval triggers** (selection, `do_update`) and on the manual refresh; stay
@@ -1003,7 +886,7 @@ blocking).
   saw on selection. The shared `_emit_rank_messages` helper is reused by the manual
   refresh, which (unlike the poll) emits **un**gated because it is user-initiated.
 - **`dcc.Loading` + `delay_show` (v14 correction).** The rank text stays wrapped in
-  `dcc.Loading` ([home.py:574](../source/pages/home.py:574)). Note that
+  `dcc.Loading` ([home.py](../source/pages/home.py)). Note that
   `dcc.Loading` keys off whether the wrapped output's callback is **in flight**, not
   off network I/O — so once the 1s interval is an input to `get_scenario_rank`, the
   child enters loading state *every tick*, even on a pure cache read, and would
@@ -1037,8 +920,11 @@ deliberately: the alternative (auto-recheck) hammered the offline/server-down ca
 where the board never catches up. The exhaustion toast points the user at Refresh,
 so the heal is one click away exactly when it matters.
 
-**Why not SSE or full-block.** SSE has no native Dash support; it would mean a
-`dash-extensions` dependency plus clientside glue — overkill for a local
+**Why not SSE or full-block.** SSE has no native Dash support; wiring it up would
+mean `dash-extensions`' SSE/`EventSource` components plus clientside glue. (We
+already depend on `dash-extensions` — it backs `DashProxy` and the notification log
+handler — so the real cost is the extra client/server plumbing and a long-lived
+streaming endpoint, not a new dependency.) Either way it is overkill for a local
 single-user tool and unjustified until this is ever multi-user. A callback that
 *blocks* until the eventually-consistent data arrives would hold a server thread
 for the whole retry window and freeze the UI — a non-starter. Interval polling
@@ -1161,6 +1047,15 @@ rank, and total cache; invoke the rank callback's interval-triggered path
 (`allow_network=False`); assert it returns the cached value and `_session_get` is
 **never called**.
 
+**Initial render with a persisted selection allows network (cold cache):** with no
+caches seeded, invoke `get_scenario_rank` on its initial call — Dash sets
+`ctx.triggered` to the `"."` sentinel — for a persisted scenario; assert
+`allow_network` computes to `True` so resolution + `fetch_scenario_rank` run as they
+do today (not the cache-only path). Also assert that a selection + interval co-fire
+in the same invocation allows network. This guards the implicit
+sentinel/co-fire behavior the `any()` form relies on — a `ctx.triggered_id !=
+"interval-component"` form would regress both cases.
+
 **Interval poll on an unresolved scenario does not fetch (v13 regression guard):**
 with no cached mapping for the scenario, invoke the rank callback's
 interval-triggered path (`allow_network=False`); assert it returns N/A,
@@ -1255,9 +1150,9 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    `_notify_exhaustion`.
 2. Route the read path's writes through `_save_rank_monotonic` in
    `get_scenario_rank_info`: the cache-miss/`force_refresh` save at
-   [`api_service.py:949`](../source/kovaaks/api_service.py:949) and the cache-hit
+   [`api_service.py`](../source/kovaaks/api_service.py) and the cache-hit
    `scenario_name` backfill at
-   [`api_service.py:906`](../source/kovaaks/api_service.py:906) (in-memory
+   [`api_service.py`](../source/kovaaks/api_service.py) (in-memory
    `scenario_name` attach stays unconditional; only the write is conditional).
 3. Delete `refresh_scenario_rank` from `api_service.py`. Confirm it has no
    remaining callers (its only caller was the watchdog, updated in step 4).
@@ -1282,7 +1177,7 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    an interval-only tick is cache-only. Extract `_emit_rank_messages` and call it
    only when `allow_network` is true (emit on selection/`do_update`, stay silent on
    interval ticks). Add `delay_show=300` (and optionally `delay_hide`) to the rank
-   `dcc.Loading` at [home.py:574](../source/pages/home.py:574) so the per-second
+   `dcc.Loading` at [home.py](../source/pages/home.py) so the per-second
    interval tick does not flicker the spinner on cache-only reads (v14).
 8. Add the manual refresh button: a `dmc.Button`/`dmc.ActionIcon` (`id="rank-refresh-button"`)
    beside the rank widget and a `refresh_rank` callback that calls
@@ -1432,7 +1327,7 @@ reviewability and de-risking, not a correctness requirement.
   not in `config.toml`. The user should not need to tune this.
 - The watchdog passes `expected_score` at all three call sites, including the
   "new scenario" path
-  ([`file_watchdog.py:95`](../source/my_watchdog/file_watchdog.py:95)). A new
+  ([`file_watchdog.py`](../source/my_watchdog/file_watchdog.py)). A new
   scenario is logically a PB-from-nothing.
 - No "rank is being checked" notification is emitted on attempt #0. The user
   already saw the PB toast. Only terminal/unexpected failure and
@@ -1475,7 +1370,7 @@ reviewability and de-risking, not a correctness requirement.
 - The 168h `scenario_rank_cache_ttl_hours` default is unchanged. New PBs
   remain the primary refresh signal.
 - The
-  [`_get_with_retry`](../source/kovaaks/api_service.py:113) HTTP-level retry
+  [`_get_with_retry`](../source/kovaaks/api_service.py) HTTP-level retry
   is unchanged. It handles per-request 429s and transient failures; the new
   code handles cross-request eventual-consistency lag. The two are
   deliberately separate concerns.
