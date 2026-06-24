@@ -1,15 +1,42 @@
 # Scenario Rank Eventual Consistency Proposal
 
-> **Status:** in review (v20). Latest changes: (1) cache-only interval reads serve the
-> rank **TTL-independently** so a long-idle page can't interval-poll itself from a rank
-> to N/A (the passive mirror can't refresh; non-interval reads still re-fetch on TTL
-> expiry); (2) transient leaderboard-resolution failures log via
-> `request_exception_summary` (no traceback), matching the api_service convention; and
-> (3) the rollout now includes updating `architecture.md`, superseding the stale
-> `scenario_rank_proposal.md` decisions, and adding a `decision_log.md` entry. (v19
-> added an equal-score recency tie-break in `_is_forward` and a ctx-free
-> `_render_scenario_rank` body; v18 made the display forward-only.) Earlier revision
-> history lives in git log.
+> **Status:** in review (v21) — verified against code, build-ready. This round folds in
+> the deep correctness pass: **P1-A** an explicit Refresh can now clear a genuine de-rank
+> (`allow_derank=force_refresh`) instead of it persisting forever; **P1-B** the cache-only
+> interval read attaches the total via `get_cached_leaderboard_total` (not
+> `_with_leaderboard_total`, which fetched on a total-cache miss → a per-tick GET); the
+> v19 equal-score recency tie-break is **cut** (over-engineered); `_notify_exhaustion`
+> drops the username-validation call and adds a free score-precision-drift diagnostic;
+> the rollout is relaxed to two PRs. The register below is the review anchor; earlier
+> revision history lives in git log.
+
+## Requirements, Non-Goals, and Accepted Tradeoffs
+
+The stable anchor — reviews and implementation are *against this*. A new finding should
+either fit here or argue to change it, not silently re-derive it.
+
+**Requirements (must be true):**
+- **R1** — After a local PB, the displayed rank reflects the new score without replaying a run. Seconds of lag is fine; "only after another run" is not.
+- **R2** — The cached rank never regresses to a *lower score*, and never flickers to UNRANKED from *automatic* paths (loop / interval / backfill). An explicit Refresh **may** clear a genuine de-rank (P1-A).
+- **R3** — A single unlucky eventual-consistency timing must not cache stale/UNRANKED data for the full 168h TTL.
+- **R4** — Background-refresh errors never die silently: terminal errors notify, transient errors retry, unexpected errors are caught.
+- **R5** — The interval poll makes *zero* network calls per tick — for unresolved scenarios *and* expired rank/total caches.
+- **R6** — Concurrent refreshes (loop-vs-loop, read-vs-loop) cannot corrupt the cache.
+
+**Non-goals (explicitly not solving):**
+- **N1** — Real-time/push (SSE). Interval polling suffices for a local single-user tool.
+- **N2** — Auto-healing a *permanently* divergent cache (offline play / server down at PB time). That's the manual Refresh button's job, not an automatic recheck.
+- **N3** — Sub-second rank-*number* accuracy at equal score (the cut v19 tie-break). Rank is a drifting snapshot.
+- **N4** — Multi-user correctness or scaling.
+- **N5** — Tuning the retry schedule via config; it's a module constant.
+
+**Accepted tradeoffs (owned consequences):**
+- **T1** — A KovaaK's update slower than ~62s exhausts the loop; the rank stays stale until the next PB / manual Refresh / TTL. We accept this over auto-rechecking.
+- **T2** — During the freshness window a non-interval read may *fetch* a lagging value, but the cache won't regress and a fetched-worse *score* is never shown. (A fetch *exception* on such a read can still show N/A — it bypasses the monotonic write.)
+- **T3** — Dense grinding (multiple PBs/min) costs extra API calls (~N+1), bounded by the retry window.
+- **T4** — One daemon Timer thread per pending attempt (bounded, acceptable).
+- **T5** — `board == floor2(local)` is single-sourced (445 scenarios, one machine). Mitigated by the exhaustion drift diagnostic (P2-C), not eliminated.
+- **T6** — Each interval tick: 3 cache file reads + JSON parses under `_CACHE_IO_LOCK` — single-digit ms, not zero.
 
 ## Summary
 
@@ -361,67 +388,73 @@ def _save_rank_monotonic(
     leaderboard_id: int,
     username: str,
     candidate: ScenarioRankInfo,
+    allow_derank: bool = False,
 ) -> tuple[ScenarioRankInfo, bool]:
     """The single rank-cache writer, shared by the read path and the loop.
 
     Returns `(winner, wrote)`. `winner` is the value now authoritative for the cache
     — `candidate` if it was a forward move, else the preserved existing entry — so a
     caller can DISPLAY a value that never regresses, not just persist one. `wrote` is
-    True iff the file was written. The lock makes read-compare-write atomic across
-    concurrent writers for the same leaderboard.
+    True iff the file was written. `allow_derank` (set only on a user-clicked Refresh /
+    `force_refresh`) permits the one regression automatic paths forbid — RANKED→UNRANKED
+    — so an explicit refresh can clear a genuine de-rank instead of it persisting
+    forever (v21). The lock makes read-compare-write atomic across concurrent writers
+    for the same leaderboard.
     """
     with _rank_save_lock:
         existing = _cached_rank(leaderboard_id, username)  # TTL-independent
-        if existing is not None and not _is_forward(existing, candidate):
+        if existing is not None and not _is_forward(existing, candidate, allow_derank):
             return existing, False  # preserve & surface the better entry, not candidate
         save_scenario_rank(leaderboard_id, username, candidate)
         return candidate, True
 
 
-def _is_forward(existing: ScenarioRankInfo, candidate: ScenarioRankInfo) -> bool:
+def _is_forward(
+    existing: ScenarioRankInfo,
+    candidate: ScenarioRankInfo,
+    allow_derank: bool = False,
+) -> bool:
     """True unless `candidate` would regress the cache."""
     existing_ranked = existing.status == ScenarioRankStatus.RANKED
     candidate_ranked = candidate.status == ScenarioRankStatus.RANKED
     if existing_ranked and not candidate_ranked:
-        return False  # never overwrite a known rank with UNRANKED/UNKNOWN
+        # Automatic paths never drop a known rank to UNRANKED/UNKNOWN (this absorbs the
+        # common transient-UNRANKED flicker). An explicit user Refresh may, so a genuine
+        # de-rank can be cleared on demand instead of persisting forever (v21).
+        return allow_derank
     if candidate_ranked and not existing_ranked:
         return True   # a real rank supersedes a cached UNRANKED
     if existing_ranked and candidate_ranked:
         if existing.score is None:
             return True   # nothing scored to protect; take the candidate
         if candidate.score is None:
-            return False  # never drop a known score to a scoreless RANKED
-        # Both are BOARD scores (already 2-dp-truncated by KovaaK's), so there is no
-        # truncation gap to absorb: SCORE_EPSILON is float-noise slack only — NOT the
-        # one-cent SCORE_FRESHNESS_TOLERANCE, which would let a stale 99.99 overwrite a
-        # cached 100.00 (v17 fix, P1).
-        if candidate.score > existing.score + SCORE_EPSILON:
-            return True   # strictly higher always wins
-        if candidate.score < existing.score - SCORE_EPSILON:
-            return False  # strictly lower rejected
-        # Equal score: the board value is unchanged but RANK still drifts as other
-        # players move, so prefer the most recent fetch — a straggler thread must not
-        # overwrite a fresher same-score rank (v19). Backfill / re-confirm carry an
-        # equal-or-newer fetched_at so they still pass; a missing timestamp falls back
-        # to allow. (fetched_at is always tz-aware UTC, set by fetch_scenario_rank.)
-        if candidate.fetched_at is None or existing.fetched_at is None:
-            return True
-        return candidate.fetched_at >= existing.fetched_at
+            return False  # never drop a known score to a scoreless RANKED (a fetch never makes one)
+        # Both are BOARD scores (already 2-dp-truncated by KovaaK's): equal-or-higher
+        # writes, strictly-lower is rejected. SCORE_EPSILON is float-noise slack only —
+        # NOT the one-cent SCORE_FRESHNESS_TOLERANCE, which would let a stale 99.99
+        # overwrite a cached 100.00 (v17 fix, P1). Equal score writes regardless of
+        # rank-number drift — that 1–2 position staleness is a non-goal (the v19 recency
+        # tie-break was cut in v21; see Resolved Decisions).
+        return candidate.score >= existing.score - SCORE_EPSILON
     return True  # both non-RANKED: nothing to protect
 ```
 
 `_cached_rank` reads the stored entry directly from the rank cache file
 **independent of TTL** (the comparison cares about the persisted value, not its
-age) — a thin read over `_read_json(_rank_cache_file(...))` returning a
-`ScenarioRankInfo`, or `get_cached_scenario_rank(..., cache_ttl_hours=<effectively
-unbounded>)`.
+age) — a thin **direct** read over `_read_json(_rank_cache_file(...))` returning a
+`ScenarioRankInfo`. Prefer the direct read over `get_cached_scenario_rank` with a huge
+`cache_ttl_hours`: that reuses a "fresh-only" function and leans on `timedelta` not
+overflowing, whereas a direct read matches the stated intent (cares about the value,
+not its age).
 
 Rule rationale:
 
-- **RANKED never regresses to UNRANKED/UNKNOWN.** KovaaK's stores a high-water
-  mark; a transient UNRANKED (an API hiccup, or a lagging read right after a PB)
-  must not erase a known rank. The rare genuine de-rank is acceptable to show
-  briefly stale rather than flicker to "Unranked."
+- **RANKED never regresses to UNRANKED/UNKNOWN on automatic paths.** KovaaK's stores
+  a high-water mark; a transient UNRANKED (an API hiccup, or a lagging read right after
+  a PB) must not erase a known rank. The one case this masks is a *genuine* de-rank
+  (KovaaK's resets/purges a leaderboard) — so an explicit Refresh clears it on demand
+  (`allow_derank=True`) rather than leaving it stale forever (v21). Automatic paths stay
+  flicker-free; the user's explicit "fetch current truth" is authoritative.
 - **A lower RANKED score is rejected** (any decrease beyond `SCORE_EPSILON` float
   noise — *not* a one-cent tolerance, since both scores are already-truncated board
   values) — this is the loop-vs-loop *and* read-vs-loop regression guard, in one
@@ -433,14 +466,11 @@ Rule rationale:
   entry), but the model permits it, so the central monotonic-write invariant handles
   it explicitly rather than trusting every present and future caller. (Symmetric case:
   a scored candidate over a scoreless existing entry is a forward move and is written.)
-- **Higher is always written; an equal score tie-breaks on recency.** A strictly
-  higher score wins outright. At equal score the board value is unchanged but the
-  *rank* can still have drifted (other players moved), so the most recent fetch wins
-  (`candidate.fetched_at >= existing.fetched_at`) — a straggler can't overwrite a
-  fresher same-score rank. The `scenario_name` backfill (same `fetched_at`) and a loop
-  re-confirm (newer `fetched_at`) still write and refresh `mtime`; a missing timestamp
-  falls back to writing. This is what makes "a saved rank never goes backwards"
-  literally true, not merely score-monotonic (v19).
+- **Equal or higher is written**, refreshing `mtime`. Equal writes are how the
+  cache-hit `scenario_name` backfill persists (same score, now carrying the name) and
+  how a successful loop re-confirms freshness. At equal score the last writer wins on
+  the rank *number*; that 1–2 position staleness in a sub-second race self-heals and is
+  a non-goal (the v19 `fetched_at` tie-break was cut in v21 — see Resolved Decisions).
 
 The one case the rule cannot catch *at write time* is a brand-new scenario with
 an *empty* cache: nothing to compare against, so a lagging read-path `UNRANKED` is
@@ -489,11 +519,12 @@ is unchanged, and stops).
     prevent_initial_call=True,
 )
 def refresh_rank(_, selected_scenario):
-    # One-shot "fetch current truth now"; writes through _save_rank_monotonic, so it
-    # cannot regress a higher cached score — and get_scenario_rank_info returns that
-    # winner, so a transient lower/UNRANKED fetch is NOT rendered (the display can't
-    # regress either). Not a freshness loop — by the time a user clicks, the board has
-    # usually settled; if it is still lagging they can click again.
+    # One-shot "fetch current truth now"; force_refresh threads allow_derank=True into
+    # _save_rank_monotonic. A lower *score* is still rejected (display stays
+    # score-monotonic, the winner is returned), but a genuine de-rank (RANKED→UNRANKED)
+    # IS written and shown — clearing a stale rank on demand is this button's job (v21).
+    # Not a freshness loop — by the time a user clicks the board has usually settled; a
+    # transient UNRANKED self-heals on the next click / loop / PB.
     if not selected_scenario:
         return "N/A"
     try:
@@ -674,8 +705,11 @@ scenarios). Two call sites change:
   can't refresh, so TTL-gating it would only degrade a still-displayed rank to N/A on
   a long-idle page; serving the last-known value keeps the interval poll a passive
   mirror, while re-fetch-on-expiry stays the job of the non-interval (TTL-gated) reads.
-  The leaderboard total likewise stays on `get_cached_leaderboard_total` (no forced
-  fetch).
+  The total is attached cache-only too: `allow_network=False` must **not** route
+  through `_with_leaderboard_total` (it calls `get_leaderboard_total`, which fetches +
+  saves on a cache miss — [api_service.py](../source/kovaaks/api_service.py)). Use
+  `get_cached_leaderboard_total` + `_with_percentile` directly, so a resolved scenario
+  whose total cache has expired does **not** fire a leaderboard GET every tick (P1-B).
 
 `force_refresh=True` and `allow_network=False` are mutually exclusive in practice
 (force-refresh means "fetch now"); the manual refresh uses `force_refresh=True`,
@@ -779,7 +813,7 @@ def _run_attempt(
 
         next_index = attempt_index + 1
         if next_index >= len(ATTEMPT_DELAYS_SECONDS):
-            _notify_exhaustion(scenario_name, username, metadata_cache_ttl_hours)
+            _notify_exhaustion(scenario_name, expected_score, rank_info)
             return  # exhausted; exit loop without writing cache
 
         _schedule_attempt(
@@ -793,24 +827,29 @@ def _run_attempt(
 
 
 def _notify_exhaustion(
-    scenario_name: str, username: str, metadata_cache_ttl_hours: int,
+    scenario_name: str, expected_score: float, last_rank_info: ScenarioRankInfo | None,
 ) -> None:
     logger.warning("Rank freshness refresh exhausted for %s", scenario_name)
-    # Always validate on exhaustion (one call, failure path only) to choose an
-    # accurate message: distinguish genuine API lag from a misconfigured
-    # username. We do not track whether a RANKED result was ever seen to skip
-    # this call — that state isn't worth threading through the Timer chain for a
-    # single saved call on a rare path (see Resolved Decisions).
-    try:
-        get_user_scenario_total_play(username, metadata_cache_ttl_hours)
-    except UnknownKovaaksUserError:
-        dash_logger.error(
-            f"Rank update for {scenario_name} failed: "
-            "KovaaK's username may be misconfigured."
+    # Precision-drift diagnostic (v21): board==floor2(local) is a single-sourced
+    # assumption. If the last fetch was RANKED but sat *below* floor2(expected), the
+    # board may have drifted under our model (e.g. KovaaK's changed score formatting) —
+    # which would make EVERY PB exhaust. Flag that distinctly so a systemic break is
+    # diagnosable rather than looking like ordinary lag. Free: just the score we
+    # already fetched, no extra call.
+    if (
+        last_rank_info is not None
+        and last_rank_info.status == ScenarioRankStatus.RANKED
+        and last_rank_info.score is not None
+        and last_rank_info.score < _floor_2dp(expected_score) - SCORE_EPSILON
+    ):
+        logger.warning(
+            "Possible score-precision drift for %s: board %.4f < floor2(%.6f). "
+            "If this recurs on every PB, the board==floor2(local) assumption is stale.",
+            scenario_name, last_rank_info.score, expected_score,
         )
-        return
-    except requests.RequestException:
-        pass  # validation unavailable; fall back to the generic message
+    # Single generic toast. The extra username-validation call was cut in v21 — a
+    # misconfigured username is already caught terminally at resolution in the common
+    # case (see Resolved Decisions).
     dash_logger.error(
         f"Rank update timed out for {scenario_name}. KovaaK's may still be catching up."
     )
@@ -920,8 +959,10 @@ blocking).
   `search_scenario_exact`; on a miss it returns `None` → N/A. The rank read is
   `get_cached_scenario_rank` read **TTL-independently** (v20) — a passive interval
   mirror can't refresh, so it serves the last-known rank rather than degrading to N/A
-  once the 168h TTL lapses on a long-idle page; the total stays
-  `get_cached_leaderboard_total`. This is the same `allow_network` tool v10/v11
+  once the 168h TTL lapses on a long-idle page; the total is attached via
+  `get_cached_leaderboard_total` + `_with_percentile` directly — **not**
+  `_with_leaderboard_total`, which fetches on a total-cache miss (P1-B). This is the
+  same `allow_network` tool v10/v11
   had, kept for a *different and still-valid* reason (resolution avoidance), which
   is why v12's deletion was wrong. The freshness loop only ever runs for *resolved*
   scenarios, so the interval poll never has a background write to surface for an
@@ -991,8 +1032,9 @@ infrastructure: each widget re-reads its own cache on the shared interval.
 Failure surfaces via `dash_logger.error(...)` directly from the freshness
 function — the same `dash_logger` channel the watchdog uses today. There are
 three trigger points, all non-blocking: a terminal bad-username error, an
-unexpected exception caught by the broad guard, and retry exhaustion (with the
-message tuned by the username-validation check). An unresolved leaderboard
+unexpected exception caught by the broad guard, and retry exhaustion (a single generic
+"may still be catching up" toast, plus a free score-precision-drift log check — v21). An
+unresolved leaderboard
 (`resolve_leaderboard_id` → `None`) is **not** one of them: it stops the loop
 with a `logger.warning` only, no toast (see [Error Handling](#error-handling)).
 The old `_handle_rank_refresh_result` callback is removed because the freshness
@@ -1002,9 +1044,9 @@ function now emits these notifications itself.
 
 | Case | Behavior |
 |---|---|
-| API never reports the new score within ~62s | Loop exhausts; previous cache preserved. `_notify_exhaustion` validates the username, then emits "still catching up — click Refresh to retry" (valid user) via `dash_logger.error`. The stale value persists until the next PB (new loop), the 168h TTL (the next **non-interval** view re-fetches on the miss — interval ticks read TTL-independently and never fetch), or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button). We do **not** auto-recheck (see that section). |
+| API never reports the new score within ~62s | Loop exhausts; previous cache preserved. `_notify_exhaustion` emits a generic "still catching up — click Refresh to retry" via `dash_logger.error` (plus a free score-precision-drift log check — v21). The stale value persists until the next PB (new loop), the 168h TTL (the next **non-interval** view re-fetches on the miss — interval ticks read TTL-independently and never fetch), or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button). We do **not** auto-recheck (see that section). |
 | API reports `RANKED` with score *higher* than expected | Accept as fresh. `_save_rank_monotonic` writes it and the loop exits. |
-| API reports `UNRANKED` | Not fresh — do not write. Continue retries. After exhaustion, `_notify_exhaustion` distinguishes lag from a misconfigured username. Previous cache preserved. |
+| API reports `UNRANKED` | Not fresh — do not write. Continue retries. After exhaustion, `_notify_exhaustion` emits the generic timeout toast (a bad username is caught terminally at resolution, not here — v21). Previous cache preserved. |
 | Multiple PBs for the same scenario in succession | Each schedules its own independent loop. `_save_rank_monotonic` prevents a slower lower-score loop from overwriting a higher score already cached by a faster one — no read-path suppression to manage. A short retry window also makes overlap rare (a second PB needs another ~60s run). |
 | UI read callback (`get_scenario_rank`) fires during the freshness window | The interval-triggered read is cache-only (no fetch). A dropdown/`do_update` read (which *may* fetch on a cache miss) goes through `_save_rank_monotonic`, which rejects the lower/UNRANKED result *and* returns the preserved winner — so neither the cache nor the display regresses. No counter or coordination needed. |
 | Interval tick, **resolved** scenario | Cache-only read (`allow_network=False`): serves the cached rank/total with no network and surfaces the Timer loop's latest write. The loop is the only fetcher during the window. |
@@ -1077,10 +1119,12 @@ Unit tests for the freshness function in `api_service.py`, mocking
 - Exhausts all 5 attempts when API never catches up; previous rank cache file
   is byte-for-byte unchanged after the run, and the leaderboard total cache is
   also untouched.
-- **Exhaustion message branches:** with a valid username the exhaustion
-  notification says "may still be catching up"; with an invalid username
-  (`get_user_scenario_total_play` raises `UnknownKovaaksUserError`) it says
-  "username may be misconfigured."
+- **Exhaustion notification + drift diagnostic (v21):** on exhaustion
+  `_notify_exhaustion` emits the single generic "may still be catching up"
+  `dash_logger.error` (the username-validation call was cut). Separately, when the last
+  fetch was RANKED with a score *below* `floor2(expected)`, it logs a distinct "possible
+  score-precision drift" `logger.warning`; assert that warning fires in that case and
+  not when the last score met `floor2(expected)`.
 - Two concurrent loops for the same scenario at different expected scores both
   exit cleanly when the API catches up (no cache corruption, no exception, no
   regression of the higher score).
@@ -1099,13 +1143,12 @@ table-driven over candidate-vs-existing:
 - existing RANKED **scoreless**, candidate RANKED **with a score** → writes (forward
   move; the candidate is strictly more informative);
 - existing UNRANKED, candidate RANKED → writes;
-- equal score, candidate `fetched_at` **newer or equal** → writes (idempotent
-  re-confirm / `scenario_name` backfill, which carries the same `fetched_at`);
-- equal score, candidate `fetched_at` **older** → rejected (v19: a straggler must not
-  overwrite a fresher same-score rank; assert the cache keeps the newer entry and its
-  `mtime` did not advance);
-- equal score, either `fetched_at` is `None` → writes (missing timestamp falls back to
-  allow).
+- equal score → writes (idempotent re-confirm / `scenario_name` backfill refreshes
+  `mtime`; rank-number last-writer-wins is a non-goal — the v19 `fetched_at` tie-break
+  was cut in v21);
+- **`allow_derank` (v21):** existing RANKED, candidate UNRANKED with `allow_derank=False`
+  → rejected (winner is the cached RANKED); the *same* inputs with `allow_derank=True`
+  (an explicit Refresh) → **writes** the UNRANKED, so a genuine de-rank clears on demand.
 
 **Read path is display- and cache-monotonic (no regression during the window):**
 seed the cache with `score=110`; call `get_scenario_rank_info` on a path that
@@ -1114,10 +1157,12 @@ fetches a lagging `score=100` (and, separately, a transient `UNRANKED`); assert 
 `110`, and its `mtime` did **not** advance (rejected write touches nothing). This is
 the "display does not regress" guard, not only "cache does not regress."
 
-**Interval poll on a resolved scenario does not fetch:** seed a fresh mapping,
-rank, and total cache; invoke the rank callback's interval-triggered path
-(`allow_network=False`); assert it returns the cached value and `_session_get` is
-**never called**.
+**Interval poll on a resolved scenario does not fetch — including a total-cache miss
+(P1-B):** seed a fresh mapping and rank cache but an **expired (or absent) total
+cache**; invoke the rank callback's interval-triggered path (`allow_network=False`);
+assert it returns the cached rank and `_session_get` is **never called**. Seeding a
+*fresh* total would hide the bug — the cache-only path must avoid
+`_with_leaderboard_total`, which fetches on a total miss.
 
 **Trigger classification allows network on initial render / co-fire (cold cache):**
 call the pure `_rank_allows_network` helper directly — no Dash context needed — with
@@ -1148,12 +1193,13 @@ hydration, no `search_scenario_exact`) and the read does not fall through to
 `fetch_scenario_rank` on the rank-cache miss.
 
 **Manual refresh forces a one-shot fetch and surfaces messages:** the
-`refresh_rank` callback calls `get_scenario_rank_info(..., force_refresh=True)`,
-which fetches once and persists through `_save_rank_monotonic`. Assert a single
-`fetch_scenario_rank`, that a returned-lower (or transient `UNRANKED`) board value
-**neither** regresses the higher cached score **nor** is displayed — the callback
-renders the preserved winner — and that a result carrying `error_message`/`warning_message`
-emits a `dash_logger.error`/`warning` (i.e. a forced-lookup failure does **not**
+`refresh_rank` callback calls `get_scenario_rank_info(..., force_refresh=True)` (which
+threads `allow_derank=True`), fetching once and persisting through `_save_rank_monotonic`.
+Assert a single `fetch_scenario_rank`; that a returned-lower *score* **neither**
+regresses the higher cached score **nor** is displayed (the winner is rendered); that a
+returned **UNRANKED** (a genuine de-rank via the explicit button) **is** written and
+displayed (P1-A); and that a result carrying `error_message`/`warning_message` emits a
+`dash_logger.error`/`warning` (i.e. a forced-lookup failure does **not**
 become a silent "N/A"). The emission is **un**gated — it fires even when the same
 error was already shown, because the click is an explicit user request.
 
@@ -1233,9 +1279,10 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    `scenario_name` backfill at
    [`api_service.py`](../source/kovaaks/api_service.py) (in-memory
    `scenario_name` attach stays unconditional; only the write is conditional).
-   Return the `winner` it reports for display — on a rejected write, return the
-   preserved cache entry, not the lower/UNRANKED fetch — so the displayed value is
-   forward-only, not just the persisted one.
+   Pass `allow_derank=force_refresh` so an explicit Refresh can clear a genuine de-rank
+   while automatic reads cannot (P1-A). Return the `winner` it reports for display — on
+   a rejected write, return the preserved cache entry, not the lower fetch — so the
+   displayed value is forward-only (for scores), not just the persisted one.
 3. Delete `refresh_scenario_rank` from `api_service.py`. Confirm it has no
    remaining callers (its only caller was the watchdog, updated in step 4).
 4. In `file_watchdog.py`, rewrite `_refresh_rank_after_high_score` to take and
@@ -1251,8 +1298,10 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    `allow_network: bool = True` to `resolve_leaderboard_id` (when `False`, consult
    only `get_cached_leaderboard_id`; skip hydration and `search_scenario_exact`)
    and to `get_scenario_rank_info` (thread it into `resolve_leaderboard_id`; on
-   `False`, do not fall through to `fetch_scenario_rank` on a rank-cache miss and
-   keep the total on `get_cached_leaderboard_total`).
+   `False`, do not fall through to `fetch_scenario_rank` on a rank-cache miss, read the
+   rank cache TTL-independently, and attach the total via `get_cached_leaderboard_total`
+   + `_with_percentile` — **not** `_with_leaderboard_total`, which fetches on a total
+   miss (P1-B)).
 7. Add the UI polling in `home.py`: add `Input("interval-component", "n_intervals")`
    to `get_scenario_rank`; extract a pure `_rank_allows_network(ctx.triggered)` helper
    (`any(t["prop_id"] != "interval-component.n_intervals" for t in triggered)`) and a
@@ -1290,10 +1339,12 @@ below are the granular checklist; the rollout section maps them onto the PRs.
 
 ## Rollout / PR Staging
 
-The change ships as **three sequential PRs** rather than one. Goals: de-risk each
-landing, keep each diff small enough to review thoroughly (local gates are the merge
-bar — there is no CI), and isolate the two very different risk surfaces (backend
-concurrency vs. Dash UI wiring) so each review is about one kind of thing.
+The change ships as **two PRs — backend (PR 1 + PR 2) / UI (PR 3)** — separating the two
+genuinely different risk surfaces (backend concurrency vs. Dash UI wiring) at a ceremony
+level that suits a solo repo with no CI (v21, P2-B). The three-way breakdown below is the
+*granular* view if you want finer staging or to land the monotonic-write foundation on
+its own; it's optional, not the default. Either way, keep each diff small enough to
+review thoroughly — the local gates are the merge bar.
 
 **Why a split is cheap here: every intermediate state is shippable.** A staged
 rollout is only safe if each PR leaves the app valid with no regression. All three
@@ -1354,24 +1405,32 @@ reviewability and de-risking, not a correctness requirement.
   the call-site-ordering requirement — all deleted. Concurrency (loop-vs-loop and
   read-vs-loop) collapses to one score comparison under one process-wide lock;
   deliberately lighter than supersession or a coordination registry.
-- **Display is forward-only, not just the cache (v18).** `_save_rank_monotonic`
-  returns `(winner, wrote)`; the read path renders the `winner` (the persisted value),
-  so a fetch the cache rejects — a transient `UNRANKED` or a lower board read on a
-  manual refresh or a freshness-window read — is never shown. Without this the cache
-  was monotonic but the UI could still flicker to a worse value for ~1s until the next
-  interval tick re-read cache, exactly the regression the manual-refresh button exists
-  to avoid. Extends the de-rank policy ("show briefly stale rather than flicker to
-  Unranked") from the cache to the display. A pure `_rank_allows_network(ctx.triggered)`
-  helper lands in the same round so the interval trigger-classification is testable
-  without a Dash callback context.
-- **Equal-score writes tie-break on recency; render body is ctx-free (v19).** At an
-  equal board score the *rank* can still drift (other players move), so `_is_forward`
-  prefers the newer `fetched_at` — a straggler can't overwrite a fresher same-score
-  rank, making "never goes backwards" true for rank, not only score (a missing
-  `fetched_at` falls back to writing; `fetched_at` stays tz-aware UTC). The same round
-  factors the rank callback body into a ctx-free
+- **Display is score-forward-only, not just the cache (v18).** `_save_rank_monotonic`
+  returns `(winner, wrote)`; the read path renders the `winner`, so a *fetched* worse
+  **score** is never shown — the UI can't flicker to a lower number for ~1s until the
+  next interval tick re-reads cache. Two scoped caveats: a fetch *exception* early-returns
+  N/A (it bypasses the monotonic write — tradeoff T2), and an explicit Refresh may show a
+  genuine de-rank (P1-A). Extends the cache's no-regress policy to the display, for
+  scores. A pure `_rank_allows_network(ctx.triggered)` helper lands in the same round so
+  the interval trigger-classification is testable without a Dash callback context.
+- **Render body is ctx-free (v19); equal-score rule stays score-only (recency tie-break
+  cut in v21).** v19 factored the rank callback body into a ctx-free
   `_render_scenario_rank(selected_scenario, allow_network)` so the existing direct-call
-  tests need no Dash callback context.
+  tests need no Dash callback context — kept. v19 also added a `fetched_at` recency
+  tie-break at equal score; **v21 cut it** — it protected only the rank *number* being
+  1–2 positions stale for a few seconds in a sub-second race (self-healing, imperceptible)
+  at the cost of a standing "`fetched_at` always tz-aware UTC" invariant. "Equal-or-higher
+  ⇒ write" is the simplest correct rule; rank-number freshness at equal score is a
+  non-goal (N3).
+- **An explicit Refresh can clear a genuine de-rank (P1-A, v21).** Routing every write
+  through `_save_rank_monotonic` (v18) plus reading `existing` TTL-independently made
+  RANKED→UNRANKED *un*writable by *any* path — including the manual button, whose whole
+  job is re-pulling a divergent rank. Without a fix a real de-rank (KovaaK's purges a
+  leaderboard) would show stale forever with no in-app recovery. Fix: `_save_rank_monotonic`
+  gains `allow_derank`, set only by `force_refresh` (the button), so automatic paths stay
+  flicker-free while the explicit user action is authoritative. A lower *score* is still
+  rejected even on Refresh (v18 score-display-monotonicity holds); only RANKED→UNRANKED is
+  permitted, and a transient UNRANKED self-heals on the next RANKED write.
 - **Two distinct score comparisons, two distinct constants (v17).** Freshness
   (local-vs-board) and monotonicity (board-vs-board) are *different* comparisons and
   must not share a constant. Freshness models KovaaK's 2-dp truncation by flooring
@@ -1379,8 +1438,8 @@ reviewability and de-risking, not a correctness requirement.
   subtracting a one-cent tolerance, which would accept a stale cent-below board when
   `expected` sits on a 2-dp boundary. Monotonicity compares two already-truncated
   board scores and requires strict non-decrease (`candidate >= existing -
-  SCORE_EPSILON`; v19 adds a recency tie-break at *equal* score — see the entry
-  above); reusing the one-cent tolerance there punched a regression hole in
+  SCORE_EPSILON`; equal-or-higher writes — the v19 equal-score recency tie-break was cut
+  in v21); reusing the one-cent tolerance there punched a regression hole in
   the "never regress" invariant. `SCORE_EPSILON` (`1e-6`) is float-noise slack only;
   the retired `SCORE_FRESHNESS_TOLERANCE` (`0.01`) conflated the two. This corrected
   two P1 bugs Codex found in v16.
@@ -1450,13 +1509,15 @@ reviewability and de-risking, not a correctness requirement.
 - No "rank is being checked" notification is emitted on attempt #0. The user
   already saw the PB toast. Only terminal/unexpected failure and
   after-exhaustion are surfaced via `dash_logger.error(...)`.
-- On exhaustion, `_notify_exhaustion` **always** runs a single total-play
-  validation to distinguish genuine API lag from a misconfigured username, so
-  the user-facing message is accurate. This is one extra call on the failure
-  path only. We deliberately do *not* skip it when a RANKED result was seen
-  earlier (which would prove the username valid): tracking that would mean
-  threading mutable state through the fire-and-forget Timer chain, a permanent
-  complexity cost to save one call on a rare path. Simplicity wins here.
+- **Exhaustion: one generic toast, no validation call; free drift diagnostic (v21).**
+  Earlier drafts ran a total-play validation on exhaustion to tune the message
+  ("misconfigured username" vs "still catching up") — cut in v21 as a failure-path API
+  call buying a rare distinction (a bad username is already caught terminally at
+  resolution in the common case). Instead `_notify_exhaustion` does a *free* check: if
+  the last fetch was RANKED but below `floor2(expected)`, it logs a distinct "possible
+  score-precision drift" warning — cheap insurance for the single-sourced
+  `board==floor2(local)` assumption (T5), making a systemic break diagnosable instead of
+  looking like ordinary lag.
 - **Manual-refresh button: now built (v12); surfaces messages (v13).** Reversed
   from the earlier "deferred" stance: with lazy staleness removed, the button is the
   user's way to re-pull a stale or divergent rank on demand. It reuses
