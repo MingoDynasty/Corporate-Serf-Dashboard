@@ -1,14 +1,15 @@
 # Scenario Rank Eventual Consistency Proposal
 
-> **Status:** in review (v18). The latest substantive change makes the rank
-> **display** forward-only, not just the cache: `_save_rank_monotonic` returns the
-> winning `ScenarioRankInfo` (the persisted value, never a rejected lower/UNRANKED
-> fetch), and the read path renders that winner — so a manual refresh or a read during
-> the freshness window can no longer flicker to a worse value before the next interval
-> tick. v18 also extracts a pure `_rank_allows_network(ctx.triggered)` helper so the
-> interval trigger-classification is unit-testable without a Dash callback context.
-> (v17 fixed two P1 score-comparison bugs: flooring the local score for freshness and
-> strict monotonic non-decrease for cache writes.) Earlier revision history lives in
+> **Status:** in review (v19). Latest change closes two equal-score / testability
+> gaps: (1) `_is_forward` now tie-breaks an **equal** board score on recency
+> (`candidate.fetched_at >= existing.fetched_at`) — at an unchanged score the *rank*
+> still drifts as other players move, so a straggler thread can no longer overwrite a
+> fresher same-score rank, making "a saved rank never goes backwards" literally true,
+> not just score-monotonic. (2) The rank callback body is factored into a ctx-free
+> `_render_scenario_rank(selected_scenario, allow_network)` so the existing direct-call
+> tests need no Dash callback context. (v18 made the display forward-only:
+> `_save_rank_monotonic` returns `(winner, wrote)` and the read path renders the
+> winner; v17 fixed two P1 score-comparison bugs.) Earlier revision history lives in
 > git log.
 
 ## Summary
@@ -391,12 +392,22 @@ def _is_forward(existing: ScenarioRankInfo, candidate: ScenarioRankInfo) -> bool
             return True   # nothing scored to protect; take the candidate
         if candidate.score is None:
             return False  # never drop a known score to a scoreless RANKED
-        # Both are BOARD scores (already 2-dp-truncated by KovaaK's), so there
-        # is no truncation gap to absorb here: require strict non-decrease. Equal
-        # is allowed (idempotent re-confirm / scenario_name backfill); SCORE_EPSILON
-        # is float-noise slack only — NOT the one-cent SCORE_FRESHNESS_TOLERANCE,
-        # which would let a stale 99.99 overwrite a cached 100.00 (v17 fix, P1).
-        return candidate.score >= existing.score - SCORE_EPSILON
+        # Both are BOARD scores (already 2-dp-truncated by KovaaK's), so there is no
+        # truncation gap to absorb: SCORE_EPSILON is float-noise slack only — NOT the
+        # one-cent SCORE_FRESHNESS_TOLERANCE, which would let a stale 99.99 overwrite a
+        # cached 100.00 (v17 fix, P1).
+        if candidate.score > existing.score + SCORE_EPSILON:
+            return True   # strictly higher always wins
+        if candidate.score < existing.score - SCORE_EPSILON:
+            return False  # strictly lower rejected
+        # Equal score: the board value is unchanged but RANK still drifts as other
+        # players move, so prefer the most recent fetch — a straggler thread must not
+        # overwrite a fresher same-score rank (v19). Backfill / re-confirm carry an
+        # equal-or-newer fetched_at so they still pass; a missing timestamp falls back
+        # to allow. (fetched_at is always tz-aware UTC, set by fetch_scenario_rank.)
+        if candidate.fetched_at is None or existing.fetched_at is None:
+            return True
+        return candidate.fetched_at >= existing.fetched_at
     return True  # both non-RANKED: nothing to protect
 ```
 
@@ -423,9 +434,14 @@ Rule rationale:
   entry), but the model permits it, so the central monotonic-write invariant handles
   it explicitly rather than trusting every present and future caller. (Symmetric case:
   a scored candidate over a scoreless existing entry is a forward move and is written.)
-- **Equal or higher is written**, refreshing `mtime`. Equal writes are how the
-  cache-hit `scenario_name` backfill persists (same score, now carrying the name)
-  and how a successful loop re-confirms freshness.
+- **Higher is always written; an equal score tie-breaks on recency.** A strictly
+  higher score wins outright. At equal score the board value is unchanged but the
+  *rank* can still have drifted (other players moved), so the most recent fetch wins
+  (`candidate.fetched_at >= existing.fetched_at`) — a straggler can't overwrite a
+  fresher same-score rank. The `scenario_name` backfill (same `fetched_at`) and a loop
+  re-confirm (newer `fetched_at`) still write and refresh `mtime`; a missing timestamp
+  falls back to writing. This is what makes "a saved rank never goes backwards"
+  literally true, not merely score-monotonic (v19).
 
 The one case the rule cannot catch *at write time* is a brand-new scenario with
 an *empty* cache: nothing to compare against, so a lagging read-path `UNRANKED` is
@@ -862,16 +878,10 @@ blocking).
       return any(t["prop_id"] != _INTERVAL_PROP for t in triggered)
 
 
-  @callback(
-      Output("scenario_rank", "children"),
-      Input("do_update", "data"),
-      Input("scenario-dropdown-selection", "value"),
-      Input("interval-component", "n_intervals"),
-  )
-  def get_scenario_rank(_do_update, selected_scenario, _n) -> str:
+  def _render_scenario_rank(selected_scenario, allow_network: bool) -> str:
+      # ctx-free body: tests drive it with an explicit allow_network (no Dash context).
       if not selected_scenario:
           return "N/A"
-      allow_network = _rank_allows_network(ctx.triggered)
       try:
           rank_info = get_scenario_rank_info(
               selected_scenario, config.kovaaks_username, config.steam_id,
@@ -886,6 +896,17 @@ blocking).
       if allow_network:           # see emission policy below
           _emit_rank_messages(rank_info)
       return format_scenario_rank(rank_info)
+
+
+  @callback(
+      Output("scenario_rank", "children"),
+      Input("do_update", "data"),
+      Input("scenario-dropdown-selection", "value"),
+      Input("interval-component", "n_intervals"),
+  )
+  def get_scenario_rank(_do_update, selected_scenario, _n) -> str:
+      # Thin shell: read ctx only here, delegate to the ctx-free body.
+      return _render_scenario_rank(selected_scenario, _rank_allows_network(ctx.triggered))
   ```
 
   `allow_network=False` makes the read **resolve-from-cache-only and
@@ -1066,8 +1087,13 @@ table-driven over candidate-vs-existing:
 - existing RANKED **scoreless**, candidate RANKED **with a score** → writes (forward
   move; the candidate is strictly more informative);
 - existing UNRANKED, candidate RANKED → writes;
-- equal score (within `SCORE_EPSILON`) → writes (idempotent; e.g. `scenario_name`
-  backfill persists and refreshes `mtime`).
+- equal score, candidate `fetched_at` **newer or equal** → writes (idempotent
+  re-confirm / `scenario_name` backfill, which carries the same `fetched_at`);
+- equal score, candidate `fetched_at` **older** → rejected (v19: a straggler must not
+  overwrite a fresher same-score rank; assert the cache keeps the newer entry and its
+  `mtime` did not advance);
+- equal score, either `fetched_at` is `None` → writes (missing timestamp falls back to
+  allow).
 
 **Read path is display- and cache-monotonic (no regression during the window):**
 seed the cache with `score=110`; call `get_scenario_rank_info` on a path that
@@ -1089,6 +1115,12 @@ with no caches seeded, drive `get_scenario_rank` so `allow_network` is `True` an
 assert resolution + `fetch_scenario_rank` run (not the cache-only path). This guards
 the sentinel/co-fire behavior — a `ctx.triggered_id != "interval-component"` form
 would regress both cases.
+
+**Rank render body is testable without Dash (v19):** call `_render_scenario_rank`
+directly with an explicit `allow_network` — `True` exercises resolve/fetch + gated
+emit, `False` exercises the cache-only path and asserts no `_session_get` — so the
+existing direct-call tests (today calling `get_scenario_rank` as a plain function) move
+to the ctx-free body and stop depending on `ctx.triggered` being populated.
 
 **Interval poll on an unresolved scenario does not fetch (v13 regression guard):**
 with no cached mapping for the scenario, invoke the rank callback's
@@ -1211,9 +1243,12 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    keep the total on `get_cached_leaderboard_total`).
 7. Add the UI polling in `home.py`: add `Input("interval-component", "n_intervals")`
    to `get_scenario_rank`; extract a pure `_rank_allows_network(ctx.triggered)` helper
-   (`any(t["prop_id"] != "interval-component.n_intervals" for t in triggered)`) and
-   pass its result through, so an interval-only tick is cache-only and the trigger
-   classification is unit-testable without a callback context. Extract `_emit_rank_messages` and call it
+   (`any(t["prop_id"] != "interval-component.n_intervals" for t in triggered)`) and a
+   ctx-free body helper `_render_scenario_rank(selected_scenario, allow_network)`, so
+   the callback is a thin shell that reads `ctx` only at the edge — an interval-only
+   tick is cache-only, and both the trigger classification and the render body are
+   unit-testable without a Dash callback context (the existing direct-call tests drive
+   `_render_scenario_rank` with an explicit `allow_network` bool). Extract `_emit_rank_messages` and call it
    only when `allow_network` is true (emit on selection/`do_update`, stay silent on
    interval ticks). Add `delay_show=300` (and optionally `delay_hide`) to the rank
    `dcc.Loading` at [home.py](../source/pages/home.py) so the per-second
@@ -1309,6 +1344,14 @@ reviewability and de-risking, not a correctness requirement.
   Unranked") from the cache to the display. A pure `_rank_allows_network(ctx.triggered)`
   helper lands in the same round so the interval trigger-classification is testable
   without a Dash callback context.
+- **Equal-score writes tie-break on recency; render body is ctx-free (v19).** At an
+  equal board score the *rank* can still drift (other players move), so `_is_forward`
+  prefers the newer `fetched_at` — a straggler can't overwrite a fresher same-score
+  rank, making "never goes backwards" true for rank, not only score (a missing
+  `fetched_at` falls back to writing; `fetched_at` stays tz-aware UTC). The same round
+  factors the rank callback body into a ctx-free
+  `_render_scenario_rank(selected_scenario, allow_network)` so the existing direct-call
+  tests need no Dash callback context.
 - **Two distinct score comparisons, two distinct constants (v17).** Freshness
   (local-vs-board) and monotonicity (board-vs-board) are *different* comparisons and
   must not share a constant. Freshness models KovaaK's 2-dp truncation by flooring
@@ -1316,7 +1359,8 @@ reviewability and de-risking, not a correctness requirement.
   subtracting a one-cent tolerance, which would accept a stale cent-below board when
   `expected` sits on a 2-dp boundary. Monotonicity compares two already-truncated
   board scores and requires strict non-decrease (`candidate >= existing -
-  SCORE_EPSILON`); reusing the one-cent tolerance there punched a regression hole in
+  SCORE_EPSILON`; v19 adds a recency tie-break at *equal* score — see the entry
+  above); reusing the one-cent tolerance there punched a regression hole in
   the "never regress" invariant. `SCORE_EPSILON` (`1e-6`) is float-noise slack only;
   the retired `SCORE_FRESHNESS_TOLERANCE` (`0.01`) conflated the two. This corrected
   two P1 bugs Codex found in v16.
