@@ -1,16 +1,15 @@
 # Scenario Rank Eventual Consistency Proposal
 
-> **Status:** in review (v19). Latest change closes two equal-score / testability
-> gaps: (1) `_is_forward` now tie-breaks an **equal** board score on recency
-> (`candidate.fetched_at >= existing.fetched_at`) — at an unchanged score the *rank*
-> still drifts as other players move, so a straggler thread can no longer overwrite a
-> fresher same-score rank, making "a saved rank never goes backwards" literally true,
-> not just score-monotonic. (2) The rank callback body is factored into a ctx-free
-> `_render_scenario_rank(selected_scenario, allow_network)` so the existing direct-call
-> tests need no Dash callback context. (v18 made the display forward-only:
-> `_save_rank_monotonic` returns `(winner, wrote)` and the read path renders the
-> winner; v17 fixed two P1 score-comparison bugs.) Earlier revision history lives in
-> git log.
+> **Status:** in review (v20). Latest changes: (1) cache-only interval reads serve the
+> rank **TTL-independently** so a long-idle page can't interval-poll itself from a rank
+> to N/A (the passive mirror can't refresh; non-interval reads still re-fetch on TTL
+> expiry); (2) transient leaderboard-resolution failures log via
+> `request_exception_summary` (no traceback), matching the api_service convention; and
+> (3) the rollout now includes updating `architecture.md`, superseding the stale
+> `scenario_rank_proposal.md` decisions, and adding a `decision_log.md` entry. (v19
+> added an equal-score recency tie-break in `_is_forward` and a ctx-free
+> `_render_scenario_rank` body; v18 made the display forward-only.) Earlier revision
+> history lives in git log.
 
 ## Summary
 
@@ -448,7 +447,8 @@ an *empty* cache: nothing to compare against, so a lagging read-path `UNRANKED` 
 written. The freshness loop corrects it on success. If the loop exhausts before
 KovaaK's catches up, that `UNRANKED` (or any stale rank) persists until one of:
 the next PB on that scenario (which schedules a new loop), the 168h TTL expiring
-(the next view then re-fetches), or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button).
+(the next non-interval view then re-fetches — interval ticks read TTL-independently),
+or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button).
 We deliberately do **not** auto-recheck on every view — see that section for why.
 
 The forced leaderboard-total refresh runs only when the save actually happened
@@ -670,8 +670,12 @@ scenarios). Two call sites change:
   `resolve_leaderboard_id`, then takes the existing cached-rank branch
   ([api_service.py](../source/kovaaks/api_service.py)) but **does not fall
   through to `fetch_scenario_rank` on a miss** — it returns the UNKNOWN/N/A state
-  instead. The leaderboard total likewise stays on `get_cached_leaderboard_total`
-  (no forced fetch).
+  instead. It reads the rank cache **TTL-independently** (v20): a cache-only read
+  can't refresh, so TTL-gating it would only degrade a still-displayed rank to N/A on
+  a long-idle page; serving the last-known value keeps the interval poll a passive
+  mirror, while re-fetch-on-expiry stays the job of the non-interval (TTL-gated) reads.
+  The leaderboard total likewise stays on `get_cached_leaderboard_total` (no forced
+  fetch).
 
 `force_refresh=True` and `allow_network=False` are mutually exclusive in practice
 (force-refresh means "fetch now"); the manual refresh uses `force_refresh=True`,
@@ -740,14 +744,16 @@ def _run_attempt(
                 "KovaaK's username may be misconfigured."
             )
             return  # terminal: do not retry a bad username
-        except requests.RequestException:
+        except requests.RequestException as exc:
             # Transient: resolve_leaderboard_id swallows its own hydration
             # RequestExceptions, but search_scenario_exact (the cold-cache,
             # first-PB path) can still raise. Fall through to the retry tail
-            # rather than letting the broad guard kill the loop.
+            # rather than letting the broad guard kill the loop. Summarize the
+            # request failure (no traceback) — it is expected and retryable — to
+            # match the api_service convention (request_exception_summary).
             logger.warning(
-                "Transient failure resolving leaderboard for %s; will retry",
-                scenario_name, exc_info=True,
+                "Transient failure resolving leaderboard for %s; will retry: %s",
+                scenario_name, request_exception_summary(exc),
             )
             leaderboard_id = None  # NOT terminal — distinct from a resolved None
         else:
@@ -911,8 +917,10 @@ blocking).
 
   `allow_network=False` makes the read **resolve-from-cache-only and
   fetch-nothing**: `resolve_leaderboard_id` skips hydration and
-  `search_scenario_exact`; on a miss it returns `None` → N/A. The rank read stays
-  `get_cached_scenario_rank` (already cache-only); the total stays
+  `search_scenario_exact`; on a miss it returns `None` → N/A. The rank read is
+  `get_cached_scenario_rank` read **TTL-independently** (v20) — a passive interval
+  mirror can't refresh, so it serves the last-known rank rather than degrading to N/A
+  once the 168h TTL lapses on a long-idle page; the total stays
   `get_cached_leaderboard_total`. This is the same `allow_network` tool v10/v11
   had, kept for a *different and still-valid* reason (resolution avoidance), which
   is why v12's deletion was wrong. The freshness loop only ever runs for *resolved*
@@ -994,13 +1002,14 @@ function now emits these notifications itself.
 
 | Case | Behavior |
 |---|---|
-| API never reports the new score within ~62s | Loop exhausts; previous cache preserved. `_notify_exhaustion` validates the username, then emits "still catching up — click Refresh to retry" (valid user) via `dash_logger.error`. The stale value persists until the next PB (new loop), the 168h TTL (next view re-fetches on the miss), or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button). We do **not** auto-recheck (see that section). |
+| API never reports the new score within ~62s | Loop exhausts; previous cache preserved. `_notify_exhaustion` validates the username, then emits "still catching up — click Refresh to retry" (valid user) via `dash_logger.error`. The stale value persists until the next PB (new loop), the 168h TTL (the next **non-interval** view re-fetches on the miss — interval ticks read TTL-independently and never fetch), or the user clicking [Refresh](#when-the-cache-stays-stale-the-manual-refresh-button). We do **not** auto-recheck (see that section). |
 | API reports `RANKED` with score *higher* than expected | Accept as fresh. `_save_rank_monotonic` writes it and the loop exits. |
 | API reports `UNRANKED` | Not fresh — do not write. Continue retries. After exhaustion, `_notify_exhaustion` distinguishes lag from a misconfigured username. Previous cache preserved. |
 | Multiple PBs for the same scenario in succession | Each schedules its own independent loop. `_save_rank_monotonic` prevents a slower lower-score loop from overwriting a higher score already cached by a faster one — no read-path suppression to manage. A short retry window also makes overlap rare (a second PB needs another ~60s run). |
 | UI read callback (`get_scenario_rank`) fires during the freshness window | The interval-triggered read is cache-only (no fetch). A dropdown/`do_update` read (which *may* fetch on a cache miss) goes through `_save_rank_monotonic`, which rejects the lower/UNRANKED result *and* returns the preserved winner — so neither the cache nor the display regresses. No counter or coordination needed. |
 | Interval tick, **resolved** scenario | Cache-only read (`allow_network=False`): serves the cached rank/total with no network and surfaces the Timer loop's latest write. The loop is the only fetcher during the window. |
 | Interval tick, **unresolved** scenario (custom, no leaderboard) | Cache-only read returns N/A with **zero network** — `resolve_leaderboard_id` does not reach `search_scenario_exact` because `allow_network=False`. No `/scenario/popular` per-second polling; the `dcc.Loading` spinner is suppressed on these fast ticks via `delay_show`. (This is the v12 regression v13 fixes; without the flag the read would fetch every tick.) |
+| Page left selected and idle on one scenario past the 168h rank TTL | The cache-only interval read is **TTL-independent** (v20), so the rank keeps showing its last-known value rather than flipping to N/A from age alone. It can't refresh anyway; the next non-interval view (selection / `do_update` / manual Refresh) is TTL-gated and re-fetches. Without this the page would interval-poll itself from a rank to N/A after a week idle. |
 | `fetch_scenario_rank` raises `RequestException` | Treat as transient; continue retries. The inner `_get_with_retry` has already retried once at the HTTP layer. |
 | `resolve_leaderboard_id` raises `UnknownKovaaksUserError` | Terminal. Stop the loop immediately; emit a "username may be misconfigured" `dash_logger.error`. No retries. |
 | `resolve_leaderboard_id` raises `requests.RequestException` (e.g. `search_scenario_exact` network blip on the first-PB cold-cache path) | Transient. Treat like a failed fetch: continue retries, exhaust if it never resolves. Distinct from a resolved `None`. |
@@ -1055,6 +1064,9 @@ Unit tests for the freshness function in `api_service.py`, mocking
   notification (it is not the broad guard, not terminal), and writes **nothing**
   to the rank cache. On a later attempt where resolution succeeds and the score
   is fresh, it saves normally. This is the branch v6 fixed but v5 left untested.
+  **`caplog` regression (v20):** assert the retry log is a one-line
+  `request_exception_summary` at WARNING with **no traceback** (`record.exc_info is
+  None`), matching the api_service logging convention.
 - **Unresolved leaderboard is warning-only:** `resolve_leaderboard_id` returning
   `None` stops the loop, schedules no further Timer, writes nothing, and emits a
   `logger.warning` but **no `dash_logger` toast** — distinct from both the
@@ -1267,6 +1279,14 @@ below are the granular checklist; the rollout section maps them onto the PRs.
 10. Smoke-test by intentionally returning stale scores from a patched
     `fetch_scenario_rank` to confirm retries fire on schedule and the cache
     stays untouched on exhaustion.
+11. Update standing docs (ships with PR 3): in `architecture.md`, replace the "Rank
+    refresh pool — `ThreadPoolExecutor(max_workers=2)`" runtime-thread entry with the
+    Timer-based freshness poll plus the interval / manual-Refresh UI; supersede the
+    now-stale `scenario_rank_proposal.md` decisions ("Use `ThreadPoolExecutor(max_workers=2)`",
+    "No manual rank refresh button is planned"); and add a `decision_log.md` entry
+    recording the durable decisions (bounded score-aware Timer poll, centralized
+    monotonic write, manual Refresh button) so this proposal can be distilled and
+    deleted on ship per the docs-lifecycle policy.
 
 ## Rollout / PR Staging
 
@@ -1299,7 +1319,7 @@ overhead (three review/test cycles instead of one).
 |---|---|---|---|
 | **PR 1 — Centralized monotonic write** | Step 1 *(partial: `_rank_save_lock`, `SCORE_EPSILON`, `_save_rank_monotonic`, `_is_forward`, `_cached_rank`)*, Step 2, plus the Step 9 tests for the `_is_forward` rule table (incl. the sub-cent regression case) and read-path no-clobber | The single forward-only cache writer every other path funnels through; cache can never regress | — |
 | **PR 2 — Bounded score-aware freshness loop** | Step 1 *(rest: `ATTEMPT_DELAYS_SECONDS`, `_floor_2dp`, `_score_is_fresh`, `schedule_rank_freshness_refresh`, `_run_attempt`, `_schedule_attempt`, `_notify_exhaustion`)*, Steps 3, 4, 5, plus the Step 9 tests for freshness gating / retry / exhaustion / error classification / watchdog wiring, and Step 10 smoke test | Reliable post-PB rank refresh; deletes `refresh_scenario_rank` and the old executor | PR 1 |
-| **PR 3 — UI: cache-only interval poll + manual refresh** | Steps 6, 7, 8, plus the Step 9 tests for interval-no-fetch (resolved *and* unresolved), `allow_network=False` short-circuit, no-re-toast, and manual-refresh one-shot + emission | Rank updates within ~1s without replaying; manual Refresh button | PR 1 (and surfaces PR 2's writes) |
+| **PR 3 — UI: cache-only interval poll + manual refresh** | Steps 6, 7, 8, 11, plus the Step 9 tests for interval-no-fetch (resolved *and* unresolved), `allow_network=False` short-circuit, no-re-toast, and manual-refresh one-shot + emission | Rank updates within ~1s without replaying; manual Refresh button; standing docs updated | PR 1 (and surfaces PR 2's writes) |
 
 Step 9 (tests) is not its own PR — each PR carries the tests for the code it adds.
 
@@ -1403,6 +1423,9 @@ reviewability and de-risking, not a correctness requirement.
   returns N/A with zero network. Warning/error emission fires only on non-interval
   triggers (and the manual refresh), realizing "fire on change, not every tick"
   without per-tick re-toasting. SSE is unjustified for a local single-user tool.
+  **TTL-independent (v20):** the cache-only interval read serves the rank regardless of
+  its 168h TTL — a passive mirror can't refresh, so TTL-gating it would only flip a
+  long-idle page's rank to N/A; TTL re-fetch stays the job of the non-interval reads.
 - **Background errors never die silently.** A terminal `UnknownKovaaksUserError`
   stops the loop and notifies; transient `RequestException` (from resolve or
   fetch) retries; everything else is caught by a broad last-resort guard that
