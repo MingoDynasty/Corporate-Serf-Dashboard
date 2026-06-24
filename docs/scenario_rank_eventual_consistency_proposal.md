@@ -1,13 +1,15 @@
 # Scenario Rank Eventual Consistency Proposal
 
-> **Status:** in review. The latest substantive change fixes two P1 score-comparison
-> bugs found in the prior draft: freshness now floors the local score to the board's
-> 2-dp resolution (`board >= _floor_2dp(expected) - SCORE_EPSILON`) instead of
-> subtracting a one-cent tolerance, and the monotonic cache write requires a strict
-> non-decrease between two already-truncated board scores (`candidate >= existing -
-> SCORE_EPSILON`). The retired `SCORE_FRESHNESS_TOLERANCE` (0.01) had been doing both
-> jobs and was wrong for each. Earlier revision history (the v5-v17 drafts and their
-> rationale) lives in git log.
+> **Status:** in review (v18). The latest substantive change makes the rank
+> **display** forward-only, not just the cache: `_save_rank_monotonic` returns the
+> winning `ScenarioRankInfo` (the persisted value, never a rejected lower/UNRANKED
+> fetch), and the read path renders that winner — so a manual refresh or a read during
+> the freshness window can no longer flicker to a worse value before the next interval
+> tick. v18 also extracts a pure `_rank_allows_network(ctx.triggered)` helper so the
+> interval trigger-classification is unit-testable without a Dash callback context.
+> (v17 fixed two P1 score-comparison bugs: flooring the local score for freshness and
+> strict monotonic non-decrease for cache writes.) Earlier revision history lives in
+> git log.
 
 ## Summary
 
@@ -190,7 +192,8 @@ schedule_rank_freshness_refresh(scenario, expected_score)
     on each scheduled tick (whole body wrapped in a broad guard):
         result = fetch_scenario_rank(...)
         if _score_is_fresh(result, expected_score):
-            if _save_rank_monotonic(...):    # forward-only; never regress
+            _, wrote = _save_rank_monotonic(...)   # forward-only; never regress
+            if wrote:
                 force-refresh leaderboard total
             done
         elif attempts_remaining > 0:
@@ -333,8 +336,9 @@ Both writers funnel through it:
   nothing, leaving the existing cache untouched.
 - The **read path** (`get_scenario_rank_info`) calls it for every fetch it would
   have persisted — the cache-miss/`force_refresh` save and the cache-hit
-  `scenario_name` backfill. It still *returns* whatever it fetched for display;
-  the monotonic rule only governs what gets *persisted*.
+  `scenario_name` backfill. It returns the **winner** `_save_rank_monotonic` reports
+  (the persisted value, never a rejected lower/UNRANKED fetch), so the *display* is
+  forward-only too — not just what gets *persisted*.
 
 Because a rejected write never touches the file — no write, no `mtime` refresh —
 a lagging read-path fetch during the freshness window can neither clobber a higher
@@ -357,19 +361,21 @@ def _save_rank_monotonic(
     leaderboard_id: int,
     username: str,
     candidate: ScenarioRankInfo,
-) -> bool:
+) -> tuple[ScenarioRankInfo, bool]:
     """The single rank-cache writer, shared by the read path and the loop.
 
-    Writes `candidate` only if it is a forward move; returns True when it wrote,
-    False when it preserved a better existing entry. The lock makes
-    read-compare-write atomic across concurrent writers for the same leaderboard.
+    Returns `(winner, wrote)`. `winner` is the value now authoritative for the cache
+    — `candidate` if it was a forward move, else the preserved existing entry — so a
+    caller can DISPLAY a value that never regresses, not just persist one. `wrote` is
+    True iff the file was written. The lock makes read-compare-write atomic across
+    concurrent writers for the same leaderboard.
     """
     with _rank_save_lock:
         existing = _cached_rank(leaderboard_id, username)  # TTL-independent
         if existing is not None and not _is_forward(existing, candidate):
-            return False
+            return existing, False  # preserve & surface the better entry, not candidate
         save_scenario_rank(leaderboard_id, username, candidate)
-        return True
+        return candidate, True
 
 
 def _is_forward(existing: ScenarioRankInfo, candidate: ScenarioRankInfo) -> bool:
@@ -430,7 +436,7 @@ the next PB on that scenario (which schedules a new loop), the 168h TTL expiring
 We deliberately do **not** auto-recheck on every view — see that section for why.
 
 The forced leaderboard-total refresh runs only when the save actually happened
-(`_save_rank_monotonic` returned `True`). A skipped (regression-avoided) save
+(`_save_rank_monotonic` reported `wrote=True`). A skipped (regression-avoided) save
 means a fresher writer already wrote the rank and forced its own total refresh, so
 repeating it would be a wasted API call.
 
@@ -467,10 +473,11 @@ is unchanged, and stops).
     prevent_initial_call=True,
 )
 def refresh_rank(_, selected_scenario):
-    # One-shot "fetch current truth now"; writes through _save_rank_monotonic, so
-    # it cannot regress a higher cached score. Not a freshness loop — by the time
-    # a user clicks, the board has usually settled; if it is still lagging they can
-    # click again.
+    # One-shot "fetch current truth now"; writes through _save_rank_monotonic, so it
+    # cannot regress a higher cached score — and get_scenario_rank_info returns that
+    # winner, so a transient lower/UNRANKED fetch is NOT rendered (the display can't
+    # regress either). Not a freshness loop — by the time a user clicks, the board has
+    # usually settled; if it is still lagging they can click again.
     if not selected_scenario:
         return "N/A"
     try:
@@ -738,7 +745,8 @@ def _run_attempt(
 
         if rank_info is not None and _score_is_fresh(rank_info, expected_score):
             rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-            if _save_rank_monotonic(leaderboard_id, username, rank_info):
+            _, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            if wrote:
                 # Force-refresh the total only when we actually wrote. Failure is
                 # non-fatal: the rank save still stands.
                 try:
@@ -837,6 +845,23 @@ blocking).
 
   ```python
   from dash import ctx
+
+  _INTERVAL_PROP = "interval-component.n_intervals"
+
+
+  def _rank_allows_network(triggered: list[dict]) -> bool:
+      """True unless the 1s interval is the SOLE trigger.
+
+      A selection / do_update (real user or data event) resolves + fetches as today.
+      On initial load Dash sets `triggered` to the "." sentinel (!= the interval), so a
+      persisted selection still fetches; if a selection co-fires with a tick, that
+      prop_id keeps this True. Deliberately NOT ctx.triggered_id, which collapses to a
+      single id and would drop the co-fire and initial-load cases. Pure and ctx-free so
+      tests can call it with crafted `triggered` lists (no callback context needed).
+      """
+      return any(t["prop_id"] != _INTERVAL_PROP for t in triggered)
+
+
   @callback(
       Output("scenario_rank", "children"),
       Input("do_update", "data"),
@@ -846,15 +871,7 @@ blocking).
   def get_scenario_rank(_do_update, selected_scenario, _n) -> str:
       if not selected_scenario:
           return "N/A"
-      # Cache-only when the interval is the SOLE trigger. A selection / do_update
-      # (real user or data event) may resolve + fetch as today; if either co-fires
-      # with the tick, err toward allowing network. On initial load ctx.triggered
-      # holds the "." sentinel (!= the interval), so a persisted selection still
-      # resolves + fetches as today — the any() form is deliberate here, not
-      # ctx.triggered_id, which would drop the co-fire and initial-load cases.
-      allow_network = any(
-          t["prop_id"] != "interval-component.n_intervals" for t in ctx.triggered
-      )
+      allow_network = _rank_allows_network(ctx.triggered)
       try:
           rank_info = get_scenario_rank_info(
               selected_scenario, config.kovaaks_username, config.steam_id,
@@ -960,7 +977,7 @@ function now emits these notifications itself.
 | API reports `RANKED` with score *higher* than expected | Accept as fresh. `_save_rank_monotonic` writes it and the loop exits. |
 | API reports `UNRANKED` | Not fresh — do not write. Continue retries. After exhaustion, `_notify_exhaustion` distinguishes lag from a misconfigured username. Previous cache preserved. |
 | Multiple PBs for the same scenario in succession | Each schedules its own independent loop. `_save_rank_monotonic` prevents a slower lower-score loop from overwriting a higher score already cached by a faster one — no read-path suppression to manage. A short retry window also makes overlap rare (a second PB needs another ~60s run). |
-| UI read callback (`get_scenario_rank`) fires during the freshness window | The interval-triggered read is cache-only (no fetch). A dropdown/`do_update` read (which *may* fetch on a cache miss) can display the lagging value, but its write goes through `_save_rank_monotonic`, which rejects the lower/UNRANKED result — cache not clobbered. No counter or coordination needed. |
+| UI read callback (`get_scenario_rank`) fires during the freshness window | The interval-triggered read is cache-only (no fetch). A dropdown/`do_update` read (which *may* fetch on a cache miss) goes through `_save_rank_monotonic`, which rejects the lower/UNRANKED result *and* returns the preserved winner — so neither the cache nor the display regresses. No counter or coordination needed. |
 | Interval tick, **resolved** scenario | Cache-only read (`allow_network=False`): serves the cached rank/total with no network and surfaces the Timer loop's latest write. The loop is the only fetcher during the window. |
 | Interval tick, **unresolved** scenario (custom, no leaderboard) | Cache-only read returns N/A with **zero network** — `resolve_leaderboard_id` does not reach `search_scenario_exact` because `allow_network=False`. No `/scenario/popular` per-second polling; the `dcc.Loading` spinner is suppressed on these fast ticks via `delay_show`. (This is the v12 regression v13 fixes; without the flag the read would fetch every tick.) |
 | `fetch_scenario_rank` raises `RequestException` | Treat as transient; continue retries. The inner `_get_with_retry` has already retried once at the HTTP layer. |
@@ -998,8 +1015,8 @@ Unit tests for the freshness function in `api_service.py`, mocking
 - **Monotonic write: an older/lower loop cannot overwrite a higher cached
   score.** Seed the rank cache with `score=110`; run an attempt that fetches
   `score=100` and passes freshness (`expected_score=100`); assert
-  `_save_rank_monotonic` returns `False`, the cache file still reads `110`, and
-  the forced total refresh is *not* triggered.
+  `_save_rank_monotonic` reports `wrote=False` (winner is the cached `110`), the cache
+  file still reads `110`, and the forced total refresh is *not* triggered.
 - On a fresh, non-regressing result, force-refreshes the leaderboard total cache
   even when the existing total cache file is within its normal TTL. Verify
   `cache/leaderboard/totals/{leaderboard_id}.json` is overwritten (e.g. by
@@ -1052,25 +1069,26 @@ table-driven over candidate-vs-existing:
 - equal score (within `SCORE_EPSILON`) → writes (idempotent; e.g. `scenario_name`
   backfill persists and refreshes `mtime`).
 
-**Read path goes through the monotonic write (no clobber during the window):**
+**Read path is display- and cache-monotonic (no regression during the window):**
 seed the cache with `score=110`; call `get_scenario_rank_info` on a path that
-fetches a lagging `score=100`; assert it **returns** the fetched value for
-display but the cache file still reads `110` and its `mtime` did **not** advance
-(rejected write touches nothing).
+fetches a lagging `score=100` (and, separately, a transient `UNRANKED`); assert it
+**returns the preserved winner (`110`) for display**, the cache file still reads
+`110`, and its `mtime` did **not** advance (rejected write touches nothing). This is
+the "display does not regress" guard, not only "cache does not regress."
 
 **Interval poll on a resolved scenario does not fetch:** seed a fresh mapping,
 rank, and total cache; invoke the rank callback's interval-triggered path
 (`allow_network=False`); assert it returns the cached value and `_session_get` is
 **never called**.
 
-**Initial render with a persisted selection allows network (cold cache):** with no
-caches seeded, invoke `get_scenario_rank` on its initial call — Dash sets
-`ctx.triggered` to the `"."` sentinel — for a persisted scenario; assert
-`allow_network` computes to `True` so resolution + `fetch_scenario_rank` run as they
-do today (not the cache-only path). Also assert that a selection + interval co-fire
-in the same invocation allows network. This guards the implicit
-sentinel/co-fire behavior the `any()` form relies on — a `ctx.triggered_id !=
-"interval-component"` form would regress both cases.
+**Trigger classification allows network on initial render / co-fire (cold cache):**
+call the pure `_rank_allows_network` helper directly — no Dash context needed — with
+the initial-call sentinel `[{"prop_id": "."}]` and assert it returns `True`; likewise
+for a selection + interval co-fire list, and `False` for an interval-only list. Then,
+with no caches seeded, drive `get_scenario_rank` so `allow_network` is `True` and
+assert resolution + `fetch_scenario_rank` run (not the cache-only path). This guards
+the sentinel/co-fire behavior — a `ctx.triggered_id != "interval-component"` form
+would regress both cases.
 
 **Interval poll on an unresolved scenario does not fetch (v13 regression guard):**
 with no cached mapping for the scenario, invoke the rank callback's
@@ -1088,8 +1106,9 @@ hydration, no `search_scenario_exact`) and the read does not fall through to
 **Manual refresh forces a one-shot fetch and surfaces messages:** the
 `refresh_rank` callback calls `get_scenario_rank_info(..., force_refresh=True)`,
 which fetches once and persists through `_save_rank_monotonic`. Assert a single
-`fetch_scenario_rank`, that a returned-lower board value does **not** regress a
-higher cached score, and that a result carrying `error_message`/`warning_message`
+`fetch_scenario_rank`, that a returned-lower (or transient `UNRANKED`) board value
+**neither** regresses the higher cached score **nor** is displayed — the callback
+renders the preserved winner — and that a result carrying `error_message`/`warning_message`
 emits a `dash_logger.error`/`warning` (i.e. a forced-lookup failure does **not**
 become a silent "N/A"). The emission is **un**gated — it fires even when the same
 error was already shown, because the click is an explicit user request.
@@ -1170,6 +1189,9 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    `scenario_name` backfill at
    [`api_service.py`](../source/kovaaks/api_service.py) (in-memory
    `scenario_name` attach stays unconditional; only the write is conditional).
+   Return the `winner` it reports for display — on a rejected write, return the
+   preserved cache entry, not the lower/UNRANKED fetch — so the displayed value is
+   forward-only, not just the persisted one.
 3. Delete `refresh_scenario_rank` from `api_service.py`. Confirm it has no
    remaining callers (its only caller was the watchdog, updated in step 4).
 4. In `file_watchdog.py`, rewrite `_refresh_rank_after_high_score` to take and
@@ -1188,9 +1210,10 @@ below are the granular checklist; the rollout section maps them onto the PRs.
    `False`, do not fall through to `fetch_scenario_rank` on a rank-cache miss and
    keep the total on `get_cached_leaderboard_total`).
 7. Add the UI polling in `home.py`: add `Input("interval-component", "n_intervals")`
-   to `get_scenario_rank`; compute `allow_network = any(t["prop_id"] !=
-   "interval-component.n_intervals" for t in ctx.triggered)` and pass it through, so
-   an interval-only tick is cache-only. Extract `_emit_rank_messages` and call it
+   to `get_scenario_rank`; extract a pure `_rank_allows_network(ctx.triggered)` helper
+   (`any(t["prop_id"] != "interval-component.n_intervals" for t in triggered)`) and
+   pass its result through, so an interval-only tick is cache-only and the trigger
+   classification is unit-testable without a callback context. Extract `_emit_rank_messages` and call it
    only when `allow_network` is true (emit on selection/`do_update`, stay silent on
    interval ticks). Add `delay_show=300` (and optionally `delay_hide`) to the rank
    `dcc.Loading` at [home.py](../source/pages/home.py) so the per-second
@@ -1276,6 +1299,16 @@ reviewability and de-risking, not a correctness requirement.
   the call-site-ordering requirement — all deleted. Concurrency (loop-vs-loop and
   read-vs-loop) collapses to one score comparison under one process-wide lock;
   deliberately lighter than supersession or a coordination registry.
+- **Display is forward-only, not just the cache (v18).** `_save_rank_monotonic`
+  returns `(winner, wrote)`; the read path renders the `winner` (the persisted value),
+  so a fetch the cache rejects — a transient `UNRANKED` or a lower board read on a
+  manual refresh or a freshness-window read — is never shown. Without this the cache
+  was monotonic but the UI could still flicker to a worse value for ~1s until the next
+  interval tick re-read cache, exactly the regression the manual-refresh button exists
+  to avoid. Extends the de-rank policy ("show briefly stale rather than flicker to
+  Unranked") from the cache to the display. A pure `_rank_allows_network(ctx.triggered)`
+  helper lands in the same round so the interval trigger-classification is testable
+  without a Dash callback context.
 - **Two distinct score comparisons, two distinct constants (v17).** Freshness
   (local-vs-board) and monotonicity (board-vs-board) are *different* comparisons and
   must not share a constant. Freshness models KovaaK's 2-dp truncation by flooring
