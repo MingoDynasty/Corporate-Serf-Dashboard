@@ -84,6 +84,9 @@ def layout(**kwargs):  # noqa: ARG001
                                                 id="burger",
                                                 size="sm",
                                                 opened=False,
+                                                persisted_props=["opened"],
+                                                persistence=True,
+                                                persistence_type="local",
                                             ),
                                             dmc.Anchor(
                                                 children=[
