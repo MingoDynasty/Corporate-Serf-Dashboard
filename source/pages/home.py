@@ -545,6 +545,12 @@ def layout(**kwargs):  # noqa: ARG001
                                                         id="scenario_datetime_last_played",
                                                         span=True,
                                                         size="sm",
+                                                        style={
+                                                            "cursor": "help",
+                                                            "textDecorationLine": "underline",
+                                                            "textDecorationStyle": "dotted",
+                                                            "textUnderlineOffset": "0.15em",
+                                                        },
                                                     ),
                                                     id="last-played-tooltip",
                                                     label="My Tooltip",
