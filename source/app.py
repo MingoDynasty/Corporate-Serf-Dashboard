@@ -2,6 +2,7 @@
 Entrypoint to the Corporate Serf Dashboard app.
 """
 
+import json
 import logging
 import sys
 from dataclasses import asdict
@@ -76,7 +77,7 @@ def main() -> None:
     """
     logger.debug(
         "Loaded config:\n%s",
-        "\n".join(f"  {key}: {value!r}" for key, value in asdict(config).items()),
+        json.dumps(asdict(config), indent=2),
     )
 
     # Initialize scenario data
