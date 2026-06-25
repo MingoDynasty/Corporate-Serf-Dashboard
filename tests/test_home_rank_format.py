@@ -9,6 +9,36 @@ from source.pages import home  # noqa: E402
 format_scenario_rank = home.format_scenario_rank
 
 
+def _find_component_by_id(component, component_id):
+    if getattr(component, "id", None) == component_id:
+        return component
+
+    children = getattr(component, "children", None)
+    if children is None:
+        return None
+    if not isinstance(children, list | tuple):
+        children = [children]
+
+    for child in children:
+        match = _find_component_by_id(child, component_id)
+        if match is not None:
+            return match
+
+    return None
+
+
+def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
+    monkeypatch.setattr(home, "get_playlists", lambda: ["Voltaic Benchmarks"])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
+
+    playlist_filter = _find_component_by_id(
+        home.layout(),
+        "playlist-dropdown-selection",
+    )
+
+    assert playlist_filter.scrollAreaProps == {"type": "always"}
+
+
 def test_format_scenario_rank_with_total_players():
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
