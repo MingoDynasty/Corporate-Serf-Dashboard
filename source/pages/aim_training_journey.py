@@ -9,7 +9,10 @@ from source.kovaaks.data_service import (
     get_aim_training_journey_for_playlists,
     get_playlists,
 )
-from source.plot.plot_service import generate_aim_training_journey_plot
+from source.plot.plot_service import (
+    apply_light_dark_mode,
+    generate_aim_training_journey_plot,
+)
 from source.utilities.dash_logging import get_dash_logger
 
 logger = logging.getLogger(__name__)
@@ -25,8 +28,9 @@ dash.register_page(
     Output("aim-training-journey-graph", "figure"),
     Input("playlists-multi-select", "value"),
     Input("checkpoint-hour", "value"),
+    Input("color-scheme-switch", "checked"),
 )
-def generate_graph(selected_playlist, checkpoint_hour):
+def generate_graph(selected_playlist, checkpoint_hour, switch_on):
     if not selected_playlist or not checkpoint_hour:
         return None
     journey_data = get_aim_training_journey_for_playlists(selected_playlist)
@@ -36,12 +40,16 @@ def generate_graph(selected_playlist, checkpoint_hour):
             dash_logger.warning(message)
 
     aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)
-    return generate_aim_training_journey_plot(journey_data, aim_training_checkpoints)
+    figure = generate_aim_training_journey_plot(
+        journey_data,
+        aim_training_checkpoints,
+    )
+    return apply_light_dark_mode(figure, switch_on)
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
-    return dmc.MantineProvider(
+    return dmc.Box(
         [
             dmc.Alert(
                 children="This page is still a work in progress!",
