@@ -41,6 +41,13 @@
     font-size: 1em;
 }
 
+.last-played-affordance {
+    cursor: help;
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 0.15em;
+}
+
 .playlist-scenarios-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-body);
     --ag-border-color: var(--mantine-color-gray-3);

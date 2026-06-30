@@ -45,6 +45,7 @@ from source.utilities.utilities import ordinal
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
+LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 dash.register_page(
     __name__,
     path="/",
@@ -106,44 +107,60 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 @callback(
     Output("scenario_num_runs", "children"),
     Output("last-played-ts", "data"),
+    Output("last-played-empty-value", "data"),
     Output("last-played-tooltip", "label"),
+    Output("scenario_datetime_last_played", "className"),
+    Output("scenario_datetime_last_played", "tabIndex"),
+    Output("last-played-tooltip", "disabled"),
     Input("do_update", "data"),
     Input("scenario-dropdown-selection", "value"),
 )
-def get_scenario_num_runs(_, selected_scenario) -> tuple[int, float | None, str]:
+def get_scenario_num_runs(
+    _, selected_scenario
+) -> tuple[int, float | None, str, str, str | None, int | None, bool]:
     """
     Updates the Scenario Stats on the UI.
 
     The relative "Last played" string is rendered client-side from the raw epoch
-    written to the ``last-played-ts`` store; this callback owns the store and the
-    tooltip label, while a clientside callback owns the visible ``children``.
+    written to the ``last-played-ts`` store. This callback owns the empty-state
+    value and tooltip affordance, while a clientside callback owns the visible
+    ``children``.
     :param _: trigger from the interval component. Its actual value is not used.
     :param selected_scenario: user-selected scenario name.
     :return: Scenario Stats data
     """
-    if not selected_scenario or not is_scenario_in_database(selected_scenario):
-        return 0, None, "N/A"
+    if not selected_scenario:
+        return 0, None, "—", "", None, None, True
+
+    if not is_scenario_in_database(selected_scenario):
+        return 0, None, "Never", "", None, None, True
+
     scenario_stats = get_scenario_stats(selected_scenario)
 
     return (
         scenario_stats.number_of_runs,
         scenario_stats.date_last_played.timestamp(),
+        "Never",  # Defensive fallback; unused for a valid timestamp.
         scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
+        "last-played-affordance",
+        0,
+        False,
     )
 
 
 # The visible "Last played" text is recomputed in the browser on each store
 # change and on every 30s interval tick, so the relative string stays current
 # without a reload. Home uses the full window.* path (dagfuncs is not a bare
-# global here) and the "N/A" sentinel.
+# global here) and the server-selected empty-state sentinel.
 clientside_callback(
     """
-    (seconds, _nIntervals) => {
-        return window.dashAgGridFunctions.relativeTime(seconds, "N/A");
+    (seconds, emptyValue, _nIntervals) => {
+        return window.dashAgGridFunctions.relativeTime(seconds, emptyValue);
     }
     """,
     Output("scenario_datetime_last_played", "children"),
     Input("last-played-ts", "data"),
+    Input("last-played-empty-value", "data"),
     Input("relative-time-interval", "n_intervals"),
 )
 
@@ -453,6 +470,10 @@ def layout(**kwargs):  # noqa: ARG001
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
+            dcc.Store(
+                id="last-played-empty-value",
+                data="—",
+            ),
             dcc.Interval(
                 id="interval-component",
                 interval=config.polling_interval,
@@ -541,13 +562,15 @@ def layout(**kwargs):  # noqa: ARG001
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Text(
-                                                        "N/A",
+                                                        "—",
                                                         id="scenario_datetime_last_played",
                                                         span=True,
                                                         size="sm",
                                                     ),
+                                                    disabled=True,
+                                                    events=LAST_PLAYED_TOOLTIP_EVENTS,
                                                     id="last-played-tooltip",
-                                                    label="My Tooltip",
+                                                    label="",
                                                 ),
                                             ],
                                             gap="0.25em",
