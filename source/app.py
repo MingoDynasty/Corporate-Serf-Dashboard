@@ -2,8 +2,10 @@
 Entrypoint to the Corporate Serf Dashboard app.
 """
 
+import json
 import logging
 import sys
+from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -73,7 +75,10 @@ def main() -> None:
     Main entry point.
     :return: None.
     """
-    logger.debug("Loaded config: %s", config)
+    logger.debug(
+        "Loaded config:\n%s",
+        json.dumps(asdict(config), indent=2),
+    )
 
     # Initialize scenario data
     initialize_kovaaks_data(config.stats_dir)
