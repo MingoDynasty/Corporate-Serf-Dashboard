@@ -5,10 +5,15 @@ import dash_mantine_components as dmc
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import aim_training_journey, playlist_scenarios, playlists  # noqa: E402
+from source.pages import (  # noqa: E402
+    aim_training_journey,
+    playlist_scenarios,
+    playlists,
+)
 
 
 def test_bare_playlists_route_callback_builds_playlist_path():
@@ -21,9 +26,7 @@ def test_aim_training_journey_page_inherits_shell_theme_provider():
     page = aim_training_journey.layout()
 
     assert isinstance(page, dmc.Box)
-    assert all(
-        not isinstance(child, dmc.MantineProvider) for child in page.children
-    )
+    assert all(not isinstance(child, dmc.MantineProvider) for child in page.children)
 
 
 def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
@@ -47,6 +50,12 @@ def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
 
     assert light_figure.layout.template.layout.paper_bgcolor == "#ffffff"
     assert dark_figure.layout.template.layout.paper_bgcolor == "#242424"
+
+
+def test_playlist_selector_dropdown_scrollbar_is_always_visible():
+    selector = playlist_components.playlist_selector("playlists-selector")
+
+    assert selector.scrollAreaProps == {"type": "always"}
 
 
 def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):

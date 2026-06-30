@@ -605,6 +605,9 @@ redefining-builtins-modules = ["six.moves", "past.builtins", "future.builtins", 
 profile = "black"
 skip = [".venv", "venv"]  # Skips directories named .venv or venv
 
+[tool.black]
+target-version = ["py314"]
+
 [tool.mypy]
 disable_error_code = ["import-untyped"]
 

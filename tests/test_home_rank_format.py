@@ -1,4 +1,5 @@
 import dash
+from dash import dcc
 
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 
@@ -7,6 +8,31 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source.pages import home  # noqa: E402
 
 format_scenario_rank = home.format_scenario_rank
+
+
+def _walk_components(component):
+    yield component
+    children = getattr(component, "children", None)
+    if children is None:
+        return
+    if isinstance(children, (list, tuple)):
+        for child in children:
+            yield from _walk_components(child)
+        return
+    yield from _walk_components(children)
+
+
+def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
+    monkeypatch.setattr(home, "get_playlists", lambda: ["Voltaic Benchmarks"])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
+
+    playlist_filter = next(
+        component
+        for component in _walk_components(home.layout())
+        if getattr(component, "id", None) == "playlist-dropdown-selection"
+    )
+
+    assert playlist_filter.scrollAreaProps == {"type": "always"}
 
 
 def test_format_scenario_rank_with_total_players():
@@ -69,3 +95,22 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
         "Unranked (54,702 ranked)"
     )
     assert queried_scenarios == ["Unplayed Scenario"]
+
+
+def test_scenario_rank_loading_has_show_delay(monkeypatch):
+    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    rank_loading = next(
+        (
+            component
+            for component in _walk_components(page)
+            if isinstance(component, dcc.Loading)
+            and getattr(component.children, "id", None) == "scenario_rank"
+        ),
+        None,
+    )
+
+    assert rank_loading is not None
+    assert rank_loading.delay_show == home.SCENARIO_RANK_LOADING_DELAY_MS == 250

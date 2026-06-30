@@ -44,6 +44,7 @@ from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
+SCENARIO_RANK_LOADING_DELAY_MS = 250
 dash.register_page(
     __name__,
     path="/",
@@ -484,6 +485,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     ml="xl",
                                     persistence=True,
                                     placeholder="Select a playlist...",
+                                    scrollAreaProps={"type": "always"},
                                     searchable=True,
                                 ),
                                 dmc.Select(
@@ -576,6 +578,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                         id="scenario_rank",
                                                         span=True,
                                                     ),
+                                                    delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
                                                     parent_style={
                                                         "display": "inline-block",
                                                         "verticalAlign": "baseline",
