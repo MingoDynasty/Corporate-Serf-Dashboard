@@ -1,4 +1,7 @@
+from datetime import datetime
+
 import dash
+import dash_mantine_components as dmc
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
@@ -6,13 +9,47 @@ from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import playlist_scenarios, playlists  # noqa: E402
+from source.pages import (  # noqa: E402
+    aim_training_journey,
+    playlist_scenarios,
+    playlists,
+)
 
 
 def test_bare_playlists_route_callback_builds_playlist_path():
     assert playlists.route_to_selected_playlist("KovaaKsTestCode") == (
         "/playlists/KovaaKsTestCode"
     )
+
+
+def test_aim_training_journey_page_inherits_shell_theme_provider():
+    page = aim_training_journey.layout()
+
+    assert isinstance(page, dmc.Box)
+    assert all(not isinstance(child, dmc.MantineProvider) for child in page.children)
+
+
+def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
+    dmc.add_figure_templates()
+
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_aim_training_journey_for_playlists",
+        lambda selected_playlists: {
+            selected_playlists[0]: {datetime(2025, 1, 1): 0.5},
+        },
+    )
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_aim_training_checkpoints",
+        lambda checkpoint_hour: {},
+    )
+
+    light_figure = aim_training_journey.generate_graph(["Playlist"], 10, False)
+    dark_figure = aim_training_journey.generate_graph(["Playlist"], 10, True)
+
+    assert light_figure.layout.template.layout.paper_bgcolor == "#ffffff"
+    assert dark_figure.layout.template.layout.paper_bgcolor == "#242424"
 
 
 def test_playlist_selector_dropdown_scrollbar_is_always_visible():

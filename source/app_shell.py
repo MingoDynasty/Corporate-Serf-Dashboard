@@ -70,9 +70,17 @@ def nav_link(label: str, href: str, icon: str) -> dcc.Link:
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
+        id="mantine-provider",
         children=[
             dmc.AppShell(
                 children=[
+                    dcc.Location(id="app-location"),
+                    dcc.Interval(
+                        id="theme-sync-interval",
+                        interval=100,
+                        max_intervals=1,
+                        n_intervals=0,
+                    ),
                     dmc.NotificationContainer(id="notification-container"),
                     dmc.AppShellHeader(
                         dmc.Grid(
@@ -175,11 +183,16 @@ def toggle_navbar(opened, navbar):
 
 clientside_callback(
     """
-    (switchOn) => {
-       document.documentElement.setAttribute('data-mantine-color-scheme', switchOn ? 'dark' : 'light');
-       return window.dash_clientside.no_update
+    (switchOn, _pathname, _nIntervals) => {
+       const persistedSwitch = document.getElementById('color-scheme-switch');
+       const isDark = persistedSwitch ? persistedSwitch.checked : Boolean(switchOn);
+       const colorScheme = isDark ? 'dark' : 'light';
+       document.documentElement.setAttribute('data-mantine-color-scheme', colorScheme);
+       return colorScheme;
     }
     """,
-    Output("color-scheme-switch", "id"),
+    Output("mantine-provider", "forceColorScheme"),
     Input("color-scheme-switch", "checked"),
+    Input("app-location", "pathname"),
+    Input("theme-sync-interval", "n_intervals"),
 )
