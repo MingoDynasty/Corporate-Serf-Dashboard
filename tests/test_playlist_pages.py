@@ -2,6 +2,7 @@ import dash
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -12,6 +13,12 @@ def test_bare_playlists_route_callback_builds_playlist_path():
     assert playlists.route_to_selected_playlist("KovaaKsTestCode") == (
         "/playlists/KovaaKsTestCode"
     )
+
+
+def test_playlist_selector_dropdown_scrollbar_is_always_visible():
+    selector = playlist_components.playlist_selector("playlists-selector")
+
+    assert selector.scrollAreaProps == {"type": "always"}
 
 
 def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):

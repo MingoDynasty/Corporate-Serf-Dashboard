@@ -485,6 +485,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     ml="xl",
                                     persistence=True,
                                     placeholder="Select a playlist...",
+                                    scrollAreaProps={"type": "always"},
                                     searchable=True,
                                 ),
                                 dmc.Select(

@@ -17,6 +17,7 @@ def playlist_selector(component_id: str, value: str | None = None) -> dmc.Select
         maxDropdownHeight="75vh",
         miw=400,
         placeholder="Select a playlist...",
+        scrollAreaProps={"type": "always"},
         searchable=True,
         value=value,
     )

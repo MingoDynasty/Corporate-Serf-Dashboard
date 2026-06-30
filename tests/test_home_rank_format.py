@@ -22,6 +22,19 @@ def _walk_components(component):
     yield from _walk_components(children)
 
 
+def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
+    monkeypatch.setattr(home, "get_playlists", lambda: ["Voltaic Benchmarks"])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
+
+    playlist_filter = next(
+        component
+        for component in _walk_components(home.layout())
+        if getattr(component, "id", None) == "playlist-dropdown-selection"
+    )
+
+    assert playlist_filter.scrollAreaProps == {"type": "always"}
+
+
 def test_format_scenario_rank_with_total_players():
     rank_info = ScenarioRankInfo(
         status=ScenarioRankStatus.RANKED,
