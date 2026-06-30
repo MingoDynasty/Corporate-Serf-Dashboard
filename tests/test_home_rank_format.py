@@ -84,16 +84,20 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
     assert queried_scenarios == ["Unplayed Scenario"]
 
 
-def test_scenario_rank_loading_delays_short_callbacks(monkeypatch):
+def test_scenario_rank_loading_has_show_delay(monkeypatch):
     monkeypatch.setattr(home, "get_playlists", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     page = home.layout()
     rank_loading = next(
-        component
-        for component in _walk_components(page)
-        if isinstance(component, dcc.Loading)
-        and getattr(component.children, "id", None) == "scenario_rank"
+        (
+            component
+            for component in _walk_components(page)
+            if isinstance(component, dcc.Loading)
+            and getattr(component.children, "id", None) == "scenario_rank"
+        ),
+        None,
     )
 
+    assert rank_loading is not None
     assert rank_loading.delay_show == home.SCENARIO_RANK_LOADING_DELAY_MS == 250
