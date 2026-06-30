@@ -137,11 +137,6 @@ def layout(**kwargs):  # noqa: ARG001
                         children=[
                             nav_link("Home", "/", "bi:house-door-fill"),
                             nav_link(
-                                "Aim Training Journey",
-                                "/aim-training-journey",
-                                "game-icons:journey",
-                            ),
-                            nav_link(
                                 "Playlists",
                                 "/playlists",
                                 "material-symbols:playlist-play",
