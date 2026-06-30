@@ -1,3 +1,6 @@
+from datetime import datetime
+from types import SimpleNamespace
+
 import dash
 from dash import dcc
 
@@ -33,6 +36,76 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     )
 
     assert playlist_filter.scrollAreaProps == {"type": "always"}
+
+
+def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
+    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    components = list(_walk_components(home.layout()))
+    last_played = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "scenario_datetime_last_played"
+    )
+    tooltip = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "last-played-tooltip"
+    )
+
+    assert last_played.children == "—"
+    assert getattr(last_played, "style", None) is None
+    assert getattr(last_played, "tabIndex", None) is None
+    assert tooltip.disabled is True
+    assert tooltip.label == ""
+    assert tooltip.events == home.LAST_PLAYED_TOOLTIP_EVENTS
+
+
+def test_get_scenario_num_runs_without_selection():
+    assert home.get_scenario_num_runs(None, None) == (
+        0,
+        None,
+        "—",
+        "",
+        {},
+        None,
+        True,
+    )
+
+
+def test_get_scenario_num_runs_without_play_data(monkeypatch):
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
+
+    assert home.get_scenario_num_runs(None, "Unplayed Scenario") == (
+        0,
+        None,
+        "Never",
+        "",
+        {},
+        None,
+        True,
+    )
+
+
+def test_get_scenario_num_runs_with_play_data(monkeypatch):
+    last_played = datetime(2026, 6, 30, 9, 5, 4)
+    scenario_stats = SimpleNamespace(
+        number_of_runs=12,
+        date_last_played=last_played,
+    )
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+    monkeypatch.setattr(home, "get_scenario_stats", lambda _scenario: scenario_stats)
+
+    assert home.get_scenario_num_runs(None, "Played Scenario") == (
+        12,
+        last_played.timestamp(),
+        "Never",
+        "2026-06-30 09:05:04 AM",
+        home.LAST_PLAYED_AFFORDANCE_STYLE,
+        0,
+        False,
+    )
 
 
 def test_format_scenario_rank_with_total_players():
