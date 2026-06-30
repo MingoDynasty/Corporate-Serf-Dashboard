@@ -2,10 +2,11 @@ import dash
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.pages import playlist_components, playlist_scenarios, playlists  # noqa: E402
+from source.pages import playlist_scenarios, playlists  # noqa: E402
 
 
 def test_bare_playlists_route_callback_builds_playlist_path():
