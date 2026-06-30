@@ -56,6 +56,7 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
 
     assert last_played.children == "—"
     assert getattr(last_played, "style", None) is None
+    assert getattr(last_played, "className", None) is None
     assert getattr(last_played, "tabIndex", None) is None
     assert tooltip.disabled is True
     assert tooltip.label == ""
@@ -68,7 +69,7 @@ def test_get_scenario_num_runs_without_selection():
         None,
         "—",
         "",
-        {},
+        None,
         None,
         True,
     )
@@ -82,7 +83,7 @@ def test_get_scenario_num_runs_without_play_data(monkeypatch):
         None,
         "Never",
         "",
-        {},
+        None,
         None,
         True,
     )
@@ -102,7 +103,7 @@ def test_get_scenario_num_runs_with_play_data(monkeypatch):
         last_played.timestamp(),
         "Never",
         "2026-06-30 09:05:04 AM",
-        home.LAST_PLAYED_AFFORDANCE_STYLE,
+        "last-played-affordance",
         0,
         False,
     )

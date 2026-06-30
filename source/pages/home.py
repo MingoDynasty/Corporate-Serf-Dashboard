@@ -45,12 +45,6 @@ from source.utilities.utilities import ordinal
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
-LAST_PLAYED_AFFORDANCE_STYLE = {
-    "cursor": "help",
-    "textDecorationLine": "underline",
-    "textDecorationStyle": "dotted",
-    "textUnderlineOffset": "0.15em",
-}
 LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 dash.register_page(
     __name__,
@@ -115,7 +109,7 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
     Output("last-played-ts", "data"),
     Output("last-played-empty-value", "data"),
     Output("last-played-tooltip", "label"),
-    Output("scenario_datetime_last_played", "style"),
+    Output("scenario_datetime_last_played", "className"),
     Output("scenario_datetime_last_played", "tabIndex"),
     Output("last-played-tooltip", "disabled"),
     Input("do_update", "data"),
@@ -123,7 +117,7 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 )
 def get_scenario_num_runs(
     _, selected_scenario
-) -> tuple[int, float | None, str, str, dict[str, str], int | None, bool]:
+) -> tuple[int, float | None, str, str, str | None, int | None, bool]:
     """
     Updates the Scenario Stats on the UI.
 
@@ -136,10 +130,10 @@ def get_scenario_num_runs(
     :return: Scenario Stats data
     """
     if not selected_scenario:
-        return 0, None, "—", "", {}, None, True
+        return 0, None, "—", "", None, None, True
 
     if not is_scenario_in_database(selected_scenario):
-        return 0, None, "Never", "", {}, None, True
+        return 0, None, "Never", "", None, None, True
 
     scenario_stats = get_scenario_stats(selected_scenario)
 
@@ -148,7 +142,7 @@ def get_scenario_num_runs(
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
         scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
-        LAST_PLAYED_AFFORDANCE_STYLE,
+        "last-played-affordance",
         0,
         False,
     )

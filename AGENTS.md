@@ -43,6 +43,11 @@ Codex <codex@local>
 
 - Prefer simple production APIs that reflect the app's real behavior. Do not add parameters, classes, or abstractions only for tests. Tests should usually adapt with fixtures, monkeypatching, or small fakes. Add explicit test seams only when they also improve the production design, or when testing would otherwise require brittle, slow, or unreliable workarounds.
 
+## Styling Conventions
+
+- Prefer semantic CSS classes in `assets/stylesheet.css` for static presentation rules, especially styles that callbacks conditionally enable or disable.
+- Keep inline style dictionaries for values that are genuinely computed at runtime or for small, highly local layout adjustments where a named class would add more indirection than clarity.
+
 ## Cache Conventions
 
 - Runtime cache files live under `cache/` and should not be committed.
