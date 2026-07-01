@@ -44,7 +44,11 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Last Played",
         "field": "last_played_sort",
         "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
-        "tooltipValueGetter": {"function": "absoluteTime(params.value, 'Never')"},
+        "tooltipValueGetter": {
+            "function": (
+                "params.value == null ? null : absoluteTime(params.value, 'Never')"
+            )
+        },
         "cellClass": {
             "function": "params.value == null ? null : 'last-played-affordance'"
         },

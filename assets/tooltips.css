@@ -1,4 +1,4 @@
-.ag-tooltip {
+[data-mantine-color-scheme] .ag-tooltip {
     background-color: var(--mantine-color-gray-9);
     border: 0;
     border-radius: var(--mantine-radius-sm);
@@ -9,7 +9,7 @@
         calc(0.625rem * var(--mantine-scale));
 }
 
-.ag-tooltip-animate {
+[data-mantine-color-scheme] .ag-tooltip-animate {
     transition-duration: 100ms;
 }
 

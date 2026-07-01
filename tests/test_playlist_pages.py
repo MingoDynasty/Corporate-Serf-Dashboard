@@ -141,6 +141,11 @@ def test_playlist_scenarios_last_played_has_immediate_tooltip_affordance():
     assert column["cellClass"] == {
         "function": "params.value == null ? null : 'last-played-affordance'"
     }
+    assert column["tooltipValueGetter"] == {
+        "function": (
+            "params.value == null ? null : absoluteTime(params.value, 'Never')"
+        )
+    }
     assert grid.dashGridOptions["tooltipShowDelay"] == 0
 
 
