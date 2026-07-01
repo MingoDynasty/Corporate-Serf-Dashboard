@@ -1,0 +1,30 @@
+.ag-tooltip {
+    background-color: var(--mantine-color-gray-9);
+    border: 0;
+    border-radius: var(--mantine-radius-sm);
+    box-shadow: none;
+    color: var(--mantine-color-white);
+    font-size: var(--mantine-font-size-sm);
+    padding: calc(0.3125rem * var(--mantine-scale))
+        calc(0.625rem * var(--mantine-scale));
+}
+
+.ag-tooltip-animate {
+    transition-duration: 100ms;
+}
+
+[data-mantine-color-scheme="dark"] {
+    --tooltip-bg: var(--mantine-color-dark-5);
+    --tooltip-color: var(--mantine-color-gray-0);
+}
+
+[data-mantine-color-scheme="dark"] .mantine-Tooltip-tooltip,
+[data-mantine-color-scheme="dark"] .ag-tooltip {
+    border: 1px solid var(--mantine-color-dark-4);
+    box-shadow: var(--mantine-shadow-md);
+}
+
+[data-mantine-color-scheme="dark"] .ag-tooltip {
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-color);
+}
