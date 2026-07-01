@@ -98,6 +98,13 @@ expanded into its own roadmap entry when it becomes the next thing up.
   training-hour checkpoints across playlists, which is a different question
   from the playlist-level overview in milestone 2 — so it remains a separate
   concern to revisit later, not a replacement for milestone 2.
+- **Run history and sessions** — a reviewable, persistent record of past runs
+  that the ephemeral per-run toast can't provide: the current cross-scenario
+  training session, and a scenario's full history over time (e.g. cold-start
+  vs warmed-up comparisons). Gap-based *sessions* are a later quality-of-life
+  layer on top. Sequenced after milestones 1 and 2; supersedes the interim
+  console-log stopgap in `file_watchdog.py`. See
+  [`run_history_proposal.md`](./run_history_proposal.md).
 
 ---
 
