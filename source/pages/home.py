@@ -386,20 +386,20 @@ def generate_graph(
 
 @callback(
     Output("graph-content", "figure"),
-    Input("color-scheme-switch", "checked"),
+    Input("color-scheme-switch", "computedColorScheme"),
     Input("cached-plot", "data"),
     prevent_initial_call=True,
 )
-def apply_light_dark_theme_to_graph(switch_on, plot_json):
+def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     """
     Applies the light or dark theme to the graph.
-    :param switch_on: switch value.
+    :param color_scheme: active Mantine color scheme.
     :param plot_json: json object with plotted data.
     :return: Figure with theme applied.
     """
     if not plot_json:
         return plot_json
-    return apply_light_dark_mode(go.Figure(json.loads(plot_json)), switch_on)
+    return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
 @callback(

@@ -276,14 +276,14 @@ def generate_time_plot(
     return figure_combined
 
 
-def apply_light_dark_mode(figure: go.Figure, dark_mode_switch) -> go.Figure:
+def apply_light_dark_mode(figure: go.Figure, color_scheme: str) -> go.Figure:
     """
     Apply light or dark mode to figure.
     :param figure: figure to lighten or darken.
-    :param dark_mode_switch: True=Dark mode, False=Light mode.
+    :param color_scheme: active Mantine color scheme.
     :return: figure with template applied.
     """
-    template = "mantine_dark" if dark_mode_switch else "mantine_light"
+    template = "mantine_dark" if color_scheme == "dark" else "mantine_light"
     figure.update_layout(template=template)
     return figure
 

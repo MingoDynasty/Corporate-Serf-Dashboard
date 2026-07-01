@@ -45,8 +45,8 @@ def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
         lambda checkpoint_hour: {},
     )
 
-    light_figure = aim_training_journey.generate_graph(["Playlist"], 10, False)
-    dark_figure = aim_training_journey.generate_graph(["Playlist"], 10, True)
+    light_figure = aim_training_journey.generate_graph(["Playlist"], 10, "light")
+    dark_figure = aim_training_journey.generate_graph(["Playlist"], 10, "dark")
 
     assert light_figure.layout.template.layout.paper_bgcolor == "#ffffff"
     assert dark_figure.layout.template.layout.paper_bgcolor == "#242424"

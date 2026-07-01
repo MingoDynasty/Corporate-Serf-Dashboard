@@ -28,9 +28,9 @@ dash.register_page(
     Output("aim-training-journey-graph", "figure"),
     Input("playlists-multi-select", "value"),
     Input("checkpoint-hour", "value"),
-    Input("color-scheme-switch", "checked"),
+    Input("color-scheme-switch", "computedColorScheme"),
 )
-def generate_graph(selected_playlist, checkpoint_hour, switch_on):
+def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
     if not selected_playlist or not checkpoint_hour:
         return None
     journey_data = get_aim_training_journey_for_playlists(selected_playlist)
@@ -44,7 +44,7 @@ def generate_graph(selected_playlist, checkpoint_hour, switch_on):
         journey_data,
         aim_training_checkpoints,
     )
-    return apply_light_dark_mode(figure, switch_on)
+    return apply_light_dark_mode(figure, color_scheme)
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
