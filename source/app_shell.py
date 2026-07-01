@@ -45,6 +45,7 @@ APP_INDEX_STRING = """<!DOCTYPE html>
                             colorScheme
                         );
                     }
+                    window.localStorage.removeItem(legacySwitchKey);
                 } catch (_error) {
                     // Local storage can be unavailable; light is the safe default.
                 }

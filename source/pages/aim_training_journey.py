@@ -1,8 +1,9 @@
 import logging
 
 import dash
-from dash import Input, Output, callback, dcc
 import dash_mantine_components as dmc
+from dash import Input, Output, callback, dcc
+from dash.exceptions import PreventUpdate
 
 from source.kovaaks.data_service import (
     get_aim_training_checkpoints,
@@ -31,6 +32,8 @@ dash.register_page(
     Input("color-scheme-switch", "computedColorScheme"),
 )
 def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
+    if color_scheme not in {"dark", "light"}:
+        raise PreventUpdate
     if not selected_playlist or not checkpoint_hour:
         return None
     journey_data = get_aim_training_journey_for_playlists(selected_playlist)

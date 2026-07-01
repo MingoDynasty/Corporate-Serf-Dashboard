@@ -44,6 +44,9 @@ def test_color_scheme_is_restored_before_styles_load():
     assert "_dash_persistence.color-scheme-switch.checked.true" in (
         app_shell.APP_INDEX_STRING
     )
+    assert "window.localStorage.removeItem(legacySwitchKey)" in (
+        app_shell.APP_INDEX_STRING
+    )
 
 
 def test_navbar_burger_open_state_persists_across_refresh():
