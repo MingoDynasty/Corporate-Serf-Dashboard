@@ -2,15 +2,16 @@
 Business logic for monitoring a specified directory for newly created files.
 """
 
-from concurrent.futures import ThreadPoolExecutor
 import datetime
 import logging
-from pathlib import Path
 import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import config
+from source.kovaaks.api_service import refresh_scenario_rank
 from source.kovaaks.data_service import (
     extract_data_from_file,
     get_high_score,
@@ -18,7 +19,6 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
     load_csv_file_into_database,
 )
-from source.kovaaks.api_service import refresh_scenario_rank
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
