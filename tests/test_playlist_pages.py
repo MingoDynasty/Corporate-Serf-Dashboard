@@ -2,6 +2,8 @@ from datetime import datetime
 
 import dash
 import dash_mantine_components as dmc
+import pytest
+from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
@@ -45,11 +47,16 @@ def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
         lambda checkpoint_hour: {},
     )
 
-    light_figure = aim_training_journey.generate_graph(["Playlist"], 10, False)
-    dark_figure = aim_training_journey.generate_graph(["Playlist"], 10, True)
+    light_figure = aim_training_journey.generate_graph(["Playlist"], 10, "light")
+    dark_figure = aim_training_journey.generate_graph(["Playlist"], 10, "dark")
 
     assert light_figure.layout.template.layout.paper_bgcolor == "#ffffff"
     assert dark_figure.layout.template.layout.paper_bgcolor == "#242424"
+
+
+def test_aim_training_journey_waits_for_color_scheme():
+    with pytest.raises(PreventUpdate):
+        aim_training_journey.generate_graph(["Playlist"], 10, None)
 
 
 def test_playlist_selector_dropdown_scrollbar_is_always_visible():

@@ -13,7 +13,7 @@ from dash_extensions.enrich import DashProxy
 from waitress import serve
 from watchdog.observers import Observer
 
-from source.app_shell import layout
+from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import config
 from source.kovaaks.data_service import initialize_kovaaks_data
 from source.my_watchdog.file_watchdog import NewFileHandler
@@ -65,6 +65,7 @@ app = DashProxy(
     title=APP_NAME,
     update_title=None,
     assets_folder="../assets",
+    index_string=APP_INDEX_STRING,
     use_pages=True,  # enable Dash pages
 )
 app.layout = layout()  # layout logic encapsulated in another file

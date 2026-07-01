@@ -1,13 +1,73 @@
 import logging
 
 import dash
-from dash import Input, Output, State, callback, clientside_callback, dcc
+from dash import Input, Output, State, callback, dcc
 from dash_iconify import DashIconify
 import dash_mantine_components as dmc
 
 from source.utilities.dash_logging import log_handler
 
 logger = logging.getLogger(__name__)
+
+APP_INDEX_STRING = """<!DOCTYPE html>
+<html>
+    <head>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        <script>
+            (() => {
+                const colorSchemeKey = "mantine-color-scheme-value";
+                const legacySwitchKey =
+                    "_dash_persistence.color-scheme-switch.checked.true";
+                let colorScheme = "light";
+
+                try {
+                    const storedColorScheme =
+                        window.localStorage.getItem(colorSchemeKey);
+
+                    if (
+                        storedColorScheme === "dark" ||
+                        storedColorScheme === "light"
+                    ) {
+                        colorScheme = storedColorScheme;
+                    } else {
+                        const persistedSwitch = JSON.parse(
+                            window.localStorage.getItem(legacySwitchKey)
+                        );
+                        colorScheme =
+                            Array.isArray(persistedSwitch) &&
+                            persistedSwitch[0] === true
+                                ? "dark"
+                                : "light";
+                        window.localStorage.setItem(
+                            colorSchemeKey,
+                            colorScheme
+                        );
+                    }
+                    window.localStorage.removeItem(legacySwitchKey);
+                } catch (_error) {
+                    // Local storage can be unavailable; light is the safe default.
+                }
+
+                document.documentElement.setAttribute(
+                    "data-mantine-color-scheme",
+                    colorScheme
+                );
+            })();
+        </script>
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>
+"""
 
 discord_component = dmc.Tooltip(
     dmc.Anchor(
@@ -28,19 +88,18 @@ github_component = dmc.Tooltip(
     label="View this app on GitHub",
 )
 
-theme_switch_component = dmc.Switch(
-    offLabel=DashIconify(
+theme_switch_component = dmc.ColorSchemeToggle(
+    lightIcon=DashIconify(
         icon="radix-icons:sun",
         width=25,
         color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
     ),
-    onLabel=DashIconify(
+    darkIcon=DashIconify(
         icon="radix-icons:moon",
         width=25,
         color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
     ),
     id="color-scheme-switch",
-    persistence=True,
     color="gray",
     size="lg",
     mr="xl",
@@ -71,16 +130,10 @@ def nav_link(label: str, href: str, icon: str) -> dcc.Link:
 def layout(**kwargs):  # noqa: ARG001
     return dmc.MantineProvider(
         id="mantine-provider",
+        defaultColorScheme="light",
         children=[
             dmc.AppShell(
                 children=[
-                    dcc.Location(id="app-location"),
-                    dcc.Interval(
-                        id="theme-sync-interval",
-                        interval=100,
-                        max_intervals=1,
-                        n_intervals=0,
-                    ),
                     dmc.NotificationContainer(id="notification-container"),
                     dmc.AppShellHeader(
                         dmc.Grid(
@@ -174,20 +227,3 @@ def toggle_navbar(opened, navbar):
         "desktop": not opened,
     }
     return navbar
-
-
-clientside_callback(
-    """
-    (switchOn, _pathname, _nIntervals) => {
-       const persistedSwitch = document.getElementById('color-scheme-switch');
-       const isDark = persistedSwitch ? persistedSwitch.checked : Boolean(switchOn);
-       const colorScheme = isDark ? 'dark' : 'light';
-       document.documentElement.setAttribute('data-mantine-color-scheme', colorScheme);
-       return colorScheme;
-    }
-    """,
-    Output("mantine-provider", "forceColorScheme"),
-    Input("color-scheme-switch", "checked"),
-    Input("app-location", "pathname"),
-    Input("theme-sync-interval", "n_intervals"),
-)
