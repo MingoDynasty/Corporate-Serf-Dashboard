@@ -130,6 +130,25 @@ def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
     assert column["comparator"] == {"function": "nullsLastComparator"}
 
 
+def test_playlist_scenarios_last_played_has_immediate_tooltip_affordance():
+    column = next(
+        column
+        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        if column["field"] == "last_played_sort"
+    )
+    grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1].children
+
+    assert column["cellClass"] == {
+        "function": "params.value == null ? null : 'last-played-affordance'"
+    }
+    assert column["tooltipValueGetter"] == {
+        "function": (
+            "params.value == null ? null : absoluteTime(params.value, 'Never')"
+        )
+    }
+    assert grid.dashGridOptions["tooltipShowDelay"] == 0
+
+
 def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
     columns = {
         column["field"]: column for column in playlist_scenarios.TABLE_COLUMN_DEFS

@@ -44,7 +44,14 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Last Played",
         "field": "last_played_sort",
         "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
-        "tooltipValueGetter": {"function": "absoluteTime(params.value, 'Never')"},
+        "tooltipValueGetter": {
+            "function": (
+                "params.value == null ? null : absoluteTime(params.value, 'Never')"
+            )
+        },
+        "cellClass": {
+            "function": "params.value == null ? null : 'last-played-affordance'"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 130,
@@ -205,6 +212,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                     dashGridOptions={
                         "animateRows": False,
                         "domLayout": "autoHeight",
+                        "tooltipShowDelay": 0,
                     },
                     columnSize="autoSize",
                     columnSizeOptions=COLUMN_SIZE_OPTIONS,
