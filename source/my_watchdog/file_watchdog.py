@@ -27,6 +27,18 @@ logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 rank_refresh_executor = ThreadPoolExecutor(max_workers=2)
 
+# Percentage of the high score a run must beat to "pass" in the debug logs
+# below. This is an interim, developer-facing stand-in for reviewing runs
+# within a session: unlike the ephemeral toast, the log keeps a scrollable
+# per-run record. Retained until the Run History feature supersedes it
+# (see docs/run_history_proposal.md).
+#
+# Known limitation: the real threshold is a live UI control this watchdog
+# thread can't read, so this constant only matches the UI verdict when the UI
+# is left at 95% (the usual case). The score and percent-from-high-score
+# figures logged next to it are always correct regardless.
+SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
+
 
 def _handle_rank_refresh_result(future) -> None:
     try:
@@ -77,7 +89,7 @@ class NewFileHandler(FileSystemEventHandler):
         # Case 1: new scenario.
         if not is_scenario_in_database(run_data.scenario):
             logger.debug("Found new scenario: %s", run_data.scenario)
-            new_score_threshold = 0.95 * run_data.score  # TODO: come from UI ?
+            new_score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * run_data.score
             logger.debug(
                 f"Current score ({run_data.score:.2f}) sets the score threshold at ({new_score_threshold:.2f})"
             )
@@ -98,7 +110,7 @@ class NewFileHandler(FileSystemEventHandler):
         high_score = get_high_score(run_data.scenario)
         is_new_high_score = run_data.score > high_score
 
-        pct_threshold = 0.95  # TODO: isn't this supposed to come from UI ?
+        pct_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT
         score_threshold = pct_threshold * high_score
         pct_diff = (run_data.score / high_score - 1) * 100
         logger.debug(
