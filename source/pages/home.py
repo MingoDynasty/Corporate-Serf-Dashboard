@@ -602,6 +602,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                         span=True,
                                                     ),
                                                     delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
+                                                    show_initially=False,
                                                     parent_style={
                                                         "display": "inline-block",
                                                         "verticalAlign": "baseline",
