@@ -171,7 +171,7 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
     assert queried_scenarios == ["Unplayed Scenario"]
 
 
-def test_scenario_rank_loading_has_show_delay(monkeypatch):
+def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     monkeypatch.setattr(home, "get_playlists", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
@@ -188,3 +188,4 @@ def test_scenario_rank_loading_has_show_delay(monkeypatch):
 
     assert rank_loading is not None
     assert rank_loading.delay_show == home.SCENARIO_RANK_LOADING_DELAY_MS == 250
+    assert rank_loading.show_initially is False
