@@ -1,13 +1,12 @@
 # Playlist Generator Refactor Proposal
 
-Status: Final (2026-07-02) — first Q&A round (naming, Evxl auto-refresh
-default, circuit-breaker lever, provenance metadata, 4-PR staging) and
-external review round (six findings accepted) folded in; no open questions
-remain. Build-ready pending Sequencing below.
+Status: Final (2026-07-02) — first Q&A round, external review round 1 (six
+findings), and external review round 2 (eight findings: five review-doc plus
+three PR-inline) all folded in; no open questions remain.
 Date: 2026-07-01
-Sequencing: implement after the Scenario Rank Eventual Consistency work fully
-lands (PR #38 was 1 of 2; wait for the second PR so `api_service.py` churn does
-not collide).
+Sequencing: satisfied — the Scenario Rank Eventual Consistency work fully
+landed with PR #40 (confirmed 2026-07-02). Implementation can begin once this
+proposal merges to main.
 
 ## Goal
 
@@ -210,15 +209,34 @@ back-to-back hammering makes it worse.
 `generated/manifest.json` maps sharecode → `{file, playlist_name,
 kovaaks_benchmark_id, rank_colors, generated_at}`.
 
+- `rank_colors` is stored — in both the manifest and the provenance stamp —
+  as an **ordered list of `[name, color]` pairs**, compared
+  order-sensitively. Plain dict equality would treat a pure reorder as
+  "unchanged", but generation pairs `rankColors` positionally with KovaaK's
+  `rank_maxes`, so a reorder silently changes every rank↔threshold
+  association and must trigger regeneration.
 - On start, a sharecode is **skipped** iff (a) it has a manifest entry whose
-  `kovaaks_benchmark_id` and `rank_colors` match the current
-  `benchmarks.json` entry, **and** (b) the referenced output file exists,
-  parses as `PlaylistData`, and its `generated_from.sharecode` matches — a
-  manifest entry whose file was deleted, truncated, or corrupted regenerates
-  instead of skipping. A changed Evxl entry therefore regenerates
-  automatically (this is what makes "I pulled a new benchmarks.json with
-  changed benchmarks" work without `--force`); unchanged, intact entries
-  resume for free (R3). 217 small JSON parses per run is trivial.
+  `kovaaks_benchmark_id` and ordered `rank_colors` match the current
+  `benchmarks.json` entry, **and** (b) the referenced output file exists and
+  passes the integrity check below — a manifest entry whose file was
+  deleted, truncated, or corrupted regenerates instead of skipping. A
+  changed Evxl entry therefore regenerates automatically (this is what makes
+  "I pulled a new benchmarks.json with changed benchmarks" work without
+  `--force`); unchanged, intact entries resume for free (R3). 217 small JSON
+  parses per run is trivial.
+- **File integrity check, in this order:** load the file as *raw JSON* and
+  compare the full `generated_from` provenance — sharecode,
+  `kovaaks_benchmark_id`, and ordered `rank_colors` — against the manifest
+  entry; then validate the playlist shape. The order matters:
+  `PlaylistData` *ignores* unknown keys, so validating first would silently
+  discard `generated_from` before it can be read, letting wrong-provenance
+  files pass. (A script-local wrapper model extending `PlaylistData` with a
+  required `generated_from` field does both checks in one validation.)
+- **Path confinement:** a manifest entry's `file` must resolve inside
+  `generated/` before it is read — or, in the rename case below, deleted. A
+  syntactically valid but corrupted or tampered manifest must not be able to
+  point the integrity check or the rename cleanup's delete at an arbitrary
+  filesystem path.
 - Sharecodes present in the manifest but **removed** from the current Evxl
   data are logged as a warning (orphaned generated files); never deleted
   automatically. If a *retained* sharecode's playlist name changes, the old
@@ -236,7 +254,8 @@ kovaaks_benchmark_id, rank_colors, generated_at}`.
 
 **Provenance stamp:** each generated playlist JSON additionally embeds a
 `generated_from` object — `{sharecode, kovaaks_benchmark_id, rank_colors,
-generated_at, generator: "benchmark_importer"}`. The app's `PlaylistData` is a
+generated_at, generator: "benchmark_importer"}`, with `rank_colors` as the
+same ordered pair list as the manifest. The app's `PlaylistData` is a
 plain pydantic v2 `BaseModel`, so unknown keys are ignored on load — this
 costs nothing today and is the hook that lets a future app feature detect
 stale benchmark data per playlist (see Out of Scope #3). The copies the user
@@ -257,6 +276,15 @@ incremental update in one step: only entries that actually changed
 regenerate. Dirtying the working tree is deliberate — the snapshot update
 belongs in the same commit as the regenerated playlists.
 
+**Removal guard:** schema validation cannot prove completeness — an empty
+list or a partially valid dataset can still parse as `EvxlData`. If the
+validated live data would *remove* sharecodes present in the current
+snapshot, the snapshot is **kept**, the would-be removals are logged, and
+the run proceeds against the existing snapshot; pass `--accept-removals` to
+accept the new data anyway. Additions and changes replace the snapshot
+automatically. (An empty or truncated-but-valid response is caught by the
+same rule, since it necessarily implies removals.)
+
 `argparse` with:
 
 - `--offline` — skip the live Evxl fetch; use the committed snapshot as-is
@@ -268,6 +296,8 @@ belongs in the same commit as the regenerated playlists.
   benchmark's thresholds" tool (Viscose-style churn).
 - `--limit N` — stop after N generated items (replaces the counter hack).
 - `--max-consecutive-failures N` — circuit-breaker threshold (default 3; D3).
+- `--accept-removals` — allow a live Evxl download that removes sharecodes
+  to replace the snapshot (see removal guard above).
 
 Delete the debugging guards (the active hard stop + sharecode pin, plus the
 commented counter skip) and the dead "debugging only" TODO blocks. Timing:
@@ -276,21 +306,37 @@ this removal lands in PR-B2 together with the failure handling, not in PR-B1
 
 ### D8 — Filename sanitization and cross-run collision ownership
 
-Sanitize the playlist name for Windows before writing: strip `<>:"/\|?*`,
-trailing dots/spaces. Collision detection must span runs, not just the
-current one: before processing, seed a filename-ownership map from all valid
-manifest entries, so a new sharecode whose name sanitizes to a file owned by
-a manifest-*skipped* sharecode still registers as a collision. On collision,
+Sanitization must be Windows-complete, not just illegal-character stripping:
+
+- Strip `<>:"/\|?*` and trailing dots/spaces.
+- Windows reserved basenames (`CON`, `PRN`, `AUX`, `NUL`, `COM1`–`COM9`,
+  `LPT1`–`LPT9`, case-insensitive) get the sharecode suffixed.
+- An empty sanitized name falls back to the sharecode as the filename.
+- Ownership keys are **casefolded**: `Foo.json` and `foo.json` are the same
+  file on NTFS, so they must be the same ownership key.
+
+Collision ownership spans runs **without depending on the manifest**: the
+ownership map is seeded by scanning existing `generated/*.json` files and
+reading each file's embedded `code` field (part of `PlaylistData` from the
+start — no provenance stamp required). This makes D8 fully deliverable in
+PR-B2, before the manifest exists, and stays correct afterwards: `--only`
+and `--limit` runs see files created by any previous run. On collision,
 suffix the later sharecode's filename with its sharecode and log a warning —
 never silently overwrite a file owned by another sharecode. (A sharecode
 replacing its *own* previous file — the rename case — is handled in D6.)
 
 ### D9 — Runnable from the repo root
 
-- Imports become `from source.kovaaks…` (repo convention), with a two-line
-  `sys.path` bootstrap inserting the repo root (derived from `__file__`) so
-  both PyCharm and `uv run python "scripts/Playlist Generator/script.py"`
-  work.
+- Imports become `from source.kovaaks…` (repo convention), with a bootstrap
+  that — **before importing any `source` module** — inserts the repo root
+  (derived from `__file__`) into `sys.path` *and* runs
+  `os.chdir(REPO_ROOT)`. The chdir is load-bearing, not cosmetic:
+  `api_service.CACHE_DIR` is the CWD-relative string `"cache"` and
+  `make_cache()` runs at import time, so `sys.path` alone would still let a
+  PyCharm run with a script-dir CWD create a stray script-local cache.
+  (Making `CACHE_DIR` absolute in shared code was considered and rejected
+  for scope — R8 keeps app behavior untouched.) The script's own paths stay
+  `__file__`-derived and are unaffected by the chdir.
 - All paths derive from `__file__`: `EVXL_BENCHMARKS_JSON_FILE` →
   `REPO_ROOT / "resources/evxl/benchmarks.json"`, output →
   `SCRIPT_DIR / "generated"`.
@@ -326,6 +372,11 @@ treatment. Cost: PyCharm run-config path update.
 
 - `get_benchmark_json` return type hint says `str`, returns a parsed dict;
   also calls `response.json()` twice on a cache miss. Fix both.
+- `get_benchmark_json`'s cache path uses raw `json.load` on read and a
+  non-atomic write. Switch to the existing tolerant `_read_json` (a
+  malformed/truncated cache file becomes `None` → refetch, instead of an
+  uncaught `JSONDecodeError` outside D3's caught tuple killing a script run)
+  and atomic `_write_json`.
 - Script logging: keep root at DEBUG but set `urllib3` to WARNING so progress
   lines are readable.
 
@@ -381,7 +432,9 @@ treatment. Cost: PyCharm run-config path update.
 - **`api_service` (D2, D11):** extend the existing retry tests — attempts
   respected, backoff schedule consumed with clamping, defaults produce
   today's exact behavior (one immediate retry), 429 path unchanged;
-  `get_benchmark_json` single-parse + type fix.
+  `get_benchmark_json` single-parse + type fix; a malformed/truncated
+  benchmark cache file refetches instead of raising; cache writes are
+  atomic.
 - **Script helpers (needs D10):**
   - Manifest skip/regenerate decision matrix: missing entry / matching entry
     / changed `kovaaksBenchmarkId` / changed `rank_colors` / missing,
@@ -389,11 +442,18 @@ treatment. Cost: PyCharm run-config path update.
     `--force`.
   - Malformed or missing manifest → warned about, treated as empty state.
   - Manifest replacement is atomic (temp file + `os.replace`).
-  - Filename sanitization cases, incl. a collision with a file owned by a
-    manifest-*skipped* sharecode → suffixed, never overwritten.
+  - Filename sanitization cases: reserved basenames (`CON`, `NUL`, …), an
+    empty sanitized name (falls back to sharecode), case-insensitive
+    collisions (`Foo.json` vs `foo.json`), and a collision with a file owned
+    by a previously-generated sharecode → suffixed, never overwritten.
   - Rank-count mismatch records one failed sharecode and the run continues.
   - Malformed or schema-invalid live Evxl data preserves the committed
-    snapshot.
+    snapshot; schema-*valid* live data implying sharecode removals also
+    preserves it unless `--accept-removals` is passed.
+  - A pure reorder of an entry's `rank_colors` regenerates (ordered
+    comparison, not dict equality).
+  - A manifest entry whose `file` resolves outside `generated/` is rejected
+    (never read, never deleted).
   - Circuit-breaker abort at the configured consecutive-failure threshold;
     summary exit codes.
 - **Manual gate:** one full `uv run` from the repo root against the live
@@ -417,15 +477,18 @@ Four PRs, in order, each independently shippable and reviewable:
    plumbing — fast review.
 3. **PR-B2 (reliability — "the run completes"):** D1 Evxl playlist-by-code,
    D3 per-item failures + circuit breaker, D4 rank-mismatch domain exception,
-   D5 politeness delay, D8 filename sanitization, and — only now that failure
-   handling exists — removal of the debugging guards plus the argparse flags
+   D5 politeness delay, D8 filename sanitization with cross-run ownership
+   (fully deliverable here — ownership scans existing output files' `code`
+   fields, no manifest dependency), and — only now that failure handling
+   exists — removal of the debugging guards plus the argparse flags
    (`--only`, `--limit`, `--max-consecutive-failures`). This PR owns the
    default-behavior change from one pinned item to all 217. After it, a full
    run finishes unattended (R1, R2, R5, R7).
 4. **PR-B3 (incremental runs):** D6 manifest + provenance, D7's default Evxl
-   refresh + `--offline` + `--force`, the gitignore rule for the script's
-   `generated/` directory (T3), D12 readme rewrite + architecture pointer.
-   After this PR reruns are cheap (R3, R4).
+   refresh + removal guard + `--offline` + `--force` + `--accept-removals`,
+   the gitignore rule for the script's `generated/` directory (T3), D12
+   readme rewrite + architecture pointer. After this PR reruns are cheap
+   (R3, R4).
 
 All wait for Scenario Rank Eventual Consistency PR 2 of 2 to land first
 (`api_service.py` conflict avoidance).
@@ -478,6 +541,40 @@ sharecode deletes the superseded file (manifest proves ownership) rather
 than accumulating orphans; the whole `generated/` directory is ignored, not
 only the manifest, since promoted copies live in
 `resources/playlists/generated/`.
+
+### External review round 2 (2026-07-02)
+
+Eight findings (five from the review doc, three PR-inline), all accepted:
+
+- **D9 CWD dependence** — `sys.path` alone doesn't move the cache;
+  `CACHE_DIR` is CWD-relative and `make_cache()` runs at import. Fix: the
+  bootstrap runs `os.chdir(REPO_ROOT)` before importing `source` modules.
+  Making `CACHE_DIR` absolute in shared code was rejected for scope (R8).
+- **D8/staging contradiction** — cross-run ownership originally leaned on
+  the manifest, which arrives one PR later. Fix (better than either option
+  offered): ownership permanently derives from existing output files'
+  embedded `code` field — D8 loses its manifest dependency entirely and is
+  fully deliverable in PR-B2.
+- **Malformed benchmark cache** — raw `json.load` in `get_benchmark_json`
+  raises `JSONDecodeError` outside D3's caught tuple. Fix in D11/PR-A:
+  tolerant `_read_json` (→ refetch) + atomic `_write_json`.
+- **Manifest path confinement + full-provenance compare** (D6) — a
+  corrupted-but-valid manifest must not read or delete arbitrary paths;
+  integrity checks compare complete provenance, not just sharecode.
+- **Windows filename completeness** (D8) — reserved basenames, empty
+  sanitized names, casefolded ownership keys; tests added.
+- **Evxl completeness beyond schema** (D7, PR-inline) — removal guard: live
+  data implying sharecode removals keeps the snapshot unless
+  `--accept-removals`; catches empty/partial-but-valid responses.
+- **Provenance read order** (D6, PR-inline) — raw JSON (or a wrapper model
+  with required `generated_from`) *before* `PlaylistData` validation, which
+  would otherwise silently drop the stamp.
+- **`rank_colors` ordering** (D6, PR-inline) — stored/compared as an ordered
+  pair list; dict equality would miss reorders that repair against the
+  positional `rank_maxes` pairing.
+
+Housekeeping from the same round: the Sequencing precondition is marked
+satisfied (PR #40 confirmed as EC 2/2).
 
 ## Open Questions
 
