@@ -202,7 +202,7 @@ def layout(**kwargs):  # noqa: ARG001
                 header={"height": "4em"},
                 padding="md",
                 navbar={
-                    "width": 300,
+                    "width": 250,
                     "breakpoint": "sm",
                     "collapsed": {
                         "mobile": True,
