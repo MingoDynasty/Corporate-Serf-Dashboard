@@ -1,7 +1,9 @@
 # Playlist Generator Refactor Proposal
 
-Status: Proposed (updated 2026-07-02 after first Q&A round: naming, Evxl
-auto-refresh default, circuit-breaker lever, provenance metadata, 4-PR staging)
+Status: Proposed (updated 2026-07-02: first Q&A round — naming, Evxl
+auto-refresh default, circuit-breaker lever, provenance metadata, 4-PR
+staging; then external review round — six findings accepted, see Resolved
+Decisions)
 Date: 2026-07-01
 Sequencing: implement after the Scenario Rank Eventual Consistency work fully
 lands (PR #38 was 1 of 2; wait for the second PR so `api_service.py` churn does
@@ -21,8 +23,10 @@ playlists that KovaaK's own search endpoint cannot find.
   sharecodes.
 - The 2026-07-01 run died at item 33/217 with an uncaught `ReadTimeout` after
   `_get_with_retry`'s single retry was exhausted twice in a row.
-- Historic workaround was editing a `counter < N` skip into the source — the
-  commented remnants are still in the committed script.
+- The committed script still contains **active** debugging guards — a hard
+  `counter >= 2` stop and a pinned-sharecode filter — plus a commented
+  `counter < N` skip from earlier runs. "Run everything" currently requires
+  hand-editing the source.
 - Some sharecodes (e.g. `KovaaKsHeadshottingAquamarineCapture`, Setsunai's
   Static Benchmark) return empty from KovaaK's search endpoint, so today they
   can be generated neither by the script nor by the app's UI import.
@@ -110,9 +114,12 @@ The stable anchor for review passes and implementation.
   resolution. If Evxl disappears, the script falls back to being exactly as
   broken as today's KovaaK's-search path — no worse. Accepted for a
   manually-run generator script.
-- **T3** — The manifest is per-machine local state (gitignored under
-  `generated/`); a fresh clone regenerates from scratch. Accepted — that is
-  also the correct behavior.
+- **T3** — The manifest is per-machine local state; a fresh clone regenerates
+  from scratch. Accepted — that is also the correct behavior. Note: nothing
+  under the script's `generated/` directory is gitignored today (it is merely
+  untracked); PR-B3 adds an ignore rule for the **whole** directory, since
+  outputs are scratch by design — the promoted copies live in the committed
+  `resources/playlists/generated/`.
 - **T4** — Duplicate sharecodes in Evxl data keep first-wins with a warning
   (existing behavior).
 
@@ -169,7 +176,10 @@ safety net, not the primary fix.
 ### D3 — Per-item failure handling with a circuit breaker
 
 - Wrap each sharecode's work in `try/except (requests.RequestException,
-  ValidationError)`: log, record the failure, continue (R1).
+  ValidationError, BenchmarkDataMismatchError)`: log, record the failure,
+  continue (R1). `BenchmarkDataMismatchError` is the script-local domain
+  exception defined in D4 — without it in the tuple, the rank-count mismatch
+  would raise something uncaught and still kill the run.
 - Abort the whole run after N **consecutive** failures (R2) — a one-off
   timeout gets skipped; a systemic outage stops the run. N is a CLI lever,
   `--max-consecutive-failures` (default 3), so it can be tuned during testing
@@ -180,10 +190,13 @@ safety net, not the primary fix.
 ### D4 — Rank-count mismatch becomes a per-item failure
 
 The current bare `raise Exception` on
-`len(rank_maxes) != len(rankColors)` becomes a recorded per-item failure
-(flows through D3). It still logs at ERROR with both counts — it usually means
-Evxl and KovaaK's disagree about a benchmark's rank ladder and needs human
-eyes, but it must not kill the other 216 items.
+`len(rank_maxes) != len(rankColors)` becomes `raise
+BenchmarkDataMismatchError(...)` — a script-local exception defined
+specifically so D3's per-item handler catches it (neither
+`RequestException` nor `ValidationError` naturally represents this expected
+data disagreement). It still logs at ERROR with both counts — it usually
+means Evxl and KovaaK's disagree about a benchmark's rank ladder and needs
+human eyes, but it must not kill the other 216 items.
 
 ### D5 — Politeness delay
 
@@ -197,18 +210,27 @@ back-to-back hammering makes it worse.
 `generated/manifest.json` maps sharecode → `{file, playlist_name,
 kovaaks_benchmark_id, rank_colors, generated_at}`.
 
-- On start, a sharecode is **skipped** iff it has a manifest entry whose
+- On start, a sharecode is **skipped** iff (a) it has a manifest entry whose
   `kovaaks_benchmark_id` and `rank_colors` match the current
-  `benchmarks.json` entry. A changed Evxl entry therefore regenerates
+  `benchmarks.json` entry, **and** (b) the referenced output file exists,
+  parses as `PlaylistData`, and its `generated_from.sharecode` matches — a
+  manifest entry whose file was deleted, truncated, or corrupted regenerates
+  instead of skipping. A changed Evxl entry therefore regenerates
   automatically (this is what makes "I pulled a new benchmarks.json with
-  changed benchmarks" work without `--force`); unchanged entries resume for
-  free (R3).
+  changed benchmarks" work without `--force`); unchanged, intact entries
+  resume for free (R3). 217 small JSON parses per run is trivial.
 - Sharecodes present in the manifest but **removed** from the current Evxl
   data are logged as a warning (orphaned generated files); never deleted
-  automatically.
-- The manifest is rewritten after each successful item (217 entries — a
-  trivial file; no atomicity machinery needed beyond write-then-rename if we
-  want to be tidy).
+  automatically. If a *retained* sharecode's playlist name changes, the old
+  file is deleted and the manifest entry updated — the manifest proves the
+  sharecode owns that file, so replacing superseded own output is not data
+  loss (contrast with the removed-sharecode case above).
+- Ordering per item: write the playlist file successfully **first**, then
+  commit its manifest entry. The manifest is rewritten after each successful
+  item (217 entries — a trivial file) via temp-file + `os.replace` — atomic
+  replacement is required, not optional: a crash mid-write must not corrupt
+  the resume state. A missing or malformed manifest is warned about and
+  treated as empty local state.
 - The filename cannot serve as the resume marker because it derives from the
   playlist *name*, which is only known after the API call — hence a manifest.
 
@@ -222,11 +244,14 @@ promotes into `resources/playlists/` carry their provenance with them.
 
 ### D7 — CLI flags replace the counter hacks; Evxl refresh is the default
 
-**Default startup behavior:** download `https://evxl.app/data/benchmarks`,
-compare to `resources/evxl/benchmarks.json`, and if it differs, overwrite the
-snapshot and log a diff summary ("Evxl data changed: N entries added/changed/
-removed"); if identical, log "Evxl data unchanged". On network failure, warn
-and fall back to the committed snapshot. This implements the existing TODO
+**Default startup behavior:** download `https://evxl.app/data/benchmarks` and
+validate it as a complete `EvxlData` model **before** comparing — an HTTP 200
+carrying malformed JSON, an error document, or a partially valid dataset must
+never replace the snapshot. If valid and different, overwrite
+`resources/evxl/benchmarks.json` atomically (temp file + `os.replace`) and
+log a diff summary ("Evxl data changed: N entries added/changed/removed");
+if identical, log "Evxl data unchanged". On fetch *or* validation failure,
+warn and fall back to the committed snapshot. This implements the existing TODO
 and, combined with D6, makes a plain script run the staleness check *and* the
 incremental update in one step: only entries that actually changed
 regenerate. Dirtying the working tree is deliberate — the snapshot update
@@ -244,15 +269,21 @@ belongs in the same commit as the regenerated playlists.
 - `--limit N` — stop after N generated items (replaces the counter hack).
 - `--max-consecutive-failures N` — circuit-breaker threshold (default 3; D3).
 
-Delete the commented counter/sharecode blocks and the dead "debugging only"
-TODO blocks.
+Delete the debugging guards (the active hard stop + sharecode pin, plus the
+commented counter skip) and the dead "debugging only" TODO blocks. Timing:
+this removal lands in PR-B2 together with the failure handling, not in PR-B1
+(see Implementation / PR Staging).
 
-### D8 — Filename sanitization
+### D8 — Filename sanitization and cross-run collision ownership
 
 Sanitize the playlist name for Windows before writing: strip `<>:"/\|?*`,
-trailing dots/spaces. If two different sharecodes sanitize to the same
-filename in one run, suffix the later one with its sharecode and log a
-warning (never silently overwrite).
+trailing dots/spaces. Collision detection must span runs, not just the
+current one: before processing, seed a filename-ownership map from all valid
+manifest entries, so a new sharecode whose name sanitizes to a file owned by
+a manifest-*skipped* sharecode still registers as a collision. On collision,
+suffix the later sharecode's filename with its sharecode and log a warning —
+never silently overwrite a file owned by another sharecode. (A sharecode
+replacing its *own* previous file — the rename case — is handled in D6.)
 
 ### D9 — Runnable from the repo root
 
@@ -351,11 +382,20 @@ treatment. Cost: PyCharm run-config path update.
   respected, backoff schedule consumed with clamping, defaults produce
   today's exact behavior (one immediate retry), 429 path unchanged;
   `get_benchmark_json` single-parse + type fix.
-- **Script helpers (needs D10):** manifest skip/regenerate decision matrix
-  (missing entry / matching entry / changed `kovaaksBenchmarkId` / changed
-  `rank_colors` / `--force`), filename sanitization cases incl. collision
-  suffixing, circuit-breaker abort after 3 consecutive failures, summary
-  exit codes.
+- **Script helpers (needs D10):**
+  - Manifest skip/regenerate decision matrix: missing entry / matching entry
+    / changed `kovaaksBenchmarkId` / changed `rank_colors` / missing,
+    malformed, or wrong-sharecode output file (regenerates, not skips) /
+    `--force`.
+  - Malformed or missing manifest → warned about, treated as empty state.
+  - Manifest replacement is atomic (temp file + `os.replace`).
+  - Filename sanitization cases, incl. a collision with a file owned by a
+    manifest-*skipped* sharecode → suffixed, never overwritten.
+  - Rank-count mismatch records one failed sharecode and the run continues.
+  - Malformed or schema-invalid live Evxl data preserves the committed
+    snapshot.
+  - Circuit-breaker abort at the configured consecutive-failure threshold;
+    summary exit codes.
 - **Manual gate:** one full `uv run` from the repo root against the live
   APIs; confirm the Setsunai sharecode generates (R5) and the run summary is
   clean.
@@ -370,16 +410,22 @@ Four PRs, in order, each independently shippable and reviewable:
    the script PRs rebase on stable helper signatures.
 2. **PR-B1 (mechanical, behavior-preserving):** D10 rename to
    `scripts/benchmark_importer`, D9 repo-root runnable (imports, `__file__`
-   paths, `sys.path` bootstrap), delete debug cruft, argparse skeleton
-   (`--only`, `--limit`), urllib3 log level. Mostly renames and plumbing —
-   fast review.
+   paths, `sys.path` bootstrap), urllib3 log level. The active debugging
+   guards (hard stop + sharecode pin) stay untouched — the committed script
+   keeps processing one pinned item, so this PR cannot regress into the fatal
+   full-run timeout before failure handling exists. Mostly renames and
+   plumbing — fast review.
 3. **PR-B2 (reliability — "the run completes"):** D1 Evxl playlist-by-code,
-   D3 per-item failures + circuit breaker, D4 rank-mismatch downgrade, D5
-   politeness delay, D8 filename sanitization. After this PR a full 217-item
+   D3 per-item failures + circuit breaker, D4 rank-mismatch domain exception,
+   D5 politeness delay, D8 filename sanitization, and — only now that failure
+   handling exists — removal of the debugging guards plus the argparse flags
+   (`--only`, `--limit`, `--max-consecutive-failures`). This PR owns the
+   default-behavior change from one pinned item to all 217. After it, a full
    run finishes unattended (R1, R2, R5, R7).
 4. **PR-B3 (incremental runs):** D6 manifest + provenance, D7's default Evxl
-   refresh + `--offline` + `--force`, D12 readme rewrite + architecture
-   pointer. After this PR reruns are cheap (R3, R4).
+   refresh + `--offline` + `--force`, the gitignore rule for the script's
+   `generated/` directory (T3), D12 readme rewrite + architecture pointer.
+   After this PR reruns are cheap (R3, R4).
 
 All wait for Scenario Rank Eventual Consistency PR 2 of 2 to land first
 (`api_service.py` conflict avoidance).
@@ -403,6 +449,35 @@ All wait for Scenario Rank Eventual Consistency PR 2 of 2 to land first
   here is throwaway.
 - **Naming:** `scripts/benchmark_importer` (D10) — noun *benchmark* (playlist
   + rank data), verb *import* (fetch-and-merge, not authoring).
+
+### External review round (2026-07-02)
+
+All six findings of the external proposal review accepted (the review doc is
+ephemeral per the handoff-doc convention; findings are distilled here):
+
+- **PR-B1 scope corrected** — the committed script's guards are *active*, so
+  removing them was never behavior-preserving; guards stay through B1, and
+  their removal + the argparse flags move to B2 alongside the failure
+  handling (fixes a staging contradiction that would have reintroduced the
+  fatal full-run timeout).
+- **Cross-run collision ownership** (D8) — the collision map is seeded from
+  manifest entries, closing the manifest-skipped-A / new-B overwrite hole.
+- **Resume marker hardened** (D6) — skip requires an intact,
+  provenance-matching output file, not manifest metadata alone; manifest
+  writes are atomic with defined file-then-manifest ordering; malformed
+  manifest → empty state with a warning.
+- **Rank-mismatch exception typed** (D3/D4) — `BenchmarkDataMismatchError`,
+  explicitly in the per-item caught tuple.
+- **Evxl download validated before snapshot replacement** (D7) — schema
+  validation + atomic replace; fallback on fetch or validation failure.
+- **Gitignore gap closed** (T3) — `generated/` is untracked, not ignored;
+  PR-B3 adds the rule.
+
+Refinements over the review's recommendations: a rename within the *same*
+sharecode deletes the superseded file (manifest proves ownership) rather
+than accumulating orphans; the whole `generated/` directory is ignored, not
+only the manifest, since promoted copies live in
+`resources/playlists/generated/`.
 
 ## Open Questions
 
