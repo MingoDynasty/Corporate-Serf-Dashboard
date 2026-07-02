@@ -15,6 +15,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# TODO: maybe pull this from "https://evxl.app/data/benchmarks" instead of relying on a cached file?
 EVXL_BENCHMARKS_JSON_FILE = "../../resources/evxl/benchmarks.json"
 
 
