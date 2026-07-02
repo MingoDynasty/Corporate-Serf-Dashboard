@@ -68,7 +68,8 @@ Current agreed behavior:
 - `ScenarioRankStatus` uses `StrEnum` with stable JSON values.
 - `scenario_rank_cache_ttl_hours` defaults to `168`.
 - `leaderboard_total_cache_ttl_hours` defaults to `168`.
-- New high scores trigger background rank refresh through `ThreadPoolExecutor(max_workers=2)`.
+- New high scores trigger a bounded score-aware background refresh through a
+  daemon `threading.Timer` chain.
 - Background refresh failures should notify the UI through `dash_logger.error(...)`.
 - Leaderboard total enrichment is best-effort. If total lookup fails, preserve the valid rank/unranked result.
 - Percentile is derived from rank plus leaderboard total when rank info is returned; do not store it in rank cache.
