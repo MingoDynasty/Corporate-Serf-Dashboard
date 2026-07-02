@@ -2,7 +2,8 @@
 
 Status: Final (2026-07-02) — first Q&A round plus external review rounds 1
 (six findings), 2 (eight findings), and 3 (five findings + housekeeping) all
-folded in; no open questions remain.
+folded in; duplicate-sharecode handling decided same day (D13); no open
+questions remain.
 Date: 2026-07-01
 Sequencing: satisfied — the Scenario Rank Eventual Consistency work fully
 landed with PR #40 (confirmed 2026-07-02). Implementation can begin once this
@@ -64,9 +65,16 @@ them.
    into `playlist`, then ignores it and reads `playlist_response.data[0]` for
    the name (script.py lines 75 and 132). Wrong output if the exact match is
    not first.
-7. Evxl's data file contains two duplicate sharecodes
-   (`KovaaKsDinkingGearedWindow`, `KovaaKsResettingScaredShotgun`); the script
-   keeps the first occurrence.
+7. Evxl's data file contains duplicate sharecodes, and (re-verified
+   2026-07-02) both current ones are **conflicting**, not benign echoes:
+   `KovaaKsDinkingGearedWindow` is "33 - benchmarks by unnamed33" under both
+   Intermediate (id 2287) and Advanced (id 2305) — different rank ladders —
+   and `KovaaKsResettingScaredShotgun` is claimed by two unrelated
+   benchmarks ("e1se Tracking Routine / Beginner" id 693 vs "i feel evil /
+   EVIL" id 2594). The current script's first-wins silently picks one rank
+   ladder. The dataset is also volatile: the committed snapshot (196
+   difficulties) lags live (218) — a partial serve was committed at some
+   point, exactly the event D7's removal guard exists to catch.
 
 ## Requirements, Non-Goals, and Accepted Tradeoffs
 
@@ -119,8 +127,12 @@ The stable anchor for review passes and implementation.
   untracked); PR-B3 adds an ignore rule for the **whole** directory, since
   outputs are scratch by design — the promoted copies live in the committed
   `resources/playlists/generated/`.
-- **T4** — Duplicate sharecodes in Evxl data keep first-wins with a warning
-  (existing behavior).
+- **T4** — Benchmarks with conflicting duplicate sharecodes are simply
+  *absent* from the generated output until Evxl fixes the data (D13).
+  Accepted: duplicates are upstream bugs, raised with the Evxl maintainer
+  when discovered; correctness beats availability here. (Replaces the
+  original first-wins-with-a-warning behavior — see finding #7 for why
+  first-wins silently writes wrong rank data.)
 
 ## Design
 
@@ -189,7 +201,8 @@ safety net, not the primary fix.
   `--max-consecutive-failures` (default 3), so it can be tuned during testing
   without source edits.
 - End-of-run summary: counts and sharecode lists for generated / skipped
-  (manifest) / failed; exit 1 if any failures (R7).
+  (manifest) / failed / conflicts (D13); exit 1 if any failures or
+  conflicts (R7).
 
 ### D4 — Rank-count mismatch becomes a per-item failure
 
@@ -424,6 +437,30 @@ treatment. Cost: PyCharm run-config path update.
 - On ship: distill into a `decision_log.md` entry (Evxl for name/code
   resolution, KovaaK's for thresholds) and delete this proposal.
 
+### D13 — Duplicate sharecodes: dedupe if identical, skip-and-report if not
+
+Duplicate sharecodes are not expected; when discovered they are raised with
+the Evxl maintainer as upstream bugs. The importer's whole job is to handle
+them gracefully — verified 2026-07-02 that both current duplicates are
+*conflicting* (finding #7), so graceful cannot mean first-wins:
+
+- At load, classify duplicates over the **raw entries**, before the
+  sharecode-keyed dict collapses them:
+  - **Identical payload** (same `kovaaksBenchmarkId` + same ordered
+    `rank_colors`) → dedupe with a single log line; harmless.
+  - **Conflicting payload** → generate nothing for that sharecode; report
+    it in the summary's *conflicts* bucket (D3) listing every claimant
+    (benchmark, difficulty, benchmark ID, rank ladder), and exit non-zero.
+- Why skip instead of first-wins: a missing file is visible and
+  recoverable; silently wrong rank thresholds are neither. Remedies while
+  waiting on upstream: report to the Evxl maintainer, or hand-edit the
+  snapshot and run `--offline`.
+- A conflict is **not** a removal for D7's guard, and conflicting
+  sharecodes get no D6 manifest entry and no D8 ownership claim.
+- Per-difficulty support (one file per `(sharecode, difficulty)` entry) was
+  considered and rejected: duplicates are upstream bugs to fix, not a data
+  model to accommodate.
+
 ## Out of Scope — flagged for separate work
 
 1. **App-side Evxl fallback for UI import.** `load_playlist_from_code`
@@ -495,6 +532,10 @@ treatment. Cost: PyCharm run-config path update.
   - A mixed live candidate (additions *and* removals) is rejected in full
     without `--accept-removals`; an additions/changes-only candidate
     replaces the snapshot automatically.
+  - An identical-payload duplicate sharecode dedupes to one generated file;
+    a conflicting duplicate generates nothing, lands in the conflicts
+    bucket with a non-zero exit, gets no manifest entry, and is not
+    counted as a D7 removal.
   - Circuit-breaker abort at the configured consecutive-failure threshold;
     summary exit codes.
 - **Manual gate:** one full `uv run` from the repo root against the live
@@ -520,7 +561,8 @@ Four PRs, in order, each independently shippable and reviewable:
    D3 per-item failures + circuit breaker, D4 rank-mismatch domain exception,
    D5 politeness delay, D8 filename sanitization with cross-run ownership
    (fully deliverable here — ownership scans existing output files' `code`
-   fields, no manifest dependency), and — only now that failure handling
+   fields, no manifest dependency), D13 duplicate classification with the
+   conflicts summary bucket, and — only now that failure handling
    exists — removal of the debugging guards plus the argparse flags
    (`--only`, `--limit`, `--max-consecutive-failures`). This PR owns the
    default-behavior change from one pinned item to all 217. After it, a full
@@ -655,6 +697,19 @@ Five findings plus two housekeeping items, all accepted:
   Scenario Rank work (contradicted the satisfied Sequencing header), and
   round 1's collision-ownership bullet is marked superseded by round 2's
   file-scan design.
+
+### Duplicate-sharecode decision (2026-07-02)
+
+Maintainer ruling: duplicate sharecodes are upstream Evxl bugs — raise them
+with the Evxl maintainer; the importer only needs to handle them
+gracefully. An empirical check found both current duplicates are
+*conflicting* (finding #7), so the original T4 (first-wins with a warning)
+was replaced by D13: dedupe identical payloads, skip-and-report conflicting
+ones in a dedicated summary bucket. Per-difficulty `(sharecode,
+difficulty)` support was considered and rejected. The same check exposed
+that the committed snapshot (196 difficulties) lags live Evxl (218) — a
+partial serve was committed; re-pull before the next run (post-refactor,
+the D7 removal guard makes this loud instead of silent).
 
 ## Open Questions
 
