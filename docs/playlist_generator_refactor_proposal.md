@@ -1,9 +1,9 @@
 # Playlist Generator Refactor Proposal
 
-Status: Proposed (updated 2026-07-02: first Q&A round — naming, Evxl
-auto-refresh default, circuit-breaker lever, provenance metadata, 4-PR
-staging; then external review round — six findings accepted, see Resolved
-Decisions)
+Status: Final (2026-07-02) — first Q&A round (naming, Evxl auto-refresh
+default, circuit-breaker lever, provenance metadata, 4-PR staging) and
+external review round (six findings accepted) folded in; no open questions
+remain. Build-ready pending Sequencing below.
 Date: 2026-07-01
 Sequencing: implement after the Scenario Rank Eventual Consistency work fully
 lands (PR #38 was 1 of 2; wait for the second PR so `api_service.py` churn does
@@ -481,5 +481,5 @@ only the manifest, since promoted copies live in
 
 ## Open Questions
 
-- **Q1** — Confirm the `benchmark_importer` name (D10) before PR-B1, since
-  the rename anchors the PR split.
+None. Q1 (the `benchmark_importer` name) was confirmed by the maintainer on
+2026-07-02, independently endorsed by the external review.
