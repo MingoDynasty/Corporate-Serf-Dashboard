@@ -1,8 +1,8 @@
 # Playlist Generator Refactor Proposal
 
-Status: Final (2026-07-02) — first Q&A round, external review round 1 (six
-findings), and external review round 2 (eight findings: five review-doc plus
-three PR-inline) all folded in; no open questions remain.
+Status: Final (2026-07-02) — first Q&A round plus external review rounds 1
+(six findings), 2 (eight findings), and 3 (five findings + housekeeping) all
+folded in; no open questions remain.
 Date: 2026-07-01
 Sequencing: satisfied — the Scenario Rank Eventual Consistency work fully
 landed with PR #40 (confirmed 2026-07-02). Implementation can begin once this
@@ -160,6 +160,11 @@ def _get_with_retry(url, *, attempts: int = 2,
   `attempts=4, backoff_seconds=(2, 4, 8)` does what it reads like.
 - 429 handling (Retry-After parse + cap) is unchanged per attempt.
 - The script calls with `attempts=4, backoff_seconds=(2, 4, 8)`.
+- The transient-failure log message becomes provider-neutral with attempt
+  counts ("Transient GET failure at %s (attempt %d/%d); retrying: %s") —
+  the current "KovaaK's … retrying once" wording turns false on both counts
+  once D1 routes Evxl calls through the helper and `attempts` can exceed 2.
+  Log wording is not behavior; R8 is unaffected.
 
 Relation to `api_retry_urllib3_migration_proposal.md`: that doc defers
 migration until we want "more attempts, real exponential backoff, broader
@@ -266,24 +271,32 @@ promotes into `resources/playlists/` carry their provenance with them.
 **Default startup behavior:** download `https://evxl.app/data/benchmarks` and
 validate it as a complete `EvxlData` model **before** comparing — an HTTP 200
 carrying malformed JSON, an error document, or a partially valid dataset must
-never replace the snapshot. If valid and different, overwrite
-`resources/evxl/benchmarks.json` atomically (temp file + `os.replace`) and
-log a diff summary ("Evxl data changed: N entries added/changed/removed");
-if identical, log "Evxl data unchanged". On fetch *or* validation failure,
-warn and fall back to the committed snapshot. This implements the existing TODO
+never replace the snapshot. The live-vs-snapshot comparison and the
+per-entry diff use the **same ordered-pair `rank_colors` representation as
+D6** — plain model/dict equality would classify a pure reorder as
+"unchanged" here, one layer before D6 could ever see it. If valid and
+different, overwrite `resources/evxl/benchmarks.json` atomically (temp file
++ `os.replace`) and log a diff summary ("Evxl data changed: N entries
+added/changed/removed"); if identical, log "Evxl data unchanged". On fetch
+*or* validation failure, warn and fall back to the committed snapshot. This implements the existing TODO
 and, combined with D6, makes a plain script run the staleness check *and* the
 incremental update in one step: only entries that actually changed
 regenerate. Dirtying the working tree is deliberate — the snapshot update
 belongs in the same commit as the regenerated playlists.
 
 **Removal guard:** schema validation cannot prove completeness — an empty
-list or a partially valid dataset can still parse as `EvxlData`. If the
-validated live data would *remove* sharecodes present in the current
-snapshot, the snapshot is **kept**, the would-be removals are logged, and
-the run proceeds against the existing snapshot; pass `--accept-removals` to
-accept the new data anyway. Additions and changes replace the snapshot
-automatically. (An empty or truncated-but-valid response is caught by the
-same rule, since it necessarily implies removals.)
+list or a partially valid dataset can still parse as `EvxlData`. The rule
+is **all-or-nothing on the candidate**: if the validated live data would
+*remove* any sharecode present in the current snapshot, the entire
+candidate is rejected — including its additions and changes — the would-be
+removals are logged, and the run proceeds against the existing snapshot;
+`--accept-removals` accepts the whole candidate. A candidate with only
+additions/changes replaces the snapshot automatically. (Partially applying
+a mixed candidate — merging its additions while keeping the removed entries
+— was considered and rejected: the snapshot must stay an exact mirror of
+*some* upstream state, or provenance comparisons stop meaning anything. An
+empty or truncated-but-valid response is caught by the same rule, since it
+necessarily implies removals.)
 
 `argparse` with:
 
@@ -320,7 +333,17 @@ ownership map is seeded by scanning existing `generated/*.json` files and
 reading each file's embedded `code` field (part of `PlaylistData` from the
 start — no provenance stamp required). This makes D8 fully deliverable in
 PR-B2, before the manifest exists, and stays correct afterwards: `--only`
-and `--limit` runs see files created by any previous run. On collision,
+and `--limit` runs see files created by any previous run.
+
+The scan must be junk-tolerant, because it runs at startup *before* D3's
+per-item handling can catch anything: it explicitly excludes
+`manifest.json` (which lives in the same directory and has no `code`), and
+a file that fails to parse or lacks a `code` field is logged and treated as
+**unowned** — never a startup abort. Overwriting an unowned (corrupt) file
+at a target path is permitted with a warning: if it actually belonged to
+another sharecode, that sharecode's D6 integrity check will fail provenance
+on its next turn and regenerate it, so the system self-heals rather than
+accumulating suffixed orphans next to garbage. On collision,
 suffix the later sharecode's filename with its sharecode and log a warning —
 never silently overwrite a file owned by another sharecode. (A sharecode
 replacing its *own* previous file — the rename case — is handled in D6.)
@@ -377,6 +400,15 @@ treatment. Cost: PyCharm run-config path update.
   malformed/truncated cache file becomes `None` → refetch, instead of an
   uncaught `JSONDecodeError` outside D3's caught tuple killing a script run)
   and atomic `_write_json`.
+- Tolerant reading alone is not enough: syntactically valid but
+  wrong-shaped cache content (e.g. `{}`) passes `_read_json` and would
+  surface later as a permanently failed item. On a cache hit,
+  additionally validate the cached data against `BenchmarksAPIResponse`;
+  a `ValidationError` is treated as a cache miss → refetch and overwrite.
+  The gate applies only to the *cached* copy — a fresh response that fails
+  validation is a real error and surfaces normally. Signature and return
+  type are unchanged (validation is a gate, the raw JSON is still what is
+  returned).
 - Script logging: keep root at DEBUG but set `urllib3` to WARNING so progress
   lines are readable.
 
@@ -433,8 +465,10 @@ treatment. Cost: PyCharm run-config path update.
   respected, backoff schedule consumed with clamping, defaults produce
   today's exact behavior (one immediate retry), 429 path unchanged;
   `get_benchmark_json` single-parse + type fix; a malformed/truncated
-  benchmark cache file refetches instead of raising; cache writes are
-  atomic.
+  benchmark cache file refetches instead of raising; a syntactically valid
+  but schema-invalid cache (e.g. `{}`) also refetches; cache writes are
+  atomic; the transient-failure log carries provider-neutral attempt
+  counts.
 - **Script helpers (needs D10):**
   - Manifest skip/regenerate decision matrix: missing entry / matching entry
     / changed `kovaaksBenchmarkId` / changed `rank_colors` / missing,
@@ -450,10 +484,17 @@ treatment. Cost: PyCharm run-config path update.
   - Malformed or schema-invalid live Evxl data preserves the committed
     snapshot; schema-*valid* live data implying sharecode removals also
     preserves it unless `--accept-removals` is passed.
-  - A pure reorder of an entry's `rank_colors` regenerates (ordered
-    comparison, not dict equality).
+  - A pure reorder of an entry's `rank_colors` regenerates — tested
+    end-to-end: a reordered *live* download must replace the snapshot (D7)
+    and then trigger regeneration (D6), not be classified "unchanged" at
+    either layer.
   - A manifest entry whose `file` resolves outside `generated/` is rejected
     (never read, never deleted).
+  - The ownership scan skips `manifest.json` and treats unparseable or
+    `code`-less files as unowned without aborting startup.
+  - A mixed live candidate (additions *and* removals) is rejected in full
+    without `--accept-removals`; an additions/changes-only candidate
+    replaces the snapshot automatically.
   - Circuit-breaker abort at the configured consecutive-failure threshold;
     summary exit codes.
 - **Manual gate:** one full `uv run` from the repo root against the live
@@ -490,8 +531,9 @@ Four PRs, in order, each independently shippable and reviewable:
    readme rewrite + architecture pointer. After this PR reruns are cheap
    (R3, R4).
 
-All wait for Scenario Rank Eventual Consistency PR 2 of 2 to land first
-(`api_service.py` conflict avoidance).
+The original precondition — waiting for the Scenario Rank Eventual
+Consistency PRs — is satisfied (PR #40 confirmed as the final one); the only
+remaining gate is this proposal merging to main.
 
 ## Resolved Decisions (2026-07-02 Q&A round)
 
@@ -525,6 +567,8 @@ ephemeral per the handoff-doc convention; findings are distilled here):
   fatal full-run timeout).
 - **Cross-run collision ownership** (D8) — the collision map is seeded from
   manifest entries, closing the manifest-skipped-A / new-B overwrite hole.
+  *(Superseded in round 2: ownership now derives from output files'
+  embedded `code` fields, with no manifest dependency.)*
 - **Resume marker hardened** (D6) — skip requires an intact,
   provenance-matching output file, not manifest metadata alone; manifest
   writes are atomic with defined file-then-manifest ordering; malformed
@@ -575,6 +619,42 @@ Eight findings (five from the review doc, three PR-inline), all accepted:
 
 Housekeeping from the same round: the Sequencing precondition is marked
 satisfied (PR #40 confirmed as EC 2/2).
+
+### External review round 3 (2026-07-02)
+
+Five findings plus two housekeeping items, all accepted:
+
+- **Ownership scan robustness** (D8) — the `generated/*.json` scan would
+  have consumed its own `manifest.json` (no `code` field) and could abort
+  startup on any truncated output file, since it runs before D3's per-item
+  handling. Fix: exclude the manifest explicitly; unparseable or
+  `code`-less files are logged and treated as unowned. Refinement beyond
+  the review: overwriting an unowned corrupt file is *permitted* (with a
+  warning) rather than suffixed around — a wrongly overwritten file's true
+  owner fails its D6 provenance check and regenerates, so the system
+  self-heals instead of accumulating suffixed orphans beside garbage.
+- **Ordered comparison extended to the live diff** (D7) — round 2 made the
+  D6/manifest comparison order-sensitive but left D7's live-vs-snapshot
+  diff on model equality, which would classify a pure `rank_colors`
+  reorder as "unchanged" one layer earlier. Both layers now use the same
+  ordered-pair representation; end-to-end reorder test added.
+- **Cache shape gate** (D11) — `_read_json` tolerance only covers invalid
+  JSON; a valid-but-wrong-shape cache (`{}`) would become a permanently
+  failed item. Cached benchmark data now validates against
+  `BenchmarksAPIResponse` before acceptance; invalid shape = cache miss →
+  refetch. Fresh responses are not gated.
+- **Removal guard made explicitly all-or-nothing** (D7) — the round-2
+  wording was contradictory for mixed candidates (removals + additions).
+  Any removal now rejects the entire candidate until `--accept-removals`;
+  partial application was considered and rejected (the snapshot must
+  mirror an actual upstream state).
+- **Provider-neutral retry logging** (D2) — "KovaaK's … retrying once"
+  becomes attempt-counted, provider-neutral wording, since D1 routes Evxl
+  through the same helper and attempts can exceed 2.
+- Housekeeping: the staging footer no longer claims all PRs wait on the
+  Scenario Rank work (contradicted the satisfied Sequencing header), and
+  round 1's collision-ownership bullet is marked superseded by round 2's
+  file-scan design.
 
 ## Open Questions
 
