@@ -2,11 +2,14 @@
 Provides business logic for Kovaak's API.
 """
 
+# pylint: disable=too-many-lines
+
 import json
 import logging
 import os
 import threading
 import time
+from decimal import ROUND_FLOOR, Decimal
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 from enum import StrEnum
@@ -25,14 +28,19 @@ from source.kovaaks.api_models import (
     UserScenarioTotalPlayAPIResponse,
 )
 from source.kovaaks.request_logging import request_exception_summary
+from source.utilities.dash_logging import get_dash_logger
 
 TIMEOUT = 10  # Default timeout for KovaaK's API requests.
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
 TRANSIENT_GET_EXCEPTIONS = (requests.Timeout, requests.ConnectionError)  # Safe GET-only retry failures.
+ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
+SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
+dash_logger = get_dash_logger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
+_rank_save_lock = threading.Lock()
 
 CACHE_DIR = "cache"
 
@@ -627,6 +635,74 @@ def save_scenario_rank(
     )
 
 
+def _cached_rank(
+    leaderboard_id: int,
+    username: str,
+) -> ScenarioRankInfo | None:
+    """Read a stored rank directly, independent of its cache age."""
+    cache_file = _rank_cache_file(leaderboard_id, username)
+    if not cache_file.exists():
+        return None
+    cache_data = _read_json(cache_file)
+    if not isinstance(cache_data, dict):
+        return None
+    try:
+        return ScenarioRankInfo.model_validate(cache_data).model_copy(
+            update={"total_players": None, "percentile": None}
+        )
+    except ValidationError:
+        logger.warning(
+            "Failed to validate rank cache file: %s",
+            cache_file,
+            exc_info=True,
+        )
+        return None
+
+
+# pylint: disable-next=too-many-return-statements
+def _is_forward(
+    existing: ScenarioRankInfo,
+    candidate: ScenarioRankInfo,
+    allow_regression: bool = False,
+) -> bool:
+    """Return whether a rank candidate may replace the stored value."""
+    if allow_regression:
+        return True
+
+    existing_ranked = existing.status == ScenarioRankStatus.RANKED
+    candidate_ranked = candidate.status == ScenarioRankStatus.RANKED
+    if existing_ranked and not candidate_ranked:
+        return False
+    if candidate_ranked and not existing_ranked:
+        return True
+    if existing_ranked and candidate_ranked:
+        if existing.score is None:
+            return True
+        if candidate.score is None:
+            return False
+        return candidate.score >= existing.score - SCORE_EPSILON
+    return True
+
+
+def _save_rank_monotonic(
+    leaderboard_id: int,
+    username: str,
+    candidate: ScenarioRankInfo,
+    allow_regression: bool = False,
+) -> tuple[ScenarioRankInfo, bool]:
+    """Atomically save a rank candidate unless an automatic write would regress."""
+    with _rank_save_lock:
+        existing = _cached_rank(leaderboard_id, username)
+        if existing is not None and not _is_forward(
+            existing,
+            candidate,
+            allow_regression,
+        ):
+            return existing, False
+        save_scenario_rank(leaderboard_id, username, candidate)
+        return candidate, True
+
+
 def _leaderboard_total_cache_file(leaderboard_id: int) -> Path:
     return Path(CACHE_DIR, "leaderboard", "totals", f"{leaderboard_id}.json")
 
@@ -843,6 +919,176 @@ def fetch_scenario_rank(
     )
 
 
+def _floor_2dp(value: float) -> float:
+    """Truncate a local score to the leaderboard's two-decimal precision."""
+    return float(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_FLOOR))
+
+
+def _score_is_fresh(
+    rank_info: ScenarioRankInfo,
+    expected_score: float,
+) -> bool:
+    """Return whether the leaderboard has reached the expected local score."""
+    return (
+        rank_info.status == ScenarioRankStatus.RANKED
+        and rank_info.score is not None
+        and rank_info.score >= _floor_2dp(expected_score) - SCORE_EPSILON
+    )
+
+
+def _notify_exhaustion(
+    scenario_name: str,
+    expected_score: float,
+    last_rank_info: ScenarioRankInfo | None,
+) -> None:
+    """Log and notify after all scheduled freshness attempts are exhausted."""
+    logger.warning("Rank freshness refresh exhausted for %s", scenario_name)
+    if (
+        last_rank_info is not None
+        and last_rank_info.status == ScenarioRankStatus.RANKED
+        and last_rank_info.score is not None
+        and last_rank_info.score < _floor_2dp(expected_score) - SCORE_EPSILON
+    ):
+        logger.warning(
+            "Possible score-precision drift for %s: board %.4f < floor2(%.6f). "
+            "If this recurs on every PB, the board==floor2(local) assumption is stale.",
+            scenario_name,
+            last_rank_info.score,
+            expected_score,
+        )
+    dash_logger.error(
+        "Rank update timed out for %s. KovaaK's may still be catching up.",
+        scenario_name,
+    )
+
+
+# pylint: disable-next=too-many-arguments,too-many-positional-arguments
+def _run_attempt(
+    scenario_name: str,
+    username: str,
+    steam_id: str | None,
+    expected_score: float,
+    metadata_cache_ttl_hours: int,
+    attempt_index: int,
+) -> None:
+    """Run one guarded freshness attempt and schedule the next when needed."""
+    try:
+        rank_info = None
+        leaderboard_id = None
+        try:
+            leaderboard_id = resolve_leaderboard_id(
+                scenario_name,
+                username,
+                metadata_cache_ttl_hours,
+            )
+        except UnknownKovaaksUserError as exc:
+            logger.warning("Rank refresh stopped for %s: %s", scenario_name, exc)
+            dash_logger.error(
+                "Rank update for %s failed: KovaaK's username may be misconfigured.",
+                scenario_name,
+            )
+            return
+        except requests.RequestException as exc:
+            logger.warning(
+                "Transient failure resolving leaderboard for %s; will retry: %s",
+                scenario_name,
+                request_exception_summary(exc),
+            )
+        else:
+            if leaderboard_id is None:
+                logger.warning("Could not resolve leaderboard for %s", scenario_name)
+                return
+            try:
+                rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
+            except requests.RequestException:
+                rank_info = None
+
+        if (
+            leaderboard_id is not None
+            and rank_info is not None
+            and _score_is_fresh(rank_info, expected_score)
+        ):
+            rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
+            _, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            if wrote:
+                try:
+                    _with_leaderboard_total(
+                        rank_info,
+                        leaderboard_total_cache_ttl_hours=0,
+                    )
+                except Exception:  # pylint: disable=broad-exception-caught
+                    logger.warning(
+                        "Total refresh failed after fresh rank",
+                        exc_info=True,
+                    )
+            return
+
+        next_index = attempt_index + 1
+        if next_index >= len(ATTEMPT_DELAYS_SECONDS):
+            _notify_exhaustion(scenario_name, expected_score, rank_info)
+            return
+
+        _schedule_attempt(
+            scenario_name,
+            username,
+            steam_id,
+            expected_score,
+            metadata_cache_ttl_hours,
+            next_index,
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        logger.exception("Unexpected error during rank refresh for %s", scenario_name)
+        dash_logger.error(
+            "Rank update for %s failed unexpectedly.",
+            scenario_name,
+        )
+
+
+# pylint: disable-next=too-many-arguments,too-many-positional-arguments
+def _schedule_attempt(
+    scenario_name: str,
+    username: str,
+    steam_id: str | None,
+    expected_score: float,
+    metadata_cache_ttl_hours: int,
+    attempt_index: int,
+) -> None:
+    """Schedule one daemon Timer for a freshness attempt."""
+    delay = ATTEMPT_DELAYS_SECONDS[attempt_index]
+    timer = threading.Timer(
+        delay,
+        _run_attempt,
+        args=(
+            scenario_name,
+            username,
+            steam_id,
+            expected_score,
+            metadata_cache_ttl_hours,
+            attempt_index,
+        ),
+    )
+    timer.daemon = True
+    timer.start()
+
+
+def schedule_rank_freshness_refresh(
+    scenario_name: str,
+    username: str,
+    steam_id: str | None,
+    expected_score: float,
+    metadata_cache_ttl_hours: int = 24,
+) -> None:
+    """Start a bounded score-aware refresh after a new local high score."""
+    _schedule_attempt(
+        scenario_name,
+        username,
+        steam_id,
+        expected_score,
+        metadata_cache_ttl_hours,
+        attempt_index=0,
+    )
+
+
 def get_scenario_rank_info(
     scenario_name: str,
     username: str | None,
@@ -915,7 +1161,14 @@ def get_scenario_rank_info(
                 cached_rank = cached_rank.model_copy(
                     update={"scenario_name": scenario_name}
                 )
-                save_scenario_rank(leaderboard_id, username, cached_rank)
+                cached_rank, _ = _save_rank_monotonic(
+                    leaderboard_id,
+                    username,
+                    cached_rank,
+                )
+                cached_rank = cached_rank.model_copy(
+                    update={"scenario_name": cached_rank.scenario_name or scenario_name}
+                )
             cached_rank = _with_leaderboard_total(
                 cached_rank,
                 leaderboard_total_cache_ttl_hours,
@@ -958,30 +1211,20 @@ def get_scenario_rank_info(
                 request_exception_summary(exc),
             )
     rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-    save_scenario_rank(leaderboard_id, username, rank_info)
+    rank_info, _ = _save_rank_monotonic(
+        leaderboard_id,
+        username,
+        rank_info,
+        allow_regression=force_refresh,
+    )
+    rank_info = rank_info.model_copy(
+        update={"scenario_name": rank_info.scenario_name or scenario_name}
+    )
     rank_info = _with_leaderboard_total(
         rank_info,
         leaderboard_total_cache_ttl_hours,
     )
     return _with_derived_rank_warning(rank_info, username, steam_id)
-
-
-def refresh_scenario_rank(
-    scenario_name: str,
-    username: str,
-    steam_id: str | None = None,
-    metadata_cache_ttl_hours: int = 24,
-    leaderboard_total_cache_ttl_hours: int = 168,
-) -> ScenarioRankInfo:
-    return get_scenario_rank_info(
-        scenario_name,
-        username,
-        steam_id,
-        metadata_cache_ttl_hours,
-        rank_cache_ttl_hours=0,
-        leaderboard_total_cache_ttl_hours=leaderboard_total_cache_ttl_hours,
-        force_refresh=True,
-    )
 
 
 make_cache()
