@@ -1,5 +1,10 @@
 # Scenario Stats Current Rank Feature Proposal
 
+> Historical implementation proposal. Its `ThreadPoolExecutor` refresh and
+> no-manual-refresh decisions are superseded by the 2026-07-01 scenario-rank
+> consistency decision in `docs/decision_log.md`. Current runtime structure lives
+> in `docs/architecture.md`.
+
 ## Goal
 
 Display the user's current leaderboard rank for the selected scenario under the Scenario Stats section of the home page.
@@ -330,6 +335,10 @@ Why only on new high score? A run that does not beat the existing high score can
 
 ### Background Execution Options
 
+> Superseded 2026-07-01. The accepted implementation uses the bounded
+> score-aware daemon Timer chain recorded in `docs/decision_log.md`; the options
+> below preserve the original design history.
+
 There are three reasonable options for the high-score-triggered refresh:
 
 | Option | Pros | Cons |
@@ -445,7 +454,7 @@ fetch_scenario_rank(leaderboard_id: int, username: str, steam_id: str | None = N
 
 # main entry points
 get_scenario_rank_info(scenario_name: str, username: str | None, steam_id: str | None = None, leaderboard_total_cache_ttl_hours: int = 168) -> ScenarioRankInfo
-refresh_scenario_rank(scenario_name: str, username: str, steam_id: str | None = None) -> ScenarioRankInfo
+refresh_scenario_rank(scenario_name: str, username: str, steam_id: str | None = None) -> ScenarioRankInfo  # Superseded
 ```
 
 Add new entries to `Endpoints`:
@@ -459,7 +468,8 @@ USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 On new high score detection:
 
-- Trigger `refresh_scenario_rank` through a shared `ThreadPoolExecutor(max_workers=2)`.
+- Superseded 2026-07-01: trigger `refresh_scenario_rank` through a shared
+  `ThreadPoolExecutor(max_workers=2)`.
 - Do not block the watchdog hot path.
 - Let the normal update path notify the UI.
 - If the background task fails, log with the normal module logger and call `dash_logger.error(...)` so the user understands when rank did not update after a new high score.
@@ -544,7 +554,8 @@ No tiny-leaderboard special casing is planned.
 ### Milestone 2: High-Score Rank Refresh
 
 - Detect new high score in the watchdog/data path
-- Background rank refresh on new PB through `ThreadPoolExecutor(max_workers=2)`
+- Superseded: background rank refresh on new PB through
+  `ThreadPoolExecutor(max_workers=2)`
 - Save refreshed rank to current-rank cache
 - Surface refreshed rank to UI on next update cycle
 - Surface refresh failures to the UI through `dash_logger.error(...)`
@@ -577,7 +588,7 @@ No tiny-leaderboard special casing is planned.
 | TTL via `mtime` | Timestamp field inside JSON | No extra logic; `mtime` resets automatically on write. |
 | Separate rank and total cache files | Combined file | Different TTLs; coupling forces total re-fetch whenever short-lived rank cache expires. |
 | Long rank TTL plus PB refresh | Short rank TTL | Once known, rank can be reused for normal browsing; new high scores trigger immediate refresh. |
-| Shared executor PB refresh | Sync in watchdog or one-off threads | Keeps the file-handling hot path fast while capping concurrency. |
+| Shared executor PB refresh (superseded 2026-07-01) | Sync in watchdog or one-off threads | Replaced by a bounded score-aware daemon Timer chain so delayed attempts do not occupy a fixed worker pool. |
 | Exact username match first | Blind first result | `usernameSearch` is partial-match, so first result can be the wrong user. |
 | Include `steam_id` | Username only | Steam ID guarantees the correct player when `usernameSearch` returns multiple partial matches. |
 | Exact scenario search | Blind first result | Scenario search returns variants, so first result is not a safe general rule. |
@@ -589,6 +600,7 @@ No tiny-leaderboard special casing is planned.
 - Use `StrEnum` for `ScenarioRankStatus` so JSON cache values are stable and readable.
 - Keep `scenario_rank_cache_ttl_hours = 168`; revisit only if stale rank data becomes a real user-facing issue.
 - Use first-page scenario search with `max=100`; do not paginate unless real data shows this is insufficient.
-- Use `ThreadPoolExecutor(max_workers=2)` for high-score-triggered refresh.
+- Superseded 2026-07-01: use `ThreadPoolExecutor(max_workers=2)` for
+  high-score-triggered refresh.
 - Surface rank refresh failures to the UI through `dash_logger.error(...)`.
-- No manual rank refresh button is planned.
+- Superseded 2026-07-01: no manual rank refresh button is planned.

@@ -11,6 +11,7 @@ from dash import (
     State,
     callback,
     clientside_callback,
+    ctx,
     dcc,
     no_update,
 )
@@ -46,6 +47,7 @@ logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
 LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
+_INTERVAL_PROP = "interval-component.n_intervals"
 dash.register_page(
     __name__,
     path="/",
@@ -165,34 +167,90 @@ clientside_callback(
 )
 
 
-@callback(
-    Output("scenario_rank", "children"),
-    Input("do_update", "data"),
-    Input("scenario-dropdown-selection", "value"),
-)
-def get_scenario_rank(_, selected_scenario) -> str:
-    if not selected_scenario:
-        return "N/A"
+def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
+    """Allow network access unless the interval is the callback's only trigger."""
+    return any(trigger["prop_id"] != _INTERVAL_PROP for trigger in triggered)
 
-    try:
-        rank_info = get_scenario_rank_info(
-            selected_scenario,
-            config.kovaaks_username,
-            config.steam_id,
-            config.scenario_metadata_cache_ttl_hours,
-            config.scenario_rank_cache_ttl_hours,
-            config.leaderboard_total_cache_ttl_hours,
-        )
-    except Exception:  # noqa: BLE001
-        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
-        return "N/A"
 
+def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
+    """Surface rank warnings and errors through the dashboard notification logger."""
     if rank_info.warning_message:
         logger.warning("Scenario rank warning: %s", rank_info.warning_message)
         dash_logger.warning(rank_info.warning_message)
     if rank_info.error_message:
         logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
         dash_logger.error(rank_info.error_message)
+
+
+def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
+    """Return the shared rank-service arguments sourced from app configuration."""
+    rank_config = config
+    return (
+        rank_config.kovaaks_username,
+        rank_config.steam_id,
+        rank_config.scenario_metadata_cache_ttl_hours,
+        rank_config.scenario_rank_cache_ttl_hours,
+        rank_config.leaderboard_total_cache_ttl_hours,
+    )
+
+
+def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) -> str:
+    """Render rank through either the normal lookup or the cache-only interval path."""
+    if not selected_scenario:
+        return "N/A"
+
+    try:
+        rank_info = get_scenario_rank_info(
+            selected_scenario,
+            *_rank_lookup_config(),
+            allow_network=allow_network,
+        )
+    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+        logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
+        return "N/A"
+
+    if allow_network:
+        _emit_rank_messages(rank_info)
+    return format_scenario_rank(rank_info)
+
+
+@callback(
+    Output("scenario_rank", "children"),
+    Input("do_update", "data"),
+    Input("scenario-dropdown-selection", "value"),
+    Input("interval-component", "n_intervals"),
+)
+def get_scenario_rank(_, selected_scenario, _n_intervals) -> str:
+    """Render scenario rank, keeping interval-only calls cache-only."""
+    return _render_scenario_rank(
+        selected_scenario,
+        _rank_allows_network(ctx.triggered),
+    )
+
+
+@callback(
+    Output("scenario_rank", "children", allow_duplicate=True),
+    Input("rank-refresh-button", "n_clicks"),
+    State("scenario-dropdown-selection", "value"),
+    prevent_initial_call=True,
+)
+def refresh_rank(_, selected_scenario: str | None) -> str:
+    """Fetch and display authoritative board truth after an explicit user request."""
+    if not selected_scenario:
+        return "N/A"
+
+    try:
+        rank_info = get_scenario_rank_info(
+            selected_scenario,
+            *_rank_lookup_config(),
+            force_refresh=True,
+        )
+    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+        logger.exception("Manual rank refresh failed for %s", selected_scenario)
+        dash_logger.error("Rank refresh for %s failed.", selected_scenario)
+        return "N/A"
+
+    _emit_rank_messages(rank_info)
     return format_scenario_rank(rank_info)
 
 
@@ -518,7 +576,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
-                                    miw=500,
+                                    miw=400,
                                     persistence=True,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
@@ -589,30 +647,46 @@ def layout(**kwargs):  # noqa: ARG001
                                             ],
                                             size="sm",
                                         ),
-                                        dmc.Text(
+                                        dmc.Group(
                                             [
                                                 dmc.Text(
-                                                    "Rank: ",
-                                                    fw=700,
-                                                    span=True,
+                                                    [
+                                                        dmc.Text(
+                                                            "Rank: ",
+                                                            fw=700,
+                                                            span=True,
+                                                        ),
+                                                        dcc.Loading(
+                                                            dmc.Text(
+                                                                id="scenario_rank",
+                                                                span=True,
+                                                            ),
+                                                            delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
+                                                            show_initially=False,
+                                                            parent_style={
+                                                                "display": "inline-block",
+                                                                "verticalAlign": "baseline",
+                                                            },
+                                                            style={
+                                                                "display": "inline-block",
+                                                            },
+                                                        ),
+                                                    ],
+                                                    size="sm",
                                                 ),
-                                                dcc.Loading(
-                                                    dmc.Text(
-                                                        id="scenario_rank",
-                                                        span=True,
+                                                dmc.Button(
+                                                    "Refresh",
+                                                    id="rank-refresh-button",
+                                                    variant="subtle",
+                                                    size="compact-xs",
+                                                    leftSection=DashIconify(
+                                                        icon="material-symbols:refresh-rounded",
+                                                        width=14,
                                                     ),
-                                                    delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
-                                                    show_initially=False,
-                                                    parent_style={
-                                                        "display": "inline-block",
-                                                        "verticalAlign": "baseline",
-                                                    },
-                                                    style={
-                                                        "display": "inline-block",
-                                                    },
                                                 ),
                                             ],
-                                            size="sm",
+                                            gap="xs",
+                                            align="center",
                                         ),
                                     ],
                                     w=300,

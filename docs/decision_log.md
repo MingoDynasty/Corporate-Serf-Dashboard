@@ -188,3 +188,36 @@ Decision: Home Scenario Stats distinguishes three "Last played" states: no scena
 Why: `—` communicates an unselected field without implying missing or failed data, while `Never` communicates a known selected scenario with no recorded plays. Showing the affordance only when more information exists keeps the interaction honest and avoids a tooltip that merely repeats an empty-state value.
 
 Consequences: The home callback owns the empty-state value and tooltip affordance alongside the raw timestamp. The clientside relative-time callback continues to own the live-updating visible timestamp. A selected scenario missing from the local database is treated as having no local play data; temporary loading or error states must not be mapped to `Never`.
+
+## 2026-07-01: Keep Scenario Rank Consistent With Score-Aware Refreshes
+
+Status: Accepted
+
+Supersedes: The `ThreadPoolExecutor(max_workers=2)` high-score refresh and the
+decision not to provide manual rank refresh in `docs/scenario_rank_proposal.md`.
+
+Decision: After a local high score, run a bounded score-aware refresh using a
+daemon `threading.Timer` chain with delays of 2, 4, 8, 16, and 32 seconds. Accept
+the leaderboard as caught up only when its score reaches the two-decimal floor of
+the local score. Route every automatic rank-cache write through one process-locked
+monotonic writer so a lower score or transient `UNRANKED` result cannot replace a
+known better value. The home rank widget passively re-reads rank and total caches
+on its existing interval without making network calls, including when those cache
+files are older than their normal TTLs. A user-clicked Refresh performs one
+authoritative fetch and may deliberately write a lower score or `UNRANKED` result.
+
+Why: KovaaK's leaderboard updates are eventually consistent, so the old single
+post-PB fetch could persist lagging data for the week-long cache TTL. Timer
+attempts keep delayed work off a bounded executor, centralized write arbitration
+prevents loop/read races, and the cache-only UI poll surfaces successful background
+writes within about one second. Automatic rechecks after the bounded window would
+hammer permanently divergent offline/server-down scores; explicit Refresh gives
+the user a bounded escape hatch instead.
+
+Consequences: Automatic rank displays move forward by score and never flicker from
+a known rank to `UNRANKED`; explicit Refresh is board-authoritative and can move
+backward after a leaderboard reset. Interval ticks resolve only cached leaderboard
+IDs, read rank and total files independent of TTL, emit no repeated warning/error
+toasts, and make zero KovaaK's requests. A refresh loop that exhausts leaves the
+previous cache untouched and asks the user to click Refresh. The retry schedule is
+a code constant, not configuration.

@@ -33,7 +33,10 @@ from source.utilities.dash_logging import get_dash_logger
 TIMEOUT = 10  # Default timeout for KovaaK's API requests.
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
-TRANSIENT_GET_EXCEPTIONS = (requests.Timeout, requests.ConnectionError)  # Safe GET-only retry failures.
+TRANSIENT_GET_EXCEPTIONS = (
+    requests.Timeout,
+    requests.ConnectionError,
+)  # Safe GET-only retry failures.
 ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
@@ -91,10 +94,10 @@ def _retry_after_seconds(response: requests.Response) -> float:
     if raw_retry_after:
         try:
             delay_seconds = float(raw_retry_after)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             try:
                 retry_at = parsedate_to_datetime(raw_retry_after)
-            except (TypeError, ValueError, IndexError, OverflowError):
+            except TypeError, ValueError, IndexError, OverflowError:
                 delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
             else:
                 if retry_at.tzinfo is None:
@@ -223,7 +226,7 @@ def _read_json(cache_file: Path) -> dict | list | None:
         try:
             with open(cache_file, encoding="utf-8") as file:
                 return json.load(file)
-        except (OSError, json.JSONDecodeError):
+        except OSError, json.JSONDecodeError:
             logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
             return None
 
@@ -249,13 +252,14 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
 def _safe_cache_key(value: str) -> str:
     """Normalize user-provided values before embedding them in cache paths."""
     return "".join(
-        char if char.isalnum() or char in ("-", "_") else "_"
-        for char in value
+        char if char.isalnum() or char in ("-", "_") else "_" for char in value
     )
 
 
 def _user_scenario_total_play_cache_file(username: str) -> Path:
-    return Path(CACHE_DIR, "user_scenario_total_play", f"{_safe_cache_key(username)}.json")
+    return Path(
+        CACHE_DIR, "user_scenario_total_play", f"{_safe_cache_key(username)}.json"
+    )
 
 
 def _user_scenario_total_play_page_cache_file(username: str, page: int) -> Path:
@@ -292,7 +296,9 @@ def _has_terminal_user_scenario_total_play_page(
 
 def _is_unknown_username_total_play_response(cache_data: dict | list | None) -> bool:
     """Detect our cached marker for KovaaK's literal-null unknown-user response."""
-    return isinstance(cache_data, dict) and cache_data.get("error") == "unknown_username"
+    return (
+        isinstance(cache_data, dict) and cache_data.get("error") == "unknown_username"
+    )
 
 
 def _is_complete_paginated_response(
@@ -322,7 +328,9 @@ def _is_complete_paginated_response(
 
 
 def _leaderboard_mapping_file() -> Path:
-    return Path(CACHE_DIR, "scenario_leaderboards", "scenario_name_to_leaderboard_id.json")
+    return Path(
+        CACHE_DIR, "scenario_leaderboards", "scenario_name_to_leaderboard_id.json"
+    )
 
 
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
@@ -554,13 +562,15 @@ def resolve_leaderboard_id(
     scenario_name: str,
     username: str | None = None,
     metadata_cache_ttl_hours: int = 24,
+    allow_network: bool = True,
 ) -> int | None:
     """
     Resolve a selected scenario name to a leaderboard ID.
 
     The total-play cache is a best-effort metadata source. If it is unavailable,
     continue to exact scenario search rather than treating cache failure as a
-    user-facing rank failure.
+    user-facing rank failure. When ``allow_network`` is false, only the permanent
+    local mapping cache is consulted.
 
     Fallback order:
     1. Permanent local mapping cache.
@@ -571,6 +581,9 @@ def resolve_leaderboard_id(
     leaderboard_id = get_cached_leaderboard_id(scenario_name)
     if leaderboard_id is not None:
         return leaderboard_id
+
+    if not allow_network:
+        return None
 
     if username:
         # Hydration is opportunistic: it can fill many mappings at once, but
@@ -726,6 +739,22 @@ def get_cached_leaderboard_total(
     return total_players
 
 
+def _cached_leaderboard_total(leaderboard_id: int) -> int | None:
+    """Read a stored leaderboard total directly, independent of its cache age."""
+    cache_file = _leaderboard_total_cache_file(leaderboard_id)
+    if not cache_file.exists():
+        return None
+
+    cache_data = _read_json(cache_file)
+    if not isinstance(cache_data, dict):
+        return None
+
+    total_players = cache_data.get("total_players")
+    if not isinstance(total_players, int):
+        return None
+    return total_players
+
+
 def save_leaderboard_total(leaderboard_id: int, total_players: int) -> None:
     """Cache the total number of ranked players for a leaderboard."""
     _write_json(
@@ -817,7 +846,7 @@ def _with_leaderboard_total(
             request_exception_summary(exc),
         )
         return rank_info
-    except (ValidationError, OSError, ValueError):
+    except ValidationError, OSError, ValueError:
         logger.warning(
             "Failed to process leaderboard total for %s",
             rank_info.leaderboard_id,
@@ -1089,6 +1118,7 @@ def schedule_rank_freshness_refresh(
     )
 
 
+# pylint: disable-next=too-many-branches
 def get_scenario_rank_info(
     scenario_name: str,
     username: str | None,
@@ -1097,12 +1127,15 @@ def get_scenario_rank_info(
     rank_cache_ttl_hours: int = 168,
     leaderboard_total_cache_ttl_hours: int = 168,
     force_refresh: bool = False,
+    allow_network: bool = True,
 ) -> ScenarioRankInfo:
     """
     Main rank lookup entry point for UI and background refresh callers.
 
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
     code can display N/A without knowing endpoint or cache details.
+    ``allow_network=False`` serves rank and total caches independent of TTL and
+    returns UNKNOWN on a miss without fetching.
 
     Result states:
     - RANKED: leaderboard exists and the exact user has a score.
@@ -1124,6 +1157,7 @@ def get_scenario_rank_info(
             scenario_name,
             username,
             metadata_cache_ttl_hours,
+            allow_network=allow_network,
         )
     except UnknownKovaaksUserError as exc:
         return ScenarioRankInfo(
@@ -1150,30 +1184,51 @@ def get_scenario_rank_info(
 
     # Rank cache is intentionally long-lived. New high-score detection refreshes
     # this cache, so normal scenario switching should avoid leaderboard calls.
-    if not force_refresh:
-        cached_rank = get_cached_scenario_rank(
-            leaderboard_id,
-            username,
-            rank_cache_ttl_hours,
-        )
+    if not force_refresh or not allow_network:
+        if allow_network:
+            cached_rank = get_cached_scenario_rank(
+                leaderboard_id,
+                username,
+                rank_cache_ttl_hours,
+            )
+        else:
+            cached_rank = _cached_rank(leaderboard_id, username)
         if cached_rank:
             if cached_rank.scenario_name is None:
                 cached_rank = cached_rank.model_copy(
                     update={"scenario_name": scenario_name}
                 )
-                cached_rank, _ = _save_rank_monotonic(
-                    leaderboard_id,
-                    username,
+                if allow_network:
+                    cached_rank, _ = _save_rank_monotonic(
+                        leaderboard_id,
+                        username,
+                        cached_rank,
+                    )
+                    cached_rank = cached_rank.model_copy(
+                        update={
+                            "scenario_name": cached_rank.scenario_name or scenario_name
+                        }
+                    )
+            if allow_network:
+                cached_rank = _with_leaderboard_total(
                     cached_rank,
+                    leaderboard_total_cache_ttl_hours,
                 )
-                cached_rank = cached_rank.model_copy(
-                    update={"scenario_name": cached_rank.scenario_name or scenario_name}
-                )
-            cached_rank = _with_leaderboard_total(
-                cached_rank,
-                leaderboard_total_cache_ttl_hours,
-            )
+            else:
+                total_players = _cached_leaderboard_total(leaderboard_id)
+                if total_players is not None:
+                    cached_rank = cached_rank.model_copy(
+                        update={"total_players": total_players}
+                    )
+                    cached_rank = _with_percentile(cached_rank)
             return _with_derived_rank_warning(cached_rank, username, steam_id)
+
+    if not allow_network:
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+        )
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
     # is not used here because it can lag behind the leaderboard endpoint.

@@ -18,8 +18,9 @@ Threads at runtime:
 
 - **Server thread(s)** — Waitress/Flask serving Dash; runs the page callbacks.
 - **Watchdog observer thread** — `NewFileHandler` fires on each new CSV.
-- **Rank refresh pool** — `ThreadPoolExecutor(max_workers=2)` in
-  `file_watchdog.py`, used to refresh scenario rank after a new high score.
+- **Rank freshness timers** — after a new high score, `api_service.py` uses a
+  bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's
+  leaderboard reflects the local score.
 - KovaaK's GETs use a **thread-local `requests.Session`**; cache file I/O is
   guarded by a single `threading.RLock` (`_CACHE_IO_LOCK` in `api_service.py`).
 
@@ -34,13 +35,15 @@ NewFileHandler  (my_watchdog/file_watchdog.py)
   - message_queue.append(...)    enqueue a NewFileMessage (UI notification)
   - load_csv_file_into_database  load the run into the in-memory stores
   - if new high score and kovaaks_username is set:
-        rank_refresh_executor.submit(refresh_scenario_rank)  -> updates rank cache
+        schedule_rank_freshness_refresh(...)  -> Timer chain updates rank cache
       |
       v  (server thread; a dcc.Interval on the home page polls each tick)
 home.py callbacks
   - check_for_new_data  peeks message_queue, may auto-switch scenario
   - generate_graph      popleft()s the message, rebuilds the plot via plot_service
-  - get_scenario_rank   reads ScenarioRankInfo from api_service (cache-first)
+  - get_scenario_rank   reads ScenarioRankInfo from api_service; interval-only
+                        calls are cache-only and surface Timer writes within ~1s
+  - refresh_rank        performs one authoritative fetch when the user clicks Refresh
 ```
 
 The watchdog and UI share two channels: `message_queue` (a `deque`) carries
@@ -85,9 +88,11 @@ UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
   `get_sensitivities_vs_runs`, and the playlist loaders/getters.
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
-  helpers, JSON cache helpers, leaderboard-id resolution, `get_scenario_rank_info`,
-  `refresh_scenario_rank`. UI consumes `ScenarioRankInfo` and never calls endpoints
-  directly. See `docs/kovaaks_api_notes.md`.
+  helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
+  `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
+  bounded `schedule_rank_freshness_refresh` Timer poll. UI consumes
+  `ScenarioRankInfo` and never calls endpoints directly. See
+  `docs/kovaaks_api_notes.md`.
 - `playlist_scenarios_service.py` — builds rows for the playlist overview table
   (`build_playlist_scenario_rank_rows`), merging local stats with rank info.
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
@@ -102,7 +107,8 @@ UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
 
 ### Infrastructure
 - `my_watchdog/file_watchdog.py` — `NewFileHandler`: parse new CSV, update DBs,
-  push `NewFileMessage`, and submit a rank refresh on a new high score.
+  push `NewFileMessage`, and schedule the bounded rank freshness poll on a new
+  high score.
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
