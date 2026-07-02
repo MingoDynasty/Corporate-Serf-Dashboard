@@ -5,13 +5,12 @@ Business logic for monitoring a specified directory for newly created files.
 import datetime
 import logging
 import time
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import config
-from source.kovaaks.api_service import refresh_scenario_rank
+from source.kovaaks.api_service import schedule_rank_freshness_refresh
 from source.kovaaks.data_service import (
     extract_data_from_file,
     get_high_score,
@@ -25,7 +24,6 @@ from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
-rank_refresh_executor = ThreadPoolExecutor(max_workers=2)
 
 # Percentage of the high score a run must beat to "pass" in the debug logs
 # below. This is an interim, developer-facing stand-in for reviewing runs
@@ -40,26 +38,24 @@ rank_refresh_executor = ThreadPoolExecutor(max_workers=2)
 SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
 
 
-def _handle_rank_refresh_result(future) -> None:
-    try:
-        future.result()
-    except Exception:  # noqa: BLE001
-        logger.exception("Failed to refresh scenario rank after new high score.")
-        dash_logger.error("Failed to refresh scenario rank after new high score.")
-
-
-def _refresh_rank_after_high_score(scenario_name: str) -> None:
+def _refresh_rank_after_high_score(
+    scenario_name: str,
+    expected_score: float,
+) -> None:
     if not config.kovaaks_username:
         return
 
-    future = rank_refresh_executor.submit(
-        refresh_scenario_rank,
-        scenario_name,
-        config.kovaaks_username,
-        config.steam_id,
-        config.scenario_metadata_cache_ttl_hours,
-    )
-    future.add_done_callback(_handle_rank_refresh_result)
+    try:
+        schedule_rank_freshness_refresh(
+            scenario_name,
+            config.kovaaks_username,
+            config.steam_id,
+            expected_score,
+            config.scenario_metadata_cache_ttl_hours,
+        )
+    except Exception:  # pylint: disable=broad-exception-caught
+        logger.exception("Failed to schedule rank refresh for %s", scenario_name)
+        dash_logger.error("Could not start rank update for %s.", scenario_name)
 
 
 class NewFileHandler(FileSystemEventHandler):
@@ -104,7 +100,7 @@ class NewFileHandler(FileSystemEventHandler):
                 ),
             )
             load_csv_file_into_database(file)
-            _refresh_rank_after_high_score(run_data.scenario)
+            _refresh_rank_after_high_score(run_data.scenario, run_data.score)
             return
 
         high_score = get_high_score(run_data.scenario)
@@ -144,7 +140,7 @@ class NewFileHandler(FileSystemEventHandler):
             )
             load_csv_file_into_database(file)
             if is_new_high_score:
-                _refresh_rank_after_high_score(run_data.scenario)
+                _refresh_rank_after_high_score(run_data.scenario, run_data.score)
             return
 
         # Case 3: existing scenario and existing sensitivity, find nth score.
@@ -172,5 +168,5 @@ class NewFileHandler(FileSystemEventHandler):
         )
         load_csv_file_into_database(file)
         if is_new_high_score:
-            _refresh_rank_after_high_score(run_data.scenario)
+            _refresh_rank_after_high_score(run_data.scenario, run_data.score)
         return
