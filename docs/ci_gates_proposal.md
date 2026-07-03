@@ -28,8 +28,8 @@ work, scoped to CI.
 - One GitHub Actions workflow, `.github/workflows/gates.yml`, running the five
   checks on `pull_request` and on `push` to `main`.
 - uv-based environment setup that *validates* `uv.lock` against
-  `pyproject.toml` (`uv sync --locked`) and pins the Python minor version,
-  with the uv cache enabled so warm runs are fast.
+  `pyproject.toml` (`uv sync --locked`) and pins both the uv version and the
+  Python minor version, with the uv cache enabled so warm runs are fast.
 - `windows-latest` runner.
 - A concurrency group so superseded runs on the same ref are cancelled.
 - Least-privilege workflow token (`permissions: contents: read`) and actions
@@ -87,6 +87,7 @@ jobs:
       - uses: astral-sh/setup-uv@<sha> # vX.Y.Z
         with:
           enable-cache: true
+          version: "0.9.9" # match the local dev uv version
           python-version: "3.14"
       - run: uv sync --locked
       - run: uv run --no-sync ruff format --check .
@@ -124,6 +125,14 @@ jobs:
   to 3.15+ when uv starts preferring it. (Committing a `.python-version`
   file is the alternative; the workflow-level pin avoids changing local
   behavior in this proposal.)
+- uv itself is pinned via `setup-uv`'s `version` input, matching the local
+  dev version (`0.9.9` at time of writing; confirm at implementation).
+  Unpinned, `setup-uv` installs the latest uv release at run time — the one
+  remaining moving part in an otherwise fully pinned workflow, and uv is
+  still 0.x, where behavior changes between releases are fair game. Bump it
+  deliberately; the bump itself gets validated by CI. If local/CI version
+  drift ever bites, `[tool.uv] required-version` in `pyproject.toml` is the
+  stronger option that enforces the same uv on both sides.
 - `setup-uv`'s cache is keyed on `uv.lock`, so dependency installs are
   near-instant after the first run per lockfile revision.
 
