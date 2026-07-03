@@ -1,8 +1,8 @@
 """Bare playlists route used as the transitional M1 playlist picker."""
 
 import dash
-from dash import Input, Output, callback, dcc, no_update
 import dash_mantine_components as dmc
+from dash import Input, Output, callback, dcc, no_update
 
 from source.pages.playlist_components import playlist_selector
 

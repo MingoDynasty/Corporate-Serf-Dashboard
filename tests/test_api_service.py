@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+from source.kovaaks import api_service
 from source.kovaaks.api_models import (
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
@@ -18,7 +19,6 @@ from source.kovaaks.api_models import (
     ScenarioRankInfo,
     ScenarioRankStatus,
 )
-from source.kovaaks import api_service
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
@@ -488,8 +488,12 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     assert cached_data["total"] == 2
     assert len(cached_data["data"]) == 2
 
-    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
-    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_0_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    )
+    page_1_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -553,8 +557,12 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     assert cached_data["total"] == 101
     assert len(cached_data["data"]) == 101
 
-    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
-    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_0_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    )
+    page_1_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -590,7 +598,9 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "username": "UnknownUser",
     }
 
-    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser" / "page_0.json"
+    page_0_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser" / "page_0.json"
+    )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == {
         "page": 0,
         "max": 100,
@@ -673,8 +683,12 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
         "Fresh First",
         "Fresh Second",
     ]
-    page_0_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
-    page_1_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_0_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    )
+    page_1_file = (
+        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
     assert api_service.get_cached_leaderboard_id("Fresh First") == 10
@@ -855,11 +869,7 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
     assert rank_info.scenario_name == "VT Pasu Intermediate S5"
 
     cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / "MingoDynasty"
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
@@ -1092,11 +1102,7 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
         TEST_CACHE_DIR / "user_scenario_total_play" / safe_username / "page_0.json"
     )
     assert api_service._rank_cache_file(98330, username) == (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / safe_username
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / safe_username / "98330.json"
     )
     assert api_service._leaderboard_total_cache_file(98330) == (
         TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
@@ -1134,11 +1140,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     assert rank_info.error_message == "KovaaK's username 'UnknownUser' was not found."
 
     rank_cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / "UnknownUser"
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "UnknownUser" / "98330.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -1207,11 +1209,7 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     )
 
     rank_cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / "MingoDynasty"
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
     )
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -1433,11 +1431,7 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
     )
 
     cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / "MingoDynasty"
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
     )
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["matched_steam_id"] == "actual-steam-id"
@@ -1493,11 +1487,7 @@ def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_f
     assert rank_info.warning_message is None
 
     rank_cache_file = (
-        TEST_CACHE_DIR
-        / "leaderboard"
-        / "user_rank"
-        / "MingoDynasty"
-        / "98330.json"
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
     )
     assert rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)

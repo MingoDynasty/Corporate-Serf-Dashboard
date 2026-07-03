@@ -538,8 +538,7 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     assert rank_file.read_bytes() == original_rank
     assert total_file.read_bytes() == original_total
     assert notifications == [
-        f"Rank update timed out for {SCENARIO_NAME}. "
-        "KovaaK's may still be catching up."
+        f"Rank update timed out for {SCENARIO_NAME}. KovaaK's may still be catching up."
     ]
     assert "Possible score-precision drift" in caplog.text
 
