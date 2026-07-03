@@ -11,6 +11,9 @@ directive cleanup added, accepted-loss inventory corrected and completed).
 **Revised:** 2026-07-03, external review round 3 — both findings accepted
 (`too-many-nested-blocks` reclassified as preview-only `PLR1702`; stale
 tooling reference in `codebase_improvement_proposals.md` added to PR-2).
+**Amended:** 2026-07-03, owner review — PR-1 dependency hygiene expanded
+(stubs + codegen tool to `dev`; dead `tomli-w` and redundant `tzdata`
+removed).
 **Decided by:** MingoDynasty. Do not reopen the frozen decisions below; implement them.
 
 Consolidate formatting and linting on ruff, replacing black + isort + pylint.
@@ -43,10 +46,13 @@ Known defects in the current setup:
   tests`, `compileall`). Both must be updated by these PRs, and the
   2026-06-20 "Interim Merge Bar" entry in `docs/decision_log.md` must be
   marked `Superseded` when the new bar lands (per AGENTS.md rules).
-- `black` and `mypy` sit in runtime `dependencies`; they belong in the `dev`
-  group with pylint/pytest/ruff. Note `datamodel-code-generator` (runtime
-  dep, used only for offline model generation) **depends on black and isort**,
-  so both remain in `uv.lock` as transitive dependencies regardless.
+- Runtime `dependencies` contains dev-only and dead entries: `black`,
+  `mypy`, the type-stub packages (`pandas-stubs`, `scipy-stubs`), and
+  codegen-only `datamodel-code-generator` belong in the `dev` group;
+  `tomli-w` is referenced nowhere; `tzdata` duplicates pandas's own
+  Windows dependency. Note `datamodel-code-generator` **depends on black
+  and isort**, so both remain in `uv.lock` as transitive dependencies
+  regardless of the cleanup.
 - `[tool.pylint.main]` `source-roots = "Corporate-Serf-Dashboard/source"`
   points at a nonexistent path (dies with the pylint config removal).
 - The `except A, B:` (PEP 758) style in `source/kovaaks/api_service.py` was
@@ -163,12 +169,22 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
    `force-exclude` is a no-op in PR-1 but must be present before PR-2:
    verified that without it, the pre-commit hook reports all 29 `scripts/`
    findings despite `lint.exclude`, and with it the exclusion holds.
-2. Delete `[tool.black]` and `[tool.isort]` sections. Remove `black` from
-   `dependencies`. Move `mypy` from `dependencies` to the `dev` group.
-   (black and isort will remain in `uv.lock` as transitive deps of
-   `datamodel-code-generator` — expected, see audit notes.) Keep pylint
-   and its config for now (it is already the known-red gate; PR-2 removes
-   it).
+2. Delete `[tool.black]` and `[tool.isort]` sections. Then clean up
+   `dependencies` (all verified 2026-07-03):
+   - **Remove `black`** (replaced by ruff).
+   - **Move to the `dev` group:** `mypy`, `pandas-stubs`, `scipy-stubs`
+     (stub-only packages consumed exclusively by mypy), and
+     `datamodel-code-generator` (offline codegen only — never imported).
+     Black and isort will remain in `uv.lock` as its transitive deps —
+     expected, see audit notes.
+   - **Remove `tomli-w`** — dead: referenced in no `.py` file in the repo
+     nor in any pending proposal; legacy carryover from the pip→uv
+     migration.
+   - **Remove `tzdata`** — redundant: nothing in `source/` imports
+     `zoneinfo`, and pandas already depends on tzdata on `win32`.
+
+   Keep pylint and its config for now (it is already the known-red gate;
+   PR-2 removes it).
 3. Run, **in this order** (fix first, then format — import fixes can
    produce lines the formatter then needs to rewrap; same order as the
    pre-commit hooks):
@@ -328,10 +344,10 @@ deps of `datamodel-code-generator` — that is not a failure).
 - CI setup — local gates remain the merge bar.
 - Items in `docs/tech_debt.md` (datetime consistency, binary search,
   inline styles) — unrelated to tooling.
-- Moving `datamodel-code-generator` out of runtime `dependencies` (it is
-  codegen-only tooling, and dropping it — or running it via `uvx` — would
-  also remove black/isort from `uv.lock` entirely). Optional follow-up,
-  not required by this proposal.
+- Dropping `datamodel-code-generator` entirely or running it via `uvx`
+  (which would purge black/isort from `uv.lock`). PR-1 moves it to the
+  `dev` group; full removal is an optional follow-up, not required by
+  this proposal.
 - Ruff preview mode, pydocstyle conventions (`D2`+), pyupgrade (`UP`), or
   any rule families beyond the frozen list. If a rule family seems
   attractive mid-implementation, note it in the PR description instead of
