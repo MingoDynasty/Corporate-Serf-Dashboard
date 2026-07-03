@@ -231,3 +231,29 @@ IDs, read rank and total files independent of TTL, emit no repeated warning/erro
 toasts, and make zero KovaaK's requests. A refresh loop that exhausts leaves the
 previous cache untouched and asks the user to click Refresh. The retry schedule is
 a code constant, not configuration.
+
+## 2026-07-03: Import Benchmarks From Evxl And KovaaK's
+
+Status: Accepted
+
+Decision: The benchmark importer uses Evxl to resolve playlist names and codes,
+and KovaaK's to fetch benchmark rank thresholds. In project terminology, a
+*playlist* is a bare scenario list without rank data; a *benchmark* is a
+playlist plus rank thresholds and colors. Generated benchmark JSON carries a
+`generated_from` provenance stamp containing the Evxl sharecode, KovaaK's
+benchmark ID, ordered rank-color pairs, generation timestamp, and generator
+name.
+
+Why: KovaaK's playlist search cannot resolve every known sharecode, while Evxl's
+exact-code endpoint can; Evxl does not expose the per-scenario rank thresholds,
+so KovaaK's remains authoritative for those values. The terminology distinguishes
+the app's playlist import from the richer files produced by the importer.
+Provenance makes the upstream inputs inspectable and allows generated files to be
+checked for stale or mismatched benchmark metadata.
+
+Consequences: Keep Evxl-specific resolution and snapshot handling in
+`scripts/benchmark_importer/` unless an app-side feature explicitly adopts that
+dependency. Preserve rank-color order when comparing provenance because colors
+pair positionally with KovaaK's thresholds. KovaaK's threshold changes under an
+unchanged benchmark ID remain invisible to provenance checks and require an
+explicit forced refresh.
