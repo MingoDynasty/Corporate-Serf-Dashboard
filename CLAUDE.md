@@ -9,7 +9,7 @@ plots scenario scores. Python 3.14, dependencies managed with uv.
 - Tests: `uv run pytest`
 - Lint: `uv run pylint source` (config in `pyproject.toml`, fail-under 10)
 - Types: `uv run mypy source`
-- Format: black + isort (`profile=black`), max line length 120
+- Format: ruff (`uv run ruff format .`), line length 88
 
 There is no CI workflow — these local gates are the merge bar. Run all three
 before calling a change done or approving a PR.
