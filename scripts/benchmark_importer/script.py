@@ -4,10 +4,12 @@ import logging
 import os
 import re
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Sequence
+from typing import Any, Sequence
 
 import requests
 from pydantic import ValidationError
@@ -29,6 +31,8 @@ from scripts.benchmark_importer.models import (  # noqa: E402
     EvxlDatabaseItem,
     EvxlPlaylist,
     EvxlPlaylistByCodeResponse,
+    Manifest,
+    ManifestEntry,
 )
 
 logging.basicConfig(
@@ -41,6 +45,8 @@ logger = logging.getLogger(__name__)
 
 EVXL_BENCHMARKS_JSON_FILE = REPO_ROOT / "resources" / "evxl" / "benchmarks.json"
 GENERATED_DIR = SCRIPT_DIR / "generated"
+MANIFEST_FILE = GENERATED_DIR / "manifest.json"
+EVXL_BENCHMARKS_URL = "https://evxl.app/data/benchmarks"
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 RETRY_ATTEMPTS = 4
 RETRY_BACKOFF_SECONDS = (2, 4, 8)
@@ -79,6 +85,217 @@ class RunSummary:
     @property
     def exit_code(self) -> int:
         return int(bool(self.failed or self.conflicts))
+
+
+def _ordered_rank_colors(item: EvxlDatabaseItem) -> list[tuple[str, str]]:
+    return list(item.rankColors.items())
+
+
+def _atomic_write_json(path: Path, payload: Any) -> None:
+    """Write JSON through a sibling temporary file and atomically replace the target."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as temporary_file:
+            temporary_path = Path(temporary_file.name)
+            json.dump(payload, temporary_file, indent=2)
+            temporary_file.write("\n")
+            temporary_file.flush()
+            os.fsync(temporary_file.fileno())
+        os.replace(temporary_path, path)
+        temporary_path = None
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+
+
+def load_manifest(path: Path = MANIFEST_FILE) -> dict[str, ManifestEntry]:
+    """Load local resume state, treating missing or malformed state as empty."""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return Manifest.model_validate(payload).root
+    except (OSError, UnicodeError, json.JSONDecodeError, ValidationError) as exc:
+        logger.warning("Manifest is missing or malformed; starting empty: %s", exc)
+        return {}
+
+
+def write_manifest(
+    manifest: dict[str, ManifestEntry],
+    path: Path = MANIFEST_FILE,
+) -> None:
+    """Atomically persist local resume state."""
+    payload = {
+        sharecode: entry.model_dump(mode="json")
+        for sharecode, entry in manifest.items()
+    }
+    _atomic_write_json(path, payload)
+
+
+def _resolve_manifest_file(
+    entry: ManifestEntry,
+    generated_dir: Path,
+) -> Path | None:
+    """Resolve a manifest path only when it remains inside generated_dir."""
+    generated_root = generated_dir.resolve()
+    candidate = (generated_dir / entry.file).resolve()
+    if not candidate.is_relative_to(generated_root) or candidate == generated_root:
+        logger.warning(
+            "Rejected manifest path outside generated directory: %s", entry.file
+        )
+        return None
+    return candidate
+
+
+def _expected_generated_from(
+    sharecode: str,
+    entry: ManifestEntry,
+) -> dict[str, Any]:
+    return {
+        "sharecode": sharecode,
+        "kovaaks_benchmark_id": entry.kovaaks_benchmark_id,
+        "rank_colors": [list(pair) for pair in entry.rank_colors],
+        "generated_at": entry.generated_at,
+        "generator": "benchmark_importer",
+    }
+
+
+def _has_intact_generated_file(
+    sharecode: str,
+    entry: ManifestEntry,
+    generated_dir: Path,
+) -> bool:
+    path = _resolve_manifest_file(entry, generated_dir)
+    if path is None:
+        return False
+    try:
+        raw_payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        logger.warning(
+            "Generated file is missing or malformed for %s: %s", sharecode, exc
+        )
+        return False
+    if not isinstance(raw_payload, dict):
+        return False
+
+    # Read provenance from raw JSON before PlaylistData validation, which drops it.
+    if raw_payload.get("generated_from") != _expected_generated_from(sharecode, entry):
+        logger.warning("Generated file provenance does not match manifest: %s", path)
+        return False
+    try:
+        playlist = PlaylistData.model_validate(raw_payload)
+    except ValidationError as exc:
+        logger.warning("Generated playlist is invalid for %s: %s", sharecode, exc)
+        return False
+    return playlist.code == sharecode and playlist.name == entry.playlist_name
+
+
+def should_skip_generation(
+    sharecode: str,
+    item: EvxlDatabaseItem,
+    entry: ManifestEntry | None,
+    generated_dir: Path,
+    *,
+    force: bool = False,
+) -> bool:
+    """Return whether manifest state and its output are current and intact."""
+    if force or entry is None:
+        return False
+    return (
+        entry.kovaaks_benchmark_id == item.kovaaksBenchmarkId
+        and entry.rank_colors == _ordered_rank_colors(item)
+        and _has_intact_generated_file(sharecode, entry, generated_dir)
+    )
+
+
+def _freeze_json(value: Any) -> Any:
+    if isinstance(value, dict):
+        return tuple((key, _freeze_json(item)) for key, item in sorted(value.items()))
+    if isinstance(value, list):
+        return tuple(_freeze_json(item) for item in value)
+    return value
+
+
+def _evxl_entry_signatures(data: EvxlData) -> dict[str, tuple]:
+    """Represent complete Evxl entries without losing rank-color order."""
+    signatures: dict[str, list[Any]] = {}
+    for benchmark in data.root:
+        benchmark_payload = benchmark.model_dump(
+            mode="json",
+            exclude={"difficulties"},
+        )
+        for difficulty in benchmark.difficulties:
+            difficulty_payload = difficulty.model_dump(mode="json")
+            difficulty_payload["rankColors"] = list(difficulty.rankColors.items())
+            signatures.setdefault(difficulty.sharecode, []).append(
+                _freeze_json(
+                    {
+                        "benchmark": benchmark_payload,
+                        "difficulty": difficulty_payload,
+                    }
+                )
+            )
+    return {
+        sharecode: tuple(sorted(claims, key=repr))
+        for sharecode, claims in signatures.items()
+    }
+
+
+def refresh_evxl_snapshot(
+    path: Path = EVXL_BENCHMARKS_JSON_FILE,
+    *,
+    accept_removals: bool = False,
+) -> bool:
+    """Refresh the Evxl snapshot when a complete, accepted candidate differs."""
+    try:
+        response = _get_with_retry(
+            EVXL_BENCHMARKS_URL,
+            attempts=RETRY_ATTEMPTS,
+            backoff_seconds=RETRY_BACKOFF_SECONDS,
+        )
+        candidate_payload = response.json()
+        candidate = EvxlData.model_validate(candidate_payload)
+    except (requests.RequestException, ValidationError, ValueError, TypeError) as exc:
+        logger.warning("Failed to refresh Evxl data; using snapshot: %s", exc)
+        return False
+
+    current_payload = json.loads(path.read_text(encoding="utf-8"))
+    current = EvxlData.model_validate(current_payload)
+    current_entries = _evxl_entry_signatures(current)
+    candidate_entries = _evxl_entry_signatures(candidate)
+    removed = sorted(current_entries.keys() - candidate_entries.keys())
+    if removed and not accept_removals:
+        logger.warning(
+            "Rejected Evxl candidate because it removes %d sharecodes: %s",
+            len(removed),
+            removed,
+        )
+        return False
+
+    added = candidate_entries.keys() - current_entries.keys()
+    changed = {
+        sharecode
+        for sharecode in current_entries.keys() & candidate_entries.keys()
+        if current_entries[sharecode] != candidate_entries[sharecode]
+    }
+    if not added and not changed and not removed:
+        logger.info("Evxl data unchanged")
+        return False
+
+    _atomic_write_json(path, candidate_payload)
+    logger.info(
+        "Evxl data changed: %d entries added/%d changed/%d removed",
+        len(added),
+        len(changed),
+        len(removed),
+    )
+    return True
 
 
 def load_evxl_data(
@@ -257,6 +474,10 @@ def generate_playlist(
     ownership: dict[str, str],
     unowned: set[str],
     generated_dir: Path = GENERATED_DIR,
+    *,
+    use_cache: bool = True,
+    manifest: dict[str, ManifestEntry] | None = None,
+    manifest_path: Path | None = None,
 ) -> Path:
     """Fetch, merge, and write one benchmark playlist."""
     playlist = get_evxl_playlist(sharecode)
@@ -265,7 +486,7 @@ def generate_playlist(
     response_json = get_benchmark_json(
         evxl_database_item.kovaaksBenchmarkId,
         None,
-        True,
+        use_cache,
         attempts=RETRY_ATTEMPTS,
         backoff_seconds=RETRY_BACKOFF_SECONDS,
     )
@@ -284,12 +505,46 @@ def generate_playlist(
         unowned,
         generated_dir,
     )
-    generated_path.write_text(
-        playlist_data.model_dump_json(indent=2),
-        encoding="utf-8",
-    )
+    generated_at = datetime.now(UTC).isoformat()
+    rank_colors = _ordered_rank_colors(evxl_database_item)
+    generated_from = {
+        "sharecode": sharecode,
+        "kovaaks_benchmark_id": evxl_database_item.kovaaksBenchmarkId,
+        "rank_colors": [list(pair) for pair in rank_colors],
+        "generated_at": generated_at,
+        "generator": "benchmark_importer",
+    }
+    output_payload = playlist_data.model_dump(mode="json")
+    output_payload["generated_from"] = generated_from
+    _atomic_write_json(generated_path, output_payload)
     ownership[generated_path.name.casefold()] = playlist_data.code
     unowned.discard(generated_path.name.casefold())
+
+    if manifest is not None:
+        previous_entry = manifest.get(sharecode)
+        if previous_entry is not None:
+            previous_path = _resolve_manifest_file(previous_entry, generated_dir)
+            if (
+                previous_path is not None
+                and previous_path != generated_path.resolve()
+                and previous_path.exists()
+            ):
+                previous_path.unlink()
+                ownership.pop(previous_path.name.casefold(), None)
+                unowned.discard(previous_path.name.casefold())
+
+        relative_path = generated_path.resolve().relative_to(generated_dir.resolve())
+        manifest[sharecode] = ManifestEntry(
+            file=relative_path.as_posix(),
+            playlist_name=playlist_data.name,
+            kovaaks_benchmark_id=evxl_database_item.kovaaksBenchmarkId,
+            rank_colors=rank_colors,
+            generated_at=generated_at,
+        )
+        write_manifest(
+            manifest,
+            manifest_path or generated_dir / "manifest.json",
+        )
     return generated_path
 
 
@@ -324,8 +579,10 @@ def run_importer(
     limit: int | None = None,
     max_consecutive_failures: int = 3,
     generated_dir: Path = GENERATED_DIR,
+    force: bool = False,
 ) -> RunSummary:
     """Generate selected playlists while containing expected per-item failures."""
+    known_sharecodes = database.keys() | conflicts.keys()
     database, selected_conflicts, missing = _selected_sharecodes(
         database, conflicts, only
     )
@@ -337,12 +594,29 @@ def run_importer(
         conflicts=selected_conflicts,
     )
     ownership, unowned = scan_generated_ownership(generated_dir)
+    manifest_path = generated_dir / "manifest.json"
+    manifest = load_manifest(manifest_path)
+    for sharecode in sorted(manifest.keys() - known_sharecodes):
+        logger.warning(
+            "Manifest contains removed Evxl sharecode %s; leaving its file untouched",
+            sharecode,
+        )
     consecutive_failures = 0
     made_network_request = False
 
     for index, (sharecode, database_item) in enumerate(database.items(), start=1):
         if limit is not None and len(summary.generated) >= limit:
             break
+        if should_skip_generation(
+            sharecode,
+            database_item,
+            manifest.get(sharecode),
+            generated_dir,
+            force=force,
+        ):
+            logger.info("Skipping current generated playlist: %s", sharecode)
+            summary.skipped.append(sharecode)
+            continue
         if made_network_request:
             time.sleep(POLITENESS_DELAY_SECONDS)
 
@@ -360,6 +634,9 @@ def run_importer(
                 ownership,
                 unowned,
                 generated_dir,
+                use_cache=not force,
+                manifest=manifest,
+                manifest_path=manifest_path,
             )
         except (
             requests.RequestException,
@@ -435,11 +712,30 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         default=3,
         help="abort after this many consecutive item failures (default: 3)",
     )
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="skip the live Evxl refresh and use the local snapshot",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="regenerate without manifest or KovaaK's benchmark cache reuse",
+    )
+    parser.add_argument(
+        "--accept-removals",
+        action="store_true",
+        help="accept a live Evxl snapshot that removes sharecodes",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.offline:
+        logger.info("Offline mode: using the local Evxl snapshot")
+    else:
+        refresh_evxl_snapshot(accept_removals=args.accept_removals)
     database, conflicts = load_evxl_data()
     logger.info(
         "Found %d unique Evxl benchmarks and %d conflicting sharecodes.",
@@ -452,6 +748,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         only=args.only,
         limit=args.limit,
         max_consecutive_failures=args.max_consecutive_failures,
+        force=args.force,
     )
     log_summary(summary)
     return summary.exit_code

@@ -512,4 +512,5 @@ config.toml
 cache/
 data/
 ignore/
+scripts/benchmark_importer/generated/
 .claude/
