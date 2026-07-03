@@ -147,9 +147,9 @@ def sanitize_playlist_name(playlist_name: str, sharecode: str) -> str:
     if not sanitized:
         return sharecode
 
-    basename = sanitized.split(".", maxsplit=1)[0]
+    basename, separator, extension = sanitized.partition(".")
     if basename.casefold() in WINDOWS_RESERVED_BASENAMES:
-        return f"{sanitized}_{sharecode}"
+        return f"{basename}_{sharecode}{separator}{extension}"
     return sanitized
 
 
@@ -297,17 +297,22 @@ def _selected_sharecodes(
     database: dict[str, EvxlDatabaseItem],
     conflicts: dict[str, list[DuplicateClaimant]],
     only: Sequence[str] | None,
-) -> tuple[dict[str, EvxlDatabaseItem], dict[str, list[DuplicateClaimant]]]:
+) -> tuple[
+    dict[str, EvxlDatabaseItem],
+    dict[str, list[DuplicateClaimant]],
+    list[str],
+]:
     if not only:
-        return database, conflicts
+        return database, conflicts, []
 
     requested = set(only)
-    missing = requested - database.keys() - conflicts.keys()
-    for sharecode in sorted(missing):
-        logger.warning("Requested sharecode was not found in Evxl data: %s", sharecode)
+    missing = sorted(requested - database.keys() - conflicts.keys())
+    for sharecode in missing:
+        logger.error("Requested sharecode was not found in Evxl data: %s", sharecode)
     return (
         {code: item for code, item in database.items() if code in requested},
         {code: claims for code, claims in conflicts.items() if code in requested},
+        missing,
     )
 
 
@@ -321,8 +326,16 @@ def run_importer(
     generated_dir: Path = GENERATED_DIR,
 ) -> RunSummary:
     """Generate selected playlists while containing expected per-item failures."""
-    database, selected_conflicts = _selected_sharecodes(database, conflicts, only)
-    summary = RunSummary(conflicts=selected_conflicts)
+    database, selected_conflicts, missing = _selected_sharecodes(
+        database, conflicts, only
+    )
+    summary = RunSummary(
+        failed={
+            sharecode: "Requested sharecode was not found in Evxl data"
+            for sharecode in missing
+        },
+        conflicts=selected_conflicts,
+    )
     ownership, unowned = scan_generated_ownership(generated_dir)
     consecutive_failures = 0
     made_network_request = False

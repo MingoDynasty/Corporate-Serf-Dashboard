@@ -169,7 +169,12 @@ def test_load_evxl_data_classifies_ordered_rank_conflicts(tmp_path):
     ("playlist_name", "sharecode", "expected"),
     [
         ("CON", "KovaaKsOne", "CON_KovaaKsOne"),
-        ("nul.txt", "KovaaKsTwo", "nul.txt_KovaaKsTwo"),
+        ("nul.txt", "KovaaKsTwo", "nul_KovaaKsTwo.txt"),
+        (
+            "COM1.profile.backup",
+            "KovaaKsThree",
+            "COM1_KovaaKsThree.profile.backup",
+        ),
         ('<>:"/\\|?* .', "KovaaKsFallback", "KovaaKsFallback"),
         ("Bad\x00Name", "KovaaKsControl", "BadName"),
         ("Valid name. ", "KovaaKsValid", "Valid name"),
@@ -367,6 +372,33 @@ def test_run_importer_only_and_limit_apply_to_generated_items(tmp_path, monkeypa
     assert summary.generated == ["Two"]
     assert summary.conflicts == {}
     assert summary.exit_code == 0
+
+
+def test_run_importer_missing_only_sharecodes_are_failures(tmp_path, monkeypatch):
+    database = {
+        "Present": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={}),
+    }
+    generated = []
+
+    def fake_generate(sharecode, *_args):
+        generated.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer(
+        database,
+        {},
+        only=["Missing", "Present"],
+        generated_dir=tmp_path,
+    )
+
+    assert generated == ["Present"]
+    assert summary.generated == ["Present"]
+    assert summary.failed == {
+        "Missing": "Requested sharecode was not found in Evxl data"
+    }
+    assert summary.exit_code == 1
 
 
 def test_identical_duplicate_generates_once(tmp_path, monkeypatch):
