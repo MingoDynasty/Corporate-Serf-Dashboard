@@ -255,6 +255,7 @@ def test_get_with_retry_retries_once_on_transient_exceptions(
 ):
     responses = [transient_exception, FakeResponse({"ok": True})]
     calls = []
+    sleeps = []
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
@@ -264,11 +265,13 @@ def test_get_with_retry_retries_once_on_transient_exceptions(
         return response
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     response = api_service._get_with_retry("https://example.test")
 
     assert response.json() == {"ok": True}
     assert len(calls) == 2
+    assert sleeps == []
 
 
 def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
@@ -286,6 +289,83 @@ def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
     assert len(calls) == 2
 
 
+def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
+    calls = []
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("still slow")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    with pytest.raises(api_service.requests.ReadTimeout):
+        api_service._get_with_retry(
+            "https://example.test",
+            attempts=5,
+            backoff_seconds=(2.0, 4.0),
+        )
+
+    assert len(calls) == 5
+    assert sleeps == [2.0, 4.0, 4.0, 4.0]
+
+
+def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplog):
+    responses = [
+        FakeResponse({"error": "rate limited"}, status_code=429),
+        FakeResponse({"error": "still rate limited"}, status_code=429),
+        FakeResponse({"ok": True}),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+
+    response = api_service._get_with_retry(
+        "https://example.test",
+        attempts=3,
+        backoff_seconds=(99.0,),
+    )
+
+    assert response.json() == {"ok": True}
+    assert sleeps == [
+        api_service.DEFAULT_RETRY_AFTER_SECONDS,
+        api_service.DEFAULT_RETRY_AFTER_SECONDS,
+    ]
+    assert caplog.messages == [
+        "Rate limited at https://example.test (attempt 1/3); retrying after 0.50s",
+        "Rate limited at https://example.test (attempt 2/3); retrying after 0.50s",
+    ]
+
+
+def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog):
+    responses = [
+        api_service.requests.ReadTimeout("read timed out"),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+
+    api_service._get_with_retry("https://evxl.gg/api", attempts=3)
+
+    assert caplog.messages == [
+        "Transient GET failure at https://evxl.gg/api "
+        "(attempt 1/3); retrying: read timed out"
+    ]
+
+
 def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
     calls = []
 
@@ -299,6 +379,125 @@ def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
         api_service._get_with_retry("https://example.test")
 
     assert len(calls) == 1
+
+
+def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
+    response_json = {"benchmark_progress": 42}
+
+    class CountingResponse(FakeResponse):
+        json_calls = 0
+
+        def json(self):
+            self.json_calls += 1
+            return super().json()
+
+    response = CountingResponse(response_json)
+    benchmark_cache_dir = tmp_path / "benchmarks"
+    benchmark_cache_dir.mkdir()
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(
+        api_service, "_get_with_retry", lambda *_args, **_kwargs: response
+    )
+
+    result = api_service.get_benchmark_json(123)
+
+    assert result == response_json
+    assert response.json_calls == 1
+    assert json.loads((benchmark_cache_dir / "123.json").read_text()) == response_json
+
+
+def test_get_benchmark_json_refetches_malformed_cache(tmp_path, monkeypatch):
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text("{", encoding="utf-8")
+    response_json = {"benchmark_progress": 42}
+    requests = []
+
+    def fake_get(*_args, **_kwargs):
+        requests.append(True)
+        return FakeResponse(response_json)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+    assert requests == [True]
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
+
+
+def test_get_benchmark_json_refetches_schema_invalid_cache(tmp_path, monkeypatch):
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text("{}", encoding="utf-8")
+    response_json = {"benchmark_progress": 42}
+    requests = []
+
+    def fake_get(*_args, **_kwargs):
+        requests.append(True)
+        return FakeResponse(response_json)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+    assert requests == [True]
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
+
+
+def test_get_benchmark_json_returns_schema_valid_cache(tmp_path, monkeypatch):
+    response_json = {
+        "benchmark_progress": 42,
+        "overall_rank": 3,
+        "categories": {},
+        "ranks": [],
+    }
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text(json.dumps(response_json), encoding="utf-8")
+
+    def fail_get(*_args, **_kwargs):
+        pytest.fail("schema-valid cache should not be refetched")
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fail_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+
+
+def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
+    response_json = {"benchmark_progress": 42}
+    replacements = []
+    original_replace = api_service.os.replace
+
+    def recording_replace(source, destination):
+        replacements.append((Path(source), Path(destination)))
+        original_replace(source, destination)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(
+        api_service,
+        "_get_with_retry",
+        lambda *_args, **_kwargs: FakeResponse(response_json),
+    )
+    monkeypatch.setattr(api_service.os, "replace", recording_replace)
+
+    result = api_service.get_benchmark_json(123)
+
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    assert result == response_json
+    assert len(replacements) == 1
+    temp_file, destination = replacements[0]
+    assert destination == cache_file
+    assert temp_file.parent == cache_file.parent
+    assert temp_file.name.startswith(f".{cache_file.name}.")
+    assert not temp_file.exists()
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
 
 
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):

@@ -7,6 +7,7 @@ import logging
 import os
 import threading
 import time
+from collections.abc import Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_FLOOR, Decimal
 from email.utils import parsedate_to_datetime
@@ -17,6 +18,7 @@ import requests
 from pydantic import ValidationError
 
 from source.kovaaks.api_models import (
+    BenchmarksAPIResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
@@ -122,37 +124,53 @@ def _session_get(url: str, **kwargs) -> requests.Response:
     return _get_thread_session().get(url, **kwargs)
 
 
-def _get_with_retry(url: str, **kwargs) -> requests.Response:
+def _get_with_retry(
+    url: str,
+    *,
+    attempts: int = 2,
+    backoff_seconds: Sequence[float] = (0.0,),
+    **kwargs,
+) -> requests.Response:
     """
-    Make a KovaaK's GET request with one automatic retry for transient failures.
+    Make a GET request with configurable retries for transient failures.
 
     Rate limits and narrow network failures can happen during cold-cache playlist
-    loads. If the second attempt fails, normal caller-level error handling
-    decides whether the UI sees UNKNOWN/N/A.
+    loads. After all attempts fail, normal caller-level error handling decides
+    whether the UI sees UNKNOWN/N/A.
     """
     kwargs.setdefault("timeout", TIMEOUT)
+    backoff_schedule = backoff_seconds or (0.0,)
 
-    for attempt in range(2):
+    for attempt in range(attempts):
         try:
             response = _session_get(url, **kwargs)
         except TRANSIENT_GET_EXCEPTIONS as exc:
-            if attempt == 0:
+            if attempt < attempts - 1:
                 logger.warning(
-                    "Transient KovaaK's GET failure at %s; retrying once: %s",
+                    "Transient GET failure at %s (attempt %d/%d); retrying: %s",
                     url,
+                    attempt + 1,
+                    attempts,
                     request_exception_summary(exc),
                 )
+                delay_seconds = backoff_schedule[
+                    min(attempt, len(backoff_schedule) - 1)
+                ]
+                if delay_seconds > 0:
+                    time.sleep(delay_seconds)
                 continue
             raise
 
-        if response.status_code != 429 or attempt == 1:
+        if response.status_code != 429 or attempt == attempts - 1:
             response.raise_for_status()
             return response
 
         delay_seconds = _retry_after_seconds(response)
         logger.warning(
-            "Rate limited by KovaaK's at %s; retrying once after %.2fs",
+            "Rate limited at %s (attempt %d/%d); retrying after %.2fs",
             url,
+            attempt + 1,
+            attempts,
             delay_seconds,
         )
         time.sleep(delay_seconds)
@@ -170,24 +188,29 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
 
 def get_benchmark_json(
     benchmark_id: int, steam_id: int | None = None, use_cache: bool = False
-) -> str:
+) -> dict:
     """Fetch benchmark progress, optionally using the local cache."""
     cache_file = Path(CACHE_DIR, "benchmarks", f"{benchmark_id}.json")
     if use_cache and os.path.exists(cache_file):
-        with open(cache_file, encoding="utf-8") as file:
-            return json.load(file)
+        cached_response = _read_json(cache_file)
+        if isinstance(cached_response, dict):
+            try:
+                BenchmarksAPIResponse.model_validate(cached_response)
+            except ValidationError:
+                pass
+            else:
+                return cached_response
 
     params = {
         "benchmarkId": benchmark_id,
         "steamId": steam_id or "00000000000000000",
     }
     response = _get_with_retry(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
+    response_json = response.json()
 
-    # save to cache
-    with open(cache_file, "w", encoding="utf-8") as file:
-        json.dump(response.json(), file, indent=2)
+    _write_json(cache_file, response_json)
 
-    return response.json()
+    return response_json
 
 
 def get_leaderboard_scores(
