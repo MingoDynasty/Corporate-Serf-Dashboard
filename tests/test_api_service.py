@@ -255,6 +255,7 @@ def test_get_with_retry_retries_once_on_transient_exceptions(
 ):
     responses = [transient_exception, FakeResponse({"ok": True})]
     calls = []
+    sleeps = []
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
@@ -264,11 +265,13 @@ def test_get_with_retry_retries_once_on_transient_exceptions(
         return response
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
     response = api_service._get_with_retry("https://example.test")
 
     assert response.json() == {"ok": True}
     assert len(calls) == 2
+    assert sleeps == []
 
 
 def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
@@ -284,6 +287,78 @@ def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
         api_service._get_with_retry("https://example.test")
 
     assert len(calls) == 2
+
+
+def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
+    calls = []
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("still slow")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    with pytest.raises(api_service.requests.ReadTimeout):
+        api_service._get_with_retry(
+            "https://example.test",
+            attempts=5,
+            backoff_seconds=(2.0, 4.0),
+        )
+
+    assert len(calls) == 5
+    assert sleeps == [2.0, 4.0, 4.0, 4.0]
+
+
+def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch):
+    responses = [
+        FakeResponse({"error": "rate limited"}, status_code=429),
+        FakeResponse({"error": "still rate limited"}, status_code=429),
+        FakeResponse({"ok": True}),
+    ]
+    sleeps = []
+
+    def fake_get(*_args, **_kwargs):
+        return responses.pop(0)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    response = api_service._get_with_retry(
+        "https://example.test",
+        attempts=3,
+        backoff_seconds=(99.0,),
+    )
+
+    assert response.json() == {"ok": True}
+    assert sleeps == [
+        api_service.DEFAULT_RETRY_AFTER_SECONDS,
+        api_service.DEFAULT_RETRY_AFTER_SECONDS,
+    ]
+
+
+def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog):
+    responses = [
+        api_service.requests.ReadTimeout("read timed out"),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+
+    api_service._get_with_retry("https://evxl.gg/api", attempts=3)
+
+    assert caplog.messages == [
+        "Transient GET failure at https://evxl.gg/api "
+        "(attempt 1/3); retrying: read timed out"
+    ]
 
 
 def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
