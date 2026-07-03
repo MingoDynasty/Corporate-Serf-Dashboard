@@ -185,7 +185,7 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
 
 def get_benchmark_json(
     benchmark_id: int, steam_id: int | None = None, use_cache: bool = False
-) -> str:
+) -> dict:
     """Fetch benchmark progress, optionally using the local cache."""
     cache_file = Path(CACHE_DIR, "benchmarks", f"{benchmark_id}.json")
     if use_cache and os.path.exists(cache_file):
@@ -197,12 +197,13 @@ def get_benchmark_json(
         "steamId": steam_id or "00000000000000000",
     }
     response = _get_with_retry(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
+    response_json = response.json()
 
     # save to cache
     with open(cache_file, "w", encoding="utf-8") as file:
-        json.dump(response.json(), file, indent=2)
+        json.dump(response_json, file, indent=2)
 
-    return response.json()
+    return response_json
 
 
 def get_leaderboard_scores(

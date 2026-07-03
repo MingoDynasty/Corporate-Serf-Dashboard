@@ -376,6 +376,32 @@ def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
     assert len(calls) == 1
 
 
+def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
+    response_json = {"benchmark_progress": 42}
+
+    class CountingResponse(FakeResponse):
+        json_calls = 0
+
+        def json(self):
+            self.json_calls += 1
+            return super().json()
+
+    response = CountingResponse(response_json)
+    benchmark_cache_dir = tmp_path / "benchmarks"
+    benchmark_cache_dir.mkdir()
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(
+        api_service, "_get_with_retry", lambda *_args, **_kwargs: response
+    )
+
+    result = api_service.get_benchmark_json(123)
+
+    assert api_service.get_benchmark_json.__annotations__["return"] is dict
+    assert result == response_json
+    assert response.json_calls == 1
+    assert json.loads((benchmark_cache_dir / "123.json").read_text()) == response_json
+
+
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
     def fake_get_with_retry(_url, params, timeout):
         assert timeout == api_service.TIMEOUT
