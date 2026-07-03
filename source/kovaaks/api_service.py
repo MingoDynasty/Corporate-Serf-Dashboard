@@ -167,8 +167,10 @@ def _get_with_retry(
 
         delay_seconds = _retry_after_seconds(response)
         logger.warning(
-            "Rate limited by KovaaK's at %s; retrying once after %.2fs",
+            "Rate limited at %s (attempt %d/%d); retrying after %.2fs",
             url,
+            attempt + 1,
+            attempts,
             delay_seconds,
         )
         time.sleep(delay_seconds)

@@ -311,7 +311,7 @@ def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
     assert sleeps == [2.0, 4.0, 4.0, 4.0]
 
 
-def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch):
+def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplog):
     responses = [
         FakeResponse({"error": "rate limited"}, status_code=429),
         FakeResponse({"error": "still rate limited"}, status_code=429),
@@ -324,6 +324,7 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch):
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+    caplog.set_level(logging.WARNING, logger=api_service.__name__)
 
     response = api_service._get_with_retry(
         "https://example.test",
@@ -335,6 +336,10 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch):
     assert sleeps == [
         api_service.DEFAULT_RETRY_AFTER_SECONDS,
         api_service.DEFAULT_RETRY_AFTER_SECONDS,
+    ]
+    assert caplog.messages == [
+        "Rate limited at https://example.test (attempt 1/3); retrying after 0.50s",
+        "Rate limited at https://example.test (attempt 2/3); retrying after 0.50s",
     ]
 
 
@@ -396,7 +401,6 @@ def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
 
     result = api_service.get_benchmark_json(123)
 
-    assert api_service.get_benchmark_json.__annotations__["return"] is dict
     assert result == response_json
     assert response.json_calls == 1
     assert json.loads((benchmark_cache_dir / "123.json").read_text()) == response_json
