@@ -23,3 +23,17 @@ class EvxlBenchmark(BaseModel):
 
 class EvxlData(RootModel):
     root: list[EvxlBenchmark]
+
+
+class EvxlPlaylistScenario(BaseModel):
+    scenario_name: str
+
+
+class EvxlPlaylist(BaseModel):
+    playlist_name: str
+    playlist_code: str
+    scenario_list: list[EvxlPlaylistScenario]
+
+
+class EvxlPlaylistByCodeResponse(BaseModel):
+    playlist: EvxlPlaylist

@@ -470,6 +470,38 @@ def test_get_benchmark_json_returns_schema_valid_cache(tmp_path, monkeypatch):
     assert result == response_json
 
 
+def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_get(*args, **kwargs):
+        calls.append((args, kwargs))
+        return FakeResponse({"benchmark_progress": 42})
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get)
+
+    api_service.get_benchmark_json(
+        123,
+        attempts=4,
+        backoff_seconds=(2, 4, 8),
+    )
+
+    assert calls == [
+        (
+            (api_service.Endpoints.BENCHMARKS,),
+            {
+                "params": {
+                    "benchmarkId": 123,
+                    "steamId": "00000000000000000",
+                },
+                "timeout": api_service.TIMEOUT,
+                "attempts": 4,
+                "backoff_seconds": (2, 4, 8),
+            },
+        )
+    ]
+
+
 def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
     response_json = {"benchmark_progress": 42}
     replacements = []
