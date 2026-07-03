@@ -1,3 +1,5 @@
+"""Build the dashboard home page and its interactive callbacks."""
+
 import json
 import logging
 from datetime import datetime
@@ -56,7 +58,8 @@ dash.register_page(
 )
 
 
-def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:
+# Rank display states deliberately map to distinct user-facing text.
+def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     """Format the compact Scenario Stats rank value shown after the fixed label."""
     match rank_info.status:
         case ScenarioRankStatus.RANKED:
@@ -100,9 +103,8 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
     if message_queue[0].scenario_name != selected_scenario:
         if automatically_change_scenario:
             return True, message_queue[0].scenario_name
-        else:
-            message_queue.popleft()
-            return no_update, no_update
+        message_queue.popleft()
+        return no_update, no_update
     return True, no_update
 
 
@@ -205,7 +207,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
             *_rank_lookup_config(),
             allow_network=allow_network,
         )
-    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+    except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
         return "N/A"
 
@@ -245,7 +247,7 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
             *_rank_lookup_config(),
             force_refresh=True,
         )
-    except Exception:  # noqa: BLE001  # pylint: disable=broad-exception-caught
+    except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
         dash_logger.error("Rank refresh for %s failed.", selected_scenario)
         return "N/A"
@@ -269,7 +271,8 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
     Input("score-threshold-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
 )
-def generate_graph(
+# This callback coordinates the page's graph controls and notification states.
+def generate_graph(  # noqa: PLR0912, PLR0913
     do_update,
     selected_scenario,
     top_n_scores,
@@ -408,7 +411,11 @@ def generate_graph(
                     {
                         "action": "show",
                         "title": "Score Threshold",
-                        "message": f"Current score percentage ({percentage:.1f}%) successfully passed the score threshold! Ready to move onto the next scenario.",
+                        "message": (
+                            f"Current score percentage ({percentage:.1f}%) "
+                            "successfully passed the score threshold! Ready to "
+                            "move onto the next scenario."
+                        ),
                         "color": "green",
                         "id": "score-threshold-notification",
                         "icon": DashIconify(icon="material-symbols:check"),
@@ -420,7 +427,10 @@ def generate_graph(
                     {
                         "action": "show",
                         "title": "Score Threshold",
-                        "message": f"Current score percentage ({percentage:.1f}%) failed to meet score threshold. Keep grinding...",
+                        "message": (
+                            f"Current score percentage ({percentage:.1f}%) "
+                            "failed to meet score threshold. Keep grinding..."
+                        ),
                         "color": "yellow",
                         "id": "score-threshold-notification",
                         "icon": DashIconify(icon="material-symbols:warning-outline"),
@@ -479,6 +489,7 @@ def modal_demo(_, opened):
     prevent_initial_call=True,
 )
 def import_playlist(_, playlist_to_import):
+    """Import a playlist code and report the result to the UI."""
     if not playlist_to_import:
         return no_update
     playlist_to_import = playlist_to_import.strip()
@@ -510,6 +521,7 @@ def import_playlist(_, playlist_to_import):
     Input("playlist-dropdown-selection", "value"),
 )
 def select_playlist(selected_playlist):
+    """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist:
         return get_unique_scenarios(config.stats_dir)
     return get_scenarios_from_playlists(selected_playlist)
@@ -521,6 +533,7 @@ dmc.add_figure_templates()
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
+    """Build the interactive home dashboard."""
     return dmc.Box(
         children=[
             dcc.Store(id="do_update"),  # used for Interval component

@@ -1,3 +1,5 @@
+"""Build the aim-training journey page and its progress graph."""
+
 import logging
 
 import dash
@@ -32,6 +34,7 @@ dash.register_page(
     Input("color-scheme-switch", "computedColorScheme"),
 )
 def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
+    """Build a themed progress graph for the selected playlists."""
     if color_scheme not in {"dark", "light"}:
         raise PreventUpdate
     if not selected_playlist or not checkpoint_hour:
@@ -52,6 +55,7 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
+    """Build the work-in-progress aim-training journey page."""
     return dmc.Box(
         [
             dmc.Alert(

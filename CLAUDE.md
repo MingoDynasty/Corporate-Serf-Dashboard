@@ -7,12 +7,12 @@ plots scenario scores. Python 3.14, dependencies managed with uv.
 - Run: `uv run python source/app.py` (settings in `config.toml`, copied from
   `example.toml`; the default port 8080 may already be taken by Steam)
 - Tests: `uv run pytest`
-- Lint: `uv run pylint source` (config in `pyproject.toml`, fail-under 10)
+- Lint: `uv run ruff check`
 - Types: `uv run mypy source`
 - Format: ruff (`uv run ruff format .`), line length 88
 
-There is no CI workflow — these local gates are the merge bar. Run all three
-before calling a change done or approving a PR.
+There is no CI workflow — ruff format/check, mypy, and pytest are the local
+merge bar. Run all four checks before calling a change done or approving a PR.
 
 ## Layout
 - `source/` — application code. See `docs/architecture.md` for the module map

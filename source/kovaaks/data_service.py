@@ -27,9 +27,11 @@ PLAYLIST_DIRECTORY = "resources/playlists"
 PLAYLIST_DIRECTORY_PATH = Path(PLAYLIST_DIRECTORY).resolve()
 POSSIBLE_SUB_CSV_HEADERS = [
     # Latest CSV header
-    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # pylint: disable=line-too-long
+    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # noqa: E501
     # Old CSV header
-    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale",
+    "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,"
+    "Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,"
+    "ADS Sens,ADS Zoom Scale",
 ]
 logger = logging.getLogger(__name__)
 
@@ -60,6 +62,7 @@ def get_playlist_file_path(playlist_name: str) -> Path:
 
 
 def get_aim_training_checkpoints(checkpoint_threshold: int) -> dict[datetime, int]:
+    """Map run timestamps to cumulative training-hour checkpoints."""
     checkpoints = {}
     threshold = checkpoint_threshold * 60
     counter = 0
@@ -74,6 +77,7 @@ def get_aim_training_checkpoints(checkpoint_threshold: int) -> dict[datetime, in
 def get_aim_training_journey_for_playlists(
     playlist_names: list[str],
 ) -> dict[str, dict[datetime, float]]:
+    """Build aim-training journeys for the selected playlists."""
     journey_data: dict[str, dict[datetime, float]] = {}
     for playlist_name in playlist_names:
         journey_data[playlist_name] = get_aim_training_journey_for_playlist(
@@ -83,6 +87,7 @@ def get_aim_training_journey_for_playlists(
 
 
 def get_aim_training_journey_for_playlist(playlist_name: str) -> dict[datetime, float]:
+    """Track a playlist's average scenario progress over time."""
     scenarios = get_scenarios_from_playlists(playlist_name)
 
     # get the high scores for each scenario
@@ -136,6 +141,7 @@ def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
 
 
 def get_high_score(scenario_name: str) -> float:
+    """Return the stored high score for a scenario."""
     return get_scenario_stats(scenario_name).high_score
 
 
@@ -186,6 +192,7 @@ def get_time_vs_runs(
     top_n_scores: int,
     oldest_date: datetime,
 ) -> dict[str, list[RunData]]:
+    """Group a scenario's top runs by date within the selected time range."""
     # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
     #  Besides, this logic might get blown away if/when we migrate to SQLite.
 
@@ -247,6 +254,7 @@ def get_scenarios_from_playlist_code(playlist_code: str) -> list[str]:
 
 
 def get_rank_data_from_playlist(playlist_name: str, scenario_name: str) -> list[Rank]:
+    """Return configured rank thresholds for a playlist scenario."""
     if playlist_name not in playlist_database:
         logger.warning(
             "Failed to get rank data for playlist (%s), scenario (%s)",
@@ -367,7 +375,7 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(unique_scenarios)
 
 
-def extract_data_from_file(full_file_path: str) -> RunData | None:
+def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912
     """
     Extracts data from a scenario CSV file.
     :param full_file_path: full file path of the file to extract data from.
@@ -388,8 +396,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
             lines_list = file.readlines()  # Read all lines into a list
 
         sub_csv_line = False
-        for line in lines_list:
-            line = line.strip()
+        for raw_line in lines_list:
+            line = raw_line.strip()
             # If we encounter this specific line, then the next line is a specific CSV line
             if line in POSSIBLE_SUB_CSV_HEADERS:
                 sub_csv_line = True
@@ -456,6 +464,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:
 
 
 def load_playlists() -> None:
+    """Load valid playlist JSON files into the in-memory database."""
     playlist_files = []
     with os.scandir(PLAYLIST_DIRECTORY) as entries:
         for entry in entries:
@@ -479,6 +488,7 @@ def load_playlists() -> None:
 
 
 def load_playlist_from_code(input_playlist_code: str) -> str | None:
+    """Import the single playlist matching a KovaaK's playlist code."""
     response = get_playlist_data(input_playlist_code)
     if not response or not response.data:
         message = (
@@ -515,6 +525,7 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
+    """Persist imported playlist metadata as formatted JSON."""
     file_path = get_playlist_file_path(playlist_data.name)
     with open(file_path, "w", encoding="utf-8") as file:
         json_string = playlist_data.model_dump_json(indent=2, exclude_none=True)

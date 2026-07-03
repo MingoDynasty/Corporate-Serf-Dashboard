@@ -53,7 +53,7 @@ def _refresh_rank_after_high_score(
             expected_score,
             config.scenario_metadata_cache_ttl_hours,
         )
-    except Exception:  # pylint: disable=broad-exception-caught
+    except Exception:
         logger.exception("Failed to schedule rank refresh for %s", scenario_name)
         dash_logger.error("Could not start rank update for %s.", scenario_name)
 
@@ -64,6 +64,7 @@ class NewFileHandler(FileSystemEventHandler):
     """
 
     def on_created(self, event):
+        """Import a newly created run CSV and notify interested UI callbacks."""
         if event.is_directory:  # Check if it's a file, not a directory
             return
         # Add your custom logic here to process the new file
@@ -87,7 +88,9 @@ class NewFileHandler(FileSystemEventHandler):
             logger.debug("Found new scenario: %s", run_data.scenario)
             new_score_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT * run_data.score
             logger.debug(
-                f"Current score ({run_data.score:.2f}) sets the score threshold at ({new_score_threshold:.2f})"
+                "Current score (%.2f) sets the score threshold at (%.2f)",
+                run_data.score,
+                new_score_threshold,
             )
             message_queue.append(
                 NewFileMessage(
@@ -110,12 +113,19 @@ class NewFileHandler(FileSystemEventHandler):
         score_threshold = pct_threshold * high_score
         pct_diff = (run_data.score / high_score - 1) * 100
         logger.debug(
-            f"Current score ({run_data.score:g}) is {pct_diff:+.2f}% from high score ({high_score:g}) with score threshold ({score_threshold:.2f})"
+            "Current score (%g) is %+.2f%% from high score (%g) "
+            "with score threshold (%.2f)",
+            run_data.score,
+            pct_diff,
+            high_score,
+            score_threshold,
         )
         if is_new_high_score:
             new_score_threshold = pct_threshold * run_data.score
             logger.debug(
-                f"Score threshold increased from ({score_threshold:.2f}) to ({new_score_threshold:.2f})"
+                "Score threshold increased from (%.2f) to (%.2f)",
+                score_threshold,
+                new_score_threshold,
             )
         if run_data.score > score_threshold:
             logger.debug(

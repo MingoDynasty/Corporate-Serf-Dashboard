@@ -19,12 +19,14 @@ dash.register_page(
     prevent_initial_call=True,
 )
 def route_to_selected_playlist(playlist_code):
+    """Navigate to the selected playlist's scenario table."""
     if not playlist_code:
         return no_update
     return f"/playlists/{playlist_code}"
 
 
 def layout(**kwargs):  # noqa: ARG001
+    """Build the transitional playlist picker page."""
     return dmc.Stack(
         children=[
             dcc.Location(id="playlists-location", refresh="callback-nav"),

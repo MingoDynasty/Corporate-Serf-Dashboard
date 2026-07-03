@@ -375,7 +375,7 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
     monkeypatch.setattr(
         api_service,
         "_schedule_attempt",
-        lambda *args, **kwargs: api_service._run_attempt(*args, **kwargs),
+        api_service._run_attempt,
     )
 
     with caplog.at_level(logging.WARNING, logger=api_service.__name__):
@@ -425,7 +425,7 @@ def test_transient_fetch_error_retries(monkeypatch):
     monkeypatch.setattr(
         api_service,
         "_schedule_attempt",
-        lambda *args, **kwargs: api_service._run_attempt(*args, **kwargs),
+        api_service._run_attempt,
     )
 
     api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)

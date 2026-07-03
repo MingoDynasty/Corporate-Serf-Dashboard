@@ -1,0 +1,1 @@
+"""Provide shared dashboard utilities."""
