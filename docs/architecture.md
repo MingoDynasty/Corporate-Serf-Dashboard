@@ -114,6 +114,8 @@ UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`).
+- `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
+  rank thresholds into reviewable benchmark files.
 
 ### Browser assets
 - `assets/dashAgGridFunctions.js` — repo-owned client-side AG Grid functions

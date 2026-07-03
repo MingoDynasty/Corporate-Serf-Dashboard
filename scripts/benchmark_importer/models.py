@@ -9,15 +9,34 @@ class EvxlDatabaseItem:
     rankColors: dict[str, str]
 
 
+class EvxlSubcategory(BaseModel):
+    subcategoryName: str
+    color: str
+    scenarioCount: int
+
+
+class EvxlCategory(BaseModel):
+    categoryName: str
+    color: str
+    subcategories: list[EvxlSubcategory]
+
+
 class EvxlDifficulty(BaseModel):
     difficultyName: str
     kovaaksBenchmarkId: int
     sharecode: str
     rankColors: dict[str, str]
+    categories: list[EvxlCategory]
 
 
 class EvxlBenchmark(BaseModel):
     benchmarkName: str
+    rankCalculation: str
+    abbreviation: str
+    color: str
+    spreadsheetURL: str
+    dateAdded: str
+    hidden: bool = False
     difficulties: list[EvxlDifficulty]
 
 
@@ -37,3 +56,15 @@ class EvxlPlaylist(BaseModel):
 
 class EvxlPlaylistByCodeResponse(BaseModel):
     playlist: EvxlPlaylist
+
+
+class ManifestEntry(BaseModel):
+    file: str
+    playlist_name: str
+    kovaaks_benchmark_id: int
+    rank_colors: list[tuple[str, str]]
+    generated_at: str
+
+
+class Manifest(RootModel[dict[str, ManifestEntry]]):
+    pass

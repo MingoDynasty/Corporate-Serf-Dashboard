@@ -10,11 +10,24 @@ from scripts.benchmark_importer.models import (
     EvxlDatabaseItem,
     EvxlPlaylist,
     EvxlPlaylistScenario,
+    ManifestEntry,
 )
 
 
 def _write_evxl_data(path: Path, benchmarks: list[dict]) -> None:
-    path.write_text(json.dumps(benchmarks), encoding="utf-8")
+    complete_benchmarks = []
+    for benchmark in benchmarks:
+        complete_benchmarks.append(
+            {
+                "rankCalculation": "basic",
+                "abbreviation": "TEST",
+                "color": "#000",
+                "spreadsheetURL": "https://example.com",
+                "dateAdded": "2026-07-03",
+                **benchmark,
+            }
+        )
+    path.write_text(json.dumps(complete_benchmarks), encoding="utf-8")
 
 
 def _difficulty(
@@ -28,6 +41,19 @@ def _difficulty(
         "kovaaksBenchmarkId": benchmark_id,
         "sharecode": sharecode,
         "rankColors": rank_colors,
+        "categories": [
+            {
+                "categoryName": "Clicking",
+                "color": "#111",
+                "subcategories": [
+                    {
+                        "subcategoryName": "Static",
+                        "color": "#222",
+                        "scenarioCount": 1,
+                    }
+                ],
+            }
+        ],
     }
 
 
@@ -53,6 +79,62 @@ def _benchmark_response(rank_maxes: list[float]) -> dict:
         },
         "ranks": [],
     }
+
+
+def _manifest_entry(
+    *,
+    file: str = "Generated Playlist.json",
+    playlist_name: str = "Generated Playlist",
+    benchmark_id: int = 42,
+    rank_colors: list[tuple[str, str]] | None = None,
+) -> ManifestEntry:
+    return ManifestEntry(
+        file=file,
+        playlist_name=playlist_name,
+        kovaaks_benchmark_id=benchmark_id,
+        rank_colors=rank_colors or [("Bronze", "#111"), ("Silver", "#222")],
+        generated_at="2026-07-03T12:00:00+00:00",
+    )
+
+
+def _write_generated_file(
+    path: Path,
+    sharecode: str,
+    entry: ManifestEntry,
+    *,
+    provenance_sharecode: str | None = None,
+) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "name": entry.playlist_name,
+                "code": sharecode,
+                "scenarios": [],
+                "generated_from": {
+                    "sharecode": provenance_sharecode or sharecode,
+                    "kovaaks_benchmark_id": entry.kovaaks_benchmark_id,
+                    "rank_colors": [list(pair) for pair in entry.rank_colors],
+                    "generated_at": entry.generated_at,
+                    "generator": "benchmark_importer",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+def _evxl_payload(*difficulties: dict) -> list[dict]:
+    return [
+        {
+            "benchmarkName": "Test Benchmark",
+            "rankCalculation": "basic",
+            "abbreviation": "TEST",
+            "color": "#000",
+            "spreadsheetURL": "https://example.com",
+            "dateAdded": "2026-07-03",
+            "difficulties": list(difficulties),
+        }
+    ]
 
 
 def test_get_evxl_playlist_uses_retry_policy_and_snake_case_model(monkeypatch):
@@ -302,7 +384,7 @@ def test_run_importer_continues_after_item_failure(tmp_path, monkeypatch):
         for index, code in enumerate(["KovaaKsBad", "KovaaKsGoodOne", "KovaaKsGoodTwo"])
     }
 
-    def fake_generate(sharecode, *_args):
+    def fake_generate(sharecode, *_args, **_kwargs):
         calls.append(sharecode)
         if sharecode == "KovaaKsBad":
             raise script.BenchmarkDataMismatchError("bad ladder")
@@ -327,7 +409,7 @@ def test_run_importer_stops_at_consecutive_failure_threshold(tmp_path, monkeypat
         for index, code in enumerate(["One", "Two", "Three"])
     }
 
-    def fail(sharecode, *_args):
+    def fail(sharecode, *_args, **_kwargs):
         calls.append(sharecode)
         raise requests.ReadTimeout("offline")
 
@@ -353,7 +435,7 @@ def test_run_importer_only_and_limit_apply_to_generated_items(tmp_path, monkeypa
         for index, code in enumerate(["One", "Two", "Three"])
     }
 
-    def fake_generate(sharecode, *_args):
+    def fake_generate(sharecode, *_args, **_kwargs):
         calls.append(sharecode)
         return tmp_path / f"{sharecode}.json"
 
@@ -380,7 +462,7 @@ def test_run_importer_missing_only_sharecodes_are_failures(tmp_path, monkeypatch
     }
     generated = []
 
-    def fake_generate(sharecode, *_args):
+    def fake_generate(sharecode, *_args, **_kwargs):
         generated.append(sharecode)
         return tmp_path / f"{sharecode}.json"
 
@@ -419,7 +501,7 @@ def test_identical_duplicate_generates_once(tmp_path, monkeypatch):
     database, conflicts = script.load_evxl_data(data_path)
     generated = []
 
-    def fake_generate(sharecode, *_args):
+    def fake_generate(sharecode, *_args, **_kwargs):
         generated.append(sharecode)
         return tmp_path / f"{sharecode}.json"
 
@@ -495,6 +577,378 @@ def test_conflict_summary_lists_claimants_and_exits_nonzero(caplog):
     assert "benchmark='Benchmark' difficulty='Advanced' benchmark_id=99" in caplog.text
 
 
+def test_manifest_skip_requires_matching_ordered_provenance_and_playlist(tmp_path):
+    sharecode = "KovaaKsGenerated"
+    item = EvxlDatabaseItem(
+        kovaaksBenchmarkId=42,
+        rankColors={"Bronze": "#111", "Silver": "#222"},
+    )
+    entry = _manifest_entry()
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+
+    assert script.should_skip_generation(sharecode, item, entry, tmp_path)
+    assert not script.should_skip_generation(
+        sharecode,
+        EvxlDatabaseItem(
+            kovaaksBenchmarkId=43,
+            rankColors={"Bronze": "#111", "Silver": "#222"},
+        ),
+        entry,
+        tmp_path,
+    )
+    assert not script.should_skip_generation(
+        sharecode,
+        EvxlDatabaseItem(
+            kovaaksBenchmarkId=42,
+            rankColors={"Silver": "#222", "Bronze": "#111"},
+        ),
+        entry,
+        tmp_path,
+    )
+    assert not script.should_skip_generation(
+        sharecode,
+        item,
+        entry,
+        tmp_path,
+        force=True,
+    )
+
+
+@pytest.mark.parametrize("failure", ["missing", "malformed", "wrong_provenance"])
+def test_manifest_skip_regenerates_for_broken_output(tmp_path, failure):
+    sharecode = "KovaaKsGenerated"
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"})
+    entry = _manifest_entry(rank_colors=[("Bronze", "#111")])
+    path = tmp_path / entry.file
+    if failure == "malformed":
+        path.write_text("{broken", encoding="utf-8")
+    elif failure == "wrong_provenance":
+        _write_generated_file(
+            path,
+            sharecode,
+            entry,
+            provenance_sharecode="KovaaKsSomeoneElse",
+        )
+
+    assert not script.should_skip_generation(sharecode, item, entry, tmp_path)
+
+
+def test_manifest_path_outside_generated_is_never_read_or_deleted(
+    tmp_path, monkeypatch
+):
+    generated_dir = tmp_path / "generated"
+    generated_dir.mkdir()
+    outside = tmp_path / "outside.json"
+    outside.write_text("do not touch", encoding="utf-8")
+    entry = _manifest_entry(file="../outside.json")
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"})
+
+    assert not script.should_skip_generation(
+        "KovaaKsGenerated", item, entry, generated_dir
+    )
+
+    playlist = EvxlPlaylist(
+        playlist_name="Renamed",
+        playlist_code="KovaaKsGenerated",
+        scenario_list=[],
+    )
+    monkeypatch.setattr(script, "get_evxl_playlist", lambda _code: playlist)
+    monkeypatch.setattr(
+        script,
+        "get_benchmark_json",
+        lambda *_args, **_kwargs: _benchmark_response([100]),
+    )
+    manifest = {"KovaaKsGenerated": entry}
+    script.generate_playlist(
+        "KovaaKsGenerated",
+        item,
+        {},
+        set(),
+        generated_dir,
+        manifest=manifest,
+    )
+
+    assert outside.read_text(encoding="utf-8") == "do not touch"
+
+
+def test_generation_writes_output_before_manifest_and_deletes_renamed_file(
+    tmp_path, monkeypatch
+):
+    old_path = tmp_path / "Old Name.json"
+    old_path.write_text("old", encoding="utf-8")
+    old_entry = _manifest_entry(
+        file=old_path.name,
+        playlist_name="Old Name",
+        rank_colors=[("Bronze", "#111")],
+    )
+    manifest = {"KovaaKsGenerated": old_entry}
+    playlist = EvxlPlaylist(
+        playlist_name="New Name",
+        playlist_code="KovaaKsGenerated",
+        scenario_list=[],
+    )
+    monkeypatch.setattr(script, "get_evxl_playlist", lambda _code: playlist)
+    monkeypatch.setattr(
+        script,
+        "get_benchmark_json",
+        lambda *_args, **_kwargs: _benchmark_response([100]),
+    )
+    writes = []
+    original_atomic_write = script._atomic_write_json
+
+    def record_write(path, payload):
+        writes.append(path.name)
+        original_atomic_write(path, payload)
+
+    monkeypatch.setattr(script, "_atomic_write_json", record_write)
+
+    output = script.generate_playlist(
+        "KovaaKsGenerated",
+        EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"}),
+        {"old name.json": "KovaaKsGenerated"},
+        set(),
+        tmp_path,
+        manifest=manifest,
+    )
+
+    assert writes == ["New Name.json", "manifest.json"]
+    assert output.exists()
+    assert not old_path.exists()
+    assert manifest["KovaaKsGenerated"].file == "New Name.json"
+    raw_output = json.loads(output.read_text(encoding="utf-8"))
+    assert raw_output["generated_from"]["rank_colors"] == [["Bronze", "#111"]]
+
+
+def test_manifest_write_uses_atomic_replace(tmp_path, monkeypatch):
+    path = tmp_path / "manifest.json"
+    replacements = []
+    original_replace = script.os.replace
+
+    def record_replace(source, destination):
+        replacements.append((Path(source), Path(destination)))
+        original_replace(source, destination)
+
+    monkeypatch.setattr(script.os, "replace", record_replace)
+    script.write_manifest({"KovaaKsGenerated": _manifest_entry()}, path)
+
+    assert len(replacements) == 1
+    assert replacements[0][1] == path
+    assert replacements[0][0].parent == path.parent
+    assert script.load_manifest(path)["KovaaKsGenerated"].rank_colors == [
+        ("Bronze", "#111"),
+        ("Silver", "#222"),
+    ]
+
+
+def test_load_manifest_treats_missing_and_malformed_as_empty(tmp_path, caplog):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    path = tmp_path / "manifest.json"
+
+    assert script.load_manifest(path) == {}
+    path.write_text("{broken", encoding="utf-8")
+    assert script.load_manifest(path) == {}
+    assert sum("missing or malformed" in message for message in caplog.messages) == 2
+
+
+def test_run_importer_skips_intact_manifest_entry(tmp_path, monkeypatch):
+    sharecode = "KovaaKsGenerated"
+    entry = _manifest_entry(rank_colors=[("Bronze", "#111")])
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+    script.write_manifest({sharecode: entry}, tmp_path / "manifest.json")
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("intact output must be skipped"),
+    )
+
+    summary = script.run_importer(
+        {
+            sharecode: EvxlDatabaseItem(
+                kovaaksBenchmarkId=42,
+                rankColors={"Bronze": "#111"},
+            )
+        },
+        {},
+        generated_dir=tmp_path,
+    )
+
+    assert summary.skipped == [sharecode]
+    assert summary.generated == []
+
+
+def test_force_bypasses_manifest_and_benchmark_cache(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_generate(sharecode, *_args, **kwargs):
+        captured[sharecode] = kwargs
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer(
+        {
+            "KovaaKsGenerated": EvxlDatabaseItem(
+                kovaaksBenchmarkId=42,
+                rankColors={},
+            )
+        },
+        {},
+        generated_dir=tmp_path,
+        force=True,
+    )
+
+    assert summary.generated == ["KovaaKsGenerated"]
+    assert captured["KovaaKsGenerated"]["use_cache"] is False
+
+
+def test_live_evxl_mixed_candidate_is_rejected_in_full(tmp_path, monkeypatch):
+    path = tmp_path / "benchmarks.json"
+    current = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+        _difficulty("Remove", 2, {"Bronze": "#111"}, "Hard"),
+    )
+    candidate = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+        _difficulty("Add", 3, {"Bronze": "#111"}, "Normal"),
+    )
+    _write_evxl_data(path, current)
+
+    class Response:
+        @staticmethod
+        def json():
+            return candidate
+
+    monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
+
+    assert not script.refresh_evxl_snapshot(path)
+    assert json.loads(path.read_text(encoding="utf-8")) == current
+
+
+def test_live_evxl_accept_removals_replaces_whole_candidate_atomically(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "benchmarks.json"
+    current = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+        _difficulty("Remove", 2, {"Bronze": "#111"}, "Hard"),
+    )
+    candidate = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+        _difficulty("Add", 3, {"Bronze": "#111"}, "Normal"),
+    )
+    _write_evxl_data(path, current)
+
+    class Response:
+        @staticmethod
+        def json():
+            return candidate
+
+    monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
+    replacements = []
+    original_replace = script.os.replace
+
+    def record_replace(source, destination):
+        replacements.append((Path(source), Path(destination)))
+        original_replace(source, destination)
+
+    monkeypatch.setattr(script.os, "replace", record_replace)
+
+    assert script.refresh_evxl_snapshot(path, accept_removals=True)
+    assert json.loads(path.read_text(encoding="utf-8")) == candidate
+    assert len(replacements) == 1
+    assert replacements[0][1] == path
+
+
+@pytest.mark.parametrize("candidate", [{}, {"error": "upstream"}])
+def test_invalid_live_evxl_data_preserves_snapshot(tmp_path, monkeypatch, candidate):
+    path = tmp_path / "benchmarks.json"
+    current = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+    )
+    _write_evxl_data(path, current)
+
+    class Response:
+        @staticmethod
+        def json():
+            return candidate
+
+    monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
+
+    assert not script.refresh_evxl_snapshot(path)
+    assert json.loads(path.read_text(encoding="utf-8")) == current
+
+
+def test_partial_live_evxl_entry_preserves_snapshot(tmp_path, monkeypatch):
+    path = tmp_path / "benchmarks.json"
+    current = _evxl_payload(
+        _difficulty("Keep", 1, {"Bronze": "#111"}, "Easy"),
+    )
+    candidate = json.loads(json.dumps(current))
+    del candidate[0]["difficulties"][0]["categories"]
+    _write_evxl_data(path, current)
+
+    class Response:
+        @staticmethod
+        def json():
+            return candidate
+
+    monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
+
+    assert not script.refresh_evxl_snapshot(path)
+    assert json.loads(path.read_text(encoding="utf-8")) == current
+
+
+def test_live_rank_color_reorder_refreshes_and_invalidates_manifest(
+    tmp_path, monkeypatch
+):
+    snapshot = tmp_path / "benchmarks.json"
+    current = _evxl_payload(
+        _difficulty(
+            "KovaaKsGenerated",
+            42,
+            {"Bronze": "#111", "Silver": "#222"},
+            "Easy",
+        )
+    )
+    candidate = _evxl_payload(
+        _difficulty(
+            "KovaaKsGenerated",
+            42,
+            {"Silver": "#222", "Bronze": "#111"},
+            "Easy",
+        )
+    )
+    _write_evxl_data(snapshot, current)
+
+    class Response:
+        @staticmethod
+        def json():
+            return candidate
+
+    monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
+    assert script.refresh_evxl_snapshot(snapshot)
+
+    entry = _manifest_entry()
+    _write_generated_file(
+        tmp_path / entry.file,
+        "KovaaKsGenerated",
+        entry,
+    )
+    script.write_manifest({"KovaaKsGenerated": entry}, tmp_path / "manifest.json")
+    database, conflicts = script.load_evxl_data(snapshot)
+    generated = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        generated.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    summary = script.run_importer(database, conflicts, generated_dir=tmp_path)
+
+    assert generated == ["KovaaKsGenerated"]
+    assert summary.generated == ["KovaaKsGenerated"]
+
+
 def test_parse_args_supports_repeated_only_and_positive_limits():
     args = script.parse_args(
         [
@@ -506,12 +960,18 @@ def test_parse_args_supports_repeated_only_and_positive_limits():
             "5",
             "--max-consecutive-failures",
             "4",
+            "--offline",
+            "--force",
+            "--accept-removals",
         ]
     )
 
     assert args.only == ["One", "Two"]
     assert args.limit == 5
     assert args.max_consecutive_failures == 4
+    assert args.offline
+    assert args.force
+    assert args.accept_removals
 
     with pytest.raises(SystemExit):
         script.parse_args(["--limit", "0"])
