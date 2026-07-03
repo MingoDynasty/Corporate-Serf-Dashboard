@@ -189,8 +189,9 @@ def get_benchmark_json(
     """Fetch benchmark progress, optionally using the local cache."""
     cache_file = Path(CACHE_DIR, "benchmarks", f"{benchmark_id}.json")
     if use_cache and os.path.exists(cache_file):
-        with open(cache_file, encoding="utf-8") as file:
-            return json.load(file)
+        cached_response = _read_json(cache_file)
+        if isinstance(cached_response, dict):
+            return cached_response
 
     params = {
         "benchmarkId": benchmark_id,
@@ -199,9 +200,7 @@ def get_benchmark_json(
     response = _get_with_retry(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
     response_json = response.json()
 
-    # save to cache
-    with open(cache_file, "w", encoding="utf-8") as file:
-        json.dump(response_json, file, indent=2)
+    _write_json(cache_file, response_json)
 
     return response_json
 

@@ -402,6 +402,57 @@ def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
     assert json.loads((benchmark_cache_dir / "123.json").read_text()) == response_json
 
 
+def test_get_benchmark_json_refetches_malformed_cache(tmp_path, monkeypatch):
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text("{", encoding="utf-8")
+    response_json = {"benchmark_progress": 42}
+    requests = []
+
+    def fake_get(*_args, **_kwargs):
+        requests.append(True)
+        return FakeResponse(response_json)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+    assert requests == [True]
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
+
+
+def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
+    response_json = {"benchmark_progress": 42}
+    replacements = []
+    original_replace = api_service.os.replace
+
+    def recording_replace(source, destination):
+        replacements.append((Path(source), Path(destination)))
+        original_replace(source, destination)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(
+        api_service,
+        "_get_with_retry",
+        lambda *_args, **_kwargs: FakeResponse(response_json),
+    )
+    monkeypatch.setattr(api_service.os, "replace", recording_replace)
+
+    result = api_service.get_benchmark_json(123)
+
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    assert result == response_json
+    assert len(replacements) == 1
+    temp_file, destination = replacements[0]
+    assert destination == cache_file
+    assert temp_file.parent == cache_file.parent
+    assert temp_file.name.startswith(f".{cache_file.name}.")
+    assert not temp_file.exists()
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
+
+
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
     def fake_get_with_retry(_url, params, timeout):
         assert timeout == api_service.TIMEOUT
