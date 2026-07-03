@@ -8,6 +8,9 @@ preview-rule losses documented, AGENTS.md/decision-log tasks added).
 **Revised:** 2026-07-03, external review round 2 — all 4 findings accepted
 (`force-exclude` added, migration command order fixed, inline `# pylint:`
 directive cleanup added, accepted-loss inventory corrected and completed).
+**Revised:** 2026-07-03, external review round 3 — both findings accepted
+(`too-many-nested-blocks` reclassified as preview-only `PLR1702`; stale
+tooling reference in `codebase_improvement_proposals.md` added to PR-2).
 **Decided by:** MingoDynasty. Do not reopen the frozen decisions below; implement them.
 
 Consolidate formatting and linting on ruff, replacing black + isort + pylint.
@@ -116,16 +119,17 @@ Every rule below was verified against ruff 0.15.19. Do not enable preview.
   boilerplate shared between pages, low value.
 - **`too-many-instance-attributes`** — `PLR0902` is not a ruff rule
   (verified: `ruff rule PLR0902` errors), not merely preview.
-- **`too-many-nested-blocks`** — no equivalent (`R1702` is not a ruff rule).
-- **`too-many-lines`** (module length) — no equivalent; the existing inline
-  disable in `api_service.py` is simply deleted in PR-2.
+- **`too-many-lines`** (module length) — no equivalent (`PLC0302` is not a
+  ruff rule); the existing inline disable in `api_service.py` is simply
+  deleted in PR-2.
 
 **Preview-only in ruff** (exists, but requires `--preview`, so not enforced):
 
 - **`unspecified-encoding`** (`PLW1514`) — the 2 current sites get
   `encoding="utf-8"` added in PR-2 as one-time cleanup, not enforced policy.
 - **`too-many-locals`** (`PLR0914`), **`too-many-positional-arguments`**
-  (`PLR0917`), **`too-many-boolean-expressions`** (`PLR0916`).
+  (`PLR0917`), **`too-many-boolean-expressions`** (`PLR0916`),
+  **`too-many-nested-blocks`** (`PLR1702`).
 
 **Not selected:**
 
@@ -283,7 +287,11 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
 6. Update **both** workflow docs: `CLAUDE.md` Lint line becomes
    `uv run ruff check` (no fail-under, no pylint) — the gates are ruff
    (format + check), mypy, pytest. `AGENTS.md` standard validation likewise
-   drops any pylint mention.
+   drops any pylint mention. Also update
+   `docs/codebase_improvement_proposals.md` item 14: the
+   `ruff`/`black`/`mypy` tooling choice is resolved by this proposal
+   (ruff + mypy, no black) — rewrite the item to keep only its still-open
+   part (a single-command entry point / task runner and CI gating).
 7. Ship-out per docs process:
    - Add a `docs/decision_log.md` entry distilling this proposal (what was
      decided and why, including the accepted losses).
