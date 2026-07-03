@@ -2,8 +2,8 @@
 This module handles functions around plots.
 """
 
-from datetime import datetime
 import logging
+from datetime import datetime
 
 import numpy as np
 import pandas as pd

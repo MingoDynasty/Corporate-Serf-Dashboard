@@ -1,9 +1,9 @@
-from collections.abc import Callable
 import logging
 import uuid
+from collections.abc import Callable
 
-from dash_extensions.logging import NotificationsLogHandler
 import dash_mantine_components as dmc
+from dash_extensions.logging import NotificationsLogHandler
 
 
 def get_custom_notification_log_writers() -> dict[int, Callable]:

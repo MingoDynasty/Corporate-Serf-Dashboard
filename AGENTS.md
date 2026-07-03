@@ -16,7 +16,8 @@ $env:UV_CACHE_DIR='.uv-cache'
 
 ```powershell
 uv run pytest tests
-uv run ruff check source tests
+uv run ruff format --check .
+uv run ruff check
 uv run python -m compileall source tests
 ```
 

@@ -2,11 +2,11 @@
 Provides business logic for managing Kovaaks data.
 """
 
-from datetime import datetime
 import logging
 import os
-from pathlib import Path
 import re
+from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 from pydantic import ValidationError
@@ -48,7 +48,7 @@ playlist_database: dict[str, PlaylistData] = {}
 
 def get_playlist_file_path(playlist_name: str) -> Path:
     """Build a safe file path for a playlist JSON file."""
-    sanitized_name = re.sub(r'[^A-Za-z0-9 ._()-]+', "_", playlist_name).strip()
+    sanitized_name = re.sub(r"[^A-Za-z0-9 ._()-]+", "_", playlist_name).strip()
     sanitized_name = sanitized_name.rstrip(". ")
     if not sanitized_name:
         msg = f"Invalid playlist name: {playlist_name!r}"

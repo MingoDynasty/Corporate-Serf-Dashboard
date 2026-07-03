@@ -1,7 +1,7 @@
 import logging
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from kovaaks.api_models import BenchmarksAPIResponse
 from kovaaks.api_service import get_benchmark_json, get_playlist_data
