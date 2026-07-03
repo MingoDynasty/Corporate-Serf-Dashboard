@@ -5,6 +5,9 @@
 **Revised:** 2026-07-02, external review round 1 — all 5 findings accepted
 (lint scope decided, uv.lock gate corrected, pre-commit pinning fixed,
 preview-rule losses documented, AGENTS.md/decision-log tasks added).
+**Revised:** 2026-07-03, external review round 2 — all 4 findings accepted
+(`force-exclude` added, migration command order fixed, inline `# pylint:`
+directive cleanup added, accepted-loss inventory corrected and completed).
 **Decided by:** MingoDynasty. Do not reopen the frozen decisions below; implement them.
 
 Consolidate formatting and linting on ruff, replacing black + isort + pylint.
@@ -105,16 +108,27 @@ are measured, not extrapolated from the pylint numbers.
 
 ## Accepted losses (do not try to work around these)
 
-Verified against ruff 0.15.19 without preview mode. Do not enable preview.
+Every rule below was verified against ruff 0.15.19. Do not enable preview.
 
-- **`duplicate-code` detection** — no ruff equivalent. The 2 current
-  findings are Mantine layout boilerplate shared between pages, low value.
-- **`unspecified-encoding`** — ruff's `PLW1514` is preview-only (verified:
-  requires `--preview`), so it will not be enforced. The 2 current sites
-  get `encoding="utf-8"` added in PR-2 as one-time cleanup, not enforced
-  policy.
-- **Other preview-only design metrics** — `too-many-locals`,
-  `too-many-positional-arguments`, and similar will not be enforced.
+**No ruff equivalent** (the rule does not exist in ruff at all):
+
+- **`duplicate-code`** — the 2 current findings are Mantine layout
+  boilerplate shared between pages, low value.
+- **`too-many-instance-attributes`** — `PLR0902` is not a ruff rule
+  (verified: `ruff rule PLR0902` errors), not merely preview.
+- **`too-many-nested-blocks`** — no equivalent (`R1702` is not a ruff rule).
+- **`too-many-lines`** (module length) — no equivalent; the existing inline
+  disable in `api_service.py` is simply deleted in PR-2.
+
+**Preview-only in ruff** (exists, but requires `--preview`, so not enforced):
+
+- **`unspecified-encoding`** (`PLW1514`) — the 2 current sites get
+  `encoding="utf-8"` added in PR-2 as one-time cleanup, not enforced policy.
+- **`too-many-locals`** (`PLR0914`), **`too-many-positional-arguments`**
+  (`PLR0917`), **`too-many-boolean-expressions`** (`PLR0916`).
+
+**Not selected:**
+
 - **`no-else-return`** — requires `RET505`, which is not in the frozen rule
   set. The 1 current site is fixed in PR-2 as one-time cleanup, not
   enforced policy.
@@ -131,6 +145,9 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
    [tool.ruff]
    line-length = 88
    target-version = "py314"
+   # pre-commit passes filenames explicitly; without this, exclusions
+   # (PR-2's lint.exclude for scripts/) are ignored for explicit paths.
+   force-exclude = true
 
    [tool.ruff.lint]
    # Defaults (E4, E7, E9, F) plus import sorting. PR-2 expands this.
@@ -139,14 +156,25 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
 
    No `lint.exclude` yet — PR-1 deliberately lints `scripts/` too so its
    imports get sorted once (2 files); PR-2 adds the exclusion.
+   `force-exclude` is a no-op in PR-1 but must be present before PR-2:
+   verified that without it, the pre-commit hook reports all 29 `scripts/`
+   findings despite `lint.exclude`, and with it the exclusion holds.
 2. Delete `[tool.black]` and `[tool.isort]` sections. Remove `black` from
    `dependencies`. Move `mypy` from `dependencies` to the `dev` group.
    (black and isort will remain in `uv.lock` as transitive deps of
    `datamodel-code-generator` — expected, see audit notes.) Keep pylint
    and its config for now (it is already the known-red gate; PR-2 removes
    it).
-3. Run `uv run ruff format .` and `uv run ruff check --fix .` (import
-   sorting). Expected churn: the 2 black-dirty files, the 10 isort-dirty
+3. Run, **in this order** (fix first, then format — import fixes can
+   produce lines the formatter then needs to rewrap; same order as the
+   pre-commit hooks):
+
+   ```powershell
+   uv run ruff check --fix .
+   uv run ruff format .
+   ```
+
+   Expected churn: the 2 black-dirty files, the 10 isort-dirty
    files, plus a handful of files where ruff format deviates slightly from
    black. Commit the reformat as its own commit and add its hash to a new
    `.git-blame-ignore-revs` file.
@@ -188,7 +216,8 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
    ignore = [
        "PLR2004",  # magic-value comparisons — not part of the old bar
    ]
-   exclude = ["scripts/**"]  # formatted but not linted (frozen decision 3)
+   exclude = ["scripts/**"]  # lint-only exclusion (frozen decision 3);
+                             # holds for explicit paths via force-exclude (PR-1)
 
    [tool.ruff.lint.pycodestyle]
    max-line-length = 120  # hard ceiling; formatter wraps at 88
@@ -213,14 +242,19 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
    - `E501` ×5 — `data_service.py:30,32`, `file_watchdog.py:113`,
      `home.py:411,423`: wrap, or `# noqa: E501` for unsplittable URLs
      (pylint previously exempted URL lines; ruff does not).
-   - `BLE001` ×1 — `api_service.py:1048`: if this broad except is a
-     deliberate handler, keep it with `# noqa: BLE001` and a one-line
-     justification comment.
+   - `BLE001` ×1 — `api_service.py:1048`: already marked deliberate with
+     an inline `# pylint: disable=broad-exception-caught` — convert to
+     `# noqa: BLE001` (step 4 covers the directive cleanup).
    - `PLR0913` ×4 / `PLR0911` ×3 / `PLR0912` ×3 — 10 design-metric
      findings over 7 functions (`api_service.py:1122` trips three at
-     once): refactor only where a clean split is obvious; otherwise
-     targeted `# noqa` with justification. Do not force awkward refactors
-     to satisfy a metric.
+     once). Four of these functions (`api_service.py:676`, `:995`,
+     `:1077`, `:1122`) already carry `# pylint: disable-next=too-many-*`
+     directives — those are prior deliberate suppress decisions; carry
+     them over as `# noqa: PLR0911`/`PLR0913`/`PLR0912`, do not
+     re-litigate refactors. For the unsuppressed sites (`home.py:59`,
+     `home.py:272`, `data_service.py:370`): refactor only where a clean
+     split is obvious; otherwise targeted `# noqa` with justification. Do
+     not force awkward refactors to satisfy a metric.
    - `PLR1711` ×3 (useless return) — auto-fixable.
    - `PLW0108` ×2 — `tests/test_scenario_rank_freshness.py`: inline the
      lambdas.
@@ -230,13 +264,27 @@ Scope: tooling only. No lint-rule expansion, no docstrings.
    - One-time unenforced cleanups (accepted-loss rules): add
      `encoding="utf-8"` at the 2 `unspecified-encoding` sites; fix the 1
      `no-else-return`.
-4. Remove pylint: delete the `pylint` dev dep and **all** `[tool.pylint.*]`
+4. Remove the **11 inline `# pylint:` directives** across `source/` (grep
+   `# pylint`), then re-run `uv run ruff check` and add a `# noqa: <rule>`
+   only where a finding actually fires after removal. Known mappings:
+   - `disable-next=too-many-*` at `api_service.py:675/994/1076/1121` →
+     `# noqa: PLR0911`/`PLR0913`/`PLR0912` on the `def` line (see step 3;
+     `too-many-positional-arguments` has no stable ruff rule — drop it).
+   - `disable=broad-exception-caught` at `api_service.py:1048` →
+     `# noqa: BLE001`. The same directive at `api_service.py:1068`,
+     `file_watchdog.py:56`, and `home.py:208/248` either already has a
+     `# noqa: BLE001` alongside it or does not fire under ruff — delete
+     the pylint half only.
+   - `disable=line-too-long` at `data_service.py:30` → `# noqa: E501`.
+   - `disable=too-many-lines` at `api_service.py:5` → delete outright (no
+     ruff equivalent; see accepted losses).
+5. Remove pylint: delete the `pylint` dev dep and **all** `[tool.pylint.*]`
    sections (~560 lines).
-5. Update **both** workflow docs: `CLAUDE.md` Lint line becomes
+6. Update **both** workflow docs: `CLAUDE.md` Lint line becomes
    `uv run ruff check` (no fail-under, no pylint) — the gates are ruff
    (format + check), mypy, pytest. `AGENTS.md` standard validation likewise
    drops any pylint mention.
-6. Ship-out per docs process:
+7. Ship-out per docs process:
    - Add a `docs/decision_log.md` entry distilling this proposal (what was
      decided and why, including the accepted losses).
    - Mark the **2026-06-20 "Interim Merge Bar Until Lint/Format Cleanup"**
