@@ -3,20 +3,30 @@ import os
 import sys
 from pathlib import Path
 
-from kovaaks.api_models import BenchmarksAPIResponse
-from kovaaks.api_service import get_benchmark_json, get_playlist_data
-from kovaaks.data_models import PlaylistData, Rank, Scenario
-from models import EvxlData, EvxlDatabaseItem
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+os.chdir(REPO_ROOT)
+
+from source.kovaaks.api_models import BenchmarksAPIResponse  # noqa: E402
+from source.kovaaks.api_service import (  # noqa: E402
+    get_benchmark_json,
+    get_playlist_data,
+)
+from source.kovaaks.data_models import PlaylistData, Rank, Scenario  # noqa: E402
+
+from models import EvxlData, EvxlDatabaseItem  # noqa: E402
 
 logging.basicConfig(
     stream=sys.stdout,
     level=logging.DEBUG,
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 # TODO: maybe pull this from "https://evxl.app/data/benchmarks" instead of relying on a cached file?
-EVXL_BENCHMARKS_JSON_FILE = "../../resources/evxl/benchmarks.json"
+EVXL_BENCHMARKS_JSON_FILE = REPO_ROOT / "resources" / "evxl" / "benchmarks.json"
 
 
 def load_evxl_data() -> dict[str, EvxlDatabaseItem]:
@@ -137,10 +147,10 @@ def main() -> None:
 
         # Save to file
         os.makedirs(
-            "generated",
+            SCRIPT_DIR / "generated",
             exist_ok=True,
         )  # create the generated directory if not exist
-        generated_filename = Path("generated", playlist_data.name + ".json")
+        generated_filename = SCRIPT_DIR / "generated" / (playlist_data.name + ".json")
         with open(generated_filename, "w") as file_handle:
             file_handle.write(playlist_data.model_dump_json(indent=2))
 
