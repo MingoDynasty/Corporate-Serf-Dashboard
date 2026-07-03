@@ -32,13 +32,16 @@ list in the roadmap.)
   runs grouped by sensitivity. *Problem solved:* "is my current sensitivity
   actually better?" and "am I trending up on this scenario?" are answered
   visually instead of by gut feel.
-- **Run notifications.** Toasts classify each new run the moment it lands:
-  a top-N placement within the run's sensitivity ("40.2 cm/360 has a new 2nd
-  place score"), and — switchable — whether the run passed the configurable
-  score threshold relative to the previous high score ("ready to move on" vs
-  "keep grinding"). A new personal best has no toast of its own; it triggers
-  the background rank refresh. *Problem solved:* immediate in-session
-  feedback on whether the run you just played met your bar.
+- **Run notifications.** When a new run lands, a toast reports it. Two
+  conditional classifications: a top-N placement within the run's sensitivity
+  ("40.2 cm/360 has a new 2nd place score"), shown when the run makes the
+  configured top N for the on-screen scenario; and a score-threshold
+  pass/fail against the previous high score ("ready to move on" vs "keep
+  grinding"), shown when the threshold notification switch is on and a
+  previous high score exists. A run that qualifies for neither still gets a
+  generic "Graph updated!" toast. A new personal best has no toast of its
+  own; it triggers the background rank refresh. *Problem solved:* immediate
+  in-session feedback on whether the run you just played met your bar.
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is.
