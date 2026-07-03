@@ -541,7 +541,8 @@ them gracefully — verified 2026-07-02 that both current duplicates are
 - **Manual gate:** one full `uv run` from the repo root against the live
   APIs; confirm the Setsunai sharecode generates (R5) and the run summary is
   clean.
-- Repo gates (`pytest`, `pylint`, `mypy`) per CLAUDE.md on the touched files.
+- Repo gates (`pytest`, `ruff format --check`, `ruff check`, `mypy`) plus the
+  `compileall` handoff check per AGENTS.md.
 
 ## Implementation / PR Staging
 

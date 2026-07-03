@@ -18,6 +18,7 @@ $env:UV_CACHE_DIR='.uv-cache'
 uv run pytest tests
 uv run ruff format --check .
 uv run ruff check
+uv run mypy source
 uv run python -m compileall source tests
 ```
 
