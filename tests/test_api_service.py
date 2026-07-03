@@ -423,6 +423,49 @@ def test_get_benchmark_json_refetches_malformed_cache(tmp_path, monkeypatch):
     assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
 
 
+def test_get_benchmark_json_refetches_schema_invalid_cache(tmp_path, monkeypatch):
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text("{}", encoding="utf-8")
+    response_json = {"benchmark_progress": 42}
+    requests = []
+
+    def fake_get(*_args, **_kwargs):
+        requests.append(True)
+        return FakeResponse(response_json)
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fake_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+    assert requests == [True]
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
+
+
+def test_get_benchmark_json_returns_schema_valid_cache(tmp_path, monkeypatch):
+    response_json = {
+        "benchmark_progress": 42,
+        "overall_rank": 3,
+        "categories": {},
+        "ranks": [],
+    }
+    cache_file = tmp_path / "benchmarks" / "123.json"
+    cache_file.parent.mkdir()
+    cache_file.write_text(json.dumps(response_json), encoding="utf-8")
+
+    def fail_get(*_args, **_kwargs):
+        pytest.fail("schema-valid cache should not be refetched")
+
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_get_with_retry", fail_get)
+
+    result = api_service.get_benchmark_json(123, use_cache=True)
+
+    assert result == response_json
+
+
 def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
     response_json = {"benchmark_progress": 42}
     replacements = []

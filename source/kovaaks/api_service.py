@@ -18,6 +18,7 @@ import requests
 from pydantic import ValidationError
 
 from source.kovaaks.api_models import (
+    BenchmarksAPIResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
@@ -191,7 +192,12 @@ def get_benchmark_json(
     if use_cache and os.path.exists(cache_file):
         cached_response = _read_json(cache_file)
         if isinstance(cached_response, dict):
-            return cached_response
+            try:
+                BenchmarksAPIResponse.model_validate(cached_response)
+            except ValidationError:
+                pass
+            else:
+                return cached_response
 
     params = {
         "benchmarkId": benchmark_id,
