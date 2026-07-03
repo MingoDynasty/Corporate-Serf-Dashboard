@@ -147,6 +147,63 @@ Why: Cold-cache playlist table loads make many small HTTPS calls. Reusing sessio
 
 Consequences: `_get_with_retry()` should call the thread-local session wrapper instead of `requests.get(...)` directly. Tests should patch that wrapper when faking HTTP responses. If we later add async HTTP or a centralized rate limiter, revisit this decision.
 
+## 2026-06-21: Keep The Hand-Rolled GET Retry; Defer urllib3 `Retry` Migration
+
+Status: Accepted
+
+Decision: Keep the hand-rolled retry helpers in `source/kovaaks/api_service.py`
+(`_get_with_retry`, `_retry_after_seconds`) instead of mounting a urllib3
+`HTTPAdapter(max_retries=Retry(...))` on the thread-local sessions. Reconsider
+only when requirements grow past one retry (exponential backoff with jitter, a
+broader `status_forcelist` such as 503, separate connect/read budgets).
+
+Why: The happy path maps cleanly onto urllib3 `Retry`, but a faithful migration
+is not a clean delete. It would lose the 0.5s default delay on a 429 without
+`Retry-After` (urllib3 sleeps 0s on the first retry), change the exhaustion
+exception types the tests assert on (`HTTPError`/bare timeout become
+`RetryError`/wrapped `ConnectionError`), downgrade recovered-retry logging from
+WARNING to a DEBUG line on urllib3's logger, and still require a wrapper for the
+per-request timeout default. Preserving the 5s `Retry-After` cap needs
+`retry_after_max`, which requires pinning `urllib3>=2.6` — currently only a
+transitive dependency. Net-neutral complexity plus a full test rewrite does not
+clear the bar for replacing working, ratified code.
+
+Consequences: The retry layer stays per-request and hand-rolled; the score-aware
+rank refresh loop sits on top of it and relies on its contract (one inner retry,
+bounded sleeps). If migrating later, the minimal-drift recipe is: one
+module-level `Retry(total=1, status=1, connect=1, read=1, status_forcelist=[429],
+allowed_methods={"GET"}, retry_after_max=5, raise_on_status=False)` mounted on
+both schemes of each thread-local session, a thin wrapper retained for the
+timeout default and WARNING log, and an explicit `urllib3>=2.6` floor. The full
+analysis lives in git history as `docs/api_retry_urllib3_migration_proposal.md`.
+
+## 2026-07-03: Playlists Routes Are Stable; The Bare-Route Selector Is Transitional
+
+Status: Accepted
+
+Decision: The playlists feature owns two routes: `/playlists` (navbar
+destination) and `/playlists/{playlistCode}` (per-playlist scenario table).
+The per-playlist route and its `playlistCode` URL identity are stable
+contracts. The current content of the bare route — a selector dropdown plus an
+empty prompt — is transitional scaffolding from milestone 1: when the
+playlist-level overview (roadmap milestone 2) ships, the overview replaces the
+bare-route content, overview rows navigate to `/playlists/{playlistCode}`, and
+the selector dropdowns are removed from both pages.
+
+Why: A single canonical landing route keeps the navbar destination stable
+across milestones, and the human-readable playlist code is already user-facing
+via the import flow. The overview is a strictly richer playlist picker than a
+name-only dropdown (it surfaces last-played, aggregate percentile, and similar
+metadata), so keeping the selector after it ships would be scaffolding
+outliving its purpose. Distilled from the milestone-1 playlist scenarios
+proposal (shipped in PRs #12, #15, #16).
+
+Consequences: Keep the selector wiring separate enough that its removal is a
+clean delete, not a refactor. Post-overview, switching playlists means
+navigating back to `/playlists` and clicking a row, so the overview needs
+visible row-click affordances (cursor, hover tint, full-row target). Do not
+bake the selector into the per-playlist page in a way that blocks removal.
+
 ## 2026-06-20: Reference dash-ag-grid Grid Functions By Bare Name
 
 Status: Accepted
@@ -204,7 +261,8 @@ Consequences: The home callback owns the empty-state value and tooltip affordanc
 Status: Accepted
 
 Supersedes: The `ThreadPoolExecutor(max_workers=2)` high-score refresh and the
-decision not to provide manual rank refresh in `docs/scenario_rank_proposal.md`.
+decision not to provide manual rank refresh in the original scenario rank
+proposal (since distilled into this log and deleted).
 
 Decision: After a local high score, run a bounded score-aware refresh using a
 daemon `threading.Timer` chain with delays of 2, 4, 8, 16, and 32 seconds. Accept
