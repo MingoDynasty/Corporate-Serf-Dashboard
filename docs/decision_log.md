@@ -254,6 +254,8 @@ checked for stale or mismatched benchmark metadata.
 Consequences: Keep Evxl-specific resolution and snapshot handling in
 `scripts/benchmark_importer/` unless an app-side feature explicitly adopts that
 dependency. Preserve rank-color order when comparing provenance because colors
-pair positionally with KovaaK's thresholds. KovaaK's threshold changes under an
-unchanged benchmark ID remain invisible to provenance checks and require an
-explicit forced refresh.
+pair positionally with KovaaK's thresholds. Conflicting duplicate Evxl
+sharecodes must be skipped and reported rather than resolved first-wins because
+a missing benchmark is visible and recoverable, while silently pairing the wrong
+rank thresholds is not. KovaaK's threshold changes under an unchanged benchmark
+ID remain invisible to provenance checks and require an explicit forced refresh.
