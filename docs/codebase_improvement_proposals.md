@@ -72,8 +72,9 @@ This document summarizes improvement opportunities discovered during a full-pass
       - notification logic for threshold and top-N messages,
       - playlist import duplicate/error handling.
 
-14. **Add lint + type-check + format automation**
-    - Add one command entry point (e.g. `make check` or task runner) for `ruff`/`black`/`mypy` and CI gating.
+14. **Add a single-command quality gate and CI**
+    - Add one command entry point (e.g. `make check` or a task runner) for the
+      existing local gates, then enforce it in CI.
 
 15. **Tighten type annotations and data contracts**
     - Add missing parameter and return types in callback functions and service helpers.

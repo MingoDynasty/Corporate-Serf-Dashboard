@@ -2,8 +2,6 @@
 Provides business logic for Kovaak's API.
 """
 
-# pylint: disable=too-many-lines
-
 import json
 import logging
 import os
@@ -53,7 +51,10 @@ class UnknownKovaaksUserError(ValueError):
 
 
 class Endpoints(StrEnum):
+    """Build fully qualified URLs for supported KovaaK's endpoints."""
+
     def __new__(cls, path: str):
+        """Combine an endpoint path with the KovaaK's API base URL."""
         base = "https://kovaaks.com/webapp-backend"
         obj = str.__new__(cls, base + path)  # type: ignore
         obj._value_ = base + path
@@ -84,7 +85,6 @@ def make_cache():
     )
     if not leaderboard_mapping_file.exists():
         _write_json(leaderboard_mapping_file, {})
-    return
 
 
 def _retry_after_seconds(response: requests.Response) -> float:
@@ -161,6 +161,7 @@ def _get_with_retry(url: str, **kwargs) -> requests.Response:
 
 
 def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
+    """Fetch playlist metadata matching a KovaaK's playlist code."""
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 
     response = _get_with_retry(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
@@ -170,9 +171,10 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
 def get_benchmark_json(
     benchmark_id: int, steam_id: int | None = None, use_cache: bool = False
 ) -> str:
+    """Fetch benchmark progress, optionally using the local cache."""
     cache_file = Path(CACHE_DIR, "benchmarks", f"{benchmark_id}.json")
     if use_cache and os.path.exists(cache_file):
-        with open(cache_file) as file:
+        with open(cache_file, encoding="utf-8") as file:
             return json.load(file)
 
     params = {
@@ -182,7 +184,7 @@ def get_benchmark_json(
     response = _get_with_retry(Endpoints.BENCHMARKS, params=params, timeout=TIMEOUT)
 
     # save to cache
-    with open(cache_file, "w") as file:
+    with open(cache_file, "w", encoding="utf-8") as file:
         json.dump(response.json(), file, indent=2)
 
     return response.json()
@@ -194,6 +196,7 @@ def get_leaderboard_scores(
     page: int = 0,
     max_results: int = 100,
 ) -> LeaderboardAPIResponse:
+    """Fetch one validated page of scenario leaderboard scores."""
     if page < 0:
         raise ValueError("page must be greater than or equal to 0")
     if max_results <= 0:
@@ -334,6 +337,7 @@ def _leaderboard_mapping_file() -> Path:
 
 
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
+    """Return the stored leaderboard ID for an exact scenario name."""
     cache_data = _read_json(_leaderboard_mapping_file())
     if not isinstance(cache_data, dict):
         return None
@@ -622,6 +626,7 @@ def get_cached_scenario_rank(
     username: str,
     cache_ttl_hours: int = 168,
 ) -> ScenarioRankInfo | None:
+    """Return fresh cached rank data without derived leaderboard totals."""
     cache_file = _rank_cache_file(leaderboard_id, username)
     if not _is_cache_fresh(cache_file, cache_ttl_hours):
         return None
@@ -639,6 +644,7 @@ def save_scenario_rank(
     username: str,
     rank_info: ScenarioRankInfo,
 ) -> None:
+    """Cache rank data without derived leaderboard totals or percentiles."""
     rank_cache_data = rank_info.model_copy(
         update={"total_players": None, "percentile": None}
     )
@@ -672,8 +678,7 @@ def _cached_rank(
         return None
 
 
-# pylint: disable-next=too-many-return-statements
-def _is_forward(
+def _is_forward(  # noqa: PLR0911
     existing: ScenarioRankInfo,
     candidate: ScenarioRankInfo,
     allow_regression: bool = False,
@@ -991,8 +996,7 @@ def _notify_exhaustion(
     )
 
 
-# pylint: disable-next=too-many-arguments,too-many-positional-arguments
-def _run_attempt(
+def _run_attempt(  # noqa: PLR0913
     scenario_name: str,
     username: str,
     steam_id: str | None,
@@ -1045,7 +1049,7 @@ def _run_attempt(
                         rank_info,
                         leaderboard_total_cache_ttl_hours=0,
                     )
-                except Exception:  # pylint: disable=broad-exception-caught
+                except Exception:  # noqa: BLE001
                     logger.warning(
                         "Total refresh failed after fresh rank",
                         exc_info=True,
@@ -1065,7 +1069,7 @@ def _run_attempt(
             metadata_cache_ttl_hours,
             next_index,
         )
-    except Exception:  # pylint: disable=broad-exception-caught
+    except Exception:
         logger.exception("Unexpected error during rank refresh for %s", scenario_name)
         dash_logger.error(
             "Rank update for %s failed unexpectedly.",
@@ -1073,8 +1077,7 @@ def _run_attempt(
         )
 
 
-# pylint: disable-next=too-many-arguments,too-many-positional-arguments
-def _schedule_attempt(
+def _schedule_attempt(  # noqa: PLR0913
     scenario_name: str,
     username: str,
     steam_id: str | None,
@@ -1118,8 +1121,7 @@ def schedule_rank_freshness_refresh(
     )
 
 
-# pylint: disable-next=too-many-branches
-def get_scenario_rank_info(
+def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     scenario_name: str,
     username: str | None,
     steam_id: str | None = None,

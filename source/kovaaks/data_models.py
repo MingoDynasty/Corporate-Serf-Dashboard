@@ -31,17 +31,23 @@ class ScenarioStats:
 
 
 class Rank(BaseModel):
+    """Represent a playlist rank threshold and its display color."""
+
     name: str
     color: str
     threshold: float
 
 
 class Scenario(BaseModel):
+    """Represent a playlist scenario with optional rank thresholds."""
+
     name: str
     ranks: list[Rank] | None = None
 
 
 class PlaylistData(BaseModel):
+    """Represent imported playlist metadata and scenarios."""
+
     name: str
     code: str
     scenarios: list[Scenario]

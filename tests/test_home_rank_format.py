@@ -261,7 +261,6 @@ def test_allow_network_false_short_circuits_resolution_and_rank_fetch(monkeypatc
 
     def get_cached(scenario_name):
         cached_lookups.append(scenario_name)
-        return None
 
     def fail_network_path(*_args, **_kwargs):
         raise AssertionError("cache-only lookup reached a network path")

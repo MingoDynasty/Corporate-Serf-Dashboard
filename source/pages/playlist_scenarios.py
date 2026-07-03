@@ -122,6 +122,7 @@ TABLE_COLUMN_DEFS = [
     prevent_initial_call=True,
 )
 def route_to_selected_playlist(playlist_code, current_pathname):
+    """Navigate to a newly selected playlist without redundant routing."""
     if not playlist_code:
         return no_update
 
@@ -137,6 +138,7 @@ def route_to_selected_playlist(playlist_code, current_pathname):
     Input("playlist-scenarios-code", "data"),
 )
 def load_playlist_scenario_rows(playlist_code):
+    """Build sortable scenario rows for the selected imported playlist."""
     if not playlist_code:
         return [], "Select a playlist from the Playlists page."
 
@@ -169,6 +171,7 @@ clientside_callback(
 
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
+    """Build the per-playlist scenario table page."""
     # Keep the raw route code for error handling, but only pass the selector a
     # value that exists in its options list.
     playlist = get_playlist_by_code(playlist_code) if playlist_code else None

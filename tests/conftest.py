@@ -10,7 +10,7 @@ _CONFIG_PATH: Path | None = None
 def pytest_sessionstart(session: Any) -> None:
     """Install a deterministic config.toml for the test session."""
     del session
-    global _CONFIG_BACKUP, _CONFIG_PATH
+    global _CONFIG_BACKUP, _CONFIG_PATH  # noqa: PLW0603
 
     repo_root = Path(__file__).resolve().parents[1]
     config_path = repo_root / "config.toml"

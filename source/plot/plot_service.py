@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
+    """Add a labeled high-score line to a figure."""
     figure.add_hline(
         name="High Score",
         annotation_text=f"High Score ({format_decimal(high_score):.2f})",
@@ -27,6 +28,7 @@ def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
 
 
 def add_score_threshold_overlay(figure: go.Figure, score_threshold: float) -> go.Figure:
+    """Add a labeled score-threshold line to a figure."""
     figure.add_hline(
         name="Score Threshold",
         annotation_text=f"Score Threshold ({format_decimal(score_threshold):.2f})",
@@ -292,6 +294,7 @@ def generate_aim_training_journey_plot(
     journey_data: dict[str, dict[datetime, float]],
     aim_training_checkpoints: dict[datetime, int],
 ) -> go.Figure:
+    """Plot playlist progress over time with training-hour checkpoints."""
     figures = {}
 
     # loop through each playlist and data and build a line plot

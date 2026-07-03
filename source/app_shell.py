@@ -1,3 +1,5 @@
+"""Build the shared Dash application shell and navigation."""
+
 import logging
 
 import dash
@@ -128,6 +130,7 @@ def nav_link(label: str, href: str, icon: str) -> dcc.Link:
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
+    """Build the shared application shell around the active Dash page."""
     return dmc.MantineProvider(
         id="mantine-provider",
         defaultColorScheme="light",
@@ -222,6 +225,7 @@ def layout(**kwargs):  # noqa: ARG001
     State("appshell", "navbar"),
 )
 def toggle_navbar(opened, navbar):
+    """Synchronize the navbar's collapsed state with the burger control."""
     navbar["collapsed"] = {
         "mobile": not opened,
         "desktop": not opened,

@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field, field_validator
 
 
 class Scenario(BaseModel):
+    """Represent a scenario included in a playlist response."""
+
     author: str
     aimType: str
     playCount: int
@@ -18,6 +20,8 @@ class Scenario(BaseModel):
 
 
 class Playlist(BaseModel):
+    """Represent a playlist returned by KovaaK's."""
+
     playlistName: str
     subscribers: int
     scenarioList: list[Scenario]
@@ -33,6 +37,8 @@ class Playlist(BaseModel):
 
 
 class PlaylistAPIResponse(BaseModel):
+    """Represent a paginated playlist response."""
+
     page: int
     max: int
     total: int
@@ -41,12 +47,15 @@ class PlaylistAPIResponse(BaseModel):
     @field_validator("data", mode="before")
     @classmethod
     def ignore_null_playlist_items(cls, value):
+        """Discard null playlist entries before response validation."""
         if isinstance(value, list):
             return [item for item in value if item is not None]
         return value
 
 
 class BenchmarkScenario(BaseModel):
+    """Represent one scenario's progress in a benchmark."""
+
     score: int
     leaderboard_rank: None
     scenario_rank: int
@@ -55,6 +64,8 @@ class BenchmarkScenario(BaseModel):
 
 
 class Category(BaseModel):
+    """Represent a benchmark category and its scenario progress."""
+
     benchmark_progress: int
     category_rank: int
     rank_maxes: list[float]
@@ -62,6 +73,8 @@ class Category(BaseModel):
 
 
 class Rank(BaseModel):
+    """Represent a benchmark rank and its display assets."""
+
     icon: str
     name: str
     color: str
@@ -72,6 +85,8 @@ class Rank(BaseModel):
 
 
 class BenchmarksAPIResponse(BaseModel):
+    """Represent a player's benchmark progress response."""
+
     benchmark_progress: int
     overall_rank: int
     categories: dict[str, Category]
@@ -79,6 +94,8 @@ class BenchmarksAPIResponse(BaseModel):
 
 
 class Attributes(BaseModel):
+    """Represent optional run attributes attached to a leaderboard score."""
+
     # fov: int
     hash: str | None = None
     cm360: float | None = None
@@ -103,6 +120,8 @@ class Attributes(BaseModel):
 
 
 class RankingPlayer(BaseModel):
+    """Represent one player entry on a scenario leaderboard."""
+
     steamId: str
     score: float
     rank: int
@@ -114,6 +133,8 @@ class RankingPlayer(BaseModel):
 
 
 class LeaderboardAPIResponse(BaseModel):
+    """Represent a paginated scenario leaderboard response."""
+
     page: int
     max: int
     total: int
@@ -121,10 +142,14 @@ class LeaderboardAPIResponse(BaseModel):
 
 
 class UserScenarioCounts(BaseModel):
+    """Represent a user's play count for one scenario."""
+
     plays: int
 
 
 class UserScenarioTotalPlayItem(BaseModel):
+    """Represent one scenario in a user's total-play response."""
+
     leaderboardId: str
     scenarioName: str
     counts: UserScenarioCounts
@@ -133,6 +158,8 @@ class UserScenarioTotalPlayItem(BaseModel):
 
 
 class UserScenarioTotalPlayAPIResponse(BaseModel):
+    """Represent a paginated user total-play response."""
+
     page: int
     max: int
     total: int
@@ -140,21 +167,29 @@ class UserScenarioTotalPlayAPIResponse(BaseModel):
 
 
 class ScenarioSearchCounts(BaseModel):
+    """Represent aggregate counts for a scenario search result."""
+
     plays: int | None = None
     entries: int | None = None
 
 
 class ScenarioSearchDetails(BaseModel):
+    """Represent descriptive details for a scenario search result."""
+
     aimType: str | None = None
     authors: list[str] | None = None
     description: str | None = None
 
 
 class ScenarioSearchTopScore(BaseModel):
+    """Represent the top score attached to a scenario search result."""
+
     score: float | None = None
 
 
 class ScenarioSearchItem(BaseModel):
+    """Represent one scenario returned by exact-name search."""
+
     rank: int
     leaderboardId: int
     scenarioName: str
@@ -164,6 +199,8 @@ class ScenarioSearchItem(BaseModel):
 
 
 class ScenarioSearchAPIResponse(BaseModel):
+    """Represent a paginated scenario search response."""
+
     page: int
     max: int
     total: int
@@ -171,12 +208,16 @@ class ScenarioSearchAPIResponse(BaseModel):
 
 
 class ScenarioRankStatus(StrEnum):
+    """Describe whether current scenario rank data is available."""
+
     RANKED = "RANKED"
     UNRANKED = "UNRANKED"
     UNKNOWN = "UNKNOWN"
 
 
 class ScenarioRankInfo(BaseModel):
+    """Represent current rank information for a selected scenario."""
+
     status: ScenarioRankStatus
     rank: int | None = None
     leaderboard_id: int | None = None

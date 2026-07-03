@@ -1,3 +1,5 @@
+"""Send selected Python log records to Dash notification components."""
+
 import logging
 import uuid
 from collections.abc import Callable
