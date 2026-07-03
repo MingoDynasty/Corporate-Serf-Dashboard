@@ -13,7 +13,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 DOC_FILES = sorted(
     [
-        *(REPO_ROOT / "docs").glob("*.md"),
+        *(REPO_ROOT / "docs").rglob("*.md"),
         REPO_ROOT / "README.md",
         REPO_ROOT / "AGENTS.md",
         REPO_ROOT / "CLAUDE.md",
@@ -22,7 +22,11 @@ DOC_FILES = sorted(
 
 # Inline markdown links/images: [text](target) — captures the target up to
 # whitespace or the closing paren, which also handles optional "title" parts.
-LINK_PATTERN = re.compile(r"\]\(([^)\s]+)[^)]*\)")
+INLINE_LINK_PATTERN = re.compile(r"\]\(([^)\s]+)[^)]*\)")
+
+# Reference-style link definitions: `[id]: target` at the start of a line
+# (up to 3 leading spaces per CommonMark). Excludes footnotes (`[^1]: ...`).
+REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTILINE)
 
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
@@ -31,11 +35,12 @@ STATUS_SEARCH_LINES = 15
 def _relative_link_targets(doc: Path) -> list[str]:
     text = doc.read_text(encoding="utf-8")
     targets = []
-    for match in LINK_PATTERN.finditer(text):
-        target = match.group(1)
-        if urlparse(target).scheme or target.startswith(("#", "mailto:")):
-            continue
-        targets.append(target)
+    for pattern in (INLINE_LINK_PATTERN, REFERENCE_DEF_PATTERN):
+        for match in pattern.finditer(text):
+            target = match.group(1)
+            if urlparse(target).scheme or target.startswith(("#", "mailto:")):
+                continue
+            targets.append(target)
     return targets
 
 
@@ -53,7 +58,7 @@ def test_doc_relative_links_resolve():
 
 def test_proposal_docs_declare_status():
     missing = []
-    for doc in (REPO_ROOT / "docs").glob("*proposal*.md"):
+    for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
         lines = doc.read_text(encoding="utf-8").splitlines()[:STATUS_SEARCH_LINES]
         if not any(STATUS_PATTERN.search(line) for line in lines):
             missing.append(str(doc.relative_to(REPO_ROOT)))
