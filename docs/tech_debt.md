@@ -58,11 +58,10 @@ error would be friendlier.
 
 ## Tooling
 
-### Single-command quality gate, then CI
+### Single-command local quality gate
 
-The merge bar is four separate commands (ruff format/check, mypy, pytest). Add
-one entry point (task runner or script) and eventually enforce it in CI. The
-2026-07-03 ruff consolidation decision explicitly deferred this.
+CI now enforces the five-command merge bar. Add one local entry point (task
+runner or script) only if repeatedly typing the commands becomes burdensome.
 
 ## UI/UX
 

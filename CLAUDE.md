@@ -11,8 +11,10 @@ plots scenario scores. Python 3.14, dependencies managed with uv.
 - Types: `uv run mypy source`
 - Format: ruff (`uv run ruff format .`), line length 88
 
-There is no CI workflow — ruff format/check, mypy, and pytest are the local
-merge bar. Run all four checks before calling a change done or approving a PR.
+CI runs ruff format/check, mypy, compileall, and pytest on every pull request
+and push to `main`; `.github/workflows/gates.yml` is the executable merge bar.
+Run the same five checks locally first for the fastest feedback before calling
+a change done or approving a PR.
 
 ## Layout
 - `source/` — application code. See `docs/architecture.md` for the module map
