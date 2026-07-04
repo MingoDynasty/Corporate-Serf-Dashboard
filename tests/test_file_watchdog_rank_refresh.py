@@ -110,6 +110,37 @@ def test_on_created_schedules_score_aware_refresh_for_all_pb_paths(
     ]
 
 
+def test_on_created_parses_absolute_source_path_outside_stats_dir(
+    tmp_path,
+    monkeypatch,
+):
+    run_data = _run_data()
+    messages, loads, _schedules = _patch_common(monkeypatch, run_data)
+    stats_dir = (tmp_path / "stats").resolve()
+    source_path = (tmp_path / "outside-stats" / "run.csv").resolve()
+    parsed_paths = []
+
+    monkeypatch.setattr(file_watchdog.config, "stats_dir", str(stats_dir))
+    monkeypatch.setattr(
+        file_watchdog,
+        "extract_data_from_file",
+        lambda path: parsed_paths.append(path) or run_data,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: False,
+    )
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path=str(source_path))
+    )
+
+    assert parsed_paths == [str(source_path)]
+    assert len(messages) == 1
+    assert loads == [str(source_path)]
+
+
 def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     run_data = _run_data(score=80.0)
     messages, loads, schedules = _patch_common(monkeypatch, run_data)
