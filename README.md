@@ -2,8 +2,24 @@
 
 The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
 
-This app scans your Kovaak's Stats directory, and builds a plot of the given scenario, plotting Sensitivity vs Score. As
-you keep playing and generating new scores, the plot will automatically update in the background.
+This app watches your KovaaK's stats directory and turns your runs into training insight. As you keep
+playing and generating new scores, the home page's plots, stats, and notifications update
+automatically in the background.
+
+## Features
+
+- **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
+  high-score, score-threshold, and benchmark-rank overlays.
+- **Run notifications** — toasts as each run lands: top-N placements for the current scenario, and
+  score-threshold pass/fail against your high score.
+- **Leaderboard standing** — your global rank and percentile for the selected scenario, e.g.
+  `Rank: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
+  personal best and a manual Refresh button for when the leaderboard lags.
+- **Playlist scenarios table** — every scenario in a playlist with rank, percentile, last played,
+  runs, high score, and personal-best stats; sort by percentile to build a training priority list.
+
+The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
+[docs/roadmap.md](docs/roadmap.md).
 
 ## Tech Stack
 
@@ -17,8 +33,12 @@ you keep playing and generating new scores, the plot will automatically update i
 ## First Time Setup
 
 1. Make a copy of the `example.toml`. Name the new file `config.toml`.
-2. Inside `config.toml`, update the `stats_dir` variable to point to your Kovaak's stats file directory.
-3. Feel free to change any other settings inside the TOML file, or leave them at their defaults.
+2. Inside `config.toml`, update the `stats_dir` variable to point to your KovaaK's stats file directory.
+3. To enable the leaderboard rank features, set `kovaaks_username` (and optionally `steam_id`, which
+   makes player matching exact when usernames are ambiguous). Leave `kovaaks_username` empty to run
+   fully offline.
+4. Feel free to change any other settings inside the TOML file, or leave them at their defaults. If
+   something on your machine already uses port 8080 (Steam, for example), change `port`.
 
 ## Usage
 
@@ -29,7 +49,7 @@ uv sync
 uv run python source/app.py
 ```
 
-Step 2: Open a browser and navigate to: <http://localhost:8080/>
+Step 2: Open a browser and navigate to: <http://localhost:8080/> (or your configured port).
 
 ## Example
 
@@ -39,15 +59,14 @@ Step 2: Open a browser and navigate to: <http://localhost:8080/>
 
 In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
 the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
-common benchmarks. These files are in `ressources/playlists/generated`. If you wish to include a specific benchmark into
+common benchmarks. These files are in `resources/playlists/generated`. If you wish to include a specific benchmark into
 the app, then simply copy the desired JSON file from `resources/playlists/generated` to `resources/playlists`. Then
 restart the app.
 
 ## Import Playlist
 
-In the `Settings` modal, there is an option to import a playlist via share code. This is the only part of the app that
-requires an internet connection, as the app queries the KovaaK's API with your input share code to retrieve the playlist
-data.
+In the `Settings` modal, there is an option to import a playlist via share code. The app queries the
+KovaaK's API with your input share code to retrieve the playlist data.
 
 Note that by importing playlists this way, the playlist will not include rank data. If you want to include rank data for
 the rank overlays, then see the **Rank Data** section.
