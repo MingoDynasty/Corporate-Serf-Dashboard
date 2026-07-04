@@ -18,13 +18,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Code Smells
 
-### Redundant path join in the watchdog handler
-
-`source/my_watchdog/file_watchdog.py` builds `Path(config.stats_dir, file)`
-where `file` is already the absolute `event.src_path` from watchdog. It works
-only because pathlib discards the base when the second argument is absolute.
-Pass `file` directly.
-
 ### Mixed naive/aware datetime usage in `_is_cache_fresh`
 
 `source/kovaaks/api_service.py::_is_cache_fresh` uses naive datetimes (`datetime.fromtimestamp(...)` and `datetime.now()`) for the TTL comparison, while elsewhere in the same file we use timezone-aware `datetime.now(UTC)` for serialization.

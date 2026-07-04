@@ -76,7 +76,7 @@ class NewFileHandler(FileSystemEventHandler):
             return
 
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
-        run_data = extract_data_from_file(str(Path(config.stats_dir, file)))
+        run_data = extract_data_from_file(file)
         if not run_data:
             logger.warning("Failed to get run data for CSV file: %s", file)
             return
