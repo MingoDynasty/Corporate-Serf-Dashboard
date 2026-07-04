@@ -26,24 +26,63 @@ Threads at runtime:
 
 ## Runtime data flow
 
+Two halves of one flow, split for readability; the `message_queue`,
+`data_service` stores, and JSON cache nodes are the shared state where they
+meet. Each arrow is an action performed by its source node.
+
+Ingest — the watchdog side (writes):
+
+```mermaid
+flowchart TD
+    Game["KovaaK's writes a new run CSV into stats_dir"]
+
+    subgraph Watchdog["Watchdog observer thread"]
+        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>classify the score"]
+    end
+
+    subgraph Timers["Rank-freshness timer chain (daemon threading.Timer)"]
+        Attempt["_run_attempt (api_service.py)<br/>resolve leaderboard id, fetch rank,<br/>retry on the next Timer<br/>until the board shows the score"]
+    end
+
+    Queue[["message_queue (deque of NewFileMessage)"]]
+    Stores[("data_service module-global stores<br/>kovaaks_database, run_database,<br/>playlist_database")]
+    Cache[("JSON cache under cache/<br/>rank, leaderboard, benchmark data")]
+    API["KovaaK's HTTP API"]
+
+    Game --> Handler
+    Handler -->|"1. appends NewFileMessage"| Queue
+    Handler -->|"2. loads the run"| Stores
+    Handler -->|"3. new high score: schedules"| Attempt
+    Attempt -->|"polls, bounded attempts"| API
+    Attempt -->|"fresh: monotonic rank write"| Cache
 ```
-KovaaK's writes a new "<scenario> ... .csv" into stats_dir
-      |  (watchdog observer thread)
-      v
-NewFileHandler  (my_watchdog/file_watchdog.py)
-  - extract_data_from_file       parse the CSV -> RunData, classify the score
-  - message_queue.append(...)    enqueue a NewFileMessage (UI notification)
-  - load_csv_file_into_database  load the run into the in-memory stores
-  - if new high score and kovaaks_username is set:
-        schedule_rank_freshness_refresh(...)  -> Timer chain updates rank cache
-      |
-      v  (server thread; a dcc.Interval on the home page polls each tick)
-home.py callbacks
-  - check_for_new_data  peeks message_queue, may auto-switch scenario
-  - generate_graph      popleft()s the message, rebuilds the plot via plot_service
-  - get_scenario_rank   reads ScenarioRankInfo from api_service; interval-only
-                        calls are cache-only and surface Timer writes within ~1s
-  - refresh_rank        performs one authoritative fetch when the user clicks Refresh
+
+UI — the server side (pull-based reads):
+
+```mermaid
+flowchart TD
+    subgraph Server["Server threads (Waitress or Flask, home.py callbacks)"]
+        Tick["dcc.Interval tick"]
+        Check["check_for_new_data<br/>may auto-switch scenario"]
+        Graph["generate_graph<br/>rebuilds the plot via plot_service"]
+        Rank["get_scenario_rank<br/>interval-only calls are cache-only and<br/>surface Timer writes within ~1s"]
+        Refresh["refresh_rank<br/>runs when the user clicks Refresh"]
+        Tick --> Check
+        Check -->|"do_update"| Graph
+        Tick --> Rank
+    end
+
+    Queue[["message_queue (deque of NewFileMessage)"]]
+    Stores[("data_service module-global stores")]
+    Cache[("JSON cache under cache/")]
+    API["KovaaK's HTTP API"]
+
+    Check -->|"peeks"| Queue
+    Graph -->|"poplefts the message"| Queue
+    Graph -->|"reads runs"| Stores
+    Rank -->|"reads via get_scenario_rank_info"| Cache
+    Refresh -->|"authoritative fetch"| API
+    Refresh -->|"monotonic rank write"| Cache
 ```
 
 The watchdog and UI share two channels: `message_queue` (a `deque`) carries
@@ -66,6 +105,62 @@ UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
 
 ## Module map
+
+Import dependencies between the main modules. `config/config_service.py` and
+`utilities/` are imported nearly everywhere and are omitted; the subsections
+below carry the per-module detail.
+
+```mermaid
+flowchart LR
+    subgraph Entry["Entry & shell"]
+        App["app.py"]
+        Shell["app_shell.py"]
+    end
+
+    subgraph Pages["Pages (source/pages/)"]
+        Home["home.py"]
+        Playlists["playlists.py"]
+        PlaylistScenarios["playlist_scenarios.py"]
+        Journey["aim_training_journey.py"]
+        Components["playlist_components.py"]
+    end
+
+    subgraph Services["Domain & plotting services"]
+        DataService["kovaaks/<br/>data_service.py"]
+        ApiService["kovaaks/<br/>api_service.py"]
+        PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
+        PlotService["plot/<br/>plot_service.py"]
+    end
+
+    subgraph Infra["Infrastructure"]
+        FileWatchdog["my_watchdog/<br/>file_watchdog.py"]
+        Queue["my_queue/<br/>message_queue.py"]
+    end
+
+    App --> Shell
+    App --> DataService
+    App --> FileWatchdog
+
+    Home --> DataService
+    Home --> ApiService
+    Home --> PlotService
+    Home --> Queue
+    Playlists --> Components
+    PlaylistScenarios --> Components
+    PlaylistScenarios --> DataService
+    PlaylistScenarios --> PlaylistService
+    Components --> DataService
+    Journey --> DataService
+    Journey --> PlotService
+
+    PlaylistService --> DataService
+    PlaylistService --> ApiService
+    DataService --> ApiService
+
+    FileWatchdog --> DataService
+    FileWatchdog --> ApiService
+    FileWatchdog --> Queue
+```
 
 ### Entry & shell
 - `source/app.py` — entry point (`main`): wiring described above.
