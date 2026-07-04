@@ -55,12 +55,6 @@ decisions, and notification composition. Extract pure functions (filter
 parsing, graph data preparation, notification derivation) to make them
 independently testable.
 
-### Observer shutdown not exception-safe in `main()`
-
-`source/app.py::main` calls `observer.stop()`/`observer.join()` after
-`serve(...)` returns; an exception while serving skips them. Wrap in
-`try/finally`.
-
 ### Import-time config load hard-fails
 
 `source/config/config_service.py` runs `config = load_config()` at module
