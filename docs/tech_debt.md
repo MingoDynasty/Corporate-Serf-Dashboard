@@ -18,6 +18,13 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Code Smells
 
+### Redundant path join in the watchdog handler
+
+`source/my_watchdog/file_watchdog.py` builds `Path(config.stats_dir, file)`
+where `file` is already the absolute `event.src_path` from watchdog. It works
+only because pathlib discards the base when the second argument is absolute.
+Pass `file` directly.
+
 ### Mixed naive/aware datetime usage in `_is_cache_fresh`
 
 `source/kovaaks/api_service.py::_is_cache_fresh` uses naive datetimes (`datetime.fromtimestamp(...)` and `datetime.now()`) for the TTL comparison, while elsewhere in the same file we use timezone-aware `datetime.now(UTC)` for serialization.
@@ -32,6 +39,50 @@ Both work in their respective contexts, but the inconsistency is a small surface
 
 Low priority: runs are processed one at a time and the data sets are not large enough for the current approach to be a performance problem.
 
+### Unsynchronized shared in-memory stores
+
+The watchdog observer thread writes `kovaaks_database` and `run_database`
+(module globals in `source/kovaaks/data_service.py`) while Dash callbacks read
+them from server threads, with no lock. `message_queue` is a `deque` (its
+append/popleft are atomic), but the stores themselves have no synchronization.
+Fine in practice for a single local user; worth a lock or a serialized writer
+if corruption is ever observed or the write paths grow.
+
+### Duplicated plot-building logic
+
+`generate_sensitivity_plot` and `generate_time_plot` in
+`source/plot/plot_service.py` share most of their structure (empty-data guard,
+scatter+line traces, hover templates, legend setup, rank overlays). A shared
+helper taking axis descriptors would remove the duplication.
+
+### Decompose large home-page callbacks
+
+`source/pages/home.py` callbacks mix UI wiring, query orchestration, plotting
+decisions, and notification composition. Extract pure functions (filter
+parsing, graph data preparation, notification derivation) to make them
+independently testable.
+
+### Observer shutdown not exception-safe in `main()`
+
+`source/app.py::main` calls `observer.stop()`/`observer.join()` after
+`serve(...)` returns; an exception while serving skips them. Wrap in
+`try/finally`.
+
+### Import-time config load hard-fails
+
+`source/config/config_service.py` runs `config = load_config()` at module
+import, so a missing/invalid `config.toml` dies with a raw traceback during
+import. Loading at startup with a clear "copy example.toml to config.toml"
+error would be friendlier.
+
+## Tooling
+
+### Single-command quality gate, then CI
+
+The merge bar is four separate commands (ruff format/check, mypy, pytest). Add
+one entry point (task runner or script) and eventually enforce it in CI. The
+2026-07-03 ruff consolidation decision explicitly deferred this.
+
 ## UI/UX
 
 ### Audit static inline styles
@@ -42,7 +93,7 @@ Scan `source/` for static inline style dictionaries that would be clearer as sem
 
 `source/pages/home.py` previously had a bug where the rank callback short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.
 
-When building new UI features that consume `get_scenario_rank_info(...)`, such as the M1 playlist scenarios table, grep for similar "is this in the local database" guards and confirm they do not inadvertently block lookups for unplayed scenarios.
+When building new UI features that consume `get_scenario_rank_info(...)`, grep for similar "is this in the local database" guards and confirm they do not inadvertently block lookups for unplayed scenarios.
 
 This is not a current bug; it is a code-pattern reminder so the same mistake does not recur.
 

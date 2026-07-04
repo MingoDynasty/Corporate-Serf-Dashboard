@@ -1,7 +1,8 @@
 # Run History Proposal
 
-> **Status:** deliberately high-level. This is expected to ship *after*
-> roadmap milestones 1 and 2, so its ship date is far out. The app will
+> **Status:** Future — deliberately high-level. This is expected to ship
+> *after* the playlist-level overview milestone, so its ship date is far
+> out. The app will
 > likely change materially before then; the navigation/UI surface below is
 > intentionally left open and should be revisited at build time. Only the
 > durable data-model and sequencing decisions are meant to survive that long.
@@ -70,9 +71,10 @@ capture is required.
   choice is between one consolidated Run History page hosting both views, and a
   per-scenario history panel on the home page (contextual to the selected
   scenario) plus a separate current-session page. Trade-off is context vs
-  consolidation. This overlaps the roadmap's existing "two pages vs one
-  combined page" question for milestones 1 and 2 and should be settled as part
-  of the app's overall navigation story, once, rather than piecemeal.
+  consolidation. The analogous question for the playlists feature was settled
+  as two pages with drill-down (see the 2026-07-03 "Playlists Routes Are
+  Stable" decision-log entry); settle this one as part of the app's overall
+  navigation story, once, rather than piecemeal.
 - **Columns per view.** Straw man: time, score, % of PB, delta vs previous
   run, accuracy, threshold pass. `accuracy` / `damage_accuracy` are barely
   surfaced today and this is their natural home.

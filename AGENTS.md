@@ -33,13 +33,30 @@ Codex <codex@local>
 ## Documentation Habits
 
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
-- Use proposal docs, such as `docs/scenario_rank_proposal.md`, for active feature design.
+- Use proposal docs under `docs/` for feature design that is in flight or
+  planned. Every proposal starts with a `Status:` line near the top
+  (`Proposed`, `In progress`, `Future`, ...) so a reader can tell live work
+  from stale files at a glance.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Do not log every small implementation choice as a decision.
 - When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
 - When fixing a bug, add or update a regression test unless there is a clear reason not to; explain the exception in the handoff.
+
+### Shipping a proposal (docs definition of done)
+
+The PR that ships (or finishes shipping) a proposal must also tidy the docs,
+in the same PR — do not leave it for later:
+
+1. Distill the proposal's durable decisions into `docs/decision_log.md`.
+2. Delete the proposal file (git history preserves the full text).
+3. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers;
+   promote what's next.
+4. Remove any `docs/tech_debt.md` entries the change fixed.
+5. Fix references to the deleted file (`rg` for the filename). The docs test
+   in `tests/test_docs.py` fails on dangling relative links, so a stale
+   reference breaks the pytest gate.
 
 ## Testing Philosophy
 
@@ -59,7 +76,8 @@ Codex <codex@local>
 
 ## Scenario Rank Feature
 
-The source of truth for detailed design is `docs/scenario_rank_proposal.md`.
+The design rationale lives in `docs/decision_log.md` (the 2026-04-27 through
+2026-07-01 scenario-rank entries); runtime structure in `docs/architecture.md`.
 Endpoint behavior and quirks are tracked in `docs/kovaaks_api_notes.md`.
 
 Current agreed behavior:

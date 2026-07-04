@@ -18,44 +18,35 @@ keeps farther-out work as brief mentions until they're up next.
 
 ## Shipped
 
+Design rationale for shipped work lives in
+[`decision_log.md`](./decision_log.md); runtime structure in
+[`architecture.md`](./architecture.md).
+
 - **Scenario rank lookup** — current rank fetched from the live leaderboard,
   with Steam ID identity matching, background refresh on new high scores, and
   thread-safe cache I/O. (PR #8)
 - **Leaderboard total and percentile** — display extends to
   `Rank: 11,290 of 63,892 (82.33% Percentile)` using KovaaK's midpoint
   formula. (PRs #9, #10)
-
-For design details, see
-[`scenario_rank_proposal.md`](./scenario_rank_proposal.md).
+- **Playlist scenarios overview** (was milestone 1) — sortable per-playlist
+  table at `/playlists/{playlistCode}`: rank, total, percentile, last played,
+  runs, high score, and PB cm/360 + accuracy for every scenario in the
+  playlist. (PRs #12, #15, #16, on retry groundwork from #11)
+- **Relative "last played" timestamps** — humanized staleness display with
+  exact-time tooltips, live-ticking on home and the playlist grid.
+  (PRs #17, #19, #23)
+- **Score-aware rank refreshes** — bounded post-PB polling until the
+  leaderboard catches up, monotonic cache writes, manual Refresh escape
+  hatch. (PRs #38, #40)
+- **Benchmark importer** — script that resolves playlists via Evxl and rank
+  thresholds via KovaaK's into reviewable generated benchmark files with
+  provenance stamps. (PRs #45–#48)
 
 ---
 
 ## Upcoming milestones
 
-### 1. Playlist scenarios overview
-
-**What:** A table view of every scenario in a selected playlist, showing each
-scenario's rank, percentile, last-played date, run count, and high score at a
-glance — without having to click through scenarios one at a time.
-
-**Why:** Today, players have to cycle through the scenario dropdown one by
-one to see how they're doing on each. This makes it hard to see the forest
-for the trees. A table lets them spot weak scenarios at a glance, sort by
-percentile to surface training priorities, and see which scenarios have gone
-stale.
-
-The headline use case:
-
-> *"Show me the scenarios where I'm worst, sorted ascending. That's my
-> training priority list."*
-
-This is a session-planning tool — checked at the start of every training
-session — which is why it's prioritized despite being the largest engineering
-effort on the horizon.
-
----
-
-### 2. Playlist-level overview and stats
+### 1. Playlist-level overview and stats
 
 **What:** A higher-level view of all imported playlists with aggregate stats —
 average percentile, last-played date, total runs — and a way to drill into
@@ -69,14 +60,12 @@ summary of which playlists are getting attention versus which are
 languishing.
 
 **Decided:** Lives as new dashboard real estate, not folded into an existing
-page (home, Aim Training Journey).
-
-**Open question:** Whether to ship milestones 1 and 2 as **two separate Dash
-pages** (with drill-down navigation) or as **one combined page** with the
-playlist-level overview on top and the per-scenario table revealed by
-selecting a playlist. Either is viable; the choice affects layout, routing,
-and how the URL reflects state. Worth resolving before milestone 1 ships,
-since whichever decision is made shapes the milestone 1 entry point.
+page (home, Aim Training Journey). Ships as its own page replacing the
+transitional selector content at `/playlists`; overview rows link to the
+existing per-playlist table, and the selector dropdowns are then removed.
+See the 2026-07-03 "Playlists Routes Are Stable" entry in
+[`decision_log.md`](./decision_log.md) for the route contract and the
+removal checklist.
 
 ---
 
@@ -102,8 +91,8 @@ expanded into its own roadmap entry when it becomes the next thing up.
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start
   vs warmed-up comparisons). Gap-based *sessions* are a later quality-of-life
-  layer on top. Sequenced after milestones 1 and 2; supersedes the interim
-  console-log stopgap in `file_watchdog.py`. See
+  layer on top. Sequenced after the playlist-level overview milestone;
+  supersedes the interim console-log stopgap in `file_watchdog.py`. See
   [`run_history_proposal.md`](./run_history_proposal.md).
 
 ---

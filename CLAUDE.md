@@ -23,5 +23,7 @@ merge bar. Run all four checks before calling a change done or approving a PR.
 - `docs/` — living docs (architecture, `decision_log.md`) plus proposals for
   in-flight work. One file per proposal (git is the version history — no
   `_v2`/`_v3` filename suffixes); when a proposal ships, distill it into a
-  `decision_log.md` entry and delete the file. Review handoff docs are
-  ephemeral and never land on main (see the `/pr-review` skill).
+  `decision_log.md` entry and delete the file **in the shipping PR** — full
+  checklist in AGENTS.md "Shipping a proposal". `tests/test_docs.py` enforces
+  proposal `Status:` lines and fails on dangling doc links. Review handoff
+  docs are ephemeral and never land on main (see the `/pr-review` skill).
