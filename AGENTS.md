@@ -53,8 +53,11 @@ in the same PR — do not leave it for later:
 2. Delete the proposal file (git history preserves the full text).
 3. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers;
    promote what's next.
-4. Remove any `docs/tech_debt.md` entries the change fixed.
-5. Fix references to the deleted file (`rg` for the filename). The docs test
+4. Add the feature's user-facing rationale — the problem it solves — to the
+   inventory in `docs/product.md` (the product counterpart to step 1's
+   technical distillation).
+5. Remove any `docs/tech_debt.md` entries the change fixed.
+6. Fix references to the deleted file (`rg` for the filename). The docs test
    in `tests/test_docs.py` fails on dangling relative links, so a stale
    reference breaks the pytest gate.
 

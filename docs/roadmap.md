@@ -12,7 +12,10 @@ data into answers to the questions players actually ask themselves:
 > *Am I improving? Where am I weak? What should I work on next?*
 
 This roadmap is intentionally short-horizon. It focuses on what's next and
-keeps farther-out work as brief mentions until they're up next.
+keeps farther-out work as brief mentions until they're up next. The durable
+"what does the app do and why" record — including the rationale for features
+after they ship and leave this file — lives in
+[`product.md`](./product.md).
 
 ---
 
