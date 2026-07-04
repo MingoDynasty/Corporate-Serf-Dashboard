@@ -82,7 +82,7 @@ flowchart TD
     Graph -->|"reads runs"| Stores
     Rank -->|"reads via get_scenario_rank_info"| Cache
     Refresh -->|"authoritative fetch"| API
-    Refresh -->|"monotonic rank write"| Cache
+    Refresh -->|"authoritative rank write"| Cache
 ```
 
 The watchdog and UI share two channels: `message_queue` (a `deque`) carries
