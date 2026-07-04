@@ -83,14 +83,7 @@ This is not a current bug; it is a code-pattern reminder so the same mistake doe
 
 ## Documentation
 
-### Refresh stale visual docs (system diagram, example screenshot)
+### Refresh stale example screenshot
 
-Two visual artifacts predate most of the app and are deliberately kept until
-replaced — do not delete them as stale:
-
-- `docs/system diagram/` (2025-09-07) — not incorrect, just missing the rank
-  pipeline, playlists pages, and benchmark importer. Replace with an updated
-  diagram; candidate approach is a Mermaid diagram in `architecture.md` so
-  agents can keep it current as text.
-- `docs/example.png` — README screenshot from before the rank UI. Recapture
-  next time the app is running with real data.
+`docs/example.png` — README screenshot from before the rank UI, deliberately
+kept until replaced. Recapture next time the app is running with real data.
