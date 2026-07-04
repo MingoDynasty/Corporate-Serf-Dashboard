@@ -39,6 +39,9 @@ Codex <codex@local>
   from stale files at a glance.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
+- Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
+  samples) goes under `ignore/` in a categorized subdirectory, never loose at
+  the top level — routing table in [ignore/README.md](ignore/README.md).
 - Do not log every small implementation choice as a decision.
 - When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.

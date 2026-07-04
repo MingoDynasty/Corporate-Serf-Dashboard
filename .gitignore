@@ -511,6 +511,9 @@ __marimo__/
 config.toml
 cache/
 data/
-ignore/
+# Scratch dir: contents ignored, but the routing README is tracked
+# (a file can't be re-included under an excluded directory, hence /*)
+ignore/*
+!ignore/README.md
 scripts/benchmark_importer/generated/
 .claude/
