@@ -22,6 +22,10 @@ uv run mypy source
 uv run python -m compileall source tests
 ```
 
+- CI runs the same merge bar from `.github/workflows/gates.yml` on every pull
+  request and push to `main`. Pre-handoff local validation is unchanged and
+  remains the fast feedback path.
+
 - Local commits authored by Codex should use:
 
 ```text
