@@ -8,19 +8,15 @@ ordered by severity within each section. This is a point-in-time review doc;
 per repo convention, distill whatever ships into `decision_log.md` and delete
 this file.
 
-## P0 — the app does not start
+## Environment note (not a finding)
 
-`source/kovaaks/api_service.py` contained three Python-2-style exception
-clauses (`except TypeError, ValueError:`) at lines 99, 102, 266 and 888. This
-is a `SyntaxError` on every Python 3 version: `python source/app.py` dies at
-import time, pytest cannot collect, and `ruff check` reports E999. Fixed in
-this branch by parenthesizing the tuples. With the fix, all 199 tests and
-`ruff check` pass.
-
-Takeaway beyond the fix itself: nothing in the merge bar ran before this
-landed on main. A minimal CI workflow (ruff format/check + pytest) would have
-caught it — worth the ~20 lines of GitHub Actions YAML even for a solo
-project.
+The audit sandbox could not download Python 3.14 (its network proxy blocked
+the interpreter download), so the app was run on Python 3.11 with the four
+unparenthesized `except A, B:` clauses in `api_service.py` temporarily
+parenthesized — that form is PEP 758 syntax, valid only on 3.14+, which this
+project correctly pins. No code change was needed or kept; the README's run
+instructions are accurate on the pinned interpreter. All 199 tests and
+`ruff check` passed in the audit environment.
 
 ## Navigation & information architecture
 
