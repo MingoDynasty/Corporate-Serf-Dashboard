@@ -48,16 +48,20 @@ list in the roadmap.)
 
 ### Standing: where do I rank
 
-- **Scenario rank and percentile** (PRs #8–#10). The home page shows the live
-  global leaderboard position for the selected scenario —
-  `Rank: 11,290 of 63,892 (82.33% Percentile)`. *Problem solved:* raw scores
-  aren't comparable across scenarios, but percentile is; it turns "804.2" into
-  "top 18%," which is the number a player actually reasons with.
+- **Scenario rank and percentile** (PRs #8–#10). The home page shows your
+  global leaderboard standing for the selected scenario —
+  `Rank: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
+  (one-week TTL) and refetched when a selection finds it stale, after a new
+  personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
+  across scenarios, but percentile is; it turns "804.2" into "top 18%," which
+  is the number a player actually reasons with.
 - **Score-aware rank refreshes** (PRs #38, #40). After a new personal best,
-  the app polls until the leaderboard reflects the new score, never regressing
-  the display; a manual Refresh exists as the authoritative escape hatch.
-  *Problem solved:* trust — a rank display that lags your own PB for a week
-  undermines the whole feature.
+  the app polls the leaderboard in a bounded backoff (five attempts over
+  about a minute) waiting for it to catch up, never regressing the display.
+  If the leaderboard still lags when the attempts are exhausted, the cached
+  value stays put and the manual Refresh button is the authoritative escape
+  hatch. *Problem solved:* trust — a rank display that lags your own PB for
+  a week undermines the whole feature.
 
 ### Planning: what should I train
 
