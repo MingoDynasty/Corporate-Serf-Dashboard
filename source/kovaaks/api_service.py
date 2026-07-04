@@ -254,8 +254,8 @@ def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
     if ttl_hours <= 0 or not os.path.exists(cache_file):
         return False
 
-    modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime)
-    return datetime.now() - modified_at < timedelta(hours=ttl_hours)
+    modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime, UTC)
+    return datetime.now(UTC) - modified_at < timedelta(hours=ttl_hours)
 
 
 def _read_json(cache_file: Path) -> dict | list | None:

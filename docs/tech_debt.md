@@ -18,12 +18,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Code Smells
 
-### Mixed naive/aware datetime usage in `_is_cache_fresh`
-
-`source/kovaaks/api_service.py::_is_cache_fresh` uses naive datetimes (`datetime.fromtimestamp(...)` and `datetime.now()`) for the TTL comparison, while elsewhere in the same file we use timezone-aware `datetime.now(UTC)` for serialization.
-
-Both work in their respective contexts, but the inconsistency is a small surface area for future bugs if someone unfamiliar refactors one side. Normalize on `datetime.now(UTC)` and `datetime.fromtimestamp(..., UTC)` for consistency.
-
 ## Refactors
 
 ### Linear search to binary search for nth-place score
