@@ -96,10 +96,10 @@ def _retry_after_seconds(response: requests.Response) -> float:
     if raw_retry_after:
         try:
             delay_seconds = float(raw_retry_after)
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             try:
                 retry_at = parsedate_to_datetime(raw_retry_after)
-            except (TypeError, ValueError, IndexError, OverflowError):
+            except TypeError, ValueError, IndexError, OverflowError:
                 delay_seconds = DEFAULT_RETRY_AFTER_SECONDS
             else:
                 if retry_at.tzinfo is None:
@@ -263,7 +263,7 @@ def _read_json(cache_file: Path) -> dict | list | None:
         try:
             with open(cache_file, encoding="utf-8") as file:
                 return json.load(file)
-        except (OSError, json.JSONDecodeError):
+        except OSError, json.JSONDecodeError:
             logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
             return None
 
@@ -885,7 +885,7 @@ def _with_leaderboard_total(
             request_exception_summary(exc),
         )
         return rank_info
-    except (ValidationError, OSError, ValueError):
+    except ValidationError, OSError, ValueError:
         logger.warning(
             "Failed to process leaderboard total for %s",
             rank_info.leaderboard_id,
