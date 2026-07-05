@@ -49,12 +49,12 @@ decisions, and notification composition. Extract pure functions (filter
 parsing, graph data preparation, notification derivation) to make them
 independently testable.
 
-### Import-time config load hard-fails
+### Config still loads at import time
 
 `source/config/config_service.py` runs `config = load_config()` at module
-import, so a missing/invalid `config.toml` dies with a raw traceback during
-import. Loading at startup with a clear "copy example.toml to config.toml"
-error would be friendlier.
+import. Missing or invalid config now exits with a concise setup instruction,
+but loading config explicitly inside the application startup path would avoid
+module-import side effects and make startup easier to test.
 
 ## Tooling
 
