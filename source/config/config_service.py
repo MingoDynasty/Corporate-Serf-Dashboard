@@ -2,11 +2,16 @@
 Manages the config file for the app, and shares that data to all other modules.
 """
 
+import sys
 import tomllib
 
+from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 
 CONFIG_FILE = "config.toml"
+CONFIG_ERROR_MESSAGE = (
+    "Configuration error: copy example.toml to config.toml and set stats_dir."
+)
 
 
 @dataclass()
@@ -32,4 +37,8 @@ def load_config() -> ConfigData:
     return ConfigData(**config_dict)
 
 
-config = load_config()
+try:
+    config = load_config()
+except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
+    print(CONFIG_ERROR_MESSAGE, file=sys.stderr)
+    raise SystemExit(1) from None
