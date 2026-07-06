@@ -29,7 +29,7 @@ Design rationale for shipped work lives in
   with Steam ID identity matching, background refresh on new high scores, and
   thread-safe cache I/O. (PR #8)
 - **Leaderboard total and percentile** — display extends to
-  `Rank: 11,290 of 63,892 (82.33% Percentile)` using KovaaK's midpoint
+  `Position: 11,290 of 63,892 (82.33% Percentile)` using KovaaK's midpoint
   formula. (PRs #9, #10)
 - **Playlist scenarios overview** (was milestone 1) — sortable per-playlist
   table at `/playlists/{playlistCode}`: rank, total, percentile, last played,

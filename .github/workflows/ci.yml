@@ -1,0 +1,36 @@
+# tooling-spec: python-v2
+name: CI
+
+on:
+    pull_request:
+    push:
+        branches: [main]
+
+permissions:
+    contents: read
+
+jobs:
+    test:
+        strategy:
+            fail-fast: false
+            matrix:
+                # the one sanctioned per-repo knob: repos may extend this list
+                os: [windows-latest]
+        runs-on: ${{ matrix.os }}
+        env:
+            UV_NO_SYNC: '1'
+        steps:
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+            - uses: astral-sh/setup-uv@fac544c07dec837d0ccb6301d7b5580bf5edae39 # v8.2.0
+              with:
+                  enable-cache: false
+            - name: Install dependencies
+              run: uv sync --locked
+            - name: Format check
+              run: uv run ruff format --check .
+            - name: Lint
+              run: uv run ruff check .
+            - name: Type check
+              run: uv run mypy
+            - name: Run tests
+              run: uv run pytest
