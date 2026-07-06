@@ -138,7 +138,7 @@ def test_format_scenario_rank_unranked_with_total_players():
         total_players=63870,
     )
 
-    assert format_scenario_rank(rank_info) == "Unranked (63,870 ranked)"
+    assert format_scenario_rank(rank_info) == "Unranked (63,870 players)"
 
 
 def test_format_scenario_rank_unranked_and_unknown():
@@ -169,7 +169,7 @@ def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypat
     monkeypatch.setattr(home, "get_scenario_rank_info", fake_get_scenario_rank_info)
 
     assert home._render_scenario_rank("Unplayed Scenario", allow_network=True) == (
-        "Unranked (54,702 ranked)"
+        "Unranked (54,702 players)"
     )
     assert queried_scenarios == [("Unplayed Scenario", True)]
 

@@ -1480,7 +1480,7 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     assert rank_info.leaderboard_id == 98330
     assert (
         rank_info.error_message
-        == "Failed to fetch scenario rank for VT Pasu Intermediate S5."
+        == "Failed to fetch leaderboard position for VT Pasu Intermediate S5."
     )
 
     rank_cache_file = (

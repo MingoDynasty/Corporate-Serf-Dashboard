@@ -478,7 +478,9 @@ def test_unexpected_attempt_error_is_caught_and_notified(monkeypatch, caplog):
     ]
     assert len(matching_records) == 1
     assert matching_records[0].exc_info is not None
-    assert notifications == [f"Rank update for {SCENARIO_NAME} failed unexpectedly."]
+    assert notifications == [
+        f"Position update for {SCENARIO_NAME} failed unexpectedly."
+    ]
 
 
 def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
@@ -538,7 +540,8 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     assert rank_file.read_bytes() == original_rank
     assert total_file.read_bytes() == original_total
     assert notifications == [
-        f"Rank update timed out for {SCENARIO_NAME}. KovaaK's may still be catching up."
+        f"Position update timed out for {SCENARIO_NAME}. "
+        "KovaaK's may still be catching up."
     ]
     assert "Possible score-precision drift" in caplog.text
 

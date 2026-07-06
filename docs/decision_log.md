@@ -372,3 +372,21 @@ sharecodes must be skipped and reported rather than resolved first-wins because
 a missing benchmark is visible and recoverable, while silently pairing the wrong
 rank thresholds is not. KovaaK's threshold changes under an unchanged benchmark
 ID remain invisible to provenance checks and require an explicit forced refresh.
+
+## 2026-07-06: One Word Per Concept In Leaderboard Verbiage
+
+Status: Accepted
+
+Decision: "Rank" was used for both benchmark tiers (Bronze/Silver/..., Rank
+Overlay) and leaderboard placement (Home "Rank:", grid "Current Rank"),
+mirroring a split in the ecosystem (KovaaK's leaderboards: rank = position;
+Voltaic/Aimlabs: rank = tier). In user-facing text, **Rank** means tier only,
+**Position** means leaderboard placement ("Total Players" for board size), and
+**PB** prefixes stats of the personal-best run (PB Score, PB cm/360, PB
+Accuracy). "Unranked" is retained as KovaaK's own term for having no leaderboard
+entry.
+
+Consequences: Labels, plot annotations, and toasts follow the invariant.
+Internal identifiers, component ids, and row field names keep their old names
+because this is a label-only rename. New UI text must not reintroduce "rank" for
+leaderboard placement.
