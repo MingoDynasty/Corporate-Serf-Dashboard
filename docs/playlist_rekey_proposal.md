@@ -1,8 +1,8 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — awaiting review. Land before the playlist-level
-> overview milestone (upcoming #1 in [`roadmap.md`](./roadmap.md)) so the
-> overview is born code-keyed.
+> **Status:** Proposed — revised 2026-07-05 after the first review round
+> (PR #58). Land before the playlist-level overview milestone (upcoming #1 in
+> [`roadmap.md`](./roadmap.md)) so the overview is born code-keyed.
 >
 > Provenance: top finding of the 2026-07-04 whole-project audit TODO triage
 > (vault draft); ported 2026-07-05 with all code citations re-verified at
@@ -10,7 +10,7 @@
 
 Re-key the in-memory `playlist_database` from playlist **name** to playlist
 **code**. Names become display-only labels; codes are the identity the app has
-already ratified everywhere else (URLs, imports, the shared selector).
+already ratified everywhere else (URLs, imports, the shared selector options).
 
 ## Problem (current behavior, verified)
 
@@ -22,7 +22,8 @@ silently lost:
   `source/kovaaks/data_service.py:48`, populated at `:485` and `:523`.
 - `load_playlists()` (`data_service.py:479-485`): a second JSON file carrying a
   duplicate name is **skipped with only a log warning**. The UI never shows it
-  and nothing tells the user.
+  and nothing tells the user. The scan order is unsorted `os.scandir()`
+  (`:469-472`), so *which* duplicate survives is unspecified.
 - `load_playlist_from_code()` (`data_service.py:513-516`): importing a playlist
   whose name matches an existing one is refused the same way — even though its
   code is unique.
@@ -33,68 +34,104 @@ silently lost:
   for a playlist the user believes they imported.
 - On-disk filenames are name-derived (`get_playlist_file_path`,
   `data_service.py:51-61`; write at `:527-532`), so two same-named playlists
-  also collide at the file layer.
+  also collide at the file layer. Imports are also still written into
+  `resources/playlists/`, which the 2026-06-22 "Keep User Runtime Data Under
+  `data/`" decision reserves for bundled defaults — future user-imported
+  playlists belong under `data/playlists/`.
 - The Home page playlist filter uses the **name** as its selector value: the
   dropdown is fed by `get_playlists()` (sorted names, `home.py:572`) and its
   value flows into `get_scenarios_from_playlists(name)` (`home.py:521-527`)
   and `get_rank_data_from_playlist(name, ...)` (`home.py:329-331`, `:356-358`).
-  The newer shared `playlist_selector()` component
+  The Aim Training Journey `MultiSelect` is fed the same name list
+  (`aim_training_journey.py:75-82`). The shared `playlist_selector()` component
   (`source/pages/playlist_components.py`) already uses
   `{label: playlist.name, value: playlist.code}`.
 
 The storage key contradicts the identity the app has already ratified: URLs,
-imports, and the shared selector all speak playlist **code**; only the
-database and the Home filter still speak name.
+imports, and the shared selector options all speak playlist **code**; the
+database, the Home filter, and the Journey picker still speak name.
 
 ## Target design
 
 1. **Key `playlist_database` by `code`**: `dict[str, PlaylistData]` where the
    key is `playlist.code`. Duplicate *names* become legal; duplicate *codes*
    become the real conflict.
-2. **Duplicate-code policy**: skip and warn (do not last-wins). Precedent: the
-   benchmark importer skips-and-reports conflicting duplicates rather than
-   resolving them silently, "because a missing benchmark is visible and
-   recoverable" while a silent wrong result is not (2026-07-03 "Import
-   Benchmarks From Evxl And KovaaK's" entry in
-   [`decision_log.md`](./decision_log.md)). The same reasoning applies here: a
-   missing playlist is visible and recoverable; a silently replaced one is not.
+2. **Duplicate-code policy: skip and warn, deterministically.** The first
+   occurrence of a code wins; later ones are skipped with a warning naming
+   both files. Precedent: the benchmark importer skips-and-reports conflicting
+   duplicates rather than resolving them silently, "because a missing
+   benchmark is visible and recoverable" while a silent wrong result is not
+   (2026-07-03 "Import Benchmarks From Evxl And KovaaK's" entry in
+   [`decision_log.md`](./decision_log.md)). "First" is well-defined: roots are
+   scanned in a fixed order (§5), and within each root files are processed in
+   case-insensitively sorted filename order — never raw `os.scandir()` order.
 3. **Lookups migrate from name to code**:
    - `get_playlist_by_code()` becomes a dict hit.
    - `get_scenarios_from_playlist_code()` already exists (`:248-254`) — becomes
      the canonical scenario lookup.
-   - `get_scenarios_from_playlists(name)` (`:243-245`),
-     `get_rank_data_from_playlist(name, scenario)` (`:256-275`), and the
-     aim-training-journey functions (`:77-125`, which take playlist *names*)
-     switch to code parameters; names remain display-only labels.
-   - `get_playlists()` / `get_playlist_selector_options()` (`:218-232`) sort by
-     name for display but carry code values.
-4. **Selectors**: every playlist dropdown uses `{label: name, value: code}` via
-   the shared `playlist_selector()` — the Home filter migrates onto it. When
-   two playlists share a name, disambiguate the label as `Name (CODE)` — only
-   for colliding names, so the common case stays clean.
-5. **On-disk filenames**: new/updated writes include the code, e.g.
-   `{sanitized name} [{code}].json`, eliminating file collisions. The loader is
-   already filename-agnostic (it keys from JSON *content*, not the filename —
-   `load_playlists()` reads every `*.json`), so old files need no rename.
+   - `get_scenarios_from_playlists(name)` (`:243-245`) and
+     `get_rank_data_from_playlist(name, scenario)` (`:256-275`) switch to code
+     parameters; names remain display-only labels.
+   - The aim-training-journey functions (`:77-125`) take codes and key their
+     result dict by **code** — today it is keyed by name, so duplicate names
+     would still collapse to one series even with a code-keyed store. The page
+     maps code → display label at the plot layer via the shared
+     disambiguation helper (§4). This is a mechanical parity change only: the
+     page is work-in-progress and may be removed, so no further UX investment.
+   - `get_playlists()` (`:218-220`, the bare name list feeding Home and
+     Journey today) is superseded by `get_playlist_selector_options()`
+     (`:223-232`): sorted by name for display, carrying code values.
+4. **Selectors: unify the data contract, not the component.** All playlist
+   dropdowns consume the shared options builder
+   `get_playlist_selector_options()` (`{label: name, value: code}`) plus one
+   shared label-disambiguation helper: when two playlists share a name, the
+   label becomes `Name (CODE)` — only for colliding names, so the common case
+   stays clean. The components themselves keep their role-specific behavior:
+   the Home filter stays a clearable, persisted `Select` (it means "no
+   filter" when empty); `playlist_selector()` stays the non-clearable
+   navigator on the playlist pages (and remains transitional on `/playlists`
+   per the "Playlists Routes Are Stable" decision); Journey keeps its
+   `MultiSelect`. Component-level UX unification is explicitly out of scope
+   (parked in [`tech_debt.md`](./tech_debt.md)).
+5. **Two on-disk roots, collision-free filenames.** Per the 2026-06-22 "Keep
+   User Runtime Data Under `data/`" decision, new and re-imported playlists
+   are written to `data/playlists/{sanitized name} [{code}].json`
+   (code-suffixed, eliminating same-name file collisions);
+   `resources/playlists/` becomes read-only bundled defaults. The loader scans
+   `data/playlists/` first, then `resources/playlists/` — top-level `*.json`
+   only in each, matching today's non-recursive semantics
+   (`resources/playlists/generated/` stays an unscanned library; users
+   activating a generated benchmark copy it to `data/playlists/` going
+   forward — the importer readme's copy instructions update in the shipping
+   PR). Combined with §2, root order gives cross-root precedence: **a
+   `data/playlists/` copy of a code wins over a bundled copy**, with a warning
+   naming the shadowed file (settled 2026-07-05: a user's re-import should
+   shadow a stale bundled copy, visibly). The loader keys from JSON *content*,
+   not the filename, so existing files need no rename; `get_playlist_file_path`'s
+   path-traversal guard (`:59-60`) carries over to the new write root.
 6. **Playlists without a `code`**: `PlaylistData.code` is already a required
    field (`source/kovaaks/data_models.py:52`), so a codeless file already fails
    validation today and is skipped — but with a generic "Invalid JSON format"
-   warning (`data_service.py:486-487`). All 347 bundled
-   `resources/playlists/**` files carry `code` (verified 2026-07-05); only
-   hand-crafted files can lack it (API-imported and generated benchmark files
-   always have one). Remaining work: make the missing-`code` skip warning
-   actionable ("add a `code` field") and document the requirement in the
-   README's Rank Data section. Simpler than synthesizing fallback keys.
+   warning (`data_service.py:486-487`). All 117 committed
+   `resources/playlists/**` files carry `code` (verified 2026-07-05: the 6
+   top-level files — the only ones `load_playlists()` scans — and the 111
+   under `generated/`). Only hand-crafted files can lack it (API-imported and
+   generated benchmark files always have one). Remaining work: make the
+   missing-`code` skip warning actionable ("add a `code` field") and document
+   the requirement in the README's Rank Data section. Simpler than
+   synthesizing fallback keys.
 
 ## Migration plan (existing user data)
 
-- **No forced migration.** Loading keys from file *content*, so existing
-  `{name}.json` files under `resources/playlists/` keep working untouched. No
-  rename script, no data rewrite.
+- **No forced migration.** Loading keys from file *content*, and
+  `resources/playlists/` stays scanned, so existing `{name}.json` files there
+  keep working untouched. No rename script, no data rewrite, no file moves.
 - Files missing `code` already fail to load today (required model field), so
   there is **no behavioral break** — the change is a clearer warning (see §6).
-- New imports write the collision-free filename format; old files only change
-  if re-imported.
+- New imports and re-imports write to `data/playlists/` in the collision-free
+  filename format; a re-imported playlist's `data/playlists/` copy then
+  deterministically shadows any older copy of the same code in
+  `resources/playlists/` (one warning names the shadowed file).
 - **Stale persisted Home filter**: the Home dropdown has `persistence=True`
   (`home.py:578`), so after the upgrade the client restores the previously
   selected *name* into a now code-valued selector. The migrated callbacks must
@@ -107,21 +144,23 @@ database and the Home filter still speak name.
 
 | Surface | Change |
 | ------- | ------ |
-| `source/kovaaks/data_service.py` | Store key, dup policy, lookup signatures, file naming — the bulk of the diff. |
-| `source/pages/home.py` | Playlist filter → shared `playlist_selector()`; callbacks pass codes to the renamed lookups; tolerate the stale persisted name (see migration plan). |
-| `source/pages/playlist_components.py` | Already `{label: name, value: code}` — becomes the single selector implementation; no change expected. |
+| `source/kovaaks/data_service.py` | Store key, deterministic dup policy, dual-root loading, lookup signatures, write root + file naming — the bulk of the diff. |
+| `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; tolerate the stale persisted name (see migration plan). |
+| `source/pages/playlist_components.py` | Hosts the shared label-disambiguation helper; `playlist_selector()` itself unchanged. |
 | `/playlists` pages | Already route by code; `get_playlist_by_code` just gets cheaper. Selector removal is separately scheduled by the overview milestone's checklist in the "Playlists Routes Are Stable" decision — do not couple it here. |
-| Aim Training Journey page | Passes playlist names today; migrate to codes with names as labels. |
-| Tests | New fixtures with duplicate names / duplicate codes; existing playlist fixtures gain `code` fields if any lack them. |
+| Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the shared helper. WIP page, possibly removed later — no further investment. |
+| `scripts/benchmark_importer/readme.md` | Activation-copy destination for users becomes `data/playlists/` — update in the shipping PR. |
+| Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases. |
 
 Note: [`architecture.md`](./architecture.md) already describes
 `playlist_database` as "keyed by code" — incorrect today, true once this
-ships; no doc change needed in the shipping PR.
+ships. The shipping PR should add the dual-root loading to its store
+description while it's in there.
 
 Explicitly out of scope: the store-locking work ("Unsynchronized shared
 in-memory stores" in [`tech_debt.md`](./tech_debt.md)) — same module, separate
-PR; and the playlist-level overview page itself, which this unblocks but does
-not include.
+PR; the playlist-level overview page itself, which this unblocks but does not
+include; and dropdown UX/component unification (see `tech_debt.md`).
 
 ## Acceptance criteria
 
@@ -136,10 +175,16 @@ not include.
 4. Existing user playlist files load with zero manual steps; a file without
    `code` produces one actionable warning and is skipped (today it is skipped
    with a generic invalid-JSON warning).
-5. Same-named imports no longer overwrite or collide on disk.
-6. A stale persisted Home-filter value (a pre-migration playlist name) does
+5. New imports land in `data/playlists/` with code-suffixed filenames;
+   same-named imports no longer overwrite or collide on disk.
+6. The same code in both roots: the `data/playlists/` copy wins, one warning
+   names the shadowed bundled file, and the winner is identical regardless of
+   directory-enumeration order (deterministic across runs and platforms).
+7. A stale persisted Home-filter value (a pre-migration playlist name) does
    not crash any callback; it degrades to "no selection".
-7. Full merge bar green (ruff format/check, mypy, compileall, pytest) locally
+8. Selecting two same-named playlists on Aim Training Journey produces two
+   distinct series with disambiguated labels.
+9. Full merge bar green (ruff format/check, mypy, compileall, pytest) locally
    and in CI.
 
 ## Test plan
@@ -147,22 +192,40 @@ not include.
 - **Regression (the bug):** fixture dir with two same-named/different-code
   playlists → both present in `playlist_database`, both selectable,
   `get_playlist_by_code` resolves each.
-- **Conflict:** two files with the same *code* → second skipped, warning
-  logged; import of duplicate code refused with message.
+- **Conflict + determinism:** two files with the same *code* in one root →
+  the casefold-sorted-first file wins, warning logged naming both (assert the
+  exact winner); import of a duplicate code refused with message.
+- **Dual root:** same code in `data/playlists/` and `resources/playlists/` →
+  the user copy wins with a warning naming the shadowed bundled file; a
+  bundled-only code still loads.
 - **Missing code:** file without `code` → skipped with actionable warning;
   rest of directory still loads.
 - **File naming:** `write_playlist_data_to_file` for same-named playlists
-  produces distinct filenames; round-trips through `load_playlists()`.
+  produces distinct filenames under `data/playlists/`; round-trips through
+  `load_playlists()`.
 - **Lookup migration:** rank-overlay and journey queries by code return
   identical results to the pre-change name-based queries on a non-colliding
   fixture (behavioral parity check).
+- **Journey identity:** the journey data function returns one entry per code
+  for two same-named playlists; the plot layer renders two traces with
+  disambiguated labels.
 - **Home selector:** callback tests assert the filter emits codes and label
   disambiguation triggers only on collisions; a stale persisted name as the
   incoming value is handled without raising.
 
 ## Review round
 
-Two decision points need sign-off:
+Round 1 (2026-07-05, Codex) drove this revision: dual-root loading with new
+writes under `data/playlists/` (was: writes stayed in `resources/playlists/`,
+conflicting with the 2026-06-22 `data/` decision); unify the options contract
+rather than the component (was: every dropdown migrates onto
+`playlist_selector()`); journey series keyed by code with labels at the plot
+layer (was: unspecified, names would still collapse); deterministic scan
+ordering (was: unspecified `os.scandir()` order); committed-file count
+corrected to 117 (was: 347, which counted untracked local directories).
+Cross-root precedence — user root wins — was settled by the user 2026-07-05.
+
+Two decision points still need sign-off:
 
 1. **Duplicate-code policy** — skip-and-warn (proposed) vs last-wins.
 2. **Missing-`code` policy** — the status quo already rejects codeless files
