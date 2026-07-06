@@ -1,6 +1,6 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised through review rounds 1–4 plus decision
+> **Status:** Proposed — revised through review rounds 1–5 plus decision
 > settlement (2026-07-05/06); **no open decision points** — see Review
 > round. All in PR #58. Land
 > before the playlist-level overview milestone (upcoming #1 in
@@ -62,9 +62,18 @@ database, the Home filter, and the Journey picker still speak name.
    Applies to directory loading only — an explicit import of a duplicate code
    is refused with a message (§3). The
    first occurrence of a code wins; later ones are skipped with a warning
-   naming both files, surfaced as a UI notification via `dash_logger` (the
-   channel background rank-refresh failures already use), not only the log
-   file. Precedent: the benchmark importer skips-and-reports
+   naming both files — logged, and surfaced in the UI. Delivery mechanism:
+   `dash_logger` alone cannot carry these, because `load_playlists()` runs at
+   module import (`:535`), outside Dash callback context, where the installed
+   `NotificationsLogHandler` (`source/utilities/dash_logging.py:54`) swallows
+   `MissingCallbackContextException` and silently drops the notification
+   (verified in `dash_extensions.logging.DashLogHandler.emit`). Startup load
+   warnings are therefore **buffered** in a module-level queue and **flushed
+   as notifications once the UI mounts** — the same boundary-crossing idiom
+   the watchdog already uses (`message_queue`,
+   `source/my_queue/message_queue.py:23`, drained by Home callbacks).
+   Import-time refusal messages (§3) are unaffected: they return through the
+   import callback. Precedent: the benchmark importer skips-and-reports
    conflicting duplicates rather than resolving them silently, "because a
    missing benchmark is visible and recoverable" while a silent wrong result
    is not (2026-07-03 "Import Benchmarks From Evxl And KovaaK's" entry in
@@ -142,7 +151,8 @@ database, the Home filter, and the Journey picker still speak name.
    update in the shipping PR). Combined with §2's first-wins rule, root order
    gives cross-root precedence: **a bundled copy of a code wins over a
    `data/playlists/` copy**, with a UI-visible notification naming the
-   skipped user file. (Settled 2026-07-06, amending the 2026-07-05
+   skipped user file (delivered via the §2 startup-warning buffer). (Settled
+   2026-07-06, amending the 2026-07-05
    user-root-wins call: the bundled root is curated **benchmarks** — every
    committed file carries rank data, value-verified 2026-07-06 and enforced
    by a bundled-invariant test — while share-code imports are rank-less by
@@ -217,8 +227,8 @@ database, the Home filter, and the Journey picker still speak name.
 
 | Surface | Change |
 | ------- | ------ |
-| `source/kovaaks/data_service.py` | Store key, startup dup policy + deterministic ordering, dual-root loading tolerant of a missing user root, code-keyed import refusal with a named message, options builder returning finished labels + code→label lookup, write root + file naming — the bulk of the diff. |
-| `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; import flow surfaces the refusal message naming the existing playlist; tolerate the stale persisted name (see migration plan). |
+| `source/kovaaks/data_service.py` | Store key, startup dup policy + deterministic ordering, dual-root loading tolerant of a missing user root, startup-warning buffer, code-keyed import refusal with a named message, options builder returning finished labels + code→label lookup, write root + file naming — the bulk of the diff. |
+| `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; import flow surfaces the refusal message naming the existing playlist; tolerate the stale persisted name (see migration plan); hosts the startup-warning flush callback (mirroring the existing `message_queue` drain). |
 | `source/pages/playlist_components.py` | No change — `playlist_selector()` already consumes `get_playlist_selector_options()`, which now returns finished labels. |
 | `/playlists` pages | Already route by code; `get_playlist_by_code` just gets cheaper. Selector removal is separately scheduled by the overview milestone's checklist in the "Playlists Routes Are Stable" decision — do not couple it here. |
 | Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the service's code→label lookup; stale persisted names filtered like Home's (see migration plan). WIP page, possibly removed later — no further investment. |
@@ -256,7 +266,9 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
 6. The same code in both roots: the bundled copy wins, one UI-visible
    notification names the skipped user file, no file is deleted, and the
    winner is identical regardless of directory-enumeration order
-   (deterministic across runs and platforms).
+   (deterministic across runs and platforms). The notification actually
+   reaches the UI — buffered past the module-import boundary, not silently
+   dropped.
 7. On a fresh checkout with no `data/` directory, the app starts and serves
    bundled playlists; the first import creates `data/playlists/`.
 8. Stale persisted selector values (pre-migration playlist names) do not
@@ -272,6 +284,10 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
 - **Regression (the bug):** fixture dir with two same-named/different-code
   playlists → both present in `playlist_database`, both selectable,
   `get_playlist_by_code` resolves each.
+- **Startup-notification delivery:** a warning generated during module-import
+  load (no callback context) is buffered rather than dropped, appears as a UI
+  notification after the flush callback first runs, and the buffer drains
+  exactly once — no duplicate notifications on later intervals.
 - **Startup conflict + determinism:** two files with the same *code* in one
   root → the sort-order-first file wins, warning logged naming both (assert
   the exact winner); include a casefold-tie pair (`A.json` vs `a.json`) to
@@ -358,7 +374,8 @@ Settlement (2026-07-06, user decisions after discussion): **both open
 decision points are settled, and one earlier call is amended.**
 
 1. **Startup duplicate-code policy — settled: skip-and-warn**, surfaced as UI
-   notifications via `dash_logger`, not only the log file. Fail-fast was
+   notifications — buffered at startup and flushed after the UI mounts (§2),
+   since `dash_logger` cannot deliver from module-import time. Fail-fast was
    considered and rejected: a bad or duplicate playlist file is not a
    prerequisite failure (the app's core runs with zero playlists), and
    legitimate paths produce these states — most notably a code imported
@@ -371,6 +388,13 @@ decision points are settled, and one earlier call is amended.**
    invariant it leans on and the accepted trade-off). Startup remains
    read-only — superseded user files are skipped, never deleted; cleanup is
    future playlist-manager work.
+
+Round 5 (2026-07-06, Codex): the settlement's notification mechanism was
+corrected — `dash_logger` cannot deliver from module-import time, where the
+handler silently drops notifications outside callback context (verified in
+`dash_extensions.logging.DashLogHandler.emit`), so startup warnings are
+buffered and flushed after the UI mounts (§2), with a regression test on the
+delivery path.
 
 With these settled, the proposal has no open decision points. Suggested
 sequencing: land before the playlist-level overview milestone (the overview
