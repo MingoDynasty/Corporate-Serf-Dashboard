@@ -38,6 +38,19 @@ dash_logger = get_dash_logger(__name__)
 SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
 
 
+def _get_created_csv_path(event) -> str | None:
+    """Return a created CSV path after preserving the detection debug log."""
+    if event.is_directory:
+        return None
+
+    file = event.src_path
+    print()
+    logger.debug("Detected new file: %s", Path(file).name)
+    if not file.endswith(".csv"):
+        return None
+    return file
+
+
 def _enqueue_after_loading(file: str, message: NewFileMessage) -> bool:
     """Make a run visible to Home only after it is queryable in the stores."""
     if not load_csv_file_into_database(file):
@@ -73,12 +86,9 @@ class NewFileHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         """Import a newly created run CSV and notify interested UI callbacks."""
-        file = event.src_path
-        if event.is_directory or not file.endswith(".csv"):
+        file = _get_created_csv_path(event)
+        if file is None:
             return
-
-        print()
-        logger.debug("Detected new file: %s", Path(file).name)
 
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         run_data = extract_data_from_file(file)

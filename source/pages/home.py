@@ -144,7 +144,7 @@ def _drain_run_events(
 
 
 @callback(
-    Output("run-events", "data", allow_duplicate=True),
+    Output("run-events", "data"),
     Output("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
     Input("automatically-change-scenario-switch", "checked"),

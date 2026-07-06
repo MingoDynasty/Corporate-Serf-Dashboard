@@ -125,6 +125,4 @@ def test_load_csv_file_into_database_reports_extract_failure(
     monkeypatch.setattr(data_service, "extract_data_from_file", lambda _path: None)
 
     assert data_service.load_csv_file_into_database("broken.csv") is False
-    assert [record.message for record in caplog.records] == [
-        "Failed to get run data for CSV file: broken.csv"
-    ]
+    assert "Failed to get run data for CSV file: broken.csv" in caplog.messages

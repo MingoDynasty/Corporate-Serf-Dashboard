@@ -1,4 +1,5 @@
 import datetime
+import logging
 from types import SimpleNamespace
 
 import pytest
@@ -172,6 +173,15 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     assert len(messages) == 1
     assert loads == ["run.csv"]
     assert schedules == []
+
+
+def test_on_created_preserves_detection_log_for_non_csv(caplog):
+    with caplog.at_level(logging.DEBUG, logger=file_watchdog.logger.name):
+        file_watchdog.NewFileHandler().on_created(
+            SimpleNamespace(is_directory=False, src_path="notes.txt")
+        )
+
+    assert "Detected new file: notes.txt" in caplog.messages
 
 
 def test_scheduling_failure_does_not_block_ingestion(monkeypatch):
