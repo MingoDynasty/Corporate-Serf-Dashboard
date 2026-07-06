@@ -50,7 +50,7 @@ list in the roadmap.)
 
 - **Scenario rank and percentile** (PRs #8–#10). The home page shows your
   global leaderboard standing for the selected scenario —
-  `Rank: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
+  `Position: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
   personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
   across scenarios, but percentile is; it turns "804.2" into "top 18%," which

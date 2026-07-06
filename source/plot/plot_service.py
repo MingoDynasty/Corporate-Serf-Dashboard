@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
     """Add a labeled high-score line to a figure."""
     figure.add_hline(
-        name="High Score",
-        annotation_text=f"High Score ({format_decimal(high_score):.2f})",
+        name="PB Score",
+        annotation_text=f"PB Score ({format_decimal(high_score):.2f})",
         y=high_score,
         line_dash="dash",
     )

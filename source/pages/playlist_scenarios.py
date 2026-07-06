@@ -65,7 +65,7 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 80,
     },
     {
-        "headerName": "Current Rank",
+        "headerName": "Position",
         "field": "rank_sort",
         "valueFormatter": {"function": "params.data.rank_display"},
         "comparator": {"function": "nullsLastComparator"},
@@ -73,7 +73,7 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 120,
     },
     {
-        "headerName": "Total Ranks",
+        "headerName": "Total Players",
         "field": "total_sort",
         "valueFormatter": {"function": "params.data.total_display"},
         "comparator": {"function": "nullsLastComparator"},
@@ -89,7 +89,7 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 140,
     },
     {
-        "headerName": "High Score",
+        "headerName": "PB Score",
         "field": "high_score_sort",
         "valueFormatter": {"function": "params.data.high_score_display"},
         "comparator": {"function": "nullsLastComparator"},

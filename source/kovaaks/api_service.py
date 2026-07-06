@@ -1039,7 +1039,7 @@ def _notify_exhaustion(
             expected_score,
         )
     dash_logger.error(
-        "Rank update timed out for %s. KovaaK's may still be catching up.",
+        "Position update timed out for %s. KovaaK's may still be catching up.",
         scenario_name,
     )
 
@@ -1065,7 +1065,7 @@ def _run_attempt(  # noqa: PLR0913
         except UnknownKovaaksUserError as exc:
             logger.warning("Rank refresh stopped for %s: %s", scenario_name, exc)
             dash_logger.error(
-                "Rank update for %s failed: KovaaK's username may be misconfigured.",
+                "Position update for %s failed: KovaaK's username may be misconfigured.",
                 scenario_name,
             )
             return
@@ -1120,7 +1120,7 @@ def _run_attempt(  # noqa: PLR0913
     except Exception:
         logger.exception("Unexpected error during rank refresh for %s", scenario_name)
         dash_logger.error(
-            "Rank update for %s failed unexpectedly.",
+            "Position update for %s failed unexpectedly.",
             scenario_name,
         )
 
@@ -1294,7 +1294,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
             status=ScenarioRankStatus.UNKNOWN,
             leaderboard_id=leaderboard_id,
             scenario_name=scenario_name,
-            error_message=f"Failed to fetch scenario rank for {scenario_name}.",
+            error_message=f"Failed to fetch leaderboard position for {scenario_name}.",
         )
     if rank_info.status == ScenarioRankStatus.UNRANKED:
         # A missing leaderboard row normally means the user has not played the
