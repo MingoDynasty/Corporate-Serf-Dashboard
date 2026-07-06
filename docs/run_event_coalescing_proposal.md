@@ -2,7 +2,8 @@
 
 > **Status:** Proposed — drafted 2026-07-06 from approach A2 of the vault
 > planning note (consumption semantics verified 2026-07-05, TODO Home item 6
-> from the 2026-07-04 whole-project audit triage). Code citations verified at
+> from the 2026-07-04 whole-project audit triage); revised through review
+> round 1 (2026-07-06, Codex) in PR #60. Code citations verified at
 > `24ac3e3`.
 
 Returning to Home after playing with another page open replays the queued run
@@ -34,11 +35,20 @@ run (`source/my_watchdog/file_watchdog.py:95`, `:141`, `:169`), so the queue
 grows unboundedly until Home is next mounted, then replays at one message per
 `polling_interval` tick.
 
-**Load-bearing fact:** the watchdog loads every run into the DB at detection
-time (`file_watchdog.py:105`, `:151`, `:179`), independent of the queue. The
-queue's *only* consumers are (a) the auto-change-scenario target and (b) toast
-content. Coalescing risks no plot data; it is purely a question of where the
-dropdown lands and what gets toasted.
+**Load-bearing fact (corrected in round 1):** the watchdog loads every run
+into the DB at detection time (`file_watchdog.py:105`, `:151`, `:179`),
+independent of the queue — the queue's *only* consumers are (a) the
+auto-change-scenario target and (b) toast content. But the *ordering* is
+currently enqueue-first, load-after (append at `:95`/`:141`/`:169` precedes
+the load at each site; [`architecture.md`](./architecture.md) documents this
+order explicitly), so a drain landing in that window rebuilds without the
+newest run — and no second trigger ever comes. Worse,
+`load_csv_file_into_database` re-extracts the CSV and silently returns on
+failure (`data_service.py:308-311`), so today a message can exist for a run
+that never entered the DB at all. §7 inverts the ordering so that
+message-visible implies run-queryable; with that fixed, coalescing risks no
+plot data — it is purely a question of where the dropdown lands and what
+gets toasted.
 
 ## Target design
 
@@ -48,11 +58,19 @@ dropdown lands and what gets toasted.
    reads the payload for toast content. The store's other listeners
    (`get_scenario_num_runs` at `home.py:119`, `get_scenario_rank` at `:221`)
    keep using it as a bare trigger, unchanged.
-2. **Atomic-per-item drain.** `popleft()` in a loop under
-   `try/except IndexError` — never len-then-pop. Consistent with the
-   "Unsynchronized shared in-memory stores" entry in
-   [`tech_debt.md`](./tech_debt.md) (`deque` append/popleft are atomic; no
-   lock added here), and it removes the existing two-tab `IndexError` race.
+2. **Atomic batch drain.** `popleft()` in a loop under `try/except
+   IndexError` — never len-then-pop — wrapped in a module-level
+   `threading.Lock` so the *batch* is atomic, not just each item (round 1:
+   per-item atomicity alone lets two Home tabs each drain part of the
+   backlog, producing two partial summaries and possibly two different
+   landing scenarios). With the lock, semantics are winner-takes-all: exactly
+   one consumer gets the whole backlog and its summary; a concurrent tab's
+   tick sees an empty queue and no-ops. The lock guards only this drain loop
+   (memory-only, no I/O) — it is not the store-locking work deferred in
+   [`tech_debt.md`](./tech_debt.md)'s "Unsynchronized shared in-memory
+   stores" entry, whose producer-side `deque.append` remains lock-free and
+   safe against `popleft`. Alternative (documenting a single-active-consumer
+   scope instead of locking) is decision point 2.
 3. **Landing policy.** Auto-change ON: land on the *latest* drained message's
    scenario — the most recent thing the user played — flipping the dropdown
    at most once. The flip re-triggers `check_for_new_data` (the dropdown is
@@ -81,19 +99,36 @@ dropdown lands and what gets toasted.
    was drained, the callback returns `no_update` — no rebuild, no toast, same
    as today's silent-discard path.
 5. **Toast policy.** `count == 1`: today's toasts, verbatim — live one-run
-   behavior is unchanged. `count > 1`: exactly one summary toast — "N new
-   runs while you were away" plus the latest run's placement and (when the
-   threshold-notification switch is on and `previous_high_score` is valid)
-   its threshold verdict. The verdict comes from the **latest run only**,
-   mirroring the current per-run meaning; per-run review after the fact is
+   behavior is unchanged. `count > 1`: exactly one summary toast whose copy
+   is **scenario-named**: "N new {scenario} runs while you were away" plus
+   the latest run's placement and (when the threshold-notification switch is
+   on and `previous_high_score` is valid) its threshold verdict. Naming the
+   scenario keeps the count honest (round 1): `count` covers the landing
+   scenario only, so a generic "N new runs" would undercount a mixed backlog
+   — five runs across scenarios must not read as "2 new runs". The verdict
+   comes from the **latest run only**, mirroring the current per-run
+   meaning; per-run review after the fact is
    [`run_history_proposal.md`](./run_history_proposal.md)'s job, so the
    summary stays minimal by design. The latest message's `nth_score` is
    already accurate: the watchdog computed it against a DB that contained all
-   earlier backlog runs.
+   earlier backlog runs (still true after §7 — nth is computed before the
+   load either way).
 6. **Trigger discipline in `generate_graph`.** Toasts are built only when the
    payload store is among `ctx.triggered` (precedent: `_rank_allows_network`,
    `home.py:172-174`) *and* the payload's scenario matches the selected
    scenario. This is what dissolves adjacent defects 1 and 2 below.
+7. **Producer ordering: load before enqueue (round 1).** The watchdog
+   currently appends the message *before* loading the run
+   (`file_watchdog.py:95→105`, `:141→151`, `:169→179`). Invert all three
+   sites: load first, enqueue only on success. `load_csv_file_into_database`
+   returns `bool` (`True` when the run was added) instead of `None`; the
+   only other caller — the startup bulk loader at `data_service.py:293` —
+   ignores the return value, so the change is backward-compatible. This
+   guarantees a drained message's run is queryable in the DB (the plot can
+   never rebuild "behind" its own toast) and stops enqueuing messages for
+   runs whose load silently failed. This is a pre-existing race that today's
+   one-per-tick consumer inherits identically — fixed here because the
+   proposal's "rebuild once from final state" guarantee depends on it.
 
 ## Rejected alternatives
 
@@ -127,9 +162,11 @@ dropdown lands and what gets toasted.
 
 | Surface | Change |
 | ------- | ------ |
-| `source/pages/home.py` | The whole diff: drain + payload in `check_for_new_data`, queue access removed from `generate_graph`, toast policy, trigger discipline. |
-| `source/my_queue/message_queue.py`, `source/my_watchdog/file_watchdog.py` | No change — producer and structure untouched. |
-| [`architecture.md`](./architecture.md) | Shipping PR updates the data-flow description: "Check peeks / Graph poplefts" becomes "Check drains and summarizes; Graph reads the payload", and "drains the queue each tick" gains its now-true meaning. |
+| `source/pages/home.py` | The bulk of the diff: locked drain + payload in `check_for_new_data`, queue access removed from `generate_graph`, toast policy, trigger discipline. |
+| `source/my_watchdog/file_watchdog.py` | Round 1: the three enqueue/load sites reorder to load-then-enqueue-on-success (§7). |
+| `source/kovaaks/data_service.py` | Round 1: `load_csv_file_into_database` returns `bool`; no caller-breaking change. |
+| `source/my_queue/message_queue.py` | No change — the deque structure is untouched. |
+| [`architecture.md`](./architecture.md) | Shipping PR updates the data-flow description: "Check peeks / Graph poplefts" becomes "Check drains and summarizes; Graph reads the payload"; "drains the queue each tick" gains its now-true meaning; and the "message is appended *before* the run is loaded" sentence flips to the new ordering. |
 | Tests | New — no tests cover these callbacks today. See test plan. |
 | Docs lifecycle | On ship: distill into `decision_log.md`, delete this file, add the user-facing rationale to `product.md` (AGENTS.md "Shipping a proposal"). No roadmap entry — this is a defect fix, not a milestone. |
 
@@ -144,14 +181,20 @@ dropdown lands and what gets toasted.
    tick; matching ones produce one summary toast; nothing relevant → no
    rebuild, no toast.
 4. Single live run (`count == 1`): toast output is byte-identical to today's.
-5. A threshold verdict is never computed against a different scenario's high
+5. The summary toast names the scenario its count covers ("N new {scenario}
+   runs…"); a mixed backlog is never presented as a generic undercount.
+6. A threshold verdict is never computed against a different scenario's high
    score (defect 1 regression test).
-6. Changing the date picker or top-N with a non-empty queue neither consumes
+7. Changing the date picker or top-N with a non-empty queue neither consumes
    messages nor toasts (defect 2 regression test).
-7. Concurrent drains cannot raise `IndexError` (defect 3 — drain loop is
-   `popleft` under `try/except`).
-8. Full merge bar green (ruff format/check, mypy, compileall, pytest) locally
-   and in CI.
+8. Two concurrent drains split nothing: one consumer receives the entire
+   backlog and the single summary, the other no-ops — and no `IndexError` is
+   possible (defect 3).
+9. A message drained from the queue always corresponds to a run already
+   queryable in the DB; a run whose load fails produces one warning and no
+   message (§7 regression tests).
+10. Full merge bar green (ruff format/check, mypy, compileall, pytest)
+    locally and in CI.
 
 ## Test plan
 
@@ -173,8 +216,31 @@ construction from a payload likewise becomes a directly callable helper.
   latest run only; scenario-mismatch produces no toast (defect 1).
 - **Trigger discipline:** `generate_graph` with a stale payload and a
   control-change trigger produces no toast (defect 2).
-- **Race:** drain loop tolerates a concurrent consumer emptying the queue
-  mid-drain (simulated by a deque fake whose `popleft` raises after k items).
+- **Batch atomicity:** two threads calling the drain helper against one
+  seeded queue — exactly one receives all messages, the other receives none
+  (lock test); the `try/except` idiom still tolerates a fake whose `popleft`
+  raises mid-drain.
+- **Producer ordering (§7):** `load_csv_file_into_database` returns `True`
+  on success / `False` on extract failure; watchdog enqueues only on `True`
+  (monkeypatch precedent: `tests/test_file_watchdog_rank_refresh.py:42-46`
+  already fakes both the queue and the loader); a failing load produces a
+  warning and no message.
+
+## Review round
+
+Round 1 (2026-07-06, Codex, PR #60): three findings, all incorporated.
+**(P1)** The "rebuild from final state" claim assumed load-before-visible,
+but the watchdog enqueues first and loads after — and a silent load failure
+could already leave a message with no run behind it. Resolved by §7
+(producer reorders to load-then-enqueue-on-success; producer added to blast
+radius and tests; the Problem section's load-bearing fact corrected).
+**(P2, atomicity)** Per-item atomicity let two Home tabs each drain part of
+one backlog. Resolved by locking the batch drain (§2) — winner-takes-all —
+with the reviewer's documentation-only alternative preserved as decision
+point 2. **(P2, wording)** Generic "N new runs" copy undercounted mixed
+backlogs since `count` is landing-scenario-only. Resolved by
+scenario-named copy (§5), which also settled the draft's original
+cross-scenario-suffix decision point.
 
 ## Decision points needing sign-off
 
@@ -182,17 +248,19 @@ construction from a payload likewise becomes a directly callable helper.
    rename to something honest like `run-events` (touches the four references
    in `home.py` only — the id is not persisted, so no migration concern).
    Proposed: rename.
-2. **Summary toast copy for cross-scenario backlogs.** Proposed: omit any
-   "across M scenarios" suffix — runs from non-landing scenarios are absorbed
-   silently (their data is in the plots regardless), and after-the-fact
-   review belongs to Run History. Alternative: append the suffix for a hint
-   of what was absorbed.
+2. **Batch-drain lock vs documented scope.** Proposed: the module-level lock
+   in §2 — two lines, memory-only critical section, turns the "one summary,
+   one landing" invariant from probabilistic into real, and does not touch
+   the deferred store-locking tech debt. Alternative (per round 1): skip the
+   lock and document that coalescing guarantees hold for a single active
+   Home consumer, consistent with the app's single-local-user stance.
 
 Everything else is mechanical once these are fixed.
 
 ## Out of scope
 
-- Producer-side changes (`message_queue` structure, watchdog behavior).
+- Producer-side changes beyond §7's enqueue-ordering fix: the `message_queue`
+  structure and the watchdog's detection/notification behavior are untouched.
 - App-shell/global consumption and any push transport (rejected above).
 - Store locking — the "Unsynchronized shared in-memory stores" entry in
   [`tech_debt.md`](./tech_debt.md) stands on its own.
