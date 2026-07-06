@@ -1,7 +1,8 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised through review rounds 1–2 (2026-07-05) and a
-> follow-up import-semantics decision (2026-07-06); all in PR #58. Land before the playlist-level overview milestone (upcoming #1 in
+> **Status:** Proposed — revised through review rounds 1–3 (2026-07-05/06;
+> import semantics settled by the user 2026-07-06); all in PR #58. Land
+> before the playlist-level overview milestone (upcoming #1 in
 > [`roadmap.md`](./roadmap.md)) so the overview is born code-keyed.
 >
 > Provenance: top finding of the 2026-07-04 whole-project audit TODO triage
@@ -65,8 +66,11 @@ database, the Home filter, and the Journey picker still speak name.
    missing benchmark is visible and recoverable" while a silent wrong result
    is not (2026-07-03 "Import Benchmarks From Evxl And KovaaK's" entry in
    [`decision_log.md`](./decision_log.md)). "First" is well-defined: roots are
-   scanned in a fixed order (§6), and within each root files are processed in
-   case-insensitively sorted filename order — never raw `os.scandir()` order.
+   scanned in a fixed order (§6), and within each root files are processed
+   sorted by `(filename.casefold(), filename)` — casefolded for
+   cross-platform stability, with the exact name as tiebreaker because
+   case-sensitive filesystems can hold names that tie under casefold alone —
+   never raw `os.scandir()` order.
 3. **Explicit imports of an existing code are refused, visibly.**
    `load_playlist_from_code()` keeps refusing duplicates — but by *code*, not
    name, and the refusal is a user-visible message naming the existing
@@ -79,12 +83,18 @@ database, the Home filter, and the Journey picker still speak name.
    model: refresh becomes delete-then-import once playlist deletion ships
    (future functionality; until then, deleting the playlist's file from
    `data/playlists/` and restarting is the documented workaround — a conscious
-   gap). Refusal also structurally prevents a degradation upsert would allow:
-   share-code imports carry no rank data (`data_service.py:509`), so an
-   import matching a bundled *benchmark* (playlist + rank thresholds) could
-   have replaced it with a bare, rank-less copy. Adding upsert later would be
-   a non-breaking addition if refresh demand appears; shipping it now and
-   walking it back would be a behavior break.
+   gap, and one that only covers user-root playlists: bundled playlists
+   refresh via app updates instead). Refusal also closes the import-time path
+   to a degradation upsert would have allowed: share-code imports carry no
+   rank data (`data_service.py:509`), so an import matching an
+   already-loaded bundled *benchmark* (playlist + rank thresholds) could have
+   replaced it with a bare, rank-less copy. The temporal reverse — a code
+   imported *before* a later bundled update ships it — still shadows the
+   richer copy, but that is exactly the §6 cross-root case: the startup
+   warning names the shadowed file, and deleting the user copy adopts the
+   bundled benchmark. Adding upsert later would be a non-breaking addition if
+   refresh demand appears; shipping it now and walking it back would be a
+   behavior break.
 4. **Lookups migrate from name to code**:
    - `get_playlist_by_code()` becomes a dict hit.
    - `get_scenarios_from_playlist_code()` already exists (`:248-254`) — becomes
@@ -118,8 +128,8 @@ database, the Home filter, and the Journey picker still speak name.
    `MultiSelect`. Component-level UX unification is explicitly out of scope
    (parked in [`tech_debt.md`](./tech_debt.md)).
 6. **Two on-disk roots, collision-free filenames, tolerant of absence.** Per
-   the 2026-06-22 "Keep User Runtime Data Under `data/`" decision, new and
-   re-imported playlists are written to
+   the 2026-06-22 "Keep User Runtime Data Under `data/`" decision, newly
+   imported playlists are written to
    `data/playlists/{sanitized name} [{code}].json` (code-suffixed, eliminating
    same-name file collisions); `resources/playlists/` becomes read-only
    bundled defaults. The loader scans `data/playlists/` first, then
@@ -142,17 +152,22 @@ database, the Home filter, and the Journey picker still speak name.
    before its first write. The loader keys from JSON *content*, not the
    filename, so existing files need no rename; `get_playlist_file_path`'s
    path-traversal guard (`:59-60`) carries over to the new write root.
-7. **Playlists without a `code`**: `PlaylistData.code` is already a required
-   field (`source/kovaaks/data_models.py:52`), so a codeless file already fails
-   validation today and is skipped — but with a generic "Invalid JSON format"
-   warning (`data_service.py:486-487`). All 117 committed
-   `resources/playlists/**` files carry `code` (verified 2026-07-05: the 6
-   top-level files — the only ones `load_playlists()` scans — and the 111
-   under `generated/`). Only hand-crafted files can lack it (API-imported and
-   generated benchmark files always have one). Remaining work: make the
-   missing-`code` skip warning actionable ("add a `code` field") and document
-   the requirement in the README's Rank Data section. Simpler than
-   synthesizing fallback keys.
+7. **Playlists without a usable `code`**: `PlaylistData.code` is already a
+   required field (`source/kovaaks/data_models.py:52`), so a codeless file
+   already fails validation today and is skipped — but with a generic
+   "Invalid JSON format" warning (`data_service.py:486-487`). The field is a
+   plain `str`, however, so empty and whitespace-only codes currently pass
+   validation (found in review round 3) — unacceptable once `code` is the
+   store key, selector value, route identity, and filename suffix. Tighten
+   the model: strip surrounding whitespace and reject blank codes at
+   validation, so blank behaves exactly like missing. All 117 committed
+   `resources/playlists/**` files carry a non-blank `code` (value-level check
+   2026-07-06: the 6 top-level files — the only ones `load_playlists()`
+   scans — and the 111 under `generated/`). Only hand-crafted files can lack
+   one (API-imported and generated benchmark files always have one).
+   Remaining work: make the skip warning actionable for missing **or blank**
+   codes ("add a `code` field") and document the requirement in the README's
+   Rank Data section. Simpler than synthesizing fallback keys.
 
 ## Migration plan (existing user data)
 
@@ -208,9 +223,10 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
    a log line; the store and both on-disk roots are left unchanged.
 3. No name-keyed access to `playlist_database` remains (`rg` for the old
    lookup names comes back empty).
-4. Existing user playlist files load with zero manual steps; a file without
-   `code` produces one actionable warning and is skipped (today it is skipped
-   with a generic invalid-JSON warning).
+4. Existing user playlist files load with zero manual steps; a file with a
+   missing, empty, or whitespace-only `code` produces one actionable warning
+   and is skipped (today a missing code is skipped with a generic
+   invalid-JSON warning, and blank codes are accepted outright).
 5. New imports land in `data/playlists/` with code-suffixed filenames;
    same-named imports no longer overwrite or collide on disk.
 6. The same code in both roots: the `data/playlists/` copy wins, one warning
@@ -231,8 +247,9 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
   playlists → both present in `playlist_database`, both selectable,
   `get_playlist_by_code` resolves each.
 - **Startup conflict + determinism:** two files with the same *code* in one
-  root → the casefold-sorted-first file wins, warning logged naming both
-  (assert the exact winner).
+  root → the sort-order-first file wins, warning logged naming both (assert
+  the exact winner); include a casefold-tie pair (`A.json` vs `a.json`) to
+  exercise the exact-name tiebreaker.
 - **Import refusal:** importing a new code succeeds and writes under
   `data/playlists/`; importing an existing code — whether it was loaded from
   the bundled or the user root — is refused with a message naming the existing
@@ -242,8 +259,9 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
   bundled-only code still loads.
 - **Missing user root:** `load_playlists()` with no `data/playlists/` present
   → no error, bundled playlists load; the first import creates the directory.
-- **Missing code:** file without `code` → skipped with actionable warning;
-  rest of directory still loads.
+- **Missing or blank code:** files with a missing, an empty, and a
+  whitespace-only `code` → each skipped with an actionable warning; rest of
+  directory still loads.
 - **File naming:** `write_playlist_data_to_file` for same-named playlists
   produces distinct filenames under `data/playlists/`; round-trips through
   `load_playlists()`.
@@ -280,10 +298,21 @@ Follow-up (2026-07-06, user decision): round 2's upsert was reverted to
 **refusal with a named message** (§3), settling round 2's open decision
 point 3. Refusal keeps the import insert-only (no obsolete-file cleanup, no
 dual messaging), composes with delete-then-import once playlist deletion
-ships, and prevents a rank-less share-code import from ever replacing a
-rank-rich bundled benchmark. The cross-root precedence rule (§6) survives on
-its own merits — organic same-code collisions still need a deterministic,
-visible winner.
+ships, and closes the import-time path to a rank-less share-code import
+replacing a rank-rich bundled benchmark (the import-before-bundling edge is
+§6's warning case). The cross-root precedence rule (§6) survives on its own
+merits — organic same-code collisions still need a deterministic, visible
+winner.
+
+Round 3 (2026-07-06, Codex): `code` validation tightened to reject empty and
+whitespace-only values, not just missing ones (§7) — blank codes previously
+passed the plain-`str` field, unacceptable for a store key / route identity /
+filename suffix; within-root ordering became a total order,
+`(filename.casefold(), filename)`, since casefold alone ties on
+case-sensitive filesystems (§2); and stale upsert-era wording was corrected —
+§6's "re-imported" writes, the delete-file workaround scoped to user-root
+playlists (bundled refresh via app updates), and §3's benchmark-shadowing
+claim scoped to the import-time path.
 
 Decision points needing sign-off:
 
