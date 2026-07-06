@@ -1,7 +1,7 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised 2026-07-05 through review rounds 1 and 2
-> (PR #58). Land before the playlist-level overview milestone (upcoming #1 in
+> **Status:** Proposed — revised through review rounds 1–2 (2026-07-05) and a
+> follow-up import-semantics decision (2026-07-06); all in PR #58. Land before the playlist-level overview milestone (upcoming #1 in
 > [`roadmap.md`](./roadmap.md)) so the overview is born code-keyed.
 >
 > Provenance: top finding of the 2026-07-04 whole-project audit TODO triage
@@ -57,7 +57,8 @@ database, the Home filter, and the Journey picker still speak name.
    key is `playlist.code`. Duplicate *names* become legal; duplicate *codes*
    become the real conflict.
 2. **Startup duplicate-code policy: skip and warn, deterministically.**
-   Applies to directory loading only — explicit imports are upserts (§3). The
+   Applies to directory loading only — an explicit import of a duplicate code
+   is refused with a message (§3). The
    first occurrence of a code wins; later ones are skipped with a warning
    naming both files. Precedent: the benchmark importer skips-and-reports
    conflicting duplicates rather than resolving them silently, "because a
@@ -66,20 +67,24 @@ database, the Home filter, and the Journey picker still speak name.
    [`decision_log.md`](./decision_log.md)). "First" is well-defined: roots are
    scanned in a fixed order (§6), and within each root files are processed in
    case-insensitively sorted filename order — never raw `os.scandir()` order.
-3. **Explicit imports are upserts by code.** `load_playlist_from_code()` stops
-   refusing duplicates. A new code adds the playlist; an existing code
-   **updates** it: the entry is re-fetched and replaced in
-   `playlist_database`, the fresh copy is written to `data/playlists/` (§6),
-   and any previous user-root file for that code — including one under an old
-   name-derived filename, if the playlist was renamed upstream — is removed
-   after the new file is written, so the user root holds at most one file per
-   code. The import flow reports "updated" vs "imported", so the outcome is
-   user-visible. Rationale for the split with §2: at startup nobody is
-   watching, so a file conflict must be preserved visibly (skip-and-warn); an
-   explicit import is the user asking for exactly this playlist, so honoring
-   it as a refresh is both safe and useful (benchmark playlists change between
-   seasons). *This supersedes the duplicate-code refusal proposed in the
-   original draft and round 1 — flagged for sign-off in the Review round.*
+3. **Explicit imports of an existing code are refused, visibly.**
+   `load_playlist_from_code()` keeps refusing duplicates — but by *code*, not
+   name, and the refusal is a user-visible message naming the existing
+   playlist (name and code), not just a log line. A new code adds the playlist
+   and writes it to `data/playlists/` (§6); import stays insert-only. Settled
+   2026-07-06 (user decision, superseding the upsert design from review
+   round 2): refusal avoids the fiddly parts of upsert — no obsolete-file
+   cleanup when an upstream rename changes the name-derived filename, no
+   "updated"-vs-"imported" dual messaging — and composes with the future
+   model: refresh becomes delete-then-import once playlist deletion ships
+   (future functionality; until then, deleting the playlist's file from
+   `data/playlists/` and restarting is the documented workaround — a conscious
+   gap). Refusal also structurally prevents a degradation upsert would allow:
+   share-code imports carry no rank data (`data_service.py:509`), so an
+   import matching a bundled *benchmark* (playlist + rank thresholds) could
+   have replaced it with a bare, rank-less copy. Adding upsert later would be
+   a non-breaking addition if refresh demand appears; shipping it now and
+   walking it back would be a behavior break.
 4. **Lookups migrate from name to code**:
    - `get_playlist_by_code()` becomes a dict hit.
    - `get_scenarios_from_playlist_code()` already exists (`:248-254`) — becomes
@@ -124,8 +129,12 @@ database, the Home filter, and the Journey picker still speak name.
    `data/playlists/` going forward — the importer readme's copy instructions
    update in the shipping PR). Combined with §2, root order gives cross-root
    precedence: **a `data/playlists/` copy of a code wins over a bundled
-   copy**, with a warning naming the shadowed file (settled 2026-07-05: a
-   user's re-import should shadow a stale bundled copy, visibly). Because
+   copy**, with a warning naming the shadowed file (settled 2026-07-05:
+   `data/` is the user's, and the warning keeps the conflict visible and
+   recoverable — delete the user copy to fall back to the bundled one).
+   Same-code-in-both-roots arises without re-imports: a code imported today
+   can appear in a later bundled update, and the importer's manual activation
+   copies can collide the same way. Because
    `data/` is gitignored and `load_playlists()` runs at module import
    (`data_service.py:535`), the loader must treat a missing `data/playlists/`
    as empty rather than raising — a clean checkout starts on bundled playlists
@@ -154,11 +163,10 @@ database, the Home filter, and the Journey picker still speak name.
   treats the missing root as empty and the first import creates it.
 - Files missing `code` already fail to load today (required model field), so
   there is **no behavioral break** — the change is a clearer warning (see §7).
-- Re-importing an existing code is an update (§3): the entry is refreshed in
-  memory, written to `data/playlists/` in the collision-free format, and the
-  obsolete same-code file (if the name changed) is removed. At the next
-  startup the user-root copy deterministically shadows any bundled copy of
-  that code (one warning names the shadowed file).
+- Re-importing an existing code is refused with a message naming the existing
+  playlist (§3). There is no in-app refresh path until playlist deletion
+  ships; deleting the playlist's file from `data/playlists/` and restarting is
+  the interim workaround.
 - **Stale persisted Home filter**: the Home dropdown has `persistence=True`
   (`home.py:578`), so after the upgrade the client restores the previously
   selected *name* into a now code-valued selector. The migrated callbacks must
@@ -171,13 +179,13 @@ database, the Home filter, and the Journey picker still speak name.
 
 | Surface | Change |
 | ------- | ------ |
-| `source/kovaaks/data_service.py` | Store key, startup dup policy + deterministic ordering, dual-root loading tolerant of a missing user root, upsert import, options builder returning finished labels + code→label lookup, write root + file naming — the bulk of the diff. |
-| `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; import flow surfaces "updated" vs "imported"; tolerate the stale persisted name (see migration plan). |
+| `source/kovaaks/data_service.py` | Store key, startup dup policy + deterministic ordering, dual-root loading tolerant of a missing user root, code-keyed import refusal with a named message, options builder returning finished labels + code→label lookup, write root + file naming — the bulk of the diff. |
+| `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; import flow surfaces the refusal message naming the existing playlist; tolerate the stale persisted name (see migration plan). |
 | `source/pages/playlist_components.py` | No change — `playlist_selector()` already consumes `get_playlist_selector_options()`, which now returns finished labels. |
 | `/playlists` pages | Already route by code; `get_playlist_by_code` just gets cheaper. Selector removal is separately scheduled by the overview milestone's checklist in the "Playlists Routes Are Stable" decision — do not couple it here. |
 | Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the service's code→label lookup. WIP page, possibly removed later — no further investment. |
 | `scripts/benchmark_importer/readme.md` | Activation-copy destination for users becomes `data/playlists/` — update in the shipping PR. |
-| Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases, missing-user-root case, import-upsert cases. |
+| Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases, missing-user-root case, import-refusal cases. |
 
 Note: [`architecture.md`](./architecture.md) already describes
 `playlist_database` as "keyed by code" — incorrect today, true once this
@@ -195,10 +203,9 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
    disk, both import via share code, both appear in every selector (labels
    disambiguated), and each resolves correctly at `/playlists/{code}`.
 2. Importing a playlist whose *name* matches an existing one succeeds as a new
-   playlist. Importing a *code* that already exists succeeds as an update: the
-   store entry is refreshed, the user-root file is replaced (an obsolete file
-   under the old name is removed), and the outcome is reported user-visibly as
-   "updated" rather than "imported" (not just a log line).
+   playlist. Importing a *code* that already exists is refused with a
+   user-visible message naming the existing playlist (name and code), not just
+   a log line; the store and both on-disk roots are left unchanged.
 3. No name-keyed access to `playlist_database` remains (`rg` for the old
    lookup names comes back empty).
 4. Existing user playlist files load with zero manual steps; a file without
@@ -226,10 +233,10 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
 - **Startup conflict + determinism:** two files with the same *code* in one
   root → the casefold-sorted-first file wins, warning logged naming both
   (assert the exact winner).
-- **Import upsert:** importing a new code reports "imported"; re-importing an
-  existing code reports "updated", replaces the store entry, and leaves
-  exactly one user-root file for that code; re-import after an upstream rename
-  removes the file under the old name.
+- **Import refusal:** importing a new code succeeds and writes under
+  `data/playlists/`; importing an existing code — whether it was loaded from
+  the bundled or the user root — is refused with a message naming the existing
+  playlist, and neither the store nor the on-disk files change.
 - **Dual root:** same code in `data/playlists/` and `resources/playlists/` →
   the user copy wins with a warning naming the shadowed bundled file; a
   bundled-only code still loads.
@@ -269,15 +276,21 @@ into the service — `get_playlist_selector_options()` returns finished options
 and a code→label lookup serves Journey (§5, the reviewer's preferred option),
 leaving `playlist_selector()` genuinely unchanged.
 
+Follow-up (2026-07-06, user decision): round 2's upsert was reverted to
+**refusal with a named message** (§3), settling round 2's open decision
+point 3. Refusal keeps the import insert-only (no obsolete-file cleanup, no
+dual messaging), composes with delete-then-import once playlist deletion
+ships, and prevents a rank-less share-code import from ever replacing a
+rank-rich bundled benchmark. The cross-root precedence rule (§6) survives on
+its own merits — organic same-code collisions still need a deterministic,
+visible winner.
+
 Decision points needing sign-off:
 
 1. **Startup duplicate-code policy** — skip-and-warn (proposed) vs last-wins.
 2. **Missing-`code` policy** — the status quo already rejects codeless files
    via required-field validation; the question reduces to improving the skip
    warning (proposed) vs synthesizing fallback keys.
-3. **Import upsert semantics (new in round 2)** — §3 changes explicit
-   re-imports from "refused with a message" (original draft and round 1) to
-   "update the existing playlist". Sign off, or argue for keeping refusal.
 
 Everything else is mechanical once those are fixed. Suggested sequencing: land
 before the playlist-level overview milestone (the overview will enumerate
