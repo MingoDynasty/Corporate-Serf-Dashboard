@@ -174,6 +174,31 @@ def test_playlist_scenarios_grid_uses_content_auto_size():
     assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
 
 
+def test_playlist_scenarios_grid_uses_bounded_viewport_layout():
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    loading = page.children[-1]
+    ag_grid = loading.children
+
+    assert page.style == {
+        "height": (
+            "calc(100dvh - var(--app-shell-header-offset, 0rem) "
+            "- 2*var(--app-shell-padding, 1rem))"
+        )
+    }
+    assert loading.parent_style == {
+        "flex": 1,
+        "minHeight": 0,
+        "display": "flex",
+        "flexDirection": "column",
+    }
+    assert "domLayout" not in ag_grid.dashGridOptions
+    assert ag_grid.style == {
+        "height": "100%",
+        "width": "100%",
+        "minHeight": 300,
+    }
+
+
 def test_playlist_scenarios_layout_includes_relative_time_refresh_interval():
     page = playlist_scenarios.layout("KovaaKsTestCode")
     children_by_id = {getattr(child, "id", None): child for child in page.children}

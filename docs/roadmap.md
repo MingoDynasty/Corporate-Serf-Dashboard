@@ -34,7 +34,8 @@ Design rationale for shipped work lives in
 - **Playlist scenarios overview** (was milestone 1) — sortable per-playlist
   table at `/playlists/{playlistCode}`: rank, total, percentile, last played,
   runs, high score, and PB cm/360 + accuracy for every scenario in the
-  playlist. (PRs #12, #15, #16, on retry groundwork from #11)
+  playlist. Long playlists use grid-owned scrolling so their column headers
+  remain visible. (PRs #12, #15, #16, on retry groundwork from #11)
 - **Relative "last played" timestamps** — humanized staleness display with
   exact-time tooltips, live-ticking on home and the playlist grid.
   (PRs #17, #19, #23)

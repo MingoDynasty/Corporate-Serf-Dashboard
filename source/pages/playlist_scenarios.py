@@ -214,15 +214,30 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                     },
                     dashGridOptions={
                         "animateRows": False,
-                        "domLayout": "autoHeight",
                         "tooltipShowDelay": 0,
                     },
                     columnSize="autoSize",
                     columnSizeOptions=COLUMN_SIZE_OPTIONS,
                     dangerously_allow_code=True,
-                    style={"width": "100%"},
-                )
+                    style={
+                        "height": "100%",
+                        "width": "100%",
+                        "minHeight": 300,
+                    },
+                ),
+                parent_style={
+                    "flex": 1,
+                    "minHeight": 0,
+                    "display": "flex",
+                    "flexDirection": "column",
+                },
             ),
         ],
         gap="md",
+        style={
+            "height": (
+                "calc(100dvh - var(--app-shell-header-offset, 0rem) "
+                "- 2*var(--app-shell-padding, 1rem))"
+            )
+        },
     )
