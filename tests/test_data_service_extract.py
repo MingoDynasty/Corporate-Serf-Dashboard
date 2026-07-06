@@ -1,6 +1,12 @@
+from datetime import datetime
 from pathlib import Path
 
-from source.kovaaks.data_service import extract_data_from_file
+from sortedcontainers import SortedList
+
+from source.kovaaks import data_service
+from source.kovaaks.data_models import RunData
+
+extract_data_from_file = data_service.extract_data_from_file
 
 SUB_CSV_HEADER = (
     "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,"
@@ -89,3 +95,36 @@ def test_extract_data_from_file_returns_none_when_shots_is_zero() -> None:
         assert extract_data_from_file(str(file_path)) is None
     finally:
         file_path.unlink(missing_ok=True)
+
+
+def test_load_csv_file_into_database_reports_success(monkeypatch) -> None:
+    run = RunData(
+        datetime_object=datetime(2026, 7, 6, 12),
+        score=123.45,
+        sens_scale="Overwatch",
+        horizontal_sens=2.0,
+        scenario="Test Scenario",
+        accuracy=0.5,
+    )
+    monkeypatch.setattr(data_service, "extract_data_from_file", lambda _path: run)
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service,
+        "run_database",
+        SortedList([], key=lambda item: item.datetime_object),
+    )
+
+    assert data_service.load_csv_file_into_database("run.csv") is True
+    assert data_service.get_scenario_stats("Test Scenario").number_of_runs == 1
+
+
+def test_load_csv_file_into_database_reports_extract_failure(
+    monkeypatch,
+    caplog,
+) -> None:
+    monkeypatch.setattr(data_service, "extract_data_from_file", lambda _path: None)
+
+    assert data_service.load_csv_file_into_database("broken.csv") is False
+    assert [record.message for record in caplog.records] == [
+        "Failed to get run data for CSV file: broken.csv"
+    ]

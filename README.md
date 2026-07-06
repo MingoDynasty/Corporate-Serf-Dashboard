@@ -51,6 +51,9 @@ uv run python source/app.py
 
 Step 2: Open a browser and navigate to: <http://localhost:8080/> (or your configured port).
 
+Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
+share one in-memory run-event queue and are not synchronized with each other.
+
 ## Example
 
 ![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")

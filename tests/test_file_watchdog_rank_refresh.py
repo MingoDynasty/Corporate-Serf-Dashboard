@@ -32,6 +32,11 @@ def _patch_common(monkeypatch, run_data):
     messages = []
     loads = []
     schedules = []
+
+    def load(file):
+        loads.append(file)
+        return True
+
     monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(
         file_watchdog,
@@ -44,7 +49,7 @@ def _patch_common(monkeypatch, run_data):
     monkeypatch.setattr(
         file_watchdog,
         "load_csv_file_into_database",
-        loads.append,
+        load,
     )
     monkeypatch.setattr(
         file_watchdog,
@@ -200,3 +205,60 @@ def test_scheduling_failure_does_not_block_ingestion(monkeypatch):
     assert len(messages) == 1
     assert loads == ["run.csv"]
     assert notifications == [f"Could not start rank update for {SCENARIO_NAME}."]
+
+
+def test_on_created_loads_before_enqueuing(monkeypatch):
+    run_data = _run_data()
+    events = []
+    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(
+        file_watchdog,
+        "extract_data_from_file",
+        lambda _path: run_data,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: False,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "load_csv_file_into_database",
+        lambda _path: events.append("load") or True,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "message_queue",
+        SimpleNamespace(append=lambda _message: events.append("enqueue")),
+    )
+    monkeypatch.setattr(file_watchdog.config, "kovaaks_username", None)
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path="run.csv")
+    )
+
+    assert events == ["load", "enqueue"]
+
+
+def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
+    run_data = _run_data()
+    messages, loads, schedules = _patch_common(monkeypatch, run_data)
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: False,
+    )
+
+    def fail_load(file):
+        loads.append(file)
+        return False
+
+    monkeypatch.setattr(file_watchdog, "load_csv_file_into_database", fail_load)
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path="run.csv")
+    )
+
+    assert loads == ["run.csv"]
+    assert messages == []
+    assert schedules == []

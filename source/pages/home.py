@@ -3,6 +3,7 @@
 import json
 import logging
 from datetime import datetime
+from typing import TypedDict
 
 import dash
 import dash_mantine_components as dmc
@@ -34,7 +35,7 @@ from source.kovaaks.data_service import (
     is_scenario_in_database,
     load_playlist_from_code,
 )
-from source.my_queue.message_queue import message_queue
+from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
@@ -50,12 +51,30 @@ dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
 LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 _INTERVAL_PROP = "interval-component.n_intervals"
+_RUN_EVENTS_PROP = "run-events.data"
 dash.register_page(
     __name__,
     path="/",
     title="Corporate Serf Dashboard",
     redirect_from=["/home", "/index"],
 )
+
+
+class RunEventData(TypedDict):
+    """JSON-safe fields from the latest run event in a drained batch."""
+
+    scenario_name: str
+    sensitivity: str
+    nth_score: int
+    score: float
+    previous_high_score: float | None
+
+
+class RunEventsPayload(TypedDict):
+    """Summary passed from the queue consumer to Home's other callbacks."""
+
+    count: int
+    latest: RunEventData
 
 
 # Rank display states deliberately map to distinct user-facing text.
@@ -82,8 +101,50 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     return "N/A"
 
 
+def _drain_run_events(
+    selected_scenario: str | None,
+    automatically_change_scenario: bool,
+) -> tuple[str | None, RunEventsPayload | None]:
+    """Drain pending run messages and summarize the landing scenario."""
+    drained: list[NewFileMessage] = []
+    while True:
+        try:
+            drained.append(message_queue.popleft())
+        except IndexError:
+            break
+
+    if not drained:
+        return selected_scenario, None
+
+    target_scenario = (
+        drained[-1].scenario_name
+        if automatically_change_scenario
+        else selected_scenario
+    )
+    if target_scenario is None:
+        return None, None
+
+    matching_messages = [
+        message for message in drained if message.scenario_name == target_scenario
+    ]
+    if not matching_messages:
+        return target_scenario, None
+
+    latest = matching_messages[-1]
+    return target_scenario, {
+        "count": len(matching_messages),
+        "latest": {
+            "scenario_name": latest.scenario_name,
+            "sensitivity": latest.sensitivity,
+            "nth_score": latest.nth_score,
+            "score": latest.score,
+            "previous_high_score": latest.previous_high_score,
+        },
+    }
+
+
 @callback(
-    Output("do_update", "data", allow_duplicate=True),
+    Output("run-events", "data", allow_duplicate=True),
     Output("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
     Input("automatically-change-scenario-switch", "checked"),
@@ -91,21 +152,18 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     prevent_initial_call=True,
 )
 def check_for_new_data(_, automatically_change_scenario, selected_scenario):
-    """
-    Simple periodic trigger function to check for new data. If so, then forward to interested functions.
-    :param _: Number of times the interval has passed. Unused, but callback functions must have at least one input.
-    :param selected_scenario: name of the currently selected scenario.
-    :return: True if we have data, else no_update.
-    """
-    if len(message_queue) == 0:
+    """Drain pending run events and forward one summary to Home callbacks."""
+    target_scenario, run_events = _drain_run_events(
+        selected_scenario,
+        automatically_change_scenario,
+    )
+    if run_events is None:
         return no_update, no_update
 
-    if message_queue[0].scenario_name != selected_scenario:
-        if automatically_change_scenario:
-            return True, message_queue[0].scenario_name
-        message_queue.popleft()
-        return no_update, no_update
-    return True, no_update
+    scenario_update = (
+        target_scenario if target_scenario != selected_scenario else no_update
+    )
+    return run_events, scenario_update
 
 
 @callback(
@@ -116,7 +174,7 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
     Output("scenario_datetime_last_played", "className"),
     Output("scenario_datetime_last_played", "tabIndex"),
     Output("last-played-tooltip", "disabled"),
-    Input("do_update", "data"),
+    Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
 )
 def get_scenario_num_runs(
@@ -218,7 +276,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
 
 @callback(
     Output("scenario_rank", "children"),
-    Input("do_update", "data"),
+    Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
 )
@@ -256,10 +314,133 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
     return format_scenario_rank(rank_info)
 
 
+def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
+    """Return whether a callback invocation was caused by new run events."""
+    return any(trigger["prop_id"] == _RUN_EVENTS_PROP for trigger in triggered)
+
+
+def _build_run_event_notifications(
+    run_events: RunEventsPayload | None,
+    selected_scenario: str,
+    top_n_scores: int,
+    score_threshold: float,
+    score_threshold_notification_switch: bool,
+) -> list[dict[str, object]]:
+    """Build either the legacy single-run toasts or one backlog summary."""
+    if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
+        return []
+
+    latest = run_events["latest"]
+    if run_events["count"] > 1:
+        message = (
+            f"{run_events['count']} new {selected_scenario} runs while you were away. "
+            f"Latest: {latest['sensitivity']} has a new "
+            f"{ordinal(latest['nth_score'])} place score: {latest['score']:.2f}."
+        )
+        color = "blue"
+        if (
+            score_threshold_notification_switch
+            and latest["previous_high_score"] is not None
+            and latest["previous_high_score"] > 0
+        ):
+            percentage = latest["score"] / latest["previous_high_score"] * 100
+            if latest["score"] > score_threshold:
+                message += (
+                    f" Current score percentage ({percentage:.1f}%) successfully "
+                    "passed the score threshold! Ready to move onto the next scenario."
+                )
+                color = "green"
+            else:
+                message += (
+                    f" Current score percentage ({percentage:.1f}%) failed to meet "
+                    "the score threshold. Keep grinding..."
+                )
+                color = "yellow"
+        return [
+            {
+                "action": "show",
+                "title": "Run Summary",
+                "message": message,
+                "color": color,
+                "id": "run-summary-notification",
+                "icon": DashIconify(icon="fontisto:line-chart"),
+                "autoClose": 8000,
+            }
+        ]
+
+    notifications: list[dict[str, object]] = []
+    if latest["nth_score"] <= top_n_scores:
+        notification_message = (
+            f"{latest['sensitivity']} has a new "
+            f"{ordinal(latest['nth_score'])} place score: {latest['score']:.2f}"
+        )
+        notifications.append(
+            {
+                "action": "show",
+                "title": "Notification",
+                "message": notification_message,
+                "color": "green",
+                "id": "new-top-n-score-notification",
+                "icon": DashIconify(icon="fontisto:line-chart"),
+                "autoClose": 8000,
+            }
+        )
+
+    if (
+        score_threshold_notification_switch
+        and latest["previous_high_score"] is not None
+        and latest["previous_high_score"] > 0
+    ):
+        percentage = latest["score"] / latest["previous_high_score"] * 100
+        if latest["score"] > score_threshold:
+            notifications.append(
+                {
+                    "action": "show",
+                    "title": "Score Threshold",
+                    "message": (
+                        f"Current score percentage ({percentage:.1f}%) "
+                        "successfully passed the score threshold! Ready to "
+                        "move onto the next scenario."
+                    ),
+                    "color": "green",
+                    "id": "score-threshold-notification",
+                    "icon": DashIconify(icon="material-symbols:check"),
+                    "autoClose": 8000,
+                }
+            )
+        else:
+            notifications.append(
+                {
+                    "action": "show",
+                    "title": "Score Threshold",
+                    "message": (
+                        f"Current score percentage ({percentage:.1f}%) "
+                        "failed to meet score threshold. Keep grinding..."
+                    ),
+                    "color": "yellow",
+                    "id": "score-threshold-notification",
+                    "icon": DashIconify(icon="material-symbols:warning-outline"),
+                    "autoClose": 8000,
+                }
+            )
+    else:
+        notifications.append(
+            {
+                "action": "show",
+                "title": "Notification",
+                "message": "Graph updated!",
+                "color": "blue",
+                "id": "graph-updated-notification",
+                "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+            }
+        )
+    return notifications
+
+
 @callback(
     Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
-    Input("do_update", "data"),
+    Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("top_n_scores", "value"),
     Input("date-picker", "value"),
@@ -273,7 +454,7 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
 )
 # This callback coordinates the page's graph controls and notification states.
 def generate_graph(  # noqa: PLR0912, PLR0913
-    do_update,
+    run_events,
     selected_scenario,
     top_n_scores,
     selected_date,
@@ -287,7 +468,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
 ):
     """
     Updates to the graph.
-    :param do_update: whether to do an update or not.
+    :param run_events: summary of newly ingested runs, when this invocation has one.
     :param selected_scenario: user-selected scenario name.
     :param top_n_scores: user-selected top n scores.
     :param selected_date: user-selected date.
@@ -376,79 +557,14 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         plot = add_score_threshold_overlay(plot, score_threshold)
 
     notifications = []
-    # Display a custom notification if we detected a new Top N score.
-    if do_update and len(message_queue) > 0:
-        message_data = message_queue.popleft()
-        if (
-            selected_scenario == message_data.scenario_name
-            and message_data.nth_score <= top_n_scores
-        ):
-            notification_message = (
-                f"{message_data.sensitivity} has a new "
-                f"{ordinal(message_data.nth_score)} place score: {message_data.score:.2f}"
-            )
-            notifications.append(
-                {
-                    "action": "show",
-                    "title": "Notification",
-                    "message": notification_message,
-                    "color": "green",
-                    "id": "new-top-n-score-notification",
-                    "icon": DashIconify(icon="fontisto:line-chart"),
-                    "autoClose": 8000,
-                }
-            )
-
-        if (
-            score_threshold_notification_switch
-            and message_data.previous_high_score is not None
-            and message_data.previous_high_score > 0
-        ):
-            # In case this is a new high score, use the previous high score for calculations
-            percentage = message_data.score / message_data.previous_high_score * 100
-            if message_data.score > score_threshold:
-                notifications.append(
-                    {
-                        "action": "show",
-                        "title": "Score Threshold",
-                        "message": (
-                            f"Current score percentage ({percentage:.1f}%) "
-                            "successfully passed the score threshold! Ready to "
-                            "move onto the next scenario."
-                        ),
-                        "color": "green",
-                        "id": "score-threshold-notification",
-                        "icon": DashIconify(icon="material-symbols:check"),
-                        "autoClose": 8000,
-                    }
-                )
-            else:
-                notifications.append(
-                    {
-                        "action": "show",
-                        "title": "Score Threshold",
-                        "message": (
-                            f"Current score percentage ({percentage:.1f}%) "
-                            "failed to meet score threshold. Keep grinding..."
-                        ),
-                        "color": "yellow",
-                        "id": "score-threshold-notification",
-                        "icon": DashIconify(icon="material-symbols:warning-outline"),
-                        "autoClose": 8000,
-                    }
-                )
-        else:
-            # Default notification is simply notifying that the graph updated.
-            notifications.append(
-                {
-                    "action": "show",
-                    "title": "Notification",
-                    "message": "Graph updated!",
-                    "color": "blue",
-                    "id": "graph-updated-notification",
-                    "icon": DashIconify(icon="material-symbols:refresh-rounded"),
-                }
-            )
+    if _run_events_were_triggered(ctx.triggered):
+        notifications = _build_run_event_notifications(
+            run_events,
+            selected_scenario,
+            top_n_scores,
+            score_threshold,
+            score_threshold_notification_switch,
+        )
     return plot.to_json(), notifications
 
 
@@ -536,7 +652,7 @@ def layout(**kwargs):  # noqa: ARG001
     """Build the interactive home dashboard."""
     return dmc.Box(
         children=[
-            dcc.Store(id="do_update"),  # used for Interval component
+            dcc.Store(id="run-events"),
             dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
