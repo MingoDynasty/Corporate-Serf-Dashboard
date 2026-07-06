@@ -214,7 +214,7 @@ def test_scheduling_failure_does_not_block_ingestion(monkeypatch):
 
     assert len(messages) == 1
     assert loads == ["run.csv"]
-    assert notifications == [f"Could not start rank update for {SCENARIO_NAME}."]
+    assert notifications == [f"Could not start position update for {SCENARIO_NAME}."]
 
 
 def test_on_created_loads_before_enqueuing(monkeypatch):

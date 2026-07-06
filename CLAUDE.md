@@ -8,13 +8,14 @@ plots scenario scores. Python 3.14, dependencies managed with uv.
   `example.toml`; the default port 8080 may already be taken by Steam)
 - Tests: `uv run pytest`
 - Lint: `uv run ruff check`
-- Types: `uv run mypy source`
+- Types: `uv run mypy`
 - Format: ruff (`uv run ruff format .`), line length 88
 
-CI runs ruff format/check, mypy, compileall, and pytest on every pull request
-and push to `main`; `.github/workflows/gates.yml` is the executable merge bar.
-Run the same five checks locally first for the fastest feedback before calling
-a change done or approving a PR.
+CI runs four checks — ruff format, ruff lint, mypy, and pytest — on every pull
+request and push to `main`; `.github/workflows/ci.yml` is the executable CI
+definition. Run the standard local validation in `AGENTS.md`, which additionally
+includes `compileall`, for the fastest feedback before calling a change done or
+approving a PR.
 
 ## Layout
 - `source/` — application code. See `docs/architecture.md` for the module map

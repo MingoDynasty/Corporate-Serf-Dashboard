@@ -94,7 +94,7 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
             return f"{rank_info.rank:,}"
         case ScenarioRankStatus.UNRANKED:
             if rank_info.total_players is not None:
-                return f"Unranked ({rank_info.total_players:,} ranked)"
+                return f"Unranked ({rank_info.total_players:,} players)"
             return "Unranked"
         case ScenarioRankStatus.UNKNOWN:
             return "N/A"
@@ -307,7 +307,7 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
         )
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
-        dash_logger.error("Rank refresh for %s failed.", selected_scenario)
+        dash_logger.error("Position refresh for %s failed.", selected_scenario)
         return "N/A"
 
     _emit_rank_messages(rank_info)
@@ -781,7 +781,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                 dmc.Text(
                                                     [
                                                         dmc.Text(
-                                                            "Rank: ",
+                                                            "Position: ",
                                                             fw=700,
                                                             span=True,
                                                         ),
@@ -906,7 +906,7 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="high-score-overlay-switch",
                                             labelPosition="right",
-                                            label="High Score Overlay",
+                                            label="PB Score Overlay",
                                             checked=True,
                                             persistence=True,
                                         ),

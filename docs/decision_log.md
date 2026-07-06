@@ -236,7 +236,7 @@ Consequences: Pylint, black, and isort are no longer direct dependencies or conf
 
 ## 2026-07-03: CI Runs The Merge Bar On Every PR
 
-Status: Accepted
+Status: Superseded in part by the 2026-07-06 cross-repo Python v2 tooling decision
 
 Decision: A single GitHub Actions `gates` job runs the repository merge bar on
 every pull request and push to `main`: ruff format check, ruff lint, mypy,
@@ -258,6 +258,36 @@ feedback path. A local single-command task runner remains optional rather than
 part of this decision. After the workflow has established a short green
 history, the repository owner should mark the `gates` check required on
 `main`; branch protection is intentionally outside the workflow.
+
+## 2026-07-06: Adopt The Cross-Repo Python V2 Tooling Spec
+
+Status: Accepted
+
+Supersedes: The workflow shape, command set, tool and runtime pin placement,
+and concurrency behavior in the 2026-07-03 CI decision. Windows execution,
+locked dependency sync, SHA-pinned actions, read-only contents permission, and
+the broader local pre-handoff validation remain in force.
+
+Decision: Use the canonical `tooling-spec: python-v2` workflow at
+`.github/workflows/ci.yml`. Its matrix-backed `test (windows-latest)` job runs
+`uv sync --locked`, ruff format, ruff lint, bare mypy, and bare pytest.
+`pyproject.toml` owns the required uv version (`==0.11.26`), pytest discovery
+and options, and mypy's `source/` scope. The workflow no longer overrides Git
+line endings, cancels superseded runs, caches uv, pins Python or uv through
+`setup-uv`, or runs `compileall`.
+
+Why: The cross-repo spec keeps local and CI invocations aligned through project
+configuration and gives repositories one recognizable CI shape. Moving the uv,
+pytest, and mypy defaults into `pyproject.toml` makes the bare commands
+authoritative in every environment instead of relying on workflow-only flags.
+
+Consequences: Local pre-handoff validation still includes `compileall`, while
+CI has four named checks inside the single Windows matrix job. CI resolves a
+compatible interpreter from `requires-python = ">=3.14"`; this migration does
+not add a `.python-version` pin. The required branch-protection check changes
+from `gates` to `test (windows-latest)` and must be updated by the repository
+owner at merge time. Add a minimal `.gitattributes` only if a runner actually
+reports line-ending format drift; the migration's first CI run did not.
 
 ## 2026-06-21: Relative ("Humanized") Last-Played Timestamps
 
@@ -371,3 +401,41 @@ data. Mixed-scenario counts describe only the landing scenario. Nonmatching
 events are discarded when automatic switching is off, preserving the previous
 policy without wasting ticks. Coherent multi-tab delivery would require a
 broadcast or push transport and remains outside this local single-user design.
+
+## 2026-07-06: One Word Per Concept In Leaderboard Verbiage
+
+Status: Accepted
+
+Decision: "Rank" was used for both benchmark tiers (Bronze/Silver/..., Rank
+Overlay) and leaderboard placement (Home "Rank:", grid "Current Rank"),
+mirroring a split in the ecosystem (KovaaK's leaderboards: rank = position;
+Voltaic/Aimlabs: rank = tier). In user-facing text, **Rank** means tier only,
+**Position** means leaderboard placement ("Total Players" for board size), and
+**PB** prefixes stats of the personal-best run (PB Score, PB cm/360, PB
+Accuracy). "Unranked" is retained as KovaaK's own term for having no leaderboard
+entry.
+
+Consequences: Labels, plot annotations, and toasts follow the invariant.
+Internal identifiers, component ids, and row field names keep their old names
+because this is a label-only rename. New UI text must not reintroduce "rank" for
+leaderboard placement.
+
+## 2026-07-06: Let The Playlist Scenarios Grid Own Vertical Scrolling
+
+Status: Accepted
+
+Decision: Bound the playlist scenarios page to the Mantine AppShell content
+viewport and let the AG Grid use its normal layout with an internal vertical
+scrollbar. The page Stack and Dash Loading wrappers form a flex column, and the
+grid fills the remaining space with a 300px minimum height. Keep the existing
+content-based column sizing and capped flexible Scenario column.
+
+Why: `domLayout: autoHeight` expanded the grid to every row, so the document
+scrolled and carried the column headers out of view on large playlists. A
+bounded grid keeps the headers visible while the user sorts and scans scenarios
+deep in the playlist, and restores row virtualization.
+
+Consequences: Short playlists show empty grid body below their final row instead
+of collapsing the grid. Very short windows may still scroll the page to preserve
+the 300px usable minimum. The layout tracks AppShell header and padding variables
+instead of duplicating their pixel values.

@@ -28,6 +28,9 @@ dependencies = [
 requires = ["uv_build"]
 build-backend = "uv_build"
 
+[tool.uv]
+required-version = "==0.11.26"
+
 [tool.uv.build-backend]
 module-root = ""
 module-name = "source"
@@ -64,6 +67,12 @@ max-line-length = 120  # hard ceiling; formatter wraps at 88
 
 [tool.mypy]
 disable_error_code = ["import-untyped"]
+files = ["source"]
+
+[tool.pytest.ini_options]
+addopts = "-q -p no:cacheprovider"
+pythonpath = ["."]
+testpaths = ["tests"]
 
 [dependency-groups]
 dev = [

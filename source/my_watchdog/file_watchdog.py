@@ -76,7 +76,7 @@ def _refresh_rank_after_high_score(
         )
     except Exception:
         logger.exception("Failed to schedule rank refresh for %s", scenario_name)
-        dash_logger.error("Could not start rank update for %s.", scenario_name)
+        dash_logger.error("Could not start position update for %s.", scenario_name)
 
 
 class NewFileHandler(FileSystemEventHandler):
