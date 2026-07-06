@@ -3,8 +3,9 @@
 > **Status:** Proposed — drafted 2026-07-06 from approach A2 of the vault
 > planning note (consumption semantics verified 2026-07-05, TODO Home item 6
 > from the 2026-07-04 whole-project audit triage); revised through review
-> round 1 (2026-07-06, Codex) in PR #60. Code citations verified at
-> `24ac3e3`.
+> round 1 (2026-07-06, Codex) and both decision points settled by the user
+> the same day; all in PR #60. Code citations verified at `24ac3e3`. No open
+> decision points remain.
 
 Returning to Home after playing with another page open replays the queued run
 events one interval-tick at a time — the graph rebuilds N times, the scenario
@@ -54,8 +55,11 @@ gets toasted.
 
 1. **Single consumer.** `check_for_new_data` drains the entire queue each
    tick and writes a summary payload into the store that is today's boolean
-   `do_update`. `generate_graph` never touches `message_queue` — it only
-   reads the payload for toast content. The store's other listeners
+   `do_update` — renamed to **`run-events`** (settled 2026-07-06, user
+   decision: the id should say what the store now carries; it touches four
+   references in `home.py` only and is not persisted, so there is no
+   migration concern). `generate_graph` never touches `message_queue` — it
+   only reads the payload for toast content. The store's other listeners
    (`get_scenario_num_runs` at `home.py:119`, `get_scenario_rank` at `:221`)
    keep using it as a bare trigger, unchanged.
 2. **Atomic batch drain.** `popleft()` in a loop under `try/except
@@ -69,8 +73,13 @@ gets toasted.
    (memory-only, no I/O) — it is not the store-locking work deferred in
    [`tech_debt.md`](./tech_debt.md)'s "Unsynchronized shared in-memory
    stores" entry, whose producer-side `deque.append` remains lock-free and
-   safe against `popleft`. Alternative (documenting a single-active-consumer
-   scope instead of locking) is decision point 2.
+   safe against `popleft`. Settled 2026-07-06 (user decision): the lock is
+   adopted; the round-1 alternative — no lock, guarantees documented for a
+   single active Home consumer — was declined because the two-tab case is
+   exactly when a backlog exists, the failure mode is user-visible
+   confusion, and the lock costs three lines and microseconds. Known limit,
+   accepted: the losing tab gets no trigger that tick and catches up on its
+   own next input; full multi-tab sync is out of scope.
 3. **Landing policy.** Auto-change ON: land on the *latest* drained message's
    scenario — the most recent thing the user played — flipping the dropdown
    at most once. The flip re-triggers `check_for_new_data` (the dropdown is
@@ -242,20 +251,10 @@ backlogs since `count` is landing-scenario-only. Resolved by
 scenario-named copy (§5), which also settled the draft's original
 cross-scenario-suffix decision point.
 
-## Decision points needing sign-off
-
-1. **Store id.** Keep the `do_update` id with payload data (smallest diff) vs
-   rename to something honest like `run-events` (touches the four references
-   in `home.py` only — the id is not persisted, so no migration concern).
-   Proposed: rename.
-2. **Batch-drain lock vs documented scope.** Proposed: the module-level lock
-   in §2 — two lines, memory-only critical section, turns the "one summary,
-   one landing" invariant from probabilistic into real, and does not touch
-   the deferred store-locking tech debt. Alternative (per round 1): skip the
-   lock and document that coalescing guarantees hold for a single active
-   Home consumer, consistent with the app's single-local-user stance.
-
-Everything else is mechanical once these are fixed.
+Follow-up (2026-07-06, user decisions): both open decision points settled —
+the store is renamed to `run-events` (§1), and the batch-drain lock is
+adopted over the documentation-only alternative (§2). No open decision
+points remain; the rest is mechanical.
 
 ## Out of scope
 
