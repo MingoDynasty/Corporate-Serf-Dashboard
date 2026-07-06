@@ -342,3 +342,23 @@ sharecodes must be skipped and reported rather than resolved first-wins because
 a missing benchmark is visible and recoverable, while silently pairing the wrong
 rank thresholds is not. KovaaK's threshold changes under an unchanged benchmark
 ID remain invisible to provenance checks and require an explicit forced refresh.
+
+## 2026-07-06: Let The Playlist Scenarios Grid Own Vertical Scrolling
+
+Status: Accepted
+
+Decision: Bound the playlist scenarios page to the Mantine AppShell content
+viewport and let the AG Grid use its normal layout with an internal vertical
+scrollbar. The page Stack and Dash Loading wrappers form a flex column, and the
+grid fills the remaining space with a 300px minimum height. Keep the existing
+content-based column sizing and capped flexible Scenario column.
+
+Why: `domLayout: autoHeight` expanded the grid to every row, so the document
+scrolled and carried the column headers out of view on large playlists. A
+bounded grid keeps the headers visible while the user sorts and scans scenarios
+deep in the playlist, and restores row virtualization.
+
+Consequences: Short playlists show empty grid body below their final row instead
+of collapsing the grid. Very short windows may still scroll the page to preserve
+the 300px usable minimum. The layout tracks AppShell header and padding variables
+instead of duplicating their pixel values.

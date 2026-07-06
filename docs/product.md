@@ -67,10 +67,12 @@ list in the roadmap.)
 
 - **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
-  high score, PB cm/360, PB accuracy. *Problem solved:* the headline use case
-  is *"show me the scenarios where I'm worst, sorted ascending — that's my
-  training priority list."* It also surfaces scenarios gone stale. A
-  session-planning tool, checked at the start of a training session.
+  high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
+  the column labels remain visible while scanning deep rows. *Problem solved:*
+  the headline use case is *"show me the scenarios where I'm worst, sorted
+  ascending — that's my training priority list."* It also surfaces scenarios
+  gone stale. A session-planning tool, checked at the start of a training
+  session.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
