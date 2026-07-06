@@ -1,6 +1,6 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised through review rounds 1–3 (2026-07-05/06;
+> **Status:** Proposed — revised through review rounds 1–4 (2026-07-05/06;
 > import semantics settled by the user 2026-07-06); all in PR #58. Land
 > before the playlist-level overview milestone (upcoming #1 in
 > [`roadmap.md`](./roadmap.md)) so the overview is born code-keyed.
@@ -182,11 +182,14 @@ database, the Home filter, and the Journey picker still speak name.
   playlist (§3). There is no in-app refresh path until playlist deletion
   ships; deleting the playlist's file from `data/playlists/` and restarting is
   the interim workaround.
-- **Stale persisted Home filter**: the Home dropdown has `persistence=True`
-  (`home.py:578`), so after the upgrade the client restores the previously
-  selected *name* into a now code-valued selector. The migrated callbacks must
-  treat an unknown value as "no selection" rather than raising (today an
-  unknown name raises `KeyError` in `get_scenarios_from_playlists`).
+- **Stale persisted selections (Home and Journey)**: the Home dropdown and
+  the Journey `MultiSelect` both have `persistence=True` (`home.py:578`,
+  `aim_training_journey.py:86`), so after the upgrade the client restores
+  previously selected *names* into now code-valued selectors. The migrated
+  callbacks must treat unknown values as "no selection" — for the
+  `MultiSelect`, filter unknown entries out and keep any valid ones — rather
+  than raising (today an unknown name raises `KeyError` in
+  `get_scenarios_from_playlists`).
 - No cache impact: rank/leaderboard caches key on leaderboard/scenario
   identity, not playlist name.
 
@@ -198,7 +201,7 @@ database, the Home filter, and the Journey picker still speak name.
 | `source/pages/home.py` | Filter consumes the shared code-valued options (stays a clearable, persisted `Select`); callbacks pass codes to the renamed lookups; import flow surfaces the refusal message naming the existing playlist; tolerate the stale persisted name (see migration plan). |
 | `source/pages/playlist_components.py` | No change — `playlist_selector()` already consumes `get_playlist_selector_options()`, which now returns finished labels. |
 | `/playlists` pages | Already route by code; `get_playlist_by_code` just gets cheaper. Selector removal is separately scheduled by the overview milestone's checklist in the "Playlists Routes Are Stable" decision — do not couple it here. |
-| Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the service's code→label lookup. WIP page, possibly removed later — no further investment. |
+| Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the service's code→label lookup; stale persisted names filtered like Home's (see migration plan). WIP page, possibly removed later — no further investment. |
 | `scripts/benchmark_importer/readme.md` | Activation-copy destination for users becomes `data/playlists/` — update in the shipping PR. |
 | Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases, missing-user-root case, import-refusal cases. |
 
@@ -234,8 +237,9 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
    directory-enumeration order (deterministic across runs and platforms).
 7. On a fresh checkout with no `data/` directory, the app starts and serves
    bundled playlists; the first import creates `data/playlists/`.
-8. A stale persisted Home-filter value (a pre-migration playlist name) does
-   not crash any callback; it degrades to "no selection".
+8. Stale persisted selector values (pre-migration playlist names) do not
+   crash any callback: the Home filter degrades to "no selection", and the
+   Journey `MultiSelect` drops unknown entries while keeping valid ones.
 9. Selecting two same-named playlists on Aim Training Journey produces two
    distinct series with disambiguated labels.
 10. Full merge bar green (ruff format/check, mypy, compileall, pytest) locally
@@ -268,9 +272,11 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
 - **Lookup migration:** rank-overlay and journey queries by code return
   identical results to the pre-change name-based queries on a non-colliding
   fixture (behavioral parity check).
-- **Journey identity:** the journey data function returns one entry per code
-  for two same-named playlists; the plot layer renders two traces whose labels
-  come from the same service lookup the dropdowns use.
+- **Journey identity + stale persistence:** the journey data function returns
+  one entry per code for two same-named playlists; the plot layer renders two
+  traces whose labels come from the same service lookup the dropdowns use; a
+  persisted pre-migration selection (mixed stale names and valid codes) is
+  filtered without raising, mirroring the Home test.
 - **Options builder:** service-level test that disambiguation triggers only on
   collisions; Home callback tests assert the filter emits codes and a stale
   persisted name as the incoming value is handled without raising.
@@ -313,6 +319,12 @@ case-sensitive filesystems (§2); and stale upsert-era wording was corrected —
 §6's "re-imported" writes, the delete-file workaround scoped to user-root
 playlists (bundled refresh via app updates), and §3's benchmark-shadowing
 claim scoped to the import-time path.
+
+Round 4 (2026-07-06, Codex): stale-persistence handling extended to the Aim
+Training Journey `MultiSelect`, which also carries `persistence=True`
+(`aim_training_journey.py:86`) — unknown persisted entries are filtered out
+while valid ones are kept, mirroring Home (migration plan, criterion 8, test
+plan).
 
 Decision points needing sign-off:
 
