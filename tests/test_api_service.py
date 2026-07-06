@@ -532,6 +532,51 @@ def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
     assert json.loads(cache_file.read_text(encoding="utf-8")) == response_json
 
 
+def test_write_json_retries_replace_after_transient_permission_error(
+    tmp_path, monkeypatch
+):
+    cache_file = tmp_path / "cache.json"
+    attempted_temp_files = []
+    sleeps = []
+    original_replace = api_service.os.replace
+
+    def flaky_replace(source, destination):
+        attempted_temp_files.append(Path(source))
+        if len(attempted_temp_files) == 1:
+            raise PermissionError(13, "Access is denied")
+        original_replace(source, destination)
+
+    monkeypatch.setattr(api_service.os, "replace", flaky_replace)
+    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+
+    api_service._write_json(cache_file, {"value": 1})
+
+    assert len(attempted_temp_files) == 2
+    assert sleeps == [api_service.CACHE_REPLACE_RETRY_DELAYS_SECONDS[0]]
+    assert json.loads(cache_file.read_text(encoding="utf-8")) == {"value": 1}
+    assert not attempted_temp_files[0].exists()
+
+
+def test_write_json_raises_after_replace_retries_exhausted(tmp_path, monkeypatch):
+    cache_file = tmp_path / "cache.json"
+    attempted_temp_files = []
+
+    def always_denied(source, destination):
+        attempted_temp_files.append(Path(source))
+        raise PermissionError(13, "Access is denied")
+
+    monkeypatch.setattr(api_service.os, "replace", always_denied)
+    monkeypatch.setattr(api_service.time, "sleep", lambda _delay: None)
+
+    with pytest.raises(PermissionError):
+        api_service._write_json(cache_file, {"value": 1})
+
+    expected_attempts = 1 + len(api_service.CACHE_REPLACE_RETRY_DELAYS_SECONDS)
+    assert len(attempted_temp_files) == expected_attempts
+    assert not cache_file.exists()
+    assert not attempted_temp_files[0].exists()
+
+
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
     def fake_get_with_retry(_url, params, timeout):
         assert timeout == api_service.TIMEOUT
