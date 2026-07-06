@@ -22,9 +22,10 @@ uv run mypy source
 uv run python -m compileall source tests
 ```
 
-- CI runs the same merge bar from `.github/workflows/gates.yml` on every pull
-  request and push to `main`. Pre-handoff local validation is unchanged and
-  remains the fast feedback path.
+- CI runs the cross-repo Python v2 job from `.github/workflows/ci.yml` on every
+  pull request and push to `main`: ruff format, ruff lint, mypy, and pytest.
+  Pre-handoff local validation remains broader because it retains the
+  inexpensive `compileall` check, and remains the fast feedback path.
 
 - Local commits authored by Codex should use:
 
