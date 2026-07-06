@@ -1,7 +1,8 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised through review rounds 1–4 (2026-07-05/06;
-> import semantics settled by the user 2026-07-06); all in PR #58. Land
+> **Status:** Proposed — revised through review rounds 1–4 plus decision
+> settlement (2026-07-05/06); **no open decision points** — see Review
+> round. All in PR #58. Land
 > before the playlist-level overview milestone (upcoming #1 in
 > [`roadmap.md`](./roadmap.md)) so the overview is born code-keyed.
 >
@@ -61,7 +62,9 @@ database, the Home filter, and the Journey picker still speak name.
    Applies to directory loading only — an explicit import of a duplicate code
    is refused with a message (§3). The
    first occurrence of a code wins; later ones are skipped with a warning
-   naming both files. Precedent: the benchmark importer skips-and-reports
+   naming both files, surfaced as a UI notification via `dash_logger` (the
+   channel background rank-refresh failures already use), not only the log
+   file. Precedent: the benchmark importer skips-and-reports
    conflicting duplicates rather than resolving them silently, "because a
    missing benchmark is visible and recoverable" while a silent wrong result
    is not (2026-07-03 "Import Benchmarks From Evxl And KovaaK's" entry in
@@ -89,10 +92,9 @@ database, the Home filter, and the Journey picker still speak name.
    rank data (`data_service.py:509`), so an import matching an
    already-loaded bundled *benchmark* (playlist + rank thresholds) could have
    replaced it with a bare, rank-less copy. The temporal reverse — a code
-   imported *before* a later bundled update ships it — still shadows the
-   richer copy, but that is exactly the §6 cross-root case: the startup
-   warning names the shadowed file, and deleting the user copy adopts the
-   bundled benchmark. Adding upsert later would be a non-breaking addition if
+   imported *before* a later bundled update ships it — resolves itself at the
+   next startup: §6's bundled-wins precedence supersedes the bare import with
+   the benchmark automatically. Adding upsert later would be a non-breaking addition if
    refresh demand appears; shipping it now and walking it back would be a
    behavior break.
 4. **Lookups migrate from name to code**:
@@ -132,19 +134,27 @@ database, the Home filter, and the Journey picker still speak name.
    imported playlists are written to
    `data/playlists/{sanitized name} [{code}].json` (code-suffixed, eliminating
    same-name file collisions); `resources/playlists/` becomes read-only
-   bundled defaults. The loader scans `data/playlists/` first, then
-   `resources/playlists/` — top-level `*.json` only in each, matching today's
+   bundled defaults. The loader scans `resources/playlists/` first, then
+   `data/playlists/` — top-level `*.json` only in each, matching today's
    non-recursive semantics (`resources/playlists/generated/` stays an
    unscanned library; users activating a generated benchmark copy it to
    `data/playlists/` going forward — the importer readme's copy instructions
-   update in the shipping PR). Combined with §2, root order gives cross-root
-   precedence: **a `data/playlists/` copy of a code wins over a bundled
-   copy**, with a warning naming the shadowed file (settled 2026-07-05:
-   `data/` is the user's, and the warning keeps the conflict visible and
-   recoverable — delete the user copy to fall back to the bundled one).
-   Same-code-in-both-roots arises without re-imports: a code imported today
-   can appear in a later bundled update, and the importer's manual activation
-   copies can collide the same way. Because
+   update in the shipping PR). Combined with §2's first-wins rule, root order
+   gives cross-root precedence: **a bundled copy of a code wins over a
+   `data/playlists/` copy**, with a UI-visible notification naming the
+   skipped user file. (Settled 2026-07-06, amending the 2026-07-05
+   user-root-wins call: the bundled root is curated **benchmarks** — every
+   committed file carries rank data, value-verified 2026-07-06 and enforced
+   by a bundled-invariant test — while share-code imports are rank-less by
+   construction, so a bundled copy is a strict superset of any user import
+   it collides with. The main collision path is exactly this: a code
+   imported before a later app update bundles it; bundled-wins turns that
+   conflict into an automatic upgrade. Accepted trade-off: a same-code file
+   in `data/playlists/` can never override a bundled benchmark, so
+   shadow-customizing bundled rank data via file copies is unsupported.)
+   Startup stays **read-only**: the superseded user file is skipped, never
+   deleted — cleanup is an explicit user action (future playlist-manager
+   work). Because
    `data/` is gitignored and `load_playlists()` runs at module import
    (`data_service.py:535`), the loader must treat a missing `data/playlists/`
    as empty rather than raising — a clean checkout starts on bundled playlists
@@ -167,7 +177,12 @@ database, the Home filter, and the Journey picker still speak name.
    one (API-imported and generated benchmark files always have one).
    Remaining work: make the skip warning actionable for missing **or blank**
    codes ("add a `code` field") and document the requirement in the README's
-   Rank Data section. Simpler than synthesizing fallback keys.
+   Rank Data section. Simpler than synthesizing fallback keys. Relatedly,
+   playlist writes adopt the cache layer's atomic pattern — write to a temp
+   file, then the retry-hardened atomic replace (PR #59) — replacing today's
+   plain overwrite (`:530-532`), so an interrupted import can no longer
+   leave a truncated file; the skip-and-warn path then only covers hand
+   edits and external anomalies.
 
 ## Migration plan (existing user data)
 
@@ -182,6 +197,11 @@ database, the Home filter, and the Journey picker still speak name.
   playlist (§3). There is no in-app refresh path until playlist deletion
   ships; deleting the playlist's file from `data/playlists/` and restarting is
   the interim workaround.
+- A code imported before a later app update bundles it: at the next startup
+  the bundled benchmark supersedes the bare import automatically (a
+  notification names the skipped file). No files are deleted at startup;
+  removing the redundant user copy is manual for now (future
+  playlist-manager work).
 - **Stale persisted selections (Home and Journey)**: the Home dropdown and
   the Journey `MultiSelect` both have `persistence=True` (`home.py:578`,
   `aim_training_journey.py:86`), so after the upgrade the client restores
@@ -203,7 +223,7 @@ database, the Home filter, and the Journey picker still speak name.
 | `/playlists` pages | Already route by code; `get_playlist_by_code` just gets cheaper. Selector removal is separately scheduled by the overview milestone's checklist in the "Playlists Routes Are Stable" decision — do not couple it here. |
 | Aim Training Journey page | Mechanical parity only: `MultiSelect` consumes the shared options; journey functions keyed by code; legend labels via the service's code→label lookup; stale persisted names filtered like Home's (see migration plan). WIP page, possibly removed later — no further investment. |
 | `scripts/benchmark_importer/readme.md` | Activation-copy destination for users becomes `data/playlists/` — update in the shipping PR. |
-| Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases, missing-user-root case, import-refusal cases. |
+| Tests | Fixtures with duplicate names / duplicate codes, dual-root fixtures, deterministic-ordering cases, missing-user-root case, import-refusal cases, bundled-invariant and atomic-write cases. |
 
 Note: [`architecture.md`](./architecture.md) already describes
 `playlist_database` as "keyed by code" — incorrect today, true once this
@@ -231,10 +251,12 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
    and is skipped (today a missing code is skipped with a generic
    invalid-JSON warning, and blank codes are accepted outright).
 5. New imports land in `data/playlists/` with code-suffixed filenames;
-   same-named imports no longer overwrite or collide on disk.
-6. The same code in both roots: the `data/playlists/` copy wins, one warning
-   names the shadowed bundled file, and the winner is identical regardless of
-   directory-enumeration order (deterministic across runs and platforms).
+   same-named imports no longer overwrite or collide on disk; an interrupted
+   import leaves no partial file (atomic temp-write + replace).
+6. The same code in both roots: the bundled copy wins, one UI-visible
+   notification names the skipped user file, no file is deleted, and the
+   winner is identical regardless of directory-enumeration order
+   (deterministic across runs and platforms).
 7. On a fresh checkout with no `data/` directory, the app starts and serves
    bundled playlists; the first import creates `data/playlists/`.
 8. Stale persisted selector values (pre-migration playlist names) do not
@@ -259,8 +281,14 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
   the bundled or the user root — is refused with a message naming the existing
   playlist, and neither the store nor the on-disk files change.
 - **Dual root:** same code in `data/playlists/` and `resources/playlists/` →
-  the user copy wins with a warning naming the shadowed bundled file; a
-  bundled-only code still loads.
+  the bundled copy wins with a notification naming the skipped user file, and
+  the user file still exists afterwards; a user-only code still loads.
+- **Bundled invariant:** every committed `resources/playlists/**` file
+  carries rank data — the curation rule the bundled-wins precedence leans
+  on, enforced in CI.
+- **Atomic write:** an exception injected mid-write leaves no partial or
+  truncated playlist file, and any previous file for that playlist is
+  intact.
 - **Missing user root:** `load_playlists()` with no `data/playlists/` present
   → no error, bundled playlists load; the first import creates the directory.
 - **Missing or blank code:** files with a missing, an empty, and a
@@ -326,13 +354,24 @@ Training Journey `MultiSelect`, which also carries `persistence=True`
 while valid ones are kept, mirroring Home (migration plan, criterion 8, test
 plan).
 
-Decision points needing sign-off:
+Settlement (2026-07-06, user decisions after discussion): **both open
+decision points are settled, and one earlier call is amended.**
 
-1. **Startup duplicate-code policy** — skip-and-warn (proposed) vs last-wins.
-2. **Missing-`code` policy** — the status quo already rejects codeless files
-   via required-field validation; the question reduces to improving the skip
-   warning (proposed) vs synthesizing fallback keys.
+1. **Startup duplicate-code policy — settled: skip-and-warn**, surfaced as UI
+   notifications via `dash_logger`, not only the log file. Fail-fast was
+   considered and rejected: a bad or duplicate playlist file is not a
+   prerequisite failure (the app's core runs with zero playlists), and
+   legitimate paths produce these states — most notably a code imported
+   before a later app update bundles it.
+2. **Missing-`code` policy — settled: skip with an actionable warning** (no
+   fallback keys). In support, playlist writes become atomic (§7), shrinking
+   the truncated-file case to hand edits and external anomalies.
+3. **Cross-root precedence — amended: bundled wins** (supersedes the
+   2026-07-05 user-root-wins call; §6 states the benchmark-superset
+   invariant it leans on and the accepted trade-off). Startup remains
+   read-only — superseded user files are skipped, never deleted; cleanup is
+   future playlist-manager work.
 
-Everything else is mechanical once those are fixed. Suggested sequencing: land
-before the playlist-level overview milestone (the overview will enumerate
-playlists — it should be born code-keyed).
+With these settled, the proposal has no open decision points. Suggested
+sequencing: land before the playlist-level overview milestone (the overview
+will enumerate playlists — it should be born code-keyed).
