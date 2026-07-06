@@ -3,8 +3,9 @@
 > **Status:** Proposed — drafted 2026-07-06 from approach A2 of the vault
 > planning note (consumption semantics verified 2026-07-05, TODO Home item 6
 > from the 2026-07-04 whole-project audit triage); revised through review
-> round 1 (2026-07-06, Codex) and both decision points settled by the user
-> the same day; all in PR #60. Code citations verified at `24ac3e3`. No open
+> rounds 1–2 (2026-07-06, Codex) with user decisions settled along the way —
+> `run-events` rename, then single-tab scope superseding the briefly-adopted
+> drain lock; all in PR #60. Code citations verified at `24ac3e3`. No open
 > decision points remain.
 
 Returning to Home after playing with another page open replays the queued run
@@ -62,24 +63,25 @@ gets toasted.
    only reads the payload for toast content. The store's other listeners
    (`get_scenario_num_runs` at `home.py:119`, `get_scenario_rank` at `:221`)
    keep using it as a bare trigger, unchanged.
-2. **Atomic batch drain.** `popleft()` in a loop under `try/except
-   IndexError` — never len-then-pop — wrapped in a module-level
-   `threading.Lock` so the *batch* is atomic, not just each item (round 1:
-   per-item atomicity alone lets two Home tabs each drain part of the
-   backlog, producing two partial summaries and possibly two different
-   landing scenarios). With the lock, semantics are winner-takes-all: exactly
-   one consumer gets the whole backlog and its summary; a concurrent tab's
-   tick sees an empty queue and no-ops. The lock guards only this drain loop
-   (memory-only, no I/O) — it is not the store-locking work deferred in
-   [`tech_debt.md`](./tech_debt.md)'s "Unsynchronized shared in-memory
-   stores" entry, whose producer-side `deque.append` remains lock-free and
-   safe against `popleft`. Settled 2026-07-06 (user decision): the lock is
-   adopted; the round-1 alternative — no lock, guarantees documented for a
-   single active Home consumer — was declined because the two-tab case is
-   exactly when a backlog exists, the failure mode is user-visible
-   confusion, and the lock costs three lines and microseconds. Known limit,
-   accepted: the losing tab gets no trigger that tick and catches up on its
-   own next input; full multi-tab sync is out of scope.
+2. **Drain idiom and concurrency scope.** `popleft()` in a loop under
+   `try/except IndexError` — never len-then-pop — which removes the existing
+   two-tab `IndexError` race and keeps any concurrent access crash-safe. The
+   supported usage model is **one active Home tab** (settled 2026-07-06,
+   user decision in round 2, superseding round 1's brief adoption of a batch
+   lock). The reason no lock can rescue a second tab: the payload store is
+   per-tab `memory` state (`home.py:539`), and neither `generate_graph`
+   (`:262-271`) nor `get_scenario_num_runs` (`:119-120`) has an interval
+   input — a tab that misses a drain has **no automatic catch-up**, lock or
+   no lock; only the cache-only rank text ticks (`:223`). Coherent multi-tab
+   behavior therefore requires a push/broadcast transport (rejected below),
+   so the lock would only defend an unsupported configuration. Under scope
+   violation the app stays safe but unsynchronized: whichever tab's tick
+   drains first gets the events; other tabs' plots stay stale until their
+   next user input or remount, and toasts may split across tabs. The
+   shipping PR adds the one-active-Home-tab usage note to the README. No
+   lock is added — consistent with the "Unsynchronized shared in-memory
+   stores" stance in [`tech_debt.md`](./tech_debt.md); the producer-side
+   `deque.append` remains lock-free and safe against `popleft`.
 3. **Landing policy.** Auto-change ON: land on the *latest* drained message's
    scenario — the most recent thing the user played — flipping the dropdown
    at most once. The flip re-triggers `check_for_new_data` (the dropdown is
@@ -171,11 +173,12 @@ gets toasted.
 
 | Surface | Change |
 | ------- | ------ |
-| `source/pages/home.py` | The bulk of the diff: locked drain + payload in `check_for_new_data`, queue access removed from `generate_graph`, toast policy, trigger discipline. |
+| `source/pages/home.py` | The bulk of the diff: drain + payload in `check_for_new_data`, queue access removed from `generate_graph`, toast policy, trigger discipline. |
 | `source/my_watchdog/file_watchdog.py` | Round 1: the three enqueue/load sites reorder to load-then-enqueue-on-success (§7). |
 | `source/kovaaks/data_service.py` | Round 1: `load_csv_file_into_database` returns `bool`; no caller-breaking change. |
 | `source/my_queue/message_queue.py` | No change — the deque structure is untouched. |
 | [`architecture.md`](./architecture.md) | Shipping PR updates the data-flow description: "Check peeks / Graph poplefts" becomes "Check drains and summarizes; Graph reads the payload"; "drains the queue each tick" gains its now-true meaning; and the "message is appended *before* the run is loaded" sentence flips to the new ordering. |
+| `README.md` | Round 2: shipping PR adds the supported-usage note — one active Home tab; extra tabs are crash-safe but unsynchronized. |
 | Tests | New — no tests cover these callbacks today. See test plan. |
 | Docs lifecycle | On ship: distill into `decision_log.md`, delete this file, add the user-facing rationale to `product.md` (AGENTS.md "Shipping a proposal"). No roadmap entry — this is a defect fix, not a milestone. |
 
@@ -196,9 +199,9 @@ gets toasted.
    score (defect 1 regression test).
 7. Changing the date picker or top-N with a non-empty queue neither consumes
    messages nor toasts (defect 2 regression test).
-8. Two concurrent drains split nothing: one consumer receives the entire
-   backlog and the single summary, the other no-ops — and no `IndexError` is
-   possible (defect 3).
+8. A concurrent drain from a second Home tab can never raise (defect 3 —
+   the `try/except` drain); beyond crash-safety, multi-tab behavior is out
+   of supported scope, and the README states the one-active-Home-tab model.
 9. A message drained from the queue always corresponds to a run already
    queryable in the DB; a run whose load fails produces one warning and no
    message (§7 regression tests).
@@ -225,10 +228,9 @@ construction from a payload likewise becomes a directly callable helper.
   latest run only; scenario-mismatch produces no toast (defect 1).
 - **Trigger discipline:** `generate_graph` with a stale payload and a
   control-change trigger produces no toast (defect 2).
-- **Batch atomicity:** two threads calling the drain helper against one
-  seeded queue — exactly one receives all messages, the other receives none
-  (lock test); the `try/except` idiom still tolerates a fake whose `popleft`
-  raises mid-drain.
+- **Drain race tolerance:** the `try/except` idiom tolerates a fake whose
+  `popleft` raises mid-drain (crash-safety under scope violation; no lock
+  and no two-thread coherence test — single-active-tab scope per §2).
 - **Producer ordering (§7):** `load_csv_file_into_database` returns `True`
   on success / `False` on extract failure; watchdog enqueues only on `True`
   (monkeypatch precedent: `tests/test_file_watchdog_rank_refresh.py:42-46`
@@ -253,8 +255,23 @@ cross-scenario-suffix decision point.
 
 Follow-up (2026-07-06, user decisions): both open decision points settled —
 the store is renamed to `run-events` (§1), and the batch-drain lock is
-adopted over the documentation-only alternative (§2). No open decision
-points remain; the rest is mechanical.
+adopted over the documentation-only alternative (§2).
+
+Round 2 (2026-07-06, Codex, PR #60): one finding, confirmed — the round-1
+claim that a losing tab "catches up on its own next input" overstated the
+mechanics as written, and the natural next-tick reading is simply false.
+Verified: the payload store is per-tab `memory` state (`home.py:539`) and
+neither `generate_graph` (`:262-271`) nor `get_scenario_num_runs`
+(`:119-120`) is interval-driven, so a tab that misses a drain has no
+automatic catch-up — it stays stale until a user input in that tab, a
+remount, or a future backlog it happens to win. Resolution (user decision):
+rather than broadcast/version machinery or an SSE migration, the supported
+scope is **one active Home tab**, documented in the README — and the
+round-1 lock adoption is reverted, since even a locked winner-takes-all
+drain cannot keep a second tab current; §2 keeps only the `try/except`
+drain idiom. This supersedes the follow-up settlement above on the lock;
+the `run-events` rename stands. No open decision points remain; the rest
+is mechanical.
 
 ## Out of scope
 
