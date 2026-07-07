@@ -18,8 +18,8 @@ from dash import (
     dcc,
     no_update,
 )
-from dash_iconify import DashIconify
 
+from source.components.local_icon import local_icon
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
@@ -365,7 +365,7 @@ def _build_run_event_notifications(
                 "message": message,
                 "color": color,
                 "id": "run-summary-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         ]
@@ -383,7 +383,7 @@ def _build_run_event_notifications(
                 "message": notification_message,
                 "color": "green",
                 "id": "new-top-n-score-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         )
@@ -406,7 +406,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "green",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:check"),
+                    "icon": local_icon("material-symbols:check"),
                     "autoClose": 8000,
                 }
             )
@@ -421,7 +421,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "yellow",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:warning-outline"),
+                    "icon": local_icon("material-symbols:warning-outline"),
                     "autoClose": 8000,
                 }
             )
@@ -433,7 +433,7 @@ def _build_run_event_notifications(
                 "message": "Graph updated!",
                 "color": "blue",
                 "id": "graph-updated-notification",
-                "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+                "icon": local_icon("material-symbols:refresh-rounded"),
             }
         )
     return notifications
@@ -598,7 +598,7 @@ def _build_startup_playlist_warning_notifications(
             "message": warning,
             "color": "yellow",
             "id": f"startup-playlist-warning-{idx}",
-            "icon": DashIconify(icon="material-symbols:warning-outline"),
+            "icon": local_icon("material-symbols:warning-outline"),
             "autoClose": 10000,
         }
         for idx, warning in enumerate(warnings)
@@ -650,7 +650,7 @@ def import_playlist(_, playlist_to_import):
             "message": error_message,
             "color": "red",
             "id": "imported-playlist-failed-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     else:
         notification = {
@@ -659,7 +659,7 @@ def import_playlist(_, playlist_to_import):
             "message": "Successfully imported playlist!",
             "color": "green",
             "id": "imported-playlist-successful-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     return [notification], get_playlist_selector_options()
 
@@ -767,7 +767,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     label="Oldest date to consider",
                                     maxDate=datetime.now().isoformat(),
                                     persistence=True,
-                                    rightSection=DashIconify(icon="clarity:date-line"),
+                                    rightSection=local_icon("clarity:date-line"),
                                     value=datetime(
                                         datetime.now().year,
                                         month=1,
@@ -850,8 +850,8 @@ def layout(**kwargs):  # noqa: ARG001
                                                     id="rank-refresh-button",
                                                     variant="subtle",
                                                     size="compact-xs",
-                                                    leftSection=DashIconify(
-                                                        icon="material-symbols:refresh-rounded",
+                                                    leftSection=local_icon(
+                                                        "material-symbols:refresh-rounded",
                                                         width=14,
                                                     ),
                                                 ),
@@ -897,8 +897,8 @@ def layout(**kwargs):  # noqa: ARG001
                                         "Settings",
                                         id="settings-modal-open-button",
                                         variant="default",
-                                        leftSection=DashIconify(
-                                            icon="clarity:settings-line",
+                                        leftSection=local_icon(
+                                            "clarity:settings-line",
                                             width=25,
                                         ),
                                     ),
