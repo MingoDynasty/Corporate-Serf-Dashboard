@@ -226,6 +226,34 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     assert imported.code == "NewCode"
 
 
+def test_import_reports_write_failures_without_updating_database(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Locked Playlist",
+                playlistCode="LockedCode",
+                scenarioList=[SimpleNamespace(scenarioName="Imported Scenario")],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    def fail_write(_playlist):
+        raise PermissionError("playlist file is locked")
+
+    monkeypatch.setattr(data_service, "write_playlist_data_to_file", fail_write)
+
+    message = data_service.load_playlist_from_code("LockedCode")
+
+    assert message == "Failed to save playlist data: Locked Playlist (LockedCode)"
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
 def test_write_playlist_data_to_file_retries_transient_replace_errors(
     monkeypatch,
     tmp_path,

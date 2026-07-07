@@ -628,6 +628,12 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
         )
         logger.warning(message)
         return message
+    except OSError:
+        message = (
+            f"Failed to save playlist data: {playlist_data.name} ({playlist_data.code})"
+        )
+        logger.warning(message)
+        return message
     playlist_database[playlist_data.code] = playlist_data
     return None
 

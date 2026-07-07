@@ -476,7 +476,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :param selected_date: user-selected date.
     :param x_axis_radiogroup: user-selected x-axis radio group.
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
-    :param selected_playlist: user-selected playlist name.
+    :param selected_playlist: user-selected playlist code.
     :return: Figure serialized to JSON, Notification
     """
     if not selected_scenario or not top_n_scores or not selected_date:
