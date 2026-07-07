@@ -42,6 +42,7 @@ from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
     apply_light_dark_mode,
+    generate_empty_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
@@ -54,12 +55,27 @@ SCENARIO_RANK_LOADING_DELAY_MS = 250
 LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
+_SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
+_SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
+_INCOMPLETE_GRAPH_CONTROLS_TITLE = "Graph settings incomplete"
+_INCOMPLETE_GRAPH_CONTROLS_MESSAGE = (
+    "Choose a Top N value and start date to plot this scenario."
+)
+_NO_SCENARIO_DATA_PLOT_TITLE = "No local runs found"
+_NO_SCENARIO_DATA_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
+_NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
+_NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
 dash.register_page(
     __name__,
     path="/",
     title="Corporate Serf Dashboard",
     redirect_from=["/home", "/index"],
 )
+
+
+def _empty_plot_json(title: str, message: str) -> str:
+    """Serialize an empty-state graph for the cached plot store."""
+    return generate_empty_plot(title, message).to_json()
 
 
 class RunEventData(TypedDict):
@@ -479,13 +495,34 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :param selected_playlist: user-selected playlist code.
     :return: Figure serialized to JSON, Notification
     """
-    if not selected_scenario or not top_n_scores or not selected_date:
-        return go.Figure().to_json(), no_update
+    if not selected_scenario:
+        return (
+            _empty_plot_json(
+                _SELECT_SCENARIO_PLOT_TITLE,
+                _SELECT_SCENARIO_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
+
+    if not top_n_scores or not selected_date:
+        return (
+            _empty_plot_json(
+                _INCOMPLETE_GRAPH_CONTROLS_TITLE,
+                _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
+            ),
+            no_update,
+        )
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
-        return go.Figure().to_json(), no_update
+        return (
+            _empty_plot_json(
+                _NO_SCENARIO_DATA_PLOT_TITLE,
+                _NO_SCENARIO_DATA_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
 
     oldest_datetime = datetime.combine(
         datetime.fromisoformat(selected_date).date(),
@@ -506,7 +543,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:
@@ -533,7 +576,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:

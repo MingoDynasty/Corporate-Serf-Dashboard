@@ -232,6 +232,32 @@ def test_notifications_ignore_payload_for_another_scenario():
     )
 
 
+def test_generate_graph_returns_empty_state_before_scenario_selection():
+    plot_json, notifications = home.generate_graph(
+        None,
+        None,
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert plot["layout"]["title"]["text"] == "No scenario selected"
+    assert plot["layout"]["annotations"][0]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
+
+
 def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatch):
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(
