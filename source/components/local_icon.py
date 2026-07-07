@@ -7,6 +7,7 @@ from dash import html
 from dash.development.base_component import Component
 
 ICON_ASSET_ROOT = "/assets/icons"
+_ARIA_HIDDEN: dict[str, Any] = {"aria-hidden": "true"}
 
 
 @dataclass(frozen=True)
@@ -87,6 +88,16 @@ def _resolve_size(
     return width, height
 
 
+def _get_icon_asset(name: str) -> IconAsset:
+    try:
+        return ICONS[name]
+    except KeyError as exc:
+        raise KeyError(
+            f"Unknown local icon {name!r}. Add its SVG under assets/icons/ "
+            "and register it in ICONS."
+        ) from exc
+
+
 def local_icon(  # noqa: PLR0913
     name: str,
     *,
@@ -97,7 +108,7 @@ def local_icon(  # noqa: PLR0913
     style: dict[str, Any] | None = None,
 ) -> Component:
     """Build a local icon component for a vendored Iconify icon name."""
-    asset = ICONS[name]
+    asset = _get_icon_asset(name)
     icon_width, icon_height = _resolve_size(asset, width, height)
     asset_url = f"{ICON_ASSET_ROOT}/{asset.file_name}"
 
@@ -117,7 +128,7 @@ def local_icon(  # noqa: PLR0913
             alt="",
             className=className,
             style=base_style,
-            **{"aria-hidden": "true"},
+            **_ARIA_HIDDEN,
         )
 
     mask = f"url({asset_url}) no-repeat center / contain"
@@ -129,5 +140,5 @@ def local_icon(  # noqa: PLR0913
             "mask": mask,
             "WebkitMask": mask,
         },
-        **{"aria-hidden": "true"},
+        **_ARIA_HIDDEN,
     )
