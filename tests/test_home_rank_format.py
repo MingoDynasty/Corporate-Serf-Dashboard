@@ -3,6 +3,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 import dash
+import dash_mantine_components as dmc
 import pytest
 from dash import dcc
 
@@ -96,6 +97,24 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
 
     assert home.select_playlist("Old Playlist Name") == ["All"]
     assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
+
+
+def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
+    monkeypatch,
+):
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    titles = {
+        component.children: component
+        for component in _walk_components(home.layout())
+        if isinstance(component, dmc.Title)
+    }
+
+    assert titles["Scenario Stats"].order == 2
+    assert titles["Scenario Stats"].size == "h6"
+    assert titles["Display Settings"].order == 2
+    assert titles["Display Settings"].size == "h4"
 
 
 def test_get_scenario_num_runs_without_selection():
