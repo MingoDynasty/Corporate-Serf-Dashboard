@@ -16,7 +16,7 @@ def test_playlist_helpers_find_playlist_by_code(monkeypatch):
         code="KovaaKsTestCode",
         scenarios=[Scenario(name="First"), Scenario(name="Second")],
     )
-    monkeypatch.setattr(data_service, "playlist_database", {playlist.name: playlist})
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
 
     assert data_service.get_playlist_by_code("KovaaKsTestCode") == playlist
     assert data_service.get_scenarios_from_playlist_code("KovaaKsTestCode") == [
@@ -202,7 +202,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             Scenario(name="Third"),
         ],
     )
-    monkeypatch.setattr(data_service, "playlist_database", {playlist.name: playlist})
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
     monkeypatch.setattr(
         playlist_scenarios_service,
         "config",

@@ -5,7 +5,7 @@ Pydantic models for various data classes.
 import datetime
 from dataclasses import dataclass
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 @dataclass(frozen=True)
@@ -51,3 +51,13 @@ class PlaylistData(BaseModel):
     name: str
     code: str
     scenarios: list[Scenario]
+
+    @field_validator("code")
+    @classmethod
+    def strip_and_require_code(cls, value: str) -> str:
+        """Normalize playlist codes before they become store keys."""
+        code = value.strip()
+        if not code:
+            msg = "Playlist code is required; add a `code` field."
+            raise ValueError(msg)
+        return code

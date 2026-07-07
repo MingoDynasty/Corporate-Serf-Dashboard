@@ -36,6 +36,16 @@ def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
 
     monkeypatch.setattr(
         aim_training_journey,
+        "filter_known_playlist_codes",
+        lambda selected_playlists: selected_playlists,
+    )
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_playlist_display_label",
+        lambda playlist_code: playlist_code,
+    )
+    monkeypatch.setattr(
+        aim_training_journey,
         "get_aim_training_journey_for_playlists",
         lambda selected_playlists: {
             selected_playlists[0]: {datetime(2025, 1, 1): 0.5},
@@ -52,6 +62,61 @@ def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
 
     assert light_figure.layout.template.layout.paper_bgcolor == "#ffffff"
     assert dark_figure.layout.template.layout.paper_bgcolor == "#242424"
+
+
+def test_aim_training_journey_filters_stale_values_and_disambiguates_labels(
+    monkeypatch,
+):
+    dmc.add_figure_templates()
+    seen_codes = []
+
+    monkeypatch.setattr(
+        aim_training_journey,
+        "filter_known_playlist_codes",
+        lambda selected_playlists: [
+            playlist_code
+            for playlist_code in selected_playlists
+            if playlist_code in {"CodeA", "CodeB"}
+        ],
+    )
+
+    def fake_journey(selected_playlists):
+        seen_codes.append(selected_playlists)
+        return {
+            "CodeA": {datetime(2025, 1, 1): 0.5},
+            "CodeB": {datetime(2025, 1, 1): 0.75},
+        }
+
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_aim_training_journey_for_playlists",
+        fake_journey,
+    )
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_aim_training_checkpoints",
+        lambda checkpoint_hour: {},
+    )
+    monkeypatch.setattr(
+        aim_training_journey,
+        "get_playlist_display_label",
+        lambda playlist_code: {
+            "CodeA": "Same Name (CodeA)",
+            "CodeB": "Same Name (CodeB)",
+        }[playlist_code],
+    )
+
+    figure = aim_training_journey.generate_graph(
+        ["Old Playlist Name", "CodeA", "CodeB"],
+        10,
+        "light",
+    )
+
+    assert seen_codes == [["CodeA", "CodeB"]]
+    assert [trace.name for trace in figure.data] == [
+        "Same Name (CodeA)",
+        "Same Name (CodeB)",
+    ]
 
 
 def test_aim_training_journey_waits_for_color_scheme():
@@ -84,7 +149,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
             "percentile_sort": 90.5,
         }
     ]
-    monkeypatch.setattr(data_service, "playlist_database", {playlist.name: playlist})
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
 
     def fake_build_rows(playlist_code):
         assert playlist_code == "KovaaKsTestCode"

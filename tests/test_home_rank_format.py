@@ -7,7 +7,7 @@ import dash_mantine_components as dmc
 import pytest
 from dash import dcc
 
-from source.kovaaks import api_service
+from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -30,7 +30,11 @@ def _walk_components(component):
 
 
 def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
-    monkeypatch.setattr(home, "get_playlists", lambda: ["Voltaic Benchmarks"])
+    monkeypatch.setattr(
+        home,
+        "get_playlist_selector_options",
+        lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
+    )
     monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
 
     playlist_filter = next(
@@ -43,7 +47,7 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
-    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     components = list(_walk_components(home.layout()))
@@ -67,10 +71,38 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert tooltip.events == home.LAST_PLAYED_TOOLTIP_EVENTS
 
 
+def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
+    data_service.playlist_startup_warning_queue.clear()
+    warnings = ["First warning", "Second warning"]
+    data_service.playlist_startup_warning_queue.extend(warnings)
+
+    notifications = home.flush_startup_playlist_warnings(1)
+
+    assert [notification["message"] for notification in notifications] == warnings
+    assert home.flush_startup_playlist_warnings(2) is dash.no_update
+
+
+def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_playlist_by_code",
+        lambda code: object() if code == "ValidCode" else None,
+    )
+    monkeypatch.setattr(
+        home,
+        "get_scenarios_from_playlist_code",
+        lambda code: [f"{code} Scenario"],
+    )
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: ["All"])
+
+    assert home.select_playlist("Old Playlist Name") == ["All"]
+    assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
+
+
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
-    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     titles = {
@@ -442,7 +474,7 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
-    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     page = home.layout()

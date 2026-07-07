@@ -22,7 +22,7 @@ thresholds.
    provenance in each file and resume state in `generated/manifest.json`.
 4. Manually copy reviewed output to `resources/playlists/generated/`.
 5. Copy the benchmarks you want the app to load from there into
-   `resources/playlists/`, then restart the app.
+   `data/playlists/`, then restart the app.
 
 Run from the repository root:
 

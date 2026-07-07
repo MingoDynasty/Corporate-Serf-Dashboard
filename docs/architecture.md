@@ -98,7 +98,11 @@ that summary and never accesses the queue directly.
   module globals, rebuilt from CSVs on every startup:
   - `kovaaks_database` — scenario stats keyed by scenario name
   - `run_database` — a `SortedList` of all runs ordered by time
-  - `playlist_database` — loaded playlists keyed by code
+  - `playlist_database` — loaded playlists keyed by code. Startup loads
+    top-level JSON files from bundled `resources/playlists/` first and user
+    `data/playlists/` second; the first file for a code wins, duplicate-code
+    files warn visibly after the UI mounts, and a missing user root is treated
+    as empty. New imports are written atomically under `data/playlists/`.
 - **Cache layer** — KovaaK's API responses and resolved rank/leaderboard data
   persist as JSON under `cache/` (not committed), written atomically and read
   tolerantly. Subtrees include `scenario_leaderboards/`,
