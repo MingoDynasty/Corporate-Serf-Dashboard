@@ -4,7 +4,7 @@ import logging
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, dcc
+from dash import Input, Output, State, callback
 from dash_iconify import DashIconify
 
 from source.utilities.dash_logging import log_handler
@@ -12,7 +12,7 @@ from source.utilities.dash_logging import log_handler
 logger = logging.getLogger(__name__)
 
 APP_INDEX_STRING = """<!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         {%metas%}
         <title>{%title%}</title>
@@ -108,23 +108,17 @@ theme_switch_component = dmc.ColorSchemeToggle(
 )
 
 
-def nav_link(label: str, href: str, icon: str) -> dcc.Link:
-    """Build Dash-native navbar links around Mantine's visual NavLink."""
-    return dcc.Link(
-        dmc.NavLink(
-            label=label,
-            leftSection=dmc.ThemeIcon(
-                DashIconify(icon=icon, height=36),
-                size="lg",
-                variant="outline",
-            ),
+def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
+    """Build a single-anchor Dash-native navbar link."""
+    return dmc.NavLink(
+        label=label,
+        leftSection=dmc.ThemeIcon(
+            DashIconify(icon=icon, height=36),
+            size="lg",
+            variant="outline",
         ),
         href=href,
         refresh=False,
-        style={
-            "color": "inherit",
-            "textDecoration": "none",
-        },
     )
 
 
@@ -151,6 +145,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                 persisted_props=["opened"],
                                                 persistence=True,
                                                 persistence_type="local",
+                                                **{"aria-label": "Toggle navigation"},
                                             ),
                                             dmc.Anchor(
                                                 children=[

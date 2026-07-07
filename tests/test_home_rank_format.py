@@ -3,6 +3,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 import dash
+import dash_mantine_components as dmc
 import pytest
 from dash import dcc
 
@@ -64,6 +65,24 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert tooltip.disabled is True
     assert tooltip.label == ""
     assert tooltip.events == home.LAST_PLAYED_TOOLTIP_EVENTS
+
+
+def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
+    monkeypatch,
+):
+    monkeypatch.setattr(home, "get_playlists", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    titles = {
+        component.children: component
+        for component in _walk_components(home.layout())
+        if isinstance(component, dmc.Title)
+    }
+
+    assert titles["Scenario Stats"].order == 2
+    assert titles["Scenario Stats"].size == "h6"
+    assert titles["Display Settings"].order == 2
+    assert titles["Display Settings"].size == "h4"
 
 
 def test_get_scenario_num_runs_without_selection():
