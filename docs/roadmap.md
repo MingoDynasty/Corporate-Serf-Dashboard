@@ -45,6 +45,11 @@ Design rationale for shipped work lives in
 - **Benchmark importer** — script that resolves playlists via Evxl and rank
   thresholds via KovaaK's into reviewable generated benchmark files with
   provenance stamps. (PRs #45–#48)
+- **Playlist code identity and user-root imports** — playlists are keyed by
+  KovaaK's share code, duplicate names are preserved with disambiguated
+  labels, duplicate codes warn visibly, and imported playlists live under
+  `data/playlists/`. This shipped the enabling identity work for the
+  playlist-level overview. (PR #__PLAYLIST_REKEY_PR__)
 
 ---
 

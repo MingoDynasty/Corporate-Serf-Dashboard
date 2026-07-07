@@ -63,8 +63,10 @@ share one in-memory run-event queue and are not synchronized with each other.
 In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
 the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
 common benchmarks. These files are in `resources/playlists/generated`. If you wish to include a specific benchmark into
-the app, then simply copy the desired JSON file from `resources/playlists/generated` to `resources/playlists`. Then
-restart the app.
+the app, then copy the desired JSON file from `resources/playlists/generated` to `data/playlists` and restart the app.
+
+Playlist JSON must include a non-blank `code` field. The app uses that code as the playlist identity for routes,
+selectors, imports, and filenames; playlist names are only display labels.
 
 ## Import Playlist
 
@@ -72,4 +74,4 @@ In the `Settings` modal, there is an option to import a playlist via share code.
 KovaaK's API with your input share code to retrieve the playlist data.
 
 Note that by importing playlists this way, the playlist will not include rank data. If you want to include rank data for
-the rank overlays, then see the **Rank Data** section.
+the rank overlays, then see the **Rank Data** section. Imported playlists are saved under `data/playlists`.

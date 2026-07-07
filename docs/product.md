@@ -89,6 +89,12 @@ list in the roadmap.)
   onboarding a playlist takes one code paste, not hand-building a scenario
   list. The only part of the app that requires an internet connection besides
   rank lookups.
+- **Code-based playlist identity** (PR #__PLAYLIST_REKEY_PR__). Playlist
+  codes, not names, identify imported and bundled playlists; duplicate names
+  stay visible with disambiguated labels, and imports are stored under
+  `data/playlists/`. *Problem solved:* same-named playlists no longer
+  silently overwrite each other in memory or on disk, and user imports no
+  longer live in the committed bundled-playlist root.
 - **Benchmark importer** (`scripts/benchmark_importer/`, PRs #45–#48). Merges
   Evxl playlist resolution with KovaaK's rank thresholds into reviewable
   benchmark files under `resources/playlists/generated/`. *Problem solved:*

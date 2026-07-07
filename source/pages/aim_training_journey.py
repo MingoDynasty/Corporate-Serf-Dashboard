@@ -8,9 +8,11 @@ from dash import Input, Output, callback, dcc
 from dash.exceptions import PreventUpdate
 
 from source.kovaaks.data_service import (
+    filter_known_playlist_codes,
     get_aim_training_checkpoints,
     get_aim_training_journey_for_playlists,
-    get_playlists,
+    get_playlist_display_label,
+    get_playlist_selector_options,
 )
 from source.plot.plot_service import (
     apply_light_dark_mode,
@@ -39,15 +41,26 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
         raise PreventUpdate
     if not selected_playlist or not checkpoint_hour:
         return None
-    journey_data = get_aim_training_journey_for_playlists(selected_playlist)
-    for playlist, data in journey_data.items():
+    selected_playlist_codes = filter_known_playlist_codes(selected_playlist)
+    if not selected_playlist_codes:
+        return None
+
+    journey_data = get_aim_training_journey_for_playlists(selected_playlist_codes)
+    labeled_journey_data = {
+        get_playlist_display_label(playlist_code): data
+        for playlist_code, data in journey_data.items()
+    }
+    for playlist_code, data in journey_data.items():
         if not data:
-            message = f"Insufficient data for playlist: {playlist}"
+            message = (
+                "Insufficient data for playlist: "
+                f"{get_playlist_display_label(playlist_code)}"
+            )
             dash_logger.warning(message)
 
     aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)
     figure = generate_aim_training_journey_plot(
-        journey_data,
+        labeled_journey_data,
         aim_training_checkpoints,
     )
     return apply_light_dark_mode(figure, color_scheme)
@@ -78,7 +91,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     checkIconPosition="right",
                                     # clearSearchOnFocus=True,
                                     clearable=True,
-                                    data=get_playlists(),
+                                    data=get_playlist_selector_options(),
                                     id="playlists-multi-select",
                                     label="Playlist filter",
                                     miw=400,

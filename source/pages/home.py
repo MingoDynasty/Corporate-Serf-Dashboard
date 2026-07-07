@@ -24,11 +24,13 @@ from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
+    drain_startup_playlist_warnings,
     get_high_score,
-    get_playlists,
-    get_rank_data_from_playlist,
+    get_playlist_by_code,
+    get_playlist_selector_options,
+    get_rank_data_from_playlist_code,
     get_scenario_stats,
-    get_scenarios_from_playlists,
+    get_scenarios_from_playlist_code,
     get_sensitivities_vs_runs_filtered,
     get_time_vs_runs,
     get_unique_scenarios,
@@ -508,7 +510,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
 
         rank_data = None
         if selected_playlist:
-            rank_data = get_rank_data_from_playlist(
+            rank_data = get_rank_data_from_playlist_code(
                 selected_playlist, selected_scenario
             )
 
@@ -535,7 +537,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
 
         rank_data = None
         if selected_playlist:
-            rank_data = get_rank_data_from_playlist(
+            rank_data = get_rank_data_from_playlist_code(
                 selected_playlist, selected_scenario
             )
 
@@ -586,6 +588,36 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
+def _build_startup_playlist_warning_notifications(
+    warnings: list[str],
+) -> list[dict[str, object]]:
+    return [
+        {
+            "action": "show",
+            "title": "Playlist Warning",
+            "message": warning,
+            "color": "yellow",
+            "id": f"startup-playlist-warning-{idx}",
+            "icon": DashIconify(icon="material-symbols:warning-outline"),
+            "autoClose": 10000,
+        }
+        for idx, warning in enumerate(warnings)
+    ]
+
+
+@callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Input("startup-playlist-warning-interval", "n_intervals"),
+    prevent_initial_call=True,
+)
+def flush_startup_playlist_warnings(_):
+    """Deliver import-time playlist warnings after Dash has mounted."""
+    warnings = drain_startup_playlist_warnings()
+    if not warnings:
+        return no_update
+    return _build_startup_playlist_warning_notifications(warnings)
+
+
 @callback(
     Output("settings-modal", "opened"),
     Input("settings-modal-open-button", "n_clicks"),
@@ -607,15 +639,15 @@ def modal_demo(_, opened):
 def import_playlist(_, playlist_to_import):
     """Import a playlist code and report the result to the UI."""
     if not playlist_to_import:
-        return no_update
+        return no_update, no_update
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message = load_playlist_from_code(playlist_to_import)
     if error_message:
         notification = {
             "action": "show",
-            "title": "Notification",
-            "message": "Failed to import playlist.",
+            "title": "Playlist Import Failed",
+            "message": error_message,
             "color": "red",
             "id": "imported-playlist-failed-notification",
             "icon": DashIconify(icon="material-symbols:upload"),
@@ -629,7 +661,7 @@ def import_playlist(_, playlist_to_import):
             "id": "imported-playlist-successful-notification",
             "icon": DashIconify(icon="material-symbols:upload"),
         }
-    return [notification], get_playlists()
+    return [notification], get_playlist_selector_options()
 
 
 @callback(
@@ -638,9 +670,9 @@ def import_playlist(_, playlist_to_import):
 )
 def select_playlist(selected_playlist):
     """List scenarios for the selected playlist or all local scenarios."""
-    if not selected_playlist:
+    if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
         return get_unique_scenarios(config.stats_dir)
-    return get_scenarios_from_playlists(selected_playlist)
+    return get_scenarios_from_playlist_code(selected_playlist)
 
 
 # Add Dash Mantine Component figure templates to Plotly's templates.
@@ -660,6 +692,12 @@ def layout(**kwargs):  # noqa: ARG001
             dcc.Store(
                 id="last-played-empty-value",
                 data="—",
+            ),
+            dcc.Interval(
+                id="startup-playlist-warning-interval",
+                interval=250,
+                n_intervals=0,
+                max_intervals=1,
             ),
             dcc.Interval(
                 id="interval-component",
@@ -685,7 +723,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     clearable=True,
-                                    data=get_playlists(),
+                                    data=get_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
                                     maxDropdownHeight="75vh",
