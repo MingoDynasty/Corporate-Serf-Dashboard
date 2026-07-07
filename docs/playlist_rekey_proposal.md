@@ -8,7 +8,8 @@
 >
 > Provenance: top finding of the 2026-07-04 whole-project audit TODO triage
 > (vault draft); ported 2026-07-05 with all code citations re-verified at
-> `a252af3`.
+> `a252af3`, and re-checked 2026-07-06 at `ffbb680` after the run-event
+> merge (only `home.py` line numbers had shifted; refreshed).
 
 Re-key the in-memory `playlist_database` from playlist **name** to playlist
 **code**. Names become display-only labels; codes are the identity the app has
@@ -41,9 +42,9 @@ silently lost:
   `data/`" decision reserves for bundled defaults — future user-imported
   playlists belong under `data/playlists/`.
 - The Home page playlist filter uses the **name** as its selector value: the
-  dropdown is fed by `get_playlists()` (sorted names, `home.py:572`) and its
-  value flows into `get_scenarios_from_playlists(name)` (`home.py:521-527`)
-  and `get_rank_data_from_playlist(name, ...)` (`home.py:329-331`, `:356-358`).
+  dropdown is fed by `get_playlists()` (sorted names, `home.py:688`) and its
+  value flows into `get_scenarios_from_playlists(name)` (`home.py:643`)
+  and `get_rank_data_from_playlist(name, ...)` (`home.py:511`, `:538`).
   The Aim Training Journey `MultiSelect` is fed the same name list
   (`aim_training_journey.py:75-82`). The shared `playlist_selector()` component
   (`source/pages/playlist_components.py`) already uses
@@ -227,7 +228,7 @@ database, the Home filter, and the Journey picker still speak name.
   (future playlist-manager work). Pre-change imports are covered by the clean
   break above, which is what makes this cross-root guarantee hold.
 - **Stale persisted selections (Home and Journey)**: the Home dropdown and
-  the Journey `MultiSelect` both have `persistence=True` (`home.py:578`,
+  the Journey `MultiSelect` both have `persistence=True` (`home.py:694`,
   `aim_training_journey.py:86`), so after the upgrade the client restores
   previously selected *names* into now code-valued selectors. The migrated
   callbacks must treat unknown values as "no selection" — for the
