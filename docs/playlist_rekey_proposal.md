@@ -1,6 +1,6 @@
 # Playlist Re-key Proposal
 
-> **Status:** Proposed — revised through review rounds 1–5 plus decision
+> **Status:** Proposed — revised through review rounds 1–6 plus decision
 > settlement (2026-07-05/06); **no open decision points** — see Review
 > round. All in PR #58. Land
 > before the playlist-level overview milestone (upcoming #1 in
@@ -155,7 +155,9 @@ database, the Home filter, and the Journey picker still speak name.
    2026-07-06, amending the 2026-07-05
    user-root-wins call: the bundled root is curated **benchmarks** — every
    committed file carries rank data, value-verified 2026-07-06 and enforced
-   by a bundled-invariant test — while share-code imports are rank-less by
+   by a bundled-invariant test, and the migration plan's clean break makes
+   the root strictly committed content on disk as well — while share-code
+   imports are rank-less by
    construction, so a bundled copy is a strict superset of any user import
    it collides with. The main collision path is exactly this: a code
    imported before a later app update bundles it; bundled-wins turns that
@@ -196,9 +198,20 @@ database, the Home filter, and the Journey picker still speak name.
 
 ## Migration plan (existing user data)
 
-- **No forced migration.** Loading keys from file *content*, and
-  `resources/playlists/` stays scanned, so existing `{name}.json` files there
-  keep working untouched. No rename script, no data rewrite, no file moves.
+- **Clean break for legacy imports (settled 2026-07-06, user decision).**
+  Pre-change imports were written into `resources/playlists/` itself
+  (`data_service.py:26`, `:59`), so they share a root with bundled content —
+  cross-root precedence can never apply to them, and within-root filename
+  order could let a rank-less legacy import hide a bundled benchmark. Rather
+  than migrate or classify them, `resources/playlists/` becomes strictly
+  committed, bundled content: user files there are **deleted at upgrade, not
+  migrated** — re-import anything still wanted by share code (imports land in
+  `data/playlists/` from then on). Affordable because the app is pre-release
+  with one user, whose files there are re-importable API fetches, not
+  authored data. One-time cleanup: the root is gitignored
+  (`resources/.gitignore`), so `git clean -Xn resources/playlists` previews
+  and `-Xf` deletes exactly the untracked user files, never committed
+  content.
 - Fresh installs have no `data/` directory (it is gitignored); the loader
   treats the missing root as empty and the first import creates it.
 - Files missing `code` already fail to load today (required model field), so
@@ -207,11 +220,12 @@ database, the Home filter, and the Journey picker still speak name.
   playlist (§3). There is no in-app refresh path until playlist deletion
   ships; deleting the playlist's file from `data/playlists/` and restarting is
   the interim workaround.
-- A code imported before a later app update bundles it: at the next startup
-  the bundled benchmark supersedes the bare import automatically (a
-  notification names the skipped file). No files are deleted at startup;
-  removing the redundant user copy is manual for now (future
-  playlist-manager work).
+- A code imported post-change (into `data/playlists/`) before a later app
+  update bundles it: at the next startup the bundled benchmark supersedes the
+  bare import automatically (a notification names the skipped file). No files
+  are deleted at startup; removing the redundant user copy is manual for now
+  (future playlist-manager work). Pre-change imports are covered by the clean
+  break above, which is what makes this cross-root guarantee hold.
 - **Stale persisted selections (Home and Journey)**: the Home dropdown and
   the Journey `MultiSelect` both have `persistence=True` (`home.py:578`,
   `aim_training_journey.py:86`), so after the upgrade the client restores
@@ -256,10 +270,10 @@ include; and dropdown UX/component unification (see `tech_debt.md`).
    a log line; the store and both on-disk roots are left unchanged.
 3. No name-keyed access to `playlist_database` remains (`rg` for the old
    lookup names comes back empty).
-4. Existing user playlist files load with zero manual steps; a file with a
-   missing, empty, or whitespace-only `code` produces one actionable warning
-   and is skipped (today a missing code is skipped with a generic
-   invalid-JSON warning, and blank codes are accepted outright).
+4. A file with a missing, empty, or whitespace-only `code` produces one
+   actionable warning and is skipped, and the rest of its root still loads
+   (today a missing code is skipped with a generic invalid-JSON warning, and
+   blank codes are accepted outright).
 5. New imports land in `data/playlists/` with code-suffixed filenames;
    same-named imports no longer overwrite or collide on disk; an interrupted
    import leaves no partial file (atomic temp-write + replace).
@@ -395,6 +409,18 @@ handler silently drops notifications outside callback context (verified in
 `dash_extensions.logging.DashLogHandler.emit`), so startup warnings are
 buffered and flushed after the UI mounts (§2), with a regression test on the
 delivery path.
+
+Round 6 (2026-07-06, Codex): legacy imports defeat bundled-wins — pre-change
+imports were written into `resources/playlists/` itself, so they share the
+bundled root and cross-root precedence never touches them; within-root
+filename order could let a rank-less legacy import hide a bundled benchmark.
+Settled (user decision) as a **clean break** rather than migration machinery:
+`resources/playlists/` becomes strictly committed bundled content, legacy
+user files there are deleted at upgrade (re-import by share code), and the
+automatic-upgrade guarantee is scoped to post-change imports in
+`data/playlists/`. Verified against the live checkout: 230 untracked user
+files currently share that root with the 117 committed ones (the root is
+gitignored, so `git clean -X` removes exactly them).
 
 With these settled, the proposal has no open decision points. Suggested
 sequencing: land before the playlist-level overview milestone (the overview
