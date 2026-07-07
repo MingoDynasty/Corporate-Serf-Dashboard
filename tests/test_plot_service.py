@@ -37,6 +37,14 @@ def test_generate_sensitivity_plot_returns_empty_state_for_no_data() -> None:
     assert len(fig.data) == 0
 
 
+def test_generate_time_plot_returns_empty_state_for_no_data() -> None:
+    fig = generate_time_plot({}, "1w4ts", True, [])
+
+    assert fig.layout.title.text == "No runs to plot"
+    assert "No score history" in fig.layout.annotations[0].text
+    assert len(fig.data) == 0
+
+
 def test_generate_sensitivity_plot_has_expected_traces() -> None:
     data = {
         "2.0 Overwatch": [

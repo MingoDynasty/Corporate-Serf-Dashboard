@@ -258,6 +258,39 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
     assert plot["layout"]["yaxis"]["visible"] is False
 
 
+def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+
+    def fail_if_called(_scenario):
+        raise AssertionError("unsupported graph option should return before overlays")
+
+    monkeypatch.setattr(home, "get_high_score", fail_if_called)
+
+    plot_json, notifications = home.generate_graph(
+        None,
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "unsupported",
+        False,
+        True,
+        True,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert plot["layout"]["title"]["text"] == "Unsupported graph option"
+    assert plot["layout"]["annotations"][0]["text"] == (
+        "Choose Score vs Sensitivity or Score vs Time."
+    )
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
+
+
 def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatch):
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(

@@ -65,6 +65,8 @@ _NO_SCENARIO_DATA_PLOT_TITLE = "No local runs found"
 _NO_SCENARIO_DATA_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
 _NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
 _NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
+_UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
+_UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score vs Time."
 dash.register_page(
     __name__,
     path="/",
@@ -530,6 +532,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     )
 
     plot = go.Figure()
+    supports_overlays = True
     if x_axis_radiogroup == "score_vs_sensitivity":
         sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
             selected_scenario,
@@ -598,24 +601,31 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         )
     else:
         logger.error("Unsupported radio option: %s", x_axis_radiogroup)
-
-    high_score = get_high_score(selected_scenario)
-    if high_score_overlay_switch:
-        plot = add_high_score_overlay(plot, high_score)
-
-    score_threshold = high_score * score_threshold_percentage / 100
-    if score_threshold_overlay_switch:
-        plot = add_score_threshold_overlay(plot, score_threshold)
-
-    notifications = []
-    if _run_events_were_triggered(ctx.triggered):
-        notifications = _build_run_event_notifications(
-            run_events,
-            selected_scenario,
-            top_n_scores,
-            score_threshold,
-            score_threshold_notification_switch,
+        supports_overlays = False
+        plot = generate_empty_plot(
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
         )
+
+    notifications = no_update
+    if supports_overlays:
+        high_score = get_high_score(selected_scenario)
+        if high_score_overlay_switch:
+            plot = add_high_score_overlay(plot, high_score)
+
+        score_threshold = high_score * score_threshold_percentage / 100
+        if score_threshold_overlay_switch:
+            plot = add_score_threshold_overlay(plot, score_threshold)
+
+        notifications = []
+        if _run_events_were_triggered(ctx.triggered):
+            notifications = _build_run_event_notifications(
+                run_events,
+                selected_scenario,
+                top_n_scores,
+                score_threshold,
+                score_threshold_notification_switch,
+            )
     return plot.to_json(), notifications
 
 
