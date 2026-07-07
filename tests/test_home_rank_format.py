@@ -46,6 +46,45 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     assert playlist_filter.scrollAreaProps == {"type": "always"}
 
 
+def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_playlist_selector_options",
+        lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
+    )
+    monkeypatch.setattr(
+        home,
+        "get_playlist_by_code",
+        lambda code: object() if code == "KovaaKsTestCode" else None,
+    )
+    monkeypatch.setattr(
+        home,
+        "get_scenarios_from_playlist_code",
+        lambda code: [f"{code} Scenario"],
+    )
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: ["All"])
+
+    page = home.layout(
+        scenario="KovaaKsTestCode Scenario",
+        playlist_code="KovaaKsTestCode",
+    )
+    components = list(_walk_components(page))
+    playlist_filter = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "playlist-dropdown-selection"
+    )
+    scenario_dropdown = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "scenario-dropdown-selection"
+    )
+
+    assert playlist_filter.value == "KovaaKsTestCode"
+    assert scenario_dropdown.data == ["KovaaKsTestCode Scenario"]
+    assert scenario_dropdown.value == "KovaaKsTestCode Scenario"
+
+
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])

@@ -136,7 +136,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
         code="KovaaKsTestCode",
         scenarios=[Scenario(name="First")],
     )
-    expected_rows = [
+    service_rows = [
         {
             "scenario": "First",
             "playlist_order": 0,
@@ -149,11 +149,17 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
             "percentile_sort": 90.5,
         }
     ]
+    expected_rows = [
+        {
+            **service_rows[0],
+            "scenario_home_href": ("/?playlist_code=KovaaKsTestCode&scenario=First"),
+        }
+    ]
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
 
     def fake_build_rows(playlist_code):
         assert playlist_code == "KovaaKsTestCode"
-        return expected_rows
+        return service_rows
 
     monkeypatch.setattr(
         playlist_scenarios,
@@ -190,6 +196,15 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
     assert "last_played_sort" in fields
     assert "runs_sort" in fields
     assert "high_score_sort" in fields
+
+
+def test_playlist_scenarios_scenario_home_href_url_encodes_values():
+    href = playlist_scenarios.scenario_home_href(
+        "VT Pasu & Friends",
+        "Code/One",
+    )
+
+    assert href == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
 
 
 def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
@@ -284,4 +299,5 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
 
     assert column["flex"] == 1
     assert column["maxWidth"] == 400
+    assert column["cellRenderer"] == {"function": "scenarioHomeLinkRenderer(params)"}
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS

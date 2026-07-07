@@ -23,6 +23,22 @@ dagfuncs.nullsLastComparator = function (
   return valueA - valueB;
 };
 
+dagfuncs.scenarioHomeLinkRenderer = function (params) {
+  const value =
+    params.value === undefined || params.value === null ? "" : params.value;
+  const href =
+    params.data && params.data.scenario_home_href
+      ? params.data.scenario_home_href
+      : "/";
+
+  const link = document.createElement("a");
+  link.className = "playlist-scenario-link";
+  link.href = href;
+  link.target = "_self";
+  link.textContent = value;
+  return link;
+};
+
 // Shared relative/absolute timestamp formatters. Pure (no DOM access) and used
 // from two contexts: AG Grid colDef `{"function": ...}` strings, where dash-ag-grid
 // spreads this registry's contents into scope as BARE names -- call

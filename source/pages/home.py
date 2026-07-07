@@ -675,13 +675,40 @@ def select_playlist(selected_playlist):
     return get_scenarios_from_playlist_code(selected_playlist)
 
 
+def _home_initial_selection(
+    scenario: str | None,
+    playlist_code: str | None,
+) -> tuple[str | None, list[str], str | None]:
+    """Resolve optional Home query params into dropdown initial state."""
+    selected_playlist = (
+        playlist_code
+        if playlist_code and get_playlist_by_code(playlist_code) is not None
+        else None
+    )
+    scenario_options = (
+        get_scenarios_from_playlist_code(selected_playlist)
+        if selected_playlist
+        else get_unique_scenarios(config.stats_dir)
+    )
+    return selected_playlist, scenario_options, scenario or None
+
+
 # Add Dash Mantine Component figure templates to Plotly's templates.
 dmc.add_figure_templates()
 
 
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
-def layout(**kwargs):  # noqa: ARG001
+def layout(
+    scenario: str | None = None,
+    playlist_code: str | None = None,
+    **_kwargs,
+):
     """Build the interactive home dashboard."""
+    selected_playlist, scenario_options, selected_scenario = _home_initial_selection(
+        scenario,
+        playlist_code,
+    )
+
     return dmc.Box(
         children=[
             dcc.Store(id="run-events"),
@@ -733,13 +760,14 @@ def layout(**kwargs):  # noqa: ARG001
                                     placeholder="Select a playlist...",
                                     scrollAreaProps={"type": "always"},
                                     searchable=True,
+                                    value=selected_playlist,
                                 ),
                                 dmc.Select(
                                     allowDeselect=False,
                                     autoSelectOnBlur=True,
                                     checkIconPosition="right",
                                     clearSearchOnFocus=True,
-                                    data=get_unique_scenarios(config.stats_dir),
+                                    data=scenario_options,
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
@@ -748,6 +776,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
                                     searchable=True,
+                                    value=selected_scenario,
                                 ),
                                 dmc.Space(h="xl"),
                                 dmc.Space(h="xl"),

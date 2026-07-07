@@ -1,5 +1,7 @@
 """Per-playlist scenario table page."""
 
+from urllib.parse import urlencode
+
 import dash
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
@@ -39,6 +41,7 @@ TABLE_COLUMN_DEFS = [
         "flex": 1,
         "minWidth": 280,
         "maxWidth": 400,
+        "cellRenderer": {"function": "scenarioHomeLinkRenderer(params)"},
     },
     {
         "headerName": "Last Played",
@@ -115,6 +118,36 @@ TABLE_COLUMN_DEFS = [
 ]
 
 
+def scenario_home_href(scenario_name: str, playlist_code: str) -> str:
+    """Build the Home URL that opens a scenario plot from a playlist row."""
+    return "/?" + urlencode(
+        {
+            "playlist_code": playlist_code,
+            "scenario": scenario_name,
+        }
+    )
+
+
+def _add_scenario_home_links(
+    rows: list[dict[str, str | int | float | None]],
+    playlist_code: str,
+) -> list[dict[str, str | int | float | None]]:
+    linked_rows: list[dict[str, str | int | float | None]] = []
+    for row in rows:
+        scenario_name = row.get("scenario")
+        linked_row = row
+        if isinstance(scenario_name, str):
+            linked_row = {
+                **row,
+                "scenario_home_href": scenario_home_href(
+                    scenario_name,
+                    playlist_code,
+                ),
+            }
+        linked_rows.append(linked_row)
+    return linked_rows
+
+
 @callback(
     Output("playlist-scenarios-location", "pathname"),
     Input("playlist-scenarios-selector", "value"),
@@ -146,7 +179,8 @@ def load_playlist_scenario_rows(playlist_code):
     if playlist is None:
         return [], f"Playlist code is not imported: {playlist_code}"
 
-    return build_playlist_scenario_rank_rows(playlist_code), ""
+    rows = build_playlist_scenario_rank_rows(playlist_code)
+    return _add_scenario_home_links(rows, playlist_code), ""
 
 
 clientside_callback(
