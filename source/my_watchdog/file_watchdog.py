@@ -38,6 +38,27 @@ dash_logger = get_dash_logger(__name__)
 SESSION_LOG_SCORE_THRESHOLD_PCT = 0.95
 
 
+def _get_created_csv_path(event) -> str | None:
+    """Return a created CSV path after preserving the detection debug log."""
+    if event.is_directory:
+        return None
+
+    file = event.src_path
+    print()
+    logger.debug("Detected new file: %s", Path(file).name)
+    if not file.endswith(".csv"):
+        return None
+    return file
+
+
+def _enqueue_after_loading(file: str, message: NewFileMessage) -> bool:
+    """Make a run visible to Home only after it is queryable in the stores."""
+    if not load_csv_file_into_database(file):
+        return False
+    message_queue.append(message)
+    return True
+
+
 def _refresh_rank_after_high_score(
     scenario_name: str,
     expected_score: float,
@@ -65,14 +86,8 @@ class NewFileHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         """Import a newly created run CSV and notify interested UI callbacks."""
-        if event.is_directory:  # Check if it's a file, not a directory
-            return
-        # Add your custom logic here to process the new file
-        # For example, you could read its content, move it, or trigger another function.
-        file = event.src_path
-        print()
-        logger.debug("Detected new file: %s", Path(file).name)
-        if not file.endswith(".csv"):
+        file = _get_created_csv_path(event)
+        if file is None:
             return
 
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
@@ -92,18 +107,16 @@ class NewFileHandler(FileSystemEventHandler):
                 run_data.score,
                 new_score_threshold,
             )
-            message_queue.append(
-                NewFileMessage(
-                    datetime_created=datetime.datetime.now(),
-                    nth_score=1,
-                    previous_high_score=None,
-                    scenario_name=run_data.scenario,
-                    score=run_data.score,
-                    sensitivity=sensitivity_key,
-                ),
+            message = NewFileMessage(
+                datetime_created=datetime.datetime.now(),
+                nth_score=1,
+                previous_high_score=None,
+                scenario_name=run_data.scenario,
+                score=run_data.score,
+                sensitivity=sensitivity_key,
             )
-            load_csv_file_into_database(file)
-            _refresh_rank_after_high_score(run_data.scenario, run_data.score)
+            if _enqueue_after_loading(file, message):
+                _refresh_rank_after_high_score(run_data.scenario, run_data.score)
             return
 
         high_score = get_high_score(run_data.scenario)
@@ -138,18 +151,15 @@ class NewFileHandler(FileSystemEventHandler):
         sensitivities_vs_runs = get_sensitivities_vs_runs(run_data.scenario)
         if sensitivity_key not in sensitivities_vs_runs:
             logger.debug("Found new sensitivity: %s", sensitivity_key)
-            message_queue.append(
-                NewFileMessage(
-                    datetime_created=datetime.datetime.now(),
-                    nth_score=1,
-                    previous_high_score=None,
-                    scenario_name=run_data.scenario,
-                    score=run_data.score,
-                    sensitivity=sensitivity_key,
-                ),
+            message = NewFileMessage(
+                datetime_created=datetime.datetime.now(),
+                nth_score=1,
+                previous_high_score=None,
+                scenario_name=run_data.scenario,
+                score=run_data.score,
+                sensitivity=sensitivity_key,
             )
-            load_csv_file_into_database(file)
-            if is_new_high_score:
+            if _enqueue_after_loading(file, message) and is_new_high_score:
                 _refresh_rank_after_high_score(run_data.scenario, run_data.score)
             return
 
@@ -166,17 +176,13 @@ class NewFileHandler(FileSystemEventHandler):
             run_data.score,
         )
 
-        message_queue.append(
-            NewFileMessage(
-                datetime_created=datetime.datetime.now(),
-                nth_score=nth_score,
-                previous_high_score=high_score,
-                scenario_name=run_data.scenario,
-                score=run_data.score,
-                sensitivity=sensitivity_key,
-            ),
+        message = NewFileMessage(
+            datetime_created=datetime.datetime.now(),
+            nth_score=nth_score,
+            previous_high_score=high_score,
+            scenario_name=run_data.scenario,
+            score=run_data.score,
+            sensitivity=sensitivity_key,
         )
-        load_csv_file_into_database(file)
-        if is_new_high_score:
+        if _enqueue_after_loading(file, message) and is_new_high_score:
             _refresh_rank_after_high_score(run_data.scenario, run_data.score)
-        return

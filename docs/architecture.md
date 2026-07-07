@@ -50,8 +50,8 @@ flowchart TD
     API["KovaaK's HTTP API"]
 
     Game --> Handler
-    Handler -->|"1. appends NewFileMessage"| Queue
-    Handler -->|"2. loads the run"| Stores
+    Handler -->|"1. loads the run"| Stores
+    Handler -->|"2. appends NewFileMessage after a successful load"| Queue
     Handler -->|"3. new high score: schedules"| Attempt
     Attempt -->|"polls, bounded attempts"| API
     Attempt -->|"fresh: monotonic rank write"| Cache
@@ -68,7 +68,7 @@ flowchart TD
         Rank["get_scenario_rank<br/>interval-only calls are cache-only and<br/>surface Timer writes within ~1s"]
         Refresh["refresh_rank<br/>runs when the user clicks Refresh"]
         Tick --> Check
-        Check -->|"do_update"| Graph
+        Check -->|"run-events summary"| Graph
         Tick --> Rank
     end
 
@@ -77,8 +77,7 @@ flowchart TD
     Cache[("JSON cache under cache/")]
     API["KovaaK's HTTP API"]
 
-    Check -->|"peeks"| Queue
-    Graph -->|"poplefts the message"| Queue
+    Check -->|"drains and summarizes"| Queue
     Graph -->|"reads runs"| Stores
     Rank -->|"reads via get_scenario_rank_info"| Cache
     Refresh -->|"authoritative fetch"| API
@@ -88,8 +87,10 @@ flowchart TD
 The watchdog and UI share two channels: `message_queue` (a `deque`) carries
 *notifications* that new data exists, while the run data itself is shared through
 the `data_service.py` module-global stores the UI reads directly. Note the order
-above — the message is appended *before* the run is loaded into the stores. The
-UI is pull-based: a `dcc.Interval` on the home page drains the queue each tick.
+above — the run is loaded into the stores before its message becomes visible.
+The UI is pull-based: a `dcc.Interval` on the home page drains the entire queue
+each tick and publishes one scenario-specific summary. `generate_graph` reads
+that summary and never accesses the queue directly.
 
 ## State
 
@@ -170,7 +171,8 @@ flowchart LR
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
   settings modal, playlist import. Owns the live-update callbacks
-  (`check_for_new_data`, `generate_graph`) that drain `message_queue`.
+  (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
+  resulting `run-events` summary).
 - `playlists.py` (`/playlists`) — playlist picker that routes to a playlist.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by mounted route

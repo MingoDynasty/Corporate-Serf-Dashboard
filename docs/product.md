@@ -40,8 +40,11 @@ list in the roadmap.)
   grinding"), shown when the threshold notification switch is on and a
   previous high score exists. A run that qualifies for neither still gets a
   generic "Graph updated!" toast. A new personal best has no toast of its
-  own; it triggers the background rank refresh. *Problem solved:* immediate
-  in-session feedback on whether the run you just played met your bar.
+  own; it triggers the background rank refresh. If runs accumulate while Home
+  is not open, the next visit rebuilds once from final state and gives one
+  scenario-named summary instead of replaying stale toasts and selections.
+  *Problem solved:* immediate in-session feedback on whether the run you just
+  played met your bar, without a noisy catch-up sequence after time away.
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is.

@@ -299,16 +299,16 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
     )
 
 
-def load_csv_file_into_database(csv_file: str) -> None:
+def load_csv_file_into_database(csv_file: str) -> bool:
     """
     Loads a CSV file into the database.
     :param csv_file: CSV to load.
-    :return: None.
+    :return: True when the run was added, otherwise False.
     """
     run_data = extract_data_from_file(csv_file)
     if not run_data:
         logger.warning("Failed to get run data for CSV file: %s", csv_file)
-        return
+        return False
 
     run_database.add(run_data)
 
@@ -354,7 +354,7 @@ def load_csv_file_into_database(csv_file: str) -> None:
 
         # Add to time_vs_runs
         kovaaks_database[run_data.scenario]["time_vs_runs"].add(run_data)
-    return
+    return True
 
 
 # TODO: simply pull this from the database instead of rescanning files again.
