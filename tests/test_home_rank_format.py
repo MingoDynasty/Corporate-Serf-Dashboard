@@ -148,6 +148,10 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
 
+    score_threshold_percentage = components["score-threshold-percentage"]
+    assert score_threshold_percentage.min == 1
+    assert score_threshold_percentage.max == 100
+
 
 def test_get_scenario_num_runs_without_selection():
     assert home.get_scenario_num_runs(None, None) == (

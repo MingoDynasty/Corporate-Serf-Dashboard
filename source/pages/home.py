@@ -1051,6 +1051,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                     "score-threshold-percentage"
                                                 ],
                                             ),
+                                            max=100,
                                             min=1,
                                             persistence=True,
                                             placeholder="Score Percentage...",
