@@ -50,6 +50,59 @@ def _payload(
     }
 
 
+def _walk_component_tree(component):
+    yield component
+    children = getattr(component, "children", None)
+    if children is None:
+        return
+    if not isinstance(children, list):
+        children = [children]
+    for child in children:
+        yield from _walk_component_tree(child)
+
+
+def test_home_layout_initial_graph_has_empty_state(monkeypatch):
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    graph = next(
+        component
+        for component in _walk_component_tree(page)
+        if getattr(component, "id", None) == "graph-content"
+    )
+    cached_plot = next(
+        component
+        for component in _walk_component_tree(page)
+        if getattr(component, "id", None) == "cached-plot"
+    )
+
+    figure = graph.figure
+    cached_plot_data = json.loads(cached_plot.data)
+
+    assert figure["layout"]["title"]["text"] == "No scenario selected"
+    assert figure["layout"]["annotations"][0]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert figure["layout"]["xaxis"]["visible"] is False
+    assert figure["layout"]["yaxis"]["visible"] is False
+    assert cached_plot_data["layout"]["title"]["text"] == "No scenario selected"
+    assert cached_plot_data["layout"]["annotations"][0]["text"] == (
+        "Select a scenario to see your score history."
+    )
+
+
+def test_graph_theme_callback_falls_back_to_initial_empty_state():
+    figure = home.apply_light_dark_theme_to_graph("light", None)
+
+    assert figure.layout.title.text == "No scenario selected"
+    assert figure.layout.annotations[0].text == (
+        "Select a scenario to see your score history."
+    )
+    assert figure.layout.xaxis.visible is False
+    assert figure.layout.yaxis.visible is False
+
+
 def test_drain_run_events_summarizes_single_scenario_backlog(monkeypatch):
     queue = deque([_message("Scenario A"), _message("Scenario A", score=830.1)])
     monkeypatch.setattr(home, "message_queue", queue)
@@ -230,6 +283,65 @@ def test_notifications_ignore_payload_for_another_scenario():
         )
         == []
     )
+
+
+def test_generate_graph_returns_empty_state_before_scenario_selection():
+    plot_json, notifications = home.generate_graph(
+        None,
+        None,
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert plot["layout"]["title"]["text"] == "No scenario selected"
+    assert plot["layout"]["annotations"][0]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
+
+
+def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+
+    def fail_if_called(_scenario):
+        raise AssertionError("unsupported graph option should return before overlays")
+
+    monkeypatch.setattr(home, "get_high_score", fail_if_called)
+
+    plot_json, notifications = home.generate_graph(
+        None,
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "unsupported",
+        False,
+        True,
+        True,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert plot["layout"]["title"]["text"] == "Unsupported graph option"
+    assert plot["layout"]["annotations"][0]["text"] == (
+        "Choose Score vs Sensitivity or Score vs Time."
+    )
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
 
 
 def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatch):
