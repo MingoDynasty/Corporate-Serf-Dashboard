@@ -65,6 +65,16 @@ runner or script) only if repeatedly typing the commands becomes burdensome.
 
 ## UI/UX
 
+### Dropdown UX consistency pass — revisit after the overview ships
+
+The three playlist dropdowns intentionally differ by role today (Home:
+clearable persisted filter; playlist pages: non-clearable navigator,
+transitional on `/playlists`; Aim Training Journey: `MultiSelect` comparison
+picker). Once the playlist-level overview replaces the transitional navigator,
+revisit whether the survivors should share visual/interaction conventions (a
+shared props preset), beyond the shared code-valued options contract from the
+playlist re-key work.
+
 ### Audit static inline styles
 
 Scan `source/` for static inline style dictionaries that would be clearer as semantic classes in `assets/stylesheet.css`, especially styles toggled by callbacks. Keep runtime-computed values and small, highly local layout adjustments inline; migrate incrementally and verify theme and responsive behavior.
