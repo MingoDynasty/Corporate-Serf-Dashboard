@@ -5,8 +5,8 @@ import logging
 import dash
 import dash_mantine_components as dmc
 from dash import Input, Output, State, callback
-from dash_iconify import DashIconify
 
+from source.components.local_icon import local_icon
 from source.utilities.dash_logging import log_handler
 
 logger = logging.getLogger(__name__)
@@ -73,8 +73,8 @@ APP_INDEX_STRING = """<!DOCTYPE html>
 
 discord_component = dmc.Tooltip(
     dmc.Anchor(
-        DashIconify(
-            icon="logos:discord-icon",
+        local_icon(
+            "logos:discord-icon",
             width=40,
         ),
         href="https://discordapp.com/users/222910150636339211",
@@ -84,20 +84,20 @@ discord_component = dmc.Tooltip(
 
 github_component = dmc.Tooltip(
     dmc.Anchor(
-        DashIconify(icon="ion:logo-github", width=40),
+        local_icon("ion:logo-github", width=40),
         href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
     ),
     label="View this app on GitHub",
 )
 
 theme_switch_component = dmc.ColorSchemeToggle(
-    lightIcon=DashIconify(
-        icon="radix-icons:sun",
+    lightIcon=local_icon(
+        "radix-icons:sun",
         width=25,
         color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
     ),
-    darkIcon=DashIconify(
-        icon="radix-icons:moon",
+    darkIcon=local_icon(
+        "radix-icons:moon",
         width=25,
         color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
     ),
@@ -113,7 +113,7 @@ def nav_link(label: str, href: str, icon: str) -> dmc.NavLink:
     return dmc.NavLink(
         label=label,
         leftSection=dmc.ThemeIcon(
-            DashIconify(icon=icon, height=36),
+            local_icon(icon, height=36),
             size="lg",
             variant="outline",
         ),
