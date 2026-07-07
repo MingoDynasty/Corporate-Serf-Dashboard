@@ -16,6 +16,30 @@ from source.utilities.utilities import format_decimal
 logger = logging.getLogger(__name__)
 
 
+def generate_empty_plot(title: str, message: str) -> go.Figure:
+    """Build an intentional empty-state figure for graph panels without data."""
+    figure = go.Figure()
+    figure.update_layout(
+        title=title,
+        annotations=[
+            {
+                "text": message,
+                "xref": "paper",
+                "yref": "paper",
+                "x": 0.5,
+                "y": 0.52,
+                "showarrow": False,
+                "align": "center",
+                "font": {"size": 18},
+            },
+        ],
+        xaxis={"visible": False},
+        yaxis={"visible": False},
+        margin={"l": 40, "r": 40, "t": 80, "b": 40},
+    )
+    return figure
+
+
 def add_high_score_overlay(figure: go.Figure, high_score: float) -> go.Figure:
     """Add a labeled high-score line to a figure."""
     figure.add_hline(
@@ -53,7 +77,10 @@ def generate_sensitivity_plot(
     :return: go.Figure Plot
     """
     if not scenario_data:
-        return go.Figure()
+        return generate_empty_plot(
+            "No runs to plot",
+            "No sensitivity data is available for this scenario yet.",
+        )
 
     scatter_plot_data: dict[str, list[float | str]] = {
         "Score": [],
@@ -174,7 +201,10 @@ def generate_time_plot(
     :return: go.Figure Plot
     """
     if not scenario_data:
-        return go.Figure()
+        return generate_empty_plot(
+            "No runs to plot",
+            "No score history is available for this scenario yet.",
+        )
 
     scatter_plot_data: dict[str, list[float | str]] = {
         "Score": [],

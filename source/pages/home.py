@@ -18,8 +18,8 @@ from dash import (
     dcc,
     no_update,
 )
-from dash_iconify import DashIconify
 
+from source.components.local_icon import local_icon
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
@@ -42,6 +42,7 @@ from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
     apply_light_dark_mode,
+    generate_empty_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
@@ -82,12 +83,29 @@ SETTINGS_HELP_TEXT = {
 }
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
+_SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
+_SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
+_INCOMPLETE_GRAPH_CONTROLS_TITLE = "Graph settings incomplete"
+_INCOMPLETE_GRAPH_CONTROLS_MESSAGE = (
+    "Choose a Top N value and start date to plot this scenario."
+)
+_NO_SCENARIO_DATA_PLOT_TITLE = "No local runs found"
+_NO_SCENARIO_DATA_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
+_NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
+_NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
+_UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
+_UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score vs Time."
 dash.register_page(
     __name__,
     path="/",
     title="Corporate Serf Dashboard",
     redirect_from=["/home", "/index"],
 )
+
+
+def _empty_plot_json(title: str, message: str) -> str:
+    """Serialize an empty-state graph for the cached plot store."""
+    return generate_empty_plot(title, message).to_json()
 
 
 class RunEventData(TypedDict):
@@ -420,7 +438,7 @@ def _build_run_event_notifications(
                 "message": message,
                 "color": color,
                 "id": "run-summary-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         ]
@@ -438,7 +456,7 @@ def _build_run_event_notifications(
                 "message": notification_message,
                 "color": "green",
                 "id": "new-top-n-score-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         )
@@ -461,7 +479,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "green",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:check"),
+                    "icon": local_icon("material-symbols:check"),
                     "autoClose": 8000,
                 }
             )
@@ -476,7 +494,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "yellow",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:warning-outline"),
+                    "icon": local_icon("material-symbols:warning-outline"),
                     "autoClose": 8000,
                 }
             )
@@ -488,7 +506,7 @@ def _build_run_event_notifications(
                 "message": "Graph updated!",
                 "color": "blue",
                 "id": "graph-updated-notification",
-                "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+                "icon": local_icon("material-symbols:refresh-rounded"),
             }
         )
     return notifications
@@ -534,13 +552,34 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :param selected_playlist: user-selected playlist code.
     :return: Figure serialized to JSON, Notification
     """
-    if not selected_scenario or not top_n_scores or not selected_date:
-        return go.Figure().to_json(), no_update
+    if not selected_scenario:
+        return (
+            _empty_plot_json(
+                _SELECT_SCENARIO_PLOT_TITLE,
+                _SELECT_SCENARIO_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
+
+    if not top_n_scores or not selected_date:
+        return (
+            _empty_plot_json(
+                _INCOMPLETE_GRAPH_CONTROLS_TITLE,
+                _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
+            ),
+            no_update,
+        )
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
-        return go.Figure().to_json(), no_update
+        return (
+            _empty_plot_json(
+                _NO_SCENARIO_DATA_PLOT_TITLE,
+                _NO_SCENARIO_DATA_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
 
     oldest_datetime = datetime.combine(
         datetime.fromisoformat(selected_date).date(),
@@ -548,6 +587,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     )
 
     plot = go.Figure()
+    supports_overlays = True
     if x_axis_radiogroup == "score_vs_sensitivity":
         sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
             selected_scenario,
@@ -561,7 +601,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:
@@ -588,7 +634,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:
@@ -604,24 +656,31 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         )
     else:
         logger.error("Unsupported radio option: %s", x_axis_radiogroup)
-
-    high_score = get_high_score(selected_scenario)
-    if high_score_overlay_switch:
-        plot = add_high_score_overlay(plot, high_score)
-
-    score_threshold = high_score * score_threshold_percentage / 100
-    if score_threshold_overlay_switch:
-        plot = add_score_threshold_overlay(plot, score_threshold)
-
-    notifications = []
-    if _run_events_were_triggered(ctx.triggered):
-        notifications = _build_run_event_notifications(
-            run_events,
-            selected_scenario,
-            top_n_scores,
-            score_threshold,
-            score_threshold_notification_switch,
+        supports_overlays = False
+        plot = generate_empty_plot(
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
         )
+
+    notifications = no_update
+    if supports_overlays:
+        high_score = get_high_score(selected_scenario)
+        if high_score_overlay_switch:
+            plot = add_high_score_overlay(plot, high_score)
+
+        score_threshold = high_score * score_threshold_percentage / 100
+        if score_threshold_overlay_switch:
+            plot = add_score_threshold_overlay(plot, score_threshold)
+
+        notifications = []
+        if _run_events_were_triggered(ctx.triggered):
+            notifications = _build_run_event_notifications(
+                run_events,
+                selected_scenario,
+                top_n_scores,
+                score_threshold,
+                score_threshold_notification_switch,
+            )
     return plot.to_json(), notifications
 
 
@@ -629,7 +688,6 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     Output("graph-content", "figure"),
     Input("color-scheme-switch", "computedColorScheme"),
     Input("cached-plot", "data"),
-    prevent_initial_call=True,
 )
 def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     """
@@ -639,7 +697,10 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     :return: Figure with theme applied.
     """
     if not plot_json:
-        return plot_json
+        plot_json = _empty_plot_json(
+            _SELECT_SCENARIO_PLOT_TITLE,
+            _SELECT_SCENARIO_PLOT_MESSAGE,
+        )
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
@@ -653,7 +714,7 @@ def _build_startup_playlist_warning_notifications(
             "message": warning,
             "color": "yellow",
             "id": f"startup-playlist-warning-{idx}",
-            "icon": DashIconify(icon="material-symbols:warning-outline"),
+            "icon": local_icon("material-symbols:warning-outline"),
             "autoClose": 10000,
         }
         for idx, warning in enumerate(warnings)
@@ -705,7 +766,7 @@ def import_playlist(_, playlist_to_import):
             "message": error_message,
             "color": "red",
             "id": "imported-playlist-failed-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     else:
         notification = {
@@ -714,7 +775,7 @@ def import_playlist(_, playlist_to_import):
             "message": "Successfully imported playlist!",
             "color": "green",
             "id": "imported-playlist-successful-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     return [notification], get_playlist_selector_options()
 
@@ -740,7 +801,13 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.Box(
         children=[
             dcc.Store(id="run-events"),
-            dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
+            dcc.Store(
+                id="cached-plot",
+                data=_empty_plot_json(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ),
+            ),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
@@ -822,7 +889,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     label="Oldest date to consider",
                                     maxDate=datetime.now().isoformat(),
                                     persistence=True,
-                                    rightSection=DashIconify(icon="clarity:date-line"),
+                                    rightSection=local_icon("clarity:date-line"),
                                     value=datetime(
                                         datetime.now().year,
                                         month=1,
@@ -905,8 +972,8 @@ def layout(**kwargs):  # noqa: ARG001
                                                     id="rank-refresh-button",
                                                     variant="subtle",
                                                     size="compact-xs",
-                                                    leftSection=DashIconify(
-                                                        icon="material-symbols:refresh-rounded",
+                                                    leftSection=local_icon(
+                                                        "material-symbols:refresh-rounded",
                                                         width=14,
                                                     ),
                                                 ),
@@ -952,8 +1019,8 @@ def layout(**kwargs):  # noqa: ARG001
                                         "Settings",
                                         id="settings-modal-open-button",
                                         variant="default",
-                                        leftSection=DashIconify(
-                                            icon="clarity:settings-line",
+                                        leftSection=local_icon(
+                                            "clarity:settings-line",
                                             width=25,
                                         ),
                                     ),
@@ -1088,6 +1155,13 @@ def layout(**kwargs):  # noqa: ARG001
                 gutter="xl",
                 overflow="hidden",
             ),
-            dcc.Graph(id="graph-content", style={"height": "80vh"}),
+            dcc.Graph(
+                id="graph-content",
+                figure=generate_empty_plot(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ).to_plotly_json(),
+                style={"height": "80vh"},
+            ),
         ],
     )

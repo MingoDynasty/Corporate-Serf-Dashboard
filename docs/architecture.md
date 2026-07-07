@@ -130,6 +130,10 @@ flowchart LR
         Components["playlist_components.py"]
     end
 
+    subgraph SharedUI["Shared UI"]
+        LocalIcon["components/<br/>local_icon.py"]
+    end
+
     subgraph Services["Domain & plotting services"]
         DataService["kovaaks/<br/>data_service.py"]
         ApiService["kovaaks/<br/>api_service.py"]
@@ -146,10 +150,12 @@ flowchart LR
     App --> DataService
     App --> FileWatchdog
 
+    Shell --> LocalIcon
     Home --> DataService
     Home --> ApiService
     Home --> PlotService
     Home --> Queue
+    Home --> LocalIcon
     Playlists --> Components
     PlaylistScenarios --> Components
     PlaylistScenarios --> DataService
@@ -183,6 +189,11 @@ flowchart LR
   state, not the selector directly (see decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `playlist_components.py` — shared `playlist_selector` component.
+
+### Shared UI components
+- `components/local_icon.py` — local SVG icon registry/helper used by the shell
+  and page controls. SVG files live under `assets/icons/` so the local app does
+  not fetch Iconify icon data at runtime.
 
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
@@ -224,6 +235,7 @@ flowchart LR
   references these from its column defs and runs with `dangerously_allow_code=True`
   in `playlist_scenarios.py`. Custom grid sort/format behavior belongs here — see
   the decision log.
+- `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
 
 ## Where to look first
 
@@ -235,4 +247,5 @@ flowchart LR
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist overview table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
+| Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
 | Config / settings | `config/config_service.py` (+ `example.toml`) |
