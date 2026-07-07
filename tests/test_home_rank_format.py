@@ -145,6 +145,7 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
 
         assert len(tooltips) == 1
         assert tooltips[0].label == home.SETTINGS_HELP_TEXT[help_key]
+        assert tooltips[0].events == home.LAST_PLAYED_TOOLTIP_EVENTS
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
 

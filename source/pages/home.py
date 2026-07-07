@@ -55,14 +55,14 @@ LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
 SETTINGS_HELP_TEXT = {
     "import-playlist": (
-        "Paste a KovaaK's playlist share code to import its scenarios into "
-        "the playlist selector."
+        "Paste a KovaaK's playlist share code and press Import to add that "
+        "playlist to the playlist selector."
     ),
     "automatically-change-scenario": (
-        "Selects the newest detected scenario automatically when a run is ingested."
+        "Automatically selects the scenario you just played when a new run is detected."
     ),
     "rank-overlay": (
-        "Shows the selected playlist's rank reference line on the graph when "
+        "Shows the selected playlist's rank threshold lines on the graph when "
         "rank data is available."
     ),
     "high-score-overlay": (
@@ -77,8 +77,7 @@ SETTINGS_HELP_TEXT = {
         "used by the threshold line and notification."
     ),
     "score-threshold-notification": (
-        "Sends a notification when a newly ingested score meets or beats the "
-        "selected threshold."
+        "Notifies after each new run whether the score reached the score threshold."
     ),
 }
 _INTERVAL_PROP = "interval-component.n_intervals"
@@ -123,6 +122,7 @@ def _settings_help_label(label: str, help_text: str) -> dmc.Group:
                     **{"aria-label": f"{label} help"},
                 ),
                 label=help_text,
+                events=LAST_PLAYED_TOOLTIP_EVENTS,
                 multiline=True,
                 withArrow=True,
                 w=SETTINGS_HELP_TOOLTIP_WIDTH,
