@@ -49,7 +49,7 @@ Design rationale for shipped work lives in
   KovaaK's share code, duplicate names are preserved with disambiguated
   labels, duplicate codes warn visibly, and imported playlists live under
   `data/playlists/`. This shipped the enabling identity work for the
-  playlist-level overview. (PR #__PLAYLIST_REKEY_PR__)
+  playlist-level overview. (PR #67)
 
 ---
 

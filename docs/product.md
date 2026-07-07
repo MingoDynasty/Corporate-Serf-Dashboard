@@ -89,7 +89,7 @@ list in the roadmap.)
   onboarding a playlist takes one code paste, not hand-building a scenario
   list. The only part of the app that requires an internet connection besides
   rank lookups.
-- **Code-based playlist identity** (PR #__PLAYLIST_REKEY_PR__). Playlist
+- **Code-based playlist identity** (PR #67). Playlist
   codes, not names, identify imported and bundled playlists; duplicate names
   stay visible with disambiguated labels, and imports are stored under
   `data/playlists/`. *Problem solved:* same-named playlists no longer
