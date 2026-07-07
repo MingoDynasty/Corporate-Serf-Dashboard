@@ -738,7 +738,11 @@ def layout(**kwargs):  # noqa: ARG001
                                 ),
                                 dmc.Box(
                                     [
-                                        dmc.Title("Scenario Stats", order=6),
+                                        dmc.Title(
+                                            "Scenario Stats",
+                                            order=2,
+                                            size="h6",
+                                        ),
                                         dmc.Group(
                                             [
                                                 dmc.Text(
@@ -885,7 +889,11 @@ def layout(**kwargs):  # noqa: ARG001
                                             ],
                                         ),
                                         dmc.Space(h="lg"),
-                                        dmc.Title("Display Settings", order=4),
+                                        dmc.Title(
+                                            "Display Settings",
+                                            order=2,
+                                            size="h4",
+                                        ),
                                         dmc.Space(h="xs"),
                                         dmc.Switch(
                                             id="automatically-change-scenario-switch",

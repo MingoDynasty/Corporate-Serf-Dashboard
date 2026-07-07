@@ -49,6 +49,18 @@ def test_color_scheme_is_restored_before_styles_load():
     )
 
 
+def test_index_string_declares_english_language():
+    assert '<html lang="en">' in app_shell.APP_INDEX_STRING
+
+
+def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
+    link = app_shell.nav_link("Home", "/", "bi:house-door-fill")
+
+    assert isinstance(link, dmc.NavLink)
+    assert link.href == "/"
+    assert link.refresh is False
+
+
 def test_navbar_burger_open_state_persists_across_refresh():
     shell = app_shell.layout()
 
@@ -57,3 +69,4 @@ def test_navbar_burger_open_state_persists_across_refresh():
     assert burger.persistence is True
     assert burger.persistence_type == "local"
     assert burger.persisted_props == ["opened"]
+    assert burger.to_plotly_json()["props"]["aria-label"] == "Toggle navigation"
