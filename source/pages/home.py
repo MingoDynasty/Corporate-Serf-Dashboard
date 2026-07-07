@@ -52,6 +52,35 @@ logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
 LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
+SETTINGS_HELP_TOOLTIP_WIDTH = 280
+SETTINGS_HELP_TEXT = {
+    "import-playlist": (
+        "Paste a KovaaK's playlist share code to import its scenarios into "
+        "the playlist selector."
+    ),
+    "automatically-change-scenario": (
+        "Selects the newest detected scenario automatically when a run is ingested."
+    ),
+    "rank-overlay": (
+        "Shows the selected playlist's rank reference line on the graph when "
+        "rank data is available."
+    ),
+    "high-score-overlay": (
+        "Shows your current personal best score as a reference line on the graph."
+    ),
+    "score-threshold-overlay": (
+        "Shows a score goal line based on the selected percentage of your "
+        "current personal best."
+    ),
+    "score-threshold-percentage": (
+        "Sets the score goal as a percentage of your current personal best, "
+        "used by the threshold line and notification."
+    ),
+    "score-threshold-notification": (
+        "Sends a notification when a newly ingested score meets or beats the "
+        "selected threshold."
+    ),
+}
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 dash.register_page(
@@ -77,6 +106,32 @@ class RunEventsPayload(TypedDict):
 
     count: int
     latest: RunEventData
+
+
+def _settings_help_label(label: str, help_text: str) -> dmc.Group:
+    return dmc.Group(
+        [
+            dmc.Text(label, span=True),
+            dmc.Tooltip(
+                dmc.ActionIcon(
+                    DashIconify(icon="material-symbols:info-outline", width=16),
+                    className="settings-help-icon",
+                    color="gray",
+                    radius="xl",
+                    size="sm",
+                    variant="subtle",
+                    **{"aria-label": f"{label} help"},
+                ),
+                label=help_text,
+                multiline=True,
+                withArrow=True,
+                w=SETTINGS_HELP_TOOLTIP_WIDTH,
+            ),
+        ],
+        align="center",
+        gap="xs",
+        wrap="nowrap",
+    )
 
 
 # Rank display states deliberately map to distinct user-facing text.
@@ -915,7 +970,12 @@ def layout(**kwargs):  # noqa: ARG001
                                                 dmc.TextInput(
                                                     id="settings-modal-import-playlist-textinput",
                                                     placeholder="KovaaK's playlist code...",
-                                                    label="Import Playlist",
+                                                    label=_settings_help_label(
+                                                        "Import Playlist",
+                                                        SETTINGS_HELP_TEXT[
+                                                            "import-playlist"
+                                                        ],
+                                                    ),
                                                     size="md",
                                                     w="300px",
                                                 ),
@@ -936,7 +996,12 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="automatically-change-scenario-switch",
                                             labelPosition="right",
-                                            label="Automatically Change Scenario",
+                                            label=_settings_help_label(
+                                                "Automatically Change Scenario",
+                                                SETTINGS_HELP_TEXT[
+                                                    "automatically-change-scenario"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -944,7 +1009,10 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="rank-overlay-switch",
                                             labelPosition="right",
-                                            label="Rank Overlay",
+                                            label=_settings_help_label(
+                                                "Rank Overlay",
+                                                SETTINGS_HELP_TEXT["rank-overlay"],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -952,7 +1020,12 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="high-score-overlay-switch",
                                             labelPosition="right",
-                                            label="PB Score Overlay",
+                                            label=_settings_help_label(
+                                                "PB Score Overlay",
+                                                SETTINGS_HELP_TEXT[
+                                                    "high-score-overlay"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -960,14 +1033,24 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="score-threshold-overlay-switch",
                                             labelPosition="right",
-                                            label="Score Threshold Overlay",
+                                            label=_settings_help_label(
+                                                "Score Threshold Overlay",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-overlay"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
                                         dmc.Space(h="xs"),
                                         dmc.NumberInput(
                                             id="score-threshold-percentage",
-                                            label="Score Threshold Percentage",
+                                            label=_settings_help_label(
+                                                "Score Threshold Percentage",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-percentage"
+                                                ],
+                                            ),
                                             min=1,
                                             persistence=True,
                                             placeholder="Score Percentage...",
@@ -981,7 +1064,12 @@ def layout(**kwargs):  # noqa: ARG001
                                         dmc.Switch(
                                             id="score-threshold-notification-switch",
                                             labelPosition="right",
-                                            label="Score Threshold Notification",
+                                            label=_settings_help_label(
+                                                "Score Threshold Notification",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-notification"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
