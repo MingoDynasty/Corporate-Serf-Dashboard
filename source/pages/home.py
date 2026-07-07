@@ -633,7 +633,6 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     Output("graph-content", "figure"),
     Input("color-scheme-switch", "computedColorScheme"),
     Input("cached-plot", "data"),
-    prevent_initial_call=True,
 )
 def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     """
@@ -643,7 +642,10 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     :return: Figure with theme applied.
     """
     if not plot_json:
-        return plot_json
+        plot_json = _empty_plot_json(
+            _SELECT_SCENARIO_PLOT_TITLE,
+            _SELECT_SCENARIO_PLOT_MESSAGE,
+        )
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
@@ -744,7 +746,13 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.Box(
         children=[
             dcc.Store(id="run-events"),
-            dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
+            dcc.Store(
+                id="cached-plot",
+                data=_empty_plot_json(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ),
+            ),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
@@ -1059,6 +1067,13 @@ def layout(**kwargs):  # noqa: ARG001
                 gutter="xl",
                 overflow="hidden",
             ),
-            dcc.Graph(id="graph-content", style={"height": "80vh"}),
+            dcc.Graph(
+                id="graph-content",
+                figure=generate_empty_plot(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ).to_plotly_json(),
+                style={"height": "80vh"},
+            ),
         ],
     )
