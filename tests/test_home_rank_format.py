@@ -68,7 +68,7 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert getattr(last_played, "tabIndex", None) is None
     assert tooltip.disabled is True
     assert tooltip.label == ""
-    assert tooltip.events == home.LAST_PLAYED_TOOLTIP_EVENTS
+    assert tooltip.events == home.TOOLTIP_EVENTS
 
 
 def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
@@ -145,7 +145,7 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
 
         assert len(tooltips) == 1
         assert tooltips[0].label == home.SETTINGS_HELP_TEXT[help_key]
-        assert tooltips[0].events == home.LAST_PLAYED_TOOLTIP_EVENTS
+        assert tooltips[0].events == home.TOOLTIP_EVENTS
         assert tooltips[0].withArrow is True
         assert tooltips[0].multiline is True
 

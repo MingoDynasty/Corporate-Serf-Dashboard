@@ -51,7 +51,7 @@ from source.utilities.utilities import ordinal
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
-LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
+TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
 SETTINGS_HELP_TEXT = {
     "import-playlist": (
@@ -122,7 +122,7 @@ def _settings_help_label(label: str, help_text: str) -> dmc.Group:
                     **{"aria-label": f"{label} help"},
                 ),
                 label=help_text,
-                events=LAST_PLAYED_TOOLTIP_EVENTS,
+                events=TOOLTIP_EVENTS,
                 multiline=True,
                 withArrow=True,
                 w=SETTINGS_HELP_TOOLTIP_WIDTH,
@@ -852,7 +852,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                         size="sm",
                                                     ),
                                                     disabled=True,
-                                                    events=LAST_PLAYED_TOOLTIP_EVENTS,
+                                                    events=TOOLTIP_EVENTS,
                                                     id="last-played-tooltip",
                                                     label="",
                                                 ),
