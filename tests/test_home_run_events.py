@@ -181,6 +181,22 @@ def test_single_run_threshold_notification_uses_previous_high_score():
     )
 
 
+def test_single_run_threshold_notification_passes_at_exact_threshold():
+    notifications = home._build_run_event_notifications(
+        _payload(score=820.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold=820.0,
+        score_threshold_notification_switch=True,
+    )
+
+    assert notifications[1]["color"] == "green"
+    assert notifications[1]["message"] == (
+        "Current score percentage (102.5%) successfully passed the score "
+        "threshold! Ready to move onto the next scenario."
+    )
+
+
 def test_single_run_threshold_failure_preserves_legacy_toast():
     notifications = home._build_run_event_notifications(
         _payload(score=780.0, previous_high_score=800.0),
@@ -216,6 +232,25 @@ def test_backlog_notification_is_one_scenario_named_summary():
         "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
         "a new 2nd place score: 780.00. Current score percentage (97.5%) "
         "failed to meet the score threshold. Keep grinding..."
+    )
+
+
+def test_backlog_threshold_summary_passes_at_exact_threshold():
+    notifications = home._build_run_event_notifications(
+        _payload(count=3, score=820.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold=820.0,
+        score_threshold_notification_switch=True,
+    )
+
+    assert len(notifications) == 1
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["message"] == (
+        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
+        "a new 2nd place score: 820.00. Current score percentage (102.5%) "
+        "successfully passed the score threshold! Ready to move onto the next "
+        "scenario."
     )
 
 

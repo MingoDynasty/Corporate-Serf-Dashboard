@@ -401,7 +401,7 @@ def _build_run_event_notifications(
             and latest["previous_high_score"] > 0
         ):
             percentage = latest["score"] / latest["previous_high_score"] * 100
-            if latest["score"] > score_threshold:
+            if latest["score"] >= score_threshold:
                 message += (
                     f" Current score percentage ({percentage:.1f}%) successfully "
                     "passed the score threshold! Ready to move onto the next scenario."
@@ -449,7 +449,7 @@ def _build_run_event_notifications(
         and latest["previous_high_score"] > 0
     ):
         percentage = latest["score"] / latest["previous_high_score"] * 100
-        if latest["score"] > score_threshold:
+        if latest["score"] >= score_threshold:
             notifications.append(
                 {
                     "action": "show",
