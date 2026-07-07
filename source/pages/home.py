@@ -131,7 +131,7 @@ def _settings_help_label(label: str, help_text: str) -> dmc.Group:
             dmc.Text(label, span=True),
             dmc.Tooltip(
                 dmc.ActionIcon(
-                    DashIconify(icon="material-symbols:info-outline", width=16),
+                    local_icon("material-symbols:info-outline", width=16),
                     className="settings-help-icon",
                     color="gray",
                     radius="xl",
