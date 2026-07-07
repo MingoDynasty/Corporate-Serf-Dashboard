@@ -44,6 +44,7 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     )
 
     assert playlist_filter.scrollAreaProps == {"type": "always"}
+    assert playlist_filter.persistence is True
 
 
 def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
@@ -81,8 +82,10 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     )
 
     assert playlist_filter.value == "KovaaKsTestCode"
+    assert playlist_filter.persistence is False
     assert scenario_dropdown.data == ["KovaaKsTestCode Scenario"]
     assert scenario_dropdown.value == "KovaaKsTestCode Scenario"
+    assert scenario_dropdown.persistence is False
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):

@@ -708,6 +708,8 @@ def layout(
         scenario,
         playlist_code,
     )
+    playlist_persistence = playlist_code is None
+    scenario_persistence = scenario is None
 
     return dmc.Box(
         children=[
@@ -756,7 +758,7 @@ def layout(
                                     maxDropdownHeight="75vh",
                                     miw=400,
                                     ml="xl",
-                                    persistence=True,
+                                    persistence=playlist_persistence,
                                     placeholder="Select a playlist...",
                                     scrollAreaProps={"type": "always"},
                                     searchable=True,
@@ -772,7 +774,7 @@ def layout(
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
                                     miw=400,
-                                    persistence=True,
+                                    persistence=scenario_persistence,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
                                     searchable=True,
