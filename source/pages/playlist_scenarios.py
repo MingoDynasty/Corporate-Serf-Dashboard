@@ -137,26 +137,6 @@ def scenario_home_href(scenario_name: str, playlist_code: str) -> str:
     )
 
 
-def _add_scenario_home_links(
-    rows: list[dict[str, str | int | float | None]],
-    playlist_code: str,
-) -> list[dict[str, str | int | float | None]]:
-    linked_rows: list[dict[str, str | int | float | None]] = []
-    for row in rows:
-        scenario_name = row.get("scenario")
-        linked_row = row
-        if isinstance(scenario_name, str):
-            linked_row = {
-                **row,
-                "scenario_home_href": scenario_home_href(
-                    scenario_name,
-                    playlist_code,
-                ),
-            }
-        linked_rows.append(linked_row)
-    return linked_rows
-
-
 @callback(
     Output("playlist-scenarios-location", "href"),
     Input("playlist-scenarios-selector", "value"),
@@ -205,8 +185,7 @@ def load_playlist_scenario_rows(playlist_code):
     if playlist is None:
         return [], f"Playlist code is not imported: {playlist_code}"
 
-    rows = build_playlist_scenario_rank_rows(playlist_code)
-    return _add_scenario_home_links(rows, playlist_code), ""
+    return build_playlist_scenario_rank_rows(playlist_code), ""
 
 
 clientside_callback(
