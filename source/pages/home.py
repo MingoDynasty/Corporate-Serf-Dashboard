@@ -74,8 +74,9 @@ SETTINGS_HELP_TEXT = {
         "current personal best."
     ),
     "score-threshold-percentage": (
-        "Sets the score goal as a percentage of your current personal best, "
-        "used by the threshold line and notification."
+        "Sets the score goal as a percentage of your personal best. The "
+        "overlay line tracks your current personal best; notifications judge "
+        "the run against the personal best it was chasing."
     ),
     "score-threshold-notification": (
         "Notifies after each new run whether the score reached the score threshold."
@@ -398,7 +399,7 @@ def _build_run_event_notifications(
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
-    score_threshold: float,
+    score_threshold_percentage: float,
     score_threshold_notification_switch: bool,
 ) -> list[dict[str, object]]:
     """Build either the legacy single-run toasts or one backlog summary."""
@@ -419,7 +420,10 @@ def _build_run_event_notifications(
             and latest["previous_high_score"] > 0
         ):
             percentage = latest["score"] / latest["previous_high_score"] * 100
-            if latest["score"] >= score_threshold:
+            if (
+                latest["score"]
+                >= latest["previous_high_score"] * score_threshold_percentage / 100
+            ):
                 message += (
                     f" Current score percentage ({percentage:.1f}%) successfully "
                     "passed the score threshold! Ready to move onto the next scenario."
@@ -467,7 +471,10 @@ def _build_run_event_notifications(
         and latest["previous_high_score"] > 0
     ):
         percentage = latest["score"] / latest["previous_high_score"] * 100
-        if latest["score"] >= score_threshold:
+        if (
+            latest["score"]
+            >= latest["previous_high_score"] * score_threshold_percentage / 100
+        ):
             notifications.append(
                 {
                     "action": "show",
@@ -678,7 +685,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 run_events,
                 selected_scenario,
                 top_n_scores,
-                score_threshold,
+                score_threshold_percentage,
                 score_threshold_notification_switch,
             )
     return plot.to_json(), notifications
