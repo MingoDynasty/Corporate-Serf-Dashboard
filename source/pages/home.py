@@ -399,7 +399,7 @@ def _build_run_event_notifications(
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
-    score_threshold_percentage: float,
+    score_threshold_percentage: float | None,
     score_threshold_notification_switch: bool,
 ) -> list[dict[str, object]]:
     """Build either the legacy single-run toasts or one backlog summary."""
@@ -416,6 +416,7 @@ def _build_run_event_notifications(
         color = "blue"
         if (
             score_threshold_notification_switch
+            and score_threshold_percentage is not None
             and latest["previous_high_score"] is not None
             and latest["previous_high_score"] > 0
         ):
@@ -467,6 +468,7 @@ def _build_run_event_notifications(
 
     if (
         score_threshold_notification_switch
+        and score_threshold_percentage is not None
         and latest["previous_high_score"] is not None
         and latest["previous_high_score"] > 0
     ):
@@ -497,7 +499,7 @@ def _build_run_event_notifications(
                     "title": "Score Threshold",
                     "message": (
                         f"Current score percentage ({percentage:.1f}%) "
-                        "failed to meet score threshold. Keep grinding..."
+                        "failed to meet the score threshold. Keep grinding..."
                     ),
                     "color": "yellow",
                     "id": "score-threshold-notification",
@@ -675,8 +677,8 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         if high_score_overlay_switch:
             plot = add_high_score_overlay(plot, high_score)
 
-        score_threshold = high_score * score_threshold_percentage / 100
-        if score_threshold_overlay_switch:
+        if score_threshold_overlay_switch and score_threshold_percentage is not None:
+            score_threshold = high_score * score_threshold_percentage / 100
             plot = add_score_threshold_overlay(plot, score_threshold)
 
         notifications = []

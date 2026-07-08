@@ -282,7 +282,7 @@ def test_single_run_threshold_notification_fails_new_pb_short_of_100_plus_goal()
 
     assert notifications[1]["color"] == "yellow"
     assert notifications[1]["message"] == (
-        "Current score percentage (102.5%) failed to meet score threshold. "
+        "Current score percentage (102.5%) failed to meet the score threshold. "
         "Keep grinding..."
     )
 
@@ -301,9 +301,24 @@ def test_single_run_threshold_failure_preserves_legacy_toast():
         "score-threshold-notification",
     ]
     assert notifications[1]["message"] == (
-        "Current score percentage (97.5%) failed to meet score threshold. "
+        "Current score percentage (97.5%) failed to meet the score threshold. "
         "Keep grinding..."
     )
+
+
+def test_single_run_threshold_notification_ignores_empty_percentage():
+    notifications = home._build_run_event_notifications(
+        _payload(score=780.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold_percentage=None,
+        score_threshold_notification_switch=True,
+    )
+
+    assert [notification["id"] for notification in notifications] == [
+        "new-top-n-score-notification",
+        "graph-updated-notification",
+    ]
 
 
 def test_backlog_notification_is_one_scenario_named_summary():
@@ -322,6 +337,23 @@ def test_backlog_notification_is_one_scenario_named_summary():
         "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
         "a new 2nd place score: 780.00. Current score percentage (97.5%) "
         "failed to meet the score threshold. Keep grinding..."
+    )
+
+
+def test_backlog_threshold_summary_ignores_empty_percentage():
+    notifications = home._build_run_event_notifications(
+        _payload(count=3, score=780.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold_percentage=None,
+        score_threshold_notification_switch=True,
+    )
+
+    assert len(notifications) == 1
+    assert notifications[0]["color"] == "blue"
+    assert notifications[0]["message"] == (
+        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
+        "a new 2nd place score: 780.00."
     )
 
 
@@ -471,3 +503,49 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
     )
 
     assert notifications == []
+
+
+def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
+    monkeypatch,
+):
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+    monkeypatch.setattr(
+        home,
+        "get_time_vs_runs",
+        lambda *_args: {"2026-07-06": [object()]},
+    )
+    monkeypatch.setattr(
+        home,
+        "generate_time_plot",
+        lambda *_args: go.Figure(),
+    )
+    monkeypatch.setattr(home, "get_high_score", lambda _scenario: 830.0)
+
+    def fail_if_called(_plot, _score_threshold):
+        raise AssertionError("empty threshold percentage should skip overlay")
+
+    monkeypatch.setattr(home, "add_score_threshold_overlay", fail_if_called)
+    monkeypatch.setattr(
+        home,
+        "ctx",
+        SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
+    )
+
+    _plot, notifications = home.generate_graph(
+        _payload(score=780.0, previous_high_score=800.0),
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        True,
+        None,
+        True,
+        None,
+    )
+
+    assert [notification["id"] for notification in notifications] == [
+        "new-top-n-score-notification",
+        "graph-updated-notification",
+    ]
