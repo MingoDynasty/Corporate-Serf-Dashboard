@@ -395,17 +395,35 @@ def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
     return any(trigger["prop_id"] == _RUN_EVENTS_PROP for trigger in triggered)
 
 
+def _normalize_score_threshold_percentage(
+    score_threshold_percentage: float | str | None,
+) -> float | None:
+    """Return a usable threshold percentage, or None while the input is empty."""
+    if not score_threshold_percentage:
+        return None
+
+    try:
+        return float(score_threshold_percentage)
+    except TypeError:
+        return None
+    except ValueError:
+        return None
+
+
 def _build_run_event_notifications(
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
-    score_threshold_percentage: float | None,
+    score_threshold_percentage: float | str | None,
     score_threshold_notification_switch: bool,
 ) -> list[dict[str, object]]:
     """Build either the legacy single-run toasts or one backlog summary."""
     if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
         return []
 
+    score_threshold_goal_percentage = _normalize_score_threshold_percentage(
+        score_threshold_percentage
+    )
     latest = run_events["latest"]
     if run_events["count"] > 1:
         message = (
@@ -416,14 +434,14 @@ def _build_run_event_notifications(
         color = "blue"
         if (
             score_threshold_notification_switch
-            and score_threshold_percentage is not None
+            and score_threshold_goal_percentage
             and latest["previous_high_score"] is not None
             and latest["previous_high_score"] > 0
         ):
             percentage = latest["score"] / latest["previous_high_score"] * 100
             if (
                 latest["score"]
-                >= latest["previous_high_score"] * score_threshold_percentage / 100
+                >= latest["previous_high_score"] * score_threshold_goal_percentage / 100
             ):
                 message += (
                     f" Current score percentage ({percentage:.1f}%) successfully "
@@ -468,14 +486,14 @@ def _build_run_event_notifications(
 
     if (
         score_threshold_notification_switch
-        and score_threshold_percentage is not None
+        and score_threshold_goal_percentage
         and latest["previous_high_score"] is not None
         and latest["previous_high_score"] > 0
     ):
         percentage = latest["score"] / latest["previous_high_score"] * 100
         if (
             latest["score"]
-            >= latest["previous_high_score"] * score_threshold_percentage / 100
+            >= latest["previous_high_score"] * score_threshold_goal_percentage / 100
         ):
             notifications.append(
                 {
@@ -677,8 +695,11 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         if high_score_overlay_switch:
             plot = add_high_score_overlay(plot, high_score)
 
-        if score_threshold_overlay_switch and score_threshold_percentage is not None:
-            score_threshold = high_score * score_threshold_percentage / 100
+        score_threshold_goal_percentage = _normalize_score_threshold_percentage(
+            score_threshold_percentage
+        )
+        if score_threshold_overlay_switch and score_threshold_goal_percentage:
+            score_threshold = high_score * score_threshold_goal_percentage / 100
             plot = add_score_threshold_overlay(plot, score_threshold)
 
         notifications = []

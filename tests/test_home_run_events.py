@@ -307,18 +307,19 @@ def test_single_run_threshold_failure_preserves_legacy_toast():
 
 
 def test_single_run_threshold_notification_ignores_empty_percentage():
-    notifications = home._build_run_event_notifications(
-        _payload(score=780.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=None,
-        score_threshold_notification_switch=True,
-    )
+    for empty_percentage in (None, ""):
+        notifications = home._build_run_event_notifications(
+            _payload(score=780.0, previous_high_score=800.0),
+            "Scenario A",
+            top_n_scores=5,
+            score_threshold_percentage=empty_percentage,
+            score_threshold_notification_switch=True,
+        )
 
-    assert [notification["id"] for notification in notifications] == [
-        "new-top-n-score-notification",
-        "graph-updated-notification",
-    ]
+        assert [notification["id"] for notification in notifications] == [
+            "new-top-n-score-notification",
+            "graph-updated-notification",
+        ]
 
 
 def test_backlog_notification_is_one_scenario_named_summary():
@@ -341,20 +342,21 @@ def test_backlog_notification_is_one_scenario_named_summary():
 
 
 def test_backlog_threshold_summary_ignores_empty_percentage():
-    notifications = home._build_run_event_notifications(
-        _payload(count=3, score=780.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=None,
-        score_threshold_notification_switch=True,
-    )
+    for empty_percentage in (None, ""):
+        notifications = home._build_run_event_notifications(
+            _payload(count=3, score=780.0, previous_high_score=800.0),
+            "Scenario A",
+            top_n_scores=5,
+            score_threshold_percentage=empty_percentage,
+            score_threshold_notification_switch=True,
+        )
 
-    assert len(notifications) == 1
-    assert notifications[0]["color"] == "blue"
-    assert notifications[0]["message"] == (
-        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
-        "a new 2nd place score: 780.00."
-    )
+        assert len(notifications) == 1
+        assert notifications[0]["color"] == "blue"
+        assert notifications[0]["message"] == (
+            "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
+            "a new 2nd place score: 780.00."
+        )
 
 
 def test_backlog_threshold_summary_passes_at_exact_threshold():
@@ -531,21 +533,22 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
     )
 
-    _plot, notifications = home.generate_graph(
-        _payload(score=780.0, previous_high_score=800.0),
-        "Scenario A",
-        5,
-        "2026-07-01",
-        "score_vs_time",
-        False,
-        False,
-        True,
-        None,
-        True,
-        None,
-    )
+    for empty_percentage in (None, ""):
+        _plot, notifications = home.generate_graph(
+            _payload(score=780.0, previous_high_score=800.0),
+            "Scenario A",
+            5,
+            "2026-07-01",
+            "score_vs_time",
+            False,
+            False,
+            True,
+            empty_percentage,
+            True,
+            None,
+        )
 
-    assert [notification["id"] for notification in notifications] == [
-        "new-top-n-score-notification",
-        "graph-updated-notification",
-    ]
+        assert [notification["id"] for notification in notifications] == [
+            "new-top-n-score-notification",
+            "graph-updated-notification",
+        ]
