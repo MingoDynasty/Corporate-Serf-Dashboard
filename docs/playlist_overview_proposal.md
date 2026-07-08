@@ -1,12 +1,13 @@
 # Playlist-Level Overview & Management Proposal
 
-> **Status:** Draft — round 2, in review on PR #76. Register updated after
-> the 2026-07-08 user review: OQ-1/3/4/5/6/7/8 settled, OQ-2 resolved as a
-> tooltip, phases given an explicit PR breakdown. PR #76 review folded in:
-> corrected the provenance-stamp assumption (no committed file is stamped —
-> see R2). The former prerequisite has shipped: playlist code identity
-> landed in PR #67 (2026-07-07 "Use Playlist Codes As Playlist Identity"
-> entry in [`decision_log.md`](./decision_log.md)).
+> **Status:** Draft — round 3, in review on PR #76. Round 2 settled
+> OQ-1/3/4/5/6/7/8 and resolved OQ-2 as a tooltip (2026-07-08 user review).
+> PR #76 review corrected the provenance-stamp assumption (no committed
+> file is stamped — see R2). Round 3 triage (YAGNI pass): R4 simplified to
+> a plain show-list; lowest-percentile column kept with a revisit note;
+> PR 2a/2b stay separate. The former prerequisite has shipped: playlist
+> code identity landed in PR #67 (2026-07-07 "Use Playlist Codes As
+> Playlist Identity" entry in [`decision_log.md`](./decision_log.md)).
 >
 > Provenance: roadmap milestone "Playlist-level overview and stats"
 > (upcoming #1 in [`roadmap.md`](./roadmap.md)); the 2026-07-03 "Playlists
@@ -62,8 +63,9 @@ review with behavioral ones.
 2. **Phase 2 — benchmark library + visibility.**
    - *PR 2a:* the visibility mechanism — preference store, filtering in the
      shared options builder, per-row hide/unhide and a "show hidden" toggle
-     on the overview. Ships dark: with today's small playlist set and
-     defaults seeded, nothing is hidden until the user hides it.
+     on the overview. Ships dark: the first-run seed covers everything
+     loaded pre-library (defaults plus existing user imports), so nothing
+     is hidden until the user hides it.
    - *PR 2b:* the library flip — bundled root becomes `resources/benchmarks/`
      (flat), the six legacy top-level files are deleted as redundant (see
      R2), default visibility seeds Voltaic + Viscose, importer readme
@@ -136,21 +138,30 @@ full-library world first (see R3).
   *selected* playlist filter (`home.py:640`), so loading 100+ benchmarks
   does not change overlay behavior; PR 2b should still audit the few code
   paths that enumerate the whole store.
-- **R4. Defaults-aware show-list.** (Settled 2026-07-08, closing OQ-4 and
-  its acknowledged tradeoff.) The preference store keeps two user lists —
-  `shown` and `hidden` — and the app ships a per-release
-  `DEFAULT_VISIBLE_CODES` constant (Voltaic + Viscose). Visibility:
-  user-root playlists are visible unless in `hidden` (importing *is* the
-  intent to see); bundled benchmarks are visible if in `shown`, or in the
-  shipped defaults and not in `hidden`. This keeps show-list semantics for
-  the long tail (new library additions arrive hidden — no surprise
-  flooding) while letting a future default-worthy "Voltaic S6" arrive
-  visible via the updated defaults constant — unless this user explicitly
-  hid it, which `hidden` remembers. Not a `config.toml` option: after first
-  run the UI owns visibility, and a config knob would be a second control
-  surface fighting it. A "new benchmarks arrived (hidden)" startup
-  notification would need a seen-codes list — deferred nicety, not in
-  scope.
+- **R4. Plain show-list.** (Settled 2026-07-08, closing OQ-4; simplified
+  from a defaults-aware design in round 3.) The preference store is one
+  list, `shown`: a playlist is visible iff its code is in it, uniformly for
+  bundled benchmarks and user playlists. Importing a playlist appends its
+  code (importing *is* the intent to see); hide removes, unhide re-adds.
+  First run seeds `shown` with `DEFAULT_VISIBLE_CODES` (Voltaic + Viscose)
+  plus any already-loaded user-root codes, so introducing the preference
+  file never hides playlists the user could already see — the loader knows
+  each file's root at scan time, so this needs no persistent origin
+  tracking. Not a `config.toml` option: after first run the UI owns
+  visibility, and a config knob would be a second control surface fighting
+  it. *Accepted tradeoff (2026-07-08):* a future default-worthy benchmark
+  (e.g. a Voltaic S6) arrives hidden. Acceptable because this is a
+  single-user app whose user is also the library curator — a new benchmark
+  only enters `resources/benchmarks/` because the user ran the importer and
+  committed it, so it cannot arrive unnoticed, and unhiding it is one known
+  click. The rejected richer design (`shown` + `hidden` + a live-evaluated
+  defaults constant, letting shipped defaults auto-surface) remains the
+  known, backward-compatible upgrade if the app is ever distributed to
+  users who aren't the curator; it would cost a second list, pulling
+  origin tracking forward into PR 2a, and roughly double the test matrix —
+  machinery defending against a surprise this app cannot currently
+  produce. A "new benchmarks arrived (hidden)" startup notification would
+  need a seen-codes list — deferred nicety, not in scope.
 - **R5. Delete exists only for user playlists.** Deleting removes the
   `data/playlists/` file and the store entry (with confirmation).
   Bundled benchmarks cannot be deleted — hiding is the equivalent — which
@@ -235,7 +246,7 @@ full-library world first (see R3).
 | Total runs | sum of per-scenario run counts | Local | |
 | Last played | max of per-scenario last-played | Local | The staleness signal; "Never" + NULLS LAST for untouched playlists. Tooltip is two lines: the exact timestamp (existing convention) plus the stalest scenario — see OQ-2 resolution |
 | Median percentile | rank cache only | Cached | Median over mean (settled 2026-07-08, OQ-1) — robust to one outlier scenario in small playlists; with coverage per R9 |
-| Lowest percentile | rank cache only | Cached | "My worst weakness here" — mirrors the scenario table's headline use case |
+| Lowest percentile | rank cache only | Cached | "My worst weakness here" — mirrors the scenario table's headline use case. Kept for v1 (2026-07-08); revisit if the table gets busy |
 
 Deliberately excluded, with reasons:
 
@@ -280,10 +291,11 @@ with a lean.
   tooltip — exact timestamp, then `Stalest: <scenario>, <relative age>` —
   rather than a second competing tooltip surface.
 - **OQ-3. Manager surface → overview-hosted.** Settled (R12).
-- **OQ-4. Preference semantics → defaults-aware show-list.** Settled; the
-  user-flagged tradeoff (a default-worthy "Voltaic S6" arriving hidden) is
-  resolved by the shipped defaults constant + `hidden`-list override design
-  in R4.
+- **OQ-4. Preference semantics → plain show-list.** Settled; simplified in
+  round 3 after a complexity-vs-value pass. One `shown` list; visibility is
+  set membership. The first-run seed, the accepted
+  new-defaults-arrive-hidden tradeoff (user-is-curator rationale), and the
+  defaults-aware upgrade path are specified in R4.
 - **OQ-5. Terminology → "show/hide".** Settled. Nothing is functionally
   disabled — data loads, routes resolve, overlays draw — so "hide" is the
   honest verb. A favorites/star system is a third state that doesn't answer
@@ -344,7 +356,10 @@ Phase 2:
 5. PR 2a: hide/unhide from the overview persists across restarts via the
    `data/` preference store; hidden playlists vanish from the Home filter
    and Journey picker (shared options builder) but remain reachable at
-   `/playlists/{code}`; "show hidden" reveals muted rows.
+   `/playlists/{code}`; "show hidden" reveals muted rows; introducing the
+   preference file hides nothing by itself (the first-run seed preserves
+   the visibility of everything already loaded); importing a playlist makes
+   it visible.
 6. PR 2b: a fresh checkout loads the full bundled library from
    `resources/benchmarks/`; only the default set (Voltaic, Viscose) is
    visible; the six legacy top-level files are gone after threshold/color
