@@ -36,9 +36,10 @@ list in the roadmap.)
   conditional classifications: a top-N placement within the run's sensitivity
   ("40.2 cm/360 has a new 2nd place score"), shown when the run makes the
   configured top N for the on-screen scenario; and a score-threshold
-  pass/fail against the previous high score ("ready to move on" vs "keep
-  grinding"), shown when the threshold notification switch is on and a
-  previous high score exists. A run that qualifies for neither still gets a
+  pass/fail against the run's previous high score ("ready to move on" vs
+  "keep grinding"), shown when the threshold notification switch is on and a
+  previous high score exists. The overlay line for that same percentage tracks
+  the current personal best. A run that qualifies for neither still gets a
   generic "Graph updated!" toast. A new personal best has no toast of its
   own; it triggers the background rank refresh. If runs accumulate while Home
   is not open, the next visit rebuilds once from final state and gives one
