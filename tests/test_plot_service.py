@@ -22,8 +22,9 @@ def _build_run(score: float, sens: float, when: datetime) -> RunData:
 def test_generate_empty_plot_has_intentional_empty_state() -> None:
     fig = generate_empty_plot("No scenario selected", "Select a scenario.")
 
-    assert fig.layout.title.text == "No scenario selected"
-    assert fig.layout.annotations[0].text == "Select a scenario."
+    assert "No scenario selected" in fig.layout.annotations[0].text
+    assert fig.layout.annotations[1].text == "Select a scenario."
+    assert fig.layout.dragmode is False
     assert fig.layout.xaxis.visible is False
     assert fig.layout.yaxis.visible is False
     assert len(fig.data) == 0
@@ -32,16 +33,16 @@ def test_generate_empty_plot_has_intentional_empty_state() -> None:
 def test_generate_sensitivity_plot_returns_empty_state_for_no_data() -> None:
     fig = generate_sensitivity_plot({}, "1w4ts", True, [])
 
-    assert fig.layout.title.text == "No runs to plot"
-    assert "No sensitivity data" in fig.layout.annotations[0].text
+    assert "No runs to plot" in fig.layout.annotations[0].text
+    assert "No sensitivity data" in fig.layout.annotations[1].text
     assert len(fig.data) == 0
 
 
 def test_generate_time_plot_returns_empty_state_for_no_data() -> None:
     fig = generate_time_plot({}, "1w4ts", True, [])
 
-    assert fig.layout.title.text == "No runs to plot"
-    assert "No score history" in fig.layout.annotations[0].text
+    assert "No runs to plot" in fig.layout.annotations[0].text
+    assert "No score history" in fig.layout.annotations[1].text
     assert len(fig.data) == 0
 
 
