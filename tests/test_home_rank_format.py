@@ -68,7 +68,7 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     assert getattr(last_played, "tabIndex", None) is None
     assert tooltip.disabled is True
     assert tooltip.label == ""
-    assert tooltip.events == home.LAST_PLAYED_TOOLTIP_EVENTS
+    assert tooltip.events == home.TOOLTIP_EVENTS
 
 
 def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
@@ -115,6 +115,42 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     assert titles["Scenario Stats"].size == "h6"
     assert titles["Display Settings"].order == 2
     assert titles["Display Settings"].size == "h4"
+
+
+def test_settings_modal_controls_have_help_tooltips(monkeypatch):
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    components = {
+        getattr(component, "id", None): component
+        for component in _walk_components(home.layout())
+    }
+    expected_settings = {
+        "settings-modal-import-playlist-textinput": "import-playlist",
+        "automatically-change-scenario-switch": "automatically-change-scenario",
+        "rank-overlay-switch": "rank-overlay",
+        "high-score-overlay-switch": "high-score-overlay",
+        "score-threshold-overlay-switch": "score-threshold-overlay",
+        "score-threshold-percentage": "score-threshold-percentage",
+        "score-threshold-notification-switch": "score-threshold-notification",
+    }
+
+    for component_id, help_key in expected_settings.items():
+        label = components[component_id].label
+        tooltips = [
+            component
+            for component in _walk_components(label)
+            if isinstance(component, dmc.Tooltip)
+        ]
+
+        assert len(tooltips) == 1
+        assert tooltips[0].label == home.SETTINGS_HELP_TEXT[help_key]
+        assert tooltips[0].events == home.TOOLTIP_EVENTS
+        assert tooltips[0].withArrow is True
+        assert tooltips[0].multiline is True
+
+    score_threshold_percentage = components["score-threshold-percentage"]
+    assert score_threshold_percentage.min == 1
 
 
 def test_get_scenario_num_runs_without_selection():

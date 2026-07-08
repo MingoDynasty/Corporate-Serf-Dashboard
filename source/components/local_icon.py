@@ -33,6 +33,11 @@ ICONS: dict[str, IconAsset] = {
         preserves_color=True,
     ),
     "material-symbols:check": IconAsset("material-symbols-check.svg", 24, 24),
+    "material-symbols:info-outline": IconAsset(
+        "material-symbols-info-outline.svg",
+        24,
+        24,
+    ),
     "material-symbols:playlist-play": IconAsset(
         "material-symbols-playlist-play.svg",
         24,
