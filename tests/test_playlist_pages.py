@@ -1,8 +1,10 @@
 from datetime import datetime
+from types import SimpleNamespace
 
 import dash
 import dash_mantine_components as dmc
 import pytest
+from dash import no_update
 from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
@@ -21,6 +23,60 @@ from source.pages import (  # noqa: E402
 def test_bare_playlists_route_callback_builds_playlist_path():
     assert playlists.route_to_selected_playlist("KovaaKsTestCode") == (
         "/playlists/KovaaKsTestCode"
+    )
+
+
+def test_playlist_scenarios_selector_callback_builds_playlist_path(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "ctx",
+        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
+    )
+
+    assert (
+        playlist_scenarios.route_from_playlist_interaction(
+            "KovaaKsTestCode",
+            None,
+            "/playlists/OldCode",
+            "OldCode",
+        )
+        == "/playlists/KovaaKsTestCode"
+    )
+
+
+def test_playlist_scenarios_selector_callback_skips_current_path(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "ctx",
+        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
+    )
+
+    assert (
+        playlist_scenarios.route_from_playlist_interaction(
+            "KovaaKsTestCode",
+            None,
+            "/playlists/KovaaKsTestCode",
+            "KovaaKsTestCode",
+        )
+        is no_update
+    )
+
+
+def test_playlist_scenarios_cell_click_callback_builds_home_link(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "ctx",
+        SimpleNamespace(triggered_id="playlist-scenarios-grid"),
+    )
+
+    assert (
+        playlist_scenarios.route_from_playlist_interaction(
+            None,
+            {"colId": "scenario", "value": "VT Pasu & Friends"},
+            "/playlists/Code/One",
+            "Code/One",
+        )
+        == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
     )
 
 
@@ -192,6 +248,15 @@ def test_playlist_scenarios_table_includes_local_stat_columns():
     assert "high_score_sort" in fields
 
 
+def test_playlist_scenarios_scenario_home_href_url_encodes_values():
+    href = playlist_scenarios.scenario_home_href(
+        "VT Pasu & Friends",
+        "Code/One",
+    )
+
+    assert href == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
+
+
 def test_playlist_scenarios_last_played_uses_defined_nulls_last_comparator():
     column = next(
         column
@@ -284,4 +349,5 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
 
     assert column["flex"] == 1
     assert column["maxWidth"] == 400
+    assert column["cellClass"] == "playlist-scenario-link-cell"
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
