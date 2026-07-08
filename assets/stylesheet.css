@@ -48,13 +48,14 @@
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link {
+.playlist-scenario-link-cell {
     color: var(--mantine-color-blue-filled);
+    cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link:hover {
+.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 

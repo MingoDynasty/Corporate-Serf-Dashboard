@@ -5,7 +5,16 @@ from urllib.parse import urlencode
 import dash
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, clientside_callback, dcc, no_update
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    dcc,
+    no_update,
+)
 
 from source.kovaaks.data_service import get_playlist_by_code
 from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
@@ -41,7 +50,7 @@ TABLE_COLUMN_DEFS = [
         "flex": 1,
         "minWidth": 280,
         "maxWidth": 400,
-        "cellRenderer": {"function": "scenarioHomeLinkRenderer(params)"},
+        "cellClass": "playlist-scenario-link-cell",
     },
     {
         "headerName": "Last Played",
@@ -149,13 +158,30 @@ def _add_scenario_home_links(
 
 
 @callback(
-    Output("playlist-scenarios-location", "pathname"),
+    Output("playlist-scenarios-location", "href"),
     Input("playlist-scenarios-selector", "value"),
+    Input("playlist-scenarios-grid", "cellClicked"),
     State("playlist-scenarios-location", "pathname"),
+    State("playlist-scenarios-code", "data"),
     prevent_initial_call=True,
 )
-def route_to_selected_playlist(playlist_code, current_pathname):
-    """Navigate to a newly selected playlist without redundant routing."""
+def route_from_playlist_interaction(
+    playlist_code,
+    cell_clicked,
+    current_pathname,
+    current_playlist_code,
+):
+    """Navigate from playlist selector changes or scenario cell clicks."""
+    if ctx.triggered_id == "playlist-scenarios-grid":
+        if (
+            not isinstance(cell_clicked, dict)
+            or cell_clicked.get("colId") != "scenario"
+            or not isinstance(cell_clicked.get("value"), str)
+            or not current_playlist_code
+        ):
+            return no_update
+        return scenario_home_href(cell_clicked["value"], current_playlist_code)
+
     if not playlist_code:
         return no_update
 
