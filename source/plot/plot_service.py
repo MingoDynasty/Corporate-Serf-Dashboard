@@ -20,22 +20,32 @@ def generate_empty_plot(title: str, message: str) -> go.Figure:
     """Build an intentional empty-state figure for graph panels without data."""
     figure = go.Figure()
     figure.update_layout(
-        title=title,
+        dragmode=False,
         annotations=[
+            {
+                "text": f"<b>{title}</b>",
+                "xref": "paper",
+                "yref": "paper",
+                "x": 0.5,
+                "y": 0.58,
+                "showarrow": False,
+                "align": "center",
+                "font": {"size": 22},
+            },
             {
                 "text": message,
                 "xref": "paper",
                 "yref": "paper",
                 "x": 0.5,
-                "y": 0.52,
+                "y": 0.46,
                 "showarrow": False,
                 "align": "center",
-                "font": {"size": 18},
+                "font": {"size": 15},
             },
         ],
         xaxis={"visible": False},
         yaxis={"visible": False},
-        margin={"l": 40, "r": 40, "t": 80, "b": 40},
+        margin={"l": 40, "r": 40, "t": 40, "b": 40},
     )
     return figure
 

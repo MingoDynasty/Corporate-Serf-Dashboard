@@ -80,25 +80,30 @@ def test_home_layout_initial_graph_has_empty_state(monkeypatch):
     figure = graph.figure
     cached_plot_data = json.loads(cached_plot.data)
 
-    assert figure["layout"]["title"]["text"] == "No scenario selected"
-    assert figure["layout"]["annotations"][0]["text"] == (
+    assert "No scenario selected" in figure["layout"]["annotations"][0]["text"]
+    assert figure["layout"]["annotations"][1]["text"] == (
         "Select a scenario to see your score history."
     )
+    assert figure["layout"]["dragmode"] is False
     assert figure["layout"]["xaxis"]["visible"] is False
     assert figure["layout"]["yaxis"]["visible"] is False
-    assert cached_plot_data["layout"]["title"]["text"] == "No scenario selected"
-    assert cached_plot_data["layout"]["annotations"][0]["text"] == (
+    assert (
+        "No scenario selected" in cached_plot_data["layout"]["annotations"][0]["text"]
+    )
+    assert cached_plot_data["layout"]["annotations"][1]["text"] == (
         "Select a scenario to see your score history."
     )
+    assert cached_plot_data["layout"]["dragmode"] is False
 
 
 def test_graph_theme_callback_falls_back_to_initial_empty_state():
     figure = home.apply_light_dark_theme_to_graph("light", None)
 
-    assert figure.layout.title.text == "No scenario selected"
-    assert figure.layout.annotations[0].text == (
+    assert "No scenario selected" in figure.layout.annotations[0].text
+    assert figure.layout.annotations[1].text == (
         "Select a scenario to see your score history."
     )
+    assert figure.layout.dragmode is False
     assert figure.layout.xaxis.visible is False
     assert figure.layout.yaxis.visible is False
 
@@ -338,10 +343,11 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
     plot = json.loads(plot_json)
 
     assert notifications is no_update
-    assert plot["layout"]["title"]["text"] == "No scenario selected"
-    assert plot["layout"]["annotations"][0]["text"] == (
+    assert "No scenario selected" in plot["layout"]["annotations"][0]["text"]
+    assert plot["layout"]["annotations"][1]["text"] == (
         "Select a scenario to see your score history."
     )
+    assert plot["layout"]["dragmode"] is False
     assert plot["layout"]["xaxis"]["visible"] is False
     assert plot["layout"]["yaxis"]["visible"] is False
 
@@ -371,10 +377,11 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
     plot = json.loads(plot_json)
 
     assert notifications is no_update
-    assert plot["layout"]["title"]["text"] == "Unsupported graph option"
-    assert plot["layout"]["annotations"][0]["text"] == (
+    assert "Unsupported graph option" in plot["layout"]["annotations"][0]["text"]
+    assert plot["layout"]["annotations"][1]["text"] == (
         "Choose Score vs Sensitivity or Score vs Time."
     )
+    assert plot["layout"]["dragmode"] is False
     assert plot["layout"]["xaxis"]["visible"] is False
     assert plot["layout"]["yaxis"]["visible"] is False
 
