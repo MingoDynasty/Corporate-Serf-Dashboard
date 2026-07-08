@@ -18,8 +18,8 @@ from dash import (
     dcc,
     no_update,
 )
-from dash_iconify import DashIconify
 
+from source.components.local_icon import local_icon
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
@@ -42,6 +42,7 @@ from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
     apply_light_dark_mode,
+    generate_empty_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
@@ -51,15 +52,60 @@ from source.utilities.utilities import ordinal
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
-LAST_PLAYED_TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
+TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
+SETTINGS_HELP_TOOLTIP_WIDTH = 280
+SETTINGS_HELP_TEXT = {
+    "import-playlist": (
+        "Paste a KovaaK's playlist share code and press Import to add that "
+        "playlist to the playlist selector."
+    ),
+    "automatically-change-scenario": (
+        "Automatically selects the scenario you just played when a new run is detected."
+    ),
+    "rank-overlay": (
+        "Shows the selected playlist's rank threshold lines on the graph when "
+        "rank data is available."
+    ),
+    "high-score-overlay": (
+        "Shows your current personal best score as a reference line on the graph."
+    ),
+    "score-threshold-overlay": (
+        "Shows a score goal line based on the selected percentage of your "
+        "current personal best."
+    ),
+    "score-threshold-percentage": (
+        "Sets the score goal as a percentage of your current personal best, "
+        "used by the threshold line and notification."
+    ),
+    "score-threshold-notification": (
+        "Notifies after each new run whether the score reached the score threshold."
+    ),
+}
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
+_SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
+_SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
+_INCOMPLETE_GRAPH_CONTROLS_TITLE = "Graph settings incomplete"
+_INCOMPLETE_GRAPH_CONTROLS_MESSAGE = (
+    "Choose a Top N value and start date to plot this scenario."
+)
+_NO_SCENARIO_DATA_PLOT_TITLE = "No local runs found"
+_NO_SCENARIO_DATA_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
+_NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
+_NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
+_UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
+_UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score vs Time."
 dash.register_page(
     __name__,
     path="/",
     title="Corporate Serf Dashboard",
     redirect_from=["/home", "/index"],
 )
+
+
+def _empty_plot_json(title: str, message: str) -> str:
+    """Serialize an empty-state graph for the cached plot store."""
+    return generate_empty_plot(title, message).to_json()
 
 
 class RunEventData(TypedDict):
@@ -77,6 +123,33 @@ class RunEventsPayload(TypedDict):
 
     count: int
     latest: RunEventData
+
+
+def _settings_help_label(label: str, help_text: str) -> dmc.Group:
+    return dmc.Group(
+        [
+            dmc.Text(label, span=True),
+            dmc.Tooltip(
+                dmc.ActionIcon(
+                    local_icon("material-symbols:info-outline", width=16),
+                    className="settings-help-icon",
+                    color="gray",
+                    radius="xl",
+                    size="sm",
+                    variant="subtle",
+                    **{"aria-label": f"{label} help"},
+                ),
+                label=help_text,
+                events=TOOLTIP_EVENTS,
+                multiline=True,
+                withArrow=True,
+                w=SETTINGS_HELP_TOOLTIP_WIDTH,
+            ),
+        ],
+        align="center",
+        gap="xs",
+        wrap="nowrap",
+    )
 
 
 # Rank display states deliberately map to distinct user-facing text.
@@ -346,7 +419,7 @@ def _build_run_event_notifications(
             and latest["previous_high_score"] > 0
         ):
             percentage = latest["score"] / latest["previous_high_score"] * 100
-            if latest["score"] > score_threshold:
+            if latest["score"] >= score_threshold:
                 message += (
                     f" Current score percentage ({percentage:.1f}%) successfully "
                     "passed the score threshold! Ready to move onto the next scenario."
@@ -365,7 +438,7 @@ def _build_run_event_notifications(
                 "message": message,
                 "color": color,
                 "id": "run-summary-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         ]
@@ -383,7 +456,7 @@ def _build_run_event_notifications(
                 "message": notification_message,
                 "color": "green",
                 "id": "new-top-n-score-notification",
-                "icon": DashIconify(icon="fontisto:line-chart"),
+                "icon": local_icon("fontisto:line-chart"),
                 "autoClose": 8000,
             }
         )
@@ -394,7 +467,7 @@ def _build_run_event_notifications(
         and latest["previous_high_score"] > 0
     ):
         percentage = latest["score"] / latest["previous_high_score"] * 100
-        if latest["score"] > score_threshold:
+        if latest["score"] >= score_threshold:
             notifications.append(
                 {
                     "action": "show",
@@ -406,7 +479,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "green",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:check"),
+                    "icon": local_icon("material-symbols:check"),
                     "autoClose": 8000,
                 }
             )
@@ -421,7 +494,7 @@ def _build_run_event_notifications(
                     ),
                     "color": "yellow",
                     "id": "score-threshold-notification",
-                    "icon": DashIconify(icon="material-symbols:warning-outline"),
+                    "icon": local_icon("material-symbols:warning-outline"),
                     "autoClose": 8000,
                 }
             )
@@ -433,7 +506,7 @@ def _build_run_event_notifications(
                 "message": "Graph updated!",
                 "color": "blue",
                 "id": "graph-updated-notification",
-                "icon": DashIconify(icon="material-symbols:refresh-rounded"),
+                "icon": local_icon("material-symbols:refresh-rounded"),
             }
         )
     return notifications
@@ -479,13 +552,34 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :param selected_playlist: user-selected playlist code.
     :return: Figure serialized to JSON, Notification
     """
-    if not selected_scenario or not top_n_scores or not selected_date:
-        return go.Figure().to_json(), no_update
+    if not selected_scenario:
+        return (
+            _empty_plot_json(
+                _SELECT_SCENARIO_PLOT_TITLE,
+                _SELECT_SCENARIO_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
+
+    if not top_n_scores or not selected_date:
+        return (
+            _empty_plot_json(
+                _INCOMPLETE_GRAPH_CONTROLS_TITLE,
+                _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
+            ),
+            no_update,
+        )
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
-        return go.Figure().to_json(), no_update
+        return (
+            _empty_plot_json(
+                _NO_SCENARIO_DATA_PLOT_TITLE,
+                _NO_SCENARIO_DATA_PLOT_MESSAGE,
+            ),
+            no_update,
+        )
 
     oldest_datetime = datetime.combine(
         datetime.fromisoformat(selected_date).date(),
@@ -493,6 +587,7 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     )
 
     plot = go.Figure()
+    supports_overlays = True
     if x_axis_radiogroup == "score_vs_sensitivity":
         sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
             selected_scenario,
@@ -506,7 +601,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:
@@ -533,7 +634,13 @@ def generate_graph(  # noqa: PLR0912, PLR0913
                 oldest_datetime,
             )
             dash_logger.warning("No scenario data for the given date range.")
-            return go.Figure().to_json(), no_update
+            return (
+                _empty_plot_json(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                no_update,
+            )
 
         rank_data = None
         if selected_playlist:
@@ -549,24 +656,31 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         )
     else:
         logger.error("Unsupported radio option: %s", x_axis_radiogroup)
-
-    high_score = get_high_score(selected_scenario)
-    if high_score_overlay_switch:
-        plot = add_high_score_overlay(plot, high_score)
-
-    score_threshold = high_score * score_threshold_percentage / 100
-    if score_threshold_overlay_switch:
-        plot = add_score_threshold_overlay(plot, score_threshold)
-
-    notifications = []
-    if _run_events_were_triggered(ctx.triggered):
-        notifications = _build_run_event_notifications(
-            run_events,
-            selected_scenario,
-            top_n_scores,
-            score_threshold,
-            score_threshold_notification_switch,
+        supports_overlays = False
+        plot = generate_empty_plot(
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
         )
+
+    notifications = no_update
+    if supports_overlays:
+        high_score = get_high_score(selected_scenario)
+        if high_score_overlay_switch:
+            plot = add_high_score_overlay(plot, high_score)
+
+        score_threshold = high_score * score_threshold_percentage / 100
+        if score_threshold_overlay_switch:
+            plot = add_score_threshold_overlay(plot, score_threshold)
+
+        notifications = []
+        if _run_events_were_triggered(ctx.triggered):
+            notifications = _build_run_event_notifications(
+                run_events,
+                selected_scenario,
+                top_n_scores,
+                score_threshold,
+                score_threshold_notification_switch,
+            )
     return plot.to_json(), notifications
 
 
@@ -574,7 +688,6 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     Output("graph-content", "figure"),
     Input("color-scheme-switch", "computedColorScheme"),
     Input("cached-plot", "data"),
-    prevent_initial_call=True,
 )
 def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     """
@@ -584,7 +697,10 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     :return: Figure with theme applied.
     """
     if not plot_json:
-        return plot_json
+        plot_json = _empty_plot_json(
+            _SELECT_SCENARIO_PLOT_TITLE,
+            _SELECT_SCENARIO_PLOT_MESSAGE,
+        )
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
@@ -598,7 +714,7 @@ def _build_startup_playlist_warning_notifications(
             "message": warning,
             "color": "yellow",
             "id": f"startup-playlist-warning-{idx}",
-            "icon": DashIconify(icon="material-symbols:warning-outline"),
+            "icon": local_icon("material-symbols:warning-outline"),
             "autoClose": 10000,
         }
         for idx, warning in enumerate(warnings)
@@ -650,7 +766,7 @@ def import_playlist(_, playlist_to_import):
             "message": error_message,
             "color": "red",
             "id": "imported-playlist-failed-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     else:
         notification = {
@@ -659,7 +775,7 @@ def import_playlist(_, playlist_to_import):
             "message": "Successfully imported playlist!",
             "color": "green",
             "id": "imported-playlist-successful-notification",
-            "icon": DashIconify(icon="material-symbols:upload"),
+            "icon": local_icon("material-symbols:upload"),
         }
     return [notification], get_playlist_selector_options()
 
@@ -714,7 +830,13 @@ def layout(
     return dmc.Box(
         children=[
             dcc.Store(id="run-events"),
-            dcc.Store(id="cached-plot"),  # caches the plot for easy light/dark mode
+            dcc.Store(
+                id="cached-plot",
+                data=_empty_plot_json(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ),
+            ),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
@@ -798,7 +920,7 @@ def layout(
                                     label="Oldest date to consider",
                                     maxDate=datetime.now().isoformat(),
                                     persistence=True,
-                                    rightSection=DashIconify(icon="clarity:date-line"),
+                                    rightSection=local_icon("clarity:date-line"),
                                     value=datetime(
                                         datetime.now().year,
                                         month=1,
@@ -828,7 +950,7 @@ def layout(
                                                         size="sm",
                                                     ),
                                                     disabled=True,
-                                                    events=LAST_PLAYED_TOOLTIP_EVENTS,
+                                                    events=TOOLTIP_EVENTS,
                                                     id="last-played-tooltip",
                                                     label="",
                                                 ),
@@ -881,8 +1003,8 @@ def layout(
                                                     id="rank-refresh-button",
                                                     variant="subtle",
                                                     size="compact-xs",
-                                                    leftSection=DashIconify(
-                                                        icon="material-symbols:refresh-rounded",
+                                                    leftSection=local_icon(
+                                                        "material-symbols:refresh-rounded",
                                                         width=14,
                                                     ),
                                                 ),
@@ -928,8 +1050,8 @@ def layout(
                                         "Settings",
                                         id="settings-modal-open-button",
                                         variant="default",
-                                        leftSection=DashIconify(
-                                            icon="clarity:settings-line",
+                                        leftSection=local_icon(
+                                            "clarity:settings-line",
                                             width=25,
                                         ),
                                     ),
@@ -946,7 +1068,12 @@ def layout(
                                                 dmc.TextInput(
                                                     id="settings-modal-import-playlist-textinput",
                                                     placeholder="KovaaK's playlist code...",
-                                                    label="Import Playlist",
+                                                    label=_settings_help_label(
+                                                        "Import Playlist",
+                                                        SETTINGS_HELP_TEXT[
+                                                            "import-playlist"
+                                                        ],
+                                                    ),
                                                     size="md",
                                                     w="300px",
                                                 ),
@@ -967,7 +1094,12 @@ def layout(
                                         dmc.Switch(
                                             id="automatically-change-scenario-switch",
                                             labelPosition="right",
-                                            label="Automatically Change Scenario",
+                                            label=_settings_help_label(
+                                                "Automatically Change Scenario",
+                                                SETTINGS_HELP_TEXT[
+                                                    "automatically-change-scenario"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -975,7 +1107,10 @@ def layout(
                                         dmc.Switch(
                                             id="rank-overlay-switch",
                                             labelPosition="right",
-                                            label="Rank Overlay",
+                                            label=_settings_help_label(
+                                                "Rank Overlay",
+                                                SETTINGS_HELP_TEXT["rank-overlay"],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -983,7 +1118,12 @@ def layout(
                                         dmc.Switch(
                                             id="high-score-overlay-switch",
                                             labelPosition="right",
-                                            label="PB Score Overlay",
+                                            label=_settings_help_label(
+                                                "PB Score Overlay",
+                                                SETTINGS_HELP_TEXT[
+                                                    "high-score-overlay"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -991,14 +1131,24 @@ def layout(
                                         dmc.Switch(
                                             id="score-threshold-overlay-switch",
                                             labelPosition="right",
-                                            label="Score Threshold Overlay",
+                                            label=_settings_help_label(
+                                                "Score Threshold Overlay",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-overlay"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
                                         dmc.Space(h="xs"),
                                         dmc.NumberInput(
                                             id="score-threshold-percentage",
-                                            label="Score Threshold Percentage",
+                                            label=_settings_help_label(
+                                                "Score Threshold Percentage",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-percentage"
+                                                ],
+                                            ),
                                             min=1,
                                             persistence=True,
                                             placeholder="Score Percentage...",
@@ -1012,7 +1162,12 @@ def layout(
                                         dmc.Switch(
                                             id="score-threshold-notification-switch",
                                             labelPosition="right",
-                                            label="Score Threshold Notification",
+                                            label=_settings_help_label(
+                                                "Score Threshold Notification",
+                                                SETTINGS_HELP_TEXT[
+                                                    "score-threshold-notification"
+                                                ],
+                                            ),
                                             checked=True,
                                             persistence=True,
                                         ),
@@ -1031,6 +1186,13 @@ def layout(
                 gutter="xl",
                 overflow="hidden",
             ),
-            dcc.Graph(id="graph-content", style={"height": "80vh"}),
+            dcc.Graph(
+                id="graph-content",
+                figure=generate_empty_plot(
+                    _SELECT_SCENARIO_PLOT_TITLE,
+                    _SELECT_SCENARIO_PLOT_MESSAGE,
+                ).to_plotly_json(),
+                style={"height": "80vh"},
+            ),
         ],
     )

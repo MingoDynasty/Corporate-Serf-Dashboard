@@ -59,6 +59,11 @@
     color: var(--mantine-color-blue-filled-hover);
 }
 
+.settings-help-icon {
+    cursor: help;
+    flex-shrink: 0;
+}
+
 .playlist-scenarios-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-body);
     --ag-border-color: var(--mantine-color-gray-3);

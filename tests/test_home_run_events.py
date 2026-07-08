@@ -50,6 +50,64 @@ def _payload(
     }
 
 
+def _walk_component_tree(component):
+    yield component
+    children = getattr(component, "children", None)
+    if children is None:
+        return
+    if not isinstance(children, list):
+        children = [children]
+    for child in children:
+        yield from _walk_component_tree(child)
+
+
+def test_home_layout_initial_graph_has_empty_state(monkeypatch):
+    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    graph = next(
+        component
+        for component in _walk_component_tree(page)
+        if getattr(component, "id", None) == "graph-content"
+    )
+    cached_plot = next(
+        component
+        for component in _walk_component_tree(page)
+        if getattr(component, "id", None) == "cached-plot"
+    )
+
+    figure = graph.figure
+    cached_plot_data = json.loads(cached_plot.data)
+
+    assert "No scenario selected" in figure["layout"]["annotations"][0]["text"]
+    assert figure["layout"]["annotations"][1]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert figure["layout"]["dragmode"] is False
+    assert figure["layout"]["xaxis"]["visible"] is False
+    assert figure["layout"]["yaxis"]["visible"] is False
+    assert (
+        "No scenario selected" in cached_plot_data["layout"]["annotations"][0]["text"]
+    )
+    assert cached_plot_data["layout"]["annotations"][1]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert cached_plot_data["layout"]["dragmode"] is False
+
+
+def test_graph_theme_callback_falls_back_to_initial_empty_state():
+    figure = home.apply_light_dark_theme_to_graph("light", None)
+
+    assert "No scenario selected" in figure.layout.annotations[0].text
+    assert figure.layout.annotations[1].text == (
+        "Select a scenario to see your score history."
+    )
+    assert figure.layout.dragmode is False
+    assert figure.layout.xaxis.visible is False
+    assert figure.layout.yaxis.visible is False
+
+
 def test_drain_run_events_summarizes_single_scenario_backlog(monkeypatch):
     queue = deque([_message("Scenario A"), _message("Scenario A", score=830.1)])
     monkeypatch.setattr(home, "message_queue", queue)
@@ -181,6 +239,22 @@ def test_single_run_threshold_notification_uses_previous_high_score():
     )
 
 
+def test_single_run_threshold_notification_passes_at_exact_threshold():
+    notifications = home._build_run_event_notifications(
+        _payload(score=820.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold=820.0,
+        score_threshold_notification_switch=True,
+    )
+
+    assert notifications[1]["color"] == "green"
+    assert notifications[1]["message"] == (
+        "Current score percentage (102.5%) successfully passed the score "
+        "threshold! Ready to move onto the next scenario."
+    )
+
+
 def test_single_run_threshold_failure_preserves_legacy_toast():
     notifications = home._build_run_event_notifications(
         _payload(score=780.0, previous_high_score=800.0),
@@ -219,6 +293,25 @@ def test_backlog_notification_is_one_scenario_named_summary():
     )
 
 
+def test_backlog_threshold_summary_passes_at_exact_threshold():
+    notifications = home._build_run_event_notifications(
+        _payload(count=3, score=820.0, previous_high_score=800.0),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold=820.0,
+        score_threshold_notification_switch=True,
+    )
+
+    assert len(notifications) == 1
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["message"] == (
+        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
+        "a new 2nd place score: 820.00. Current score percentage (102.5%) "
+        "successfully passed the score threshold! Ready to move onto the next "
+        "scenario."
+    )
+
+
 def test_notifications_ignore_payload_for_another_scenario():
     assert (
         home._build_run_event_notifications(
@@ -230,6 +323,67 @@ def test_notifications_ignore_payload_for_another_scenario():
         )
         == []
     )
+
+
+def test_generate_graph_returns_empty_state_before_scenario_selection():
+    plot_json, notifications = home.generate_graph(
+        None,
+        None,
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert "No scenario selected" in plot["layout"]["annotations"][0]["text"]
+    assert plot["layout"]["annotations"][1]["text"] == (
+        "Select a scenario to see your score history."
+    )
+    assert plot["layout"]["dragmode"] is False
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
+
+
+def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+
+    def fail_if_called(_scenario):
+        raise AssertionError("unsupported graph option should return before overlays")
+
+    monkeypatch.setattr(home, "get_high_score", fail_if_called)
+
+    plot_json, notifications = home.generate_graph(
+        None,
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "unsupported",
+        False,
+        True,
+        True,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert "Unsupported graph option" in plot["layout"]["annotations"][0]["text"]
+    assert plot["layout"]["annotations"][1]["text"] == (
+        "Choose Score vs Sensitivity or Score vs Time."
+    )
+    assert plot["layout"]["dragmode"] is False
+    assert plot["layout"]["xaxis"]["visible"] is False
+    assert plot["layout"]["yaxis"]["visible"] is False
 
 
 def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatch):

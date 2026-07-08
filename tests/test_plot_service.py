@@ -1,7 +1,11 @@
 from datetime import datetime
 
 from source.kovaaks.data_models import Rank, RunData
-from source.plot.plot_service import generate_sensitivity_plot, generate_time_plot
+from source.plot.plot_service import (
+    generate_empty_plot,
+    generate_sensitivity_plot,
+    generate_time_plot,
+)
 
 
 def _build_run(score: float, sens: float, when: datetime) -> RunData:
@@ -13,6 +17,33 @@ def _build_run(score: float, sens: float, when: datetime) -> RunData:
         scenario="1w4ts",
         accuracy=0.5,
     )
+
+
+def test_generate_empty_plot_has_intentional_empty_state() -> None:
+    fig = generate_empty_plot("No scenario selected", "Select a scenario.")
+
+    assert "No scenario selected" in fig.layout.annotations[0].text
+    assert fig.layout.annotations[1].text == "Select a scenario."
+    assert fig.layout.dragmode is False
+    assert fig.layout.xaxis.visible is False
+    assert fig.layout.yaxis.visible is False
+    assert len(fig.data) == 0
+
+
+def test_generate_sensitivity_plot_returns_empty_state_for_no_data() -> None:
+    fig = generate_sensitivity_plot({}, "1w4ts", True, [])
+
+    assert "No runs to plot" in fig.layout.annotations[0].text
+    assert "No sensitivity data" in fig.layout.annotations[1].text
+    assert len(fig.data) == 0
+
+
+def test_generate_time_plot_returns_empty_state_for_no_data() -> None:
+    fig = generate_time_plot({}, "1w4ts", True, [])
+
+    assert "No runs to plot" in fig.layout.annotations[0].text
+    assert "No score history" in fig.layout.annotations[1].text
+    assert len(fig.data) == 0
 
 
 def test_generate_sensitivity_plot_has_expected_traces() -> None:
