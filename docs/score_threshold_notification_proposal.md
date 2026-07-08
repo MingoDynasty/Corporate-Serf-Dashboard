@@ -89,14 +89,19 @@ still share the same denominator, so they agree up to display rounding (the
 toast prints `:.1f`, so a 102.46% run prints "102.5%" yet fails a 102.5 goal —
 inherent to rounding the display, unchanged by this proposal).
 
-Why it is safe for the existing ≤100% behavior (verified against the code):
+Why it is safe for the existing ≤100% behavior (verified against the code).
+These cases cover the runs that receive a threshold verdict at all — runs on
+an existing sensitivity, whose events carry a real `previous_high_score`; the
+new-scenario and new-sensitivity events carry `None` and are suppressed by the
+guard, before and after this change (see Out of scope):
 
 - **Non-PB run:** the previous PB equals the current PB (the run didn't move
   it), so the reference is identical to today — no behavior change.
-- **New-PB run, pct ≤ 100:** already passes today and still passes (the run
-  exceeds its previous PB, which is ≥ `previous_PB × pct/100`).
-- **New-PB run, pct > 100:** the *only* behavior that changes — now it can turn
-  green, which is the fix.
+- **New-PB run (existing sensitivity), pct ≤ 100:** already passes today and
+  still passes (the run exceeds its previous PB, which is ≥
+  `previous_PB × pct/100`).
+- **New-PB run (existing sensitivity), pct > 100:** the *only* behavior that
+  changes — now it can turn green, which is the fix.
 
 ## Implementation sketch (confirm at build time)
 
@@ -106,8 +111,13 @@ Why it is safe for the existing ≤100% behavior (verified against the code):
   `score_threshold` from the post-run PB for the overlay.
 - Both notification paths change identically: the single-run branch and the
   `count > 1` backlog-summary branch.
-- The guard stays `previous_high_score is not None and > 0`; runs with no prior
-  PB continue to fall through to the generic "Graph updated!" toast.
+- The guard stays `previous_high_score is not None and > 0`; runs whose events
+  carry no prior PB continue to fall through to the generic "Graph updated!"
+  toast (behavior pinned by the existing `previous_high_score=None` test).
+  Note the guard suppresses more than true first-ever runs: the watchdog also
+  enqueues `previous_high_score=None` for the first run on a *new sensitivity*
+  (`file_watchdog.py`, case 2), so those runs get no verdict even when they
+  beat the scenario PB — unchanged by this proposal (see Out of scope).
 - Tests: all seven `_build_run_event_notifications` call sites in
   `tests/test_home_run_events.py` pass `score_threshold=` and shift to the new
   percentage parameter — not just the two boundary tests from `752e47f`
@@ -135,10 +145,24 @@ was chasing by that margin"** (Option 1). If instead a >100% goal should mean
 something else — or if the notification should simply never be offered above
 100% while the overlay still allows it — say so, since that changes the fix.
 
+Secondary: whether the new-sensitivity gap (see Out of scope) should ride
+along. Default is no — it is a pre-existing, user-visible behavior expansion,
+not part of the denominator fix.
+
 ## Out of scope
 
 - The overlay's reference PB (stays post-run/current — correct as-is).
 - The ≥ vs > boundary at the threshold (already settled in PR #68 as `>=`).
+- Threshold verdicts for new-scenario and new-sensitivity runs. Both enqueue
+  `previous_high_score=None` (`file_watchdog.py` cases 1–2), so the guard
+  suppresses the verdict — a PB-beating first run on a new sensitivity gets
+  only the top-N and "Graph updated!" toasts, today and after this change.
+  Pre-existing and orthogonal to the denominator fix. For the new-sensitivity
+  case the enabling change is one producer line (case 2 already computes the
+  scenario-wide `high_score`; pass it instead of `None`), but it would start
+  firing green/yellow verdicts on runs that are silent today — a product
+  decision; flag it with the reference-PB decision above if it should ride
+  along.
 - The backlog summary judges only the **latest** run of the batch
   (`_drain_run_events` keeps `matching_messages[-1]`), so a >100% goal met by
   a mid-batch PB run followed by a cooldown run still shows yellow. Not a
