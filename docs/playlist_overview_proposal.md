@@ -1,10 +1,12 @@
 # Playlist-Level Overview & Management Proposal
 
-> **Status:** Draft — round 2. Register updated after the 2026-07-08 user
-> review: OQ-1/3/4/5/6/7/8 settled, OQ-2 resolved as a tooltip, phases given
-> an explicit PR breakdown. The former prerequisite has shipped: playlist
-> code identity landed in PR #67 (2026-07-07 "Use Playlist Codes As Playlist
-> Identity" entry in [`decision_log.md`](./decision_log.md)).
+> **Status:** Draft — round 2, in review on PR #76. Register updated after
+> the 2026-07-08 user review: OQ-1/3/4/5/6/7/8 settled, OQ-2 resolved as a
+> tooltip, phases given an explicit PR breakdown. PR #76 review folded in:
+> corrected the provenance-stamp assumption (no committed file is stamped —
+> see R2). The former prerequisite has shipped: playlist code identity
+> landed in PR #67 (2026-07-07 "Use Playlist Codes As Playlist Identity"
+> entry in [`decision_log.md`](./decision_log.md)).
 >
 > Provenance: roadmap milestone "Playlist-level overview and stats"
 > (upcoming #1 in [`roadmap.md`](./roadmap.md)); the 2026-07-03 "Playlists
@@ -91,21 +93,29 @@ full-library world first (see R3).
   `data/`" decision and the shipped dual-root loader (2026-07-07 decision).
 - **R2. The bundled root becomes `resources/benchmarks/`, flat, scanned in
   full.** (User direction; layout settled 2026-07-08, closing OQ-6.) The
-  111 provenance-stamped files under `resources/playlists/generated/` move
-  to `resources/benchmarks/`; the loader scans the whole library instead of
+  111 files under `resources/playlists/generated/` move to
+  `resources/benchmarks/`; the loader scans the whole library instead of
   today's activated six. The six top-level `resources/playlists/*.json`
-  files are **deleted, not moved**: all six lack `generated_from` stamps
-  (pre-importer hand copies) while their codes are all duplicated by stamped
-  files in `generated/` (verified 2026-07-08) — under full-library scanning
-  they would be pure duplicate-code noise. Before deleting, verify the
-  stamped twins carry equivalent rank thresholds/colors, since the app
-  currently serves the hand-made copies. No `generated/` subdir survives:
-  with the legacy six gone, every bundled file is importer-produced, so the
-  don't-hand-edit boundary lives in the provenance stamps and the
-  bundled-invariant test (every bundled file carries rank data), which
-  extends to the whole root. The importer's true working directory —
-  `scripts/benchmark_importer/generated/` staging with its manifest — is
-  untouched; its readme's manual-copy destination becomes
+  files are **deleted, not moved**: their codes are all duplicated by files
+  in `generated/` (verified 2026-07-08) — under full-library scanning they
+  would be pure duplicate-code noise. Before deleting, verify the
+  `generated/` twins carry equivalent rank thresholds/colors, since the app
+  currently serves the top-level copies; if any pair disagrees, regenerate
+  that benchmark through the importer (a fresh, authoritative pull) rather
+  than guessing which copy is stale. No `generated/` subdir survives: the
+  don't-hand-edit boundary becomes the rule that the *entire*
+  `resources/benchmarks/` root is pipeline-managed — documented in the
+  importer readme and enforced by the bundled-invariant test (every bundled
+  file carries rank data) extended to the whole root. Note (PR #76 review,
+  2026-07-08): **no committed file carries a `generated_from` stamp** — the
+  committed corpus predates the importer's provenance stamping (PRs
+  #45–#48), so stamps cannot serve as a boundary or a deletion criterion
+  today. Restamping the corpus via a bulk importer regeneration would
+  restore the inspectability intended by the 2026-07-03 provenance decision
+  and is desirable hygiene, but it is **not** a PR 2b prerequisite: nothing
+  in this milestone reads the stamps. The importer's true working
+  directory — `scripts/benchmark_importer/generated/` staging with its
+  manifest — is untouched; its readme's manual-copy destination becomes
   `resources/benchmarks/` and the copy-to-activate step dies (activation
   becomes unhiding).
 - **R3. Visibility is a per-code show/hide preference, not file state.**
@@ -232,9 +242,10 @@ Deliberately excluded, with reasons:
 - **Leaderboard / benchmark / playlist IDs** (user stats list 2–4):
   `PlaylistData` carries only `name`, `code`, `scenarios` (re-verified
   post-re-key) — leaderboard IDs are *per-scenario* metadata, and the
-  KovaaK's benchmark ID exists only in the on-disk `generated_from`
-  provenance stamp, unparsed. Debugging metadata, not attention-directing
-  signals. Defer until a concrete need appears.
+  KovaaK's benchmark ID appears nowhere in the committed corpus (the
+  committed generated files predate the importer's provenance stamping —
+  see R2). Debugging metadata, not attention-directing signals. Defer until
+  a concrete need appears.
 - **Share code** (user stats list 5): agreed not needed — it *is* the URL
   identity. A copy-share-code affordance on the scenario table page header
   would serve sharing better than a grid column; parked.
@@ -280,9 +291,12 @@ with a lean.
 - **OQ-6. Bundled-root layout → flat, no `generated/` subdir.** Settled;
   rationale and the legacy-six deletion in R2. The subdir's only real value
   would be separating hand-crafted from importer-produced files — and after
-  the redundant hand-made six are deleted, no hand-crafted bundled files
-  exist. A future hand-crafted benchmark is still expressible as a
-  `data/playlists/` file with `ranks` filled in.
+  the redundant six are deleted, the whole root is pipeline-managed by
+  rule. (No stamp-based distinction exists in the committed corpus today —
+  see the R2 note; the boundary is the documented rule plus the
+  bundled-invariant test, not per-file provenance.) A future hand-crafted
+  benchmark is still expressible as a `data/playlists/` file with `ranks`
+  filled in.
 - **OQ-7. Type badge → keep.** Settled.
 - **OQ-8. Scenario-first navigation → out of scope; park a Scenarios
   page.** Settled. The overview → scenario table → Home drill chain is
@@ -334,8 +348,9 @@ Phase 2:
 6. PR 2b: a fresh checkout loads the full bundled library from
    `resources/benchmarks/`; only the default set (Voltaic, Viscose) is
    visible; the six legacy top-level files are gone after threshold/color
-   parity with their stamped twins is verified; the bundled-invariant test
-   covers the whole new root; the importer readme no longer instructs
+   parity with their `generated/` twins is verified (importer regeneration
+   as the tiebreaker on any mismatch); the bundled-invariant test covers
+   the whole new root; the importer readme no longer instructs
    copy-to-activate.
 7. PR 2b: an audit of store-enumerating code paths (Home filter options,
    Journey, overview, overlays) confirms no surface changed behavior from
