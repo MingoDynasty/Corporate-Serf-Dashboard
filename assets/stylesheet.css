@@ -64,7 +64,8 @@
     flex-shrink: 0;
 }
 
-.playlist-scenarios-grid.ag-theme-quartz {
+.playlist-scenarios-grid.ag-theme-quartz,
+.playlist-overview-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-body);
     --ag-border-color: var(--mantine-color-gray-3);
     --ag-font-family: var(--mantine-font-family);
@@ -77,11 +78,25 @@
     --ag-wrapper-border-radius: var(--mantine-radius-sm);
 }
 
-.playlist-scenarios-grid .ag-header-cell-text {
+.playlist-scenarios-grid .ag-header-cell-text,
+.playlist-overview-grid .ag-header-cell-text {
     font-weight: bold;
 }
 
-:root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz {
+/* Overview rows are full-row navigation targets (routes decision 2026-07-03:
+   visible click affordances). Hover tint comes from --ag-row-hover-color. */
+.playlist-overview-grid .ag-row {
+    cursor: pointer;
+}
+
+/* The overview's Last Played tooltip is two lines (exact time + stalest
+   scenario); pre-line renders the \n the tooltip getter emits. */
+.playlist-overview-grid .ag-tooltip {
+    white-space: pre-line;
+}
+
+:root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz,
+:root[data-mantine-color-scheme="dark"] .playlist-overview-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-dark-7);
     --ag-border-color: var(--mantine-color-dark-4);
     --ag-foreground-color: var(--mantine-color-dark-0);

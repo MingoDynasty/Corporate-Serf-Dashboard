@@ -20,10 +20,106 @@ from source.pages import (  # noqa: E402
 )
 
 
-def test_bare_playlists_route_callback_builds_playlist_path():
-    assert playlists.route_to_selected_playlist("KovaaKsTestCode") == (
-        "/playlists/KovaaKsTestCode"
+def test_playlists_overview_cell_click_routes_to_playlist():
+    assert playlists.route_to_clicked_playlist(
+        {"rowId": "KovaaKsTestCode", "colId": "name", "rowIndex": 0}
+    ) == ("/playlists/KovaaKsTestCode")
+
+
+def test_playlists_overview_cell_click_ignores_malformed_payloads():
+    assert playlists.route_to_clicked_playlist(None) is no_update
+    assert playlists.route_to_clicked_playlist({"colId": "name"}) is no_update
+    assert playlists.route_to_clicked_playlist({"rowId": ""}) is no_update
+    assert playlists.route_to_clicked_playlist({"rowId": 3}) is no_update
+
+
+def test_playlists_overview_page_loads_rows(monkeypatch):
+    expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda: expected_rows,
     )
+
+    rows, status = playlists.load_playlist_overview_rows(True)
+
+    assert rows == expected_rows
+    assert status == ""
+
+
+def test_playlists_overview_page_reports_empty_database(monkeypatch):
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", lambda: [])
+
+    rows, status = playlists.load_playlist_overview_rows(True)
+
+    assert rows == []
+    assert status == "No playlists are loaded."
+
+
+def test_playlists_overview_sortable_columns_use_nulls_last_comparator():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    for field in [
+        "played_sort",
+        "runs_sort",
+        "last_played_sort",
+        "median_percentile_sort",
+        "lowest_percentile_sort",
+    ]:
+        assert columns[field]["comparator"] == {"function": "nullsLastComparator"}
+
+
+def test_playlists_overview_last_played_follows_relative_time_conventions():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+    column = columns["last_played_sort"]
+
+    assert column["valueFormatter"] == {
+        "function": "relativeTime(params.value, 'Never')"
+    }
+    assert column["tooltipValueGetter"] == {"function": playlists.LAST_PLAYED_TOOLTIP}
+    assert "stalest_scenario" in playlists.LAST_PLAYED_TOOLTIP
+    assert "relativeTime(params.data.stalest_sort" in playlists.LAST_PLAYED_TOOLTIP
+
+
+def test_playlists_overview_grid_rows_navigate_by_playlist_code():
+    page = playlists.layout()
+    grid = page.children[-1].children
+
+    assert grid.dashGridOptions["getRowId"] == {"function": "params.data.code"}
+    assert grid.dashGridOptions["tooltipShowDelay"] == 0
+    assert grid.dangerously_allow_code is True
+
+
+def test_playlists_overview_grid_uses_bounded_viewport_layout():
+    page = playlists.layout()
+    loading = page.children[-1]
+    grid = loading.children
+
+    assert page.style == {
+        "height": (
+            "calc(100dvh - var(--app-shell-header-offset, 0rem) "
+            "- 2*var(--app-shell-padding, 1rem))"
+        )
+    }
+    assert loading.parent_style == {
+        "flex": 1,
+        "minHeight": 0,
+        "display": "flex",
+        "flexDirection": "column",
+    }
+    assert grid.columnSize == "autoSize"
+    assert grid.columnSizeOptions == playlists.COLUMN_SIZE_OPTIONS
+
+
+def test_playlists_overview_layout_includes_relative_time_refresh_interval():
+    page = playlists.layout()
+    children_by_id = {getattr(child, "id", None): child for child in page.children}
+
+    interval = children_by_id["playlists-overview-relative-time-interval"]
+
+    assert "playlists-overview-relative-time-refresh" in children_by_id
+    assert interval.interval == 30_000
+    assert interval.n_intervals == 0
 
 
 def test_playlist_scenarios_selector_callback_builds_playlist_path(monkeypatch):
