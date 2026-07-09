@@ -69,7 +69,7 @@ list in the roadmap.)
 
 ### Planning: what should I train
 
-- **Playlist-level overview** (PRs #78, #80). A sortable table at `/playlists`,
+- **Playlist-level overview** (PRs #78, #83). A sortable table at `/playlists`,
   one row per imported playlist with coverage, runs, last-played, and
   aggregate-percentile stats; each row drills into that playlist's scenario
   table. *Problem solved:* the scenario table answers "where am I weak *within*

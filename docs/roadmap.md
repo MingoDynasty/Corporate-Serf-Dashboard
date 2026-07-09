@@ -55,7 +55,7 @@ Design rationale for shipped work lives in
   aggregate-percentile stats; any row drills into that playlist's scenario
   table. Surfaces stale and weak playlists at a glance to direct attention
   across playlists. Completing this milestone also removed the transitional
-  per-playlist selector. (PRs #78, #80) Design:
+  per-playlist selector. (PRs #78, #83) Design:
   [`playlist_overview_proposal.md`](./playlist_overview_proposal.md) (phase 1;
   phases 2–3 continue under Future).
 
