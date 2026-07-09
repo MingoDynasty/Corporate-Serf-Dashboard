@@ -76,6 +76,11 @@ See the 2026-07-03 "Playlists Routes Are Stable" entry in
 [`decision_log.md`](./decision_log.md) for the route contract and the
 removal checklist.
 
+**Design:** [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)
+(accepted 2026-07-09). Phase 1 of the proposal completes this milestone;
+phases 2–3 continue as the "Playlist management & benchmark library" item
+under Future.
+
 ---
 
 ## Future (briefly)
@@ -96,6 +101,12 @@ expanded into its own roadmap entry when it becomes the next thing up.
   training-hour checkpoints across playlists, which is a different question
   from the playlist-level overview in milestone 2 — so it remains a separate
   concern to revisit later, not a replacement for milestone 2.
+- **Playlist management & benchmark library** — phases 2–3 of the accepted
+  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md): the
+  full bundled benchmark library ships under `resources/benchmarks/` with
+  per-code show/hide visibility (plain show-list), then overview-hosted
+  import, delete, and cleanup. Sequenced immediately after the overview
+  milestone ships.
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start
@@ -103,6 +114,12 @@ expanded into its own roadmap entry when it becomes the next thing up.
   layer on top. Sequenced after the playlist-level overview milestone;
   supersedes the interim console-log stopgap in `file_watchdog.py`. See
   [`run_history_proposal.md`](./run_history_proposal.md).
+- **Scenarios page** — scenario-first navigation for scenarios that live in
+  several playlists or in none, parked from the overview design (OQ-8 in
+  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)). The
+  overview → scenario table → Home drill chain covers playlist-first
+  navigation; this would answer "show me this scenario regardless of
+  playlist."
 
 ---
 

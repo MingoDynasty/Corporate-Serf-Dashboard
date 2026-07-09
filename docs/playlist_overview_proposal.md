@@ -1,14 +1,13 @@
 # Playlist-Level Overview & Management Proposal
 
-> **Status:** Draft — round 4, in review on PR #76. Round 2: OQ-1…8
-> settled/resolved (2026-07-08 user review). Round 3 (YAGNI triage): R4
-> simplified to a plain show-list; lowest percentile kept with a revisit
-> note. Round 4 (PR #76 reviews): provenance-stamp assumption corrected
-> (see R2); the legacy Viscose files shown **not** threshold-equivalent to
-> their twins — canonical-values call opened as **OQ-9 (awaiting user)**;
-> the cited bundled-invariant test verified to exist and now named
-> precisely. Prerequisite shipped: playlist code identity, PR #67
-> (2026-07-07 entry in [`decision_log.md`](./decision_log.md)).
+> **Status:** Accepted 2026-07-09 — register frozen, all nine OQs settled
+> (OQ-9 last: fresh importer pull). Doc landed via PR #76; build next:
+> Phase 1 (PR 1a). Review trail: round 2 settled OQ-1…8 (2026-07-08 user
+> review); round 3 (YAGNI triage) simplified R4 to a plain show-list;
+> round 4 (PR #76 reviews) corrected the provenance-stamp assumption and
+> opened OQ-9 on the Viscose threshold divergence. Prerequisite shipped:
+> playlist code identity, PR #67 (2026-07-07 entry in
+> [`decision_log.md`](./decision_log.md)).
 >
 > Provenance: roadmap milestone "Playlist-level overview and stats"
 > (upcoming #1 in [`roadmap.md`](./roadmap.md)); the 2026-07-03 "Playlists
@@ -47,9 +46,9 @@ are weak.
 
 Phase 1 alone completes the roadmap milestone as written. Phases 2–3 are
 **scope beyond that milestone** (the management model from the vault
-direction notes and the 2026-07-08 user notes); accepting this proposal
-should add them to the roadmap as the follow-on milestone rather than
-silently widening this one.
+direction notes and the 2026-07-08 user notes); on acceptance (2026-07-09)
+they were added to the roadmap's Future list as the follow-on milestone
+rather than silently widening this one.
 
 Phases are user-meaningful stopping points — after any phase the app is
 complete and the work could pause indefinitely. PRs within a phase are
@@ -113,8 +112,8 @@ full-library world first (see R3).
     currently serves the top-level copies. Deleting them **changes served
     thresholds** — a deliberate data decision inside PR 2b, not a
     mechanical delete. The top-level values date to 2025-11-12; the twins
-    are a fresher 2026-05-05 KovaaK's repull. Which values are canonical
-    is **OQ-9**.
+    are a fresher 2026-05-05 KovaaK's repull. Canonical values: a fresh
+    importer pull at PR 2b time (OQ-9, settled 2026-07-09).
 
   No `generated/` subdir survives: the don't-hand-edit boundary becomes
   the rule that the *entire* `resources/benchmarks/` root is
@@ -292,8 +291,8 @@ Deliberately excluded, with reasons:
 
 ## Open questions — resolutions (2026-07-08 review)
 
-Numbering kept from round 1 for continuity. OQ-1…8 are settled or resolved
-with a lean; OQ-9 (opened by the PR #76 review) awaits a product call.
+Numbering kept from round 1 for continuity. All nine are settled (OQ-9
+last, 2026-07-09).
 
 - **OQ-1. Mean or median percentile? → Median.** Settled.
 - **OQ-2. Stalest scenario: column? → Tooltip line, with a caveat.** User
@@ -333,18 +332,17 @@ with a lean; OQ-9 (opened by the PR #76 review) awaits a product call.
   gap behind the question — scenarios living in several playlists or none —
   is a dedicated **Scenarios page**: add it to `roadmap.md` Future when
   this proposal is accepted.
-- **OQ-9 (open). Canonical Viscose thresholds.** Opened by the PR #76
-  review (2026-07-08). Deleting the three top-level Viscose files (R2)
-  changes 19 served thresholds, and upstream may have moved again since
-  either committed copy. Options: freeze the currently-served top-level
-  values, adopt the committed twins (2026-05-05 pull), or regenerate
-  through the importer at PR 2b time (fresh pull). Lean: **fresh importer
-  pull** — KovaaK's is authoritative for thresholds (2026-07-03 import
-  decision), and the served values are demonstrably stale: the twins are
-  already a newer repull whose thresholds mostly dropped, so "preserving"
-  the top-level numbers would preserve staleness, not user data.
-  Consequence to accept explicitly: the user's Viscose rank displays shift
-  when PR 2b lands. Product call — needs user sign-off before PR 2b.
+- **OQ-9. Canonical Viscose thresholds → fresh importer pull.** (Opened by
+  the PR #76 review 2026-07-08; settled by the user 2026-07-09.) Deleting
+  the three top-level Viscose files (R2) changes 19 served thresholds, and
+  upstream may have moved again since either committed copy. PR 2b
+  regenerates the Viscose benchmarks through the importer and adopts the
+  fresh pull as canonical: KovaaK's is authoritative for thresholds
+  (2026-07-03 import decision), and the served values were demonstrably
+  stale — the committed twins are already a newer repull whose thresholds
+  mostly dropped, so preserving the top-level numbers would have preserved
+  staleness, not user data. Accepted consequence: the user's Viscose rank
+  displays shift when PR 2b lands.
 
 ## Interactions with in-flight and parked work
 
@@ -392,9 +390,9 @@ Phase 2:
 6. PR 2b: a fresh checkout loads the full bundled library from
    `resources/benchmarks/`; only the default set (Voltaic, Viscose) is
    visible; the six legacy top-level files are gone — the Voltaic trio as
-   verified pure duplicates, the Viscose trio per the settled OQ-9
-   decision, with the resulting threshold changes called out in the PR
-   description; the existing bundled-invariant test
+   verified pure duplicates, the Viscose trio replaced by a fresh importer
+   regeneration (OQ-9), with the resulting threshold changes called out in
+   the PR description; the existing bundled-invariant test
    (`test_committed_bundled_playlists_all_carry_rank_data`) is repointed
    at the new root and green; the importer readme no longer instructs
    copy-to-activate.
