@@ -1,13 +1,14 @@
 # Playlist-Level Overview & Management Proposal
 
-> **Status:** Draft — round 3, in review on PR #76. Round 2 settled
-> OQ-1/3/4/5/6/7/8 and resolved OQ-2 as a tooltip (2026-07-08 user review).
-> PR #76 review corrected the provenance-stamp assumption (no committed
-> file is stamped — see R2). Round 3 triage (YAGNI pass): R4 simplified to
-> a plain show-list; lowest-percentile column kept with a revisit note;
-> PR 2a/2b stay separate. The former prerequisite has shipped: playlist
-> code identity landed in PR #67 (2026-07-07 "Use Playlist Codes As
-> Playlist Identity" entry in [`decision_log.md`](./decision_log.md)).
+> **Status:** Draft — round 4, in review on PR #76. Round 2: OQ-1…8
+> settled/resolved (2026-07-08 user review). Round 3 (YAGNI triage): R4
+> simplified to a plain show-list; lowest percentile kept with a revisit
+> note. Round 4 (PR #76 reviews): provenance-stamp assumption corrected
+> (see R2); the legacy Viscose files shown **not** threshold-equivalent to
+> their twins — canonical-values call opened as **OQ-9 (awaiting user)**;
+> the cited bundled-invariant test verified to exist and now named
+> precisely. Prerequisite shipped: playlist code identity, PR #67
+> (2026-07-07 entry in [`decision_log.md`](./decision_log.md)).
 >
 > Provenance: roadmap milestone "Playlist-level overview and stats"
 > (upcoming #1 in [`roadmap.md`](./roadmap.md)); the 2026-07-03 "Playlists
@@ -67,9 +68,11 @@ review with behavioral ones.
      loaded pre-library (defaults plus existing user imports), so nothing
      is hidden until the user hides it.
    - *PR 2b:* the library flip — bundled root becomes `resources/benchmarks/`
-     (flat), the six legacy top-level files are deleted as redundant (see
-     R2), default visibility seeds Voltaic + Viscose, importer readme
-     updated. Mostly mechanical because 2a already owns the semantics.
+     (flat), the six legacy top-level files are deleted (see R2), default
+     visibility seeds Voltaic + Viscose, importer readme updated. Mostly
+     mechanical because 2a already owns the semantics — **except** the
+     Viscose threshold change (R2 / OQ-9), which is a deliberate data
+     decision inside this PR.
 3. **Phase 3 — playlist management.**
    - *PR 3a:* import moves from Home → Settings to the overview surface.
    - *PR 3b:* delete for user playlists + cleanup affordance for user files
@@ -94,30 +97,43 @@ full-library world first (see R3).
   automatically). Extends the 2026-06-22 "Keep User Runtime Data Under
   `data/`" decision and the shipped dual-root loader (2026-07-07 decision).
 - **R2. The bundled root becomes `resources/benchmarks/`, flat, scanned in
-  full.** (User direction; layout settled 2026-07-08, closing OQ-6.) The
-  111 files under `resources/playlists/generated/` move to
+  full.** (User direction; layout settled 2026-07-08, closing OQ-6; the
+  Viscose threshold question split out to OQ-9 after the PR #76 review.)
+  The 111 files under `resources/playlists/generated/` move to
   `resources/benchmarks/`; the loader scans the whole library instead of
   today's activated six. The six top-level `resources/playlists/*.json`
-  files are **deleted, not moved**: their codes are all duplicated by files
-  in `generated/` (verified 2026-07-08) — under full-library scanning they
-  would be pure duplicate-code noise. Before deleting, verify the
-  `generated/` twins carry equivalent rank thresholds/colors, since the app
-  currently serves the top-level copies; if any pair disagrees, regenerate
-  that benchmark through the importer (a fresh, authoritative pull) rather
-  than guessing which copy is stale. No `generated/` subdir survives: the
-  don't-hand-edit boundary becomes the rule that the *entire*
-  `resources/benchmarks/` root is pipeline-managed — documented in the
-  importer readme and enforced by the bundled-invariant test (every bundled
-  file carries rank data) extended to the whole root. Note (PR #76 review,
-  2026-07-08): **no committed file carries a `generated_from` stamp** — the
-  committed corpus predates the importer's provenance stamping (PRs
-  #45–#48), so stamps cannot serve as a boundary or a deletion criterion
-  today. Restamping the corpus via a bulk importer regeneration would
-  restore the inspectability intended by the 2026-07-03 provenance decision
-  and is desirable hygiene, but it is **not** a PR 2b prerequisite: nothing
-  in this milestone reads the stamps. The importer's true working
-  directory — `scripts/benchmark_importer/generated/` staging with its
-  manifest — is untouched; its readme's manual-copy destination becomes
+  files are **deleted, not moved** — their codes are all duplicated by
+  same-named files in `generated/` — but the two trios are not alike
+  (content diffed 2026-07-08, PR #76 review round):
+  - The three **Voltaic S5** files are rank-identical to their twins:
+    pure duplicates; deleting them changes nothing.
+  - The three **Viscose** files diverge from their twins on **19
+    scenarios' thresholds** (2 easier / 9 hard / 8 medium; e.g.
+    `PGTI Voltaic Easy 80%` first threshold 400 → 350), and the app
+    currently serves the top-level copies. Deleting them **changes served
+    thresholds** — a deliberate data decision inside PR 2b, not a
+    mechanical delete. The top-level values date to 2025-11-12; the twins
+    are a fresher 2026-05-05 KovaaK's repull. Which values are canonical
+    is **OQ-9**.
+
+  No `generated/` subdir survives: the don't-hand-edit boundary becomes
+  the rule that the *entire* `resources/benchmarks/` root is
+  pipeline-managed — documented in the importer readme and enforced by the
+  **existing** bundled-invariant test
+  (`test_committed_bundled_playlists_all_carry_rank_data`,
+  `tests/test_playlist_rekey.py`), which already walks every committed
+  file under the bundled root recursively via `git ls-files` — `generated/`
+  included — and asserts rank data on every scenario; PR 2b repoints its
+  path to `resources/benchmarks/`. Note (PR #76 review, 2026-07-08): **no
+  committed file carries a `generated_from` stamp** — the committed corpus
+  predates the importer's provenance stamping (PRs #45–#48), so stamps
+  cannot serve as a boundary or a deletion criterion today. Restamping the
+  corpus via a bulk importer regeneration would restore the inspectability
+  intended by the 2026-07-03 provenance decision and is desirable hygiene,
+  but it is **not** a PR 2b prerequisite: nothing in this milestone reads
+  the stamps. The importer's true working directory —
+  `scripts/benchmark_importer/generated/` staging with its manifest — is
+  untouched; its readme's manual-copy destination becomes
   `resources/benchmarks/` and the copy-to-activate step dies (activation
   becomes unhiding).
 - **R3. Visibility is a per-code show/hide preference, not file state.**
@@ -135,9 +151,9 @@ full-library world first (see R3).
   sorted by last-played, active playlists float up — so the dropdowns and
   first-run experience, not the grid, are what visibility protects.
   Verified bound on the blast radius: rank overlays draw only for the
-  *selected* playlist filter (`home.py:640`), so loading 100+ benchmarks
-  does not change overlay behavior; PR 2b should still audit the few code
-  paths that enumerate the whole store.
+  *selected* playlist filter (`source/pages/home.py:640`), so loading 100+
+  benchmarks does not change overlay behavior; PR 2b should still audit the
+  few code paths that enumerate the whole store.
 - **R4. Plain show-list.** (Settled 2026-07-08, closing OQ-4; simplified
   from a defaults-aware design in round 3.) The preference store is one
   list, `shown`: a playlist is visible iff its code is in it, uniformly for
@@ -276,8 +292,8 @@ Deliberately excluded, with reasons:
 
 ## Open questions — resolutions (2026-07-08 review)
 
-Numbering kept from round 1 for continuity; all are settled or resolved
-with a lean.
+Numbering kept from round 1 for continuity. OQ-1…8 are settled or resolved
+with a lean; OQ-9 (opened by the PR #76 review) awaits a product call.
 
 - **OQ-1. Mean or median percentile? → Median.** Settled.
 - **OQ-2. Stalest scenario: column? → Tooltip line, with a caveat.** User
@@ -300,15 +316,16 @@ with a lean.
   disabled — data loads, routes resolve, overlays draw — so "hide" is the
   honest verb. A favorites/star system is a third state that doesn't answer
   the 117-row default problem; it can layer on later as sort pinning.
-- **OQ-6. Bundled-root layout → flat, no `generated/` subdir.** Settled;
-  rationale and the legacy-six deletion in R2. The subdir's only real value
-  would be separating hand-crafted from importer-produced files — and after
-  the redundant six are deleted, the whole root is pipeline-managed by
-  rule. (No stamp-based distinction exists in the committed corpus today —
-  see the R2 note; the boundary is the documented rule plus the
-  bundled-invariant test, not per-file provenance.) A future hand-crafted
-  benchmark is still expressible as a `data/playlists/` file with `ranks`
-  filled in.
+- **OQ-6. Bundled-root layout → flat, no `generated/` subdir.** Settled
+  *as layout*; the PR #76 review showed the legacy-six deletion is not
+  value-neutral for the Viscose trio, so the canonical-thresholds call is
+  split out as OQ-9. The subdir's only real value would be separating
+  hand-crafted from importer-produced files — and after the six are
+  deleted, the whole root is pipeline-managed by rule. (No stamp-based
+  distinction exists in the committed corpus today — see the R2 note; the
+  boundary is the documented rule plus the existing bundled-invariant test
+  named in R2, not per-file provenance.) A future hand-crafted benchmark
+  is still expressible as a `data/playlists/` file with `ranks` filled in.
 - **OQ-7. Type badge → keep.** Settled.
 - **OQ-8. Scenario-first navigation → out of scope; park a Scenarios
   page.** Settled. The overview → scenario table → Home drill chain is
@@ -316,6 +333,18 @@ with a lean.
   gap behind the question — scenarios living in several playlists or none —
   is a dedicated **Scenarios page**: add it to `roadmap.md` Future when
   this proposal is accepted.
+- **OQ-9 (open). Canonical Viscose thresholds.** Opened by the PR #76
+  review (2026-07-08). Deleting the three top-level Viscose files (R2)
+  changes 19 served thresholds, and upstream may have moved again since
+  either committed copy. Options: freeze the currently-served top-level
+  values, adopt the committed twins (2026-05-05 pull), or regenerate
+  through the importer at PR 2b time (fresh pull). Lean: **fresh importer
+  pull** — KovaaK's is authoritative for thresholds (2026-07-03 import
+  decision), and the served values are demonstrably stale: the twins are
+  already a newer repull whose thresholds mostly dropped, so "preserving"
+  the top-level numbers would preserve staleness, not user data.
+  Consequence to accept explicitly: the user's Viscose rank displays shift
+  when PR 2b lands. Product call — needs user sign-off before PR 2b.
 
 ## Interactions with in-flight and parked work
 
@@ -362,10 +391,12 @@ Phase 2:
    it visible.
 6. PR 2b: a fresh checkout loads the full bundled library from
    `resources/benchmarks/`; only the default set (Voltaic, Viscose) is
-   visible; the six legacy top-level files are gone after threshold/color
-   parity with their `generated/` twins is verified (importer regeneration
-   as the tiebreaker on any mismatch); the bundled-invariant test covers
-   the whole new root; the importer readme no longer instructs
+   visible; the six legacy top-level files are gone — the Voltaic trio as
+   verified pure duplicates, the Viscose trio per the settled OQ-9
+   decision, with the resulting threshold changes called out in the PR
+   description; the existing bundled-invariant test
+   (`test_committed_bundled_playlists_all_carry_rank_data`) is repointed
+   at the new root and green; the importer readme no longer instructs
    copy-to-activate.
 7. PR 2b: an audit of store-enumerating code paths (Home filter options,
    Journey, overview, overlays) confirms no surface changed behavior from
