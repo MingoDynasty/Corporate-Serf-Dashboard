@@ -46,8 +46,9 @@ POSSIBLE_SUB_CSV_HEADERS = [
 logger = logging.getLogger(__name__)
 
 # Deliberately unsynchronized: after startup the watchdog thread is the only
-# writer, and server-thread readers self-heal on the next interval tick. See
-# the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
+# writer, and raced reads self-heal on re-render (the home page's polling
+# tick, or the next interaction on pages without a data-driving interval).
+# See the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
 # docs/decision_log.md for the revisit triggers and why an eventual SQLite
 # migration must be file-backed (WAL), not in-memory.
 kovaaks_database: dict = {}

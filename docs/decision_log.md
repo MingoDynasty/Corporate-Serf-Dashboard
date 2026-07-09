@@ -34,9 +34,14 @@ of mutating fields in place, so a reader that binds one sees field-consistent
 values. The remaining exposure is server-thread readers iterating nested
 `sortedcontainers` structures (and the journey page walking `run_database`)
 mid-`add()`: worst case is a skipped or duplicated point, or a rare exception,
-in one render. Every consumer is pull-based and re-renders within one interval
-tick, and Dash contains callback exceptions, so all failure modes self-heal in
-about a second; no path writes torn state back. The load-before-notify
+in one render. Dash contains callback exceptions and no path writes torn state
+back. Self-healing has two cadences: home-page consumers re-render on the
+polling interval, so races there clear within about a second; the journey,
+playlist grid, and playlist overview pages rebuild store-derived data only on
+navigation or control interaction (their intervals only re-tick relative
+timestamps), so a raced render there can persist until the next interaction.
+Both cadences stay within the accepted class — a wrong or failed render, never
+corrupted state. The load-before-notify
 ordering in `_enqueue_after_loading` guarantees a drained message's run is
 already fully visible in the stores. `playlist_database` carried the same
 class between server threads (the import callback's insert vs. `.values()`
