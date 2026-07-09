@@ -10,15 +10,15 @@ the roadmap/product steps don't apply — this is not a product feature).
 `source/config/config_service.py` runs `config = load_config()` at module
 import (inside a top-level `try/except`). Because nearly everything imports
 this module — directly or transitively through `app.py`, `data_service.py`,
-`home.py`, `file_watchdog.py`, `playlist_scenarios_service.py` — importing any
-of them triggers a config read and, on a missing/invalid `config.toml`, a
-`SystemExit(1)`.
+`home.py`, `file_watchdog.py`, `playlist_scenarios_service.py`,
+`playlist_overview_service.py` — importing any of them triggers a config read
+and, on a missing/invalid `config.toml`, a `SystemExit(1)`.
 
 Two consequences:
 
 1. **Import-time side effects.** You cannot import the app's modules in a test
    or REPL without a valid `config.toml` on disk.
-2. **A by-value singleton.** Five modules bind the value with
+2. **A by-value singleton.** Six modules bind the value with
    `from source.config.config_service import config`, so moving the load later
    requires converting the access pattern at every call site.
 
@@ -48,10 +48,13 @@ from the same worktree" restriction.
 
 ## Decision record — design review findings (2026-07-09)
 
-1. **Call-site census:** ~19 `config.` attribute reads across the five
+1. **Call-site census:** ~24 `config.` attribute reads across the six
    importing modules, **all inside function bodies** — zero module-level
    access anywhere in `source/`. The conversion is mechanical; `home.py`
-   already funnels five of them through `_rank_lookup_config()`.
+   already funnels five of them through `_rank_lookup_config()`, and the two
+   playlist services funnel five each through their rank-lookup helpers.
+   (`playlist_overview_service.py` joined in PR #78, after the review's
+   original five-module census — re-grep the import at implementation HEAD.)
 2. **Conftest hazard** (see Problem): retired entirely by B — tests seed the
    loader in-process and never touch the real `config.toml`.
 3. **`load_playlists()` is in scope — required, not optional.** Today a bad
@@ -75,7 +78,7 @@ from the same worktree" restriction.
   add `@functools.cache def get_config() -> ConfigData`. (`functools.cache`
   does not cache exceptions, and `main()` populates it before any threads
   exist — no concurrency wrinkle.)
-- Convert the five modules: `from … import get_config`; call sites become
+- Convert the six modules: `from … import get_config`; call sites become
   `get_config().x` (or a local `config = get_config()` where a function reads
   several fields, as `_rank_lookup_config` already does).
 - `app.py` `main()` order: `get_config()` (with error translation) →
