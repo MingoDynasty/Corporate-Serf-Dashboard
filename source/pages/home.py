@@ -20,7 +20,7 @@ from dash import (
 )
 
 from source.components.local_icon import local_icon
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
@@ -320,7 +320,7 @@ def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
 
 def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
     """Return the shared rank-service arguments sourced from app configuration."""
-    rank_config = config
+    rank_config = get_config()
     return (
         rank_config.kovaaks_username,
         rank_config.steam_id,
@@ -817,7 +817,7 @@ def import_playlist(_, playlist_to_import):
 def select_playlist(selected_playlist):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return get_unique_scenarios(config.stats_dir)
+        return get_unique_scenarios(get_config().stats_dir)
     return get_scenarios_from_playlist_code(selected_playlist)
 
 
@@ -834,7 +834,7 @@ def _home_initial_selection(
     scenario_options = (
         get_scenarios_from_playlist_code(selected_playlist)
         if selected_playlist
-        else get_unique_scenarios(config.stats_dir)
+        else get_unique_scenarios(get_config().stats_dir)
     )
     return selected_playlist, scenario_options, scenario or None
 
@@ -850,6 +850,7 @@ def layout(
     **_kwargs,
 ):
     """Build the interactive home dashboard."""
+    config = get_config()
     selected_playlist, scenario_options, selected_scenario = _home_initial_selection(
         scenario,
         playlist_code,

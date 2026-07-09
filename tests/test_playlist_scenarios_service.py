@@ -205,8 +205,8 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
     monkeypatch.setattr(
         playlist_scenarios_service,
-        "config",
-        SimpleNamespace(
+        "get_config",
+        lambda: SimpleNamespace(
             kovaaks_username="MingoDynasty",
             steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,

@@ -5,17 +5,19 @@ Entrypoint to the Corporate Serf Dashboard app.
 import json
 import logging
 import sys
+import tomllib
 from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 from dash_extensions.enrich import DashProxy
+from pydantic import ValidationError
 from waitress import serve
 from watchdog.observers import Observer
 
 from source.app_shell import APP_INDEX_STRING, layout
-from source.config.config_service import config
-from source.kovaaks.data_service import initialize_kovaaks_data
+from source.config.config_service import CONFIG_ERROR_MESSAGE, get_config
+from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
 from source.my_watchdog.file_watchdog import NewFileHandler
 
 # Logging setup
@@ -76,10 +78,18 @@ def main() -> None:
     Main entry point.
     :return: None.
     """
+    try:
+        config = get_config()
+    except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
+        print(CONFIG_ERROR_MESSAGE, file=sys.stderr)
+        raise SystemExit(1) from None
+
     logger.debug(
         "Loaded config:\n%s",
         json.dumps(asdict(config), indent=2),
     )
+
+    load_playlists()
 
     # Initialize scenario data
     initialize_kovaaks_data(config.stats_dir)

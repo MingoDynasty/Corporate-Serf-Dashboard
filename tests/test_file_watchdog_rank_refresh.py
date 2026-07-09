@@ -57,10 +57,14 @@ def _patch_common(monkeypatch, run_data):
         "schedule_rank_freshness_refresh",
         lambda *args: schedules.append(args),
     )
-    monkeypatch.setattr(file_watchdog.config, "kovaaks_username", "MingoDynasty")
-    monkeypatch.setattr(file_watchdog.config, "steam_id", "steam-id")
     monkeypatch.setattr(
-        file_watchdog.config,
+        file_watchdog.get_config(),
+        "kovaaks_username",
+        "MingoDynasty",
+    )
+    monkeypatch.setattr(file_watchdog.get_config(), "steam_id", "steam-id")
+    monkeypatch.setattr(
+        file_watchdog.get_config(),
         "scenario_metadata_cache_ttl_hours",
         24,
     )
@@ -126,7 +130,7 @@ def test_on_created_parses_absolute_source_path_outside_stats_dir(
     source_path = (tmp_path / "outside-stats" / "run.csv").resolve()
     parsed_paths = []
 
-    monkeypatch.setattr(file_watchdog.config, "stats_dir", str(stats_dir))
+    monkeypatch.setattr(file_watchdog.get_config(), "stats_dir", str(stats_dir))
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",
@@ -241,7 +245,7 @@ def test_on_created_loads_before_enqueuing(monkeypatch):
         "message_queue",
         SimpleNamespace(append=lambda _message: events.append("enqueue")),
     )
-    monkeypatch.setattr(file_watchdog.config, "kovaaks_username", None)
+    monkeypatch.setattr(file_watchdog.get_config(), "kovaaks_username", None)
 
     file_watchdog.NewFileHandler().on_created(
         SimpleNamespace(is_directory=False, src_path="run.csv")

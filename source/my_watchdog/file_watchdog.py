@@ -9,7 +9,7 @@ from pathlib import Path
 
 from watchdog.events import FileSystemEventHandler
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_service import schedule_rank_freshness_refresh
 from source.kovaaks.data_service import (
     extract_data_from_file,
@@ -63,6 +63,7 @@ def _refresh_rank_after_high_score(
     scenario_name: str,
     expected_score: float,
 ) -> None:
+    config = get_config()
     if not config.kovaaks_username:
         return
 
