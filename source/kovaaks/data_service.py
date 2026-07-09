@@ -121,21 +121,22 @@ def _is_code_validation_error(exc: ValidationError) -> bool:
     return any(error.get("loc") == ("code",) for error in exc.errors())
 
 
-def _playlist_display_labels() -> dict[str, str]:
-    name_counts = Counter(playlist.name for playlist in playlist_database.values())
+def _playlist_display_labels(playlists: list[PlaylistData]) -> dict[str, str]:
+    name_counts = Counter(playlist.name for playlist in playlists)
     return {
         playlist.code: (
             f"{playlist.name} ({playlist.code})"
             if name_counts[playlist.name] > 1
             else playlist.name
         )
-        for playlist in playlist_database.values()
+        for playlist in playlists
     }
 
 
 def get_playlist_display_label(playlist_code: str) -> str:
     """Return the same disambiguated label used by playlist selectors."""
-    return _playlist_display_labels().get(playlist_code, playlist_code)
+    labels = _playlist_display_labels(list(playlist_database.values()))
+    return labels.get(playlist_code, playlist_code)
 
 
 def filter_known_playlist_codes(playlist_codes: list[str]) -> list[str]:
@@ -215,6 +216,19 @@ def is_scenario_in_database(scenario_name: str) -> bool:
 def get_scenario_stats(scenario_name: str) -> ScenarioStats:
     """Get scenario statistics for a scenario."""
     return kovaaks_database[scenario_name]["scenario_stats"]
+
+
+def get_scenario_stats_snapshot() -> dict[str, ScenarioStats]:
+    """Get one consistent scenario-to-stats mapping for callback-wide reads.
+
+    The list() over the items view is a single C-level operation, so a
+    concurrent watchdog insert cannot break the iteration; each bound
+    ScenarioStats object is consistent because updates replace it.
+    """
+    return {
+        scenario_name: scenario_data["scenario_stats"]
+        for scenario_name, scenario_data in list(kovaaks_database.items())
+    }
 
 
 def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
@@ -299,9 +313,12 @@ def get_time_vs_runs(
 
 def get_playlist_selector_options() -> list[dict[str, str]]:
     """Get playlist dropdown options with finished display labels and codes."""
-    display_labels = _playlist_display_labels()
+    # One snapshot for both label counting and sorting: an import callback on
+    # another server thread can insert into playlist_database mid-iteration.
+    snapshot = list(playlist_database.values())
+    display_labels = _playlist_display_labels(snapshot)
     playlists = sorted(
-        playlist_database.values(),
+        snapshot,
         key=lambda playlist: (
             playlist.name.casefold(),
             playlist.name,
@@ -416,14 +433,18 @@ def load_csv_file_into_database(csv_file: str) -> bool:
             ),
         }
     else:
-        # Update scenario stats
+        # Replace (never mutate) the stats object: readers on other server
+        # threads bind it once and then see one consistent snapshot of all
+        # three fields, instead of a torn mid-update combination.
         scenario_stats = kovaaks_database[run_data.scenario]["scenario_stats"]
-        scenario_stats.number_of_runs += 1
-        scenario_stats.date_last_played = max(
-            scenario_stats.date_last_played,
-            run_data.datetime_object,
+        kovaaks_database[run_data.scenario]["scenario_stats"] = ScenarioStats(
+            date_last_played=max(
+                scenario_stats.date_last_played,
+                run_data.datetime_object,
+            ),
+            number_of_runs=scenario_stats.number_of_runs + 1,
+            high_score=max(scenario_stats.high_score, run_data.score),
         )
-        scenario_stats.high_score = max(scenario_stats.high_score, run_data.score)
 
         # Add to sensitivities_vs_runs
         sens_vs_runs = kovaaks_database[run_data.scenario]["sensitivities_vs_runs"]
