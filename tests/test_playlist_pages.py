@@ -1,5 +1,4 @@
 from datetime import datetime
-from types import SimpleNamespace
 
 import dash
 import dash_mantine_components as dmc
@@ -9,7 +8,6 @@ from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
-from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -139,54 +137,10 @@ def test_playlists_overview_layout_includes_relative_time_refresh_interval():
     assert interval.n_intervals == 0
 
 
-def test_playlist_scenarios_selector_callback_builds_playlist_path(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
-    )
-
+def test_playlist_scenarios_cell_click_callback_builds_home_link():
     assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            "KovaaKsTestCode",
-            None,
-            "/playlists/OldCode",
-            "OldCode",
-        )
-        == "/playlists/KovaaKsTestCode"
-    )
-
-
-def test_playlist_scenarios_selector_callback_skips_current_path(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
-    )
-
-    assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            "KovaaKsTestCode",
-            None,
-            "/playlists/KovaaKsTestCode",
-            "KovaaKsTestCode",
-        )
-        is no_update
-    )
-
-
-def test_playlist_scenarios_cell_click_callback_builds_home_link(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-grid"),
-    )
-
-    assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            None,
+        playlist_scenarios.route_to_scenario_home(
             {"colId": "scenario", "value": "VT Pasu & Friends"},
-            "/playlists/Code/One",
             "Code/One",
         )
         == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
@@ -291,12 +245,6 @@ def test_aim_training_journey_filters_stale_values_and_disambiguates_labels(
 def test_aim_training_journey_waits_for_color_scheme():
     with pytest.raises(PreventUpdate):
         aim_training_journey.generate_graph(["Playlist"], 10, None)
-
-
-def test_playlist_selector_dropdown_scrollbar_is_always_visible():
-    selector = playlist_components.playlist_selector("playlists-selector")
-
-    assert selector.scrollAreaProps == {"type": "always"}
 
 
 def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):

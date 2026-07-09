@@ -127,7 +127,6 @@ flowchart LR
         Playlists["playlists.py"]
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
-        Components["playlist_components.py"]
     end
 
     subgraph SharedUI["Shared UI"]
@@ -138,6 +137,7 @@ flowchart LR
         DataService["kovaaks/<br/>data_service.py"]
         ApiService["kovaaks/<br/>api_service.py"]
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
+        OverviewService["kovaaks/playlist_<br/>overview_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -156,16 +156,16 @@ flowchart LR
     Home --> PlotService
     Home --> Queue
     Home --> LocalIcon
-    Playlists --> Components
-    PlaylistScenarios --> Components
+    Playlists --> OverviewService
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
-    Components --> DataService
     Journey --> DataService
     Journey --> PlotService
 
     PlaylistService --> DataService
     PlaylistService --> ApiService
+    OverviewService --> DataService
+    OverviewService --> ApiService
     DataService --> ApiService
 
     FileWatchdog --> DataService
@@ -189,10 +189,9 @@ flowchart LR
   data comes from local run data and rank caches only — this page never
   triggers KovaaK's API calls.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
-  overview (AG Grid). `load_playlist_scenario_rows` is driven by mounted route
-  state, not the selector directly (see decision log).
+  overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
+  mounted-route store, not the URL directly (see decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
-- `playlist_components.py` — shared `playlist_selector` component.
 
 ### Shared UI components
 - `components/local_icon.py` — local SVG icon registry/helper used by the shell

@@ -69,6 +69,13 @@ list in the roadmap.)
 
 ### Planning: what should I train
 
+- **Playlist-level overview** (PRs #78, #80). A sortable table at `/playlists`,
+  one row per imported playlist with coverage, runs, last-played, and
+  aggregate-percentile stats; each row drills into that playlist's scenario
+  table. *Problem solved:* the scenario table answers "where am I weak *within*
+  a playlist," but not "*which* playlist deserves attention" — this surfaces
+  stale and weak playlists at a glance and directs training focus across
+  playlists, the way the scenario table already does within one.
 - **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
@@ -104,17 +111,8 @@ list in the roadmap.)
 
 ## Where it's going
 
-**Next up: the playlist-level overview** — the same "direct my attention"
-logic, one level above the scenario table. As the user put it: if Playlist A
-hasn't been played in over a year, it's worth revisiting to measure new
-skills against old scores; if Playlist B shows a low average or median
-percentile, that's a weakness worth targeted work. At a glance, the app
-should tell the player where to focus across *playlists*, the way the
-scenario table already does within one. Sequencing and design state live in
-the [roadmap](./roadmap.md).
-
-Behind it, the unsolved user problems (each becomes a roadmap milestone when
-it's next up):
+Sequencing and design state live in the [roadmap](./roadmap.md). The unsolved
+user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.

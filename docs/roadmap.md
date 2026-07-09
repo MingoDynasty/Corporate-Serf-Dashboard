@@ -50,36 +50,23 @@ Design rationale for shipped work lives in
   labels, duplicate codes warn visibly, and imported playlists live under
   `data/playlists/`. This shipped the enabling identity work for the
   playlist-level overview. (PR #67)
+- **Playlist-level overview and stats** — a sortable overview at `/playlists`,
+  one row per imported playlist with coverage, runs, last-played, and
+  aggregate-percentile stats; any row drills into that playlist's scenario
+  table. Surfaces stale and weak playlists at a glance to direct attention
+  across playlists. Completing this milestone also removed the transitional
+  per-playlist selector. (PRs #78, #80) Design:
+  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md) (phase 1;
+  phases 2–3 continue under Future).
 
 ---
 
 ## Upcoming milestones
 
-### 1. Playlist-level overview and stats
-
-**What:** A higher-level view of all imported playlists with aggregate stats —
-average percentile, last-played date, total runs — and a way to drill into
-any playlist to see its scenarios.
-
-**Why:** Playlists go stale. A player might have crushed a Voltaic benchmark
-six months ago and forgotten about it, only to come back later with
-significantly better mechanics and beat all their old scores. This view
-surfaces forgotten playlists worth revisiting, and gives a single-glance
-summary of which playlists are getting attention versus which are
-languishing.
-
-**Decided:** Lives as new dashboard real estate, not folded into an existing
-page (home, Aim Training Journey). Ships as its own page replacing the
-transitional selector content at `/playlists`; overview rows link to the
-existing per-playlist table, and the selector dropdowns are then removed.
-See the 2026-07-03 "Playlists Routes Are Stable" entry in
-[`decision_log.md`](./decision_log.md) for the route contract and the
-removal checklist.
-
-**Design:** [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)
-(accepted 2026-07-09). Phase 1 of the proposal completes this milestone;
-phases 2–3 continue as the "Playlist management & benchmark library" item
-under Future.
+The playlist-level overview milestone shipped (see Shipped). The next candidate
+— "Playlist management & benchmark library" (phases 2–3 of the accepted
+[`playlist_overview_proposal.md`](./playlist_overview_proposal.md)) — is listed
+under Future and gets promoted here when it becomes the next thing up.
 
 ---
 
@@ -99,8 +86,8 @@ expanded into its own roadmap entry when it becomes the next thing up.
 - **Aim Training Journey page polish** — the page already exists at
   `/aim-training-journey` (currently marked work-in-progress). It visualizes
   training-hour checkpoints across playlists, which is a different question
-  from the playlist-level overview in milestone 2 — so it remains a separate
-  concern to revisit later, not a replacement for milestone 2.
+  from the shipped playlist-level overview — so it remains a separate
+  concern to revisit later, not a replacement for it.
 - **Playlist management & benchmark library** — phases 2–3 of the accepted
   [`playlist_overview_proposal.md`](./playlist_overview_proposal.md): the
   full bundled benchmark library ships under `resources/benchmarks/` with
