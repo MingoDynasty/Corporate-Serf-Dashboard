@@ -6,6 +6,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/.venv_test313" />
       <excludeFolder url="file://$MODULE_DIR$/.claude" />
+      <excludeFolder url="file://$MODULE_DIR$/ignore" />
     </content>
     <orderEntry type="jdk" jdkName="uv (Corporate-Serf-Dashboard)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
