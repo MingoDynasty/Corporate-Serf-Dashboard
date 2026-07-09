@@ -69,6 +69,17 @@ def test_playlists_overview_sortable_columns_use_nulls_last_comparator():
         assert columns[field]["comparator"] == {"function": "nullsLastComparator"}
 
 
+def test_playlists_overview_defaults_to_staleness_sort():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    assert columns["last_played_sort"]["sort"] == "desc"
+    assert all(
+        "sort" not in column
+        for column in playlists.TABLE_COLUMN_DEFS
+        if column["field"] != "last_played_sort"
+    )
+
+
 def test_playlists_overview_last_played_follows_relative_time_conventions():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
     column = columns["last_played_sort"]

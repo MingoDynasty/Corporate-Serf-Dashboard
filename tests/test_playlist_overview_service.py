@@ -177,6 +177,17 @@ def test_format_playlist_overview_row_empty_playlist(monkeypatch):
     assert row["median_percentile_sort"] is None
 
 
+def _played_stats(*scenario_names):
+    return {
+        scenario_name: ScenarioStats(
+            date_last_played=datetime(2026, 5, 1, 12, 0, 0),
+            number_of_runs=1,
+            high_score=100,
+        )
+        for scenario_name in scenario_names
+    }
+
+
 def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch):
     _configure(monkeypatch)
     playlist = PlaylistData(
@@ -189,7 +200,10 @@ def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch
             Scenario(name="ColdCache", ranks=RANKS),
         ],
     )
-    _install_local_stats(monkeypatch, {})
+    _install_local_stats(
+        monkeypatch,
+        _played_stats("Cached", "RankedNoTotal", "Unranked", "ColdCache"),
+    )
     _install_cached_ranks(
         monkeypatch,
         {
@@ -219,6 +233,48 @@ def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch
     assert row["lowest_scenario"] == "Cached"
 
 
+def test_format_playlist_overview_row_excludes_ranked_but_unplayed_scenarios(
+    monkeypatch,
+):
+    """R9: cached rank info without local run data stays out of the aggregate."""
+    _configure(monkeypatch)
+    playlist = PlaylistData(
+        name="Pruned",
+        code="KovaaKsPruned",
+        scenarios=[
+            Scenario(name="Played", ranks=RANKS),
+            Scenario(name="PrunedCsvs", ranks=RANKS),
+        ],
+    )
+    _install_local_stats(monkeypatch, _played_stats("Played"))
+    _install_cached_ranks(
+        monkeypatch,
+        {
+            "Played": ScenarioRankInfo(
+                status=ScenarioRankStatus.RANKED,
+                rank=10,
+                total_players=100,
+                percentile=90.0,
+            ),
+            # Ranked in cache, but its local CSVs are gone: excluded so the
+            # coverage numerator can never exceed the Played numerator.
+            "PrunedCsvs": ScenarioRankInfo(
+                status=ScenarioRankStatus.RANKED,
+                rank=90,
+                total_players=100,
+                percentile=10.0,
+            ),
+        },
+    )
+
+    row = format_playlist_overview_row("Pruned", playlist)
+
+    assert row["played_display"] == "1/2"
+    assert row["median_percentile_display"] == "90.00% · 1/2"
+    assert row["lowest_percentile_sort"] == 90.0
+    assert row["lowest_scenario"] == "Played"
+
+
 def test_format_playlist_overview_row_isolates_cache_read_failures(monkeypatch):
     _configure(monkeypatch)
     playlist = PlaylistData(
@@ -229,7 +285,7 @@ def test_format_playlist_overview_row_isolates_cache_read_failures(monkeypatch):
             Scenario(name="Broken", ranks=RANKS),
         ],
     )
-    _install_local_stats(monkeypatch, {})
+    _install_local_stats(monkeypatch, _played_stats("Good", "Broken"))
 
     def fragile_rank_lookup(scenario_name, *args, **kwargs):
         assert kwargs["allow_network"] is False

@@ -76,6 +76,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Last Played",
         "field": "last_played_sort",
+        # Default sort: the staleness view is the page's purpose — active
+        # playlists float up, "Never" stays last (nullsLastComparator handles
+        # both sort directions).
+        "sort": "desc",
         "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
         "tooltipValueGetter": {"function": LAST_PLAYED_TOOLTIP},
         "cellClass": {

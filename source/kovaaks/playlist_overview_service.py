@@ -75,7 +75,11 @@ def format_playlist_overview_row(
     last_played: datetime | None = None
     stalest_played: datetime | None = None
     stalest_scenario: str | None = None
+    percentiles: list[tuple[float, str]] = []
     for scenario_name in scenario_names:
+        # Percentile aggregates cover played scenarios with cached rank info
+        # (proposal R9): a scenario ranked in cache but absent locally (e.g.
+        # pruned CSVs) is excluded, so coverage can never exceed Played.
         if not is_scenario_in_database(scenario_name):
             continue
         stats = get_scenario_stats(scenario_name)
@@ -86,9 +90,6 @@ def format_playlist_overview_row(
         if stalest_played is None or stats.date_last_played < stalest_played:
             stalest_played = stats.date_last_played
             stalest_scenario = scenario_name
-
-    percentiles: list[tuple[float, str]] = []
-    for scenario_name in scenario_names:
         percentile = _cached_rank_percentile(scenario_name)
         if percentile is not None:
             percentiles.append((percentile, scenario_name))
