@@ -7,12 +7,11 @@ from datetime import datetime
 from source.config.config_service import config
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
-from source.kovaaks.data_models import PlaylistData
+from source.kovaaks.data_models import PlaylistData, ScenarioStats
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_selector_options,
-    get_scenario_stats,
-    is_scenario_in_database,
+    get_scenario_stats_snapshot,
 )
 
 logger = logging.getLogger(__name__)
@@ -65,8 +64,14 @@ def _cached_rank_percentile(scenario_name: str) -> float | None:
 def format_playlist_overview_row(
     display_label: str,
     playlist: PlaylistData,
+    stats_by_scenario: dict[str, ScenarioStats],
 ) -> OverviewRow:
-    """Create one overview AG Grid row with separate display and sort values."""
+    """Create one overview AG Grid row with separate display and sort values.
+
+    ``stats_by_scenario`` is the callback-wide snapshot (R11): every row of
+    one render is built from the same mapping, so a run recorded mid-render
+    cannot make overlapping playlists disagree about a shared scenario.
+    """
     scenario_names = [scenario.name for scenario in playlist.scenarios]
     scenario_count = len(scenario_names)
 
@@ -80,9 +85,9 @@ def format_playlist_overview_row(
         # Percentile aggregates cover played scenarios with cached rank info
         # (proposal R9): a scenario ranked in cache but absent locally (e.g.
         # pruned CSVs) is excluded, so coverage can never exceed Played.
-        if not is_scenario_in_database(scenario_name):
+        stats = stats_by_scenario.get(scenario_name)
+        if stats is None:
             continue
-        stats = get_scenario_stats(scenario_name)
         played_count += 1
         total_runs += stats.number_of_runs
         if last_played is None or stats.date_last_played > last_played:
@@ -143,12 +148,20 @@ def build_playlist_overview_rows() -> list[OverviewRow]:
     Reads only local run data and the existing rank caches
     (``allow_network=False``); the overview page must never trigger KovaaK's
     API calls. Percentile cells fill in as drilling into playlists warms the
-    rank cache.
+    rank cache. Scenario stats are snapshotted once at entry (R11) so all
+    rows of one render agree about every shared scenario.
     """
+    stats_by_scenario = get_scenario_stats_snapshot()
     rows: list[OverviewRow] = []
     for option in get_playlist_selector_options():
         playlist = get_playlist_by_code(option["value"])
         if playlist is None:
             continue
-        rows.append(format_playlist_overview_row(option["label"], playlist))
+        rows.append(
+            format_playlist_overview_row(
+                option["label"],
+                playlist,
+                stats_by_scenario,
+            )
+        )
     return rows

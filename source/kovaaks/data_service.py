@@ -218,6 +218,19 @@ def get_scenario_stats(scenario_name: str) -> ScenarioStats:
     return kovaaks_database[scenario_name]["scenario_stats"]
 
 
+def get_scenario_stats_snapshot() -> dict[str, ScenarioStats]:
+    """Get one consistent scenario-to-stats mapping for callback-wide reads.
+
+    The list() over the items view is a single C-level operation, so a
+    concurrent watchdog insert cannot break the iteration; each bound
+    ScenarioStats object is consistent because updates replace it.
+    """
+    return {
+        scenario_name: scenario_data["scenario_stats"]
+        for scenario_name, scenario_data in list(kovaaks_database.items())
+    }
+
+
 def get_sensitivities_vs_runs(scenario_name: str) -> dict[str, list[RunData]]:
     """Get sensitivities vs runs for a scenario."""
     return kovaaks_database[scenario_name]["sensitivities_vs_runs"]

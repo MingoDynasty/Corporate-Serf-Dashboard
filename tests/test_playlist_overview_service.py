@@ -56,16 +56,11 @@ def _install_cached_ranks(monkeypatch, rank_infos_by_scenario):
     )
 
 
-def _install_local_stats(monkeypatch, stats_by_scenario):
+def _install_stats_snapshot(monkeypatch, stats_by_scenario):
     monkeypatch.setattr(
         playlist_overview_service,
-        "is_scenario_in_database",
-        lambda scenario_name: scenario_name in stats_by_scenario,
-    )
-    monkeypatch.setattr(
-        playlist_overview_service,
-        "get_scenario_stats",
-        stats_by_scenario.__getitem__,
+        "get_scenario_stats_snapshot",
+        lambda: dict(stats_by_scenario),
     )
 
 
@@ -82,21 +77,18 @@ def test_format_playlist_overview_row_aggregates_played_and_cached_scenarios(
             Scenario(name="Third", ranks=RANKS),
         ],
     )
-    _install_local_stats(
-        monkeypatch,
-        {
-            "First": ScenarioStats(
-                date_last_played=datetime(2026, 4, 1, 12, 0, 0),
-                number_of_runs=10,
-                high_score=1000,
-            ),
-            "Third": ScenarioStats(
-                date_last_played=datetime(2026, 6, 3, 12, 0, 0),
-                number_of_runs=20,
-                high_score=3000,
-            ),
-        },
-    )
+    stats_by_scenario = {
+        "First": ScenarioStats(
+            date_last_played=datetime(2026, 4, 1, 12, 0, 0),
+            number_of_runs=10,
+            high_score=1000,
+        ),
+        "Third": ScenarioStats(
+            date_last_played=datetime(2026, 6, 3, 12, 0, 0),
+            number_of_runs=20,
+            high_score=3000,
+        ),
+    }
     _install_cached_ranks(
         monkeypatch,
         {
@@ -115,7 +107,9 @@ def test_format_playlist_overview_row_aggregates_played_and_cached_scenarios(
         },
     )
 
-    row = format_playlist_overview_row("Voltaic Benchmarks", playlist)
+    row = format_playlist_overview_row(
+        "Voltaic Benchmarks", playlist, stats_by_scenario
+    )
 
     assert row == {
         "name": "Voltaic Benchmarks",
@@ -143,10 +137,9 @@ def test_format_playlist_overview_row_never_played(monkeypatch):
         code="KovaaKsUntouched",
         scenarios=[Scenario(name="First"), Scenario(name="Second")],
     )
-    _install_local_stats(monkeypatch, {})
     _install_cached_ranks(monkeypatch, {})
 
-    row = format_playlist_overview_row("Untouched", playlist)
+    row = format_playlist_overview_row("Untouched", playlist, {})
 
     assert row["type_display"] == "Playlist"
     assert row["played_display"] == "0/2"
@@ -166,10 +159,9 @@ def test_format_playlist_overview_row_never_played(monkeypatch):
 def test_format_playlist_overview_row_empty_playlist(monkeypatch):
     _configure(monkeypatch)
     playlist = PlaylistData(name="Empty", code="KovaaKsEmpty", scenarios=[])
-    _install_local_stats(monkeypatch, {})
     _install_cached_ranks(monkeypatch, {})
 
-    row = format_playlist_overview_row("Empty", playlist)
+    row = format_playlist_overview_row("Empty", playlist, {})
 
     assert row["played_display"] == "0/0"
     assert row["played_sort"] is None
@@ -200,9 +192,8 @@ def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch
             Scenario(name="ColdCache", ranks=RANKS),
         ],
     )
-    _install_local_stats(
-        monkeypatch,
-        _played_stats("Cached", "RankedNoTotal", "Unranked", "ColdCache"),
+    stats_by_scenario = _played_stats(
+        "Cached", "RankedNoTotal", "Unranked", "ColdCache"
     )
     _install_cached_ranks(
         monkeypatch,
@@ -225,7 +216,7 @@ def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch
         },
     )
 
-    row = format_playlist_overview_row("Partial", playlist)
+    row = format_playlist_overview_row("Partial", playlist, stats_by_scenario)
 
     assert row["median_percentile_display"] == "95.00% · 1/4"
     assert row["median_percentile_sort"] == 95.0
@@ -246,7 +237,7 @@ def test_format_playlist_overview_row_excludes_ranked_but_unplayed_scenarios(
             Scenario(name="PrunedCsvs", ranks=RANKS),
         ],
     )
-    _install_local_stats(monkeypatch, _played_stats("Played"))
+    stats_by_scenario = _played_stats("Played")
     _install_cached_ranks(
         monkeypatch,
         {
@@ -267,7 +258,7 @@ def test_format_playlist_overview_row_excludes_ranked_but_unplayed_scenarios(
         },
     )
 
-    row = format_playlist_overview_row("Pruned", playlist)
+    row = format_playlist_overview_row("Pruned", playlist, stats_by_scenario)
 
     assert row["played_display"] == "1/2"
     assert row["median_percentile_display"] == "90.00% · 1/2"
@@ -285,7 +276,7 @@ def test_format_playlist_overview_row_isolates_cache_read_failures(monkeypatch):
             Scenario(name="Broken", ranks=RANKS),
         ],
     )
-    _install_local_stats(monkeypatch, _played_stats("Good", "Broken"))
+    stats_by_scenario = _played_stats("Good", "Broken")
 
     def fragile_rank_lookup(scenario_name, *args, **kwargs):
         assert kwargs["allow_network"] is False
@@ -304,7 +295,7 @@ def test_format_playlist_overview_row_isolates_cache_read_failures(monkeypatch):
         fragile_rank_lookup,
     )
 
-    row = format_playlist_overview_row("Fragile", playlist)
+    row = format_playlist_overview_row("Fragile", playlist, stats_by_scenario)
 
     assert row["median_percentile_display"] == "95.00% · 1/2"
 
@@ -333,7 +324,7 @@ def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
         "playlist_database",
         {first.code: first, second.code: second, other.code: other},
     )
-    _install_local_stats(monkeypatch, {})
+    _install_stats_snapshot(monkeypatch, {})
     _install_cached_ranks(monkeypatch, {})
 
     rows = build_playlist_overview_rows()
@@ -347,6 +338,7 @@ def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
 
 def test_build_playlist_overview_rows_skips_unknown_selector_codes(monkeypatch):
     _configure(monkeypatch)
+    _install_stats_snapshot(monkeypatch, {})
     monkeypatch.setattr(
         playlist_overview_service,
         "get_playlist_selector_options",

@@ -4,7 +4,7 @@ from pathlib import Path
 from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, ScenarioStats
 
 extract_data_from_file = data_service.extract_data_from_file
 
@@ -72,6 +72,24 @@ def test_load_csv_replaces_scenario_stats_object(monkeypatch) -> None:
     assert stats_after.number_of_runs == 2
     assert stats_after.high_score == 150
     assert stats_after.date_last_played == datetime(2026, 7, 2, 12, 0, 0)
+
+
+def test_get_scenario_stats_snapshot_maps_every_scenario(monkeypatch) -> None:
+    stats = ScenarioStats(
+        date_last_played=datetime(2026, 7, 1, 12, 0, 0),
+        number_of_runs=3,
+        high_score=500,
+    )
+    monkeypatch.setattr(
+        data_service,
+        "kovaaks_database",
+        {"1w4ts": {"scenario_stats": stats}},
+    )
+
+    snapshot = data_service.get_scenario_stats_snapshot()
+
+    assert snapshot == {"1w4ts": stats}
+    assert snapshot["1w4ts"] is stats
 
 
 def test_extract_data_from_file_parses_valid_file() -> None:
