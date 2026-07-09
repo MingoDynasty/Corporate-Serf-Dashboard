@@ -1,0 +1,281 @@
+# Notification System Proposal
+
+> **Status:** Proposed — awaiting agreement. Scope is the toast/notification
+> layer only (delivery mechanism, routing policy, and per-notification copy).
+> No change to run capture, plotting, or the rank pipeline's data. Distill into
+> `decision_log.md` and delete this file in the shipping PR.
+>
+> Design was cross-validated: an independent cold author received only the
+> problem statement and fact inventory (no verdicts) and converged on the same
+> architecture and routing policy; its divergences were triaged and folded in.
+
+## Problem
+
+The app has grown **two independent notification subsystems**, and the split is
+the root cause of the noise reported in the UI audit:
+
+- **System A — logging-driven.** A Python logger (`dash_logger`) routes
+  `logging` records through `dash-extensions`' `NotificationsLogHandler` into
+  DMC notifications (`utilities/dash_logging.py`, mounted via
+  `log_handler.embed()` in `app_shell.py`). Every message gets a fresh `uuid`
+  id, so these **stack rather than replace**; titles are the generic
+  "Info/Warning/Error". Crucially, `emit()` only works inside a Dash callback —
+  it swallows `MissingCallbackContextException` — so **anything logged from a
+  background thread silently never renders**.
+- **System B — callback-driven.** Explicit `sendNotifications` on
+  `dmc.NotificationContainer` (`app_shell.py`), fed by dicts in `home.py`. These
+  use **stable ids, so they dedupe/replace**, with custom titles, colors, and
+  icons.
+
+Two host components, two id conventions, two title vocabularies, two auto-close
+defaults. During a play session System A piles up while System B replaces in
+place. Worse, **four of System A's error toasts are dead code**: the watchdog's
+"Could not start position update" and the three `api_service.py` rank-timer
+messages ("Position update timed out / misconfigured / failed unexpectedly")
+all fire from `threading.Timer` daemon threads or the watchdog observer thread,
+outside any callback context, so they can never appear despite reading like
+user-facing errors.
+
+There is also a **second stacking source inside System B**: the top-N toast and
+the score-threshold toast use *different* stable ids, so a single run that
+qualifies for both fires two stacked toasts.
+
+The most visible symptom: with `kovaaks_username` unset (**the default**), an
+unset username is a *supported* state — `example.toml` says "Leave unset or
+empty to disable scenario rank lookups" — yet the rank lookup still runs on
+every scenario switch and every new run, and reports the result as a red
+**Error** toast. It auto-closes after 8s, but re-fires constantly and stacks
+(unique ids), so it reads as a persistent wall of red.
+
+## Goals / non-goals
+
+**Goals**
+- One delivery path with one set of conventions.
+- Passive, automatic activity is quiet by default; toasts are reserved for
+  achievements, coaching, and the results of user-initiated actions.
+- One run produces at most one toast.
+- No toast that cannot actually render.
+- Titles that carry the verdict; copy that leads with the scenario.
+
+**Non-goals**
+- Persistent/reviewable notification history — that is the separate
+  [Run History](./run_history_proposal.md) work; this proposal keeps toasts
+  ephemeral.
+- Changing what counts as a top-N score, or the score-threshold verdict rule
+  (settled 2026-07-08 in `decision_log.md`).
+- New background→UI plumbing for rank events (see Open questions).
+
+## Current inventory
+
+| # | Notification | Fires when | System | Renders? | Verdict |
+|---|---|---|---|---|---|
+| 1 | 🔴 "KovaaK's username is not configured" | Every scenario switch / new run, username unset (default) | A | yes | **Remove toast**; inline hint on the Position field + one startup console INFO |
+| 2 | 🔴 Rank fetch/resolve failed | Scenario switch / run, transient API failure | A | yes | **Remove toast**; inline field state, Refresh is the retry |
+| 3 | 🟡 Steam-ID mismatch | Scenario switch when `steam_id` disagrees | A | yes | **Keep, once per app session**, persistent until dismissed |
+| 4 | 🟡 "No scenario data found" | Selecting an unplayed scenario | A | yes | **Remove** (on-canvas empty state already covers it) |
+| 5 | 🟡 "No scenario data for the given date range" | Date filter empties the plot | A | yes | **Remove** (same) |
+| 6 | 🔴 "Position refresh for X failed" | Manual Refresh errors | A | yes | **Keep → move to B** |
+| 7 | 🟡 "Insufficient data for playlist X" | Journey page, selected playlist has no data | A | yes | **Modify → in-page empty state**, no toast |
+| 8 | 🔴 "Could not start position update for X" | Watchdog fails to schedule refresh | A | **no (dead)** | **Delete** |
+| 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | **no (dead)** | **Delete** |
+| 10 | 🟢 New top-N score | Run makes top-N for its sensitivity | B | yes | **Merge into one run-verdict toast** (D5) + rewrite copy |
+| 11 | 🟢/🟡 Score threshold pass/fail | Threshold switch on + prior PB exists | B | yes | **Merge into one run-verdict toast** (D5) |
+| 12 | 🔵 "Graph updated!" | Run that is neither top-N nor threshold-judged | B | yes | **Remove** |
+| 13 | 🔵/🟢/🟡 Backlog run summary | Runs accrued while Home was closed | B | yes | **Keep** |
+| 14 | 🟢/🔴 Playlist import result | Import button | B | yes | **Keep** |
+| 15 | 🟡 Startup playlist warnings | Duplicate playlist codes at boot | B | yes | **Keep, make persistent** (no autoClose — fires when nobody may be looking) |
+
+Net effect: during normal play with the default config, the only toasts are the
+per-run verdict, the backlog summary, and the results of things the user
+clicked. Nothing red unless something the user asked for failed.
+
+## Design decisions
+
+### D1. One delivery path: System B; retire System A
+
+Consolidate on `sendNotifications` / `dmc.NotificationContainer` (native DMC,
+stable ids, dedupes). Python `logging` stays as the console/file record — it is
+the developer-facing log and the eventual Run History seed — but is **decoupled
+from the toast layer**. After the surviving live toasts (#3, #6) move to
+System B and the rest are dropped, deleted, or moved in-page,
+`dash_logging.py`, `log_handler.embed()`, and the `dash-extensions` logging
+bridge have no remaining UI consumers and are removed.
+
+Beyond the uuid-stacking and title vocabulary, the decisive argument is that
+System A is a **silent-failure trap**: rows 8–9 were "implemented" and never
+rendered once, because the handler swallows the missing-context exception. Any
+future contributor who logs from the watchdog or a Timer hits the same
+invisible hole.
+
+### D2. Routing policy — who gets a toast
+
+A decision rule so future notifications have an obvious home:
+
+- **Persistent condition** (misconfiguration, missing/empty data, degraded
+  feature) → **in-place UI** at the point of impact: field state, on-canvas
+  empty state. Never a toast — conditions don't stop being true when the toast
+  expires, and re-toasting per trigger is the noise machine being removed.
+  One exception: the Steam-ID mismatch (#3) is an actionable misconfiguration
+  with no natural field home, so it gets **one** persistent toast per app
+  session (server-side guard), not one per scenario switch.
+- **Automatic failure** (rank fetch failing during passive navigation) → **no
+  toast**; the field state conveys it. Console `logger.warning` retained.
+- **User-initiated failure** (Import, manual Refresh) → **error toast** — the
+  user asked and deserves the result.
+- **Achievement / coaching** (run verdict) → one toast per run (D5).
+- **Diagnostic** (thread failures, timeouts with automatic fallback) →
+  **console log only**.
+
+Litmus tests, in order: *Is it a state rather than an event?* → in-place.
+*Is it already visible somewhere?* (plot point, Position field, empty-state
+canvas) → nothing. *Would the user act differently for having seen it right
+now?* No → log, not toast.
+
+### D3. Ambient state lives in the UI, not in toasts
+
+The empty-plot already renders "No local runs found" / "No runs in this date
+range" on-canvas, and the Position field already shows `N/A` when rank is
+unavailable. The parallel toasts (#1, #4, #5) are redundant second copies.
+Remove them, and make the Position field's `N/A` **self-explanatory** with an
+inline state or tooltip:
+
+- Username unset → `N/A` with hint "set `kovaaks_username` in `config.toml` to
+  enable rank lookups" (note: username lives in `config.toml`, not the Settings
+  modal — copy must say so).
+- Lookup failed → `N/A` with hint "lookup failed — Refresh to retry".
+
+Exact wording/affordance (trailing text vs. tooltip) is a build-time detail;
+the decision is that the field explains itself instead of toasting.
+
+### D4. No fake toasts from background threads
+
+`sendNotifications`, like the old logging bridge, is a callback output and
+cannot be driven from the watchdog or timer threads. The existing
+`message_queue` → `dcc.Interval` → callback pattern is the **only** legitimate
+bridge. After the verdicts above, nothing on a background thread needs a toast,
+so rows 8–9 become console-only (delete the toast calls, keep the
+`logger.warning`/`logger.exception` siblings). Document the rule in
+`docs/architecture.md` so the row-8/9 mistake cannot recur. Surfacing
+background rank events as real toasts is deferred (Open questions).
+
+### D5. One run, one toast
+
+Today a run that both places top-N and gets a threshold verdict fires **two**
+stacked toasts (#10 + #11 have different ids). Merge them: a single per-run
+**run-verdict toast** under one stable id (e.g. `run-verdict`), so consecutive
+runs replace instead of stack. When both qualify, the threshold verdict is the
+headline and the top-N placement a trailing detail. A run that qualifies for
+neither emits nothing (the new plot point is the confirmation — #12 is
+removed). The backlog summary (#13) already follows this one-toast shape.
+
+### D6. Presentation standards
+
+- Stable, semantic notification ids; dedupe/replace by id.
+- **Title carries the verdict** — title + color must tell the whole story from
+  across the room. Never the literal word "Notification".
+- **Message leads with the scenario**; sensitivity is a trailing qualifier
+  (top-N is per-sensitivity, so it matters, but it is never the subject).
+- Consistent `autoClose` (one constant), with two deliberate exceptions that
+  persist until dismissed: the Steam-ID mismatch (#3) and startup playlist
+  warnings (#15), both of which fire when the user may not be looking.
+- Copy shapes (final wording is a build-time detail; the shape is the
+  decision):
+  - Top-N only: title `New 2nd-best score` (1st: `New best score`), message
+    `VT Pasu Rasp — 3421.50 at 32.0 cm/360`.
+  - Threshold pass: title `Threshold passed`, message
+    `VT Pasu Rasp — 941.20, 97.3% of PB. Ready to move on.`
+  - Threshold fail: title `Below threshold`, message
+    `VT Pasu Rasp — 899.10, 92.9% of PB — need 95.0%. Keep grinding...`
+    (the target % is included: one extra number with real motivational value).
+  - Both: title `Threshold passed`, message
+    `VT Pasu Rasp — 941.20, 97.3% of PB. Also your 2nd-best at 32.0 cm/360.`
+  - Backlog: title `While you were away`, message
+    `6 new VT Pasu Rasp runs. Latest: 941.20 — 97.3% of PB, passed threshold.`
+
+**PB coherence note:** a new overall PB necessarily places 1st within its
+sensitivity, so the run-verdict toast already fires for every PB. The recorded
+"no dedicated PB toast" decision (`product.md`) is therefore coherent and
+stands. Deliberately *not* retitling the 1st-place case to "New personal
+best!" — that would effectively create the PB toast the decision declined.
+
+## Concrete changes
+
+Grouped by file; each maps to inventory rows above.
+
+- **`utilities/dash_logging.py`** — delete after consumers migrate (D1).
+- **`utilities/notifications.py`** (new, small) — one payload builder, e.g.
+  `toast(id, title, message, *, color, icon, auto_close)`, so shape/convention
+  lives in one place. A function, not a framework; the pure builder pattern in
+  `home.py` (`_build_run_event_notifications`) stays and calls it.
+- **`app_shell.py`** — drop `log_handler.embed()` and its import; the single
+  `dmc.NotificationContainer` remains the only host.
+- **`pages/home.py`**
+  - `_emit_rank_messages` / `get_scenario_rank`: stop toasting on the passive
+    path (#1, #2). Return the inline field states from D3 instead of bare
+    `N/A`. Steam-ID mismatch (#3) becomes a once-per-session System B toast
+    (module-level seen-flag guard).
+  - `refresh_rank` (#6): emit the failure via a `sendNotifications` output
+    (`allow_duplicate=True`) instead of `dash_logger`.
+  - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
+    replace `_build_run_event_notifications`' two-toast output with the single
+    merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
+- **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
+  empty state where the chart renders, mirroring Home's on-canvas pattern.
+- **`my_watchdog/file_watchdog.py`** — delete the dead `dash_logger.error`
+  (#8); keep `logger.exception`.
+- **`kovaaks/api_service.py`** — delete the three dead `dash_logger.error`
+  calls in `_notify_exhaustion` / `_run_attempt` (#9); keep the `logger`
+  siblings. Drop the now-unused `dash_logger` import.
+- **`docs/architecture.md`** — document the D4 rule (message_queue is the only
+  background→UI bridge; no toast calls from background threads).
+- **`pyproject.toml`** — `dash-extensions` may still be used elsewhere; only
+  drop the dependency if the logging bridge was its sole use (verify at build
+  time before removing).
+
+## Build sequencing — three reviewable PRs
+
+1. **Noise kill.** Remove the #1/#2/#4/#5/#12 toasts and add the inline
+   Position-field states. Resolves the audit complaint by itself; smallest
+   reviewable unit. (The #8/#9 dead-call deletions are zero-risk and can ride
+   along or land first as an independent commit.)
+2. **System consolidation.** Delete System A, migrate #3 (once-per-session)
+   and #6 to System B, move #7 in-page, add the `toast()` builder, document
+   the D4 rule in `architecture.md`.
+3. **Copy rework.** The merged run-verdict toast (D5) and the D6 copy shapes;
+   align the backlog summary; make #15 persistent.
+
+## Migration notes
+
+- **Tests.** `tests/test_home_run_events.py` asserts the exact `"Graph
+  updated!"` message, the `graph-updated-notification` /
+  `new-top-n-score-notification` / `score-threshold-notification` ids, and the
+  current two-toast-per-run shape. The D5 merge and D6 copy rewrite break
+  those cases; they must be updated in the same change, and the
+  "neither top-N nor threshold" case should assert an empty notification list.
+- **Docs on ship.** `product.md` ("Run notifications" describes the "Graph
+  updated!" fallback and the current copy) and this file distill into a
+  `decision_log.md` entry; `tests/test_docs.py` fails on dangling links if
+  this file is deleted without removing references to it.
+- **Behavior parity.** Retiring System A loses nothing that currently renders
+  except the passive rank/no-data toasts being intentionally removed; the four
+  dead toasts were never visible.
+
+## Open questions (defer to build time)
+
+- **Do background rank events deserve a real toast?** "Your rank updated after
+  that PB" and "Position update timed out" are currently invisible. Surfacing
+  them means routing through `message_queue` (D4). Pairs naturally with the
+  rank-improved addition below — decide together, not piecemeal.
+- **Manual Refresh error color.** Keep red, or soften to a neutral "couldn't
+  refresh — showing cached position" given the cached value is still displayed?
+
+## Future / optional (scope additions, not committed)
+
+- **"Rank improved" toast.** When the background poll lands a better position,
+  the UI updates silently on the next tick; a one-shot "You're now 1,240th (up
+  from 1,310)" would close the loop on a PB. Requires the D4 queue routing.
+- **"Last run" line on Home.** A persistent one-row readout near the plot
+  (latest run's score, % of PB, verdict), replaced on each run — the toast's
+  content with no expiry. Deliberately deferred: it is Run History's session
+  view in miniature and should be designed in that work's context, not bolted
+  on here.
