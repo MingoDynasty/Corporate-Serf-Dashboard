@@ -26,17 +26,23 @@ Why: Design review (2026-07-09) verified the structural guarantees that bound
 the risk. After startup, the watchdog observer thread is the only writer to
 `kovaaks_database`/`run_database` (the startup bulk load is single-threaded,
 before the observer and server exist), so writer-writer corruption cannot
-occur. The top-level `kovaaks_database` dict is never iterated — only
-GIL-atomic lookups. The remaining exposure is server-thread readers iterating
-nested `sortedcontainers` structures (and the journey page walking
-`run_database`) mid-`add()`: worst case is a skipped or duplicated point, or a
-rare exception, in one render. Every consumer is pull-based and re-renders
-within one interval tick, and Dash contains callback exceptions, so all
-failure modes self-heal in about a second; no path writes torn state back. The
-load-before-notify ordering in `_enqueue_after_loading` guarantees a drained
-message's run is already fully visible in the stores. `playlist_database`
-carries the same accepted class between server threads (the import callback's
-insert vs. `.values()` iterations under Waitress's worker pool). A coarse lock
+occur. The top-level `kovaaks_database` dict is read via GIL-atomic lookups;
+the one reader that iterates it (`get_scenario_stats_snapshot`, PR #78)
+snapshots with a single C-level `list()` call that a concurrent insert cannot
+break, and PR #78 also made the writer replace `ScenarioStats` objects instead
+of mutating fields in place, so a reader that binds one sees field-consistent
+values. The remaining exposure is server-thread readers iterating nested
+`sortedcontainers` structures (and the journey page walking `run_database`)
+mid-`add()`: worst case is a skipped or duplicated point, or a rare exception,
+in one render. Every consumer is pull-based and re-renders within one interval
+tick, and Dash contains callback exceptions, so all failure modes self-heal in
+about a second; no path writes torn state back. The load-before-notify
+ordering in `_enqueue_after_loading` guarantees a drained message's run is
+already fully visible in the stores. `playlist_database` carried the same
+class between server threads (the import callback's insert vs. `.values()`
+iterations under Waitress's worker pool) until PR #78 converted its iterating
+readers to the same `list()` snapshot pattern, leaving only atomic containment
+checks and single-key lookups exposed — which are safe. A coarse lock
 was rejected because it imposes permanent accessor discipline — silent when
 violated — against a self-healing one-frame glitch; a single-writer ingest
 redesign was rejected as not worth reworking the load-before-notify contract
@@ -55,7 +61,12 @@ would each see a separate empty database), WAL does not support in-memory
 databases, and shared-cache mode is quirky and semi-deprecated — or an ingest
 rework undertaken for other reasons, which should then adopt the single-writer
 design. Run History adds more reader iteration over `run_database` but no
-writers; it stays within this acceptance.
+writers; it stays within this acceptance. New readers that iterate a shared
+store dict should follow the established snapshot pattern — one C-level
+`list()` call before iterating (see `get_scenario_stats_snapshot`). That
+pattern is deliberately not extended to the nested `sortedcontainers`
+structures, where `list()` is itself Python-level iteration and offers no
+atomicity; those remain the accepted self-healing class above.
 
 ## 2026-07-08: Judge Score-Threshold Notifications Against The Previous PB
 
