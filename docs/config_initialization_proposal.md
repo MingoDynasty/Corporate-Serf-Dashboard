@@ -1,9 +1,9 @@
 # Config Initialization Proposal
 
-**Status:** Proposed — decision-first. The goal of this doc is to pick *how far
-to go* (or to consciously accept the status quo), not to pre-commit to a large
-refactor. Payoff is modest; the point is to decide deliberately rather than
-drift.
+**Status:** Accepted — Option B, full scope (design review 2026-07-09). Ready
+to implement. The shipping PR distills this into `decision_log.md`, deletes
+this file, and removes the tech-debt entry (AGENTS.md "Shipping a proposal";
+the roadmap/product steps don't apply — this is not a product feature).
 
 ## Problem
 
@@ -17,84 +17,80 @@ of them triggers a config read and, on a missing/invalid `config.toml`, a
 Two consequences:
 
 1. **Import-time side effects.** You cannot import the app's modules in a test
-   or REPL without a valid `config.toml` on disk. `tests/test_config_service.py`
-   already works around this by spawning a *subprocess* (`python -m source.app`)
-   to exercise the bad-config exit path, rather than importing anything.
+   or REPL without a valid `config.toml` on disk.
 2. **A by-value singleton.** Five modules bind the value with
-   `from source.config.config_service import config`. The binding captures the
-   object at import time, so simply moving the load later would leave those
-   five names pointing at nothing unless the *access pattern* also changes.
+   `from source.config.config_service import config`, so moving the load later
+   requires converting the access pattern at every call site.
 
-Related import-time side effect (same spirit, separate call site):
-`data_service.py` runs `load_playlists()` at import (bottom of the module). Call
-it out so we decide whether it's in or out of scope; it is not the subject of
-this proposal.
+The load-bearing consequence, found in review: the import-time load forces the
+pytest harness to intercept at the *file* level. `tests/conftest.py`
+**overwrites the real repo-root `config.toml`** at session start with a test
+config and restores it at session end — with the backup held **only in process
+memory**. Abnormal termination (kill, OOM, power loss) permanently replaces the
+user's config with the test one; two concurrent pytest runs in the same
+checkout corrupt each other's backup/restore chain; and this mechanism is the
+root cause of the standing "never run gates and the preview app concurrently
+from the same worktree" restriction.
 
-## Why this is non-trivial
+## Options considered
 
-The by-value import is the crux. "Load config in `main()` instead" is one line;
-making the existing five call sites see that value is the actual work, and the
-*right* access pattern is a genuine choice with testability trade-offs. It also
-has to stay compatible with the pytest harness, which swaps the repo-root
-`config.toml` for the whole session (see `tests/conftest.py`) — the subprocess
-startup test in `test_config_service.py` must stay green.
+- **A — Accept as-is.** Rejected: it preserves the conftest file-swap hazard
+  above, which is a real operational risk, not an aesthetic complaint.
+- **B — Lazy `get_config()` accessor.** **Accepted**, full scope (below).
+- **B-middle — env-var override for `CONFIG_FILE`.** Would fix the conftest
+  hazard for ~10 lines while keeping the import-time load. Rejected on the
+  repo's own testing philosophy (AGENTS.md): a test-only production knob is the
+  discouraged kind of seam; `get_config()` is the sanctioned kind (it also
+  improves the production design — startup owns loading, modules import-safe).
+- **C — explicit init + module-attribute access / D — dependency injection.**
+  Rejected: more ceremony (C) or far more churn (D) than B, no added benefit at
+  this codebase's scale.
 
-## Options
+## Decision record — design review findings (2026-07-09)
 
-**A — Accept as-is (close the tech-debt entry).**
-Do nothing but optionally document the decision. Bad config already exits
-cleanly with a concise message (shipped in `e4d3f08`), and the subprocess test
-covers it. Cost: import side effects remain; config-dependent code stays
-un-unit-testable without a `config.toml` present. This is the debt entry's
-implicit current stance and is defensible for a single-user local app.
+1. **Call-site census:** ~19 `config.` attribute reads across the five
+   importing modules, **all inside function bodies** — zero module-level
+   access anywhere in `source/`. The conversion is mechanical; `home.py`
+   already funnels five of them through `_rank_lookup_config()`.
+2. **Conftest hazard** (see Problem): retired entirely by B — tests seed the
+   loader in-process and never touch the real `config.toml`.
+3. **`load_playlists()` is in scope — required, not optional.** Today a bad
+   config exits at `app.py`'s config import, *before* `configure_logging()`
+   and before `data_service` imports. Under B with `load_playlists()` left at
+   import, the chain survives to the playlist scan; in a cwd without
+   `resources/playlists` that emits a warning through logging's last-resort
+   handler → **stderr noise ahead of the friendly config error**, breaking
+   `test_config_service`'s exact-stderr assertion and changing user-visible
+   bad-config behavior. Moving `load_playlists()` into `main()` after config
+   validation preserves the current contract exactly.
+4. **Raise-and-translate.** `get_config()` raises (`OSError`,
+   `UnicodeDecodeError`, `tomllib.TOMLDecodeError`, `ValidationError`);
+   `main()` catches and reproduces the exact current stderr message +
+   `SystemExit(1)` + no traceback. `config_service` becomes import-safe and
+   library-like. The existing subprocess test pins this contract unchanged.
 
-**B — Lazy accessor `get_config()` (recommended if we act).**
-Replace the module-level `config` with a cached loader:
+## Implementation shape
 
-```python
-@functools.cache
-def get_config() -> ConfigData:
-    ...  # load_config() + the current error handling
-```
+- `config_service.py`: drop the module-level `try/except` and `config` global;
+  add `@functools.cache def get_config() -> ConfigData`. (`functools.cache`
+  does not cache exceptions, and `main()` populates it before any threads
+  exist — no concurrency wrinkle.)
+- Convert the five modules: `from … import get_config`; call sites become
+  `get_config().x` (or a local `config = get_config()` where a function reads
+  several fields, as `_rank_lookup_config` already does).
+- `app.py` `main()` order: `get_config()` (with error translation) →
+  `load_playlists()` → `initialize_kovaaks_data(...)` → observer → serve.
+- `tests/conftest.py`: replace the sessionstart/sessionfinish file-swap with an
+  autouse fixture that monkeypatches `load_config` (or seeds the cache) and
+  calls `get_config.cache_clear()` around it. The subprocess startup test in
+  `test_config_service.py` stays exactly as-is — it exercises the real path.
+- Test ripple: grep tests for reliance on import-time playlist loading
+  (`test_playlist_pages.py`, `test_playlist_rekey.py`,
+  `test_playlist_scenarios_service.py`, …) and call `load_playlists()`
+  explicitly via fixture where needed.
 
-Convert the five `config` uses to `get_config()`. Load moves off the import
-path (first *access* triggers it); `main()` can call `get_config()` explicitly
-and own the error message. Tests override via `get_config.cache_clear()` +
-monkeypatching, no subprocess needed. Least invasive way to actually remove the
-import-time side effect while keeping singleton ergonomics.
+## Constraints
 
-**C — Explicit init in `main()`, module-attribute access.**
-`main()` calls a `configure()` that populates a module global; the five sites
-switch from `from x import config` to `import x` + `x.config`. Startup fully
-owns load + error handling. Slightly more ceremony than B at every call site,
-no real advantage over B for this codebase.
-
-**D — Dependency injection (pass `ConfigData` through).**
-Thread config as an argument. Cleanest for testing, but a large change across
-call chains for a local single-user tool — almost certainly over-engineering
-here. Listed for completeness; not recommended.
-
-## Recommendation
-
-Decide between **A** (accept and close) and **B** (lazy `get_config()` seam).
-Both are honest endpoints; B buys unit-testability of startup/config-dependent
-code for a small, mechanical diff. Avoid C and D. If B is chosen, decide
-separately whether to fold the `load_playlists()` import-time call into the same
-cleanup or leave it.
-
-## Interactions / constraints
-
-- `tests/conftest.py` swaps the repo-root `config.toml` for the pytest session;
-  `test_config_service.py` spawns a subprocess to test the bad-config exit.
-  Both must keep passing. Under B, the subprocess test still exercises the real
-  startup path; add an in-process test for the loader as the new fast path.
-- Keep the app boundary behavior: on bad config the *process* exits `1` with the
-  existing stderr message and no traceback. A library-style `get_config()` that
-  merely *raises* is fine as long as `main()` translates that to the clean exit.
-
-## Open questions (decide at build time)
-
-- How far: **A vs B** (this is the real decision).
-- Include the `data_service.load_playlists()` import-time call, or leave it?
-- Should `get_config()` exit the process itself, or raise and let `main()`
-  translate? (Prefer raise-and-translate to keep the module import-safe.)
+- Boundary behavior is frozen: bad config → exit code 1, the exact existing
+  stderr message, empty stdout, no traceback.
+- Committed blobs LF; standard merge bar (ruff format/check, mypy, pytest).
