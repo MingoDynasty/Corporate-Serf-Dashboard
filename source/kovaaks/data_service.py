@@ -45,8 +45,11 @@ POSSIBLE_SUB_CSV_HEADERS = [
 ]
 logger = logging.getLogger(__name__)
 
-# TODO: maybe at some point convert this to in-memory SQLite
-#  But a simple dictionary should suffice for now.
+# Deliberately unsynchronized: after startup the watchdog thread is the only
+# writer, and server-thread readers self-heal on the next interval tick. See
+# the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
+# docs/decision_log.md for the revisit triggers and why an eventual SQLite
+# migration must be file-backed (WAL), not in-memory.
 kovaaks_database: dict = {}
 
 run_database: SortedList = SortedList(
