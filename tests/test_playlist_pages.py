@@ -69,6 +69,12 @@ def test_playlists_overview_sortable_columns_use_nulls_last_comparator():
         assert columns[field]["comparator"] == {"function": "nullsLastComparator"}
 
 
+def test_playlists_overview_type_column_uses_badge_renderer():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    assert columns["type_display"]["cellRenderer"] == "TypeBadge"
+
+
 def test_playlists_overview_defaults_to_staleness_sort():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
 

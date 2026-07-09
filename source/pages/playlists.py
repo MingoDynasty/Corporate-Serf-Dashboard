@@ -54,6 +54,7 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Type",
         "field": "type_display",
+        "cellRenderer": "TypeBadge",
         "sortable": True,
         "minWidth": 110,
     },
