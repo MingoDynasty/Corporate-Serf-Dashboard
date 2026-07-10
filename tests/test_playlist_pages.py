@@ -1,4 +1,5 @@
 from datetime import datetime
+from types import SimpleNamespace
 
 import dash
 import dash_mantine_components as dmc
@@ -31,27 +32,149 @@ def test_playlists_overview_cell_click_ignores_malformed_payloads():
     assert playlists.route_to_clicked_playlist({"rowId": 3}) is no_update
 
 
-def test_playlists_overview_page_loads_rows(monkeypatch):
-    expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
-    monkeypatch.setattr(
-        playlists,
-        "build_playlist_overview_rows",
-        lambda: expected_rows,
+def test_playlists_overview_visibility_cell_click_does_not_navigate():
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID}
+        )
+        is no_update
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True)
+
+def _trigger(monkeypatch, triggered_id):
+    monkeypatch.setattr(
+        playlists,
+        "ctx",
+        SimpleNamespace(triggered_id=triggered_id),
+    )
+
+
+def test_playlists_overview_page_loads_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
+    seen_include_hidden = []
+
+    def fake_build(include_hidden=False):
+        seen_include_hidden.append(include_hidden)
+        return expected_rows
+
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None)
 
     assert rows == expected_rows
     assert status == ""
+    assert seen_include_hidden == [False]
+
+
+def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-show-hidden")
+    seen_include_hidden = []
+
+    def fake_build(include_hidden=False):
+        seen_include_hidden.append(include_hidden)
+        return [{"code": "KovaaKsTestCode", "hidden": True}]
+
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
+
+    rows, _status = playlists.load_playlist_overview_rows(True, True, None)
+
+    assert seen_include_hidden == [True]
+    assert rows[0]["hidden"] is True
+
+
+def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    toggled = []
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", toggled.append)
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(
+        True,
+        False,
+        {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
+    )
+
+    assert toggled == ["KovaaKsTestCode"]
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    assert status == ""
+
+
+def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(
+        playlists,
+        "toggle_playlist_visibility",
+        lambda _code: pytest.fail("navigation clicks must not toggle visibility"),
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(
+        True,
+        False,
+        {"rowId": "KovaaKsTestCode", "colId": "name"},
+    )
+
+    assert rows is no_update
+    assert status is no_update
 
 
 def test_playlists_overview_page_reports_empty_database(monkeypatch):
-    monkeypatch.setattr(playlists, "build_playlist_overview_rows", lambda: [])
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [],
+    )
 
-    rows, status = playlists.load_playlist_overview_rows(True)
+    rows, status = playlists.load_playlist_overview_rows(True, False, None)
 
     assert rows == []
     assert status == "No playlists are loaded."
+
+
+def test_playlists_overview_page_reports_all_hidden(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: (
+            [{"code": "KovaaKsTestCode", "hidden": True}] if include_hidden else []
+        ),
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None)
+
+    assert rows == []
+    assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
+
+
+def test_playlists_overview_visibility_column_config():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+    column = columns[playlists.VISIBILITY_COLUMN_ID]
+
+    assert column["cellRenderer"] == "VisibilityAction"
+    assert column["sortable"] is False
+
+
+def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
+    page = playlists.layout()
+    grid = page.children[-1].children
+    switch = next(
+        child
+        for component in page.children
+        if isinstance(getattr(component, "children", None), list)
+        for child in component.children
+        if getattr(child, "id", None) == "playlists-overview-show-hidden"
+    )
+
+    assert switch.checked is False
+    assert grid.rowClassRules == {
+        "playlist-overview-row-hidden": "params.data.hidden",
+    }
 
 
 def test_playlists_overview_sortable_columns_use_nulls_last_comparator():

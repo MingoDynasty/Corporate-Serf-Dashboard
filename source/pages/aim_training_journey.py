@@ -12,7 +12,9 @@ from source.kovaaks.data_service import (
     get_aim_training_checkpoints,
     get_aim_training_journey_for_playlists,
     get_playlist_display_label,
-    get_playlist_selector_options,
+)
+from source.kovaaks.playlist_visibility_service import (
+    get_visible_playlist_selector_options,
 )
 from source.plot.plot_service import (
     apply_light_dark_mode,
@@ -91,7 +93,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     checkIconPosition="right",
                                     # clearSearchOnFocus=True,
                                     clearable=True,
-                                    data=get_playlist_selector_options(),
+                                    data=get_visible_playlist_selector_options(),
                                     id="playlists-multi-select",
                                     label="Playlist filter",
                                     miw=400,

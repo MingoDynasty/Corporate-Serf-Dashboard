@@ -3,9 +3,12 @@
 import dash
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash import Input, Output, callback, clientside_callback, dcc, no_update
+from dash import Input, Output, callback, clientside_callback, ctx, dcc, no_update
 
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
+from source.kovaaks.playlist_visibility_service import toggle_playlist_visibility
+
+VISIBILITY_COLUMN_ID = "hidden"
 
 dash.register_page(
     __name__,
@@ -107,6 +110,17 @@ TABLE_COLUMN_DEFS = [
         "sortable": True,
         "minWidth": 160,
     },
+    {
+        # Hide/unhide action cell. Its colId is excluded from row navigation,
+        # and the row-load callback treats clicks on it as visibility toggles.
+        "headerName": "",
+        "field": VISIBILITY_COLUMN_ID,
+        "cellRenderer": "VisibilityAction",
+        "sortable": False,
+        "resizable": False,
+        "minWidth": 90,
+        "maxWidth": 100,
+    },
 ]
 
 
@@ -119,6 +133,8 @@ def route_to_clicked_playlist(cell_clicked):
     """Navigate to a playlist's scenario table from any cell in its row."""
     if not isinstance(cell_clicked, dict):
         return no_update
+    if cell_clicked.get("colId") == VISIBILITY_COLUMN_ID:
+        return no_update
     playlist_code = cell_clicked.get("rowId")
     if not isinstance(playlist_code, str) or not playlist_code:
         return no_update
@@ -129,11 +145,29 @@ def route_to_clicked_playlist(cell_clicked):
     Output("playlists-overview-grid", "rowData"),
     Output("playlists-overview-status", "children"),
     Input("playlists-overview-mounted", "data"),
+    Input("playlists-overview-show-hidden", "checked"),
+    Input("playlists-overview-grid", "cellClicked"),
 )
-def load_playlist_overview_rows(_mounted):
-    """Build overview rows from local run data and rank caches (no network)."""
-    rows = build_playlist_overview_rows()
+def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked):
+    """Build overview rows from local run data and rank caches (no network).
+
+    Also handles hide/unhide: a click on the visibility action cell toggles
+    that playlist's preference, then the rows rebuild from the new state.
+    """
+    if ctx.triggered_id == "playlists-overview-grid":
+        if (
+            not isinstance(cell_clicked, dict)
+            or cell_clicked.get("colId") != VISIBILITY_COLUMN_ID
+            or not isinstance(cell_clicked.get("rowId"), str)
+            or not cell_clicked["rowId"]
+        ):
+            return no_update, no_update
+        toggle_playlist_visibility(cell_clicked["rowId"])
+
+    rows = build_playlist_overview_rows(include_hidden=bool(show_hidden))
     if not rows:
+        if build_playlist_overview_rows(include_hidden=True):
+            return [], 'All playlists are hidden. Toggle "Show hidden" to manage them.'
         return [], "No playlists are loaded."
     return rows, ""
 
@@ -173,13 +207,27 @@ def layout(**kwargs):  # noqa: ARG001
                 interval=30_000,
                 n_intervals=0,
             ),
-            dmc.Text("", c="dimmed", id="playlists-overview-status"),
+            dmc.Group(
+                children=[
+                    dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                    dmc.Switch(
+                        checked=False,
+                        id="playlists-overview-show-hidden",
+                        label="Show hidden",
+                        size="sm",
+                    ),
+                ],
+                justify="space-between",
+            ),
             dcc.Loading(
                 dag.AgGrid(
                     id="playlists-overview-grid",
                     className="ag-theme-quartz playlist-overview-grid",
                     columnDefs=TABLE_COLUMN_DEFS,
                     rowData=[],
+                    rowClassRules={
+                        "playlist-overview-row-hidden": "params.data.hidden",
+                    },
                     defaultColDef={
                         "resizable": True,
                         "sortable": True,

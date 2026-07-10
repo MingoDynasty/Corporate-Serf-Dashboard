@@ -63,10 +63,23 @@ Design rationale for shipped work lives in
 
 ## Upcoming milestones
 
-The playlist-level overview milestone shipped (see Shipped). The next candidate
-— "Playlist management & benchmark library" (phases 2–3 of the accepted
-[`playlist_overview_proposal.md`](./playlist_overview_proposal.md)) — is listed
-under Future and gets promoted here when it becomes the next thing up.
+### 1. Playlist management & benchmark library
+
+**What:** Phases 2–3 of the accepted
+[`playlist_overview_proposal.md`](./playlist_overview_proposal.md): a per-code
+show/hide visibility preference filtering every playlist list (PR 2a), the
+full bundled benchmark library shipping under `resources/benchmarks/` with
+Voltaic + Viscose visible by default (PR 2b), then overview-hosted import,
+delete, and superseded-copy cleanup (PRs 3a/3b).
+
+**Why:** The whole benchmark library should ship with the app without
+flooding every dropdown with 100+ rows, and playlists should be managed in
+the app — import, hide, delete — instead of by copying files ("the user
+interacts with the app, not the filesystem").
+
+**Decided:** The design is settled in the proposal's requirements register
+(R1–R14; all open questions resolved, including OQ-9's fresh-importer-pull
+canonical thresholds for the legacy Viscose files).
 
 ---
 
@@ -88,12 +101,6 @@ expanded into its own roadmap entry when it becomes the next thing up.
   training-hour checkpoints across playlists, which is a different question
   from the shipped playlist-level overview — so it remains a separate
   concern to revisit later, not a replacement for it.
-- **Playlist management & benchmark library** — phases 2–3 of the accepted
-  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md): the
-  full bundled benchmark library ships under `resources/benchmarks/` with
-  per-code show/hide visibility (plain show-list), then overview-hosted
-  import, delete, and cleanup. Sequenced immediately after the overview
-  milestone ships.
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start

@@ -60,6 +60,10 @@ run_database: SortedList = SortedList(
 
 
 playlist_database: dict[str, PlaylistData] = {}
+# Codes whose winning file came from data/playlists/ (or arrived via import).
+# Feeds the visibility first-run seed: user-root playlists must never be
+# hidden by the preference file's introduction.
+_user_root_playlist_codes: set[str] = set()
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -343,6 +347,11 @@ def get_playlist_by_code(playlist_code: str) -> PlaylistData | None:
     return playlist_database.get(playlist_code)
 
 
+def get_user_root_playlist_codes() -> set[str]:
+    """Get the codes loaded from the user root or imported this session."""
+    return set(_user_root_playlist_codes)
+
+
 def get_scenarios_from_playlist_code(playlist_code: str) -> list[str]:
     """Get scenario names from a playlist selected by URL playlist code."""
     playlist = get_playlist_by_code(playlist_code)
@@ -573,6 +582,7 @@ def load_playlists() -> None:
     """Load valid playlist JSON files into the in-memory database."""
     playlist_database.clear()
     playlist_startup_warning_queue.clear()
+    _user_root_playlist_codes.clear()
     playlist_sources: dict[str, Path] = {}
     for root, missing_ok in (
         (BUNDLED_PLAYLIST_DIRECTORY_PATH, False),
@@ -610,22 +620,31 @@ def load_playlists() -> None:
                 continue
             playlist_database[playlist_data.code] = playlist_data
             playlist_sources[playlist_data.code] = playlist_file
+            if root == USER_PLAYLIST_DIRECTORY_PATH:
+                _user_root_playlist_codes.add(playlist_data.code)
 
 
-def load_playlist_from_code(input_playlist_code: str) -> str | None:
-    """Import the single playlist matching a KovaaK's playlist code."""
+def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
+    """Import the single playlist matching a KovaaK's playlist code.
+
+    Returns ``(error_message, imported_playlist_code)`` — exactly one is
+    None. The imported code is the canonical ``playlistCode`` from KovaaK's,
+    which is what the store, the user-root tracking, and the visibility
+    show-list are keyed by; it can differ from the pasted input (case
+    normalization, non-exact search matches).
+    """
     response = get_playlist_data(input_playlist_code)
     if not response or not response.data:
         message = (
             f"Failed to load playlist data for playlist code: {input_playlist_code}"
         )
         logger.warning(message)
-        return message
+        return message, None
 
     if len(response.data) > 1:
         message = f"Found more than one playlist from code: {input_playlist_code}"
         logger.warning(message)
-        return message
+        return message, None
 
     playlist_data = PlaylistData(
         name=response.data[0].playlistName,
@@ -643,7 +662,7 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
             f"{existing_playlist.name} ({existing_playlist.code})."
         )
         logger.warning(message)
-        return message
+        return message, None
     try:
         write_playlist_data_to_file(playlist_data)
     except ValueError:
@@ -652,15 +671,16 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
             f"{playlist_data.name} ({playlist_data.code})"
         )
         logger.warning(message)
-        return message
+        return message, None
     except OSError:
         message = (
             f"Failed to save playlist data: {playlist_data.name} ({playlist_data.code})"
         )
         logger.warning(message)
-        return message
+        return message, None
     playlist_database[playlist_data.code] = playlist_data
-    return None
+    _user_root_playlist_codes.add(playlist_data.code)
+    return None, playlist_data.code
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
