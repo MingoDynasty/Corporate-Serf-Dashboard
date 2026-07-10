@@ -9,7 +9,9 @@
 > problem statement and fact inventory (no verdicts) and converged on the same
 > architecture and routing policy; its divergences were triaged and folded in.
 > A two-pass cold deep review (internal consistency, then external verification
-> against the code) completed 2026-07-10; all findings triaged and applied.
+> against the code) completed 2026-07-10; all findings triaged and applied. A
+> further mechanism re-review (DMC show/update semantics, Dash duplicate-output
+> rules) was verified against the installed packages and applied the same day.
 
 ## Problem
 
@@ -26,12 +28,14 @@ the root cause of the noise reported in the UI audit:
   background thread silently never renders**.
 - **System B — callback-driven.** Explicit `sendNotifications` on
   `dmc.NotificationContainer` (`app_shell.py`), fed by dicts in `home.py`. These
-  use **stable ids, so they dedupe/replace**, with custom titles, colors, and
-  icons.
+  use **stable ids, which suppress duplicates**: DMC's `show` action silently
+  ignores a payload whose id is already on screen (it does *not* replace it —
+  replacement needs the separate `update` action, see D5). Custom titles,
+  colors, and icons.
 
 Two host components, two id conventions, two title vocabularies, two auto-close
-defaults. During a play session System A piles up while System B replaces in
-place. Worse, **four of System A's error toasts are dead code**: the watchdog's
+defaults. During a play session System A piles up while System B at least
+suppresses repeats. Worse, **four of System A's error toasts are dead code**: the watchdog's
 "Could not start position update" and the three `api_service.py` rank-timer
 messages ("Position update timed out / misconfigured / failed unexpectedly")
 all fire from `threading.Timer` daemon threads or the watchdog observer thread,
@@ -158,11 +162,17 @@ the decision is that the field explains itself instead of toasting.
 ### D4. No fake toasts from background threads
 
 `sendNotifications`, like the old logging bridge, is a callback output and
-cannot be driven from the watchdog or timer threads. The existing
-`message_queue` → `dcc.Interval` → callback pattern is the **only** legitimate
-bridge. After the verdicts above, nothing on a background thread needs a toast,
-so rows 8–9 become console-only (delete the toast calls, keep the
-`logger.warning`/`logger.exception` siblings). Document the rule in
+cannot be driven from the watchdog or timer threads. The rule: **background
+threads never drive UI outputs; they publish to shared state that interval
+callbacks poll.** Two sanctioned channels exist today, each with its own
+schema: `message_queue` (a `deque[NewFileMessage]` — run events only; its
+consumer assumes run-specific fields) and the JSON caches (the rank pipeline:
+Timer writes, cache-only interval reads surface within ~1s). The run queue is
+*not* a general event bus — a future background event that is neither a run
+nor a cache write needs its own typed queue or polled state, not a schema
+graft onto `NewFileMessage`. After the verdicts above, nothing on a background
+thread needs a toast, so rows 8–9 become console-only (delete the toast calls,
+keep the `logger.warning`/`logger.exception` siblings). Document the rule in
 `docs/architecture.md` so the row-8/9 mistake cannot recur. Surfacing
 background rank events as real toasts is deferred (Open questions).
 
@@ -177,6 +187,15 @@ neither emits nothing (the new plot point is the confirmation — #12 is
 removed). The backlog summary (#13) already follows this one-toast shape and
 **shares the `run-verdict` id**: a new live run replaces the catch-up digest,
 which is strictly staler information.
+
+**Replace mechanics (DMC 2.8.0):** a bare `show` cannot replace — the Mantine
+store ignores `show` for an id already on screen, and `update` is a no-op for
+an id that is not. Neither alone is an upsert, so each run-verdict emission
+sends **both actions with the same id and payload** (`update` then `show`):
+whichever matches the toast's current state applies and the other is a no-op.
+PR 3 must carry a regression test for both replace cases — a second run's
+toast replacing a visible one, and a live run replacing the backlog digest —
+verifying the pair actually upserts rather than silently dropping.
 
 ### D6. Presentation standards
 
@@ -243,9 +262,18 @@ Grouped by file; each maps to inventory rows above.
     pool, and the stable id makes the check-and-set race benign) —
     `get_scenario_rank` gains its own guarded `sendNotifications` output
     (`allow_duplicate=True`) so the mismatch fires on the passive path, not
-    only on manual Refresh.
+    only on manual Refresh. Because this callback must keep running on page
+    load (it renders the initial rank), the duplicate output requires
+    `prevent_initial_call="initial_duplicate"` — Dash 4.3 refuses to register
+    an `allow_duplicate` output otherwise, and plain
+    `prevent_initial_call=True` would lose the initial render.
   - `refresh_rank` (#6): emit the failure via a `sendNotifications` output
-    (`allow_duplicate=True`) instead of `dash_logger`.
+    (`allow_duplicate=True`, `prevent_initial_call=True` — already set) instead
+    of `dash_logger`, on **both** failure paths: expected failures come back as
+    `ScenarioRankInfo.error_message` (no raise), unexpected bugs raise — each
+    must produce the toast. On failure the rank output returns `no_update` so
+    the displayed (cached) position stays, replacing today's behavior of
+    flashing `N/A` until the next ~1s cache-only tick restores it.
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
@@ -259,10 +287,11 @@ Grouped by file; each maps to inventory rows above.
 - **`kovaaks/api_service.py`** — delete the three dead `dash_logger.error`
   calls in `_notify_exhaustion` / `_run_attempt` (#9); keep the `logger`
   siblings. Drop the now-unused `dash_logger` import.
-- **`docs/architecture.md`** — document the D4 rule (message_queue is the only
-  background→UI bridge; no toast calls from background threads), and
-  remove/rewrite the `utilities/` module-map entry describing `dash_logging`
-  ("routes `logging` to on-screen Mantine notifications"), which C1 falsifies —
+- **`docs/architecture.md`** — document the D4 rule (background threads never
+  drive UI outputs; they publish to polled shared state — no toast calls from
+  background threads), and remove/rewrite the `utilities/` module-map entry
+  describing `dash_logging` ("routes `logging` to on-screen Mantine
+  notifications"), which deleting `dash_logging.py` falsifies —
   `test_docs.py` gates dangling links, not stale prose, so nothing else
   catches it.
 - **`pyproject.toml`** — **`dash-extensions` stays**: `app.py` imports
@@ -274,7 +303,7 @@ Grouped by file; each maps to inventory rows above.
 
 1. **Noise kill.** Remove the #1/#2/#4/#5/#12 toasts, add the inline
    Position-field states, and add the one-time startup console INFO for the
-   unset username (R1). Touch up `product.md`'s run-notifications paragraph
+   unset username (inventory row 1). Touch up `product.md`'s run-notifications paragraph
    (the "Graph updated!" description becomes false here). Resolves the audit
    complaint by itself; smallest reviewable unit. (The #8/#9 dead-call
    deletions are zero-risk and can ride along or land first as an independent
@@ -318,16 +347,21 @@ Grouped by file; each maps to inventory rows above.
 
 - **Do background rank events deserve a real toast?** "Your rank updated after
   that PB" and "Position update timed out" are currently invisible. Surfacing
-  them means routing through `message_queue` (D4). Pairs naturally with the
+  them needs a D4-conformant channel — a dedicated typed event queue or polled
+  cache state, *not* the run-specific `message_queue`. Pairs naturally with the
   rank-improved addition below — decide together, not piecemeal.
 - **Manual Refresh error color.** Keep red, or soften to a neutral "couldn't
-  refresh — showing cached position" given the cached value is still displayed?
+  refresh — showing cached position"? (The copy's premise now holds: the
+  failure path returns `no_update`, so the cached value genuinely stays
+  displayed — see the `refresh_rank` item in Concrete changes. Only the
+  severity styling remains open.)
 
 ## Future / optional (scope additions, not committed)
 
 - **"Rank improved" toast.** When the background poll lands a better position,
   the UI updates silently on the next tick; a one-shot "You're now 1,240th (up
-  from 1,310)" would close the loop on a PB. Requires the D4 queue routing.
+  from 1,310)" would close the loop on a PB. Requires a D4-conformant channel
+  (typed event queue or polled cache state).
 - **"Last run" line on Home.** A persistent one-row readout near the plot
   (latest run's score, % of PB, verdict), replaced on each run — the toast's
   content with no expiry. Deliberately deferred: it is Run History's session
