@@ -170,10 +170,10 @@ class NewFileHandler(FileSystemEventHandler):
         # The value is a SortedKeyList keyed by score ascending (see
         # data_service.load_csv_file_into_database); the annotation widens it to
         # list, so cast to reach bisect_key_right. The count of runs scoring
-        # strictly higher than this run is len - bisect_key_right(score), and the
-        # +1 makes it the same 1-based rank the old linear scan produced (ties
-        # excluded either way). The new run is not yet in the store, so both the
-        # old loop and this bisect operate on the same pre-insert list.
+        # strictly higher than this run is len - bisect_key_right(score); the +1
+        # makes it a 1-based rank (ties are not counted as higher). The new run
+        # is not yet in the store, so this bisect ranks against the pre-insert
+        # list.
         runs_by_score = cast(SortedKeyList, sensitivities_vs_runs[sensitivity_key])
         higher_count = len(runs_by_score) - runs_by_score.bisect_key_right(
             run_data.score
