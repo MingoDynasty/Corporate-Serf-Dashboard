@@ -539,6 +539,109 @@ def _build_run_event_notifications(
     return notifications
 
 
+def _empty_state_graph_response(title: str, message: str) -> tuple[str, object]:
+    """Return a cached empty-state plot with notifications left unchanged."""
+    return _empty_plot_json(title, message), no_update
+
+
+def _build_scenario_figure(  # noqa: PLR0913
+    x_axis_radiogroup: str,
+    selected_scenario: str,
+    top_n_scores: int,
+    oldest_datetime: datetime,
+    rank_overlay_switch: bool,
+    selected_playlist: str | None,
+) -> tuple[go.Figure, bool]:
+    """Query the selected x-axis mode and build its figure.
+
+    Returns the figure plus whether score overlays apply to it. Empty-range and
+    unsupported-mode placeholders return ``False`` so the caller skips overlays
+    and notifications.
+    """
+    if x_axis_radiogroup == "score_vs_sensitivity":
+        sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
+            selected_scenario,
+            top_n_scores,
+            oldest_datetime,
+        )
+        if not sensitivities_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return (
+                generate_empty_plot(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                False,
+            )
+
+        rank_data = (
+            get_rank_data_from_playlist_code(selected_playlist, selected_scenario)
+            if selected_playlist
+            else []
+        )
+
+        return (
+            generate_sensitivity_plot(
+                sensitivities_vs_runs,
+                selected_scenario,
+                rank_overlay_switch,
+                rank_data,
+            ),
+            True,
+        )
+
+    if x_axis_radiogroup == "score_vs_time":
+        time_vs_runs = get_time_vs_runs(
+            selected_scenario,
+            top_n_scores,
+            oldest_datetime,
+        )
+        if not time_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return (
+                generate_empty_plot(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                False,
+            )
+
+        rank_data = (
+            get_rank_data_from_playlist_code(selected_playlist, selected_scenario)
+            if selected_playlist
+            else []
+        )
+
+        return (
+            generate_time_plot(
+                time_vs_runs,
+                selected_scenario,
+                rank_overlay_switch,
+                rank_data,
+            ),
+            True,
+        )
+
+    logger.error("Unsupported radio option: %s", x_axis_radiogroup)
+    return (
+        generate_empty_plot(
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
+        ),
+        False,
+    )
+
+
 @callback(
     Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
@@ -555,7 +658,7 @@ def _build_run_event_notifications(
     State("playlist-dropdown-selection", "value"),
 )
 # This callback coordinates the page's graph controls and notification states.
-def generate_graph(  # noqa: PLR0912, PLR0913
+def generate_graph(  # noqa: PLR0913
     run_events,
     selected_scenario,
     top_n_scores,
@@ -580,32 +683,23 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :return: Figure serialized to JSON, Notification
     """
     if not selected_scenario:
-        return (
-            _empty_plot_json(
-                _SELECT_SCENARIO_PLOT_TITLE,
-                _SELECT_SCENARIO_PLOT_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _SELECT_SCENARIO_PLOT_TITLE,
+            _SELECT_SCENARIO_PLOT_MESSAGE,
         )
 
     if not top_n_scores or not selected_date:
-        return (
-            _empty_plot_json(
-                _INCOMPLETE_GRAPH_CONTROLS_TITLE,
-                _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _INCOMPLETE_GRAPH_CONTROLS_TITLE,
+            _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
         )
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
-        return (
-            _empty_plot_json(
-                _NO_SCENARIO_DATA_PLOT_TITLE,
-                _NO_SCENARIO_DATA_PLOT_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _NO_SCENARIO_DATA_PLOT_TITLE,
+            _NO_SCENARIO_DATA_PLOT_MESSAGE,
         )
 
     oldest_datetime = datetime.combine(
@@ -613,81 +707,14 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         datetime.min.time(),
     )
 
-    plot = go.Figure()
-    supports_overlays = True
-    if x_axis_radiogroup == "score_vs_sensitivity":
-        sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
-            selected_scenario,
-            top_n_scores,
-            oldest_datetime,
-        )
-        if not sensitivities_vs_runs:
-            logger.warning(
-                "No scenario data found for (%s) for date range: %s",
-                selected_scenario,
-                oldest_datetime,
-            )
-            dash_logger.warning("No scenario data for the given date range.")
-            return (
-                _empty_plot_json(
-                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
-                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
-                ),
-                no_update,
-            )
-
-        rank_data = None
-        if selected_playlist:
-            rank_data = get_rank_data_from_playlist_code(
-                selected_playlist, selected_scenario
-            )
-
-        plot = generate_sensitivity_plot(
-            sensitivities_vs_runs,
-            selected_scenario,
-            rank_overlay_switch,
-            rank_data,
-        )
-    elif x_axis_radiogroup == "score_vs_time":
-        time_vs_runs = get_time_vs_runs(
-            selected_scenario,
-            top_n_scores,
-            oldest_datetime,
-        )
-        if not time_vs_runs:
-            logger.warning(
-                "No scenario data found for (%s) for date range: %s",
-                selected_scenario,
-                oldest_datetime,
-            )
-            dash_logger.warning("No scenario data for the given date range.")
-            return (
-                _empty_plot_json(
-                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
-                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
-                ),
-                no_update,
-            )
-
-        rank_data = None
-        if selected_playlist:
-            rank_data = get_rank_data_from_playlist_code(
-                selected_playlist, selected_scenario
-            )
-
-        plot = generate_time_plot(
-            time_vs_runs,
-            selected_scenario,
-            rank_overlay_switch,
-            rank_data,
-        )
-    else:
-        logger.error("Unsupported radio option: %s", x_axis_radiogroup)
-        supports_overlays = False
-        plot = generate_empty_plot(
-            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
-            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
-        )
+    plot, supports_overlays = _build_scenario_figure(
+        x_axis_radiogroup,
+        selected_scenario,
+        top_n_scores,
+        oldest_datetime,
+        rank_overlay_switch,
+        selected_playlist,
+    )
 
     notifications = no_update
     if supports_overlays:
