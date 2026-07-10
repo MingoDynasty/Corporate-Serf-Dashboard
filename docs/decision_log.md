@@ -60,12 +60,18 @@ these stores (for example runtime playlist reload or a background recompute);
 a move to free-threaded (no-GIL) CPython, which weakens the per-bytecode
 atomicity and pure-Python `sortedcontainers` invariants this acceptance leans
 on. Resolving events (the problem dissolves as a side effect): a SQLite
-migration — which must be file-backed with WAL to actually resolve it, because
-a `:memory:` database is per-connection under Python's `sqlite3` (threads
-would each see a separate empty database), WAL does not support in-memory
-databases, and shared-cache mode is quirky and semi-deprecated — or an ingest
-rework undertaken for other reasons, which should then adopt the single-writer
-design. Run History adds more reader iteration over `run_database` but no
+migration, or an ingest rework undertaken for other reasons (which should then
+adopt the single-writer design). For the SQLite path, file-backed WAL is the
+chosen shape — a design choice, not the only technically viable one. In-memory
+variants can be shared across threads (a single serialized connection via
+`check_same_thread=False`, or one shared database via `cache=shared` or SQLite
+3.36+'s `memdb` VFS), while a naive connection-per-thread `:memory:` setup
+silently gives each thread a separate empty database. The shared variants are
+rejected because WAL does not support in-memory databases, so each of them
+forfeits concurrent snapshot-isolated readers and reintroduces reader-writer
+serialization or a discouraged mode; file-backed is also the only shape that
+serves the persistence and startup-scan justifications that would motivate the
+migration in the first place. Run History adds more reader iteration over `run_database` but no
 writers; it stays within this acceptance. New readers that iterate a shared
 store dict should follow the established snapshot pattern — one C-level
 `list()` call before iterating (see `get_scenario_stats_snapshot`). That

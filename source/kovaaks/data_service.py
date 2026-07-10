@@ -49,8 +49,8 @@ logger = logging.getLogger(__name__)
 # writer, and raced reads self-heal on re-render (the home page's polling
 # tick, or the next interaction on pages without a data-driving interval).
 # See the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
-# docs/decision_log.md for the revisit triggers and why an eventual SQLite
-# migration must be file-backed (WAL), not in-memory.
+# docs/decision_log.md for the revisit triggers and why file-backed (WAL) is
+# the chosen shape for an eventual SQLite migration.
 kovaaks_database: dict = {}
 
 run_database: SortedList = SortedList(
