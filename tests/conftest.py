@@ -14,6 +14,7 @@ def test_config(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     """Provide deterministic config without touching the user's config file."""
     repo_root = Path(__file__).resolve().parents[1]
     stats_dir = repo_root / "tests" / "fixtures" / "stats"
+    stats_dir.mkdir(parents=True, exist_ok=True)
     config = ConfigData(
         stats_dir=str(stats_dir),
         polling_interval=1000,
