@@ -20,12 +20,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Refactors
 
-### Linear search to binary search for nth-place score
-
-`source/my_watchdog/file_watchdog.py` has a `TODO` in the run processing path indicating that the nth-place score is calculated via linear search. It could be optimized to binary search since the data is sorted.
-
-Low priority: runs are processed one at a time and the data sets are not large enough for the current approach to be a performance problem.
-
 ### Duplicated plot-building logic
 
 `generate_sensitivity_plot` and `generate_time_plot` in
