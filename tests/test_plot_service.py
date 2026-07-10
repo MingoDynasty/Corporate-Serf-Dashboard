@@ -86,3 +86,22 @@ def test_generate_time_plot_has_expected_traces() -> None:
     assert len(fig.data) == 2
     assert fig.data[0].name == "Run Data Point"
     assert fig.data[1].name == "Average Score"
+
+
+def test_scatter_x_locks_sensitivity_vs_time_asymmetry() -> None:
+    # The sensitivity scatter's per-point x is derived from the run
+    # ("<horizontal_sens> <sens_scale>"), not the grouping dict key -- so a key
+    # that differs from that string still yields the run-derived x value.
+    sens_data = {
+        "group-key-not-the-scatter-x": [
+            _build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0)),
+        ],
+    }
+    sens_fig = generate_sensitivity_plot(sens_data, "1w4ts", False, [])
+    assert tuple(sens_fig.data[0].x) == ("2.0 Overwatch",)
+
+    # The time scatter's per-point x is the grouping dict key (the date) itself.
+    day = datetime(2025, 1, 1).date()
+    time_data = {day: [_build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))]}
+    time_fig = generate_time_plot(time_data, "1w4ts", False, [])
+    assert tuple(time_fig.data[0].x) == (day,)

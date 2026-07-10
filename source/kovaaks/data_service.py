@@ -8,7 +8,7 @@ import re
 import threading
 import time
 from collections import Counter, deque
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import numpy as np
@@ -291,13 +291,13 @@ def get_time_vs_runs(
     scenario_name: str,
     top_n_scores: int,
     oldest_date: datetime,
-) -> dict[str, list[RunData]]:
+) -> dict[date, list[RunData]]:
     """Group a scenario's top runs by date within the selected time range."""
     # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
     #  Besides, this logic might get blown away if/when we migrate to SQLite.
 
     # 1. Build a dictionary with <Date, [RunData]>
-    data: dict[str, list[RunData]] = {}
+    data: dict[date, list[RunData]] = {}
     for run_data in kovaaks_database[scenario_name]["time_vs_runs"]:
         if run_data.datetime_object < oldest_date:
             continue

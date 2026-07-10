@@ -3,7 +3,10 @@ This module handles functions around plots.
 """
 
 import logging
-from datetime import datetime
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import date, datetime
+from typing import Generic, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -14,6 +17,8 @@ from source.kovaaks.data_models import Rank, RunData
 from source.utilities.utilities import format_decimal
 
 logger = logging.getLogger(__name__)
+
+_K = TypeVar("_K")
 
 
 def generate_empty_plot(title: str, message: str) -> go.Figure:
@@ -72,6 +77,174 @@ def add_score_threshold_overlay(figure: go.Figure, score_threshold: float) -> go
     return figure
 
 
+def _add_rank_overlays(
+    figure: go.Figure,
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    scores: list[float],
+) -> None:
+    """Overlay rank threshold lines spanning the plotted score range."""
+    if not (rank_overlay_switch and rank_data):
+        return
+
+    # Get the highest rank that is still below our lowest score
+    idx_lowest_rank = 0
+    for idx in range(1, len(rank_data)):
+        if rank_data[idx].threshold >= float(min(scores)):
+            break
+        idx_lowest_rank = idx
+
+    # Get the lowest rank that is still above our highest score
+    idx_highest_rank = len(rank_data) - 1
+    for idx in range(len(rank_data) - 2, -1, -1):
+        if rank_data[idx].threshold <= float(max(scores)):
+            break
+        idx_highest_rank = idx
+
+    # Show the ranks between "highest rank below min_score" and "lowest rank above max_score"
+    for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
+        figure.add_hline(
+            name=rank.name,
+            annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
+            y=rank.threshold,
+            line_dash="dash",
+            line_color=rank.color,
+        )
+
+
+@dataclass(frozen=True)
+class _AxisDescriptor(Generic[_K]):
+    """Per-axis configuration for the shared scatter/line plot builder.
+
+    ``_K`` is the type of the ``scenario_data`` grouping key, so the x-value
+    extractors stay honest per plot: sensitivity groups by ``str``, time groups
+    by ``datetime.date``.
+
+    :param axis_title: label for the x column, axis, and dataframe key.
+    :param empty_message: empty-state message shown when there is no data.
+    :param scatter_x: per-run x value from the ``(dict key, run)`` pair.
+    :param line_x: per-group x value from the dict key.
+    :param hover_x_label: hovertemplate fragment for the x value.
+    """
+
+    axis_title: str
+    empty_message: str
+    scatter_x: Callable[[_K, RunData], float | str | date]
+    line_x: Callable[[_K], float | str | date]
+    hover_x_label: str
+
+
+def _generate_xy_plot(
+    scenario_data: dict[_K, list[RunData]],
+    scenario_name: str,
+    rank_overlay_switch: bool,
+    rank_data: list[Rank],
+    axis: _AxisDescriptor[_K],
+) -> go.Figure:
+    """
+    Build a scatter-plus-average-line score plot against a configurable x axis.
+
+    :param scenario_data: the scenario data to use for the plot.
+    :param scenario_name: the name of the scenario to use for the plot.
+    :param rank_overlay_switch: enable/disable rank overlay.
+    :param rank_data: an optional list of ranks to plot.
+    :param axis: descriptor for the x column, values, and hover label.
+    :return: go.Figure Plot
+    """
+    if not scenario_data:
+        return generate_empty_plot(
+            "No runs to plot",
+            axis.empty_message,
+        )
+
+    axis_title = axis.axis_title
+    hover_x_label = axis.hover_x_label
+    scores: list[float] = []
+    scatter_plot_data: dict[str, list[float | str | date]] = {
+        "Score": [],
+        axis_title: [],
+        "Datetime": [],
+        "Accuracy": [],
+    }
+    line_plot_data: dict[str, list[float | str | date]] = {
+        "Score": [],
+        axis_title: [],
+    }
+
+    for key, runs_data in scenario_data.items():
+        for run_data in runs_data:
+            scores.append(run_data.score)
+            scatter_plot_data["Score"].append(run_data.score)
+            scatter_plot_data[axis_title].append(axis.scatter_x(key, run_data))
+            scatter_plot_data["Datetime"].append(
+                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p"),
+            )
+            scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
+        line_plot_data[axis_title].append(axis.line_x(key))
+        line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
+    # If we want to generate a trendline (e.g. lowess)
+    # if len(data.keys()) <= 2:
+    #     # We need at least 3 sensitivities to generate a trendline
+    #     logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
+    #     return
+
+    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+    title = f"{scenario_name} (updated: {current_datetime!s})"
+    logger.debug("Generating plot for: %s", scenario_name)
+
+    figure_scatter = px.scatter(
+        data_frame=pd.DataFrame(scatter_plot_data),
+        x=axis_title,
+        y="Score",
+        hover_name="Datetime",
+        hover_data=["Datetime"],
+        custom_data=["Datetime", "Accuracy"],
+    )
+    figure_scatter.update_traces(
+        hovertemplate="<b>%{customdata[0]}</b><br><br>"
+        + "<b>Score</b>: %{y}<br>"
+        + f"{hover_x_label}<br>"
+        + "<b>Accuracy</b>: %{customdata[1]}%"
+        + "<extra></extra>",
+        hoverlabel={"font_size": 16},
+    )
+
+    # trendline="lowess"  # simply using average line for now
+    figure_line = px.line(
+        data_frame=pd.DataFrame(line_plot_data),
+        x=axis_title,
+        y="Score",
+    )
+    figure_line.update_traces(
+        hovertemplate="<b>Average Score</b>: %{y}<br>"
+        + hover_x_label
+        + "<extra></extra>",
+        hoverlabel={"font_size": 16},
+    )
+
+    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
+    figure_combined.update_layout(
+        title=title,
+        xaxis={"title": axis_title},
+        yaxis={"title": "Score"},
+        font={
+            "size": 14,
+        },
+    )
+    figure_combined["data"][0]["name"] = "Run Data Point"
+    figure_combined["data"][0]["showlegend"] = True
+    figure_combined["data"][1]["name"] = "Average Score"
+    figure_combined["data"][1]["showlegend"] = True
+
+    _add_rank_overlays(
+        figure_combined,
+        rank_overlay_switch,
+        rank_data,
+        scores,
+    )
+    return figure_combined
+
+
 def generate_sensitivity_plot(
     scenario_data: dict[str, list[RunData]],
     scenario_name: str,
@@ -86,118 +259,23 @@ def generate_sensitivity_plot(
     :param rank_data: an optional list of ranks to plot.
     :return: go.Figure Plot
     """
-    if not scenario_data:
-        return generate_empty_plot(
-            "No runs to plot",
-            "No sensitivity data is available for this scenario yet.",
-        )
-
-    scatter_plot_data: dict[str, list[float | str]] = {
-        "Score": [],
-        "Sensitivity": [],
-        "Datetime": [],
-        "Accuracy": [],
-    }
-    line_plot_data: dict[str, list[float | str]] = {
-        "Score": [],
-        "Sensitivity": [],
-    }
-
-    for sens, runs_data in scenario_data.items():
-        for run_data in runs_data:
-            scatter_plot_data["Score"].append(run_data.score)
-            scatter_plot_data["Sensitivity"].append(
-                f"{run_data.horizontal_sens} {run_data.sens_scale}",
-            )
-            scatter_plot_data["Datetime"].append(
-                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p"),
-            )
-            scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
-        line_plot_data["Sensitivity"].append(sens)
-        line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
-    # If we want to generate a trendline (e.g. lowess)
-    # if len(data.keys()) <= 2:
-    #     # We need at least 3 sensitivities to generate a trendline
-    #     logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-    #     return
-
-    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
-    title = f"{scenario_name} (updated: {current_datetime!s})"
-    logger.debug("Generating plot for: %s", scenario_name)
-
-    figure_scatter = px.scatter(
-        data_frame=pd.DataFrame(scatter_plot_data),
-        x="Sensitivity",
-        y="Score",
-        hover_name="Datetime",
-        hover_data=["Datetime"],
-        custom_data=["Datetime", "Accuracy"],
+    return _generate_xy_plot(
+        scenario_data,
+        scenario_name,
+        rank_overlay_switch,
+        rank_data,
+        _AxisDescriptor[str](
+            axis_title="Sensitivity",
+            empty_message="No sensitivity data is available for this scenario yet.",
+            scatter_x=lambda _key, run: f"{run.horizontal_sens} {run.sens_scale}",
+            line_x=lambda key: key,
+            hover_x_label="<b>Sensitivity</b>: %{x}",
+        ),
     )
-    figure_scatter.update_traces(
-        hovertemplate="<b>%{customdata[0]}</b><br><br>"
-        + "<b>Score</b>: %{y}<br>"
-        + "<b>Sensitivity</b>: %{x}<br>"
-        + "<b>Accuracy</b>: %{customdata[1]}%"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    # trendline="lowess"  # simply using average line for now
-    figure_line = px.line(
-        data_frame=pd.DataFrame(line_plot_data),
-        x="Sensitivity",
-        y="Score",
-    )
-    figure_line.update_traces(
-        hovertemplate="<b>Average Score</b>: %{y}<br>"
-        + "<b>Sensitivity</b>: %{x}"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
-    figure_combined.update_layout(
-        title=title,
-        xaxis={"title": "Sensitivity"},
-        yaxis={"title": "Score"},
-        font={
-            "size": 14,
-        },
-    )
-    figure_combined["data"][0]["name"] = "Run Data Point"
-    figure_combined["data"][0]["showlegend"] = True
-    figure_combined["data"][1]["name"] = "Average Score"
-    figure_combined["data"][1]["showlegend"] = True
-
-    if rank_overlay_switch and rank_data:
-        # Get the highest rank that is still below our lowest score
-        idx_lowest_rank = 0
-        for idx in range(1, len(rank_data)):
-            if rank_data[idx].threshold >= float(min(scatter_plot_data["Score"])):
-                break
-            idx_lowest_rank = idx
-
-        # Get the lowest rank that is still above our highest score
-        idx_highest_rank = len(rank_data) - 1
-        for idx in range(len(rank_data) - 2, -1, -1):
-            if rank_data[idx].threshold <= float(max(scatter_plot_data["Score"])):
-                break
-            idx_highest_rank = idx
-
-        # Show the ranks between "highest rank below min_score" and "lowest rank above max_score"
-        for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
-            figure_combined.add_hline(
-                name=rank.name,
-                annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
-                y=rank.threshold,
-                line_dash="dash",
-                line_color=rank.color,
-            )
-    return figure_combined
 
 
 def generate_time_plot(
-    scenario_data: dict[str, list[RunData]],
+    scenario_data: dict[date, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
@@ -210,112 +288,19 @@ def generate_time_plot(
     :param rank_data: an optional list of ranks to plot.
     :return: go.Figure Plot
     """
-    if not scenario_data:
-        return generate_empty_plot(
-            "No runs to plot",
-            "No score history is available for this scenario yet.",
-        )
-
-    scatter_plot_data: dict[str, list[float | str]] = {
-        "Score": [],
-        "Date": [],
-        "Datetime": [],
-        "Accuracy": [],
-    }
-    line_plot_data: dict[str, list[float | str]] = {
-        "Score": [],
-        "Date": [],
-    }
-
-    for date_obj, runs_data in scenario_data.items():
-        for run_data in runs_data:
-            scatter_plot_data["Score"].append(run_data.score)
-            scatter_plot_data["Date"].append(date_obj)
-            scatter_plot_data["Datetime"].append(
-                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p"),
-            )
-            scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
-        line_plot_data["Date"].append(date_obj)
-        line_plot_data["Score"].append(float(np.mean([rd.score for rd in runs_data])))
-    # If we want to generate a trendline (e.g. lowess)
-    # if len(data.keys()) <= 2:
-    #     # We need at least 3 sensitivities to generate a trendline
-    #     logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
-    #     return
-
-    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
-    title = f"{scenario_name} (updated: {current_datetime!s})"
-    logger.debug("Generating plot for: %s", scenario_name)
-
-    figure_scatter = px.scatter(
-        data_frame=pd.DataFrame(scatter_plot_data),
-        x="Date",
-        y="Score",
-        hover_name="Datetime",
-        hover_data=["Datetime"],
-        custom_data=["Datetime", "Accuracy"],
+    return _generate_xy_plot(
+        scenario_data,
+        scenario_name,
+        rank_overlay_switch,
+        rank_data,
+        _AxisDescriptor[date](
+            axis_title="Date",
+            empty_message="No score history is available for this scenario yet.",
+            scatter_x=lambda key, _run: key,
+            line_x=lambda key: key,
+            hover_x_label="<b>Date</b>: %{x}",
+        ),
     )
-    figure_scatter.update_traces(
-        hovertemplate="<b>%{customdata[0]}</b><br><br>"
-        + "<b>Score</b>: %{y}<br>"
-        + "<b>Date</b>: %{x}<br>"
-        + "<b>Accuracy</b>: %{customdata[1]}%"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    # trendline="lowess"  # simply using average line for now
-    figure_line = px.line(
-        data_frame=pd.DataFrame(line_plot_data),
-        x="Date",
-        y="Score",
-    )
-    figure_line.update_traces(
-        hovertemplate="<b>Average Score</b>: %{y}<br>"
-        + "<b>Date</b>: %{x}"
-        + "<extra></extra>",
-        hoverlabel={"font_size": 16},
-    )
-
-    figure_combined = go.Figure(data=figure_scatter.data + figure_line.data)
-    figure_combined.update_layout(
-        title=title,
-        xaxis={"title": "Date"},
-        yaxis={"title": "Score"},
-        font={
-            "size": 14,
-        },
-    )
-    figure_combined["data"][0]["name"] = "Run Data Point"
-    figure_combined["data"][0]["showlegend"] = True
-    figure_combined["data"][1]["name"] = "Average Score"
-    figure_combined["data"][1]["showlegend"] = True
-
-    if rank_overlay_switch and rank_data:
-        # Get the highest rank that is still below our lowest score
-        idx_lowest_rank = 0
-        for idx in range(1, len(rank_data)):
-            if rank_data[idx].threshold >= float(min(scatter_plot_data["Score"])):
-                break
-            idx_lowest_rank = idx
-
-        # Get the lowest rank that is still above our highest score
-        idx_highest_rank = len(rank_data) - 1
-        for idx in range(len(rank_data) - 2, -1, -1):
-            if rank_data[idx].threshold <= float(max(scatter_plot_data["Score"])):
-                break
-            idx_highest_rank = idx
-
-        # Show the ranks between "highest rank below min_score" and "lowest rank above max_score"
-        for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
-            figure_combined.add_hline(
-                name=rank.name,
-                annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
-                y=rank.threshold,
-                line_dash="dash",
-                line_color=rank.color,
-            )
-    return figure_combined
 
 
 def apply_light_dark_mode(figure: go.Figure, color_scheme: str) -> go.Figure:

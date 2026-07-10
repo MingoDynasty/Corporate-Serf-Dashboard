@@ -20,13 +20,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Refactors
 
-### Duplicated plot-building logic
-
-`generate_sensitivity_plot` and `generate_time_plot` in
-`source/plot/plot_service.py` share most of their structure (empty-data guard,
-scatter+line traces, hover templates, legend setup, rank overlays). A shared
-helper taking axis descriptors would remove the duplication.
-
 ## Tooling
 
 ### Single-command local quality gate
