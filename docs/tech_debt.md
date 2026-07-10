@@ -14,7 +14,14 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-*(none currently tracked)*
+### Navbar title color uses a font-family CSS variable
+
+`source/app_shell.py` (~line 160) styles the navbar title anchor with
+`"color": "var(--mantine-font-family-headings)"` — a font-family variable used
+as a color value, so the declaration is invalid CSS and silently ignored.
+Likely a copy-paste slip for a `--mantine-color-*` variable. Decide the
+intended color and fix, or drop the style if the inherited color is already
+right.
 
 ## Code Smells
 
