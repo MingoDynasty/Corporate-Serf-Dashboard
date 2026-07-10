@@ -64,7 +64,8 @@
     flex-shrink: 0;
 }
 
-.playlist-scenarios-grid.ag-theme-quartz {
+.playlist-scenarios-grid.ag-theme-quartz,
+.playlist-overview-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-body);
     --ag-border-color: var(--mantine-color-gray-3);
     --ag-font-family: var(--mantine-font-family);
@@ -77,11 +78,56 @@
     --ag-wrapper-border-radius: var(--mantine-radius-sm);
 }
 
-.playlist-scenarios-grid .ag-header-cell-text {
+.playlist-scenarios-grid .ag-header-cell-text,
+.playlist-overview-grid .ag-header-cell-text {
     font-weight: bold;
 }
 
-:root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz {
+/* Overview rows are full-row navigation targets (routes decision 2026-07-03:
+   visible click affordances). Hover tint comes from --ag-row-hover-color. */
+.playlist-overview-grid .ag-row {
+    cursor: pointer;
+}
+
+/* The overview's Last Played tooltip is two lines (exact time + stalest
+   scenario); pre-line renders the \n the tooltip getter emits. */
+.playlist-overview-grid .ag-tooltip {
+    white-space: pre-line;
+}
+
+/* Benchmark/Playlist pill in the overview's Type column (TypeBadge renderer
+   in dashAgGridComponentFunctions.js). */
+.type-badge {
+    border-radius: var(--mantine-radius-xl);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 0.15em 0.7em;
+    text-transform: uppercase;
+}
+
+.type-badge-benchmark {
+    background-color: var(--mantine-color-blue-0);
+    color: var(--mantine-color-blue-9);
+}
+
+.type-badge-playlist {
+    background-color: var(--mantine-color-gray-1);
+    color: var(--mantine-color-gray-7);
+}
+
+:root[data-mantine-color-scheme="dark"] .type-badge-benchmark {
+    background-color: var(--mantine-color-blue-9);
+    color: var(--mantine-color-blue-1);
+}
+
+:root[data-mantine-color-scheme="dark"] .type-badge-playlist {
+    background-color: var(--mantine-color-dark-5);
+    color: var(--mantine-color-dark-0);
+}
+
+:root[data-mantine-color-scheme="dark"] .playlist-scenarios-grid.ag-theme-quartz,
+:root[data-mantine-color-scheme="dark"] .playlist-overview-grid.ag-theme-quartz {
     --ag-background-color: var(--mantine-color-dark-7);
     --ag-border-color: var(--mantine-color-dark-4);
     --ag-foreground-color: var(--mantine-color-dark-0);

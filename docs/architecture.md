@@ -183,7 +183,11 @@ flowchart LR
   settings modal, playlist import. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
-- `playlists.py` (`/playlists`) — playlist picker that routes to a playlist.
+- `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
+  per loaded playlist with coverage, runs, last-played, and cached-percentile
+  aggregates; any cell click navigates to that playlist's scenario table. Row
+  data comes from local run data and rank caches only — this page never
+  triggers KovaaK's API calls.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by mounted route
   state, not the selector directly (see decision log).
@@ -205,8 +209,13 @@ flowchart LR
   bounded `schedule_rank_freshness_refresh` Timer poll. UI consumes
   `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.
-- `playlist_scenarios_service.py` — builds rows for the playlist overview table
-  (`build_playlist_scenario_rank_rows`), merging local stats with rank info.
+- `playlist_scenarios_service.py` — builds rows for the per-playlist scenario
+  table (`build_playlist_scenario_rank_rows`), merging local stats with rank
+  info.
+- `playlist_overview_service.py` — builds rows for the playlist-level overview
+  (`build_playlist_overview_rows`): per-playlist aggregates over local stats
+  plus cache-only rank reads (`get_scenario_rank_info` with
+  `allow_network=False`).
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
   `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -231,10 +240,10 @@ flowchart LR
 
 ### Browser assets
 - `assets/dashAgGridFunctions.js` — repo-owned client-side AG Grid functions
-  (e.g. `nullsLastComparator` for NULLS-LAST sorting). The playlist overview grid
-  references these from its column defs and runs with `dangerously_allow_code=True`
-  in `playlist_scenarios.py`. Custom grid sort/format behavior belongs here — see
-  the decision log.
+  (e.g. `nullsLastComparator` for NULLS-LAST sorting). Both playlist grids
+  (`playlists.py`, `playlist_scenarios.py`) reference these from their column
+  defs and run with `dangerously_allow_code=True`. Custom grid sort/format
+  behavior belongs here — see the decision log.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
 
 ## Where to look first
@@ -245,7 +254,8 @@ flowchart LR
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Any plot/figure | `plot/plot_service.py` |
-| The playlist overview table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
 | Config / settings | `config/config_service.py` (+ `example.toml`) |

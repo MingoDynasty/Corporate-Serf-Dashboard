@@ -26,15 +26,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 Low priority: runs are processed one at a time and the data sets are not large enough for the current approach to be a performance problem.
 
-### Unsynchronized shared in-memory stores
-
-The watchdog observer thread writes `kovaaks_database` and `run_database`
-(module globals in `source/kovaaks/data_service.py`) while Dash callbacks read
-them from server threads, with no lock. `message_queue` is a `deque` (its
-append/popleft are atomic), but the stores themselves have no synchronization.
-Fine in practice for a single local user; worth a lock or a serialized writer
-if corruption is ever observed or the write paths grow.
-
 ### Duplicated plot-building logic
 
 `generate_sensitivity_plot` and `generate_time_plot` in

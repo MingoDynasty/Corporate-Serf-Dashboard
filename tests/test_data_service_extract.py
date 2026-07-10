@@ -4,7 +4,7 @@ from pathlib import Path
 from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import RunData, ScenarioStats
 
 extract_data_from_file = data_service.extract_data_from_file
 
@@ -30,6 +30,66 @@ def _write_stats_file(file_path: Path, sub_csv_row: str) -> None:
         ),
         encoding="utf-8",
     )
+
+
+def test_load_csv_replaces_scenario_stats_object(monkeypatch) -> None:
+    first_run = RunData(
+        datetime_object=datetime(2026, 7, 1, 12, 0, 0),
+        score=100,
+        sens_scale="cm/360",
+        horizontal_sens=40,
+        scenario="1w4ts",
+        accuracy=0.5,
+    )
+    second_run = RunData(
+        datetime_object=datetime(2026, 7, 2, 12, 0, 0),
+        score=150,
+        sens_scale="cm/360",
+        horizontal_sens=40,
+        scenario="1w4ts",
+        accuracy=0.6,
+    )
+    runs = iter([first_run, second_run])
+    monkeypatch.setattr(data_service, "extract_data_from_file", lambda _f: next(runs))
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service,
+        "run_database",
+        SortedList(key=lambda run: run.datetime_object),
+    )
+
+    assert data_service.load_csv_file_into_database("first.csv")
+    stats_before = data_service.get_scenario_stats("1w4ts")
+
+    assert data_service.load_csv_file_into_database("second.csv")
+    stats_after = data_service.get_scenario_stats("1w4ts")
+
+    # Concurrent readers bind the stats object once; updates must replace it
+    # so a bound object never shows a torn mid-update field combination.
+    assert stats_after is not stats_before
+    assert stats_before.number_of_runs == 1
+    assert stats_before.high_score == 100
+    assert stats_after.number_of_runs == 2
+    assert stats_after.high_score == 150
+    assert stats_after.date_last_played == datetime(2026, 7, 2, 12, 0, 0)
+
+
+def test_get_scenario_stats_snapshot_maps_every_scenario(monkeypatch) -> None:
+    stats = ScenarioStats(
+        date_last_played=datetime(2026, 7, 1, 12, 0, 0),
+        number_of_runs=3,
+        high_score=500,
+    )
+    monkeypatch.setattr(
+        data_service,
+        "kovaaks_database",
+        {"1w4ts": {"scenario_stats": stats}},
+    )
+
+    snapshot = data_service.get_scenario_stats_snapshot()
+
+    assert snapshot == {"1w4ts": stats}
+    assert snapshot["1w4ts"] is stats
 
 
 def test_extract_data_from_file_parses_valid_file() -> None:
