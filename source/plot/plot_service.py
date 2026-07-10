@@ -5,7 +5,8 @@ This module handles functions around plots.
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
+from typing import Generic, TypeVar
 
 import numpy as np
 import pandas as pd
@@ -16,6 +17,8 @@ from source.kovaaks.data_models import Rank, RunData
 from source.utilities.utilities import format_decimal
 
 logger = logging.getLogger(__name__)
+
+_K = TypeVar("_K")
 
 
 def generate_empty_plot(title: str, message: str) -> go.Figure:
@@ -78,7 +81,7 @@ def _add_rank_overlays(
     figure: go.Figure,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
-    scores: list[float | str],
+    scores: list[float],
 ) -> None:
     """Overlay rank threshold lines spanning the plotted score range."""
     if not (rank_overlay_switch and rank_data):
@@ -110,8 +113,12 @@ def _add_rank_overlays(
 
 
 @dataclass(frozen=True)
-class _AxisDescriptor:
+class _AxisDescriptor(Generic[_K]):
     """Per-axis configuration for the shared scatter/line plot builder.
+
+    ``_K`` is the type of the ``scenario_data`` grouping key, so the x-value
+    extractors stay honest per plot: sensitivity groups by ``str``, time groups
+    by ``datetime.date``.
 
     :param axis_title: label for the x column, axis, and dataframe key.
     :param empty_message: empty-state message shown when there is no data.
@@ -122,17 +129,17 @@ class _AxisDescriptor:
 
     axis_title: str
     empty_message: str
-    scatter_x: Callable[[str, RunData], float | str]
-    line_x: Callable[[str], float | str]
+    scatter_x: Callable[[_K, RunData], float | str | date]
+    line_x: Callable[[_K], float | str | date]
     hover_x_label: str
 
 
 def _generate_xy_plot(
-    scenario_data: dict[str, list[RunData]],
+    scenario_data: dict[_K, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
-    axis: _AxisDescriptor,
+    axis: _AxisDescriptor[_K],
 ) -> go.Figure:
     """
     Build a scatter-plus-average-line score plot against a configurable x axis.
@@ -152,19 +159,21 @@ def _generate_xy_plot(
 
     axis_title = axis.axis_title
     hover_x_label = axis.hover_x_label
-    scatter_plot_data: dict[str, list[float | str]] = {
+    scores: list[float] = []
+    scatter_plot_data: dict[str, list[float | str | date]] = {
         "Score": [],
         axis_title: [],
         "Datetime": [],
         "Accuracy": [],
     }
-    line_plot_data: dict[str, list[float | str]] = {
+    line_plot_data: dict[str, list[float | str | date]] = {
         "Score": [],
         axis_title: [],
     }
 
     for key, runs_data in scenario_data.items():
         for run_data in runs_data:
+            scores.append(run_data.score)
             scatter_plot_data["Score"].append(run_data.score)
             scatter_plot_data[axis_title].append(axis.scatter_x(key, run_data))
             scatter_plot_data["Datetime"].append(
@@ -231,7 +240,7 @@ def _generate_xy_plot(
         figure_combined,
         rank_overlay_switch,
         rank_data,
-        scatter_plot_data["Score"],
+        scores,
     )
     return figure_combined
 
@@ -255,7 +264,7 @@ def generate_sensitivity_plot(
         scenario_name,
         rank_overlay_switch,
         rank_data,
-        _AxisDescriptor(
+        _AxisDescriptor[str](
             axis_title="Sensitivity",
             empty_message="No sensitivity data is available for this scenario yet.",
             scatter_x=lambda _key, run: f"{run.horizontal_sens} {run.sens_scale}",
@@ -266,7 +275,7 @@ def generate_sensitivity_plot(
 
 
 def generate_time_plot(
-    scenario_data: dict[str, list[RunData]],
+    scenario_data: dict[date, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
@@ -284,7 +293,7 @@ def generate_time_plot(
         scenario_name,
         rank_overlay_switch,
         rank_data,
-        _AxisDescriptor(
+        _AxisDescriptor[date](
             axis_title="Date",
             empty_message="No score history is available for this scenario yet.",
             scatter_x=lambda key, _run: key,
