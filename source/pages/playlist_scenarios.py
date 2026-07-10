@@ -11,14 +11,12 @@ from dash import (
     State,
     callback,
     clientside_callback,
-    ctx,
     dcc,
     no_update,
 )
 
 from source.kovaaks.data_service import get_playlist_by_code
 from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
-from source.pages.playlist_components import playlist_selector
 
 dash.register_page(
     __name__,
@@ -139,36 +137,20 @@ def scenario_home_href(scenario_name: str, playlist_code: str) -> str:
 
 @callback(
     Output("playlist-scenarios-location", "href"),
-    Input("playlist-scenarios-selector", "value"),
     Input("playlist-scenarios-grid", "cellClicked"),
-    State("playlist-scenarios-location", "pathname"),
     State("playlist-scenarios-code", "data"),
     prevent_initial_call=True,
 )
-def route_from_playlist_interaction(
-    playlist_code,
-    cell_clicked,
-    current_pathname,
-    current_playlist_code,
-):
-    """Navigate from playlist selector changes or scenario cell clicks."""
-    if ctx.triggered_id == "playlist-scenarios-grid":
-        if (
-            not isinstance(cell_clicked, dict)
-            or cell_clicked.get("colId") != "scenario"
-            or not isinstance(cell_clicked.get("value"), str)
-            or not current_playlist_code
-        ):
-            return no_update
-        return scenario_home_href(cell_clicked["value"], current_playlist_code)
-
-    if not playlist_code:
+def route_to_scenario_home(cell_clicked, current_playlist_code):
+    """Open the Home plot for a clicked scenario cell."""
+    if (
+        not isinstance(cell_clicked, dict)
+        or cell_clicked.get("colId") != "scenario"
+        or not isinstance(cell_clicked.get("value"), str)
+        or not current_playlist_code
+    ):
         return no_update
-
-    pathname = f"/playlists/{playlist_code}"
-    if pathname == current_pathname:
-        return no_update
-    return pathname
+    return scenario_home_href(cell_clicked["value"], current_playlist_code)
 
 
 @callback(
@@ -211,16 +193,11 @@ clientside_callback(
 
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
     """Build the per-playlist scenario table page."""
-    # Keep the raw route code for error handling, but only pass the selector a
-    # value that exists in its options list.
-    playlist = get_playlist_by_code(playlist_code) if playlist_code else None
-    playlist_selector_value = playlist_code if playlist else None
-
     return dmc.Stack(
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
             # The table load is intentionally driven by this layout-bound store
-            # instead of the URL. When the selector changes, Dash Pages first
+            # instead of the URL. When the route changes, Dash Pages first
             # navigates and rebuilds the page, then this store triggers exactly
             # one load for the new playlist.
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
@@ -229,16 +206,6 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 id="playlist-scenarios-relative-time-interval",
                 interval=30_000,
                 n_intervals=0,
-            ),
-            dmc.Group(
-                children=[
-                    playlist_selector(
-                        "playlist-scenarios-selector",
-                        value=playlist_selector_value,
-                    ),
-                ],
-                align="flex-end",
-                justify="space-between",
             ),
             dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
             dcc.Loading(
