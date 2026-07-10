@@ -1622,5 +1622,45 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRaidingMediumFaction",
+    "kovaaks_benchmark_id": 686,
+    "rank_colors": [
+      [
+        "Lemming",
+        "#C5C3F2"
+      ],
+      [
+        "Hare",
+        "#B2CBEA"
+      ],
+      [
+        "Ermine",
+        "#BAF6FC"
+      ],
+      [
+        "Penguin",
+        "#6B94DF"
+      ],
+      [
+        "Fox",
+        "#5558AA"
+      ],
+      [
+        "Mammoth",
+        "#6E3F98"
+      ],
+      [
+        "Orca",
+        "#C080E4"
+      ],
+      [
+        "Seal",
+        "#F5BDE8"
+      ]
+    ],
+    "generated_at": "2026-07-10T20:17:06.247590+00:00",
+    "generator": "benchmark_importer"
+  }
 }

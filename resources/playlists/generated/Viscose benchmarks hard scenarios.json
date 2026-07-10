@@ -1262,5 +1262,37 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsQuestingMaximumblueNightfall",
+    "kovaaks_benchmark_id": 688,
+    "rank_colors": [
+      [
+        "Wool",
+        "#F1ECEB"
+      ],
+      [
+        "Linen",
+        "#EED3CE"
+      ],
+      [
+        "Velvet",
+        "#ECA1B0"
+      ],
+      [
+        "Chiffon",
+        "#8FC7E7"
+      ],
+      [
+        "Satin",
+        "#5CA9C6"
+      ],
+      [
+        "Silk",
+        "#2E6F8A"
+      ]
+    ],
+    "generated_at": "2026-07-10T20:17:08.134068+00:00",
+    "generator": "benchmark_importer"
+  }
 }
