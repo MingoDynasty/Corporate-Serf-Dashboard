@@ -29,12 +29,13 @@ from source.kovaaks.data_models import (
 )
 from source.utilities.stopwatch import Stopwatch
 
-BUNDLED_PLAYLIST_DIRECTORY = "resources/playlists"
+# The bundled root is the full benchmark library (every committed file
+# carries rank data — CI-enforced); which of them the user sees is the
+# show/hide preference in playlist_visibility_service, not file state.
+BUNDLED_PLAYLIST_DIRECTORY = "resources/benchmarks"
 USER_PLAYLIST_DIRECTORY = "data/playlists"
-PLAYLIST_DIRECTORY = BUNDLED_PLAYLIST_DIRECTORY
 BUNDLED_PLAYLIST_DIRECTORY_PATH = Path(BUNDLED_PLAYLIST_DIRECTORY).resolve()
 USER_PLAYLIST_DIRECTORY_PATH = Path(USER_PLAYLIST_DIRECTORY).resolve()
-PLAYLIST_DIRECTORY_PATH = BUNDLED_PLAYLIST_DIRECTORY_PATH
 POSSIBLE_SUB_CSV_HEADERS = [
     # Latest CSV header
     "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # noqa: E501

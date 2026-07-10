@@ -20,9 +20,10 @@ thresholds.
    from KovaaK's, and merge the data.
 3. Write benchmark JSON to `scripts/benchmark_importer/generated/`, with
    provenance in each file and resume state in `generated/manifest.json`.
-4. Manually copy reviewed output to `resources/playlists/generated/`.
-5. Copy the benchmarks you want the app to load from there into
-   `data/playlists/`, then restart the app.
+4. Manually copy reviewed output to `resources/benchmarks/` — the app scans
+   that whole directory at startup. No per-benchmark activation copies:
+   which benchmarks the user sees is a show/hide preference managed on the
+   app's Playlists page ("Show hidden" reveals new arrivals).
 
 Run from the repository root:
 
