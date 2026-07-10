@@ -197,7 +197,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
         children=[
             dcc.Location(id="playlist-scenarios-location", refresh="callback-nav"),
             # The table load is intentionally driven by this layout-bound store
-            # instead of the URL. When the selector changes, Dash Pages first
+            # instead of the URL. When the route changes, Dash Pages first
             # navigates and rebuilds the page, then this store triggers exactly
             # one load for the new playlist.
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
