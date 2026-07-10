@@ -27,13 +27,6 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 scatter+line traces, hover templates, legend setup, rank overlays). A shared
 helper taking axis descriptors would remove the duplication.
 
-### Decompose large home-page callbacks
-
-`source/pages/home.py` callbacks mix UI wiring, query orchestration, plotting
-decisions, and notification composition. Extract pure functions (filter
-parsing, graph data preparation, notification derivation) to make them
-independently testable.
-
 ## Tooling
 
 ### Single-command local quality gate
