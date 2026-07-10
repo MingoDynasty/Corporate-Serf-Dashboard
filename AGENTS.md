@@ -47,6 +47,12 @@ Codex <codex@local>
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
   samples) goes under `ignore/` in a categorized subdirectory, never loose at
   the top level — routing table in [ignore/README.md](ignore/README.md).
+- `ignore/prompts/` is the live queue of ready-to-fire kickoff prompts. When
+  the PR that consumes a prompt merges, move the prompt to
+  `ignore/prompts/done/` as part of that PR's cleanup, so `ls ignore/prompts`
+  always answers "what's ready to start?". The `done/` corpus is the
+  house-style reference for writing new prompts; it is untracked (no git
+  history), so move — never delete.
 - Do not log every small implementation choice as a decision.
 - When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
@@ -68,6 +74,8 @@ in the same PR — do not leave it for later:
 6. Fix references to the deleted file (`rg` for the filename). The docs test
    in `tests/test_docs.py` fails on dangling relative links, so a stale
    reference breaks the pytest gate.
+7. Move the kickoff prompt the PR consumed (if one exists) from
+   `ignore/prompts/` to `ignore/prompts/done/`.
 
 ## Testing Philosophy
 
