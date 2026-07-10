@@ -64,7 +64,7 @@ def _read_shown_from_disk() -> set[str] | None:
         raw = PREFERENCES_FILE_PATH.read_text(encoding="utf-8")
     except FileNotFoundError:
         return None
-    except OSError:
+    except OSError, UnicodeDecodeError:
         logger.warning(
             "Failed to read %s; falling back to the first-run visibility seed.",
             PREFERENCES_FILE_PATH,

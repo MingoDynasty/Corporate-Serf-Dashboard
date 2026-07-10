@@ -791,10 +791,11 @@ def import_playlist(_, playlist_to_import):
         return no_update, no_update
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
-    error_message = load_playlist_from_code(playlist_to_import)
-    if not error_message:
-        # Importing is the intent to see: new playlists arrive visible.
-        show_playlist(playlist_to_import)
+    error_message, imported_code = load_playlist_from_code(playlist_to_import)
+    if not error_message and imported_code:
+        # Importing is the intent to see: new playlists arrive visible. Mark
+        # the canonical stored code, which can differ from the pasted input.
+        show_playlist(imported_code)
     if error_message:
         notification = {
             "action": "show",

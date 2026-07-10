@@ -156,8 +156,10 @@ full-library world first (see R3).
   few code paths that enumerate the whole store.
 - **R4. Plain show-list.** (Settled 2026-07-08, closing OQ-4; simplified
   from a defaults-aware design in round 3.) The preference store is one
-  list, `shown`: a playlist is visible iff its code is in it, uniformly for
-  bundled benchmarks and user playlists. Importing a playlist appends its
+  list — persisted as the `shown_playlists` key in `data/preferences.json`,
+  named descriptively since the file may host other preferences later — and
+  a playlist is visible iff its code is in it, uniformly for bundled
+  benchmarks and user playlists. Importing a playlist appends its
   code (importing *is* the intent to see); hide removes, unhide re-adds.
   First run seeds `shown` with `DEFAULT_VISIBLE_CODES` (Voltaic + Viscose)
   plus any already-loaded user-root codes, so introducing the preference
@@ -308,10 +310,10 @@ last, 2026-07-09).
   rather than a second competing tooltip surface.
 - **OQ-3. Manager surface → overview-hosted.** Settled (R12).
 - **OQ-4. Preference semantics → plain show-list.** Settled; simplified in
-  round 3 after a complexity-vs-value pass. One `shown` list; visibility is
-  set membership. The first-run seed, the accepted
-  new-defaults-arrive-hidden tradeoff (user-is-curator rationale), and the
-  defaults-aware upgrade path are specified in R4.
+  round 3 after a complexity-vs-value pass. One shown list (persisted as
+  `shown_playlists`; see R4); visibility is set membership. The first-run
+  seed, the accepted new-defaults-arrive-hidden tradeoff (user-is-curator
+  rationale), and the defaults-aware upgrade path are specified in R4.
 - **OQ-5. Terminology → "show/hide".** Settled. Nothing is functionally
   disabled — data loads, routes resolve, overlays draw — so "hide" is the
   honest verb. A favorites/star system is a third state that doesn't answer

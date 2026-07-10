@@ -124,25 +124,32 @@ def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
     assert home.flush_startup_playlist_warnings(2) is dash.no_update
 
 
-def test_import_playlist_shows_the_new_playlist(monkeypatch):
-    monkeypatch.setattr(home, "load_playlist_from_code", lambda _code: None)
+def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
+    # KovaaK's canonicalizes pasted codes; the stored code is what visibility
+    # must persist, or a non-canonical paste imports hidden once a
+    # preferences file exists.
+    monkeypatch.setattr(
+        home,
+        "load_playlist_from_code",
+        lambda _code: (None, "CanonicalCode"),
+    )
     shown = []
     monkeypatch.setattr(home, "show_playlist", shown.append)
     monkeypatch.setattr(
         home,
         "get_visible_playlist_selector_options",
-        lambda: [{"label": "New", "value": "NewCode"}],
+        lambda: [{"label": "New", "value": "CanonicalCode"}],
     )
 
-    notifications, options = home.import_playlist(1, "  NewCode  ")
+    notifications, options = home.import_playlist(1, "  canonicalcode  ")
 
-    assert shown == ["NewCode"]
-    assert options == [{"label": "New", "value": "NewCode"}]
+    assert shown == ["CanonicalCode"]
+    assert options == [{"label": "New", "value": "CanonicalCode"}]
     assert notifications[0]["color"] == "green"
 
 
 def test_import_playlist_failure_does_not_show(monkeypatch):
-    monkeypatch.setattr(home, "load_playlist_from_code", lambda _code: "boom")
+    monkeypatch.setattr(home, "load_playlist_from_code", lambda _code: ("boom", None))
     monkeypatch.setattr(
         home,
         "show_playlist",

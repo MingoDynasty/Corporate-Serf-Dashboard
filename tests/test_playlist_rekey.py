@@ -219,19 +219,22 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     )
     monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
 
-    message = data_service.load_playlist_from_code("ExistingCode")
+    message, imported_code = data_service.load_playlist_from_code("ExistingCode")
 
     assert message == (
         "Playlist code already exists: ExistingCode is already imported as "
         "Same Name (ExistingCode)."
     )
+    assert imported_code is None
     assert not user_root.exists()
     assert data_service.playlist_database == {"ExistingCode": existing}
 
     api_response.data[0].playlistName = "Same Name"
     api_response.data[0].playlistCode = "NewCode"
 
-    assert data_service.load_playlist_from_code("NewCode") is None
+    # The canonical stored code is returned even when the pasted input
+    # differs (case normalization, non-exact search matches).
+    assert data_service.load_playlist_from_code("newcode") == (None, "NewCode")
     assert set(data_service.playlist_database) == {"ExistingCode", "NewCode"}
     imported_file = user_root / "Same Name [NewCode].json"
     assert imported_file.exists()
@@ -263,9 +266,10 @@ def test_import_reports_write_failures_without_updating_database(
 
     monkeypatch.setattr(data_service, "write_playlist_data_to_file", fail_write)
 
-    message = data_service.load_playlist_from_code("LockedCode")
+    message, imported_code = data_service.load_playlist_from_code("LockedCode")
 
     assert message == "Failed to save playlist data: Locked Playlist (LockedCode)"
+    assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
 

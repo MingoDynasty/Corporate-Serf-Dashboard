@@ -92,6 +92,16 @@ def test_corrupt_file_falls_back_to_seed_and_recovers_on_write(
     )
 
 
+def test_invalid_utf8_file_falls_back_to_seed(monkeypatch, tmp_path):
+    preferences_path = _use_tmp_preferences(monkeypatch, tmp_path)
+    preferences_path.parent.mkdir(parents=True, exist_ok=True)
+    preferences_path.write_bytes(b"\xff\xfe\x00garbage")
+
+    assert visibility.get_shown_playlist_codes() == set(
+        visibility.DEFAULT_VISIBLE_CODES
+    )
+
+
 def test_non_list_shown_value_falls_back_to_seed(monkeypatch, tmp_path):
     preferences_path = _use_tmp_preferences(monkeypatch, tmp_path)
     preferences_path.parent.mkdir(parents=True, exist_ok=True)
