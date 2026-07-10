@@ -49,8 +49,9 @@ Codex <codex@local>
   the top level — routing table in [ignore/README.md](ignore/README.md).
 - `ignore/prompts/` is the live queue of ready-to-fire kickoff prompts. When
   the PR that consumes a prompt merges, move the prompt to
-  `ignore/prompts/done/` as part of that PR's cleanup, so `ls ignore/prompts`
-  always answers "what's ready to start?". The `done/` corpus is the
+  `ignore/prompts/done/` as part of that PR's cleanup, so `ls ignore/prompts/*.md`
+  always answers "what's ready to start?" (the consumed corpus stays out of the
+  way in the `done/` subdir). The `done/` corpus is the
   house-style reference for writing new prompts; it is untracked (no git
   history), so move — never delete.
 - Do not log every small implementation choice as a decision.

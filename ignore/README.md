@@ -8,7 +8,7 @@ a subdirectory — don't drop them at the top level.
 | What | Where |
 |---|---|
 | PR / proposal review handoff docs | `pr-reviews/` (`pr<num>-review.md` — the `/pr-review` skill already writes here) |
-| Kickoff / implementation prompts for agent sessions | `prompts/` — the live queue: only prompts not yet consumed by a merged PR, so `ls ignore/prompts` answers "what's ready to start?" |
+| Kickoff / implementation prompts for agent sessions | `prompts/` — the live queue: only prompts not yet consumed by a merged PR, so `ls ignore/prompts/*.md` answers "what's ready to start?" (consumed ones live in the `done/` subdir) |
 | Consumed kickoff prompts | `prompts/done/` — move a prompt here when the PR that consumes it merges. Kept as the house-style reference corpus for writing new prompts; everything here is untracked, so move, never delete |
 | One-off scripts, runners, experiments in code | `scripts/` |
 | Data samples: API responses, stats CSVs, tool test outputs | `data/` |
