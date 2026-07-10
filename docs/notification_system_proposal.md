@@ -8,6 +8,8 @@
 > Design was cross-validated: an independent cold author received only the
 > problem statement and fact inventory (no verdicts) and converged on the same
 > architecture and routing policy; its divergences were triaged and folded in.
+> A two-pass cold deep review (internal consistency, then external verification
+> against the code) completed 2026-07-10; all findings triaged and applied.
 
 ## Problem
 
@@ -36,9 +38,11 @@ all fire from `threading.Timer` daemon threads or the watchdog observer thread,
 outside any callback context, so they can never appear despite reading like
 user-facing errors.
 
-There is also a **second stacking source inside System B**: the top-N toast and
-the score-threshold toast use *different* stable ids, so a single run that
-qualifies for both fires two stacked toasts.
+System B has stacking sources of its own: the top-N toast and the
+score-threshold toast use *different* stable ids, so a single run that
+qualifies for both fires two stacked toasts — and the "Graph updated!" fallback
+fires whenever a run is not threshold-judged, *independent of top-N*, so a
+top-N run with the threshold switch off also fires two.
 
 The most visible symptom: with `kovaaks_username` unset (**the default**), an
 unset username is a *supported* state — `example.toml` says "Leave unset or
@@ -80,7 +84,7 @@ every scenario switch and every new run, and reports the result as a red
 | 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | **no (dead)** | **Delete** |
 | 10 | 🟢 New top-N score | Run makes top-N for its sensitivity | B | yes | **Merge into one run-verdict toast** (D5) + rewrite copy |
 | 11 | 🟢/🟡 Score threshold pass/fail | Threshold switch on + prior PB exists | B | yes | **Merge into one run-verdict toast** (D5) |
-| 12 | 🔵 "Graph updated!" | Run that is neither top-N nor threshold-judged | B | yes | **Remove** |
+| 12 | 🔵 "Graph updated!" | Any run not threshold-judged (co-fires with the top-N toast, which does not suppress it) | B | yes | **Remove** |
 | 13 | 🔵/🟢/🟡 Backlog run summary | Runs accrued while Home was closed | B | yes | **Keep** |
 | 14 | 🟢/🔴 Playlist import result | Import button | B | yes | **Keep** |
 | 15 | 🟡 Startup playlist warnings | Duplicate playlist codes at boot | B | yes | **Keep, make persistent** (no autoClose — fires when nobody may be looking) |
@@ -115,13 +119,17 @@ A decision rule so future notifications have an obvious home:
   feature) → **in-place UI** at the point of impact: field state, on-canvas
   empty state. Never a toast — conditions don't stop being true when the toast
   expires, and re-toasting per trigger is the noise machine being removed.
-  One exception: the Steam-ID mismatch (#3) is an actionable misconfiguration
-  with no natural field home, so it gets **one** persistent toast per app
-  session (server-side guard), not one per scenario switch.
+  Two named exceptions, both persistent conditions with no natural in-place
+  home, both surfaced once per lifecycle rather than per trigger: the Steam-ID
+  mismatch (#3) gets **one** persistent toast per app session (server-side
+  guard), not one per scenario switch; the startup playlist warnings (#15) get
+  one persistent toast batch per boot.
 - **Automatic failure** (rank fetch failing during passive navigation) → **no
   toast**; the field state conveys it. Console `logger.warning` retained.
 - **User-initiated failure** (Import, manual Refresh) → **error toast** — the
-  user asked and deserves the result.
+  user asked and deserves the result. (The routing is settled; whether the
+  manual-Refresh failure stays red or softens is the styling question in Open
+  questions.)
 - **Achievement / coaching** (run verdict) → one toast per run (D5).
 - **Diagnostic** (thread failures, timeouts with automatic fallback) →
   **console log only**.
@@ -166,7 +174,9 @@ stacked toasts (#10 + #11 have different ids). Merge them: a single per-run
 runs replace instead of stack. When both qualify, the threshold verdict is the
 headline and the top-N placement a trailing detail. A run that qualifies for
 neither emits nothing (the new plot point is the confirmation — #12 is
-removed). The backlog summary (#13) already follows this one-toast shape.
+removed). The backlog summary (#13) already follows this one-toast shape and
+**shares the `run-verdict` id**: a new live run replaces the catch-up digest,
+which is strictly staler information.
 
 ### D6. Presentation standards
 
@@ -187,13 +197,29 @@ removed). The backlog summary (#13) already follows this one-toast shape.
   - Threshold fail: title `Below threshold`, message
     `VT Pasu Rasp — 899.10, 92.9% of PB — need 95.0%. Keep grinding...`
     (the target % is included: one extra number with real motivational value).
-  - Both: title `Threshold passed`, message
+  - Both, threshold pass: title `Threshold passed`, message
     `VT Pasu Rasp — 941.20, 97.3% of PB. Also your 2nd-best at 32.0 cm/360.`
-  - Backlog: title `While you were away`, message
+  - Both, threshold fail (reachable: a top-N run below a <100% goal, or a new
+    PB below a >100% goal): title `Below threshold`, message
+    `VT Pasu Rasp — 899.10, 92.9% of PB — need 95.0%. Still your 2nd-best at
+    32.0 cm/360. Keep grinding...` The new-PB-that-fails variant keeps the
+    `Below threshold` title — the title is the verdict, and there is no PB
+    retitle (coherence note below).
+  - Backlog, judged latest run: title `While you were away`, message
     `6 new VT Pasu Rasp runs. Latest: 941.20 — 97.3% of PB, passed threshold.`
+  - Backlog, verdict-less latest run (threshold switch off, or
+    `previous_high_score=None` on a new scenario/sensitivity — no denominator
+    for % of PB): neutral color, title `While you were away`, message
+    `6 new VT Pasu Rasp runs. Latest: 941.20 at 32.0 cm/360.` (The existing
+    variant logic carries over; this is copy-only alignment.)
+  - Migrated System A survivors get titles now so PR 2 doesn't guess: #3
+    `Steam ID mismatch`, #6 `Position refresh failed`.
 
 **PB coherence note:** a new overall PB necessarily places 1st within its
-sensitivity, so the run-verdict toast already fires for every PB. The recorded
+sensitivity, so the run-verdict toast already fires for every PB that produces
+a run event on the selected scenario (with automatic scenario switching off,
+PBs on non-selected scenarios are discarded per the 2026-07-06 coalesce
+decision and get no toast — unchanged behavior). The recorded
 "no dedicated PB toast" decision (`product.md`) is therefore coherent and
 stands. Deliberately *not* retitling the 1st-place case to "New personal
 best!" — that would effectively create the PB toast the decision declined.
@@ -213,49 +239,77 @@ Grouped by file; each maps to inventory rows above.
   - `_emit_rank_messages` / `get_scenario_rank`: stop toasting on the passive
     path (#1, #2). Return the inline field states from D3 instead of bare
     `N/A`. Steam-ID mismatch (#3) becomes a once-per-session System B toast
-    (module-level seen-flag guard).
+    (module-level seen-flag guard; sound under Waitress's single-process thread
+    pool, and the stable id makes the check-and-set race benign) —
+    `get_scenario_rank` gains its own guarded `sendNotifications` output
+    (`allow_duplicate=True`) so the mismatch fires on the passive path, not
+    only on manual Refresh.
   - `refresh_rank` (#6): emit the failure via a `sendNotifications` output
     (`allow_duplicate=True`) instead of `dash_logger`.
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
+  - Drop the `get_dash_logger` import and the `dash_logger` module-global.
 - **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
   empty state where the chart renders, mirroring Home's on-canvas pattern.
+  Drop the `get_dash_logger` import and module-global.
 - **`my_watchdog/file_watchdog.py`** — delete the dead `dash_logger.error`
-  (#8); keep `logger.exception`.
+  (#8); keep `logger.exception`. Drop the `get_dash_logger` import and
+  module-global.
 - **`kovaaks/api_service.py`** — delete the three dead `dash_logger.error`
   calls in `_notify_exhaustion` / `_run_attempt` (#9); keep the `logger`
   siblings. Drop the now-unused `dash_logger` import.
 - **`docs/architecture.md`** — document the D4 rule (message_queue is the only
-  background→UI bridge; no toast calls from background threads).
-- **`pyproject.toml`** — `dash-extensions` may still be used elsewhere; only
-  drop the dependency if the logging bridge was its sole use (verify at build
-  time before removing).
+  background→UI bridge; no toast calls from background threads), and
+  remove/rewrite the `utilities/` module-map entry describing `dash_logging`
+  ("routes `logging` to on-screen Mantine notifications"), which C1 falsifies —
+  `test_docs.py` gates dangling links, not stale prose, so nothing else
+  catches it.
+- **`pyproject.toml`** — **`dash-extensions` stays**: `app.py` imports
+  `DashProxy` from `dash_extensions.enrich` (the app framework itself), so the
+  logging bridge was never its sole use. Only the
+  `NotificationsLogHandler` usage goes away.
 
 ## Build sequencing — three reviewable PRs
 
-1. **Noise kill.** Remove the #1/#2/#4/#5/#12 toasts and add the inline
-   Position-field states. Resolves the audit complaint by itself; smallest
-   reviewable unit. (The #8/#9 dead-call deletions are zero-risk and can ride
-   along or land first as an independent commit.)
+1. **Noise kill.** Remove the #1/#2/#4/#5/#12 toasts, add the inline
+   Position-field states, and add the one-time startup console INFO for the
+   unset username (R1). Touch up `product.md`'s run-notifications paragraph
+   (the "Graph updated!" description becomes false here). Resolves the audit
+   complaint by itself; smallest reviewable unit. (The #8/#9 dead-call
+   deletions are zero-risk and can ride along or land first as an independent
+   commit.)
 2. **System consolidation.** Delete System A, migrate #3 (once-per-session)
    and #6 to System B, move #7 in-page, add the `toast()` builder, document
    the D4 rule in `architecture.md`.
 3. **Copy rework.** The merged run-verdict toast (D5) and the D6 copy shapes;
-   align the backlog summary; make #15 persistent.
+   align the backlog summary (a full copy rewrite, not a no-op — see Migration
+   notes); make #15 persistent. This is the shipping PR for docs: distill this
+   file into the `decision_log.md` entry, finish the `product.md` rewrite, and
+   delete this proposal here.
 
 ## Migration notes
 
-- **Tests.** `tests/test_home_run_events.py` asserts the exact `"Graph
-  updated!"` message, the `graph-updated-notification` /
-  `new-top-n-score-notification` / `score-threshold-notification` ids, and the
-  current two-toast-per-run shape. The D5 merge and D6 copy rewrite break
-  those cases; they must be updated in the same change, and the
-  "neither top-N nor threshold" case should assert an empty notification list.
-- **Docs on ship.** `product.md` ("Run notifications" describes the "Graph
-  updated!" fallback and the current copy) and this file distill into a
-  `decision_log.md` entry; `tests/test_docs.py` fails on dangling links if
-  this file is deleted without removing references to it.
+- **Tests.** About twelve functions in `tests/test_home_run_events.py` break,
+  split across two PRs — update them in the PR that breaks them:
+  - **PR 1** (removes #12): every assertion on the `"Graph updated!"` message
+    and `graph-updated-notification` id
+    (`test_single_run_notifications_preserve_top_n_and_fallback_toasts`,
+    `test_single_run_threshold_notification_ignores_empty_percentage`,
+    `test_generate_graph_skips_threshold_features_when_percentage_is_empty`);
+    the "neither top-N nor threshold" case then asserts an empty list.
+  - **PR 3** (D5 merge + D6 copy): the `new-top-n-score-notification` /
+    `score-threshold-notification` ids and two-toast-per-run shape in the
+    remaining `test_single_run_*` cases, **and the four `test_backlog_*`
+    functions** — the backlog realignment changes the
+    `run-summary-notification` id (now `run-verdict`, D5) and rewrites the
+    exact copy those tests assert. D5's "already follows this one-toast shape"
+    refers to toast *count* only; the backlog copy and id both change.
+- **Docs on ship.** `product.md`'s "Run notifications" paragraph is touched
+  twice: PR 1 removes the "Graph updated!" description, PR 3 rewrites it for
+  the merged toast. PR 3 is the distill-and-delete PR for this file
+  (`decision_log.md` entry + deletion); `tests/test_docs.py` fails on dangling
+  links if any doc still references it then.
 - **Behavior parity.** Retiring System A loses nothing that currently renders
   except the passive rank/no-data toasts being intentionally removed; the four
   dead toasts were never visible.
