@@ -15,7 +15,7 @@ import numpy as np
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_service import (
     CACHE_REPLACE_RETRY_DELAYS_SECONDS,
     get_playlist_data,
@@ -539,7 +539,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
                 horizontal_sens = round(
                     float(str_horizontal_sens),
-                    config.sens_round_decimal_places,
+                    get_config().sens_round_decimal_places,
                 )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
@@ -693,6 +693,3 @@ def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
         finally:
             if temp_file.exists():
                 temp_file.unlink()
-
-
-load_playlists()

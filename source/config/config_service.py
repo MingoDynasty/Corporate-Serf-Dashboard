@@ -2,10 +2,9 @@
 Manages the config file for the app, and shares that data to all other modules.
 """
 
-import sys
 import tomllib
+from functools import cache
 
-from pydantic import ValidationError
 from pydantic.dataclasses import dataclass
 
 CONFIG_FILE = "config.toml"
@@ -37,8 +36,7 @@ def load_config() -> ConfigData:
     return ConfigData(**config_dict)
 
 
-try:
-    config = load_config()
-except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
-    print(CONFIG_ERROR_MESSAGE, file=sys.stderr)
-    raise SystemExit(1) from None
+@cache
+def get_config() -> ConfigData:
+    """Load and cache the application config."""
+    return load_config()

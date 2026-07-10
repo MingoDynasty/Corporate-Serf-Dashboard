@@ -4,7 +4,7 @@ import logging
 import statistics
 from datetime import datetime
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import PlaylistData, ScenarioStats
@@ -39,6 +39,7 @@ def _format_percentile_with_coverage(
 
 def _cached_rank_percentile(scenario_name: str) -> float | None:
     """Read a scenario's cached percentile without any network I/O."""
+    config = get_config()
     try:
         rank_info = get_scenario_rank_info(
             scenario_name,

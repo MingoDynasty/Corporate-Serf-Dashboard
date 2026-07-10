@@ -40,13 +40,6 @@ decisions, and notification composition. Extract pure functions (filter
 parsing, graph data preparation, notification derivation) to make them
 independently testable.
 
-### Config still loads at import time
-
-`source/config/config_service.py` runs `config = load_config()` at module
-import. Missing or invalid config now exits with a concise setup instruction,
-but loading config explicitly inside the application startup path would avoid
-module-import side effects and make startup easier to test.
-
 ## Tooling
 
 ### Single-command local quality gate

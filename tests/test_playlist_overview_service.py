@@ -15,8 +15,8 @@ RANKS = [Rank(name="Bronze", color="#a97142", threshold=100)]
 def _configure(monkeypatch):
     monkeypatch.setattr(
         playlist_overview_service,
-        "config",
-        SimpleNamespace(
+        "get_config",
+        lambda: SimpleNamespace(
             kovaaks_username="MingoDynasty",
             steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,

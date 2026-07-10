@@ -336,8 +336,8 @@ def test_interval_rank_render_is_ttl_independent_and_never_fetches(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", None)
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -373,7 +373,7 @@ def test_interval_rank_render_does_not_fetch_or_cache_unresolved_scenario(
 ):
     scenario_name = "Local Custom Scenario"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", "MingoDynasty")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", "MingoDynasty")
     api_service.make_cache()
 
     def fail_network(*_args, **_kwargs):
@@ -421,8 +421,8 @@ def test_interval_rank_render_does_not_retoast_derived_warning(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", "configured-steam-id")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", "configured-steam-id")
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -486,8 +486,8 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", None)
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
