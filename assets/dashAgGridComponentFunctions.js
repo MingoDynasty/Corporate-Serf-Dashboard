@@ -19,3 +19,14 @@ dagcomponentfuncs.TypeBadge = function (props) {
     props.value
   );
 };
+
+// Hide/Unhide action for the playlist overview's visibility column. Clicks
+// are handled server-side via the grid's cellClicked payload (colId
+// "hidden"); this renderer only draws the link-styled label.
+dagcomponentfuncs.VisibilityAction = function (props) {
+  return React.createElement(
+    "span",
+    { className: "visibility-action" },
+    props.data && props.data.hidden ? "Unhide" : "Hide"
+  );
+};

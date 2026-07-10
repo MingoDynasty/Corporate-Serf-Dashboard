@@ -32,7 +32,7 @@ def _walk_components(component):
 def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     monkeypatch.setattr(
         home,
-        "get_playlist_selector_options",
+        "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
     monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
@@ -50,7 +50,7 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
 def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     monkeypatch.setattr(
         home,
-        "get_playlist_selector_options",
+        "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
     monkeypatch.setattr(
@@ -89,7 +89,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     components = list(_walk_components(home.layout()))
@@ -124,6 +124,37 @@ def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
     assert home.flush_startup_playlist_warnings(2) is dash.no_update
 
 
+def test_import_playlist_shows_the_new_playlist(monkeypatch):
+    monkeypatch.setattr(home, "load_playlist_from_code", lambda _code: None)
+    shown = []
+    monkeypatch.setattr(home, "show_playlist", shown.append)
+    monkeypatch.setattr(
+        home,
+        "get_visible_playlist_selector_options",
+        lambda: [{"label": "New", "value": "NewCode"}],
+    )
+
+    notifications, options = home.import_playlist(1, "  NewCode  ")
+
+    assert shown == ["NewCode"]
+    assert options == [{"label": "New", "value": "NewCode"}]
+    assert notifications[0]["color"] == "green"
+
+
+def test_import_playlist_failure_does_not_show(monkeypatch):
+    monkeypatch.setattr(home, "load_playlist_from_code", lambda _code: "boom")
+    monkeypatch.setattr(
+        home,
+        "show_playlist",
+        lambda _code: pytest.fail("must not mark failed imports as shown"),
+    )
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+
+    notifications, _options = home.import_playlist(1, "BadCode")
+
+    assert notifications[0]["color"] == "red"
+
+
 def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     monkeypatch.setattr(
         home,
@@ -144,7 +175,7 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     titles = {
@@ -160,7 +191,7 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
 
 
 def test_settings_modal_controls_have_help_tooltips(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     components = {
@@ -552,7 +583,7 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     page = home.layout()

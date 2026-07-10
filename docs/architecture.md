@@ -108,6 +108,10 @@ that summary and never accesses the queue directly.
   tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
+- **User preferences** — `data/preferences.json` (not committed) holds the
+  playlist show-list (`playlist_visibility_service.py`): written atomically on
+  each show/hide, read once and cached in-process, absent until the first
+  show/hide (reads fall back to the first-run seed).
 
 ## Module map
 
@@ -138,6 +142,7 @@ flowchart LR
         ApiService["kovaaks/<br/>api_service.py"]
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
         OverviewService["kovaaks/playlist_<br/>overview_service.py"]
+        Visibility["kovaaks/playlist_<br/>visibility_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -162,10 +167,16 @@ flowchart LR
     Journey --> DataService
     Journey --> PlotService
 
+    Home --> Visibility
+    Journey --> Visibility
+    Playlists --> Visibility
+
     PlaylistService --> DataService
     PlaylistService --> ApiService
     OverviewService --> DataService
     OverviewService --> ApiService
+    OverviewService --> Visibility
+    Visibility --> DataService
     DataService --> ApiService
 
     FileWatchdog --> DataService
@@ -184,10 +195,12 @@ flowchart LR
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
-  per loaded playlist with coverage, runs, last-played, and cached-percentile
+  per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table. Row
   data comes from local run data and rank caches only — this page never
-  triggers KovaaK's API calls.
+  triggers KovaaK's API calls. Also hosts the visibility controls: a per-row
+  Hide/Unhide action cell and a "Show hidden" toggle that reveals hidden
+  playlists as muted rows.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log).
@@ -214,7 +227,14 @@ flowchart LR
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
-  `allow_network=False`).
+  `allow_network=False`), filtered by visibility unless the overview's "show
+  hidden" mode asks for everything.
+- `playlist_visibility_service.py` — per-code show/hide preferences (plain
+  show-list persisted at `data/preferences.json`, atomic writes under a module
+  lock). A missing file yields the first-run seed (bundled defaults plus
+  user-root codes) without writing. `get_visible_playlist_selector_options()`
+  is the single visibility filter every playlist option list consumes (Home
+  filter, Journey picker, overview).
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
   `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -254,6 +274,7 @@ flowchart LR
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |

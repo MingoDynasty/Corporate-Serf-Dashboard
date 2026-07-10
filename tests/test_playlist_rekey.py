@@ -93,6 +93,22 @@ def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
     assert data_service.drain_startup_playlist_warnings() == []
 
 
+def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
+    monkeypatch,
+    tmp_path,
+):
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    _write_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+    # A user copy shadowed by a bundled duplicate never wins, so it must not
+    # count as a user-root code either.
+    _write_playlist(user_root / "shadowed.json", _playlist("Shadow", "BundledCode"))
+
+    data_service.load_playlists()
+
+    assert data_service.get_user_root_playlist_codes() == {"UserCode"}
+
+
 def test_load_playlists_treats_missing_user_root_as_empty(monkeypatch, tmp_path):
     bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     playlist = _playlist("Bundled", "BundledCode")

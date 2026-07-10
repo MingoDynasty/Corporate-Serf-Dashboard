@@ -76,6 +76,13 @@ list in the roadmap.)
   a playlist," but not "*which* playlist deserves attention" — this surfaces
   stale and weak playlists at a glance and directs training focus across
   playlists, the way the scenario table already does within one.
+- **Playlist show/hide** (proposal PR 2a). Per-playlist Hide/Unhide on the
+  overview, a "Show hidden" toggle for managing hidden ones, and hiding
+  filters every playlist dropdown (Home filter, Journey picker). Hidden
+  playlists stay loaded — routes and rank overlays keep working. *Problem
+  solved:* focus — dropdowns and the overview show only the playlists you
+  care about, which is what makes shipping the full benchmark library (next
+  milestone) tolerable.
 - **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so

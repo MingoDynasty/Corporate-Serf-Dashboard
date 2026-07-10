@@ -27,7 +27,6 @@ from source.kovaaks.data_service import (
     drain_startup_playlist_warnings,
     get_high_score,
     get_playlist_by_code,
-    get_playlist_selector_options,
     get_rank_data_from_playlist_code,
     get_scenario_stats,
     get_scenarios_from_playlist_code,
@@ -36,6 +35,10 @@ from source.kovaaks.data_service import (
     get_unique_scenarios,
     is_scenario_in_database,
     load_playlist_from_code,
+)
+from source.kovaaks.playlist_visibility_service import (
+    get_visible_playlist_selector_options,
+    show_playlist,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.plot.plot_service import (
@@ -789,6 +792,9 @@ def import_playlist(_, playlist_to_import):
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message = load_playlist_from_code(playlist_to_import)
+    if not error_message:
+        # Importing is the intent to see: new playlists arrive visible.
+        show_playlist(playlist_to_import)
     if error_message:
         notification = {
             "action": "show",
@@ -807,7 +813,7 @@ def import_playlist(_, playlist_to_import):
             "id": "imported-playlist-successful-notification",
             "icon": local_icon("material-symbols:upload"),
         }
-    return [notification], get_playlist_selector_options()
+    return [notification], get_visible_playlist_selector_options()
 
 
 @callback(
@@ -905,7 +911,7 @@ def layout(
                                     checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     clearable=True,
-                                    data=get_playlist_selector_options(),
+                                    data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
                                     maxDropdownHeight="75vh",
