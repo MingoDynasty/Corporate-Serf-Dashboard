@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import dash
 
-from source.kovaaks.data_models import RunData
+from source.kovaaks.data_models import Rank, RunData
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -34,7 +34,6 @@ def test_build_scenario_figure_sensitivity_mode_builds_traces(monkeypatch):
         ],
     }
     monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: data)
-    monkeypatch.setattr(home, "get_rank_data_from_playlist_code", lambda *_: [])
 
     figure, supports_overlays = home._build_scenario_figure(
         "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, None
@@ -44,6 +43,32 @@ def test_build_scenario_figure_sensitivity_mode_builds_traces(monkeypatch):
     assert len(figure.data) == 2
     assert figure.data[0].name == "Run Data Point"
     assert figure.data[1].name == "Average Score"
+
+
+def test_build_scenario_figure_fetches_and_applies_playlist_ranks(monkeypatch):
+    data = {
+        "2.0 Overwatch": [
+            _build_run(90.0, 2.0, datetime(2025, 1, 1, 10, 0, 0)),
+            _build_run(120.0, 2.0, datetime(2025, 1, 1, 11, 0, 0)),
+        ],
+    }
+    ranks = [
+        Rank(name="Bronze", color="#aaaaaa", threshold=80),
+        Rank(name="Silver", color="#bbbbbb", threshold=110),
+        Rank(name="Gold", color="#ffcc00", threshold=150),
+    ]
+    monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: data)
+    rank_fetch = Mock(return_value=ranks)
+    monkeypatch.setattr(home, "get_rank_data_from_playlist_code", rank_fetch)
+
+    figure, supports_overlays = home._build_scenario_figure(
+        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, "playlist-code"
+    )
+
+    assert supports_overlays is True
+    rank_fetch.assert_called_once_with("playlist-code", "1w4ts")
+    # The fetched ranks reach the plot builder as rank-overlay lines.
+    assert any(shape["type"] == "line" for shape in figure.layout.shapes)
 
 
 def test_build_scenario_figure_time_mode_builds_traces(monkeypatch):
@@ -57,7 +82,6 @@ def test_build_scenario_figure_time_mode_builds_traces(monkeypatch):
         ],
     }
     monkeypatch.setattr(home, "get_time_vs_runs", lambda *_: data)
-    monkeypatch.setattr(home, "get_rank_data_from_playlist_code", lambda *_: [])
 
     figure, supports_overlays = home._build_scenario_figure(
         "score_vs_time", "1w4ts", 5, _OLDEST, False, None
