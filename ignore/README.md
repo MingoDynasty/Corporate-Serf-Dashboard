@@ -8,7 +8,7 @@ a subdirectory — don't drop them at the top level.
 | What | Where |
 |---|---|
 | PR / proposal review handoff docs | `pr-reviews/` (`pr<num>-review.md` — the `/pr-review` skill already writes here): the live queue holds only reviews still in flight, so `ls ignore/pr-reviews/*.md` answers "what's mid-review?" (merged/closed ones live in the `done/` subdir) |
-| Completed review handoff docs | `pr-reviews/done/` — move a review here once its PR is merged/closed. Keeps the top level as reviews-in-flight only; everything here is untracked, so move, never delete |
+| Completed review handoff docs | `pr-reviews/done/` — move a review here once it's no longer in flight: its PR merged/closed, or (for a proposal review) the proposal shipped or was abandoned. Keeps the top level as reviews-in-flight only; everything here is untracked, so move, never delete |
 | Kickoff / implementation prompts for agent sessions | `prompts/` — the live queue: only prompts not yet consumed by a merged PR, so `ls ignore/prompts/*.md` answers "what's ready to start?" (consumed ones live in the `done/` subdir) |
 | Consumed kickoff prompts | `prompts/done/` — move a prompt here when the PR that consumes it merges. Kept as the house-style reference corpus for writing new prompts; everything here is untracked, so move, never delete |
 | One-off scripts, runners, experiments in code | `scripts/` |
