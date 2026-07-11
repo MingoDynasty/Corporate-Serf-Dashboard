@@ -1,0 +1,480 @@
+{
+  "name": "Point Zero [Aim Academy] - Valorant S1",
+  "code": "KovaaKsBaitingMediumSniper",
+  "scenarios": [
+    {
+      "name": "1w2ts Perfected",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 97.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 102.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 105.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 116.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto TE Wide",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 3450.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets_pasu Reload",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 84.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 93.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 100.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Pasu Perfected",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 89.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 93.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 96.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 104.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetClick 20% Small",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 84.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 89.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 91.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 101.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 400% Larger",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick - Fair",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 6000.0
+        }
+      ]
+    },
+    {
+      "name": "Static Wide Reflex",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 950.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick - Mini",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Micro++ Flick",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 220.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 240.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 260.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 280.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 135.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 145.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 155.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bpes Angelic",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 85.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 95.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 100.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "FB DynMicros",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 55.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 65.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 75.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 8000.0
+        }
+      ]
+    },
+    {
+      "name": "centering I",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere 80%",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#62a3f9",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#e67cee",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#93ff75",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#fb2d2d",
+          "threshold": 10000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBaitingMediumSniper",
+    "kovaaks_benchmark_id": 2264,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#62a3f9"
+      ],
+      [
+        "Diamond",
+        "#e67cee"
+      ],
+      [
+        "Ascendant",
+        "#93ff75"
+      ],
+      [
+        "Immortal",
+        "#fb2d2d"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:38.367217+00:00",
+    "generator": "benchmark_importer"
+  }
+}

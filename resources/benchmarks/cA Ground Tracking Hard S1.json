@@ -1,0 +1,244 @@
+{
+  "name": "cA Ground Tracking Hard S1",
+  "code": "KovaaKsRoamingWhiteClip",
+  "scenarios": [
+    {
+      "name": "cA REACTIVE Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 3630.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 3930.0
+        }
+      ]
+    },
+    {
+      "name": "cA MFSI Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 12600.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 14350.0
+        }
+      ]
+    },
+    {
+      "name": "cA FBS Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 4050.0
+        }
+      ]
+    },
+    {
+      "name": "cA SLIPPERY Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 8150.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 8850.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 10250.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 10950.0
+        }
+      ]
+    },
+    {
+      "name": "cA VSS Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 13300.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 14200.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 16000.0
+        }
+      ]
+    },
+    {
+      "name": "cA FLUIDITY Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 3760.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "cA XYZ Hard S1",
+      "ranks": [
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3170.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Vapour",
+          "color": "#c4065b",
+          "threshold": 3630.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#56e4fe",
+          "threshold": 3830.0
+        },
+        {
+          "name": "Element",
+          "color": "#faa0fc",
+          "threshold": 4050.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRoamingWhiteClip",
+    "kovaaks_benchmark_id": 2534,
+    "rank_colors": [
+      [
+        "Droplets",
+        "#feeb01"
+      ],
+      [
+        "Fluid",
+        "#6f1d89"
+      ],
+      [
+        "Vapour",
+        "#c4065b"
+      ],
+      [
+        "Hydro",
+        "#56e4fe"
+      ],
+      [
+        "Element",
+        "#faa0fc"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:32.848860+00:00",
+    "generator": "benchmark_importer"
+  }
+}

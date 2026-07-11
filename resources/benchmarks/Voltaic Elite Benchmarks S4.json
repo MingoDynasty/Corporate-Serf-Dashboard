@@ -1,0 +1,598 @@
+{
+  "name": "Voltaic Elite Benchmarks S4",
+  "code": "KovaaKsCrackingSalmonCallout",
+  "scenarios": [
+    {
+      "name": "VT Pasu Rasp Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 670.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 780.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 890.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1190.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 580.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 690.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 910.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w2ts Rasp Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "VT Multiclick 180 Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1590.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1790.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1880.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1970.0
+        }
+      ]
+    },
+    {
+      "name": "VT AngleStrafe Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 760.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 870.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 980.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1280.0
+        }
+      ]
+    },
+    {
+      "name": "VT ArcStrafe Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 820.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 920.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1290.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3390.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3115.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3415.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3460.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3475.0
+        }
+      ]
+    },
+    {
+      "name": "VT PatStrafe Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3460.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3580.0
+        }
+      ]
+    },
+    {
+      "name": "VT AirStrafe Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 3535.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 3655.0
+        }
+      ]
+    },
+    {
+      "name": "VT psalmTS Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 920.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1290.0
+        }
+      ]
+    },
+    {
+      "name": "VT skyTS Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1640.0
+        }
+      ]
+    },
+    {
+      "name": "VT evaTS Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 650.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 750.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 790.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 830.0
+        }
+      ]
+    },
+    {
+      "name": "VT bounceTS Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 720.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900FF",
+          "threshold": 800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#FF2262",
+          "threshold": 880.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#24DDD8",
+          "threshold": 960.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#FFABBA",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#351C75",
+          "threshold": 1090.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrackingSalmonCallout",
+    "kovaaks_benchmark_id": 1977,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ],
+      [
+        "Ascended",
+        "#FFABBA"
+      ],
+      [
+        "Eclipse",
+        "#351C75"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:07:24.264957+00:00",
+    "generator": "benchmark_importer"
+  }
+}

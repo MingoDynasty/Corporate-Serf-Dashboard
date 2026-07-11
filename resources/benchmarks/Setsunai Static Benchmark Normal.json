@@ -1,0 +1,330 @@
+{
+  "name": "Setsunai Static Benchmark Normal",
+  "code": "KovaaKsHeadshottingAquamarineCapture",
+  "scenarios": [
+    {
+      "name": "Reflex Flick - Easy",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 6000.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick Wide - Easy",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick - Horizontal",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 25.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 35.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 45.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 55.0
+        }
+      ]
+    },
+    {
+      "name": "Wide Wall 4 Targets",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 85.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 95.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 105.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "ww2t Voltaic",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 88.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 98.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 108.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 118.0
+        }
+      ]
+    },
+    {
+      "name": "ww2t Voltaic Pokeball",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 80.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 90.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 100.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControlClickingXYZ",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 2050.0
+        }
+      ]
+    },
+    {
+      "name": "nova's 5 Sphere Hipfire",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 100.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 110.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 120.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 5 Sphere Hipfire Small",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 120.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 130.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 140.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts medium reload 30% larger",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 93.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 103.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 113.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts 30% larger",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 95.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 105.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 115.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 1w4ts Voltaic 30% Larger",
+      "ranks": [
+        {
+          "name": "Elysain",
+          "color": "#b6c9db",
+          "threshold": 90.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#30c8ec",
+          "threshold": 100.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#76c1e5",
+          "threshold": 110.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#e2bed9",
+          "threshold": 120.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHeadshottingAquamarineCapture",
+    "kovaaks_benchmark_id": 692,
+    "rank_colors": [
+      [
+        "Elysain",
+        "#b6c9db"
+      ],
+      [
+        "Ethereal",
+        "#30c8ec"
+      ],
+      [
+        "Angelic",
+        "#76c1e5"
+      ],
+      [
+        "Seraphic",
+        "#e2bed9"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:54.562224+00:00",
+    "generator": "benchmark_importer"
+  }
+}

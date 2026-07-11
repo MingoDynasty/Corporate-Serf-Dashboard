@@ -1,0 +1,1466 @@
+{
+  "name": "RXZU - VALORANT RANK ADVANCED",
+  "code": "KovaaKsCheatingJitteryCash",
+  "scenarios": [
+    {
+      "name": "Rxzu - TenZclick Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Mikruwka Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Sinichka Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - KALibri Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - DoubleShotik Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Doticlicko Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - 314Doors Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - 1WFP Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - phantomflick Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Astralis Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Smoochiez Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Wristie Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - SosiskaVAL Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - UGOL Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Zazoola Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform I Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform II Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform III Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform IV Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform V Adv",
+      "ranks": [
+        {
+          "name": "AIMSTAR",
+          "color": "#806c00",
+          "threshold": 400.0
+        },
+        {
+          "name": "ORION",
+          "color": "#ffea00",
+          "threshold": 500.0
+        },
+        {
+          "name": "VEGA",
+          "color": "#7496fb",
+          "threshold": 600.0
+        },
+        {
+          "name": "ASTARTES",
+          "color": "#007bff",
+          "threshold": 700.0
+        },
+        {
+          "name": "ANGELIC",
+          "color": "#0008ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "NOVA",
+          "color": "#5500bd",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASTRUM",
+          "color": "#a700f5",
+          "threshold": 900.0
+        },
+        {
+          "name": "PHANTOM",
+          "color": "#00fffb",
+          "threshold": 950.0
+        },
+        {
+          "name": "SUPREME",
+          "color": "#660a00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "DIVINE",
+          "color": "#e60039",
+          "threshold": 1050.0
+        },
+        {
+          "name": "DEMONIC",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "BIOMASCHINE",
+          "color": "#ff00f7",
+          "threshold": 1150.0
+        },
+        {
+          "name": "AIMBEAST",
+          "color": "#000000",
+          "threshold": 1200.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCheatingJitteryCash",
+    "kovaaks_benchmark_id": 1883,
+    "rank_colors": [
+      [
+        "AIMSTAR",
+        "#806c00"
+      ],
+      [
+        "ORION",
+        "#ffea00"
+      ],
+      [
+        "VEGA",
+        "#7496fb"
+      ],
+      [
+        "ASTARTES",
+        "#007bff"
+      ],
+      [
+        "ANGELIC",
+        "#0008ff"
+      ],
+      [
+        "NOVA",
+        "#5500bd"
+      ],
+      [
+        "ASTRUM",
+        "#a700f5"
+      ],
+      [
+        "PHANTOM",
+        "#00fffb"
+      ],
+      [
+        "SUPREME",
+        "#660a00"
+      ],
+      [
+        "DIVINE",
+        "#e60039"
+      ],
+      [
+        "DEMONIC",
+        "#ff0000"
+      ],
+      [
+        "BIOMASCHINE",
+        "#ff00f7"
+      ],
+      [
+        "AIMBEAST",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:07.151200+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -477,7 +477,10 @@ def build_scenarios(
                 )
                 for index, (rank_name, rank_color) in enumerate(evxl_rank_data)
             ]
-            scenario_list.append(Scenario(name=scenario_name, ranks=ranks))
+            # Strip the KovaaK's scenario key: CSV run import strips the
+            # `Scenario:` value, so padded names would never match run/PB/rank
+            # lookups (all exact-match) once the benchmark is unhidden.
+            scenario_list.append(Scenario(name=scenario_name.strip(), ranks=ranks))
     return scenario_list
 
 

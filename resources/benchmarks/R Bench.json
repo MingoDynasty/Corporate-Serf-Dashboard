@@ -1,0 +1,394 @@
+{
+  "name": "R Bench",
+  "code": "KovaaKsAcingFuchsiaEngine",
+  "scenarios": [
+    {
+      "name": "Close Fast Strafes Very Easy Invincible",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 17500.0
+        }
+      ]
+    },
+    {
+      "name": "Midrange Fast Strafes Easy Invincible",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 16000.0
+        }
+      ]
+    },
+    {
+      "name": "Cata IC Fast Strafes Easy Invincible",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 17000.0
+        }
+      ]
+    },
+    {
+      "name": "Centering I Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 18500.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafes Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Thin Aiming Long Invincible Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 910.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 915.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 920.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 925.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 895.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 900.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 905.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 910.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Novice",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Novice",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "KovaaKs Sandbox Intro Scenario",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Close Tappy Strafes Easy",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#6aa84f",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f1c232",
+          "threshold": 95.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#38b9ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Master",
+          "color": "#6f00ff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#ff3100",
+          "threshold": 110.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAcingFuchsiaEngine",
+    "kovaaks_benchmark_id": 929,
+    "rank_colors": [
+      [
+        "Beginner",
+        "#6aa84f"
+      ],
+      [
+        "Gold",
+        "#f1c232"
+      ],
+      [
+        "Platinum",
+        "#38b9ff"
+      ],
+      [
+        "Master",
+        "#6f00ff"
+      ],
+      [
+        "Qualified",
+        "#ff3100"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:15.412823+00:00",
+    "generator": "benchmark_importer"
+  }
+}

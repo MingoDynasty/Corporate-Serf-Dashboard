@@ -1,0 +1,353 @@
+{
+  "name": "Euphoric TacFPS Benchmarks (Novice)",
+  "code": "KovaaKsDunkingAngelicClient",
+  "scenarios": [
+    {
+      "name": "DotSwitch Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 76.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 86.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 96.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 106.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 116.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 126.0
+        }
+      ]
+    },
+    {
+      "name": "Driftshot Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 58.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 66.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 74.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 82.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "BlinkClick Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 45.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 52.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 59.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 66.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 73.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "YoxTS Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 76.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 86.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 96.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 106.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 116.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 126.0
+        }
+      ]
+    },
+    {
+      "name": "Miniclick Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 78.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 89.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 111.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 122.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 133.0
+        }
+      ]
+    },
+    {
+      "name": "Animicro Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 69.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 78.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 87.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 96.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 105.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 114.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "Nomysphere Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 3500.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDunkingAngelicClient",
+    "kovaaks_benchmark_id": 2158,
+    "rank_colors": [
+      [
+        "Copper",
+        "#E56352"
+      ],
+      [
+        "Iron",
+        "#5B5B5B"
+      ],
+      [
+        "Bronze",
+        "#D99652"
+      ],
+      [
+        "Silver",
+        "#C0D1D4"
+      ],
+      [
+        "Gold",
+        "#EFBF04"
+      ],
+      [
+        "Platinum",
+        "#5990B3"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:32.643296+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,4266 @@
+{
+  "name": "roa ultimate",
+  "code": "KovaaKsTrackingEasyBattlepass",
+  "scenarios": [
+    {
+      "name": "cA x-axis flick",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 90.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 98.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 105.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 112.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 119.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 131.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 136.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 141.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 148.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 150.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 152.0
+        }
+      ]
+    },
+    {
+      "name": "cA y-axis flick",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 90.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 98.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 105.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 112.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 119.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 131.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 136.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 141.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 148.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 150.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 152.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire Voltaic",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 100.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 115.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 129.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 143.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 156.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 168.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 179.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 188.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 197.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 205.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 211.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 215.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 218.0
+        }
+      ]
+    },
+    {
+      "name": "cA voxTSs smaller",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 110.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 122.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 134.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 145.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 155.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 164.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 173.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 181.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 188.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 194.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 199.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 203.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 205.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Voltaic",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 80.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 90.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 101.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 110.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 120.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 128.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 136.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 143.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 149.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 154.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 159.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 162.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 164.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w3ts Rasp Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 720.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 820.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 930.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1530.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "ww3t Voltaic",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 90.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 101.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 112.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 123.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 132.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 142.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 150.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 157.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 164.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 170.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 174.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 178.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Perfected",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 75.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 85.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 95.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 104.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 112.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 128.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 134.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 140.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 149.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 152.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 154.0
+        }
+      ]
+    },
+    {
+      "name": "cA 1ts ruohong",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 560.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 610.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 650.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 700.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 740.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 780.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 810.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 850.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 870.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 920.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 930.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 940.0
+        }
+      ]
+    },
+    {
+      "name": "Ballsheet fixed",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 52.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 58.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 65.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 71.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 76.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 81.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 86.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 90.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 94.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 96.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 98.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bpes Angelic",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 55.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 67.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 80.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 91.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 101.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 111.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 120.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 128.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 136.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 142.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 147.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 151.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 153.0
+        }
+      ]
+    },
+    {
+      "name": "PureG Horizontal Clicking",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 85.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 95.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 105.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 114.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 123.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 138.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 144.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 150.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 155.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 159.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 162.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 164.0
+        }
+      ]
+    },
+    {
+      "name": "FloatingClick SuperbAim",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 240.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 340.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 430.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 520.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 680.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 750.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 810.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 870.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 920.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 960.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 980.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Frogtagon Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 610.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 720.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 820.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 910.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 990.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1340.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1360.0
+        }
+      ]
+    },
+    {
+      "name": "remClick - OW 85%",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 290.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 350.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 410.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 460.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 510.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 560.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 600.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 640.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 680.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 710.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 730.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 750.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 760.0
+        }
+      ]
+    },
+    {
+      "name": "VT Pasu Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 590.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 680.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 760.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 830.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 900.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 960.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1130.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 XYCLICK HARD",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 280.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 340.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 410.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 460.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 520.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 570.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 610.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 660.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 690.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 720.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 750.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 770.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 780.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 SNAPCLICK HARD",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 90.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 160.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 230.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 300.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 360.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 420.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 470.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 520.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 560.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 630.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 650.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 660.0
+        }
+      ]
+    },
+    {
+      "name": "ToonsClick rAim",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 28.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 36.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 44.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 51.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 58.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 65.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 71.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 76.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 81.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 88.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 90.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 92.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 280.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 380.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 470.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 560.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 640.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 710.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 780.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 840.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 950.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 990.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1010.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1030.0
+        }
+      ]
+    },
+    {
+      "name": "Centering III 180 no strafes",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 5600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 6600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 11800.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Far Angle Smoothness small",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 360.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 420.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 480.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 530.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 580.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 630.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 670.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 710.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 780.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 820.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 830.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 4100.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3150.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 AIRTRACK HARD",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 2400.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 10000.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 10200.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Smoothsphere Better",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3150.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 4100.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Control Phantasy 30% Smaller",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 12300.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Polarized Hell",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3450.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3450.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3650.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "VSS GP9 thin",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 8800.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 9000.0
+        }
+      ]
+    },
+    {
+      "name": "MFSI rAim - Thin",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 10600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 10800.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3550.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3550.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PipeTrack Hard S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3400.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "cAt furTrack Hard",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 2350.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "cAt fluffyTrack Hard",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Week #10 - evyTrack",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Week #5 - Static Switching",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 13400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 14300.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 15100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 15800.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 17100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 17600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 18300.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 18500.0
+        }
+      ]
+    },
+    {
+      "name": "Target Switching 360 Static Thin",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 13100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 13700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 14300.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 14900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 15400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 15800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 16100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 16300.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 16500.0
+        }
+      ]
+    },
+    {
+      "name": "VT skyTS Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 850.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 940.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1530.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 72.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 80.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 87.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 94.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 101.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 107.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 113.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 118.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 123.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 127.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 130.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 132.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 134.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch speed Medium",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 72.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 77.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 82.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 87.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 92.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 96.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 100.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 103.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 106.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 109.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 111.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 113.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 114.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 78.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 90.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 101.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 111.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 121.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 138.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 146.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 152.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 158.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 162.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 166.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 168.0
+        }
+      ]
+    },
+    {
+      "name": "AngleSwitch Revosect",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 870.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 930.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 990.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1310.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1320.0
+        }
+      ]
+    },
+    {
+      "name": "VT psalmTS Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 610.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 780.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 860.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 930.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1270.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1290.0
+        }
+      ]
+    },
+    {
+      "name": "VT EddieTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 570.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 650.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 730.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 810.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 880.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 940.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 1200.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 1220.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 ORBSWITCH HARD",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 80.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 88.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 96.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 104.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 111.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 118.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 124.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 130.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 135.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 139.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 142.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 144.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 146.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ caTS Hard S1",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 33.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 36.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 38.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 40.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 42.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 44.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 46.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 48.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 50.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 52.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 54.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 56.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 58.0
+        }
+      ]
+    },
+    {
+      "name": "VT bounceTS Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 470.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 550.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 610.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 680.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 730.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 790.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 840.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 880.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 920.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 940.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 960.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 980.0
+        }
+      ]
+    },
+    {
+      "name": "VT Penta Bounce Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 280.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 320.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 370.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 410.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 450.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 480.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 510.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 540.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 570.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 590.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 610.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 620.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 630.0
+        }
+      ]
+    },
+    {
+      "name": "rA S4 EVASWITCH HARD",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 35.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 38.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 41.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 44.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 47.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 49.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 52.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 54.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 56.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 57.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 58.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 59.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "VT FlyTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 340.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 390.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 430.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 470.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 530.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 560.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 590.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 610.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 630.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 640.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "CB AerialSwitch",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 360.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 390.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 420.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 470.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 520.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 540.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 560.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 570.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 580.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 590.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 600.0
+        }
+      ]
+    },
+    {
+      "name": "VT ControlTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 220.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 260.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 290.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 330.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 360.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 390.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 420.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 450.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 470.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 490.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 510.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "VT evaTS Advanced",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 450.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 540.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 590.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 620.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 660.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 690.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 720.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 750.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 770.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 780.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 790.0
+        }
+      ]
+    },
+    {
+      "name": "VT DriftTS Advanced S5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 240.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 270.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 310.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 340.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 370.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 400.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 430.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 450.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 470.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 480.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 490.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 500.0
+        }
+      ]
+    },
+    {
+      "name": "ToonsTS rAim",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 31.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#c69602",
+          "threshold": 36.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 42.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 47.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2fcfc2",
+          "threshold": 52.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#b9f2ff",
+          "threshold": 56.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85fa85",
+          "threshold": 60.0
+        },
+        {
+          "name": "Master",
+          "color": "#ec44ca",
+          "threshold": 64.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffd700",
+          "threshold": 67.0
+        },
+        {
+          "name": "Nova",
+          "color": "#7900ff",
+          "threshold": 70.0
+        },
+        {
+          "name": "Astra",
+          "color": "#ff2262",
+          "threshold": 72.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#001cc9",
+          "threshold": 74.0
+        },
+        {
+          "name": "One_Above_All",
+          "color": "#000000",
+          "threshold": 75.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrackingEasyBattlepass",
+    "kovaaks_benchmark_id": 826,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#c69602"
+      ],
+      [
+        "Silver",
+        "#cbd9e6"
+      ],
+      [
+        "Gold",
+        "#cab148"
+      ],
+      [
+        "Platinum",
+        "#2fcfc2"
+      ],
+      [
+        "Diamond",
+        "#b9f2ff"
+      ],
+      [
+        "Jade",
+        "#85fa85"
+      ],
+      [
+        "Master",
+        "#ec44ca"
+      ],
+      [
+        "Grandmaster",
+        "#ffd700"
+      ],
+      [
+        "Nova",
+        "#7900ff"
+      ],
+      [
+        "Astra",
+        "#ff2262"
+      ],
+      [
+        "Celestial",
+        "#001cc9"
+      ],
+      [
+        "One_Above_All",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:04.966426+00:00",
+    "generator": "benchmark_importer"
+  }
+}

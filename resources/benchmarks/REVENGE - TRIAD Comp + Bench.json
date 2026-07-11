@@ -1,0 +1,316 @@
+{
+  "name": "REVENGE - TRIAD Comp + Bench",
+  "code": "KovaaKsDinkingScaredSniper",
+  "scenarios": [
+    {
+      "name": "Static Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 920.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 990.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 1800.0
+        }
+      ]
+    },
+    {
+      "name": "Dynamic Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 350.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 410.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 470.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 540.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 630.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 720.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 800.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 930.0
+        }
+      ]
+    },
+    {
+      "name": "Precise Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 4375.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 4900.0
+        }
+      ]
+    },
+    {
+      "name": "Reactive Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "Speed Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Evasive Triad",
+      "ranks": [
+        {
+          "name": "Origin",
+          "color": "#A6611A",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Vector",
+          "color": "#DFC27D",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Axis",
+          "color": "#80CDC1",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Orbit",
+          "color": "#018571",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Vertex",
+          "color": "#422246",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Nexus",
+          "color": "#A7568F",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Apex",
+          "color": "#B4A5BA",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Oculus",
+          "color": "#094A93",
+          "threshold": 2400.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDinkingScaredSniper",
+    "kovaaks_benchmark_id": 2064,
+    "rank_colors": [
+      [
+        "Origin",
+        "#A6611A"
+      ],
+      [
+        "Vector",
+        "#DFC27D"
+      ],
+      [
+        "Axis",
+        "#80CDC1"
+      ],
+      [
+        "Orbit",
+        "#018571"
+      ],
+      [
+        "Vertex",
+        "#422246"
+      ],
+      [
+        "Nexus",
+        "#A7568F"
+      ],
+      [
+        "Apex",
+        "#B4A5BA"
+      ],
+      [
+        "Oculus",
+        "#094A93"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:25.672772+00:00",
+    "generator": "benchmark_importer"
+  }
+}

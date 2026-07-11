@@ -1,0 +1,754 @@
+{
+  "name": "Revosect S5 - Intermediate",
+  "code": "KovaaKsAdventuringRoyalpurpleWindow",
+  "scenarios": [
+    {
+      "name": "EvoClick Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 730.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 830.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 930.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1130.0
+        }
+      ]
+    },
+    {
+      "name": "StrawberryClick Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 850.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 925.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1075.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "1w5ts vbr Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1440.0
+        }
+      ]
+    },
+    {
+      "name": "1w4t Pressure Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1630.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 570.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 645.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 720.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 795.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 870.0
+        }
+      ]
+    },
+    {
+      "name": "SpringClick Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 530.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 610.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 690.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 770.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 850.0
+        }
+      ]
+    },
+    {
+      "name": "SnowClick Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 610.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 690.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 770.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 850.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 930.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 580.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 640.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 760.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 820.0
+        }
+      ]
+    },
+    {
+      "name": "FloodTrack Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "VTP Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "Tornadosphere Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 882.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 887.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 892.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 897.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 903.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Smooth Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 874.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 879.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 884.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 889.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 894.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 876.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 880.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 884.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 888.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 892.0
+        }
+      ]
+    },
+    {
+      "name": "Air Smooth Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 874.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 879.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 884.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 889.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 894.0
+        }
+      ]
+    },
+    {
+      "name": "AngleSwitch Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 920.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 990.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "DotSwitch Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "NovaSwitch Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 730.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 810.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 890.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 970.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "WaveSwitch Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 810.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 870.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 930.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 990.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "SpringTS Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 370.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 410.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 450.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 490.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 530.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereTS Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 420.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 460.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 540.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 580.0
+        }
+      ]
+    },
+    {
+      "name": "PasuTS Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 360.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 390.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 420.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 450.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 480.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothTS Revosect Int",
+      "ranks": [
+        {
+          "name": "Ace",
+          "color": "#E06666",
+          "threshold": 390.0
+        },
+        {
+          "name": "Legend",
+          "color": "#B6D7A8",
+          "threshold": 430.0
+        },
+        {
+          "name": "Sentinel",
+          "color": "#76A5AF",
+          "threshold": 470.0
+        },
+        {
+          "name": "Valour",
+          "color": "#A64D79",
+          "threshold": 510.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#FFD700",
+          "threshold": 550.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAdventuringRoyalpurpleWindow",
+    "kovaaks_benchmark_id": 822,
+    "rank_colors": [
+      [
+        "Ace",
+        "#E06666"
+      ],
+      [
+        "Legend",
+        "#B6D7A8"
+      ],
+      [
+        "Sentinel",
+        "#76A5AF"
+      ],
+      [
+        "Valour",
+        "#A64D79"
+      ],
+      [
+        "Mythic",
+        "#FFD700"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:32.043340+00:00",
+    "generator": "benchmark_importer"
+  }
+}

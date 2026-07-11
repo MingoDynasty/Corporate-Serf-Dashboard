@@ -1,0 +1,136 @@
+{
+  "name": "Jade Palace Ground Benchmark - Fundamentals",
+  "code": "KovaaKsGriefingLightvenetianredFalldamage",
+  "scenarios": [
+    {
+      "name": "Close Long Strafes Invincible",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 18000.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 Invincible 5",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 4600.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGriefingLightvenetianredFalldamage",
+    "kovaaks_benchmark_id": 988,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#cd30c1"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:53.666015+00:00",
+    "generator": "benchmark_importer"
+  }
+}

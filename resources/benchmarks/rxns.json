@@ -1,0 +1,1158 @@
+{
+  "name": "rxns",
+  "code": "KovaaKsNerfingFuchsiaInitiator",
+  "scenarios": [
+    {
+      "name": "RawMouseControl Reload Easy",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 200.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 250.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 275.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 300.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 350.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 400.0
+        }
+      ]
+    },
+    {
+      "name": "4BK - RawMouseControlPokeball Adapt",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 0.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 250.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 275.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 325.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 350.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 360.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static 5Bot",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 0.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 650.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 700.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 800.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 850.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 870.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload LG56",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 120.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 135.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 180.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 200.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 220.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 250.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload LG56 AIMGOD",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 0.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 130.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 150.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 165.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 180.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Pokeball Easy",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 120.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 150.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 165.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 180.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 200.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 250.0
+        }
+      ]
+    },
+    {
+      "name": "Cartoon's Micro RawMouseControlReact 30s",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 15.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 25.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 40.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 50.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 60.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 63.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 95.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 100.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 120.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 130.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 140.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "Pokevox LG56",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 65.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 80.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 90.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 95.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 100.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Auto ww6ts LG56",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 65.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 70.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 80.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 90.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 100.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick - Very Easy",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 600.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 650.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 680.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 720.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 750.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "4BK - 1w1ts Pokeball",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 750.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 850.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 900.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 1200.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "1w1t horizonalish extremely small",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 150.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 500.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 600.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 650.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 700.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 720.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Auto ww6t Larger Voltaic",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 120.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 150.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 180.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 200.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 220.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 230.0
+        }
+      ]
+    },
+    {
+      "name": "VT 1w3ts Intermediate S5 Clusters Pokeball",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 450.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 500.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 660.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 770.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 880.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "1wall 6targets extra small",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 650.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 720.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 900.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 1100.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 1200.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 1250.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Floating Heads 400%",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 60.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 70.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 75.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 85.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS 30% Smaller",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 80.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 90.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 105.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 120.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 130.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 100.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 115.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 130.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 170.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 180.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 190.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Viscose Varied",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 70.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 85.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 110.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 130.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 140.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bp",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 105.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 130.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 180.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 186.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 192.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets_pasu - track",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 50.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 55.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 60.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 75.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 80.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Cloverrawcontrol Adaptive Very Easy",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 5800.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 6200.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 6500.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 7500.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 8000.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 10400.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl 30% small",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 4400.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 6000.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 8000.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 9300.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 10500.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 11800.0
+        }
+      ]
+    },
+    {
+      "name": "Leaptrack Goated 80%",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 1650.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 2750.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 2920.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 3210.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 3470.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Smooth",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 18.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 25.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 35.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 40.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 45.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 50.0
+        }
+      ]
+    },
+    {
+      "name": "Tamspeed 2bpes LG56 AIMGOD",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 15.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 20.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 30.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 35.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 40.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 45.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere OW 150%",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 4400.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 6000.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 7000.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 7880.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 8900.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 9500.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Angelic",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 60.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 80.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 100.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 114.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 124.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 800.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 820.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 840.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 865.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 885.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 895.0
+        }
+      ]
+    },
+    {
+      "name": "voxtargetclick hard strafe fast",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 100.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 440.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 650.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 700.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 750.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "white",
+          "color": "#FFFFFF",
+          "threshold": 650.0
+        },
+        {
+          "name": "red",
+          "color": "#ff0000",
+          "threshold": 720.0
+        },
+        {
+          "name": "orange",
+          "color": "#ff9500",
+          "threshold": 1500.0
+        },
+        {
+          "name": "yellow",
+          "color": "#fbff00",
+          "threshold": 2500.0
+        },
+        {
+          "name": "green",
+          "color": "#04ff00",
+          "threshold": 2750.0
+        },
+        {
+          "name": "black",
+          "color": "#000000",
+          "threshold": 3000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsNerfingFuchsiaInitiator",
+    "kovaaks_benchmark_id": 928,
+    "rank_colors": [
+      [
+        "white",
+        "#FFFFFF"
+      ],
+      [
+        "red",
+        "#ff0000"
+      ],
+      [
+        "orange",
+        "#ff9500"
+      ],
+      [
+        "yellow",
+        "#fbff00"
+      ],
+      [
+        "green",
+        "#04ff00"
+      ],
+      [
+        "black",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:22.355137+00:00",
+    "generator": "benchmark_importer"
+  }
+}

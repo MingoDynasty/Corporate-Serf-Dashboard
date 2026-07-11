@@ -1,0 +1,206 @@
+{
+  "name": "EMPULSE BEGINNER",
+  "code": "KovaaKsAfkingFedPharmercy",
+  "scenarios": [
+    {
+      "name": "SmoothBot Invincible Goated 75%",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 3625.0
+        }
+      ]
+    },
+    {
+      "name": "Frog House Revolving",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic Easy 80%",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 900.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 1720.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Control Novice",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 28.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 33.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 40.0
+        }
+      ]
+    },
+    {
+      "name": "VT evaTS Novice",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 400.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 500.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 600.0
+        }
+      ]
+    },
+    {
+      "name": "Frog House Smooth Entry",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "MSSI Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 6450.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Intermediate S5 Bot 3 Invincible",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 2600.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafes Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#cd7f32",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Beginner",
+          "color": "#c0c0c0",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Intermediate",
+          "color": "#007bff",
+          "threshold": 7200.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAfkingFedPharmercy",
+    "kovaaks_benchmark_id": 2520,
+    "rank_colors": [
+      [
+        "Novice",
+        "#cd7f32"
+      ],
+      [
+        "Beginner",
+        "#c0c0c0"
+      ],
+      [
+        "Intermediate",
+        "#007bff"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:33.536682+00:00",
+    "generator": "benchmark_importer"
+  }
+}

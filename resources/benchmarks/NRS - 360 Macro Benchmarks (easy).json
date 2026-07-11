@@ -1,0 +1,458 @@
+{
+  "name": "NRS - 360 Macro Benchmarks (easy)",
+  "code": "KovaaKsChallengingFraggedSniper",
+  "scenarios": [
+    {
+      "name": "Pasu Voltaic 360 Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 48.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 56.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 64.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 72.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn rAim Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 120.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 170.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 230.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 280.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 330.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 380.0
+        }
+      ]
+    },
+    {
+      "name": "6wall18targets small reload",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 62.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 72.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 82.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 91.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 100.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 109.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 360 Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 57.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 66.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 75.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 84.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 92.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Pauer Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 5900.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Sky&Floorbot 70%",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 19500.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 22000.0
+        }
+      ]
+    },
+    {
+      "name": "NRS Air Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Fundamentals",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS 360 Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 720.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 880.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 960.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 1120.0
+        }
+      ]
+    },
+    {
+      "name": "patTS Voltaic 360",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 46.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 53.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 60.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 67.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 74.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 81.0
+        }
+      ]
+    },
+    {
+      "name": "KinTs 360 NR Varied",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 18500.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch 360 Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#ff9900",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#cbd9e6",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#cab148",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#bce5f6",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#4a86e8",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0000ff",
+          "threshold": 6000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingFraggedSniper",
+    "kovaaks_benchmark_id": 2480,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#ff9900"
+      ],
+      [
+        "Silver",
+        "#cbd9e6"
+      ],
+      [
+        "Gold",
+        "#cab148"
+      ],
+      [
+        "Platinum",
+        "#bce5f6"
+      ],
+      [
+        "Diamond",
+        "#4a86e8"
+      ],
+      [
+        "Sapphire",
+        "#0000ff"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:02.739579+00:00",
+    "generator": "benchmark_importer"
+  }
+}

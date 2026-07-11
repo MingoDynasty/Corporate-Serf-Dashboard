@@ -1,0 +1,602 @@
+{
+  "name": "mH Benchmark (Easy)",
+  "code": "KovaaKsFlankingSmallArena",
+  "scenarios": [
+    {
+      "name": "1w2ts reload smallflicks 20% smaller",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 85.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 92.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 100.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 110.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 118.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 126.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "rx 1w6ts No Clusters",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 750.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 840.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 920.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 1010.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 1070.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 1120.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 1170.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Pasu Perfected",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 75.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 82.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 86.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 92.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 96.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 100.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 103.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS rAim Click",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 84.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 89.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 95.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 101.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 107.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 113.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothBot Invincible Goated 15% bigger",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 3000.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 3150.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 3350.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 3550.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 3800.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 4000.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Leaptrack Goated 60% Larger",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 1750.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 2050.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 2150.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 2350.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 2575.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 2625.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 2750.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 3150.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 3300.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 3550.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 3750.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 3950.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 4100.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Novice S5 Hard",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 2250.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 2450.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 2600.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 2850.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 3000.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 3100.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim Easy",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 8750.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 9500.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 10500.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 11000.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 12000.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 12500.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 13250.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 6500.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 7000.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 7600.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 8100.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 8500.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 9000.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 9800.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Viscose Varied",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 86.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 95.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 101.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 108.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 111.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 116.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 119.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic Low TTK",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 64.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 67.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 72.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 75.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 80.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 86.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "VT EvaTS Intermediate Regen",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 540.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 600.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 640.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 680.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 700.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 730.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 760.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Smooth Easy",
+      "ranks": [
+        {
+          "name": "jubilant",
+          "color": "#77a5eb",
+          "threshold": 15.0
+        },
+        {
+          "name": "whimsical",
+          "color": "#3d85c6",
+          "threshold": 17.0
+        },
+        {
+          "name": "joyous",
+          "color": "#0000a6",
+          "threshold": 22.0
+        },
+        {
+          "name": "ecstatic",
+          "color": "#d19df4",
+          "threshold": 24.0
+        },
+        {
+          "name": "happy",
+          "color": "#ff00ff",
+          "threshold": 28.0
+        },
+        {
+          "name": "cheerful",
+          "color": "#674ea7",
+          "threshold": 30.0
+        },
+        {
+          "name": "blissful",
+          "color": "#741b47",
+          "threshold": 35.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsFlankingSmallArena",
+    "kovaaks_benchmark_id": 963,
+    "rank_colors": [
+      [
+        "jubilant",
+        "#77a5eb"
+      ],
+      [
+        "whimsical",
+        "#3d85c6"
+      ],
+      [
+        "joyous",
+        "#0000a6"
+      ],
+      [
+        "ecstatic",
+        "#d19df4"
+      ],
+      [
+        "happy",
+        "#ff00ff"
+      ],
+      [
+        "cheerful",
+        "#674ea7"
+      ],
+      [
+        "blissful",
+        "#741b47"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:35.581665+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,762 @@
+{
+  "name": "AimSpeed Benchmark 2 Hard",
+  "code": "KovaaKsMainingMaroonChopper",
+  "scenarios": [
+    {
+      "name": "voxTargetSwitch Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 74.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 78.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 82.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 86.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 90.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2 Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 94.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 98.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 102.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 106.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 110.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 115.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox xxSmall",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 124.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 128.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 132.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 136.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 140.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 144.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 148.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 84.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 88.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 96.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 100.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 105.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch 90 NR Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 86.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 90.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 94.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 98.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 104.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 110.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 116.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingPat 90 xxSmall",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 99.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 103.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 107.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 111.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 115.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 120.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch Small v2",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 74.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 78.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 82.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 86.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 90.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch Static Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 74.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 78.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 82.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 86.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 90.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 95.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 330.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 360.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 390.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 420.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 450.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 480.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 510.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 650.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 680.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 710.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 740.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 750.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 780.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 810.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Angelic",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 96.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 100.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 104.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 108.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 112.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 116.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "Floatswitch Advanced",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 640.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 680.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 720.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 760.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 800.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 850.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS 30% Smaller",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 124.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 128.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 132.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 136.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 140.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 145.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Elite",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 130.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 135.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 140.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 145.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 150.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 160.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "vietTS Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 940.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 980.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "3D Switching Small",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 430.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 460.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 490.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 520.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 550.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 600.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "Skeet Tracking Goated Small v2",
+      "ranks": [
+        {
+          "name": "Instant",
+          "color": "#EC7D0E",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Burst",
+          "color": "#FFBF00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Overdrive",
+          "color": "#629D48",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#1C65E3",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Luminous",
+          "color": "#692B8C",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#EEEEEE",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 3600.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingMaroonChopper",
+    "kovaaks_benchmark_id": 2176,
+    "rank_colors": [
+      [
+        "Instant",
+        "#EC7D0E"
+      ],
+      [
+        "Burst",
+        "#FFBF00"
+      ],
+      [
+        "Overdrive",
+        "#629D48"
+      ],
+      [
+        "Ascendant",
+        "#1C65E3"
+      ],
+      [
+        "Luminous",
+        "#692B8C"
+      ],
+      [
+        "Zenith",
+        "#EEEEEE"
+      ],
+      [
+        "Speed",
+        "#050000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:17.771092+00:00",
+    "generator": "benchmark_importer"
+  }
+}

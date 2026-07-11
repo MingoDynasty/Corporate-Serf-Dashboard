@@ -1,0 +1,634 @@
+{
+  "name": "Jade Palace Air Benchmark - Easy",
+  "code": "KovaaKsHipfiringNarrowTimewarp",
+  "scenarios": [
+    {
+      "name": "Air Palace",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 877.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 886.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 894.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 901.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 907.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Perfected Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 898.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 905.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 911.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 916.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 920.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 921.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 927.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 932.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 936.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 939.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 872.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 881.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 889.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 896.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 902.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy Invincible 4",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 7 Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuAirPalace Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Medium",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 889.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 895.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 901.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 907.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 913.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 917.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 922.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 927.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 932.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 936.0
+        }
+      ]
+    },
+    {
+      "name": "Air Palace Smooth",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 887.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 894.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 905.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 909.0
+        }
+      ]
+    },
+    {
+      "name": "Air Smooth Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 879.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 888.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 896.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 903.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 909.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 872.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 881.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 889.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 896.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 902.0
+        }
+      ]
+    },
+    {
+      "name": "Leisphere Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "AA4V OW Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4450.0
+        }
+      ]
+    },
+    {
+      "name": "Pasutrack RCT Evo Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4150.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere OW",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 8250.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10500.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic Invincible 2",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Novice S5 Hard Bot 1",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Intermediate S5 Bot 2",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4100.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHipfiringNarrowTimewarp",
+    "kovaaks_benchmark_id": 2429,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#cd30c1"
+      ],
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:58.337634+00:00",
+    "generator": "benchmark_importer"
+  }
+}

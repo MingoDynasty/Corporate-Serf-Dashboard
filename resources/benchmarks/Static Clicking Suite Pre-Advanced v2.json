@@ -1,0 +1,364 @@
+{
+  "name": "Static Clicking Suite Pre-Advanced v2",
+  "code": "KovaaKsBottingCobaltCd",
+  "scenarios": [
+    {
+      "name": "SCS 2L Uniform",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 83.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 91.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 99.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 107.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 4L Wide Easier",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 88.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 96.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 104.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 112.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 3m Dynamic",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 80.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 88.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 96.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 104.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 112.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 5m Dynamic",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 95.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 103.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 111.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 119.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 127.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6s",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 85.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 93.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 101.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 109.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 117.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 4s",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 75.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 83.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 91.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 99.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 107.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 3s Uniform",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 73.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 81.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 89.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 97.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 2s Uniform",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 68.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 76.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 84.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 92.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6s Narrow",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 110.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 118.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 126.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 134.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 142.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 15xs Narrow",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 88.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 96.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 104.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 111.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 8xs Uniform",
+      "ranks": [
+        {
+          "name": "Calcite",
+          "color": "#f3f58d",
+          "threshold": 65.0
+        },
+        {
+          "name": "Quartz",
+          "color": "#e6feff",
+          "threshold": 73.0
+        },
+        {
+          "name": "Malachite",
+          "color": "#027b4a",
+          "threshold": 81.0
+        },
+        {
+          "name": "Celestine",
+          "color": "#71d0ff",
+          "threshold": 89.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9662ca",
+          "threshold": 97.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBottingCobaltCd",
+    "kovaaks_benchmark_id": 2405,
+    "rank_colors": [
+      [
+        "Calcite",
+        "#f3f58d"
+      ],
+      [
+        "Quartz",
+        "#e6feff"
+      ],
+      [
+        "Malachite",
+        "#027b4a"
+      ],
+      [
+        "Celestine",
+        "#71d0ff"
+      ],
+      [
+        "Amethyst",
+        "#9662ca"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:48.948843+00:00",
+    "generator": "benchmark_importer"
+  }
+}

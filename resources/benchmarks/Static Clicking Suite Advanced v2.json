@@ -1,0 +1,950 @@
+{
+  "name": "Static Clicking Suite Advanced v2",
+  "code": "KovaaKsBoomstickingClutchFlank",
+  "scenarios": [
+    {
+      "name": "SCS 2L Uniform",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 123.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 130.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 137.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 144.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 151.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 158.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 165.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 172.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 179.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 3L Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 137.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 144.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 151.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 158.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 165.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 172.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 179.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 186.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 4L Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 128.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 135.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 142.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 149.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 156.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 163.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 170.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 177.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 184.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 3m Dynamic",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 120.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 127.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 134.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 141.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 148.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 155.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 162.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 169.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 176.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 5m Dynamic",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 135.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 142.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 149.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 156.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 163.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 170.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 177.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 184.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 191.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 3s Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 107.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 114.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 121.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 128.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 135.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 142.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 149.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 156.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 163.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6s Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 119.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 126.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 133.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 140.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 147.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 154.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 161.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 168.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 175.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6s",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 125.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 132.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 139.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 146.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 153.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 160.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 167.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 174.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 181.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 4s",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 115.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 122.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 129.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 136.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 143.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 150.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 157.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 164.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 171.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 2s",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 108.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 115.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 122.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 129.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 136.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 143.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 150.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 157.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 164.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6s Narrow",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 150.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 158.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 166.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 174.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 181.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 188.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 195.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 202.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 209.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 15xs Narrow",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 128.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 135.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 142.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 149.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 156.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 163.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 170.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 177.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 184.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 8xs Uniform",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 105.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 112.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 119.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 126.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 133.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 140.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 147.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 154.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 161.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 6xs",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 108.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 115.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 122.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 129.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 136.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 143.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 150.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 157.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 164.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 4xs Dynamic",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 115.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 122.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 129.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 136.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 143.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 150.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 157.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 164.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 171.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 2v",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 109.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 116.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 123.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 130.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 137.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 144.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 151.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 158.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 5v Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 132.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 139.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 146.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 153.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 160.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 167.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 174.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 181.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 188.0
+        }
+      ]
+    },
+    {
+      "name": "SCS 8v Wide",
+      "ranks": [
+        {
+          "name": "Pebble",
+          "color": "#e2d7e3",
+          "threshold": 113.0
+        },
+        {
+          "name": "Rock",
+          "color": "#50505a",
+          "threshold": 120.0
+        },
+        {
+          "name": "Stalagmite",
+          "color": "#7d5744",
+          "threshold": 127.0
+        },
+        {
+          "name": "Boulder",
+          "color": "#2d3e30",
+          "threshold": 134.0
+        },
+        {
+          "name": "Pillar",
+          "color": "#5a2323",
+          "threshold": 141.0
+        },
+        {
+          "name": "Obelisk",
+          "color": "#9f7b2f",
+          "threshold": 148.0
+        },
+        {
+          "name": "Cliff",
+          "color": "#003e4a",
+          "threshold": 155.0
+        },
+        {
+          "name": "Cirque",
+          "color": "#a8eaff",
+          "threshold": 162.0
+        },
+        {
+          "name": "Monolith",
+          "color": "#24252d",
+          "threshold": 169.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBoomstickingClutchFlank",
+    "kovaaks_benchmark_id": 2377,
+    "rank_colors": [
+      [
+        "Pebble",
+        "#e2d7e3"
+      ],
+      [
+        "Rock",
+        "#50505a"
+      ],
+      [
+        "Stalagmite",
+        "#7d5744"
+      ],
+      [
+        "Boulder",
+        "#2d3e30"
+      ],
+      [
+        "Pillar",
+        "#5a2323"
+      ],
+      [
+        "Obelisk",
+        "#9f7b2f"
+      ],
+      [
+        "Cliff",
+        "#003e4a"
+      ],
+      [
+        "Cirque",
+        "#a8eaff"
+      ],
+      [
+        "Monolith",
+        "#24252d"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:41.444574+00:00",
+    "generator": "benchmark_importer"
+  }
+}
