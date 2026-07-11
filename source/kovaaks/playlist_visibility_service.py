@@ -14,11 +14,11 @@ import os
 import threading
 from pathlib import Path
 
-from source.kovaaks.api_service import CACHE_REPLACE_RETRY_DELAYS_SECONDS
 from source.kovaaks.data_service import (
     get_playlist_selector_options,
     get_user_root_playlist_codes,
 )
+from source.utilities.atomic_write import replace_with_retry
 
 logger = logging.getLogger(__name__)
 
@@ -102,18 +102,7 @@ def _write_shown_to_disk(shown: set[str]) -> None:
             file.write("\n")
             file.flush()
             os.fsync(file.fileno())
-        for retry_delay in (*CACHE_REPLACE_RETRY_DELAYS_SECONDS, None):
-            try:
-                os.replace(temp_file, PREFERENCES_FILE_PATH)
-                break
-            except PermissionError:
-                if retry_delay is None:
-                    raise
-                logger.warning(
-                    "Retrying preferences replace after PermissionError: %s",
-                    PREFERENCES_FILE_PATH,
-                )
-                threading.Event().wait(retry_delay)
+        replace_with_retry(temp_file, PREFERENCES_FILE_PATH, logger=logger)
     finally:
         temp_file.unlink(missing_ok=True)
 

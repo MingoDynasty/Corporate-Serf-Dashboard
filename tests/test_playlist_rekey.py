@@ -6,6 +6,7 @@ import pytest
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
+from source.utilities import atomic_write
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -283,7 +284,7 @@ def test_write_playlist_data_to_file_retries_transient_replace_errors(
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     playlist = _playlist("Retry Me", "RetryCode")
     replacements = []
-    original_replace = data_service.os.replace
+    original_replace = atomic_write.os.replace
 
     def flaky_replace(source, destination):
         replacements.append((Path(source), Path(destination)))
@@ -291,8 +292,8 @@ def test_write_playlist_data_to_file_retries_transient_replace_errors(
             raise PermissionError("transient lock")
         original_replace(source, destination)
 
-    monkeypatch.setattr(data_service.os, "replace", flaky_replace)
-    monkeypatch.setattr(data_service.time, "sleep", lambda _delay: None)
+    monkeypatch.setattr(atomic_write.os, "replace", flaky_replace)
+    monkeypatch.setattr(atomic_write.time, "sleep", lambda _delay: None)
 
     data_service.write_playlist_data_to_file(playlist)
 
