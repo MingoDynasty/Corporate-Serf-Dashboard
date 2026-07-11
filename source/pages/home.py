@@ -34,11 +34,9 @@ from source.kovaaks.data_service import (
     get_time_vs_runs,
     get_unique_scenarios,
     is_scenario_in_database,
-    load_playlist_from_code,
 )
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
-    show_playlist,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.plot.plot_service import (
@@ -58,10 +56,6 @@ SCENARIO_RANK_LOADING_DELAY_MS = 250
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
 SETTINGS_HELP_TEXT = {
-    "import-playlist": (
-        "Paste a KovaaK's playlist share code and press Import to add that "
-        "playlist to the playlist selector."
-    ),
     "automatically-change-scenario": (
         "Automatically selects the scenario you just played when a new run is detected."
     ),
@@ -806,45 +800,6 @@ def modal_demo(_, opened):
 
 
 @callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("playlist-dropdown-selection", "data"),
-    Input("settings-modal-import-button", "n_clicks"),
-    State("settings-modal-import-playlist-textinput", "value"),
-    prevent_initial_call=True,
-)
-def import_playlist(_, playlist_to_import):
-    """Import a playlist code and report the result to the UI."""
-    if not playlist_to_import:
-        return no_update, no_update
-    playlist_to_import = playlist_to_import.strip()
-    logger.debug("Importing playlist '%s'", playlist_to_import)
-    error_message, imported_code = load_playlist_from_code(playlist_to_import)
-    if not error_message and imported_code:
-        # Importing is the intent to see: new playlists arrive visible. Mark
-        # the canonical stored code, which can differ from the pasted input.
-        show_playlist(imported_code)
-    if error_message:
-        notification = {
-            "action": "show",
-            "title": "Playlist Import Failed",
-            "message": error_message,
-            "color": "red",
-            "id": "imported-playlist-failed-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
-    else:
-        notification = {
-            "action": "show",
-            "title": "Notification",
-            "message": "Successfully imported playlist!",
-            "color": "green",
-            "id": "imported-playlist-successful-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
-    return [notification], get_visible_playlist_selector_options()
-
-
-@callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
 )
@@ -1126,30 +1081,6 @@ def layout(
                                     title="Settings",
                                     id="settings-modal",
                                     children=[
-                                        dmc.Group(
-                                            gap="md",
-                                            grow=False,
-                                            children=[
-                                                dmc.TextInput(
-                                                    id="settings-modal-import-playlist-textinput",
-                                                    placeholder="KovaaK's playlist code...",
-                                                    label=_settings_help_label(
-                                                        "Import Playlist",
-                                                        SETTINGS_HELP_TEXT[
-                                                            "import-playlist"
-                                                        ],
-                                                    ),
-                                                    size="md",
-                                                    w="300px",
-                                                ),
-                                                dmc.Button(
-                                                    children="Import",
-                                                    id="settings-modal-import-button",
-                                                    mt="lg",
-                                                ),
-                                            ],
-                                        ),
-                                        dmc.Space(h="lg"),
                                         dmc.Title(
                                             "Display Settings",
                                             order=2,

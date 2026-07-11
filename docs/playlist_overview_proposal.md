@@ -2,8 +2,9 @@
 
 > **Status:** Accepted 2026-07-09 — register frozen, all nine OQs settled
 > (OQ-9 last: fresh importer pull). Phase 1 shipped (PRs #78, #83 —
-> roadmap milestone complete); Phase 2: PR 2a shipped (#87), PR 2b (library
-> flip) in review. Review trail: round 2 settled OQ-1…8 (2026-07-08 user
+> roadmap milestone complete); Phase 2 shipped (PR 2a #87, PR 2b library
+> flip #90); Phase 3 in progress (PR 3a: import relocates to the overview
+> surface). Review trail: round 2 settled OQ-1…8 (2026-07-08 user
 > review); round 3 (YAGNI triage) simplified R4 to a plain show-list;
 > round 4 (PR #76 reviews) corrected the provenance-stamp assumption and
 > opened OQ-9 on the Viscose threshold divergence. Prerequisite shipped:

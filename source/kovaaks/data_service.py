@@ -628,11 +628,16 @@ def load_playlists() -> None:
 def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
     """Import the single playlist matching a KovaaK's playlist code.
 
-    Returns ``(error_message, imported_playlist_code)`` — exactly one is
-    None. The imported code is the canonical ``playlistCode`` from KovaaK's,
-    which is what the store, the user-root tracking, and the visibility
-    show-list are keyed by; it can differ from the pasted input (case
-    normalization, non-exact search matches).
+    Returns ``(error_message, canonical_playlist_code)``. The second element
+    is the canonical ``playlistCode`` from KovaaK's — the imported code on a
+    successful import, or the conflicting existing code on a duplicate-code
+    refusal (so callers can, for example, ask whether that existing playlist
+    is hidden). It is None only when there is no canonical code to report:
+    the search returned nothing, was ambiguous, or the write failed. The
+    canonical code is what the store, the user-root tracking, and the
+    visibility show-list are keyed by; it can differ from the pasted input
+    (case normalization, non-exact search matches), so it must never be
+    derived from ``input_playlist_code``.
     """
     response = get_playlist_data(input_playlist_code)
     if not response or not response.data:
@@ -663,7 +668,10 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
             f"{existing_playlist.name} ({existing_playlist.code})."
         )
         logger.warning(message)
-        return message, None
+        # Duplicate refusal carries the conflicting existing code so the page
+        # layer can check its visibility without importing the visibility
+        # service (which would create an import cycle through data_service).
+        return message, playlist_data.code
     try:
         write_playlist_data_to_file(playlist_data)
     except ValueError:
