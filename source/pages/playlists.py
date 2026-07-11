@@ -22,6 +22,7 @@ from source.kovaaks.data_service import (
     delete_user_playlist,
     get_playlist_display_label,
     get_superseded_user_playlist_files,
+    get_user_root_playlist_codes,
     load_playlist_from_code,
 )
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
@@ -324,6 +325,13 @@ def manage_delete_modal(cell_clicked, _cancel):
     ):
         return no_update, no_update, no_update
     playlist_code = cell_clicked["rowId"]
+    # Bundled rows render no Delete link, but their (empty) delete cell still
+    # emits cellClicked with this colId. Refuse non-user codes here — same
+    # source of truth as the row's ``deletable`` flag — so a bundled row can
+    # never open a misleading "will be removed from data/playlists" dialog
+    # (delete_user_playlist would refuse it anyway, but only after a scare).
+    if playlist_code not in get_user_root_playlist_codes():
+        return no_update, no_update, no_update
     label = get_playlist_display_label(playlist_code)
     message = (
         f'Delete "{label}" ({playlist_code})? This removes its playlist file '

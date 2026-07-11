@@ -182,6 +182,7 @@ def test_playlists_overview_delete_cell_click_does_not_navigate():
 
 def test_manage_delete_modal_opens_for_delete_cell(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
     monkeypatch.setattr(
         playlists, "get_playlist_display_label", lambda _code: "My Playlist"
     )
@@ -194,6 +195,25 @@ def test_manage_delete_modal_opens_for_delete_cell(monkeypatch):
     assert target == "UserCode"
     assert "My Playlist" in message
     assert "UserCode" in message
+
+
+def test_manage_delete_modal_ignores_bundled_delete_cell(monkeypatch):
+    # A bundled row renders no Delete link, but its empty delete cell still
+    # emits cellClicked; the modal must not open for a non-user code (which
+    # delete_user_playlist would refuse anyway, after a misleading dialog).
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
+    monkeypatch.setattr(
+        playlists,
+        "get_playlist_display_label",
+        lambda _code: pytest.fail("bundled delete cell must not reach the modal"),
+    )
+
+    result = playlists.manage_delete_modal(
+        {"rowId": "BundledCode", "colId": playlists.DELETE_COLUMN_ID}, 0
+    )
+
+    assert result == (no_update, no_update, no_update)
 
 
 def test_manage_delete_modal_ignores_non_delete_cells(monkeypatch):
