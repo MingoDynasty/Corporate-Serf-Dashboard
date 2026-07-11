@@ -48,7 +48,7 @@ from source.plot.plot_service import (
     generate_time_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
-from source.utilities.utilities import ordinal
+from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -276,7 +276,7 @@ def get_scenario_num_runs(
         scenario_stats.number_of_runs,
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
-        scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
+        format_absolute_timestamp(scenario_stats.date_last_played),
         "last-played-affordance",
         0,
         False,
