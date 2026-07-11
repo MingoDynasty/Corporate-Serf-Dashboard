@@ -763,6 +763,48 @@ def test_manifest_write_uses_atomic_replace(tmp_path, monkeypatch):
     ]
 
 
+def test_atomic_write_retries_replace_on_transient_permission_error(
+    tmp_path, monkeypatch, caplog
+):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    path = tmp_path / "out.json"
+    original_replace = script.os.replace
+    attempts = {"count": 0}
+
+    def flaky_replace(source, destination):
+        attempts["count"] += 1
+        if attempts["count"] == 1:
+            raise PermissionError("antivirus is holding the destination open")
+        original_replace(source, destination)
+
+    monkeypatch.setattr(script.os, "replace", flaky_replace)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    script._atomic_write_json(path, {"ok": True})
+
+    assert attempts["count"] == 2
+    assert json.loads(path.read_text(encoding="utf-8")) == {"ok": True}
+    assert any("Retrying atomic replace" in message for message in caplog.messages)
+
+
+def test_atomic_write_reraises_and_cleans_up_after_exhausting_retries(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "out.json"
+
+    def always_locked(source, destination):
+        raise PermissionError("destination stays locked")
+
+    monkeypatch.setattr(script.os, "replace", always_locked)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    with pytest.raises(PermissionError):
+        script._atomic_write_json(path, {"ok": True})
+
+    assert not path.exists()
+    assert list(tmp_path.glob(f".{path.name}.*.tmp")) == []
+
+
 def test_load_manifest_treats_missing_and_malformed_as_empty(tmp_path, caplog):
     caplog.set_level(logging.WARNING, logger=script.__name__)
     path = tmp_path / "manifest.json"

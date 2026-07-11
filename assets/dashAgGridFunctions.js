@@ -91,9 +91,25 @@ dagfuncs.relativeTime = function (seconds, sentinel, nowMs) {
   return years + (years === 1 ? " year ago" : " years ago");
 };
 
-// Full absolute timestamp for the tooltip, formatted to match the home page's
-// existing "%Y-%m-%d %I:%M:%S %p" (not toLocaleString, which is locale-dependent
-// and date-ambiguous). Renders in browser-local time.
+// Absolute timestamp for the tooltip, humanized to a GitHub-shaped format like
+// "Apr 9, 2026, 7:04 PM" (not toLocaleString, which is locale-dependent and
+// date-ambiguous). Renders in browser-local time. This mirrors the no-seconds
+// output of `format_absolute_timestamp` in source/utilities/utilities.py --
+// keep the two in sync by hand (there is no JS test harness for parity).
+const ABSOLUTE_MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 dagfuncs.absoluteTime = function (seconds, sentinel) {
   if (seconds === null || seconds === undefined || seconds === "") {
     return sentinel;
@@ -109,13 +125,18 @@ dagfuncs.absoluteTime = function (seconds, sentinel) {
     hours = 12; // 0 -> 12 for both midnight (12 AM) and noon (12 PM)
   }
 
-  const datePart =
+  const month = ABSOLUTE_MONTHS[date.getMonth()];
+  return (
+    month +
+    " " +
+    date.getDate() +
+    ", " +
     date.getFullYear() +
-    "-" +
-    pad(date.getMonth() + 1) +
-    "-" +
-    pad(date.getDate());
-  const timePart =
-    pad(hours) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
-  return datePart + " " + timePart + " " + ampm;
+    ", " +
+    hours +
+    ":" +
+    pad(date.getMinutes()) +
+    " " +
+    ampm
+  );
 };

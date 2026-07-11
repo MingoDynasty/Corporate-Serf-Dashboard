@@ -4,7 +4,8 @@ Visibility is a display preference, not file state: hidden playlists stay
 loaded, their routes keep resolving, and rank overlays keep drawing — hiding
 only removes them from selector option lists and (by default) the overview.
 The store is a plain show-list: a playlist is visible iff its code is in the
-persisted ``shown_playlists`` list (see ``playlist_overview_proposal.md`` R3/R4).
+persisted ``shown_playlists`` list (see the 2026-07-11 playlist-overview entry
+in ``docs/decision_log.md``).
 """
 
 import json

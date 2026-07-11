@@ -39,6 +39,7 @@ from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
@@ -48,7 +49,7 @@ from source.plot.plot_service import (
     generate_time_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
-from source.utilities.utilities import ordinal
+from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -276,7 +277,7 @@ def get_scenario_num_runs(
         scenario_stats.number_of_runs,
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
-        scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
+        format_absolute_timestamp(scenario_stats.date_last_played),
         "last-played-affordance",
         0,
         False,
@@ -889,21 +890,16 @@ def layout(
                         dmc.Flex(
                             children=[
                                 dmc.Select(
+                                    **PLAYLIST_SELECTOR_PRESET,
                                     allowDeselect=False,
                                     autoSelectOnBlur=True,
-                                    checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     clearable=True,
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    maxDropdownHeight="75vh",
-                                    miw=400,
                                     ml="xl",
                                     persistence=playlist_persistence,
-                                    placeholder="Select a playlist...",
-                                    scrollAreaProps={"type": "always"},
-                                    searchable=True,
                                     value=selected_playlist,
                                 ),
                                 dmc.Select(
