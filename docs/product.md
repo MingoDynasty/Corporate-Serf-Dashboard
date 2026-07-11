@@ -106,10 +106,13 @@ list in the roadmap.)
 
 ### Getting data in
 
-- **Playlist import via sharecode** (Settings modal). *Problem solved:*
-  onboarding a playlist takes one code paste, not hand-building a scenario
-  list. The only part of the app that requires an internet connection besides
-  rank lookups.
+- **Playlist import via sharecode** (Playlists overview page, proposal PR 3a;
+  previously the Home Settings modal). *Problem solved:* onboarding a playlist
+  takes one code paste, not hand-building a scenario list. Lives on the
+  playlist management surface, where the imported playlist lands as a new
+  visible row; a duplicate-code refusal whose playlist is hidden points the
+  user at the "Show hidden" toggle. The only part of the app that requires an
+  internet connection besides rank lookups.
 - **Code-based playlist identity** (PR #67). Playlist
   codes, not names, identify imported and bundled playlists; duplicate names
   stay visible with disambiguated labels, and imports are stored under

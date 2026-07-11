@@ -1,14 +1,48 @@
 """Playlist-level overview page at the playlists landing route."""
 
+import logging
+
 import dash
 import dash_ag_grid as dag
 import dash_mantine_components as dmc
-from dash import Input, Output, callback, clientside_callback, ctx, dcc, no_update
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    dcc,
+    no_update,
+)
 
+from source.components.local_icon import local_icon
+from source.kovaaks.data_service import load_playlist_from_code
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
-from source.kovaaks.playlist_visibility_service import toggle_playlist_visibility
+from source.kovaaks.playlist_visibility_service import (
+    is_playlist_shown,
+    show_playlist,
+    toggle_playlist_visibility,
+)
+
+logger = logging.getLogger(__name__)
 
 VISIBILITY_COLUMN_ID = "hidden"
+
+# Reused from the former Settings-modal import control, with the trailing
+# clause reworded for the overview: importing here lands the playlist as a new
+# visible row on this management surface.
+IMPORT_HELP_TEXT = (
+    "Paste a KovaaK's playlist share code and press Import to add that "
+    "playlist to this list."
+)
+
+# Appended to a duplicate-code refusal when the conflicting playlist exists but
+# is hidden (R14): the code "already exists" but the user cannot see it, so
+# point them at the toggle that surfaces it.
+HIDDEN_DUPLICATE_HINT = (
+    ' It is currently hidden — toggle "Show hidden" on this page to unhide it.'
+)
 
 dash.register_page(
     __name__,
@@ -147,8 +181,9 @@ def route_to_clicked_playlist(cell_clicked):
     Input("playlists-overview-mounted", "data"),
     Input("playlists-overview-show-hidden", "checked"),
     Input("playlists-overview-grid", "cellClicked"),
+    Input("playlists-import-refresh", "data"),
 )
-def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked):
+def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _import_refresh):
     """Build overview rows from local run data and rank caches (no network).
 
     Also handles hide/unhide: a click on the visibility action cell toggles
@@ -170,6 +205,76 @@ def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked):
             return [], 'All playlists are hidden. Toggle "Show hidden" to manage them.'
         return [], "No playlists are loaded."
     return rows, ""
+
+
+@callback(
+    Output("playlists-import-modal", "opened"),
+    Input("playlists-import-open-button", "n_clicks"),
+    State("playlists-import-modal", "opened"),
+    prevent_initial_call=True,
+)
+def toggle_import_modal(_, opened):
+    """Open or close the share-code import modal."""
+    return not opened
+
+
+@callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("playlists-import-refresh", "data"),
+    Output("playlists-import-modal", "opened", allow_duplicate=True),
+    Output("playlists-import-textinput", "value"),
+    Input("playlists-import-button", "n_clicks"),
+    State("playlists-import-textinput", "value"),
+    State("playlists-import-refresh", "data"),
+    prevent_initial_call=True,
+)
+def import_playlist(_, playlist_to_import, import_refresh):
+    """Import a playlist code and surface the result on this page.
+
+    Reuses the shared import service path. On success the playlist is marked
+    visible ("importing is the intent to see"), the refresh store is bumped so
+    the overview rebuilds and shows the new row without a page reload, and the
+    modal closes with a cleared field so the user sees that new row. A refusal
+    leaves the modal open with the pasted code intact so the user can correct
+    it; a duplicate-code refusal whose conflicting playlist is hidden gets the
+    unhide hint appended (R14).
+    """
+    if not playlist_to_import:
+        return no_update, no_update, no_update, no_update
+    playlist_to_import = playlist_to_import.strip()
+    logger.debug("Importing playlist '%s'", playlist_to_import)
+    error_message, canonical_code = load_playlist_from_code(playlist_to_import)
+
+    if error_message:
+        # The refusal branch can carry the conflicting existing code; if that
+        # playlist is hidden, tell the user where to find it.
+        if canonical_code is not None and not is_playlist_shown(canonical_code):
+            error_message += HIDDEN_DUPLICATE_HINT
+        notification = {
+            "action": "show",
+            "title": "Playlist Import Failed",
+            "message": error_message,
+            "color": "red",
+            "id": "imported-playlist-failed-notification",
+            "icon": local_icon("material-symbols:upload"),
+        }
+        return [notification], no_update, no_update, no_update
+
+    # Importing is the intent to see: new playlists arrive visible. Mark the
+    # canonical stored code, which can differ from the pasted input. The
+    # is-not-None guard is defensive; the service contract guarantees a code
+    # here, but never persist a None into the shown-set if that ever changes.
+    if canonical_code is not None:
+        show_playlist(canonical_code)
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": "Successfully imported playlist!",
+        "color": "green",
+        "id": "imported-playlist-successful-notification",
+        "icon": local_icon("material-symbols:upload"),
+    }
+    return [notification], (import_refresh or 0) + 1, False, ""
 
 
 clientside_callback(
@@ -201,6 +306,9 @@ def layout(**kwargs):  # noqa: ARG001
             # The row load is driven by this layout-bound store so revisiting
             # the page rebuilds rows exactly once from current local state.
             dcc.Store(id="playlists-overview-mounted", data=True),
+            # Bumped by a successful import so the row-load callback rebuilds
+            # and shows the new row without a page reload.
+            dcc.Store(id="playlists-import-refresh", data=0),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
@@ -210,14 +318,53 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.Group(
                 children=[
                     dmc.Text("", c="dimmed", id="playlists-overview-status"),
-                    dmc.Switch(
-                        checked=False,
-                        id="playlists-overview-show-hidden",
-                        label="Show hidden",
-                        size="sm",
+                    dmc.Group(
+                        children=[
+                            dmc.Switch(
+                                checked=False,
+                                id="playlists-overview-show-hidden",
+                                label="Show hidden",
+                                size="sm",
+                            ),
+                            dmc.Button(
+                                "Import",
+                                id="playlists-import-open-button",
+                                variant="default",
+                                leftSection=local_icon(
+                                    "material-symbols:upload",
+                                    width=18,
+                                ),
+                            ),
+                        ],
+                        gap="md",
+                        align="center",
                     ),
                 ],
                 justify="space-between",
+            ),
+            dmc.Modal(
+                title="Import Playlist",
+                id="playlists-import-modal",
+                children=dmc.Group(
+                    gap="md",
+                    grow=False,
+                    align="flex-start",
+                    children=[
+                        dmc.TextInput(
+                            id="playlists-import-textinput",
+                            placeholder="KovaaK's playlist code...",
+                            label="Playlist code",
+                            description=IMPORT_HELP_TEXT,
+                            size="md",
+                            w="300px",
+                        ),
+                        dmc.Button(
+                            children="Import",
+                            id="playlists-import-button",
+                            mt="xl",
+                        ),
+                    ],
+                ),
             ),
             dcc.Loading(
                 dag.AgGrid(

@@ -192,16 +192,19 @@ flowchart LR
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
-  settings modal, playlist import. Owns the live-update callbacks
+  settings modal. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
   per visible playlist with coverage, runs, last-played, and cached-percentile
-  aggregates; any cell click navigates to that playlist's scenario table. Row
-  data comes from local run data and rank caches only — this page never
-  triggers KovaaK's API calls. Also hosts the visibility controls: a per-row
-  Hide/Unhide action cell and a "Show hidden" toggle that reveals hidden
-  playlists as muted rows.
+  aggregates; any cell click navigates to that playlist's scenario table.
+  Overview row rendering is local-only — it draws from local run data and rank
+  caches and never triggers KovaaK's API calls. Also hosts the visibility
+  controls: a per-row Hide/Unhide action cell and a "Show hidden" toggle that
+  reveals hidden playlists as muted rows. Hosts playlist import (share-code
+  modal, proposal PR 3a) — the one networked action on this page:
+  `load_playlist_from_code` calls the API, and on success a refresh store bump
+  rebuilds the grid with the new visible row without a page reload.
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log).

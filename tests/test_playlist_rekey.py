@@ -225,7 +225,9 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
         "Playlist code already exists: ExistingCode is already imported as "
         "Same Name (ExistingCode)."
     )
-    assert imported_code is None
+    # Duplicate refusal now carries the conflicting existing (canonical) code,
+    # so the page layer can check whether that playlist is hidden.
+    assert imported_code == "ExistingCode"
     assert not user_root.exists()
     assert data_service.playlist_database == {"ExistingCode": existing}
 

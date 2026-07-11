@@ -60,7 +60,7 @@ def test_playlists_overview_page_loads_rows(monkeypatch):
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None)
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
 
     assert rows == expected_rows
     assert status == ""
@@ -77,7 +77,7 @@ def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch)
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
-    rows, _status = playlists.load_playlist_overview_rows(True, True, None)
+    rows, _status = playlists.load_playlist_overview_rows(True, True, None, 0)
 
     assert seen_include_hidden == [True]
     assert rows[0]["hidden"] is True
@@ -97,6 +97,7 @@ def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
         True,
         False,
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
+        0,
     )
 
     assert toggled == ["KovaaKsTestCode"]
@@ -116,6 +117,7 @@ def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
         True,
         False,
         {"rowId": "KovaaKsTestCode", "colId": "name"},
+        0,
     )
 
     assert rows is no_update
@@ -130,7 +132,7 @@ def test_playlists_overview_page_reports_empty_database(monkeypatch):
         lambda include_hidden=False: [],
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None)
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
 
     assert rows == []
     assert status == "No playlists are loaded."
@@ -146,7 +148,7 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
         ),
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None)
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
 
     assert rows == []
     assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
@@ -160,21 +162,140 @@ def test_playlists_overview_visibility_column_config():
     assert column["sortable"] is False
 
 
+def _walk_components(component):
+    yield component
+    children = getattr(component, "children", None)
+    if children is None:
+        return
+    if isinstance(children, (list, tuple)):
+        for child in children:
+            yield from _walk_components(child)
+        return
+    yield from _walk_components(children)
+
+
 def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     page = playlists.layout()
     grid = page.children[-1].children
     switch = next(
-        child
-        for component in page.children
-        if isinstance(getattr(component, "children", None), list)
-        for child in component.children
-        if getattr(child, "id", None) == "playlists-overview-show-hidden"
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlists-overview-show-hidden"
     )
 
     assert switch.checked is False
     assert grid.rowClassRules == {
         "playlist-overview-row-hidden": "params.data.hidden",
     }
+
+
+def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
+    # KovaaK's canonicalizes pasted codes; the stored code is what visibility
+    # must persist, or a non-canonical paste imports hidden once a
+    # preferences file exists.
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (None, "CanonicalCode"),
+    )
+    shown = []
+    monkeypatch.setattr(playlists, "show_playlist", shown.append)
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "  canonicalcode  ", 0
+    )
+
+    assert shown == ["CanonicalCode"]
+    assert notifications[0]["color"] == "green"
+    # A successful import bumps the refresh store so the grid rebuilds, then
+    # closes the modal and clears the field so the user sees the new row.
+    assert import_refresh == 1
+    assert opened is False
+    assert value == ""
+
+
+def test_import_playlist_failure_does_not_show(monkeypatch):
+    monkeypatch.setattr(
+        playlists, "load_playlist_from_code", lambda _code: ("boom", None)
+    )
+    monkeypatch.setattr(
+        playlists,
+        "show_playlist",
+        lambda _code: pytest.fail("must not mark failed imports as shown"),
+    )
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "BadCode", 3
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "boom"
+    # A failed import must not rebuild rows, and leaves the modal open with the
+    # pasted code intact so the user can correct it.
+    assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
+
+
+def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (
+            "Playlist code already exists: ExistingCode is already imported "
+            "as Same Name (ExistingCode).",
+            "ExistingCode",
+        ),
+    )
+    monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: False)
+    monkeypatch.setattr(
+        playlists,
+        "show_playlist",
+        lambda _code: pytest.fail("a refused import must not be shown"),
+    )
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"].endswith(playlists.HIDDEN_DUPLICATE_HINT)
+    assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
+
+
+def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (
+            "Playlist code already exists: ExistingCode is already imported "
+            "as Same Name (ExistingCode).",
+            "ExistingCode",
+        ),
+    )
+    monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: True)
+
+    notifications, _import_refresh, _opened, _value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
+
+    assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
+
+
+def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-refresh")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 1)
+
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    assert status == ""
 
 
 def test_playlists_overview_sortable_columns_use_nulls_last_comparator():
