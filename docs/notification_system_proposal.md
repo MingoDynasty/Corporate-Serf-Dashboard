@@ -200,7 +200,13 @@ timer effect is keyed on the resolved `autoClose` duration only, so an
 landing near the old toast's expiry would flash for milliseconds. Each
 emission therefore alternates `autoClose` between two indistinguishable
 durations (e.g. 8000/8001 ms), forcing the duration-keyed effect to cancel and
-re-arm the timer. PR 3 must carry a regression test for both replace cases —
+re-arm the timer. The alternation state is **per browser client**: a
+`dcc.Store` sequence flipped on each emission (`generate_graph` gains a
+`State`/`Output` pair on it, and the pure builders take the sequence as an
+argument). A module-global toggle would be wrong — each tab runs its own
+callback stream and `NotificationContainer`, so one tab's flip could hand
+another tab the duration it is already displaying, leaving the old timer
+running. PR 3 must carry a regression test for both replace cases —
 a second run's toast replacing a visible one, and a live run replacing the
 backlog digest — asserting with **elapsed time** that the replacement gets a
 full lifetime, not merely that the payload changed. (The test doubles as an
@@ -214,9 +220,11 @@ dependency, which a future DMC/Mantine version could change.)
   across the room. Never the literal word "Notification".
 - **Message leads with the scenario**; sensitivity is a trailing qualifier
   (top-N is per-sensitivity, so it matters, but it is never the subject).
-- Consistent `autoClose` (one constant), with two deliberate exceptions that
-  persist until dismissed: the Steam-ID mismatch (#3) and startup playlist
-  warnings (#15), both of which fire when the user may not be looking.
+- Consistent `autoClose`: one nominal duration — expressed at runtime as two
+  indistinguishable values by the D5 timer-reset alternation — with two
+  deliberate exceptions that persist until dismissed: the Steam-ID mismatch
+  (#3) and startup playlist warnings (#15), both of which fire when the user
+  may not be looking.
 - Copy shapes (final wording is a build-time detail; the shape is the
   decision):
   - Top-N only: title `New 2nd-best score` (1st: `New best score`), message
@@ -290,6 +298,9 @@ Grouped by file; each maps to inventory rows above.
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
+    The layout gains the per-client toast-lifetime `dcc.Store`, and this
+    callback the `State`/`Output` pair on it, for the D5 autoClose
+    alternation.
   - Drop the `get_dash_logger` import and the `dash_logger` module-global.
 - **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
   empty state where the chart renders, mirroring Home's on-canvas pattern.
@@ -332,26 +343,43 @@ Grouped by file; each maps to inventory rows above.
 
 ## Migration notes
 
-- **Tests.** About twelve functions in `tests/test_home_run_events.py` break,
-  split across two PRs — update them in the PR that breaks them:
-  - **PR 1** (removes #12): every assertion on the `"Graph updated!"` message
-    and `graph-updated-notification` id
+- **Tests.** Breakage spans four files plus one coverage gap — update each in
+  the PR that breaks it:
+  - **PR 1** (removes #12 and the passive rank toasts): in
+    `tests/test_home_run_events.py`, every assertion on the `"Graph updated!"`
+    message and `graph-updated-notification` id
     (`test_single_run_notifications_preserve_top_n_and_fallback_toasts`,
     `test_single_run_threshold_notification_ignores_empty_percentage`,
     `test_generate_graph_skips_threshold_features_when_percentage_is_empty`);
-    the "neither top-N nor threshold" case then asserts an empty list.
+    the "neither top-N nor threshold" case then asserts an empty list. In
+    `tests/test_home_rank_format.py`, the cases that monkeypatch
+    `home.dash_logger` to assert passive-path rank toasts — rewrite against
+    the inline Position-field states of D3.
+  - **PR 1 or 2** (whichever deletes the #8/#9 calls):
+    `tests/test_file_watchdog_rank_refresh.py` and
+    `tests/test_scenario_rank_freshness.py` monkeypatch `dash_logger` and
+    assert the dead toasts' message text — green today despite the toasts
+    never rendering (they tested copy, not deliverability). Rewrite against
+    the retained console `logger` calls.
+  - **PR 2** (System A deletion, Journey in-page state): any remaining
+    `dash_logger` monkeypatches vanish with the module; the Journey page has
+    no dedicated coverage today (only a tangential touch in
+    `test_playlist_pages.py`), so the in-page empty state needs **net-new**
+    regression tests.
   - **PR 3** (D5 merge + D6 copy): the `new-top-n-score-notification` /
     `score-threshold-notification` ids and two-toast-per-run shape in the
     remaining `test_single_run_*` cases, **and the four `test_backlog_*`
     functions** — the backlog realignment changes the
     `run-summary-notification` id (now `run-verdict`, D5) and rewrites the
     exact copy those tests assert. D5's "already follows this one-toast shape"
-    refers to toast *count* only; the backlog copy and id both change.
+    refers to toast *count* only; the backlog copy and id both change. Plus
+    the new D5 lifetime/upsert regression tests.
 - **Docs on ship.** `product.md`'s "Run notifications" paragraph is touched
   twice: PR 1 removes the "Graph updated!" description, PR 3 rewrites it for
   the merged toast. PR 3 is the distill-and-delete PR for this file
   (`decision_log.md` entry + deletion); `tests/test_docs.py` fails on dangling
-  links if any doc still references it then.
+  links if any doc still references it then — including the `roadmap.md`
+  entry for this work, which the same sweep removes.
 - **Behavior parity.** Retiring System A loses nothing that currently renders
   except the passive rank/no-data toasts being intentionally removed; the four
   dead toasts were never visible.

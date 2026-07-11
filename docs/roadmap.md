@@ -81,6 +81,20 @@ removal checklist.
 phases 2–3 continue as the "Playlist management & benchmark library" item
 under Future.
 
+### 2. Notification system redesign
+
+**What:** Collapse the two notification subsystems into one quiet-by-default
+toast layer: passive navigation never toasts errors, persistent conditions
+render in-place, and each run produces at most one verdict toast.
+
+**Why:** The default configuration currently produces a stacking wall of red
+error toasts plus a no-information "Graph updated!" toast during normal play —
+noise that drowns the in-session feedback the toasts exist to deliver.
+
+**Design:** [`notification_system_proposal.md`](./notification_system_proposal.md)
+(Proposed). Ships as three PRs (noise kill → consolidation → copy rework); the
+noise kill alone resolves the audit complaint.
+
 ---
 
 ## Future (briefly)
