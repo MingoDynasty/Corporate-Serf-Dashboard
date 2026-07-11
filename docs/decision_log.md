@@ -206,7 +206,7 @@ to run history.
 
 ## 2026-04-27: Use JSON Files For Runtime API Caches
 
-Status: Accepted (cache root superseded by the 2026-07-11 cache-migration
+Status: Accepted (cache root superseded by the 2026-07-11 cache-relocation
 entry: caches now live under `data/cache/`)
 
 Decision: Store current API cache data as JSON files under `cache/`.
@@ -219,8 +219,8 @@ Consequences: Cache reads must tolerate missing, malformed, stale, or partially-
 
 Status: Accepted (bundled-root path superseded in part by the 2026-07-11
 playlist-overview entry: bundled playlists now live under
-`resources/benchmarks/`, not `resources/playlists/`; the deferred cache
-migration shipped in the 2026-07-11 cache-migration entry)
+`resources/benchmarks/`, not `resources/playlists/`; the deferred cache move
+shipped in the 2026-07-11 cache-relocation entry)
 
 Decision: Store user/runtime app data under a repo-local ignored `data/` directory. New runtime logs belong under `data/logs/`. Existing API caches remain under `cache/` until a separate migration moves them.
 
@@ -651,20 +651,18 @@ instead of duplicating their pixel values.
 
 Status: Accepted
 
-Decision: Relocate the runtime API cache root from `cache/` to `data/cache/`.
-At `api_service` import time, before the cache skeleton is created,
-`migrate_legacy_cache_dir` moves an existing legacy `cache/` directory to
-`data/cache/` in a single rename; when both roots exist the legacy one is
-ignored with a warning that it is safe to delete.
+Decision: Relocate the runtime API cache root from `cache/` to `data/cache/`
+as a plain path change, with no in-app compatibility migration. An existing
+`cache/` directory is moved by hand after the change lands.
 
 Why: The 2026-06-22 entry grouped user/runtime state under `data/` but
-deferred the cache to a dedicated compatibility migration. Completing it puts
-all runtime state — logs, preferences, user playlists, and the cache — under
-one ignored root.
+deferred the cache to a dedicated compatibility migration. The app currently
+has exactly one user and the cache is fully regenerable from the API, so
+migration code would outlive its single use; a one-time manual move (or just
+letting the cache rebuild) covers it.
 
-Consequences: Cache contents survive the move because it is a rename, not a
-rebuild. If the rename fails (for example a Windows file lock that outlasts
-the transient-lock retries), the app continues with a fresh, regenerable
-cache and later startups warn about the leftover legacy directory.
-`.gitignore` keeps the legacy `cache/` entry so pre-migration checkouts stay
-clean.
+Consequences: All runtime state — logs, preferences, user playlists, and the
+cache — lives under one ignored `data/` root. A legacy `cache/` root left in
+place is silently ignored; `.gitignore` keeps its entry so pre-move checkouts
+stay clean. Revisit an in-app migration only if the app gains users beyond
+its author.

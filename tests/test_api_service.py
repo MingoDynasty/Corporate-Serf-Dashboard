@@ -681,69 +681,6 @@ def test_make_cache_creates_leaderboard_mapping_file(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def _set_cache_roots(monkeypatch, tmp_path):
-    legacy_dir = tmp_path / "cache"
-    target_dir = tmp_path / "data" / "cache"
-    monkeypatch.setattr(api_service, "LEGACY_CACHE_DIR", legacy_dir)
-    monkeypatch.setattr(api_service, "CACHE_DIR", target_dir)
-    return legacy_dir, target_dir
-
-
-def test_migrate_legacy_cache_dir_moves_legacy_cache(monkeypatch, tmp_path):
-    legacy_dir, target_dir = _set_cache_roots(monkeypatch, tmp_path)
-    (legacy_dir / "benchmarks").mkdir(parents=True)
-    (legacy_dir / "benchmarks" / "123.json").write_text("{}", encoding="utf-8")
-
-    api_service.migrate_legacy_cache_dir()
-
-    assert not legacy_dir.exists()
-    assert (target_dir / "benchmarks" / "123.json").read_text(encoding="utf-8") == "{}"
-
-
-def test_migrate_legacy_cache_dir_without_legacy_is_noop(monkeypatch, tmp_path):
-    legacy_dir, target_dir = _set_cache_roots(monkeypatch, tmp_path)
-
-    api_service.migrate_legacy_cache_dir()
-
-    assert not legacy_dir.exists()
-    assert not target_dir.exists()
-
-
-def test_migrate_legacy_cache_dir_keeps_both_roots_when_target_exists(
-    monkeypatch, tmp_path, caplog
-):
-    legacy_dir, target_dir = _set_cache_roots(monkeypatch, tmp_path)
-    legacy_dir.mkdir(parents=True)
-    (legacy_dir / "old.json").write_text("{}", encoding="utf-8")
-    target_dir.mkdir(parents=True)
-    (target_dir / "new.json").write_text("{}", encoding="utf-8")
-
-    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
-        api_service.migrate_legacy_cache_dir()
-
-    assert (legacy_dir / "old.json").exists()
-    assert (target_dir / "new.json").exists()
-    assert "safe to delete" in caplog.text
-
-
-def test_migrate_legacy_cache_dir_tolerates_move_failure(monkeypatch, tmp_path, caplog):
-    legacy_dir, target_dir = _set_cache_roots(monkeypatch, tmp_path)
-    legacy_dir.mkdir(parents=True)
-    (legacy_dir / "old.json").write_text("{}", encoding="utf-8")
-
-    def failing_replace(*_args):
-        raise OSError("directory in use")
-
-    monkeypatch.setattr(api_service.os, "replace", failing_replace)
-
-    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
-        api_service.migrate_legacy_cache_dir()
-
-    assert (legacy_dir / "old.json").exists()
-    assert not target_dir.exists()
-    assert "continuing with a fresh cache" in caplog.text
-
-
 def test_save_leaderboard_id_handles_concurrent_upserts(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)

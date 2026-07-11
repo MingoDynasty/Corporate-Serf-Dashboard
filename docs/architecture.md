@@ -106,9 +106,7 @@ that summary and never accesses the queue directly.
     as empty. New imports are written atomically under `data/playlists/`.
 - **Cache layer** — KovaaK's API responses and resolved rank/leaderboard data
   persist as JSON under `data/cache/` (not committed), written atomically and
-  read tolerantly. A legacy pre-2026-07 `cache/` root is moved to `data/cache/`
-  once at `api_service` import time (`migrate_legacy_cache_dir`). Subtrees
-  include `scenario_leaderboards/`,
+  read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
 - **User preferences** — `data/preferences.json` (not committed) holds the
