@@ -13,6 +13,7 @@ import pytest
 
 from source.kovaaks import api_service
 from source.kovaaks.api_models import (
+    BenchmarksAPIResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
@@ -468,6 +469,30 @@ def test_get_benchmark_json_returns_schema_valid_cache(tmp_path, monkeypatch):
     result = api_service.get_benchmark_json(123, use_cache=True)
 
     assert result == response_json
+
+
+def test_benchmarks_response_allows_rank_without_color():
+    """KovaaK's omits `color` on some rank tiers; validation must tolerate it."""
+    payload = {
+        "benchmark_progress": 42,
+        "overall_rank": 3,
+        "categories": {},
+        "ranks": [
+            {
+                "icon": "copper.png",
+                "name": "Copper",
+                "frame": "frame.png",
+                "description": "",
+                "playercard_large": "large.png",
+                "playercard_small": "small.png",
+            }
+        ],
+    }
+
+    response = BenchmarksAPIResponse.model_validate(payload)
+
+    assert response.ranks[0].color is None
+    assert response.ranks[0].name == "Copper"
 
 
 def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
