@@ -114,6 +114,20 @@
     color: var(--mantine-color-blue-filled-hover);
 }
 
+/* Delete link in the overview's delete column (DeleteAction renderer in
+   dashAgGridComponentFunctions.js). Styled like .visibility-action but red to
+   signal the destructive, user-playlist-only action. */
+.delete-action {
+    color: var(--mantine-color-red-filled);
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+}
+
+.delete-action:hover {
+    color: var(--mantine-color-red-filled-hover);
+}
+
 /* Benchmark/Playlist pill in the overview's Type column (TypeBadge renderer
    in dashAgGridComponentFunctions.js). */
 .type-badge {

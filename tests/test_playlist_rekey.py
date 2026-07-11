@@ -323,6 +323,142 @@ def test_write_playlist_data_to_file_leaves_existing_file_intact_on_failure(
     assert not list(user_root.glob(".*.tmp"))
 
 
+def test_load_playlists_records_user_root_file_paths(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # A hand-dropped file whose name get_playlist_file_path would never
+    # reconstruct: delete must still find it via the recorded path.
+    hand_named = user_root / "arbitrary-name.json"
+    _write_playlist(hand_named, _playlist("Hand Named", "HandCode"))
+
+    data_service.load_playlists()
+
+    recorded = data_service._user_root_playlist_files
+    assert recorded == {"HandCode": user_root.resolve() / "arbitrary-name.json"}
+    # The import-written path the naive reconstruction would produce does not
+    # match the hand-dropped filename — that is exactly why we record paths.
+    reconstructed = data_service.get_playlist_file_path("Hand Named", "HandCode")
+    assert reconstructed.name == "Hand Named [HandCode].json"
+    assert reconstructed != recorded["HandCode"]
+
+
+def test_load_playlists_records_superseded_user_files_only_for_bundled_winners(
+    monkeypatch,
+    tmp_path,
+):
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    # A user copy of a bundled code: a dead pre-#90 copy-to-activate leftover.
+    superseded = user_root / "old-copy.json"
+    _write_playlist(superseded, _playlist("Old Copy", "BundledCode"))
+    # A user file shadowed by another *user* file is a plain duplicate, not
+    # "superseded by bundled", so it must stay out of the cleanup list.
+    _write_playlist(user_root / "a-dup.json", _playlist("Dup", "DupCode"))
+    _write_playlist(user_root / "z-dup.json", _playlist("Dup Two", "DupCode"))
+
+    data_service.load_playlists()
+
+    assert data_service.get_superseded_user_playlist_files() == [
+        (user_root.resolve() / "old-copy.json", "BundledCode")
+    ]
+
+
+def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    user_file = user_root / "user.json"
+    _write_playlist(user_file, _playlist("User", "UserCode"))
+    data_service.load_playlists()
+    assert user_file.exists()
+
+    result = data_service.delete_user_playlist("UserCode")
+
+    assert result is None
+    assert not user_file.exists()
+    assert "UserCode" not in data_service.playlist_database
+    assert data_service.get_user_root_playlist_codes() == set()
+    assert "UserCode" not in data_service._user_root_playlist_files
+
+
+def test_delete_user_playlist_refuses_bundled_code(monkeypatch, tmp_path):
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    bundled_file = bundled_root / "bundled.json"
+    _write_playlist(bundled_file, _playlist("Bundled", "BundledCode"))
+    data_service.load_playlists()
+
+    result = data_service.delete_user_playlist("BundledCode")
+
+    assert result is not None
+    assert "cannot be deleted" in result
+    assert bundled_file.exists()
+    assert "BundledCode" in data_service.playlist_database
+
+
+def test_delete_user_playlist_refuses_unknown_code(monkeypatch, tmp_path):
+    _configure_roots(monkeypatch, tmp_path)
+    data_service.load_playlists()
+
+    result = data_service.delete_user_playlist("NopeCode")
+
+    assert result is not None
+    assert "cannot be deleted" in result
+
+
+def test_delete_user_playlist_tolerates_already_missing_file(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    user_file = user_root / "user.json"
+    _write_playlist(user_file, _playlist("User", "UserCode"))
+    data_service.load_playlists()
+    user_file.unlink()  # vanished out from under us before delete
+
+    result = data_service.delete_user_playlist("UserCode")
+
+    assert result is None
+    assert "UserCode" not in data_service.playlist_database
+    assert "UserCode" not in data_service._user_root_playlist_files
+
+
+def test_delete_user_playlist_reports_oserror_without_touching_store(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    user_file = user_root / "user.json"
+    _write_playlist(user_file, _playlist("User", "UserCode"))
+    data_service.load_playlists()
+
+    def locked_unlink(_self):
+        raise PermissionError("file is locked")
+
+    monkeypatch.setattr(data_service.Path, "unlink", locked_unlink)
+
+    result = data_service.delete_user_playlist("UserCode")
+
+    assert result is not None
+    assert "Failed to delete playlist file" in result
+    assert "UserCode" in data_service.playlist_database
+    assert "UserCode" in data_service._user_root_playlist_files
+
+
+def test_delete_superseded_user_playlist_files_removes_all_dead_copies(
+    monkeypatch,
+    tmp_path,
+):
+    bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
+    superseded = user_root / "old-copy.json"
+    _write_playlist(superseded, _playlist("Old Copy", "BundledCode"))
+    data_service.load_playlists()
+    assert superseded.exists()
+    assert len(data_service.get_superseded_user_playlist_files()) == 1
+
+    result = data_service.delete_superseded_user_playlist_files()
+
+    assert result is None
+    assert not superseded.exists()
+    assert data_service.get_superseded_user_playlist_files() == []
+    # The bundled winner never had a store entry touched.
+    assert "BundledCode" in data_service.playlist_database
+
+
 def test_committed_bundled_playlists_all_carry_rank_data():
     result = subprocess.run(
         ["git", "ls-files", "resources/benchmarks"],

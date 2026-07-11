@@ -377,6 +377,36 @@ def test_build_playlist_overview_rows_filters_hidden_playlists(monkeypatch):
     ]
 
 
+def test_build_playlist_overview_rows_marks_only_user_playlists_deletable(
+    monkeypatch,
+):
+    _configure(monkeypatch)
+    user = PlaylistData(
+        name="User", code="UserCode", scenarios=[Scenario(name="First")]
+    )
+    bundled = PlaylistData(
+        name="Bundled", code="BundledCode", scenarios=[Scenario(name="Second")]
+    )
+    monkeypatch.setattr(
+        data_service,
+        "playlist_database",
+        {user.code: user, bundled.code: bundled},
+    )
+    _install_stats_snapshot(monkeypatch, {})
+    _install_cached_ranks(monkeypatch, {})
+    _install_shown_codes(monkeypatch, {"UserCode", "BundledCode"})
+    monkeypatch.setattr(
+        playlist_overview_service,
+        "get_user_root_playlist_codes",
+        lambda: {"UserCode"},
+    )
+
+    rows = {row["code"]: row for row in build_playlist_overview_rows()}
+
+    assert rows["UserCode"]["deletable"] is True
+    assert rows["BundledCode"]["deletable"] is False
+
+
 def test_build_playlist_overview_rows_skips_unknown_selector_codes(monkeypatch):
     _configure(monkeypatch)
     _install_stats_snapshot(monkeypatch, {})

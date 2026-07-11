@@ -202,9 +202,14 @@ flowchart LR
   caches and never triggers KovaaK's API calls. Also hosts the visibility
   controls: a per-row Hide/Unhide action cell and a "Show hidden" toggle that
   reveals hidden playlists as muted rows. Hosts playlist import (share-code
-  modal, proposal PR 3a) — the one networked action on this page:
-  `load_playlist_from_code` calls the API, and on success a refresh store bump
-  rebuilds the grid with the new visible row without a page reload.
+  modal) — the one networked action on this page: `load_playlist_from_code`
+  calls the API, and on success a refresh store bump rebuilds the grid with the
+  new visible row without a page reload. Hosts playlist deletion: a per-row
+  Delete action cell (user playlists only; bundled rows render nothing) opens a
+  confirmation modal, then `delete_user_playlist` unlinks the file and the same
+  refresh store rebuilds the grid. When the loader recorded user files
+  superseded by bundled benchmarks, an alert above the grid offers a one-click
+  cleanup (`delete_superseded_user_playlist_files`).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log).
@@ -218,7 +223,12 @@ flowchart LR
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
-  `get_sensitivities_vs_runs`, and the playlist loaders/getters.
+  `get_sensitivities_vs_runs`, and the playlist loaders/getters. `load_playlists`
+  records each winning user-root code's actual file path (so deletion targets
+  the real file, not a reconstructed name) and the user files it skips because
+  a bundled code already won; `delete_user_playlist` and
+  `delete_superseded_user_playlist_files` are the write paths that unlink those
+  files under the playlist I/O lock, keeping startup itself read-only.
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
