@@ -132,7 +132,10 @@ full-library world first (see R3).
   corpus via a bulk importer regeneration would restore the inspectability
   intended by the 2026-07-03 provenance decision and is desirable hygiene,
   but it is **not** a PR 2b prerequisite: nothing in this milestone reads
-  the stamps. The importer's true working directory —
+  the stamps. Update (PR #97, 2026-07-11): the library-curation import added
+  101 stamped files, so the corpus is now mixed — the original 111 legacy
+  files remain unstamped; the 101 new arrivals carry `generated_from`. The
+  importer's true working directory —
   `scripts/benchmark_importer/generated/` staging with its manifest — is
   untouched; its readme's manual-copy destination becomes
   `resources/benchmarks/` and the copy-to-activate step dies (activation
