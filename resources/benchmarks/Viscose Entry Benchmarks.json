@@ -1,0 +1,668 @@
+{
+  "name": "Viscose Entry Benchmarks",
+  "code": "KovaaKsDinkingVibrantInfiltration",
+  "scenarios": [
+    {
+      "name": "Smoothsphere Viscose Horizontal Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 4 Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Flower Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Vertical Iron",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "RawControlSphere Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 13400.0
+        }
+      ]
+    },
+    {
+      "name": "wasuTS Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 95.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 108.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 118.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 128.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 138.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ Static Switching 6 Bot Larger",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 85.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 92.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 98.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 104.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 110.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload smallflicks Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 75.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 84.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 92.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 100.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 108.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 80.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 87.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 93.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 99.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 105.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 110.0
+        }
+      ]
+    },
+    {
+      "name": "eth Pasu Micro Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 600.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 700.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 800.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 900.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Novice Static",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 99.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 106.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 113.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 120.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 600.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 680.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 750.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 830.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 400.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 490.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 580.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 670.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 760.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 850.0
+        }
+      ]
+    },
+    {
+      "name": "VT Floating Heads Viscose Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 550.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 630.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 700.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 760.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 820.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 880.0
+        }
+      ]
+    },
+    {
+      "name": "VoxTS Click Entry",
+      "ranks": [
+        {
+          "name": "Caspian",
+          "color": "#C5C3F2",
+          "threshold": 71.0
+        },
+        {
+          "name": "Ribbon",
+          "color": "#B2CBEA",
+          "threshold": 79.0
+        },
+        {
+          "name": "Weddell",
+          "color": "#BAF6FC",
+          "threshold": 86.0
+        },
+        {
+          "name": "Harbour",
+          "color": "#7bcaf0",
+          "threshold": 92.0
+        },
+        {
+          "name": "Harp",
+          "color": "#6B94DF",
+          "threshold": 98.0
+        },
+        {
+          "name": "Baikal",
+          "color": "#5558AA",
+          "threshold": 105.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDinkingVibrantInfiltration",
+    "kovaaks_benchmark_id": 2477,
+    "rank_colors": [
+      [
+        "Caspian",
+        "#C5C3F2"
+      ],
+      [
+        "Ribbon",
+        "#B2CBEA"
+      ],
+      [
+        "Weddell",
+        "#BAF6FC"
+      ],
+      [
+        "Harbour",
+        "#7bcaf0"
+      ],
+      [
+        "Harp",
+        "#6B94DF"
+      ],
+      [
+        "Baikal",
+        "#5558AA"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:53.263998+00:00",
+    "generator": "benchmark_importer"
+  }
+}
