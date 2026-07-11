@@ -92,8 +92,9 @@ def _add_rank_overlays(
     # whose threshold lands inside the plotted score range, plus the nearest
     # context rank strictly below and strictly above that range (including any
     # ties at those boundary thresholds). This is a strict generalization of
-    # the old index-bracketing: for ascending ladders the selection is
-    # identical.
+    # the old index-bracketing: for strictly ascending ladders the selection is
+    # identical (with equal thresholds the new code draws all tied ranks where
+    # the old drew one).
     low = float(min(scores))
     high = float(max(scores))
 

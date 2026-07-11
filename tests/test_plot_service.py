@@ -158,7 +158,7 @@ def test_rank_overlays_non_monotonic_wide_range_draws_in_range_plus_context() ->
 
 
 def test_rank_overlays_monotonic_equivalence() -> None:
-    # For ascending ladders the value-based selection matches the old
+    # For strictly ascending ladders the value-based selection matches the old
     # index-bracketing exactly: one context rank below, in-range ranks, one
     # context rank above.
     ladder = [
