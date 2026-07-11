@@ -333,12 +333,12 @@ def test_load_playlists_records_user_root_file_paths(monkeypatch, tmp_path):
     data_service.load_playlists()
 
     recorded = data_service._user_root_playlist_files
-    assert recorded == {"HandCode": user_root.resolve() / "arbitrary-name.json"}
+    assert recorded == {"HandCode": [user_root.resolve() / "arbitrary-name.json"]}
     # The import-written path the naive reconstruction would produce does not
     # match the hand-dropped filename — that is exactly why we record paths.
     reconstructed = data_service.get_playlist_file_path("Hand Named", "HandCode")
     assert reconstructed.name == "Hand Named [HandCode].json"
-    assert reconstructed != recorded["HandCode"]
+    assert reconstructed not in recorded["HandCode"]
 
 
 def test_load_playlists_records_superseded_user_files_only_for_bundled_winners(
@@ -376,6 +376,30 @@ def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_p
     assert "UserCode" not in data_service.playlist_database
     assert data_service.get_user_root_playlist_codes() == set()
     assert "UserCode" not in data_service._user_root_playlist_files
+
+
+def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_path):
+    # Two user files sharing one code: the loser is skipped at load, but a
+    # leftover copy would resurrect the playlist on restart. Delete must remove
+    # every copy (regression for PR #98 review).
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(user_root / "a.json", _playlist("Dup A", "DupCode"))
+    _write_playlist(user_root / "b.json", _playlist("Dup B", "DupCode"))
+    data_service.load_playlists()
+    assert (user_root / "a.json").exists()
+    assert (user_root / "b.json").exists()
+    assert len(data_service._user_root_playlist_files["DupCode"]) == 2
+
+    result = data_service.delete_user_playlist("DupCode")
+
+    assert result is None
+    assert not (user_root / "a.json").exists()
+    assert not (user_root / "b.json").exists()
+    assert "DupCode" not in data_service.playlist_database
+
+    # Simulate a restart: reloading must not resurrect the deleted playlist.
+    data_service.load_playlists()
+    assert "DupCode" not in data_service.playlist_database
 
 
 def test_delete_user_playlist_refuses_bundled_code(monkeypatch, tmp_path):
