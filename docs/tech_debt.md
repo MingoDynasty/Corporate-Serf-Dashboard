@@ -39,8 +39,10 @@ is the fix site.
 
 ### Single-command local quality gate
 
-CI now enforces the five-command merge bar. Add one local entry point (task
-runner or script) only if repeatedly typing the commands becomes burdensome.
+CI enforces four of the five standard checks (ruff format, ruff lint, mypy,
+pytest); `compileall` runs only in the local pre-handoff validation. Add one
+local entry point (task runner or script) only if repeatedly typing the five
+commands becomes burdensome.
 
 ## UI/UX
 
