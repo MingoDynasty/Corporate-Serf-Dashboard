@@ -19,8 +19,11 @@ absolutely throughout:
 git worktree list   # first entry is the main checkout
 ```
 
-If that `ignore/` directory is not reachable (e.g. a cloud session), stop and
-report that the sweep must run on the local machine.
+`ignore/README.md` is tracked, so `ignore/` itself exists in every checkout —
+its presence proves nothing. The untracked queue dirs are the real check:
+if `ignore/pr-reviews/` and `ignore/prompts/` are not both present at the
+main-checkout path (e.g. a cloud session), stop and report that the sweep
+must run on the local machine — do not report empty queues.
 
 ## 1. Archive merged review handoffs
 
@@ -55,7 +58,9 @@ shipped or finished shipping a proposal, verify the "Shipping a proposal"
 definition of done in AGENTS.md actually happened: proposal file deleted,
 `docs/decision_log.md` entry added, `docs/roadmap.md` milestone moved to
 Shipped, `docs/product.md` inventory updated, fixed `docs/tech_debt.md`
-entries removed.
+entries removed, and no stale references to the deleted proposal file remain
+(`rg` the filename across the repo — CI's `test_docs.py` only catches
+dangling Markdown links, not plain-text or source references).
 
 Report gaps — do NOT fix tracked docs from the sweep. Doc fixes on main
 belong in a PR (ideally the shipping PR; a small follow-up docs PR when
