@@ -1622,5 +1622,45 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPushingMauveWeaponlevel",
+    "kovaaks_benchmark_id": 687,
+    "rank_colors": [
+      [
+        "Cinnabar",
+        "#A71112"
+      ],
+      [
+        "Vermillion",
+        "#F85939"
+      ],
+      [
+        "Saffron",
+        "#F1C338"
+      ],
+      [
+        "Celadon",
+        "#9CFF91"
+      ],
+      [
+        "Cerulean",
+        "#02A4D3"
+      ],
+      [
+        "Lavender",
+        "#C2C2FF"
+      ],
+      [
+        "Indigo",
+        "#5C3896"
+      ],
+      [
+        "Fuchsia",
+        "#C74375"
+      ]
+    ],
+    "generated_at": "2026-07-10T20:17:07.193222+00:00",
+    "generator": "benchmark_importer"
+  }
 }

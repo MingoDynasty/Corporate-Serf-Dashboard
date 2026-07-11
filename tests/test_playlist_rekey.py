@@ -323,7 +323,7 @@ def test_write_playlist_data_to_file_leaves_existing_file_intact_on_failure(
 
 def test_committed_bundled_playlists_all_carry_rank_data():
     result = subprocess.run(
-        ["git", "ls-files", "resources/playlists"],
+        ["git", "ls-files", "resources/benchmarks"],
         cwd=REPO_ROOT,
         text=True,
         capture_output=True,

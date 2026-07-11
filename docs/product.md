@@ -81,8 +81,14 @@ list in the roadmap.)
   filters every playlist dropdown (Home filter, Journey picker). Hidden
   playlists stay loaded — routes and rank overlays keep working. *Problem
   solved:* focus — dropdowns and the overview show only the playlists you
-  care about, which is what makes shipping the full benchmark library (next
-  milestone) tolerable.
+  care about, which is what makes shipping the full benchmark library
+  tolerable.
+- **Bundled benchmark library** (proposal PR 2b). Every importer-generated
+  benchmark (111 files) ships with the app and loads at startup; Voltaic and
+  Viscose are visible by default and the rest wait behind "Show hidden" on
+  the Playlists page. *Problem solved:* enabling a benchmark used to mean
+  manually copying a JSON file and restarting — now it's one unhide click,
+  and app updates refresh the whole library automatically.
 - **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
@@ -112,7 +118,7 @@ list in the roadmap.)
   longer live in the committed bundled-playlist root.
 - **Benchmark importer** (`scripts/benchmark_importer/`, PRs #45–#48). Merges
   Evxl playlist resolution with KovaaK's rank thresholds into reviewable
-  benchmark files under `resources/playlists/generated/`. *Problem solved:*
+  benchmark files under `resources/benchmarks/`. *Problem solved:*
   rank overlays need threshold data that no single public API provides; the
   importer builds it reproducibly, with provenance, instead of by hand.
 
