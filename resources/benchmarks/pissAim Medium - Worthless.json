@@ -1,0 +1,574 @@
+{
+  "name": "pissAim Medium - Worthless",
+  "code": "KovaaKsClickingBurntorangeVehicle",
+  "scenarios": [
+    {
+      "name": "1w6t NQS pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 54.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 64.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 72.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 90.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "Wide4t pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 50.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 60.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 70.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 78.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 85.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Smallflicks pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 54.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 64.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 72.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 90.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 30.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 40.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 48.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 56.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 64.0
+        }
+      ]
+    },
+    {
+      "name": "beanClick pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 54.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 64.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 72.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 90.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 98.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Click pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 15.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 20.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 26.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 31.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 36.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Speed Switching pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 60.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 70.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 78.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 85.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Easy pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 52.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 66.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 76.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 84.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "1w4t NQS Pokeball pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 50.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 65.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 80.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 90.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "TrgSwitch pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 210.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 280.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 340.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 390.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 430.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS Strafes pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 210.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 280.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 330.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 360.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 380.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS Angelic pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 280.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 350.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 410.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 460.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Easy pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 8400.0
+        }
+      ]
+    },
+    {
+      "name": "BC120TI pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 140.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 240.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 330.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 400.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 450.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Easy pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 8400.0
+        }
+      ]
+    },
+    {
+      "name": "UFO Fallen pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 800.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 1750.0
+        }
+      ]
+    },
+    {
+      "name": "Air AIO Angelic pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 800.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 2200.0
+        }
+      ]
+    },
+    {
+      "name": "STSR pAim",
+      "ranks": [
+        {
+          "name": "Amber",
+          "color": "#c68801",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#ff0000",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#054ebd",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#60048b",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#62f500",
+          "threshold": 4800.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClickingBurntorangeVehicle",
+    "kovaaks_benchmark_id": 920,
+    "rank_colors": [
+      [
+        "Amber",
+        "#c68801"
+      ],
+      [
+        "Ruby",
+        "#ff0000"
+      ],
+      [
+        "Sapphire",
+        "#054ebd"
+      ],
+      [
+        "Amethyst",
+        "#60048b"
+      ],
+      [
+        "Emerald",
+        "#62f500"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:15.950845+00:00",
+    "generator": "benchmark_importer"
+  }
+}

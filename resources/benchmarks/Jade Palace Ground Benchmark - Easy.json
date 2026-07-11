@@ -1,0 +1,634 @@
+{
+  "name": "Jade Palace Ground Benchmark - Easy",
+  "code": "KovaaKsStartingLavenderArmorshard",
+  "scenarios": [
+    {
+      "name": "Plaza Palace Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 893.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 899.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 904.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 910.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 916.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic Goated Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 880.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 886.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 892.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 898.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 905.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawGround Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Easy Invincible - Thin",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 12600.0
+        }
+      ]
+    },
+    {
+      "name": "Midrange Fast Strafes Easy Invincible Thin",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 13500.0
+        }
+      ]
+    },
+    {
+      "name": "MSSI Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10100.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 893.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 898.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 903.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 908.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 913.0
+        }
+      ]
+    },
+    {
+      "name": "MFSI v3 Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 880.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 884.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 888.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 892.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 896.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky V3",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 893.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 897.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 901.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 905.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 909.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Thin",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Perfected Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3950.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafes Raspberry Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 11600.0
+        }
+      ]
+    },
+    {
+      "name": "Close Needle Thin Easy+",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "MLSI Demotori Easy Thin",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 12400.0
+        }
+      ]
+    },
+    {
+      "name": "MLSI Demotori Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 11100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 11900.0
+        }
+      ]
+    },
+    {
+      "name": "controlstrafes midrange easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 10700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 11400.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible Precise+ Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 13400.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Smooth 2 Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4550.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Intermediate S5 Bot 3 Invincible",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4300.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsStartingLavenderArmorshard",
+    "kovaaks_benchmark_id": 962,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#cd30c1"
+      ],
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:46.669216+00:00",
+    "generator": "benchmark_importer"
+  }
+}

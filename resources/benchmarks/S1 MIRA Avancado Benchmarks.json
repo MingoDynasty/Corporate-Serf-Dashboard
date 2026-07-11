@@ -1,0 +1,394 @@
+{
+  "name": "S1 MIRA Avancado Benchmarks",
+  "code": "KovaaKsChallengingSmallClass",
+  "scenarios": [
+    {
+      "name": "Multiclick Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 138.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 147.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 156.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 163.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "Fourshot Hard MIRA Fixed",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "Bounceshot Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 800.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 900.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 980.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 1130.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 880.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 940.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 1120.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Hard MIRA Fixed",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 8600.0
+        }
+      ]
+    },
+    {
+      "name": "PTI Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 11450.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 12375.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 13100.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 5350.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 6050.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 6350.0
+        }
+      ]
+    },
+    {
+      "name": "AA4 Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 7875.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 9625.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 10500.0
+        }
+      ]
+    },
+    {
+      "name": "VelozSwitch Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 100.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 110.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 119.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 128.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 134.0
+        }
+      ]
+    },
+    {
+      "name": "kndTS Wide Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 110.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 118.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 124.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 136.0
+        }
+      ]
+    },
+    {
+      "name": "r3dSwitch Hard MIRA",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 320.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 360.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 400.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 460.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 520.0
+        }
+      ]
+    },
+    {
+      "name": "FugaSwitch Hard MIRA Fixed",
+      "ranks": [
+        {
+          "name": "Ascendant",
+          "color": "#66FF66",
+          "threshold": 48.0
+        },
+        {
+          "name": "Expert",
+          "color": "#FF9900",
+          "threshold": 52.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#FF2262",
+          "threshold": 59.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#19E1FF",
+          "threshold": 62.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#020202",
+          "threshold": 66.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingSmallClass",
+    "kovaaks_benchmark_id": 601,
+    "rank_colors": [
+      [
+        "Ascendant",
+        "#66FF66"
+      ],
+      [
+        "Expert",
+        "#FF9900"
+      ],
+      [
+        "Supreme",
+        "#FF2262"
+      ],
+      [
+        "Immortal",
+        "#19E1FF"
+      ],
+      [
+        "Eternal",
+        "#020202"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:07:35.444654+00:00",
+    "generator": "benchmark_importer"
+  }
+}

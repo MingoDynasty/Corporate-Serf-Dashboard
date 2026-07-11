@@ -1,0 +1,402 @@
+{
+  "name": "Mastering Gridshot",
+  "code": "KovaaKsVibratingPeachGasmask",
+  "scenarios": [
+    {
+      "name": "GridShot 3x3",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 100000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 115000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 128000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 140000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 150000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 160000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 170000.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot 3x3 30s",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 50000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 57000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 64000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 70000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 77000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 83000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 88000.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot 3x3 50% Smaller",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 58000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 66000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 75000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 85000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 100000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 115000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 130000.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 145.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 152.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 160.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 170.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 180.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 190.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot Mini",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 78.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 87.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 96.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 105.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 115.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 125.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot Large",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 158.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 165.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 174.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 185.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 194.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 208.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 217.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot Ultimate",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 50000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 57000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 64000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 73000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 80000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 87000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 94000.0
+        }
+      ]
+    },
+    {
+      "name": "True Gridshot Ultimate",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 75000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 83000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 90000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 100000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 115000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 125000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 130000.0
+        }
+      ]
+    },
+    {
+      "name": "GridShot 5x5",
+      "ranks": [
+        {
+          "name": "Novice",
+          "color": "#ff4d00",
+          "threshold": 93000.0
+        },
+        {
+          "name": "Regular",
+          "color": "#eeff00",
+          "threshold": 100000.0
+        },
+        {
+          "name": "Confirmed",
+          "color": "#44e4a9",
+          "threshold": 107000.0
+        },
+        {
+          "name": "Elite",
+          "color": "#0f8ddb",
+          "threshold": 118000.0
+        },
+        {
+          "name": "Dominant",
+          "color": "#600193",
+          "threshold": 125000.0
+        },
+        {
+          "name": "Primordial",
+          "color": "#000000",
+          "threshold": 134000.0
+        },
+        {
+          "name": "Sovereign",
+          "color": "#FFFFFF",
+          "threshold": 142000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsVibratingPeachGasmask",
+    "kovaaks_benchmark_id": 2622,
+    "rank_colors": [
+      [
+        "Novice",
+        "#ff4d00"
+      ],
+      [
+        "Regular",
+        "#eeff00"
+      ],
+      [
+        "Confirmed",
+        "#44e4a9"
+      ],
+      [
+        "Elite",
+        "#0f8ddb"
+      ],
+      [
+        "Dominant",
+        "#600193"
+      ],
+      [
+        "Primordial",
+        "#000000"
+      ],
+      [
+        "Sovereign",
+        "#FFFFFF"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:08.758723+00:00",
+    "generator": "benchmark_importer"
+  }
+}

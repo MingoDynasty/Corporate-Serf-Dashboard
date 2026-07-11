@@ -1,0 +1,633 @@
+{
+  "name": "Ultimate Valorant Benchmark",
+  "code": "KovaaKsHeadshottingMaroonAdd",
+  "scenarios": [
+    {
+      "name": "Valorant Small Horizontal Flicks - Don't Miss! (boON's)",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 135.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 140.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 145.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 150.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 155.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Static Click Angelic",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 135.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 140.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 145.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 150.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 155.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Hard S1",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 170.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 180.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 190.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 200.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 210.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 220.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 1560.0
+        }
+      ]
+    },
+    {
+      "name": "FB DynMicros",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 82.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 87.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 97.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 102.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 107.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 400% FIXED",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Micro++ flick reload small",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 103.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 106.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 109.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 112.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 115.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 118.0
+        }
+      ]
+    },
+    {
+      "name": "400ms strafing Reflex Micro++ Horizontalish valorant",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 67.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 72.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 77.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 82.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 87.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 92.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Reflex Flick Strafing",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 60.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 62.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 64.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 66.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 68.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 9100.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 9700.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 10900.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 12100.0
+        }
+      ]
+    },
+    {
+      "name": "ADJUSTTRACK - VALORANT",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "Centering I 180",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "Lovable SmoothBot",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 150.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 154.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 157.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 160.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 163.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 166.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 5 Sphere Hipfire Extra Small",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 123.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 128.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 133.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 137.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 142.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 147.0
+        }
+      ]
+    },
+    {
+      "name": "AvasiveTS Perfected",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 6450.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 7150.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 7850.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Avasive",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#efc90b",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Plat",
+          "color": "#2EC4B6",
+          "threshold": 5150.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#bd4dfe",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Ascendant",
+          "color": "#3EDB7C",
+          "threshold": 5650.0
+        },
+        {
+          "name": "Immortal",
+          "color": "#a80030",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Radiant",
+          "color": "#fdfebe",
+          "threshold": 6150.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHeadshottingMaroonAdd",
+    "kovaaks_benchmark_id": 2332,
+    "rank_colors": [
+      [
+        "Gold",
+        "#efc90b"
+      ],
+      [
+        "Plat",
+        "#2EC4B6"
+      ],
+      [
+        "Diamond",
+        "#bd4dfe"
+      ],
+      [
+        "Ascendant",
+        "#3EDB7C"
+      ],
+      [
+        "Immortal",
+        "#a80030"
+      ],
+      [
+        "Radiant",
+        "#fdfebe"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:56.372831+00:00",
+    "generator": "benchmark_importer"
+  }
+}

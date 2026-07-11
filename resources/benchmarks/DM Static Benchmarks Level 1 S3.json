@@ -1,0 +1,280 @@
+{
+  "name": "DM Static Benchmarks Level 1 S3",
+  "code": "KovaaKsHipfiringDiagonalBottomfrag",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 850.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 950.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 820.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 920.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2020.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 900.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 870.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 970.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2070.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 840.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 940.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1990.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 910.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2110.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 870.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 970.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2020.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 940.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2140.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 890.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 990.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2040.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Level 1 S3",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 960.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2160.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHipfiringDiagonalBottomfrag",
+    "kovaaks_benchmark_id": 2111,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Vortex",
+        "#6B0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:57.308647+00:00",
+    "generator": "benchmark_importer"
+  }
+}

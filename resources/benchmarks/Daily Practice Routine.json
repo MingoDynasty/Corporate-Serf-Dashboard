@@ -1,0 +1,334 @@
+{
+  "name": "Daily Practice Routine",
+  "code": "KovaaKsChallengingCamouflagedHell",
+  "scenarios": [
+    {
+      "name": "SmoothBot Invincible Goated 75%",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 2500.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "GP Far Long Strafes Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 3750.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy 80% Speed",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 5000.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 6000.0
+        }
+      ]
+    },
+    {
+      "name": "TSK - DVD Tracking MASSIVE",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 750.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 1250.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Intermediate Slower No UFO",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 500.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 650.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 800.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static 5Bot",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 500.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 600.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 700.0
+        }
+      ]
+    },
+    {
+      "name": "patTS Voltaic Silver",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 35.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 55.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 65.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 52.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 60.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 67.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn rAim Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 90.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 115.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 140.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 170.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu rAim Easy",
+      "ranks": [
+        {
+          "name": "Bronze",
+          "color": "#e87400",
+          "threshold": 30.0
+        },
+        {
+          "name": "Silver",
+          "color": "#afc2e7",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gold",
+          "color": "#e1cf4d",
+          "threshold": 60.0
+        },
+        {
+          "name": "Plat",
+          "color": "#7bbcc1",
+          "threshold": 80.0
+        },
+        {
+          "name": "LETS GOOOO",
+          "color": "#45efef",
+          "threshold": 100.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingCamouflagedHell",
+    "kovaaks_benchmark_id": 2060,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#e87400"
+      ],
+      [
+        "Silver",
+        "#afc2e7"
+      ],
+      [
+        "Gold",
+        "#e1cf4d"
+      ],
+      [
+        "Plat",
+        "#7bbcc1"
+      ],
+      [
+        "LETS GOOOO",
+        "#45efef"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:59.034264+00:00",
+    "generator": "benchmark_importer"
+  }
+}

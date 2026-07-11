@@ -1,0 +1,330 @@
+{
+  "name": "Setsunai Static Benchmark Hard",
+  "code": "KovaaKsReloadingCaffeinatedStrike",
+  "scenarios": [
+    {
+      "name": "Reflex Flick - Fair",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 7000.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick Wide - Fair",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick Horizontal Small",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 25.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 35.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 45.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 55.0
+        }
+      ]
+    },
+    {
+      "name": "Wide Wall 4 Targets Small",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 93.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 103.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 113.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "ww2t 30% Smaller",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 103.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 113.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 123.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 133.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball ww2t Voltaic Smaller",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 95.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 105.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 115.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload LG56",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 170.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 180.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 190.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "5 Sphere Hipfire Extra Small",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 5 Sphere Hipfire Extra Small",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 115.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 125.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 135.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Perfected",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 108.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 118.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 128.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 138.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts reload",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 115.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 125.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 135.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto 1w4ts",
+      "ranks": [
+        {
+          "name": "Cherubim",
+          "color": "#4db4ea",
+          "threshold": 110.0
+        },
+        {
+          "name": "Empyrean",
+          "color": "#9abfe1",
+          "threshold": 120.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#807efb",
+          "threshold": 130.0
+        },
+        {
+          "name": "Iridescent",
+          "color": "#9dd2bc",
+          "threshold": 140.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsReloadingCaffeinatedStrike",
+    "kovaaks_benchmark_id": 743,
+    "rank_colors": [
+      [
+        "Cherubim",
+        "#4db4ea"
+      ],
+      [
+        "Empyrean",
+        "#9abfe1"
+      ],
+      [
+        "Celestial",
+        "#807efb"
+      ],
+      [
+        "Iridescent",
+        "#9dd2bc"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:41.355591+00:00",
+    "generator": "benchmark_importer"
+  }
+}

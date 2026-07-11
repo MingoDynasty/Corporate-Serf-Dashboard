@@ -1,0 +1,850 @@
+{
+  "name": "Amare's Quest",
+  "code": "KovaaKsChatfraggingVibrantSupport",
+  "scenarios": [
+    {
+      "name": "AmareAngleSmoothness",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 2100.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Smoothsphere",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy Far 30s",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 5650.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 6330.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 7050.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 7850.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 8740.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 9720.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 13200.0
+        }
+      ]
+    },
+    {
+      "name": "Domi SmoothinTrack 90%",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 1970.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 2190.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 2420.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "tamTS Control Hard (Faster TTK - 30%)",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 25.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 29.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 32.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 36.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 40.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 44.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 48.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 53.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 57.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto Small Wide",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 2340.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 2580.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 2820.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 3240.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 3470.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 5 Sphere Hipfire Extra Small",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 91.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 100.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 108.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 115.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 122.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 131.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 141.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 151.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 163.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Horizontal Switch",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 61.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 68.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 73.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 80.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 86.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 94.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 102.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 111.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 122.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Dynamic TAF Micro v2",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 400.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 500.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 600.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 700.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 800.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 900.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 1098.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 1198.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Star Clicking",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 340.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 440.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 520.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 585.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 650.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 725.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 810.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 900.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 960.0
+        }
+      ]
+    },
+    {
+      "name": "eth PHM",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 500.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 580.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 650.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 750.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 830.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 920.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 1015.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 1250.0
+        }
+      ]
+    },
+    {
+      "name": "eth FarSkeet Small",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 400.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 450.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 510.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 570.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 620.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 680.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 750.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 820.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "Amare VAL Micro Static 2T",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 90.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 100.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 114.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 122.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 131.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 140.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 152.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "Amare JaguarClick",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 490.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 550.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 600.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 650.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 700.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 740.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 770.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 800.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 840.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Microcluster Horizontal",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 38.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 43.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 47.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 51.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 56.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 60.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 65.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 70.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 76.0
+        }
+      ]
+    },
+    {
+      "name": "uv VoxTargetClick Strafe",
+      "ranks": [
+        {
+          "name": "Desire",
+          "color": "#FFFFFF",
+          "threshold": 119.0
+        },
+        {
+          "name": "Doll",
+          "color": "#feffc7",
+          "threshold": 130.0
+        },
+        {
+          "name": "Pixie",
+          "color": "#f4bdff",
+          "threshold": 140.0
+        },
+        {
+          "name": "Fairy",
+          "color": "#ff99df",
+          "threshold": 148.0
+        },
+        {
+          "name": "Fantasy",
+          "color": "#f2274c",
+          "threshold": 155.0
+        },
+        {
+          "name": "Star",
+          "color": "#ffdd00",
+          "threshold": 162.0
+        },
+        {
+          "name": "Twilight",
+          "color": "#2d2c6d",
+          "threshold": 170.0
+        },
+        {
+          "name": "Queen",
+          "color": "#4a0d87",
+          "threshold": 178.0
+        },
+        {
+          "name": "Goddess",
+          "color": "#000000",
+          "threshold": 185.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChatfraggingVibrantSupport",
+    "kovaaks_benchmark_id": 1927,
+    "rank_colors": [
+      [
+        "Desire",
+        "#FFFFFF"
+      ],
+      [
+        "Doll",
+        "#feffc7"
+      ],
+      [
+        "Pixie",
+        "#f4bdff"
+      ],
+      [
+        "Fairy",
+        "#ff99df"
+      ],
+      [
+        "Fantasy",
+        "#f2274c"
+      ],
+      [
+        "Star",
+        "#ffdd00"
+      ],
+      [
+        "Twilight",
+        "#2d2c6d"
+      ],
+      [
+        "Queen",
+        "#4a0d87"
+      ],
+      [
+        "Goddess",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:04.658831+00:00",
+    "generator": "benchmark_importer"
+  }
+}

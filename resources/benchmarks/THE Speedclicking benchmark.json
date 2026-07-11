@@ -1,0 +1,353 @@
+{
+  "name": "THE Speedclicking benchmark",
+  "code": "KovaaKsGriefingFlawlessGoat",
+  "scenarios": [
+    {
+      "name": "Gridshot Ultimate",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 52000.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 57000.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 62000.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 67000.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 71000.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 75000.0
+        }
+      ]
+    },
+    {
+      "name": "GridShot 3x3",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 96000.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 103800.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 111600.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 119400.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 127200.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 135000.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 86.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 99.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 112.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 124.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 137.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy Mini",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 94.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 108.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 122.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 136.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 150.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 191.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 213.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 235.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 257.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 278.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 300.0
+        }
+      ]
+    },
+    {
+      "name": "RawMousima",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 1840.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 1980.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 2120.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 2260.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "eth 1w4tes Micro",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 152.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 174.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 196.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 217.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 239.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 260.0
+        }
+      ]
+    },
+    {
+      "name": "uv VBR Micro 2ts",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 130.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 154.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 178.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 202.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 226.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 250.0
+        }
+      ]
+    },
+    {
+      "name": "1wall 2targets far smaller denserer",
+      "ranks": [
+        {
+          "name": "Type-99",
+          "color": "#48cae4",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#00b4d8",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Zero",
+          "color": "#0096c7",
+          "threshold": 1980.0
+        },
+        {
+          "name": "Hien",
+          "color": "#0077b6",
+          "threshold": 2320.0
+        },
+        {
+          "name": "Raiden",
+          "color": "#023e8a",
+          "threshold": 2660.0
+        },
+        {
+          "name": "SP-005",
+          "color": "#03045e",
+          "threshold": 3000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGriefingFlawlessGoat",
+    "kovaaks_benchmark_id": 877,
+    "rank_colors": [
+      [
+        "Type-99",
+        "#48cae4"
+      ],
+      [
+        "Pulsar",
+        "#00b4d8"
+      ],
+      [
+        "Zero",
+        "#0096c7"
+      ],
+      [
+        "Hien",
+        "#0077b6"
+      ],
+      [
+        "Raiden",
+        "#023e8a"
+      ],
+      [
+        "SP-005",
+        "#03045e"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:52.768527+00:00",
+    "generator": "benchmark_importer"
+  }
+}

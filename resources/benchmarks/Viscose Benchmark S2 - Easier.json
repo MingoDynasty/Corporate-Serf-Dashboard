@@ -1,0 +1,2000 @@
+{
+  "name": "Viscose Benchmark S2 - Easier",
+  "code": "KovaaKsScreamingPulledEgg",
+  "scenarios": [
+    {
+      "name": "Smoothsphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 8050.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 13050.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 13600.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 11100.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 16200.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 18500.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothBot Perfected Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 4775.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 5025.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Control wobin Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3450.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere SuperbAim Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 6200.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 7050.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 7975.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 9050.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 11750.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy 70%",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 4175.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 4475.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 5100.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Viscose Easier 50cm",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 5850.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 6400.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 7100.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 10700.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 11500.0
+        }
+      ]
+    },
+    {
+      "name": "Flower Easier 50cm",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3475.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic Easy Smoother",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 550.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1675.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 800.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 817.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 842.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 852.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 862.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 873.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 883.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 889.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 896.0
+        }
+      ]
+    },
+    {
+      "name": "RawControlSphere Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 13200.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 Easy",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 780.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 805.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 833.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 845.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 854.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 866.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 876.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 884.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 889.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral Easy 85%",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 870.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 895.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 907.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 913.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 917.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 922.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 926.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 929.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 932.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Bot 1 Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3475.0
+        }
+      ]
+    },
+    {
+      "name": "Plink Palace Easy Less Blinks",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 2525.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Easier No UFO",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 875.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 895.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 912.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 919.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 923.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 928.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 933.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 937.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 940.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 4 Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "ww5t Voltaic Slightly Larger",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 70.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 80.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 92.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 97.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 101.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 108.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 113.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 119.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2 Large",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 59.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 68.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 78.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 84.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 92.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 99.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 106.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 113.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ Static Switching 6 Bot Slightly Larger",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 78.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 89.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 98.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 103.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 109.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 115.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 121.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 126.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 131.0
+        }
+      ]
+    },
+    {
+      "name": "1w6ts reload v2 20% bigger",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 64.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 71.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 78.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 85.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 91.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 97.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 103.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 109.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS Larger",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 53.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 64.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 75.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 86.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 96.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 106.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 116.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 126.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 137.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 67.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 76.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 86.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 91.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 96.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 101.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 108.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 114.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 119.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload smallflicks larger",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 76.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 85.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 93.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 100.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 106.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 112.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 118.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 124.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "eth Pasu Micro Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 600.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 775.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 850.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 925.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 1075.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 1225.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Novice",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 51.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 63.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 74.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 85.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 96.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 107.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 118.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 129.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic Easy 85%",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 35.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 38.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 44.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 49.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 54.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 59.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 63.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 67.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 72.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 7500.0
+        }
+      ]
+    },
+    {
+      "name": "B180T Voltaic Easy Slower",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 32.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 37.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 42.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 47.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 52.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 57.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 62.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 67.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 72.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Voltaic Reload Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 38.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 46.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 52.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 59.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 65.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 72.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 78.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 84.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 91.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 300.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 380.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 460.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 540.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 610.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 690.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 750.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 810.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 870.0
+        }
+      ]
+    },
+    {
+      "name": "CatClick Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 27.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 35.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 42.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 49.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 56.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 63.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 69.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 75.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated Larger 80%",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 420.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 530.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 640.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 750.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 860.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 970.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn MV Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 90.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 150.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 200.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 240.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 280.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 320.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 360.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 390.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 420.0
+        }
+      ]
+    },
+    {
+      "name": "skyClick Goated Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 60.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 71.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 80.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 89.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 95.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 102.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 107.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 112.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 117.0
+        }
+      ]
+    },
+    {
+      "name": "VoxTS Click Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 48.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 57.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 64.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 72.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 79.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 86.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 93.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 99.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "VT Floating Heads Viscose Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 400.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 500.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 580.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 645.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 790.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 870.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 930.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 1015.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS Viscose Click Easier",
+      "ranks": [
+        {
+          "name": "Lemming",
+          "color": "#C5C3F2",
+          "threshold": 31.0
+        },
+        {
+          "name": "Hare",
+          "color": "#B2CBEA",
+          "threshold": 39.0
+        },
+        {
+          "name": "Ermine",
+          "color": "#BAF6FC",
+          "threshold": 45.0
+        },
+        {
+          "name": "Puffin",
+          "color": "#7bcaf0",
+          "threshold": 51.0
+        },
+        {
+          "name": "Penguin",
+          "color": "#6B94DF",
+          "threshold": 57.0
+        },
+        {
+          "name": "Fox",
+          "color": "#5558AA",
+          "threshold": 63.0
+        },
+        {
+          "name": "Mammoth",
+          "color": "#6E3F98",
+          "threshold": 69.0
+        },
+        {
+          "name": "Orca",
+          "color": "#C080E4",
+          "threshold": 74.0
+        },
+        {
+          "name": "Seal",
+          "color": "#F5BDE8",
+          "threshold": 80.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsScreamingPulledEgg",
+    "kovaaks_benchmark_id": 2335,
+    "rank_colors": [
+      [
+        "Lemming",
+        "#C5C3F2"
+      ],
+      [
+        "Hare",
+        "#B2CBEA"
+      ],
+      [
+        "Ermine",
+        "#BAF6FC"
+      ],
+      [
+        "Puffin",
+        "#7bcaf0"
+      ],
+      [
+        "Penguin",
+        "#6B94DF"
+      ],
+      [
+        "Fox",
+        "#5558AA"
+      ],
+      [
+        "Mammoth",
+        "#6E3F98"
+      ],
+      [
+        "Orca",
+        "#C080E4"
+      ],
+      [
+        "Seal",
+        "#F5BDE8"
+      ]
+    ],
+    "generated_at": "2026-07-11T11:58:50.540892+00:00",
+    "generator": "benchmark_importer"
+  }
+}

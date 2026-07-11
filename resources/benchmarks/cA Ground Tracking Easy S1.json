@@ -1,0 +1,205 @@
+{
+  "name": "cA Ground Tracking Easy S1",
+  "code": "KovaaKsAdventuringRare90s",
+  "scenarios": [
+    {
+      "name": "cA REACTIVE Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "cA MFSI Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "cA FBS Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "cA SLIPPERY Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 9350.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "cA VSS Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 12100.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 13800.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 14600.0
+        }
+      ]
+    },
+    {
+      "name": "cA FLUIDITY Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 3070.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 3370.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3620.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3850.0
+        }
+      ]
+    },
+    {
+      "name": "cA XYZ Easy S1",
+      "ranks": [
+        {
+          "name": "Rivulet",
+          "color": "#85FA85",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Cloud",
+          "color": "#cd30c1",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Droplets",
+          "color": "#feeb01",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Fluid",
+          "color": "#6f1d89",
+          "threshold": 3800.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAdventuringRare90s",
+    "kovaaks_benchmark_id": 2531,
+    "rank_colors": [
+      [
+        "Rivulet",
+        "#85FA85"
+      ],
+      [
+        "Cloud",
+        "#cd30c1"
+      ],
+      [
+        "Droplets",
+        "#feeb01"
+      ],
+      [
+        "Fluid",
+        "#6f1d89"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:27.646759+00:00",
+    "generator": "benchmark_importer"
+  }
+}

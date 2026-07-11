@@ -1,0 +1,353 @@
+{
+  "name": "IFE",
+  "code": "KovaaKsStartingMountedBug",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky V3",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 862.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 872.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 878.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 884.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 888.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 909.0
+        }
+      ]
+    },
+    {
+      "name": "Flicker Plaza rAim Easy",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 860.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 870.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 880.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 890.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 900.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 917.0
+        }
+      ]
+    },
+    {
+      "name": "Polarized Hell Easy 20% Slower",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 1800.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 2000.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 2250.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 2500.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 2800.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 103.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 115.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 127.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 136.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 142.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 149.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 88.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 98.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 107.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 116.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 123.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot TS Voltaic",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 39.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 41.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 43.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 46.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 50.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 55.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 7900.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 8800.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 9700.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 10400.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 11500.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 2700.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 3000.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 3600.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 4100.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 4450.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "CANTON",
+          "color": "#7c3131",
+          "threshold": 7200.0
+        },
+        {
+          "name": "NOBLE",
+          "color": "#878787",
+          "threshold": 8300.0
+        },
+        {
+          "name": "AEGIS",
+          "color": "#fbff00",
+          "threshold": 9100.0
+        },
+        {
+          "name": "SHADOW",
+          "color": "#02c028",
+          "threshold": 10000.0
+        },
+        {
+          "name": "CSOC",
+          "color": "#009dff",
+          "threshold": 10600.0
+        },
+        {
+          "name": "VIPER",
+          "color": "#e60000",
+          "threshold": 11500.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsStartingMountedBug",
+    "kovaaks_benchmark_id": 2594,
+    "rank_colors": [
+      [
+        "CANTON",
+        "#7c3131"
+      ],
+      [
+        "NOBLE",
+        "#878787"
+      ],
+      [
+        "AEGIS",
+        "#fbff00"
+      ],
+      [
+        "SHADOW",
+        "#02c028"
+      ],
+      [
+        "CSOC",
+        "#009dff"
+      ],
+      [
+        "VIPER",
+        "#e60000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:47.575997+00:00",
+    "generator": "benchmark_importer"
+  }
+}

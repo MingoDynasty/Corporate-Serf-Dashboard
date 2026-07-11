@@ -1,0 +1,353 @@
+{
+  "name": "TheTrackingBenchmark",
+  "code": "KovaaKsPlunderingGreenGunsmith",
+  "scenarios": [
+    {
+      "name": "Spherical Centering Dodge",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Pole Centering Dodge",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 2480.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 2660.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 2840.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 3020.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 3120.0
+        }
+      ]
+    },
+    {
+      "name": "Sphere 90 Centering Dodge",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 1980.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 2320.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 2660.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Kindaclose Fast Strafes",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 13200.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 15100.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 17000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Air Advanced",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 1920.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 2340.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 2760.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 3180.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "LDDH LG56 AIMGOD",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 270.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 306.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 342.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 378.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 414.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 450.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 4225.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 5450.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 6675.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 9125.0
+        }
+      ]
+    },
+    {
+      "name": "VT PreciseOrb Advanced",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 750.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 1730.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 2220.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 2710.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "VT Smoothbot Advanced",
+      "ranks": [
+        {
+          "name": "Weak",
+          "color": "#787878",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Evil",
+          "color": "#3d2546",
+          "threshold": 2180.0
+        },
+        {
+          "name": "Pure Evil",
+          "color": "#4c00ff",
+          "threshold": 2660.0
+        },
+        {
+          "name": "Villain",
+          "color": "#ff6600",
+          "threshold": 3140.0
+        },
+        {
+          "name": "Demon",
+          "color": "#2e0000",
+          "threshold": 3620.0
+        },
+        {
+          "name": "Demon Lord",
+          "color": "#ff0000",
+          "threshold": 4100.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPlunderingGreenGunsmith",
+    "kovaaks_benchmark_id": 878,
+    "rank_colors": [
+      [
+        "Weak",
+        "#787878"
+      ],
+      [
+        "Evil",
+        "#3d2546"
+      ],
+      [
+        "Pure Evil",
+        "#4c00ff"
+      ],
+      [
+        "Villain",
+        "#ff6600"
+      ],
+      [
+        "Demon",
+        "#2e0000"
+      ],
+      [
+        "Demon Lord",
+        "#ff0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:27.848366+00:00",
+    "generator": "benchmark_importer"
+  }
+}

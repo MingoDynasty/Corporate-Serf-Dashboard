@@ -1,0 +1,574 @@
+{
+  "name": "pissAim Hard - Worthless",
+  "code": "KovaaKsClearingBurntorangeChaingun",
+  "scenarios": [
+    {
+      "name": "1w6ts pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 92.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 98.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 106.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 114.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 122.0
+        }
+      ]
+    },
+    {
+      "name": "Wide4ts pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 74.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 80.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 87.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 94.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Micro++ pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 102.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 111.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 121.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 131.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Pasu Perfected pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 64.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 71.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 80.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 89.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 96.0
+        }
+      ]
+    },
+    {
+      "name": "BC120 pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 50.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 58.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 67.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 76.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 84.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Click pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 26.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 34.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 43.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 52.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "patTS pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 8900.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 82.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 86.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 92.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 98.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 102.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Wide pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 88.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 94.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 101.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 108.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 114.0
+        }
+      ]
+    },
+    {
+      "name": "tamTS Control NR pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 5100.0
+        }
+      ]
+    },
+    {
+      "name": "BC120T pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 360.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 410.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 480.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 550.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 600.0
+        }
+      ]
+    },
+    {
+      "name": "Air Switch pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 6700.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 7700.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 8600.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 800.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 9000.0
+        }
+      ]
+    },
+    {
+      "name": "raspStrafes pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 10800.0
+        }
+      ]
+    },
+    {
+      "name": "Air pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "VSS GPAIO pAim",
+      "ranks": [
+        {
+          "name": "Topaz",
+          "color": "#bb7007",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Zircon",
+          "color": "#584a32",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#5e2ce8",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Umbra",
+          "color": "#3e091e",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Visceral",
+          "color": "#ff0000",
+          "threshold": 3100.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingBurntorangeChaingun",
+    "kovaaks_benchmark_id": 923,
+    "rank_colors": [
+      [
+        "Topaz",
+        "#bb7007"
+      ],
+      [
+        "Zircon",
+        "#584a32"
+      ],
+      [
+        "Obsidian",
+        "#5e2ce8"
+      ],
+      [
+        "Umbra",
+        "#3e091e"
+      ],
+      [
+        "Visceral",
+        "#ff0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:20.767300+00:00",
+    "generator": "benchmark_importer"
+  }
+}

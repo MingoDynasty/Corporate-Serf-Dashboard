@@ -1,0 +1,664 @@
+{
+  "name": "R Bench Normal",
+  "code": "KovaaKsSwitchingBlueUfo",
+  "scenarios": [
+    {
+      "name": "RawMouseControlClicking3 70% Size",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "Piano Tiles I 50% SLOW",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "1 wall 6 targets Micro++",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 13500.0
+        }
+      ]
+    },
+    {
+      "name": "Batting Aimer",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 23.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 27.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 31.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 35.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Click Small",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 105.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 110.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 115.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 118.0
+        }
+      ]
+    },
+    {
+      "name": "Long Strafes Humanoid Switch Miyu but it's REGEN",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky V3 Extra Thin",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 880.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 885.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 890.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 895.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic UFO Initiate",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ PreciseTrack S1 Modified 80%",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL Beginner",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 940.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 942.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 945.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 947.5
+        }
+      ]
+    },
+    {
+      "name": "canTS Small",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 230.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 270.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 310.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 360.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Popcorn",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 23.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 27.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 30.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 36.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Small Regen",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "Star Tracking GOATED - Regen",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 34.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 37.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 40.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 43.0
+        }
+      ]
+    },
+    {
+      "name": "voxTS Viscose Varied small 150%",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 58.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 63.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 68.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "Close LS Dodge Grandmaster",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 20000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 22000.0
+        }
+      ]
+    },
+    {
+      "name": "Close FS Easy Dodge Invincible Blink Thin",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 12555.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 14555.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 18000.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Goated Tracking Reversed Dodge",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 8500.0
+        }
+      ]
+    },
+    {
+      "name": "TRACKING RITE OF AIMER",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 1500000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 1540000.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 1580000.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 1630000.0
+        }
+      ]
+    },
+    {
+      "name": "Kovaaks Sandbox Intro Scenario Small",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Tracking God Aoi Small",
+      "ranks": [
+        {
+          "name": "Beginner",
+          "color": "#9cf7ae",
+          "threshold": 1.0
+        },
+        {
+          "name": "Gold",
+          "color": "#f4ec10",
+          "threshold": 825.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#0bb9d0",
+          "threshold": 835.0
+        },
+        {
+          "name": "Master",
+          "color": "#c007f2",
+          "threshold": 845.0
+        },
+        {
+          "name": "Qualified",
+          "color": "#f00528",
+          "threshold": 860.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSwitchingBlueUfo",
+    "kovaaks_benchmark_id": 2093,
+    "rank_colors": [
+      [
+        "Beginner",
+        "#9cf7ae"
+      ],
+      [
+        "Gold",
+        "#f4ec10"
+      ],
+      [
+        "Platinum",
+        "#0bb9d0"
+      ],
+      [
+        "Master",
+        "#c007f2"
+      ],
+      [
+        "Qualified",
+        "#f00528"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:49.823267+00:00",
+    "generator": "benchmark_importer"
+  }
+}

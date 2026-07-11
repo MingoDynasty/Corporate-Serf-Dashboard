@@ -1,0 +1,754 @@
+{
+  "name": "Revosect S5 - Advanced",
+  "code": "KovaaKsAdsingRoyalpurpleChat",
+  "scenarios": [
+    {
+      "name": "EvoClick Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1275.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1350.0
+        }
+      ]
+    },
+    {
+      "name": "StrawberryClick Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "1w5ts vbr Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1620.0
+        }
+      ]
+    },
+    {
+      "name": "1w4t Pressure Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1690.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1780.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1870.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1960.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 800.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "SpringClick Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 830.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 960.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1220.0
+        }
+      ]
+    },
+    {
+      "name": "SnowClick Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 800.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 900.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 700.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 780.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 860.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 940.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1020.0
+        }
+      ]
+    },
+    {
+      "name": "FloodTrack Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "VTP Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 2525.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Tornadosphere Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 892.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 898.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 904.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 910.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 916.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Smooth Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 884.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 890.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 896.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 902.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 908.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 876.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 885.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 893.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 906.0
+        }
+      ]
+    },
+    {
+      "name": "Air Smooth Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 878.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 887.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 895.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 902.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 908.0
+        }
+      ]
+    },
+    {
+      "name": "AngleSwitch Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "DotSwitch Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1320.0
+        }
+      ]
+    },
+    {
+      "name": "NovaSwitch Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1320.0
+        }
+      ]
+    },
+    {
+      "name": "WaveSwitch Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 940.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 1260.0
+        }
+      ]
+    },
+    {
+      "name": "SpringTS Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 480.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 560.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 600.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 640.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereTS Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 470.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 520.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 570.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 620.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 670.0
+        }
+      ]
+    },
+    {
+      "name": "PasuTS Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 360.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 390.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 420.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 450.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 480.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothTS Revosect",
+      "ranks": [
+        {
+          "name": "Immortal",
+          "color": "#A43EFF",
+          "threshold": 460.0
+        },
+        {
+          "name": "Ascended",
+          "color": "#D03F5A",
+          "threshold": 490.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#FFE599",
+          "threshold": 520.0
+        },
+        {
+          "name": "Divine",
+          "color": "#6FA8DC",
+          "threshold": 550.0
+        },
+        {
+          "name": "Eternal",
+          "color": "#FF0000",
+          "threshold": 580.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAdsingRoyalpurpleChat",
+    "kovaaks_benchmark_id": 821,
+    "rank_colors": [
+      [
+        "Immortal",
+        "#A43EFF"
+      ],
+      [
+        "Ascended",
+        "#D03F5A"
+      ],
+      [
+        "Ethereal",
+        "#FFE599"
+      ],
+      [
+        "Divine",
+        "#6FA8DC"
+      ],
+      [
+        "Eternal",
+        "#FF0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:17.644948+00:00",
+    "generator": "benchmark_importer"
+  }
+}

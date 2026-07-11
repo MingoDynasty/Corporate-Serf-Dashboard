@@ -1,0 +1,181 @@
+{
+  "name": "Jade Palace Air Benchmark - Fundamentals",
+  "code": "KovaaKsJigglepeekingNavyblueEngram",
+  "scenarios": [
+    {
+      "name": "Air Angelic Invincible 2 80%",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy Invincible 4 80%",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Novice S5 Bot 2",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#FF9900",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 4450.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsJigglepeekingNavyblueEngram",
+    "kovaaks_benchmark_id": 2430,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#cd30c1"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:02.146618+00:00",
+    "generator": "benchmark_importer"
+  }
+}

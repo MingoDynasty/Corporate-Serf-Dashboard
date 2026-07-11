@@ -1,0 +1,350 @@
+{
+  "name": "Ground Track DOJO",
+  "code": "KovaaKsBouncingPrismaticCamper",
+  "scenarios": [
+    {
+      "name": "DeceptiveStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4350.0
+        }
+      ]
+    },
+    {
+      "name": "ElusiveStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "IcyStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "SnappyStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3925.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "PlazaStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "WiggleStrafes",
+      "ranks": [
+        {
+          "name": "White Belt|\u767d\u5e2f",
+          "color": "#FFFFFF",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Yellow Belt|\u9ec4\u5e2f",
+          "color": "#E4E428",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Orange Belt|\u6a59\u5e2f",
+          "color": "#D89925",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Green Belt|\u7dd1\u5e2f",
+          "color": "#13A513",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Blue Belt|\u9752\u5e2f",
+          "color": "#4176CB",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Purple Belt|\u7d2b\u5e2f",
+          "color": "#5E259B",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Brown Belt|\u8336\u5e2f",
+          "color": "#964B00",
+          "threshold": 4075.0
+        },
+        {
+          "name": "Red Belt|\u8d64\u5e2f",
+          "color": "#9B1B0A",
+          "threshold": 4275.0
+        },
+        {
+          "name": "Black Belt|\u9ed2\u5e2f",
+          "color": "#434343",
+          "threshold": 4400.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBouncingPrismaticCamper",
+    "kovaaks_benchmark_id": 977,
+    "rank_colors": [
+      [
+        "White Belt|\u767d\u5e2f",
+        "#FFFFFF"
+      ],
+      [
+        "Yellow Belt|\u9ec4\u5e2f",
+        "#E4E428"
+      ],
+      [
+        "Orange Belt|\u6a59\u5e2f",
+        "#D89925"
+      ],
+      [
+        "Green Belt|\u7dd1\u5e2f",
+        "#13A513"
+      ],
+      [
+        "Blue Belt|\u9752\u5e2f",
+        "#4176CB"
+      ],
+      [
+        "Purple Belt|\u7d2b\u5e2f",
+        "#5E259B"
+      ],
+      [
+        "Brown Belt|\u8336\u5e2f",
+        "#964B00"
+      ],
+      [
+        "Red Belt|\u8d64\u5e2f",
+        "#9B1B0A"
+      ],
+      [
+        "Black Belt|\u9ed2\u5e2f",
+        "#434343"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:51.156211+00:00",
+    "generator": "benchmark_importer"
+  }
+}

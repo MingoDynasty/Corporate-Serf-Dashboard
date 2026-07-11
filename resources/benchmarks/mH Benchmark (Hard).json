@@ -1,0 +1,762 @@
+{
+  "name": "mH Benchmark (Hard)",
+  "code": "KovaaKsLosingThinLoadout",
+  "scenarios": [
+    {
+      "name": "Horizontalish 3 Targets (Distance)",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 119.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 124.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 126.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 129.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 132.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 135.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 139.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Voltaic 30% smaller",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 110.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 115.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 117.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 120.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 123.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 126.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 128.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts_truste Raspberry",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 158.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 162.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 165.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 168.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 170.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 173.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 175.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Pasu Perfected 30% Smaller",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 90.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 92.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 96.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 99.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 102.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 105.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 107.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS angelic click small",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 52.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 53.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 57.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 61.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 63.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 65.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 67.0
+        }
+      ]
+    },
+    {
+      "name": "B180 Voltaic 30% Smaller",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 70.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 73.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 75.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 78.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 80.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 84.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 88.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball ww3t Voltaic smaller",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 114.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 117.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 121.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 124.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 126.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 128.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "rx 1w4ts vbr Varied Pokeball",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 1260.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 1300.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 1330.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 1350.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 1400.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 1420.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 1450.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Control Phantasy",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 13000.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 13900.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 14000.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 14700.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 15250.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 15600.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 15900.0
+        }
+      ]
+    },
+    {
+      "name": "VT PGT Intermediate S5 Precision Focus",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 3500.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 3750.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 3850.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 4000.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 4150.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 4300.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Elite S5 Reactive Focus",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 1750.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 1920.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 2000.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 2120.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 2240.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 2320.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 2450.0
+        }
+      ]
+    },
+    {
+      "name": "Polarized Hell memoire",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 3000.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 3250.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 3375.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 3450.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 3600.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 3750.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 11000.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 11300.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 11500.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 11650.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 11800.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 12000.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Advanced S5 Hard",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 2150.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 2300.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 2475.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 2600.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 2725.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 2850.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 2950.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 122.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 125.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 128.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 131.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 134.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 137.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 139.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 114.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 116.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 118.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 120.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 124.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 128.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 132.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS angelic",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 67.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 71.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 74.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 77.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 81.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 83.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 85.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Control Small",
+      "ranks": [
+        {
+          "name": "nettspend",
+          "color": "#8e7cc3",
+          "threshold": 27.0
+        },
+        {
+          "name": "glaive",
+          "color": "#c079cb",
+          "threshold": 30.0
+        },
+        {
+          "name": "underscores",
+          "color": "#8ac3bb",
+          "threshold": 32.0
+        },
+        {
+          "name": "2hollis",
+          "color": "#68a3ba",
+          "threshold": 34.0
+        },
+        {
+          "name": "blxty",
+          "color": "#9ac3cd",
+          "threshold": 36.0
+        },
+        {
+          "name": "jane remover",
+          "color": "#d78eb9",
+          "threshold": 37.0
+        },
+        {
+          "name": "mental",
+          "color": "#ba7171",
+          "threshold": 40.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsLosingThinLoadout",
+    "kovaaks_benchmark_id": 966,
+    "rank_colors": [
+      [
+        "nettspend",
+        "#8e7cc3"
+      ],
+      [
+        "glaive",
+        "#c079cb"
+      ],
+      [
+        "underscores",
+        "#8ac3bb"
+      ],
+      [
+        "2hollis",
+        "#68a3ba"
+      ],
+      [
+        "blxty",
+        "#9ac3cd"
+      ],
+      [
+        "jane remover",
+        "#d78eb9"
+      ],
+      [
+        "mental",
+        "#ba7171"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:10.364755+00:00",
+    "generator": "benchmark_importer"
+  }
+}

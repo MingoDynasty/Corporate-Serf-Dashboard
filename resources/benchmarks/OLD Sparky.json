@@ -1,0 +1,738 @@
+{
+  "name": "OLD Sparky",
+  "code": "KovaaKsTeleportingGoatedBlueberry",
+  "scenarios": [
+    {
+      "name": "1wall 6targets small",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 700.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 900.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "Bounce 180",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 35.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 45.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 65.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 85.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 95.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "1wall6targets TE",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 125.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 150.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 175.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 195.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 210.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets_pasu Reload",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 105.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 120.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 130.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Sparky",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 70.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 150.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 200.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 250.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 300.0
+        }
+      ]
+    },
+    {
+      "name": "Air no UFO no SKYBOTS",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 780.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 800.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 820.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 850.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 865.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 877.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza NO UFO",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 99870.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 99885.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 99905.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 99915.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 99920.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 99925.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Goated Tracking Invincible",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Easy Invincible",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 17000.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets pasu track invincible",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 6200.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 7300.0
+        }
+      ]
+    },
+    {
+      "name": "kinTargetSwitch",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 18500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 20500.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 22500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 23500.0
+        }
+      ]
+    },
+    {
+      "name": "devTargetSwitch Goated",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 380.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 430.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 480.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 530.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 580.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 630.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 50.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 65.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 80.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 95.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 105.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 112.0
+        }
+      ]
+    },
+    {
+      "name": "Bounce 180 Tracking",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 30.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 40.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 60.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 80.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 90.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 100.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetSwitch",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 7800.0
+        }
+      ]
+    },
+    {
+      "name": "Air Dodge",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 75.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 90.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 105.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 120.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 130.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 143.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Dodge Easy",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 270000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 300000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 340000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 405000.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 415000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 440000.0
+        }
+      ]
+    },
+    {
+      "name": "Pistol Strafe Gallery Sparky",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 130000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 160000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 190000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 220000.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 250000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 280000.0
+        }
+      ]
+    },
+    {
+      "name": "Close FS Easy Dodge",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "LGC3 Reborn (old scoring)",
+      "ranks": [
+        {
+          "name": "Silver",
+          "color": "#CBD9E6",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 21000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 25000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 29000.0
+        },
+        {
+          "name": "Master",
+          "color": "#EC44CA",
+          "threshold": 30000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#FFD700",
+          "threshold": 31000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTeleportingGoatedBlueberry",
+    "kovaaks_benchmark_id": 832,
+    "rank_colors": [
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:01.660010+00:00",
+    "generator": "benchmark_importer"
+  }
+}

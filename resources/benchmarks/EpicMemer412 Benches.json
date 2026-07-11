@@ -1,0 +1,780 @@
+{
+  "name": "EpicMemer412 Benches",
+  "code": "KovaaKsCrankingLongCubby",
+  "scenarios": [
+    {
+      "name": "PTS Close Fast",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Frog House Revolving",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 5600.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 6100.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothBot Invincible Goated",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 5605.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Intermediate S5 Bot 3 Invincible",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Glider GOATED Hard",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Vertical P+",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 2300.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Advanced S5 Hard",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 10550.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 11250.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Aethercontrol",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 7700.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "Carmen Winstead Hype Moments",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ VGS Med S1",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Advanced S5 Reactive Focus",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "VT Snake Track Advanced S5 Reactive Focus",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 2800.0
+        }
+      ]
+    },
+    {
+      "name": "Overhead Jumps Incline Hard",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 600.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 700.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 875.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "Jumppad Blink Gliders",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "fl2reTrack",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible Precise+ OW",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 8.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "Jump Pad Small",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 31000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 36000.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 41000.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 46000.0
+        }
+      ]
+    },
+    {
+      "name": "PsalmTS Revolving Easy",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 60.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 70.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 75.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 80.0
+        }
+      ]
+    },
+    {
+      "name": "revolving tracking strafes ow",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "Jiggle Tracking",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 2700.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Smooth Hard",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 35.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 40.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 44.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 47.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot TS Voltaic Regen Hasin 20% Smaller",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 32.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 35.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 38.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 42.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ joeTS Normal",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 87.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 95.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 100.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ pivoTS Easy S1",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 105.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 120.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 135.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "psev Star Clicking",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 700.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 950.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "cAt purrClick Hard",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 600.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 800.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "Vertical hell click small",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 40.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 46.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 52.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 58.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn MV Advanced",
+      "ranks": [
+        {
+          "name": "Dzhura",
+          "color": "#E2C275",
+          "threshold": 360.0
+        },
+        {
+          "name": "Cossack",
+          "color": "#DC143C",
+          "threshold": 390.0
+        },
+        {
+          "name": "Otaman",
+          "color": "#007FFF",
+          "threshold": 420.0
+        },
+        {
+          "name": "Hetman",
+          "color": "#FFD700",
+          "threshold": 450.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrankingLongCubby",
+    "kovaaks_benchmark_id": 2223,
+    "rank_colors": [
+      [
+        "Dzhura",
+        "#E2C275"
+      ],
+      [
+        "Cossack",
+        "#DC143C"
+      ],
+      [
+        "Otaman",
+        "#007FFF"
+      ],
+      [
+        "Hetman",
+        "#FFD700"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:18.640523+00:00",
+    "generator": "benchmark_importer"
+  }
+}

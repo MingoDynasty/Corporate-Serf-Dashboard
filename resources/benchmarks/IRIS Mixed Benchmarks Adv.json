@@ -1,0 +1,480 @@
+{
+  "name": "IRIS Mixed Benchmarks Adv",
+  "code": "KovaaKsVibratingFastLoadout",
+  "scenarios": [
+    {
+      "name": "IRIS Pasu",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 95.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 110.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 116.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Popcorn",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 520.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 580.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 630.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 680.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS 1w6ts",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 1380.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Wide Wall",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 138.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 147.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 156.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS voxTS Click",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 133.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 143.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 153.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 163.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Controlsphere Click",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 72.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 80.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 88.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 96.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Smoothbot",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 3300.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 3950.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Leaptrack Goated",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 3400.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 4450.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Air Nuns",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 3300.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Ground Plaza",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 2800.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Controlsphere",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 12800.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 13550.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 14250.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 15000.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS WhisphereRawControl",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 11000.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SlideTS",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 950.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SpeedSwitch",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 1260.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS PasuTS",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 520.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 550.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 580.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 620.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SmoothbotTS",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 55.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 59.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 63.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 67.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Popswitch",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 49.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 52.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 55.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 58.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS 3D Switching",
+      "ranks": [
+        {
+          "name": "Lily",
+          "color": "#f2b202",
+          "threshold": 500.0
+        },
+        {
+          "name": "IRIS",
+          "color": "#0212f2",
+          "threshold": 550.0
+        },
+        {
+          "name": "Violet",
+          "color": "#8900fa",
+          "threshold": 600.0
+        },
+        {
+          "name": "Sakura",
+          "color": "#b800eb",
+          "threshold": 650.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsVibratingFastLoadout",
+    "kovaaks_benchmark_id": 2400,
+    "rank_colors": [
+      [
+        "Lily",
+        "#f2b202"
+      ],
+      [
+        "IRIS",
+        "#0212f2"
+      ],
+      [
+        "Violet",
+        "#8900fa"
+      ],
+      [
+        "Sakura",
+        "#b800eb"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:07.797382+00:00",
+    "generator": "benchmark_importer"
+  }
+}

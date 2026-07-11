@@ -1,0 +1,668 @@
+{
+  "name": "Euphoric TacFPS Benchmarks (Main)",
+  "code": "KovaaKsKillstreakingLightvenetianredReset",
+  "scenarios": [
+    {
+      "name": "DotSwitch Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 117.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 125.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 133.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 141.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 149.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 156.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 126.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 134.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 142.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 150.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 158.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 166.0
+        }
+      ]
+    },
+    {
+      "name": "Driftshot Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 86.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 94.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 102.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 110.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 118.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 126.0
+        }
+      ]
+    },
+    {
+      "name": "EvaClick Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 94.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 102.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 110.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 118.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 126.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 134.0
+        }
+      ]
+    },
+    {
+      "name": "BlinkClick Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 66.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 72.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 78.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 84.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 90.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 96.0
+        }
+      ]
+    },
+    {
+      "name": "Widereflex Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 45.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 51.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 57.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 63.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 69.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "YoxTS Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 120.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 128.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 136.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 144.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 152.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "Clustershot Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 162.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 174.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 186.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 198.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 210.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 222.0
+        }
+      ]
+    },
+    {
+      "name": "Miniclick Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 124.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 136.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 148.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 160.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 172.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 184.0
+        }
+      ]
+    },
+    {
+      "name": "ControlTS Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 52.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 56.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 60.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 64.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 68.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 72.0
+        }
+      ]
+    },
+    {
+      "name": "Animicro Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 100.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 108.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 116.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 124.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 132.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "MicroReflex Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 54.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 62.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 70.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 78.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 86.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 94.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothsphere Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 4150.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 11100.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Nomysphere Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 4750.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 9750.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 11250.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 12750.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 13500.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "Air Euphoric",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Champion",
+          "color": "#3A035E",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Supreme",
+          "color": "#0F52BA",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Spectral",
+          "color": "#9966CC",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Divine",
+          "color": "#E13CDC",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Omniscient",
+          "color": "#F1076B",
+          "threshold": 3875.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsKillstreakingLightvenetianredReset",
+    "kovaaks_benchmark_id": 1871,
+    "rank_colors": [
+      [
+        "Emerald",
+        "#50C878"
+      ],
+      [
+        "Champion",
+        "#3A035E"
+      ],
+      [
+        "Supreme",
+        "#0F52BA"
+      ],
+      [
+        "Spectral",
+        "#9966CC"
+      ],
+      [
+        "Divine",
+        "#E13CDC"
+      ],
+      [
+        "Omniscient",
+        "#F1076B"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:06.048769+00:00",
+    "generator": "benchmark_importer"
+  }
+}

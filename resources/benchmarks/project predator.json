@@ -1,0 +1,384 @@
+{
+  "name": "project predator",
+  "code": "KovaaKsBobbingTwitchyAdventure",
+  "scenarios": [
+    {
+      "name": "3 Tile Jumbo Tile Frenzy",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 20.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 41.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 76.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 121.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 156.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 181.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 201.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 221.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 236.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 246.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 400% Larger",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 400.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 871.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 1631.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 2611.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 3371.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 3916.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 4351.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 4786.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 5111.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 5326.0
+        }
+      ]
+    },
+    {
+      "name": "Close Evasive Pure",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 400.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 826.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 1546.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 2476.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 3196.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 3712.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 4125.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 4537.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 4846.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 5050.0
+        }
+      ]
+    },
+    {
+      "name": "Cata IC Long Strafes Thin",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 850.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 1701.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 3183.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 5099.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 6581.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 7643.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 8492.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 9341.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 9976.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 10399.0
+        }
+      ]
+    },
+    {
+      "name": "patTargetSwitch Small No Reload",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 600.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 1219.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 2282.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 3656.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 4719.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 5482.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 6091.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 6700.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 7155.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 7458.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS NR",
+      "ranks": [
+        {
+          "name": "HIRON",
+          "color": "#808080",
+          "threshold": 2200.0
+        },
+        {
+          "name": "BRONCE",
+          "color": "#ff5900",
+          "threshold": 4400.0
+        },
+        {
+          "name": "SILVER",
+          "color": "#ffffff",
+          "threshold": 8239.0
+        },
+        {
+          "name": "GOLD",
+          "color": "#ffd500",
+          "threshold": 13198.0
+        },
+        {
+          "name": "PLATINUM",
+          "color": "#00fffb",
+          "threshold": 17037.0
+        },
+        {
+          "name": "EMERALD",
+          "color": "#04ff00",
+          "threshold": 19794.0
+        },
+        {
+          "name": "DIAMOND",
+          "color": "#7300ff",
+          "threshold": 21997.0
+        },
+        {
+          "name": "MASTER",
+          "color": "#7d8000",
+          "threshold": 24199.0
+        },
+        {
+          "name": "GRANDMASTER",
+          "color": "#ffdd00",
+          "threshold": 25844.0
+        },
+        {
+          "name": "AIMBOT",
+          "color": "#ff0000",
+          "threshold": 26938.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBobbingTwitchyAdventure",
+    "kovaaks_benchmark_id": 2376,
+    "rank_colors": [
+      [
+        "HIRON",
+        "#808080"
+      ],
+      [
+        "BRONCE",
+        "#ff5900"
+      ],
+      [
+        "SILVER",
+        "#ffffff"
+      ],
+      [
+        "GOLD",
+        "#ffd500"
+      ],
+      [
+        "PLATINUM",
+        "#00fffb"
+      ],
+      [
+        "EMERALD",
+        "#04ff00"
+      ],
+      [
+        "DIAMOND",
+        "#7300ff"
+      ],
+      [
+        "MASTER",
+        "#7d8000"
+      ],
+      [
+        "GRANDMASTER",
+        "#ffdd00"
+      ],
+      [
+        "AIMBOT",
+        "#ff0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:39.419534+00:00",
+    "generator": "benchmark_importer"
+  }
+}

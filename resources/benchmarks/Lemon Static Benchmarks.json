@@ -1,0 +1,882 @@
+{
+  "name": "Lemon Static Benchmarks",
+  "code": "KovaaKsCrossfiringSpringgreenTacmap",
+  "scenarios": [
+    {
+      "name": "Pokeball 1w4ts 30%",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 113.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 120.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 125.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 130.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 135.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 140.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball 1w2ts Horizontalish small",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 100.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 107.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 115.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 120.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 130.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 135.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Week #5 - Static Switching 30% smaller",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 13700.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 16500.0
+        }
+      ]
+    },
+    {
+      "name": "5 Sphere Hipfire Small",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 1630.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 2200.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Static Click Angelic",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 137.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 145.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 153.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 160.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 170.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 175.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Pasu Perfected 30% Smaller",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 80.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 87.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 90.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 97.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 105.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 112.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 118.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Hard S1",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 170.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 180.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 195.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 205.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 215.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 225.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 235.0
+        }
+      ]
+    },
+    {
+      "name": "Wide Wall 3 Targets",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 127.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 135.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 140.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 155.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 160.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 165.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "Wide Wall 4 Targets",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 132.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 140.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 150.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 155.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 165.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 170.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ ww2t Hard S1",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 142.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 150.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 155.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 160.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 170.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 175.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Perfected",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 123.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 133.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 140.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 144.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 155.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 160.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload smallflicks",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 152.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 160.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 165.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 175.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 180.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 190.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts Vertical Flicks v2",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 95.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 105.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 110.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 120.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 125.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts PulseShot",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 13800.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 16200.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 17000.0
+        }
+      ]
+    },
+    {
+      "name": "1w5t smallflicks - Pressure Aiming",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 11500.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts_truste Raspberry",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 146.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 152.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 168.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 175.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 185.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 195.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 205.0
+        }
+      ]
+    },
+    {
+      "name": "1w6ts_trustechain Raspberry",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 150.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 157.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 165.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 175.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 180.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 190.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 118.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 123.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 128.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 138.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 145.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 155.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts reload",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 123.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 130.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 135.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 140.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 150.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 160.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts reload",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 133.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 140.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 145.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 150.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 160.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 165.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 175.0
+        }
+      ]
+    },
+    {
+      "name": "1w6ts reload v2",
+      "ranks": [
+        {
+          "name": "Yuzu",
+          "color": "#FF0000",
+          "threshold": 136.0
+        },
+        {
+          "name": "Snake",
+          "color": "#FF9900",
+          "threshold": 145.0
+        },
+        {
+          "name": "Mango",
+          "color": "#FFFF00",
+          "threshold": 155.0
+        },
+        {
+          "name": "Lime",
+          "color": "#00FF00",
+          "threshold": 160.0
+        },
+        {
+          "name": "Star",
+          "color": "#00FFFF",
+          "threshold": 165.0
+        },
+        {
+          "name": "Guava",
+          "color": "#4A86E8",
+          "threshold": 175.0
+        },
+        {
+          "name": "Dragon",
+          "color": "#0000FF",
+          "threshold": 185.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrossfiringSpringgreenTacmap",
+    "kovaaks_benchmark_id": 1829,
+    "rank_colors": [
+      [
+        "Yuzu",
+        "#FF0000"
+      ],
+      [
+        "Snake",
+        "#FF9900"
+      ],
+      [
+        "Mango",
+        "#FFFF00"
+      ],
+      [
+        "Lime",
+        "#00FF00"
+      ],
+      [
+        "Star",
+        "#00FFFF"
+      ],
+      [
+        "Guava",
+        "#4A86E8"
+      ],
+      [
+        "Dragon",
+        "#0000FF"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:20.742645+00:00",
+    "generator": "benchmark_importer"
+  }
+}

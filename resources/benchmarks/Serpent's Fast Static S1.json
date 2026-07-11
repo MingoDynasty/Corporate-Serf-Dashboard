@@ -1,0 +1,633 @@
+{
+  "name": "Serpent's Fast Static S1",
+  "code": "KovaaKsUltingShinyFinisher",
+  "scenarios": [
+    {
+      "name": "1wall6targets TE Horizontalish",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 200.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 256.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 272.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 290.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 307.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 321.0
+        }
+      ]
+    },
+    {
+      "name": "1wall6targets TE reload",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 235.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 248.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 257.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 268.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 285.0
+        }
+      ]
+    },
+    {
+      "name": "1wall3targets TE Perfected",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 235.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 260.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 270.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 280.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 290.0
+        }
+      ]
+    },
+    {
+      "name": "5 Sphere Hipfire",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "1 wall 6 targets Micro++",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 13600.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 15200.0
+        }
+      ]
+    },
+    {
+      "name": " 6 Sphere Hipfire 150% Size",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 225.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 238.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 249.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 261.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 275.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire 200% Size",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 200.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 255.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 275.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 295.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 310.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 330.0
+        }
+      ]
+    },
+    {
+      "name": "1wall9000sphere",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 190.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 240.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 255.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 270.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 285.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 300.0
+        }
+      ]
+    },
+    {
+      "name": "MicroGOD click Easy",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 2310.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 2400.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy 180",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 230.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 242.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 255.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 272.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 290.0
+        }
+      ]
+    },
+    {
+      "name": "1wall6targets TE 180",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 120.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 150.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 165.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 175.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 185.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "1wall8tiles",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 225.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 300.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 330.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 348.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 360.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 380.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 140.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 160.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 175.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 188.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 195.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 210.0
+        }
+      ]
+    },
+    {
+      "name": "flix's spidershot",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 10600.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 12200.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 13500.0
+        }
+      ]
+    },
+    {
+      "name": "2 Tile Jumbo Microshot Speed",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 240.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 305.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 325.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 345.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 362.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 380.0
+        }
+      ]
+    },
+    {
+      "name": "Microshot Speed",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 150.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 200.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 210.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 220.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 230.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 240.0
+        }
+      ]
+    },
+    {
+      "name": "1wall 1target",
+      "ranks": [
+        {
+          "name": "Dogwater",
+          "color": "#4e2e0e",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wannabe",
+          "color": "#064110",
+          "threshold": 250.0
+        },
+        {
+          "name": "Admirable",
+          "color": "#ffdd00",
+          "threshold": 275.0
+        },
+        {
+          "name": "Respectable",
+          "color": "#ff6600",
+          "threshold": 295.0
+        },
+        {
+          "name": "Serious",
+          "color": "#710936",
+          "threshold": 310.0
+        },
+        {
+          "name": "Insane",
+          "color": "#81008a",
+          "threshold": 340.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsUltingShinyFinisher",
+    "kovaaks_benchmark_id": 2355,
+    "rank_colors": [
+      [
+        "Dogwater",
+        "#4e2e0e"
+      ],
+      [
+        "Wannabe",
+        "#064110"
+      ],
+      [
+        "Admirable",
+        "#ffdd00"
+      ],
+      [
+        "Respectable",
+        "#ff6600"
+      ],
+      [
+        "Serious",
+        "#710936"
+      ],
+      [
+        "Insane",
+        "#81008a"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:06.867926+00:00",
+    "generator": "benchmark_importer"
+  }
+}

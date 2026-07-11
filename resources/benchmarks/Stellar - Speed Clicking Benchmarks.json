@@ -1,0 +1,650 @@
+{
+  "name": "Stellar - Speed Clicking Benchmarks",
+  "code": "KovaaKsStrikingRoyalpurpleArmor",
+  "scenarios": [
+    {
+      "name": "Gridshot",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 140.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 152.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 162.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 171.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 179.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 187.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 194.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 200.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 205.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 130.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 142.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 153.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 163.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 172.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 180.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 187.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 194.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "2 Tile Jumbo Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 140.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 150.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 158.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 166.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 173.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 180.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 186.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 192.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 197.0
+        }
+      ]
+    },
+    {
+      "name": "Ballsheet BB",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 90.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 99.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 107.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 114.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 121.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 127.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 132.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 136.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "Jumbo Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 175.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 188.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 199.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 209.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 218.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 227.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 235.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 240.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 245.0
+        }
+      ]
+    },
+    {
+      "name": "Huge Poke Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 170.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 192.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 201.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 209.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 217.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 224.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 228.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 233.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 238.0
+        }
+      ]
+    },
+    {
+      "name": "1wall9000targets",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 250.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 270.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 288.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 304.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 318.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 331.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 342.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 351.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 360.0
+        }
+      ]
+    },
+    {
+      "name": "Jumbo1wall9000targets",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 270.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 292.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 312.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 330.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 347.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 363.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 377.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 391.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 405.0
+        }
+      ]
+    },
+    {
+      "name": "Jumbo 1wall6targets TE",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 240.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 258.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 274.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 288.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 301.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 313.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 324.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 332.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 340.0
+        }
+      ]
+    },
+    {
+      "name": "Jumbo Tile Frenzy 180",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 265.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 280.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 294.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 307.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 319.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 330.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 340.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 350.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 360.0
+        }
+      ]
+    },
+    {
+      "name": "6 Sphere Hipfire 200% Size",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 180.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 200.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 218.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 234.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 249.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 263.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 275.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 287.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 300.0
+        }
+      ]
+    },
+    {
+      "name": "RawMouseControl Reload Easy",
+      "ranks": [
+        {
+          "name": "Eclipse",
+          "color": "#ffff00",
+          "threshold": 260.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#ff0550",
+          "threshold": 285.0
+        },
+        {
+          "name": "Pulsar",
+          "color": "#0544ff",
+          "threshold": 307.0
+        },
+        {
+          "name": "Lunar",
+          "color": "#ff0000",
+          "threshold": 327.0
+        },
+        {
+          "name": "Aether",
+          "color": "#339cff",
+          "threshold": 346.0
+        },
+        {
+          "name": "Astral",
+          "color": "#ff00ea",
+          "threshold": 364.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#5500ff",
+          "threshold": 380.0
+        },
+        {
+          "name": "Divine",
+          "color": "#00eeff",
+          "threshold": 393.0
+        },
+        {
+          "name": "Stellar",
+          "color": "#000000",
+          "threshold": 405.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsStrikingRoyalpurpleArmor",
+    "kovaaks_benchmark_id": 918,
+    "rank_colors": [
+      [
+        "Eclipse",
+        "#ffff00"
+      ],
+      [
+        "Cosmic",
+        "#ff0550"
+      ],
+      [
+        "Pulsar",
+        "#0544ff"
+      ],
+      [
+        "Lunar",
+        "#ff0000"
+      ],
+      [
+        "Aether",
+        "#339cff"
+      ],
+      [
+        "Astral",
+        "#ff00ea"
+      ],
+      [
+        "Nebula",
+        "#5500ff"
+      ],
+      [
+        "Divine",
+        "#00eeff"
+      ],
+      [
+        "Stellar",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:48.620480+00:00",
+    "generator": "benchmark_importer"
+  }
+}
