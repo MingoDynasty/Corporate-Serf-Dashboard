@@ -747,10 +747,16 @@ def delete_user_playlist(playlist_code: str) -> str | None:
     tracking is refused with a user-visible message in the import flow's style.
     Unlinks **every** user file tracked for the code — two user files can share
     one code, and a leftover copy would resurrect the playlist on restart —
-    tolerating already-missing files. If any file fails to unlink for another
-    reason the playlist stays loaded and tracked (only the surviving copies)
-    and the error is reported, so a locked leftover never silently reappears.
-    On full success the store entry and user-root tracking are dropped under
+    tolerating already-missing files.
+
+    The tracked list is ``[winner, ...duplicates]`` (the winner's data is what
+    the store serves). Deletion runs duplicates-first, winner-last, and stops
+    at the first hard failure, so the served file is only unlinked once every
+    other copy is gone. That keeps the store consistent with disk on a partial
+    failure: a locked duplicate leaves the served file (and store entry) intact
+    rather than deleting the served file while a copy survives — which would
+    serve a deleted file now and silently swap in the survivor on restart. On
+    full success the store entry and user-root tracking are dropped under
     ``_PLAYLIST_IO_LOCK``. Returns an error message, or ``None`` on success.
     """
     with _PLAYLIST_IO_LOCK:
@@ -762,23 +768,28 @@ def delete_user_playlist(playlist_code: str) -> str | None:
             )
             logger.warning(message)
             return message
-        remaining: list[Path] = []
         error_message: str | None = None
-        for file_path in file_paths:
+        deleted: set[Path] = set()
+        # reversed(): non-winning duplicates first, the served winner last.
+        for file_path in reversed(file_paths):
             try:
                 file_path.unlink()
             except FileNotFoundError:
-                # Already gone on disk (manual delete or a prior partial run):
-                # drop it from tracking by not carrying it into `remaining`.
+                # Already gone on disk (manual delete or a prior partial run).
+                deleted.add(file_path)
                 logger.warning("Playlist file already missing on delete: %s", file_path)
             except OSError:
                 error_message = f"Failed to delete playlist file: {file_path}"
                 logger.warning(error_message, exc_info=True)
-                remaining.append(file_path)
-        if remaining:
-            # A copy survives: keep the playlist loaded and tracked (only the
-            # surviving copies) so it does not silently reappear on restart.
-            _user_root_playlist_files[playlist_code] = remaining
+                break
+            else:
+                deleted.add(file_path)
+        if error_message:
+            # Stop before touching the store: the served winner is untouched
+            # (or was the failure), so leaving the entry keeps store == disk.
+            _user_root_playlist_files[playlist_code] = [
+                path for path in file_paths if path not in deleted
+            ]
             return error_message
         playlist_database.pop(playlist_code, None)
         _user_root_playlist_codes.discard(playlist_code)

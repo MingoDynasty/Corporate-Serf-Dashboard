@@ -402,6 +402,45 @@ def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_
     assert "DupCode" not in data_service.playlist_database
 
 
+def test_delete_user_playlist_keeps_served_winner_when_a_duplicate_is_locked(
+    monkeypatch,
+    tmp_path,
+):
+    # A locked non-winning duplicate must not leave the store serving the
+    # winner's data after its file is deleted (which would silently swap in the
+    # survivor on restart). Winner-last deletion keeps store == disk on failure.
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(user_root / "a.json", _playlist("Winner", "DupCode", "Win Scen"))
+    _write_playlist(user_root / "b.json", _playlist("Survivor", "DupCode", "Surv Scen"))
+    data_service.load_playlists()
+    # a.json wins on filename order; its data is what the store serves.
+    assert data_service.playlist_database["DupCode"].name == "Winner"
+
+    real_unlink = data_service.Path.unlink
+
+    def locked_b_unlink(self):
+        if self.name == "b.json":
+            raise PermissionError("b.json is locked")
+        real_unlink(self)
+
+    monkeypatch.setattr(data_service.Path, "unlink", locked_b_unlink)
+
+    result = data_service.delete_user_playlist("DupCode")
+
+    assert result is not None
+    assert "Failed to delete playlist file" in result
+    # The served (winning) file survives — the store is not serving a deleted
+    # file — and the store still holds the winner's data.
+    assert (user_root / "a.json").exists()
+    assert (user_root / "b.json").exists()
+    assert data_service.playlist_database["DupCode"].name == "Winner"
+
+    # Simulated restart: still the winner, no silent swap to the survivor.
+    monkeypatch.setattr(data_service.Path, "unlink", real_unlink)
+    data_service.load_playlists()
+    assert data_service.playlist_database["DupCode"].name == "Winner"
+
+
 def test_delete_user_playlist_refuses_bundled_code(monkeypatch, tmp_path):
     bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
     bundled_file = bundled_root / "bundled.json"
