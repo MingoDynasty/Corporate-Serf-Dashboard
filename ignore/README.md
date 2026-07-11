@@ -18,6 +18,9 @@ a subdirectory — don't drop them at the top level.
 | Superseded / abandoned proposal drafts | `superseded-proposals/` |
 | pytest basetemp (`--basetemp=ignore/pt`) | `pt/` — disposable; parallel sessions may create `pt2/`, `pt-audit/`, etc., all safe to delete anytime |
 
+The `/merge-sweep` skill (scheduled daily) reconciles both live queues
+against merged PRs and archives anything a shipping PR missed.
+
 Anything that doesn't fit: make a new descriptively-named subdirectory rather
 than leaving files loose.
 
