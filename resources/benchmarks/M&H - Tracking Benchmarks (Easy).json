@@ -1,28 +1,28 @@
 {
-  "name": "M&H Tracking Benchmarks - Easy",
-  "code": "KovaaKsRoamingLongCashdrop",
+  "name": "M&H - Tracking Benchmarks (Easy)",
+  "code": "KovaaKsZoningTaggedBfg",
   "scenarios": [
     {
       "name": "Smoothsphere 80%",
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 5550.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 6375.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 7200.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 8025.0
         }
       ]
@@ -32,22 +32,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 1500.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 1800.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 2100.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 2400.0
         }
       ]
@@ -57,22 +57,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 1600.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 1900.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 2200.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 2500.0
         }
       ]
@@ -82,22 +82,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 1900.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 2250.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 2625.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 3000.0
         }
       ]
@@ -107,22 +107,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 6000.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 6100.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 7600.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 10000.0
         }
       ]
@@ -132,22 +132,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 6250.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 7425.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 9100.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 10750.0
         }
       ]
@@ -157,22 +157,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 7500.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 9100.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 10675.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 12250.0
         }
       ]
@@ -182,22 +182,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 4250.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 5650.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 7100.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 8500.0
         }
       ]
@@ -207,22 +207,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 2600.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 2825.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 3050.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 3250.0
         }
       ]
@@ -232,22 +232,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 1900.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 2325.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 2750.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 3200.0
         }
       ]
@@ -257,22 +257,22 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 2400.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 2725.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 3050.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 3350.0
         }
       ]
@@ -282,25 +282,49 @@
       "ranks": [
         {
           "name": "Copper",
-          "color": "#E68346",
+          "color": "#E56352",
           "threshold": 2300.0
         },
         {
           "name": "Bronze",
-          "color": "#CE8946",
+          "color": "#D99652",
           "threshold": 2500.0
         },
         {
           "name": "Iron",
-          "color": "#D4D7D9",
+          "color": "#5B5B5B",
           "threshold": 2700.0
         },
         {
           "name": "Silver",
-          "color": "#C0C0C0",
+          "color": "#C0D1D4",
           "threshold": 2900.0
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsZoningTaggedBfg",
+    "kovaaks_benchmark_id": 644,
+    "rank_colors": [
+      [
+        "Copper",
+        "#E56352"
+      ],
+      [
+        "Bronze",
+        "#D99652"
+      ],
+      [
+        "Iron",
+        "#5B5B5B"
+      ],
+      [
+        "Silver",
+        "#C0D1D4"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:59.865508+00:00",
+    "generator": "benchmark_importer"
+  }
 }
