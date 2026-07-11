@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from types import SimpleNamespace
 
 import dash
@@ -162,6 +163,244 @@ def test_playlists_overview_visibility_column_config():
     assert column["sortable"] is False
 
 
+def test_playlists_overview_delete_column_config():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+    column = columns[playlists.DELETE_COLUMN_ID]
+
+    assert column["cellRenderer"] == "DeleteAction"
+    assert column["sortable"] is False
+
+
+def test_playlists_overview_delete_cell_click_does_not_navigate():
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "UserCode", "colId": playlists.DELETE_COLUMN_ID}
+        )
+        is no_update
+    )
+
+
+def test_manage_delete_modal_opens_for_delete_cell(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "My Playlist"
+    )
+
+    opened, target, message = playlists.manage_delete_modal(
+        {"rowId": "UserCode", "colId": playlists.DELETE_COLUMN_ID}, 0
+    )
+
+    assert opened is True
+    assert target == "UserCode"
+    assert "My Playlist" in message
+    assert "UserCode" in message
+
+
+def test_manage_delete_modal_ignores_bundled_delete_cell(monkeypatch):
+    # A bundled row renders no Delete link, but its empty delete cell still
+    # emits cellClicked; the modal must not open for a non-user code (which
+    # delete_user_playlist would refuse anyway, after a misleading dialog).
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
+    monkeypatch.setattr(
+        playlists,
+        "get_playlist_display_label",
+        lambda _code: pytest.fail("bundled delete cell must not reach the modal"),
+    )
+
+    result = playlists.manage_delete_modal(
+        {"rowId": "BundledCode", "colId": playlists.DELETE_COLUMN_ID}, 0
+    )
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_manage_delete_modal_ignores_non_delete_cells(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+
+    result = playlists.manage_delete_modal({"rowId": "UserCode", "colId": "name"}, 0)
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_manage_delete_modal_cancel_closes(monkeypatch):
+    _trigger(monkeypatch, "playlists-delete-cancel-button")
+
+    opened, target, message = playlists.manage_delete_modal(None, 1)
+
+    assert opened is False
+    assert target is no_update
+    assert message is no_update
+
+
+def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeypatch):
+    deleted = []
+    hidden = []
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda code: deleted.append(code) or None,
+    )
+    monkeypatch.setattr(playlists, "hide_playlist", hidden.append)
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert deleted == ["UserCode"]
+    # In a show-list, dropping membership IS forgetting the code, so
+    # preferences.json does not accumulate dead codes.
+    assert hidden == ["UserCode"]
+    assert notifications[0]["color"] == "green"
+    assert rows_refresh == 5
+    assert opened is False
+
+
+def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch):
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: "boom")
+    monkeypatch.setattr(
+        playlists,
+        "hide_playlist",
+        lambda _code: pytest.fail("a failed delete must not forget visibility"),
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "boom"
+    assert rows_refresh is no_update
+    assert opened is False
+
+
+def test_confirm_delete_playlist_without_target_noops(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda _code: pytest.fail("no target must not trigger a delete"),
+    )
+
+    result = playlists.confirm_delete_playlist(1, None, 0)
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_render_superseded_alert_hidden_when_no_files(monkeypatch):
+    monkeypatch.setattr(playlists, "get_superseded_user_playlist_files", lambda: [])
+
+    style, text = playlists.render_superseded_alert(True, 0)
+
+    assert style == {"display": "none"}
+    assert text == ""
+
+
+def test_render_superseded_alert_shows_count_when_files_exist(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: [(Path("a.json"), "C1"), (Path("b.json"), "C2")],
+    )
+
+    style, text = playlists.render_superseded_alert(True, 1)
+
+    assert style == {}
+    assert "2 leftover playlist files" in text
+
+
+def test_manage_superseded_modal_opens_with_count(monkeypatch):
+    _trigger(monkeypatch, "playlists-superseded-delete-button")
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: [(Path("a.json"), "C1")],
+    )
+
+    opened, message = playlists.manage_superseded_modal(1, 0)
+
+    assert opened is True
+    assert "1 leftover playlist file" in message
+
+
+def test_manage_superseded_modal_cancel_closes(monkeypatch):
+    _trigger(monkeypatch, "playlists-superseded-cancel-button")
+
+    opened, message = playlists.manage_superseded_modal(0, 1)
+
+    assert opened is False
+    assert message is no_update
+
+
+def test_confirm_delete_superseded_success_refreshes(monkeypatch):
+    monkeypatch.setattr(
+        playlists, "delete_superseded_user_playlist_files", lambda: None
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+
+    assert notifications[0]["color"] == "green"
+    assert rows_refresh == 3
+    assert opened is False
+
+
+def test_confirm_delete_superseded_failure_still_refreshes(monkeypatch):
+    # A partial failure still prunes the files it removed, so the alert must
+    # re-render with the reduced count even on error.
+    monkeypatch.setattr(
+        playlists, "delete_superseded_user_playlist_files", lambda: "nope"
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "nope"
+    assert rows_refresh == 3
+    assert opened is False
+
+
+def test_confirm_delete_superseded_ignores_initial_load(monkeypatch):
+    # Regression: under DashProxy an allow_duplicate callback can fire once on
+    # initial page load with n_clicks=None; a destructive handler must never
+    # delete without a real confirm click.
+    monkeypatch.setattr(
+        playlists,
+        "delete_superseded_user_playlist_files",
+        lambda: pytest.fail("must not delete files without a confirm click"),
+    )
+
+    assert playlists.confirm_delete_superseded(None, 0) == (
+        no_update,
+        no_update,
+        no_update,
+    )
+
+
+def test_confirm_delete_playlist_ignores_initial_load(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda _code: pytest.fail("must not delete without a confirm click"),
+    )
+
+    assert playlists.confirm_delete_playlist(None, "UserCode", 0) == (
+        no_update,
+        no_update,
+        no_update,
+    )
+
+
+def test_manage_superseded_modal_ignores_initial_load(monkeypatch):
+    _trigger(monkeypatch, None)
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: pytest.fail("initial load must not open the cleanup modal"),
+    )
+
+    assert playlists.manage_superseded_modal(None, None) == (no_update, no_update)
+
+
 def _walk_components(component):
     yield component
     children = getattr(component, "children", None)
@@ -285,7 +524,7 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
 
 
 def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
-    _trigger(monkeypatch, "playlists-import-refresh")
+    _trigger(monkeypatch, "playlists-rows-refresh")
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",

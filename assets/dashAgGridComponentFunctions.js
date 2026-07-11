@@ -30,3 +30,15 @@ dagcomponentfuncs.VisibilityAction = function (props) {
     props.data && props.data.hidden ? "Unhide" : "Hide"
   );
 };
+
+// Delete action for the playlist overview's delete column. Only user
+// playlists are deletable (bundled benchmarks offer hide instead), so this
+// renders nothing for non-deletable rows. The click is handled server-side
+// via the grid's cellClicked payload (colId "deletable"), which opens a
+// confirmation modal; this renderer only draws the link-styled label.
+dagcomponentfuncs.DeleteAction = function (props) {
+  if (!props.data || !props.data.deletable) {
+    return null;
+  }
+  return React.createElement("span", { className: "delete-action" }, "Delete");
+};

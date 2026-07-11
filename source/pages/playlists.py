@@ -17,9 +17,17 @@ from dash import (
 )
 
 from source.components.local_icon import local_icon
-from source.kovaaks.data_service import load_playlist_from_code
+from source.kovaaks.data_service import (
+    delete_superseded_user_playlist_files,
+    delete_user_playlist,
+    get_playlist_display_label,
+    get_superseded_user_playlist_files,
+    get_user_root_playlist_codes,
+    load_playlist_from_code,
+)
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
 from source.kovaaks.playlist_visibility_service import (
+    hide_playlist,
     is_playlist_shown,
     show_playlist,
     toggle_playlist_visibility,
@@ -28,6 +36,9 @@ from source.kovaaks.playlist_visibility_service import (
 logger = logging.getLogger(__name__)
 
 VISIBILITY_COLUMN_ID = "hidden"
+# The delete action cell's colId. Matches the ``deletable`` row flag so the
+# renderer can hide itself on bundled rows; excluded from row navigation.
+DELETE_COLUMN_ID = "deletable"
 
 # Reused from the former Settings-modal import control, with the trailing
 # clause reworded for the overview: importing here lands the playlist as a new
@@ -155,6 +166,18 @@ TABLE_COLUMN_DEFS = [
         "minWidth": 90,
         "maxWidth": 100,
     },
+    {
+        # Delete action cell (user playlists only; the renderer draws nothing
+        # on bundled rows). Its colId is excluded from row navigation, and a
+        # click opens the delete confirmation modal.
+        "headerName": "",
+        "field": DELETE_COLUMN_ID,
+        "cellRenderer": "DeleteAction",
+        "sortable": False,
+        "resizable": False,
+        "minWidth": 90,
+        "maxWidth": 100,
+    },
 ]
 
 
@@ -167,7 +190,7 @@ def route_to_clicked_playlist(cell_clicked):
     """Navigate to a playlist's scenario table from any cell in its row."""
     if not isinstance(cell_clicked, dict):
         return no_update
-    if cell_clicked.get("colId") == VISIBILITY_COLUMN_ID:
+    if cell_clicked.get("colId") in (VISIBILITY_COLUMN_ID, DELETE_COLUMN_ID):
         return no_update
     playlist_code = cell_clicked.get("rowId")
     if not isinstance(playlist_code, str) or not playlist_code:
@@ -181,9 +204,9 @@ def route_to_clicked_playlist(cell_clicked):
     Input("playlists-overview-mounted", "data"),
     Input("playlists-overview-show-hidden", "checked"),
     Input("playlists-overview-grid", "cellClicked"),
-    Input("playlists-import-refresh", "data"),
+    Input("playlists-rows-refresh", "data"),
 )
-def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _import_refresh):
+def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _rows_refresh):
     """Build overview rows from local run data and rank caches (no network).
 
     Also handles hide/unhide: a click on the visibility action cell toggles
@@ -220,15 +243,15 @@ def toggle_import_modal(_, opened):
 
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("playlists-import-refresh", "data"),
+    Output("playlists-rows-refresh", "data"),
     Output("playlists-import-modal", "opened", allow_duplicate=True),
     Output("playlists-import-textinput", "value"),
     Input("playlists-import-button", "n_clicks"),
     State("playlists-import-textinput", "value"),
-    State("playlists-import-refresh", "data"),
+    State("playlists-rows-refresh", "data"),
     prevent_initial_call=True,
 )
-def import_playlist(_, playlist_to_import, import_refresh):
+def import_playlist(_, playlist_to_import, rows_refresh):
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
@@ -274,7 +297,190 @@ def import_playlist(_, playlist_to_import, import_refresh):
         "id": "imported-playlist-successful-notification",
         "icon": local_icon("material-symbols:upload"),
     }
-    return [notification], (import_refresh or 0) + 1, False, ""
+    return [notification], (rows_refresh or 0) + 1, False, ""
+
+
+@callback(
+    Output("playlists-delete-modal", "opened"),
+    Output("playlists-delete-target", "data"),
+    Output("playlists-delete-message", "children"),
+    Input("playlists-overview-grid", "cellClicked"),
+    Input("playlists-delete-cancel-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def manage_delete_modal(cell_clicked, _cancel):
+    """Open the delete confirmation modal for a clicked delete cell, or cancel.
+
+    A click on the delete action cell opens the modal naming the target
+    playlist; the Cancel button (or the modal's own close control) closes it.
+    Deletion itself is confirmed by ``confirm_delete_playlist``.
+    """
+    if ctx.triggered_id == "playlists-delete-cancel-button":
+        return False, no_update, no_update
+    if (
+        not isinstance(cell_clicked, dict)
+        or cell_clicked.get("colId") != DELETE_COLUMN_ID
+        or not isinstance(cell_clicked.get("rowId"), str)
+        or not cell_clicked["rowId"]
+    ):
+        return no_update, no_update, no_update
+    playlist_code = cell_clicked["rowId"]
+    # Bundled rows render no Delete link, but their (empty) delete cell still
+    # emits cellClicked with this colId. Refuse non-user codes here — same
+    # source of truth as the row's ``deletable`` flag — so a bundled row can
+    # never open a misleading "will be removed from data/playlists" dialog
+    # (delete_user_playlist would refuse it anyway, but only after a scare).
+    if playlist_code not in get_user_root_playlist_codes():
+        return no_update, no_update, no_update
+    label = get_playlist_display_label(playlist_code)
+    message = (
+        f'Delete "{label}" ({playlist_code})? This removes its playlist file '
+        "from data/playlists. You can re-import it later by share code."
+    )
+    return True, playlist_code, message
+
+
+@callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("playlists-rows-refresh", "data", allow_duplicate=True),
+    Output("playlists-delete-modal", "opened", allow_duplicate=True),
+    Input("playlists-delete-confirm-button", "n_clicks"),
+    State("playlists-delete-target", "data"),
+    State("playlists-rows-refresh", "data"),
+    prevent_initial_call=True,
+)
+def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
+    """Delete the confirmed user playlist, then rebuild the grid.
+
+    On failure the red notification carries the service's message and the grid
+    is left untouched. On success the visibility membership is dropped too
+    (in a show-list, forgetting a code IS removing its membership — this keeps
+    preferences.json from accumulating dead codes) and the refresh store bumps
+    so the deleted row disappears without a page reload.
+
+    Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
+    still fire once on initial page load despite ``prevent_initial_call``, so a
+    destructive handler must confirm a real button click (a fresh load has
+    ``n_clicks`` None and no target) before touching the filesystem.
+    """
+    if not n_clicks or not target_code:
+        return no_update, no_update, no_update
+    error_message = delete_user_playlist(target_code)
+    if error_message:
+        notification = {
+            "action": "show",
+            "title": "Playlist Delete Failed",
+            "message": error_message,
+            "color": "red",
+            "id": "deleted-playlist-failed-notification",
+        }
+        return [notification], no_update, False
+    hide_playlist(target_code)
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": "Deleted playlist.",
+        "color": "green",
+        "id": "deleted-playlist-successful-notification",
+    }
+    return [notification], (rows_refresh or 0) + 1, False
+
+
+@callback(
+    Output("playlists-superseded-alert", "style"),
+    Output("playlists-superseded-text", "children"),
+    Input("playlists-overview-mounted", "data"),
+    Input("playlists-rows-refresh", "data"),
+)
+def render_superseded_alert(_mounted, _rows_refresh):
+    """Show the cleanup alert only while superseded user files remain.
+
+    The recorded list is refreshed on each ``load_playlists()`` run and pruned
+    as files are deleted, so the alert re-renders (and hides) whenever the
+    refresh store bumps after a cleanup.
+    """
+    superseded_files = get_superseded_user_playlist_files()
+    if not superseded_files:
+        return {"display": "none"}, ""
+    count = len(superseded_files)
+    noun = "file" if count == 1 else "files"
+    verb = "is" if count == 1 else "are"
+    message = (
+        f"{count} leftover playlist {noun} in data/playlists {verb} superseded "
+        "by bundled benchmarks."
+    )
+    return {}, message
+
+
+@callback(
+    Output("playlists-superseded-modal", "opened"),
+    Output("playlists-superseded-message", "children"),
+    Input("playlists-superseded-delete-button", "n_clicks"),
+    Input("playlists-superseded-cancel-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def manage_superseded_modal(_delete, _cancel):
+    """Open the confirm modal for the superseded-file cleanup, or cancel it.
+
+    Keyed off ``ctx.triggered_id`` (not a bare else) so an initial-load fire —
+    where the triggered id is None — cannot pop the modal open unbidden.
+    """
+    if ctx.triggered_id == "playlists-superseded-cancel-button":
+        return False, no_update
+    if ctx.triggered_id != "playlists-superseded-delete-button":
+        return no_update, no_update
+    superseded_files = get_superseded_user_playlist_files()
+    if not superseded_files:
+        return no_update, no_update
+    count = len(superseded_files)
+    noun = "file" if count == 1 else "files"
+    message = (
+        f"Delete {count} leftover playlist {noun} from data/playlists? They are "
+        "superseded by bundled benchmarks and hold no data."
+    )
+    return True, message
+
+
+@callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("playlists-rows-refresh", "data", allow_duplicate=True),
+    Output("playlists-superseded-modal", "opened", allow_duplicate=True),
+    Input("playlists-superseded-confirm-button", "n_clicks"),
+    State("playlists-rows-refresh", "data"),
+    prevent_initial_call=True,
+)
+def confirm_delete_superseded(n_clicks, rows_refresh):
+    """Delete the superseded user files, then refresh the alert.
+
+    ``delete_superseded_user_playlist_files`` prunes every file it removes even
+    on partial failure, so the refresh store bumps in both branches to keep the
+    alert's count honest.
+
+    Guard on ``n_clicks``: like ``confirm_delete_playlist``, this
+    ``allow_duplicate`` handler can fire once on initial page load under
+    DashProxy, and it must never delete files without a real confirm click.
+    """
+    if not n_clicks:
+        return no_update, no_update, no_update
+    error_message = delete_superseded_user_playlist_files()
+    next_refresh = (rows_refresh or 0) + 1
+    if error_message:
+        notification = {
+            "action": "show",
+            "title": "Cleanup Failed",
+            "message": error_message,
+            "color": "red",
+            "id": "superseded-cleanup-failed-notification",
+        }
+        return [notification], next_refresh, False
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": "Deleted leftover playlist files.",
+        "color": "green",
+        "id": "superseded-cleanup-successful-notification",
+    }
+    return [notification], next_refresh, False
 
 
 clientside_callback(
@@ -306,9 +512,11 @@ def layout(**kwargs):  # noqa: ARG001
             # The row load is driven by this layout-bound store so revisiting
             # the page rebuilds rows exactly once from current local state.
             dcc.Store(id="playlists-overview-mounted", data=True),
-            # Bumped by a successful import so the row-load callback rebuilds
-            # and shows the new row without a page reload.
-            dcc.Store(id="playlists-import-refresh", data=0),
+            # Bumped by a successful import or delete so the row-load callback
+            # (and the superseded alert) rebuild without a page reload.
+            dcc.Store(id="playlists-rows-refresh", data=0),
+            # Holds the code the delete confirmation modal is targeting.
+            dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
@@ -362,6 +570,81 @@ def layout(**kwargs):  # noqa: ARG001
                             children="Import",
                             id="playlists-import-button",
                             mt="xl",
+                        ),
+                    ],
+                ),
+            ),
+            # Delete confirmation for a user playlist. Opened by a click on a
+            # row's delete cell; the target code lives in the store above.
+            dmc.Modal(
+                title="Delete Playlist",
+                id="playlists-delete-modal",
+                children=dmc.Stack(
+                    gap="md",
+                    children=[
+                        dmc.Text(id="playlists-delete-message"),
+                        dmc.Group(
+                            justify="flex-end",
+                            gap="sm",
+                            children=[
+                                dmc.Button(
+                                    "Cancel",
+                                    id="playlists-delete-cancel-button",
+                                    variant="default",
+                                ),
+                                dmc.Button(
+                                    "Delete",
+                                    id="playlists-delete-confirm-button",
+                                    color="red",
+                                ),
+                            ],
+                        ),
+                    ],
+                ),
+            ),
+            # Cleanup affordance for user files superseded by bundled
+            # benchmarks. Hidden (display:none) until superseded files exist.
+            dmc.Alert(
+                id="playlists-superseded-alert",
+                title="Leftover playlist files",
+                color="yellow",
+                style={"display": "none"},
+                children=dmc.Group(
+                    justify="space-between",
+                    align="center",
+                    children=[
+                        dmc.Text(id="playlists-superseded-text"),
+                        dmc.Button(
+                            "Delete leftover files",
+                            id="playlists-superseded-delete-button",
+                            color="red",
+                            variant="light",
+                        ),
+                    ],
+                ),
+            ),
+            dmc.Modal(
+                title="Delete Leftover Files",
+                id="playlists-superseded-modal",
+                children=dmc.Stack(
+                    gap="md",
+                    children=[
+                        dmc.Text(id="playlists-superseded-message"),
+                        dmc.Group(
+                            justify="flex-end",
+                            gap="sm",
+                            children=[
+                                dmc.Button(
+                                    "Cancel",
+                                    id="playlists-superseded-cancel-button",
+                                    variant="default",
+                                ),
+                                dmc.Button(
+                                    "Delete",
+                                    id="playlists-superseded-confirm-button",
+                                    color="red",
+                                ),
+                            ],
                         ),
                     ],
                 ),

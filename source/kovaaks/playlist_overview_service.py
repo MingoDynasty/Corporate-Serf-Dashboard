@@ -12,6 +12,7 @@ from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_selector_options,
     get_scenario_stats_snapshot,
+    get_user_root_playlist_codes,
 )
 from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
 
@@ -158,6 +159,9 @@ def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewR
     the hide/unhide action cell.
     """
     shown_codes = get_shown_playlist_codes()
+    # Only user-root playlists can be deleted (bundled benchmarks offer hide,
+    # not delete — proposal R5); the delete action cell keys off this flag.
+    deletable_codes = get_user_root_playlist_codes()
     stats_by_scenario = get_scenario_stats_snapshot()
     rows: list[OverviewRow] = []
     for option in get_playlist_selector_options():
@@ -173,5 +177,6 @@ def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewR
             stats_by_scenario,
         )
         row["hidden"] = hidden
+        row["deletable"] = option["value"] in deletable_codes
         rows.append(row)
     return rows

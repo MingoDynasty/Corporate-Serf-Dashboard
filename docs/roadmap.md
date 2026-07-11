@@ -55,31 +55,24 @@ Design rationale for shipped work lives in
   aggregate-percentile stats; any row drills into that playlist's scenario
   table. Surfaces stale and weak playlists at a glance to direct attention
   across playlists. Completing this milestone also removed the transitional
-  per-playlist selector. (PRs #78, #83) Design:
-  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md) (phase 1;
-  phases 2–3 continue under Future).
+  per-playlist selector. (PRs #78, #83)
+- **Playlist management & benchmark library** — the overview became the single
+  playlist-management surface: per-code show/hide filtering every dropdown, the
+  full importer-generated benchmark library shipped flat under
+  `resources/benchmarks/` with Voltaic + Viscose visible by default, and
+  overview-hosted import, delete (user playlists only), and cleanup of user
+  files superseded by bundled benchmarks. The whole library ships with the app
+  without flooding dropdowns, and playlists are managed in the app instead of
+  by copying files. (PRs #87, #90, #92, and this PR) Design rationale distilled
+  into [`decision_log.md`](./decision_log.md).
 
 ---
 
 ## Upcoming milestones
 
-### 1. Playlist management & benchmark library
-
-**What:** Phases 2–3 of the accepted
-[`playlist_overview_proposal.md`](./playlist_overview_proposal.md): a per-code
-show/hide visibility preference filtering every playlist list (PR 2a), the
-full bundled benchmark library shipping under `resources/benchmarks/` with
-Voltaic + Viscose visible by default (PR 2b), then overview-hosted import,
-delete, and superseded-copy cleanup (PRs 3a/3b).
-
-**Why:** The whole benchmark library should ship with the app without
-flooding every dropdown with 100+ rows, and playlists should be managed in
-the app — import, hide, delete — instead of by copying files ("the user
-interacts with the app, not the filesystem").
-
-**Decided:** The design is settled in the proposal's requirements register
-(R1–R14; all open questions resolved, including OQ-9's fresh-importer-pull
-canonical thresholds for the legacy Viscose files).
+Nothing is actively in progress right now. The sequenced next candidate is
+**Run history and sessions** (see Future); it will be promoted here with a
+full entry when work on it starts.
 
 ---
 
@@ -109,8 +102,7 @@ expanded into its own roadmap entry when it becomes the next thing up.
   supersedes the interim console-log stopgap in `file_watchdog.py`. See
   [`run_history_proposal.md`](./run_history_proposal.md).
 - **Scenarios page** — scenario-first navigation for scenarios that live in
-  several playlists or in none, parked from the overview design (OQ-8 in
-  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)). The
+  several playlists or in none, parked from the playlist-overview design. The
   overview → scenario table → Home drill chain covers playlist-first
   navigation; this would answer "show me this scenario regardless of
   playlist."
