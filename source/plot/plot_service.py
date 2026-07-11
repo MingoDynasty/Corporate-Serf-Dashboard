@@ -87,22 +87,29 @@ def _add_rank_overlays(
     if not (rank_overlay_switch and rank_data):
         return
 
-    # Get the highest rank that is still below our lowest score
-    idx_lowest_rank = 0
-    for idx in range(1, len(rank_data)):
-        if rank_data[idx].threshold >= float(min(scores)):
-            break
-        idx_lowest_rank = idx
+    # Select by threshold value, not ladder index, so the overlay is robust to
+    # non-monotonic rank ladders in upstream KovaaK's data. We draw every rank
+    # whose threshold lands inside the plotted score range, plus the nearest
+    # context rank strictly below and strictly above that range (including any
+    # ties at those boundary thresholds). This is a strict generalization of
+    # the old index-bracketing: for strictly ascending ladders the selection is
+    # identical (with equal thresholds the new code draws all tied ranks where
+    # the old drew one).
+    low = float(min(scores))
+    high = float(max(scores))
 
-    # Get the lowest rank that is still above our highest score
-    idx_highest_rank = len(rank_data) - 1
-    for idx in range(len(rank_data) - 2, -1, -1):
-        if rank_data[idx].threshold <= float(max(scores)):
-            break
-        idx_highest_rank = idx
+    thresholds_below = [r.threshold for r in rank_data if r.threshold < low]
+    thresholds_above = [r.threshold for r in rank_data if r.threshold > high]
+    nearest_below = max(thresholds_below) if thresholds_below else None
+    nearest_above = min(thresholds_above) if thresholds_above else None
 
-    # Show the ranks between "highest rank below min_score" and "lowest rank above max_score"
-    for rank in rank_data[idx_lowest_rank : idx_highest_rank + 1]:
+    def _is_selected(threshold: float) -> bool:
+        return low <= threshold <= high or threshold in (nearest_below, nearest_above)
+
+    # Draw in original ladder order; do not sort or mutate rank_data (shared).
+    for rank in rank_data:
+        if not _is_selected(rank.threshold):
+            continue
         figure.add_hline(
             name=rank.name,
             annotation_text=f"{rank.name} ({format_decimal(rank.threshold)}) ",
