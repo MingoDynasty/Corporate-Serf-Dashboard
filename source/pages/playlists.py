@@ -221,6 +221,8 @@ def toggle_import_modal(_, opened):
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
     Output("playlists-import-refresh", "data"),
+    Output("playlists-import-modal", "opened", allow_duplicate=True),
+    Output("playlists-import-textinput", "value"),
     Input("playlists-import-button", "n_clicks"),
     State("playlists-import-textinput", "value"),
     State("playlists-import-refresh", "data"),
@@ -230,13 +232,15 @@ def import_playlist(_, playlist_to_import, import_refresh):
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
-    visible ("importing is the intent to see") and the refresh store is bumped
-    so the overview rebuilds and shows the new row without a page reload. A
-    duplicate-code refusal whose conflicting playlist is hidden gets the unhide
-    hint appended (R14).
+    visible ("importing is the intent to see"), the refresh store is bumped so
+    the overview rebuilds and shows the new row without a page reload, and the
+    modal closes with a cleared field so the user sees that new row. A refusal
+    leaves the modal open with the pasted code intact so the user can correct
+    it; a duplicate-code refusal whose conflicting playlist is hidden gets the
+    unhide hint appended (R14).
     """
     if not playlist_to_import:
-        return no_update, no_update
+        return no_update, no_update, no_update, no_update
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
@@ -254,11 +258,14 @@ def import_playlist(_, playlist_to_import, import_refresh):
             "id": "imported-playlist-failed-notification",
             "icon": local_icon("material-symbols:upload"),
         }
-        return [notification], no_update
+        return [notification], no_update, no_update, no_update
 
     # Importing is the intent to see: new playlists arrive visible. Mark the
-    # canonical stored code, which can differ from the pasted input.
-    show_playlist(canonical_code)
+    # canonical stored code, which can differ from the pasted input. The
+    # is-not-None guard is defensive; the service contract guarantees a code
+    # here, but never persist a None into the shown-set if that ever changes.
+    if canonical_code is not None:
+        show_playlist(canonical_code)
     notification = {
         "action": "show",
         "title": "Notification",
@@ -267,7 +274,7 @@ def import_playlist(_, playlist_to_import, import_refresh):
         "id": "imported-playlist-successful-notification",
         "icon": local_icon("material-symbols:upload"),
     }
-    return [notification], (import_refresh or 0) + 1
+    return [notification], (import_refresh or 0) + 1, False, ""
 
 
 clientside_callback(

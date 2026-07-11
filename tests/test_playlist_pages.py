@@ -201,12 +201,17 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
     shown = []
     monkeypatch.setattr(playlists, "show_playlist", shown.append)
 
-    notifications, import_refresh = playlists.import_playlist(1, "  canonicalcode  ", 0)
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "  canonicalcode  ", 0
+    )
 
     assert shown == ["CanonicalCode"]
     assert notifications[0]["color"] == "green"
-    # A successful import bumps the refresh store so the grid rebuilds.
+    # A successful import bumps the refresh store so the grid rebuilds, then
+    # closes the modal and clears the field so the user sees the new row.
     assert import_refresh == 1
+    assert opened is False
+    assert value == ""
 
 
 def test_import_playlist_failure_does_not_show(monkeypatch):
@@ -219,12 +224,17 @@ def test_import_playlist_failure_does_not_show(monkeypatch):
         lambda _code: pytest.fail("must not mark failed imports as shown"),
     )
 
-    notifications, import_refresh = playlists.import_playlist(1, "BadCode", 3)
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "BadCode", 3
+    )
 
     assert notifications[0]["color"] == "red"
     assert notifications[0]["message"] == "boom"
-    # A failed import must not rebuild rows.
+    # A failed import must not rebuild rows, and leaves the modal open with the
+    # pasted code intact so the user can correct it.
     assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
 
 
 def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
@@ -244,11 +254,15 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
         lambda _code: pytest.fail("a refused import must not be shown"),
     )
 
-    notifications, import_refresh = playlists.import_playlist(1, "ExistingCode", 0)
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
 
     assert notifications[0]["color"] == "red"
     assert notifications[0]["message"].endswith(playlists.HIDDEN_DUPLICATE_HINT)
     assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
 
 
 def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
@@ -263,7 +277,9 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
     )
     monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: True)
 
-    notifications, _import_refresh = playlists.import_playlist(1, "ExistingCode", 0)
+    notifications, _import_refresh, _opened, _value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
 
     assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
 
