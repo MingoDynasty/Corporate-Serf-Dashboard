@@ -193,9 +193,19 @@ store ignores `show` for an id already on screen, and `update` is a no-op for
 an id that is not. Neither alone is an upsert, so each run-verdict emission
 sends **both actions with the same id and payload** (`update` then `show`):
 whichever matches the toast's current state applies and the other is a no-op.
-PR 3 must carry a regression test for both replace cases — a second run's
-toast replacing a visible one, and a live run replacing the backlog digest —
-verifying the pair actually upserts rather than silently dropping.
+
+The upsert must also grant a **fresh full lifetime**: Mantine's auto-close
+timer effect is keyed on the resolved `autoClose` duration only, so an
+`update` carrying the same duration leaves the original timer running — a run
+landing near the old toast's expiry would flash for milliseconds. Each
+emission therefore alternates `autoClose` between two indistinguishable
+durations (e.g. 8000/8001 ms), forcing the duration-keyed effect to cancel and
+re-arm the timer. PR 3 must carry a regression test for both replace cases —
+a second run's toast replacing a visible one, and a live run replacing the
+backlog digest — asserting with **elapsed time** that the replacement gets a
+full lifetime, not merely that the payload changed. (The test doubles as an
+upgrade guard: the mechanism depends on the timer effect's duration
+dependency, which a future DMC/Mantine version could change.)
 
 ### D6. Presentation standards
 
@@ -272,8 +282,11 @@ Grouped by file; each maps to inventory rows above.
     of `dash_logger`, on **both** failure paths: expected failures come back as
     `ScenarioRankInfo.error_message` (no raise), unexpected bugs raise — each
     must produce the toast. On failure the rank output returns `no_update` so
-    the displayed (cached) position stays, replacing today's behavior of
-    flashing `N/A` until the next ~1s cache-only tick restores it.
+    the displayed value stays put — usually the cached position, but `N/A`
+    when none was ever shown (default config, first failure) — replacing
+    today's behavior of flashing `N/A` until the next ~1s cache-only tick
+    restores it. The toast copy is therefore the always-true
+    "Couldn't refresh — position unchanged.", not "showing cached position".
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
@@ -350,11 +363,10 @@ Grouped by file; each maps to inventory rows above.
   them needs a D4-conformant channel — a dedicated typed event queue or polled
   cache state, *not* the run-specific `message_queue`. Pairs naturally with the
   rank-improved addition below — decide together, not piecemeal.
-- **Manual Refresh error color.** Keep red, or soften to a neutral "couldn't
-  refresh — showing cached position"? (The copy's premise now holds: the
-  failure path returns `no_update`, so the cached value genuinely stays
-  displayed — see the `refresh_rank` item in Concrete changes. Only the
-  severity styling remains open.)
+- **Manual Refresh error color.** Keep red, or soften to a neutral yellow?
+  The copy is settled ("Couldn't refresh — position unchanged.", always true
+  since the failure path returns `no_update` — see the `refresh_rank` item in
+  Concrete changes); only the severity styling remains open.
 
 ## Future / optional (scope additions, not committed)
 
