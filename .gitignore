@@ -509,6 +509,7 @@ marimo/_lsp/
 __marimo__/
 
 config.toml
+# Legacy cache root, now data/cache/; kept ignored for pre-migration checkouts
 cache/
 data/
 # Scratch dir: contents ignored, but the routing README is tracked

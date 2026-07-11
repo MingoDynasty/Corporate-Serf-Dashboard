@@ -46,7 +46,8 @@ _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
 
-CACHE_DIR = "cache"
+CACHE_DIR = "data/cache"
+LEGACY_CACHE_DIR = "cache"  # pre-2026-07 cache root, migrated at startup
 
 
 class UnknownKovaaksUserError(ValueError):
@@ -68,6 +69,51 @@ class Endpoints(StrEnum):
     PLAYLIST = "/playlist/playlists"
     SEARCH_SCENARIO = "/scenario/popular"
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
+
+
+def migrate_legacy_cache_dir() -> None:
+    """One-time move of the legacy cache root to its home under data/."""
+    legacy_dir = Path(LEGACY_CACHE_DIR)
+    target_dir = Path(CACHE_DIR)
+    if not legacy_dir.is_dir():
+        return
+    if target_dir.exists():
+        logger.warning(
+            "Both %s and %s exist; using %s and ignoring the legacy cache "
+            "directory, which is safe to delete.",
+            legacy_dir,
+            target_dir,
+            target_dir,
+        )
+        return
+    target_dir.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        for retry_delay in (*CACHE_REPLACE_RETRY_DELAYS_SECONDS, None):
+            try:
+                os.replace(legacy_dir, target_dir)
+                break
+            except PermissionError:
+                # On Windows, antivirus/indexer scans can briefly hold the
+                # directory open, failing the move transiently.
+                if retry_delay is None:
+                    raise
+                logger.warning(
+                    "Retrying legacy cache migration after PermissionError: %s",
+                    legacy_dir,
+                )
+                time.sleep(retry_delay)
+    except OSError:
+        # The cache is regenerable, so continue with a fresh cache root; the
+        # next startup warns that the leftover legacy directory can be deleted.
+        logger.warning(
+            "Failed to move legacy cache directory %s to %s; continuing with "
+            "a fresh cache.",
+            legacy_dir,
+            target_dir,
+            exc_info=True,
+        )
+        return
+    logger.info("Moved legacy cache directory %s to %s", legacy_dir, target_dir)
 
 
 def make_cache():
@@ -1332,4 +1378,5 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     return _with_derived_rank_warning(rank_info, username, steam_id)
 
 
+migrate_legacy_cache_dir()
 make_cache()

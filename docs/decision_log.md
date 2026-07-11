@@ -206,7 +206,8 @@ to run history.
 
 ## 2026-04-27: Use JSON Files For Runtime API Caches
 
-Status: Accepted
+Status: Accepted (cache root superseded by the 2026-07-11 cache-migration
+entry: caches now live under `data/cache/`)
 
 Decision: Store current API cache data as JSON files under `cache/`.
 
@@ -218,7 +219,8 @@ Consequences: Cache reads must tolerate missing, malformed, stale, or partially-
 
 Status: Accepted (bundled-root path superseded in part by the 2026-07-11
 playlist-overview entry: bundled playlists now live under
-`resources/benchmarks/`, not `resources/playlists/`)
+`resources/benchmarks/`, not `resources/playlists/`; the deferred cache
+migration shipped in the 2026-07-11 cache-migration entry)
 
 Decision: Store user/runtime app data under a repo-local ignored `data/` directory. New runtime logs belong under `data/logs/`. Existing API caches remain under `cache/` until a separate migration moves them.
 
@@ -644,3 +646,25 @@ Consequences: Short playlists show empty grid body below their final row instead
 of collapsing the grid. Very short windows may still scroll the page to preserve
 the 300px usable minimum. The layout tracks AppShell header and padding variables
 instead of duplicating their pixel values.
+
+## 2026-07-11: Move The API Cache Under data/cache/
+
+Status: Accepted
+
+Decision: Relocate the runtime API cache root from `cache/` to `data/cache/`.
+At `api_service` import time, before the cache skeleton is created,
+`migrate_legacy_cache_dir` moves an existing legacy `cache/` directory to
+`data/cache/` in a single rename; when both roots exist the legacy one is
+ignored with a warning that it is safe to delete.
+
+Why: The 2026-06-22 entry grouped user/runtime state under `data/` but
+deferred the cache to a dedicated compatibility migration. Completing it puts
+all runtime state — logs, preferences, user playlists, and the cache — under
+one ignored root.
+
+Consequences: Cache contents survive the move because it is a rename, not a
+rebuild. If the rename fails (for example a Windows file lock that outlasts
+the transient-lock retries), the app continues with a fresh, regenerable
+cache and later startups warn about the leftover legacy directory.
+`.gitignore` keeps the legacy `cache/` entry so pre-migration checkouts stay
+clean.
