@@ -637,6 +637,19 @@ def test_aim_training_journey_page_inherits_shell_theme_provider():
     assert all(not isinstance(child, dmc.MantineProvider) for child in page.children)
 
 
+def test_aim_training_journey_playlist_picker_shares_home_scroll_and_height():
+    picker = next(
+        component
+        for component in _walk_components(aim_training_journey.layout())
+        if getattr(component, "id", None) == "playlists-multi-select"
+    )
+
+    # Adopted from the Home filter via the shared preset so the two dropdowns
+    # scroll and cap height consistently once the library grows past a screen.
+    assert picker.scrollAreaProps == {"type": "always"}
+    assert picker.maxDropdownHeight == "75vh"
+
+
 def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
     dmc.add_figure_templates()
 

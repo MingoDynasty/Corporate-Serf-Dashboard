@@ -2,7 +2,25 @@
 Utility functions for the Corporate Serf app.
 """
 
+from datetime import datetime
 from decimal import Decimal
+
+# Abbreviated English month names, hardcoded so the absolute-timestamp format is
+# locale-independent (``%b``/``calendar.month_abbr`` follow the process locale).
+_MONTH_ABBREVIATIONS = (
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+)
 
 
 def ordinal(number: int) -> str:
@@ -30,3 +48,33 @@ def format_decimal(number) -> Decimal | int:
     if decimal == decimal.to_integral():
         return int(decimal)
     return decimal.normalize()
+
+
+def format_absolute_timestamp(dt: datetime, *, include_seconds: bool = False) -> str:
+    """
+    Format a datetime as a humanized, GitHub-shaped absolute timestamp.
+
+    Examples: ``Apr 9, 2026, 7:04 PM`` (default),
+    ``Apr 9, 2026, 7:04:22 PM`` (``include_seconds=True``).
+
+    The month is a hardcoded English abbreviation, the day and hour are
+    unpadded, and minutes/seconds are zero-padded. The hour is 12-hour with
+    ``0`` mapped to ``12`` so midnight is ``12:xx AM`` and noon ``12:xx PM``.
+    Hand-rolled rather than ``strftime``-ed for locale independence (see the
+    month array) and the unpadded hour (no cross-platform strftime code exists:
+    ``%-I`` is POSIX-only, ``%#I`` Windows-only).
+
+    The no-seconds variant is mirrored by ``dagfuncs.absoluteTime`` in
+    ``assets/dashAgGridFunctions.js``; keep the two in sync by hand.
+
+    :param dt: datetime to format (rendered in its own naive/local time).
+    :param include_seconds: whether to append zero-padded seconds.
+    :return: formatted timestamp string.
+    """
+    month = _MONTH_ABBREVIATIONS[dt.month - 1]
+    meridiem = "AM" if dt.hour < 12 else "PM"
+    hour = dt.hour % 12 or 12
+    time_part = f"{hour}:{dt.minute:02d}"
+    if include_seconds:
+        time_part += f":{dt.second:02d}"
+    return f"{month} {dt.day}, {dt.year}, {time_part} {meridiem}"

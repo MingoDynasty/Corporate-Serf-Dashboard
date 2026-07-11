@@ -14,7 +14,7 @@ import plotly.express as px
 import plotly.graph_objs as go
 
 from source.kovaaks.data_models import Rank, RunData
-from source.utilities.utilities import format_decimal
+from source.utilities.utilities import format_absolute_timestamp, format_decimal
 
 logger = logging.getLogger(__name__)
 
@@ -184,7 +184,9 @@ def _generate_xy_plot(
             scatter_plot_data["Score"].append(run_data.score)
             scatter_plot_data[axis_title].append(axis.scatter_x(key, run_data))
             scatter_plot_data["Datetime"].append(
-                run_data.datetime_object.strftime("%Y-%m-%d %I:%M:%S %p"),
+                format_absolute_timestamp(
+                    run_data.datetime_object, include_seconds=True
+                ),
             )
             scatter_plot_data["Accuracy"].append(round(100 * run_data.accuracy, 2))
         line_plot_data[axis_title].append(axis.line_x(key))
@@ -195,7 +197,7 @@ def _generate_xy_plot(
     #     logger.debug(f"WARNING: Skipping '{scenario}' due to insufficient Sensitivity data.")
     #     return
 
-    current_datetime = datetime.today().strftime("%Y-%m-%d %I:%M:%S %p")
+    current_datetime = format_absolute_timestamp(datetime.today())
     title = f"{scenario_name} (updated: {current_datetime!s})"
     logger.debug("Generating plot for: %s", scenario_name)
 
