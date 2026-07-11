@@ -157,7 +157,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                 target="_self",
                                                 underline="never",
                                                 style={
-                                                    "color": "var(--mantine-font-family-headings)",
+                                                    "color": "var(--mantine-color-text)",
                                                 },
                                             ),
                                         ],
