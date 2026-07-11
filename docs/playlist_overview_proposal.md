@@ -347,6 +347,14 @@ last, 2026-07-09).
   staleness, not user data. Accepted consequence: the user's Viscose rank
   displays shift when PR 2b lands.
 
+## Shipping notes for the final PR (3b)
+
+- PR #90 review F2: the 2026-06-22 ("Keep User Runtime Data Under `data/`")
+  and 2026-07-07 (code identity) decision-log entries still describe the
+  bundled root as `resources/playlists/`. The 3b distillation entry should
+  supersede those path details (keep-old-mark-superseded convention) rather
+  than rewriting the dated entries.
+
 ## Interactions with in-flight and parked work
 
 - **Playlist code identity (shipped, PR #67).** The overview consumes

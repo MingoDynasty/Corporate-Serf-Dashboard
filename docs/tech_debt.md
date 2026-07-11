@@ -14,7 +14,22 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-*(none currently tracked)*
+### Rank overlays assume monotonically ascending thresholds
+
+`_add_rank_overlays` (`source/plot/plot_service.py`) index-walks `rank_data`
+in rank order to pick the ranks bracketing the plotted score range, assuming
+thresholds ascend with rank. Upstream KovaaK's data violates this on 3 of the
+111 bundled benchmarks (8 scenarios total; found in the PR #90 review):
+`Viscose benchmarks easier scenarios` — **default-visible** — has one
+(`1w3ts reload Larger`: Hare 54 > Ermine 50), and the two hidden-by-default
+TSK Static/Ultimate files carry the rest. Impact is cosmetic: for scores in
+the inverted band, one dashed rank line can be omitted or a lower rank shown
+as the floor. Fix shape: make the window selection robust to non-monotonic
+thresholds (e.g. select by min/max over thresholds, or sort a copy by
+threshold for the scan) — small, self-contained in `plot_service.py`, and
+should not reorder the drawn rank ladder itself. The data is faithful
+upstream truth (OQ-9: KovaaK's is authoritative) — the code, not the data,
+is the fix site.
 
 ## Code Smells
 
