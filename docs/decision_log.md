@@ -18,11 +18,14 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 Status: Accepted
 
 Decision: When `get_scenario_rank_info` has resolved a leaderboard but the
-live rank fetch raises `RequestException`, it falls back to the last cached
-rank (read via `_cached_rank`, ignoring the rank-cache TTL) instead of
-returning UNKNOWN. UNKNOWN is reserved for the case where there is genuinely
-nothing cached to show. `force_refresh=True` inherits the same fallback — a
-failed forced refresh showing last-known still beats "N/A".
+live rank fetch fails — either an unreachable endpoint (`RequestException`) or
+a successful-but-unusable, schema-invalid response (`ValidationError`) — it
+falls back to the last cached rank (read via `_cached_rank`, ignoring the
+rank-cache TTL) instead of returning UNKNOWN. Both failure modes route through
+the shared `_stale_rank_fallback` helper. UNKNOWN is reserved for the case
+where there is genuinely nothing cached to show. `force_refresh=True` inherits
+the same fallback — a failed forced refresh showing last-known still beats
+"N/A".
 
 Rationale: the app should never display less than it already knows, and the
 behavior was already inconsistent — the Playlists overview reads ranks with
