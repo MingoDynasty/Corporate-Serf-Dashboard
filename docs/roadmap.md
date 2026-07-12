@@ -55,7 +55,7 @@ Design rationale for shipped work lives in
 
 ## Upcoming milestones
 
-### 1. Playlist-level overview and stats
+### Playlist-level overview and stats
 
 **What:** A higher-level view of all imported playlists with aggregate stats —
 average percentile, last-played date, total runs — and a way to drill into
@@ -81,7 +81,10 @@ removal checklist.
 phases 2–3 continue as the "Playlist management & benchmark library" item
 under Future.
 
-### 2. Notification system redesign
+### Notification system redesign
+
+*(Ordering relative to playlist management after the overview ships is not
+yet decided.)*
 
 **What:** Collapse the two notification subsystems into one quiet-by-default
 toast layer: passive navigation never toasts errors, persistent conditions
@@ -113,14 +116,14 @@ expanded into its own roadmap entry when it becomes the next thing up.
 - **Aim Training Journey page polish** — the page already exists at
   `/aim-training-journey` (currently marked work-in-progress). It visualizes
   training-hour checkpoints across playlists, which is a different question
-  from the playlist-level overview in milestone 2 — so it remains a separate
-  concern to revisit later, not a replacement for milestone 2.
+  from the playlist-level overview milestone — so it remains a separate
+  concern to revisit later, not a replacement for it.
 - **Playlist management & benchmark library** — phases 2–3 of the accepted
   [`playlist_overview_proposal.md`](./playlist_overview_proposal.md): the
   full bundled benchmark library ships under `resources/benchmarks/` with
   per-code show/hide visibility (plain show-list), then overview-hosted
-  import, delete, and cleanup. Sequenced immediately after the overview
-  milestone ships.
+  import, delete, and cleanup. Sequenced after the overview milestone ships;
+  ordering relative to the notification system redesign is not yet decided.
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start

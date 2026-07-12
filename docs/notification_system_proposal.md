@@ -206,10 +206,15 @@ re-arm the timer. The alternation state is **per browser client**: a
 argument). A module-global toggle would be wrong — each tab runs its own
 callback stream and `NotificationContainer`, so one tab's flip could hand
 another tab the duration it is already displaying, leaving the old timer
-running. PR 3 must carry a regression test for both replace cases —
-a second run's toast replacing a visible one, and a live run replacing the
-backlog digest — asserting with **elapsed time** that the replacement gets a
-full lifetime, not merely that the payload changed. (The test doubles as an
+running. The Store's **lifecycle must match the host's**: it lives in
+`app_shell.py` beside the `NotificationContainer`, not in Home's page layout —
+toasts survive page navigation (the container is shell-hosted) while a
+page-layout memory Store resets on remount, which could reissue the visible
+toast's duration after a navigate-away-and-back. PR 3 must carry a regression
+test for the replace cases — a second run's toast replacing a visible one, a
+live run replacing the backlog digest, and an emission after navigating away
+and back while a toast is active — asserting with **elapsed time** that the
+replacement gets a full lifetime, not merely that the payload changed. (The test doubles as an
 upgrade guard: the mechanism depends on the timer effect's duration
 dependency, which a future DMC/Mantine version could change.)
 
@@ -271,7 +276,9 @@ Grouped by file; each maps to inventory rows above.
   lives in one place. A function, not a framework; the pure builder pattern in
   `home.py` (`_build_run_event_notifications`) stays and calls it.
 - **`app_shell.py`** — drop `log_handler.embed()` and its import; the single
-  `dmc.NotificationContainer` remains the only host.
+  `dmc.NotificationContainer` remains the only host. Add the per-client
+  toast-lifetime `dcc.Store` beside it (D5) — shell-hosted so its lifecycle
+  matches the container's across page navigation.
 - **`pages/home.py`**
   - `_emit_rank_messages` / `get_scenario_rank`: stop toasting on the passive
     path (#1, #2). Return the inline field states from D3 instead of bare
@@ -298,9 +305,9 @@ Grouped by file; each maps to inventory rows above.
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
-    The layout gains the per-client toast-lifetime `dcc.Store`, and this
-    callback the `State`/`Output` pair on it, for the D5 autoClose
-    alternation.
+    This callback gains the `State`/`Output` pair on the shell-hosted
+    toast-lifetime `dcc.Store` (see the `app_shell.py` item) for the D5
+    autoClose alternation.
   - Drop the `get_dash_logger` import and the `dash_logger` module-global.
 - **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
   empty state where the chart renders, mirroring Home's on-canvas pattern.
