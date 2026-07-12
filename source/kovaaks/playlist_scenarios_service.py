@@ -3,9 +3,16 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import requests
+
 from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
-from source.kovaaks.api_service import get_scenario_rank_info
+from source.kovaaks.api_service import (
+    UnknownKovaaksUserError,
+    get_cached_leaderboard_id,
+    get_scenario_rank_info,
+    hydrate_leaderboard_id_cache,
+)
 from source.kovaaks.data_models import RunData, ScenarioStats
 from source.kovaaks.data_service import (
     get_personal_best_run,
@@ -136,6 +143,8 @@ def _lookup_rank_info(
     scenario_name: str,
 ) -> ScenarioRankInfo:
     config = get_config()
+    # Hydration is hoisted to build_playlist_scenario_rank_rows and runs once
+    # per playlist open, so the per-scenario path must never re-hydrate.
     return get_scenario_rank_info(
         scenario_name,
         config.kovaaks_username,
@@ -143,6 +152,7 @@ def _lookup_rank_info(
         config.scenario_metadata_cache_ttl_hours,
         config.scenario_rank_cache_ttl_hours,
         config.leaderboard_total_cache_ttl_hours,
+        allow_hydration=False,
     )
 
 
@@ -159,6 +169,34 @@ def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
     )
 
 
+def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
+    """
+    Hydrate the leaderboard-id mapping cache once before the per-scenario fan-out.
+
+    Hydration paginates the user's full total-play history, so doing it here --
+    once, and only when it can help -- avoids the per-scenario path racing four
+    duplicate paginations on a cold cache or re-attempting a flaky total-play
+    endpoint for every unmapped scenario. A fully-mapped playlist skips this
+    entirely, preserving today's behavior of never touching total-play then.
+    """
+    config = get_config()
+    username = config.kovaaks_username
+    if not username:
+        return
+    if all(get_cached_leaderboard_id(name) is not None for name in scenario_names):
+        return
+    try:
+        hydrate_leaderboard_id_cache(
+            username,
+            config.scenario_metadata_cache_ttl_hours,
+        )
+    except (requests.RequestException, UnknownKovaaksUserError) as exc:
+        logger.warning(
+            "Failed to hydrate leaderboard metadata for playlist open: %s",
+            exc,
+        )
+
+
 def build_playlist_scenario_rank_rows(
     playlist_code: str,
 ) -> list[dict[str, str | int | float | None]]:
@@ -171,6 +209,10 @@ def build_playlist_scenario_rank_rows(
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
         return []
+
+    _hydrate_playlist_leaderboard_ids(
+        [scenario.name for scenario in playlist.scenarios]
+    )
 
     max_workers = max(1, PLAYLIST_RANK_MAX_WORKERS)
     rows: list[dict[str, str | int | float | None] | None] = [
