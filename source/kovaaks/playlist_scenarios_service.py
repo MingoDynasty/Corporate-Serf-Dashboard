@@ -180,9 +180,12 @@ def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
     username = config.kovaaks_username
     if not username:
         return
-    if all(get_cached_leaderboard_id(name) is not None for name in scenario_names):
-        return
     try:
+        # The mapping-cache probe is inside the guard too: get_cached_leaderboard_id
+        # can raise on a malformed cached value, and like hydration it must not
+        # escape to the try/except-free playlist callback.
+        if all(get_cached_leaderboard_id(name) is not None for name in scenario_names):
+            return
         hydrate_leaderboard_id_cache(
             username,
             config.scenario_metadata_cache_ttl_hours,

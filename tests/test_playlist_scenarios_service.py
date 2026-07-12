@@ -454,3 +454,28 @@ def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
     rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+def test_hydration_probe_error_still_yields_full_rows(monkeypatch):
+    # get_cached_leaderboard_id can raise (e.g. int() on a malformed cached id).
+    # The any-unmapped probe runs inside the best-effort guard, so a probe
+    # failure must not take down the whole playlist page either.
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": 1, "Second": 2})
+
+    def failing_probe(scenario_name):
+        raise ValueError("malformed leaderboard_id in mapping cache")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        failing_probe,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        lambda username, ttl: None,
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert [row["scenario"] for row in rows] == ["First", "Second"]
