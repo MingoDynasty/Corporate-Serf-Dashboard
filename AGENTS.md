@@ -107,7 +107,12 @@ in the same PR — do not leave it for later:
    in `tests/test_docs.py` fails on dangling relative links, so a stale
    reference breaks the pytest gate.
 7. Move the kickoff prompt the PR consumed (if one exists) from
-   `ignore/prompts/` to `ignore/prompts/done/`.
+   `ignore/prompts/` to `ignore/prompts/done/`. `ignore/` exists only in the
+   main checkout — from a worktree session, reach it by absolute path
+   (`git worktree list`, first entry); a cloud session can't, so say so in
+   the PR description instead. The `/merge-sweep` skill
+   (`.claude/skills/merge-sweep/`) is the on-demand backstop that archives
+   anything missed after merge.
 
 ## Testing Philosophy
 

@@ -113,8 +113,8 @@ list in the roadmap.)
   visible row; a duplicate-code refusal whose playlist is hidden points the
   user at the "Show hidden" toggle. The only part of the app that requires an
   internet connection besides rank lookups.
-- **Playlist delete & superseded-copy cleanup** (Playlists overview page, this
-  PR). A per-row Delete on user playlists removes the `data/playlists/` file
+- **Playlist delete & superseded-copy cleanup** (Playlists overview page, PR
+  #98). A per-row Delete on user playlists removes the `data/playlists/` file
   after confirmation (bundled benchmarks offer Hide instead — a share-code
   re-import would come back rank-less); a one-click cleanup clears user files
   left dead by the bundled library flip. *Problem solved:* the user prunes
