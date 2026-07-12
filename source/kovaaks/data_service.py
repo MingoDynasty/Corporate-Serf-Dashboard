@@ -6,7 +6,6 @@ import logging
 import os
 import re
 import threading
-import time
 from collections import Counter, deque
 from datetime import date, datetime
 from pathlib import Path
@@ -16,10 +15,7 @@ from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from source.config.config_service import get_config
-from source.kovaaks.api_service import (
-    CACHE_REPLACE_RETRY_DELAYS_SECONDS,
-    get_playlist_data,
-)
+from source.kovaaks.api_service import get_playlist_data
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
@@ -27,6 +23,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.utilities.atomic_write import replace_with_retry
 from source.utilities.stopwatch import Stopwatch
 
 # The bundled root is the full benchmark library (every committed file
@@ -841,18 +838,7 @@ def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
                 file.write("\n")
                 file.flush()
                 os.fsync(file.fileno())
-            for retry_delay in (*CACHE_REPLACE_RETRY_DELAYS_SECONDS, None):
-                try:
-                    os.replace(temp_file, file_path)
-                    break
-                except PermissionError:
-                    if retry_delay is None:
-                        raise
-                    logger.warning(
-                        "Retrying playlist replace after PermissionError: %s",
-                        file_path,
-                    )
-                    time.sleep(retry_delay)
+            replace_with_retry(temp_file, file_path, logger=logger)
         finally:
             if temp_file.exists():
                 temp_file.unlink()

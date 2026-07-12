@@ -25,6 +25,7 @@ from source.kovaaks.api_service import (  # noqa: E402
     get_benchmark_json,
 )
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario  # noqa: E402
+from source.utilities.atomic_write import replace_with_retry  # noqa: E402
 
 from scripts.benchmark_importer.models import (  # noqa: E402
     EvxlData,
@@ -50,7 +51,6 @@ EVXL_BENCHMARKS_URL = "https://evxl.app/data/benchmarks"
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 RETRY_ATTEMPTS = 4
 RETRY_BACKOFF_SECONDS = (2, 4, 8)
-REPLACE_RETRY_DELAYS_SECONDS = (0.05, 0.1)  # Windows AV/indexer file locks.
 POLITENESS_DELAY_SECONDS = 0.5
 
 WINDOWS_RESERVED_BASENAMES = {
@@ -110,19 +110,7 @@ def _atomic_write_json(path: Path, payload: Any) -> None:
             temporary_file.write("\n")
             temporary_file.flush()
             os.fsync(temporary_file.fileno())
-        for retry_delay in (*REPLACE_RETRY_DELAYS_SECONDS, None):
-            try:
-                os.replace(temporary_path, path)
-                break
-            except PermissionError:
-                # On Windows, antivirus/indexer scans can briefly hold the
-                # destination open, failing the replace transiently.
-                if retry_delay is None:
-                    raise
-                logger.warning(
-                    "Retrying atomic replace after PermissionError: %s", path
-                )
-                time.sleep(retry_delay)
+        replace_with_retry(temporary_path, path, logger=logger)
         temporary_path = None
     finally:
         if temporary_path is not None:
