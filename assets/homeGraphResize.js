@@ -12,6 +12,9 @@
                 continue;
             }
             const plot = entry.target.querySelector(".js-plotly-plot");
+            // window.Plotly is set by dcc's lazily injected plotly.min.js
+            // once the first graph renders; before that there is no plot to
+            // resize yet and the guard is a safe no-op.
             if (plot && window.Plotly) {
                 window.Plotly.Plots.resize(plot);
             }
