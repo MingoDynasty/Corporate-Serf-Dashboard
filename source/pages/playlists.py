@@ -90,8 +90,8 @@ LOWEST_PERCENTILE_TOOLTIP = (
     "params.value == null ? null : ('Lowest: ' + params.data.lowest_scenario)"
 )
 
-# The Hide/Unhide labels act immediately with no confirm step, so the hover
-# copy carries the consequence and the way back (Show hidden).
+# The eye toggle acts immediately with no confirm step, so the hover copy
+# carries the action, its consequence, and the way back (Show hidden).
 VISIBILITY_TOOLTIP = (
     "params.data.hidden"
     " ? 'Show this playlist again in the overview and playlist selectors'"

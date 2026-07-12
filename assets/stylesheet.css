@@ -101,21 +101,36 @@
     opacity: 0.55;
 }
 
-/* Hide/Unhide link in the overview's visibility column (VisibilityAction
-   renderer in dashAgGridComponentFunctions.js). */
+/* Hide/Unhide eye toggle in the overview's visibility column
+   (VisibilityAction renderer in dashAgGridComponentFunctions.js). The span is
+   a masked SVG recolored via background-color, matching the local_icon
+   component's technique. Open eye = row visible (click hides), struck-out
+   eye = row hidden (click unhides). */
 .visibility-action {
-    color: var(--mantine-color-blue-filled);
+    background-color: var(--mantine-color-blue-filled);
     cursor: pointer;
-    text-decoration-line: underline;
-    text-underline-offset: 0.15em;
+    display: inline-block;
+    height: 18px;
+    vertical-align: middle;
+    width: 18px;
 }
 
 .visibility-action:hover {
-    color: var(--mantine-color-blue-filled-hover);
+    background-color: var(--mantine-color-blue-filled-hover);
+}
+
+.visibility-action-visible {
+    -webkit-mask: url("icons/material-symbols-visibility-outline.svg") no-repeat center / contain;
+    mask: url("icons/material-symbols-visibility-outline.svg") no-repeat center / contain;
+}
+
+.visibility-action-hidden {
+    -webkit-mask: url("icons/material-symbols-visibility-off-outline.svg") no-repeat center / contain;
+    mask: url("icons/material-symbols-visibility-off-outline.svg") no-repeat center / contain;
 }
 
 /* Delete link in the overview's delete column (DeleteAction renderer in
-   dashAgGridComponentFunctions.js). Styled like .visibility-action but red to
+   dashAgGridComponentFunctions.js). Red to
    signal the destructive, user-playlist-only action. */
 .delete-action {
     color: var(--mantine-color-red-filled);
