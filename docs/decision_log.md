@@ -44,8 +44,13 @@ Constraints:
   the `allow_network=False` read path.
 - The resolve-failure branch is unchanged: no `leaderboard_id` means nothing
   is cached to fall back on.
-- No UI staleness indicator is surfaced (`fetched_at` remains on the model for
-  a future opt-in).
+- The stale result carries a `warning_message`, driving a three-tier toast
+  model on the Home rank paths: fetch fails with nothing cached → red error;
+  fetch fails but a stale rank is served → yellow warning; fetch succeeds →
+  green success (manual refresh only). `refresh_rank`'s green confirmation is
+  suppressed by any error *or* warning. No persistent on-display staleness
+  indicator is surfaced (`fetched_at` remains on the model for a future
+  opt-in).
 
 ## 2026-07-11: The Playlist Overview Is The Playlist Management Surface
 
