@@ -70,6 +70,20 @@ def test_playlist_data_strips_codes_and_rejects_blank_codes():
         _playlist("Blank", "   ")
 
 
+def test_scenario_strips_name_and_keeps_blank_names():
+    assert Scenario.model_validate({"name": "  Padded Scenario  "}).name == (
+        "Padded Scenario"
+    )
+    # Unlike code, a whitespace-only scenario name is kept (lenient) so one odd
+    # upstream entry never rejects the whole playlist import.
+    assert Scenario.model_validate({"name": "   "}).name == ""
+
+    imported = PlaylistData.model_validate_json(
+        '{"name": "P", "code": "C", "scenarios": [{"name": "  Padded  "}]}'
+    )
+    assert imported.scenarios[0].name == "Padded"
+
+
 def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
     monkeypatch,
     tmp_path,
@@ -245,6 +259,44 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     )
     assert imported.name == "Same Name"
     assert imported.code == "NewCode"
+
+
+def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # kovaaks_database keys are always stripped (CSV run import strips them), so
+    # a padded imported name must be stripped to match this local run key.
+    monkeypatch.setattr(
+        data_service,
+        "kovaaks_database",
+        {"Padded Scenario": {"scenario_stats": object()}},
+    )
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Padded Playlist",
+                playlistCode="PaddedCode",
+                scenarioList=[SimpleNamespace(scenarioName="  Padded Scenario  ")],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    message, imported_code = data_service.load_playlist_from_code("PaddedCode")
+
+    assert message is None
+    assert imported_code == "PaddedCode"
+    stored = data_service.playlist_database["PaddedCode"]
+    assert [scenario.name for scenario in stored.scenarios] == ["Padded Scenario"]
+    # The stored (stripped) name now resolves against the local run key.
+    assert data_service.is_scenario_in_database(stored.scenarios[0].name)
+    imported_file = user_root / "Padded Playlist [PaddedCode].json"
+    imported = PlaylistData.model_validate_json(
+        imported_file.read_text(encoding="utf-8")
+    )
+    assert [scenario.name for scenario in imported.scenarios] == ["Padded Scenario"]
 
 
 def test_import_reports_write_failures_without_updating_database(
