@@ -38,7 +38,12 @@ what it knows and stream in what it doesn't, with visible progress.
 - **R4 — Progress counter.** The existing status Text
   (`playlist-scenarios-status`) shows
   `Updating positions from KovaaK's… done/total` (total = all scenarios,
-  per R2) while phase 2 runs, and clears on completion. All-fresh playlists
+  per R2) while phase 2 runs. On a clean completion it clears; on a degraded
+  completion (any UNKNOWN or stale-served rows, per R9) it settles to a
+  compact persistent summary — e.g.
+  `2 of 34 positions unavailable · 30 from cache — KovaaK's unreachable` —
+  until the next fill. The R9 toast is transient; a degraded page must not
+  look identical to a fresh one ten seconds later. All-fresh playlists
   complete within roughly one interval tick; a brief counter flash is
   accepted.
 - **R5 — Transport: registry + interval drain.** A module-level registry in
@@ -93,12 +98,17 @@ what it knows and stream in what it doesn't, with visible progress.
   with a per-fill unique notification id (dmc silently swallows a "show"
   with a duplicate id). Tiers mirror the PR #112 three-tier toast model,
   aggregated: any scenario ended UNKNOWN → red
-  "Couldn't update K of N positions" (K counts only UNKNOWN rows);
-  otherwise any scenario served stale (detectable via the staleness
-  `warning_message` #112 attaches) → yellow
+  "Couldn't update K of N positions" (K counts only UNKNOWN rows), with
+  "; M more served from cache" appended whenever stale-serves also
+  occurred; otherwise any scenario served stale → yellow
   "M of N positions served from cache — KovaaK's was unreachable";
   all fresh → no toast (phase 2 is automatic, and green is reserved for
-  manual refreshes per the #112 model).
+  manual refreshes per the #112 model). Stale-serves are detected via the
+  staleness `warning_message` #112 attaches. The red tier must never mask
+  the stale count: once the background percentile warmup is ambient,
+  UNKNOWN requires an empty cache (rare) while an outage presents almost
+  entirely as stale-serves — M, in both tiers and in the settled R4 status
+  line, IS the outage signal in the warmed steady state.
 - **R10 — Drop `dcc.Loading` on this grid.** Phase 1 is near-instant, and
   interval-driven prop updates would flicker the overlay every tick. The
   pending placeholders (R3) plus the counter (R4) replace the spinner as the
