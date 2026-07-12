@@ -46,7 +46,7 @@ _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
 
-CACHE_DIR = "cache"
+CACHE_DIR = "data/cache"
 
 
 class UnknownKovaaksUserError(ValueError):

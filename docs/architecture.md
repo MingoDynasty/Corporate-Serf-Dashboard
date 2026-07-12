@@ -46,7 +46,7 @@ flowchart TD
 
     Queue[["message_queue (deque of NewFileMessage)"]]
     Stores[("data_service module-global stores<br/>kovaaks_database, run_database,<br/>playlist_database")]
-    Cache[("JSON cache under cache/<br/>rank, leaderboard, benchmark data")]
+    Cache[("JSON cache under data/cache/<br/>rank, leaderboard, benchmark data")]
     API["KovaaK's HTTP API"]
 
     Game --> Handler
@@ -74,7 +74,7 @@ flowchart TD
 
     Queue[["message_queue (deque of NewFileMessage)"]]
     Stores[("data_service module-global stores")]
-    Cache[("JSON cache under cache/")]
+    Cache[("JSON cache under data/cache/")]
     API["KovaaK's HTTP API"]
 
     Check -->|"drains and summarizes"| Queue
@@ -105,8 +105,8 @@ that summary and never accesses the queue directly.
     files warn visibly after the UI mounts, and a missing user root is treated
     as empty. New imports are written atomically under `data/playlists/`.
 - **Cache layer** — KovaaK's API responses and resolved rank/leaderboard data
-  persist as JSON under `cache/` (not committed), written atomically and read
-  tolerantly. Subtrees include `scenario_leaderboards/`,
+  persist as JSON under `data/cache/` (not committed), written atomically and
+  read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
 - **User preferences** — `data/preferences.json` (not committed) holds the

@@ -120,7 +120,7 @@ in the same PR — do not leave it for later:
 
 ## Cache Conventions
 
-- Runtime cache files live under `cache/` and should not be committed.
+- Runtime cache files live under `data/cache/` and should not be committed.
 - Cache reads should tolerate missing, stale, malformed, or partially-written files.
 - Cache writes should be atomic where practical.
 - Derived display fields should not be persisted unless there is a clear reason.

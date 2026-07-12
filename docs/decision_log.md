@@ -206,7 +206,8 @@ to run history.
 
 ## 2026-04-27: Use JSON Files For Runtime API Caches
 
-Status: Accepted
+Status: Accepted (cache root superseded by the 2026-07-11 cache-relocation
+entry: caches now live under `data/cache/`)
 
 Decision: Store current API cache data as JSON files under `cache/`.
 
@@ -218,7 +219,8 @@ Consequences: Cache reads must tolerate missing, malformed, stale, or partially-
 
 Status: Accepted (bundled-root path superseded in part by the 2026-07-11
 playlist-overview entry: bundled playlists now live under
-`resources/benchmarks/`, not `resources/playlists/`)
+`resources/benchmarks/`, not `resources/playlists/`; the deferred cache move
+shipped in the 2026-07-11 cache-relocation entry)
 
 Decision: Store user/runtime app data under a repo-local ignored `data/` directory. New runtime logs belong under `data/logs/`. Existing API caches remain under `cache/` until a separate migration moves them.
 
@@ -644,3 +646,23 @@ Consequences: Short playlists show empty grid body below their final row instead
 of collapsing the grid. Very short windows may still scroll the page to preserve
 the 300px usable minimum. The layout tracks AppShell header and padding variables
 instead of duplicating their pixel values.
+
+## 2026-07-11: Move The API Cache Under data/cache/
+
+Status: Accepted
+
+Decision: Relocate the runtime API cache root from `cache/` to `data/cache/`
+as a plain path change, with no in-app compatibility migration. An existing
+`cache/` directory is moved by hand after the change lands.
+
+Why: The 2026-06-22 entry grouped user/runtime state under `data/` but
+deferred the cache to a dedicated compatibility migration. The app currently
+has exactly one user and the cache is fully regenerable from the API, so
+migration code would outlive its single use; a one-time manual move (or just
+letting the cache rebuild) covers it.
+
+Consequences: All runtime state — logs, preferences, user playlists, and the
+cache — lives under one ignored `data/` root. A legacy `cache/` root left in
+place is silently ignored; `.gitignore` keeps its entry so pre-move checkouts
+stay clean. Revisit an in-app migration only if the app gains users beyond
+its author.
