@@ -315,7 +315,7 @@ def test_write_playlist_data_to_file_leaves_existing_file_intact_on_failure(
     def failing_replace(_source, _destination):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(data_service.os, "replace", failing_replace)
+    monkeypatch.setattr(atomic_write.os, "replace", failing_replace)
 
     with pytest.raises(RuntimeError, match="boom"):
         data_service.write_playlist_data_to_file(playlist)
