@@ -1516,6 +1516,104 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def _seed_expired_rank_cache(monkeypatch, *, with_total):
+    """Seed an expired rank cache (scenario_name absent) for fallback tests.
+
+    Returns the backdated rank cache file, its pre-call bytes, and its mtime so
+    callers can assert the fallback read path never rewrites the cache.
+    """
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=98330,
+        ),
+    )
+    rank_cache_file = (
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
+    )
+    stale_timestamp = time.time() - (200 * 60 * 60)
+    os.utime(rank_cache_file, (stale_timestamp, stale_timestamp))
+    if with_total:
+        api_service.save_leaderboard_total(98330, 200)
+        total_cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
+        os.utime(total_cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_fetch_scenario_rank(*_args, **_kwargs):
+        raise api_service.requests.RequestException("leaderboard unavailable")
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fail_fetch_scenario_rank,
+    )
+
+    return (
+        rank_cache_file,
+        rank_cache_file.read_bytes(),
+        rank_cache_file.stat().st_mtime,
+    )
+
+
+@pytest.mark.parametrize("force_refresh", [False, True])
+def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
+    monkeypatch,
+    force_refresh,
+):
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=True,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        force_refresh=force_refresh,
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.leaderboard_id == 98330
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players == 200
+    assert round(rank_info.percentile, 2) == 75.25
+
+    # The fallback is read-only: the stale cache must not be laundered into a
+    # TTL-fresh file by a rewrite (content and mtime both unchanged).
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_serves_stale_rank_without_total_cache(monkeypatch):
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=False,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.leaderboard_id == 98330
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players is None
+    assert rank_info.percentile is None
+
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_scenario_rank_info_keeps_unranked_when_username_validation_fails(
     monkeypatch,
 ):

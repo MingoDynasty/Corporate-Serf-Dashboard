@@ -1156,7 +1156,7 @@ def schedule_rank_freshness_refresh(
     )
 
 
-def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
+def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     scenario_name: str,
     username: str | None,
     steam_id: str | None = None,
@@ -1277,6 +1277,25 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
             scenario_name,
             request_exception_summary(exc),
         )
+        # Graceful degradation: a transient fetch failure should not hide a
+        # rank we already know. Fall back to the last cached rank (ignoring
+        # TTL) so we never display less than the app knows -- the overview
+        # page already serves TTL-expired ranks via allow_network=False. Read
+        # only, never write: a write would launder this stale data into
+        # TTL-fresh on the next read. UNKNOWN only when nothing is cached.
+        stale_rank = _cached_rank(leaderboard_id, username)
+        if stale_rank is not None:
+            if stale_rank.scenario_name is None:
+                stale_rank = stale_rank.model_copy(
+                    update={"scenario_name": scenario_name}
+                )
+            total_players = _cached_leaderboard_total(leaderboard_id)
+            if total_players is not None:
+                stale_rank = stale_rank.model_copy(
+                    update={"total_players": total_players}
+                )
+                stale_rank = _with_percentile(stale_rank)
+            return _with_derived_rank_warning(stale_rank, username, steam_id)
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
             leaderboard_id=leaderboard_id,
