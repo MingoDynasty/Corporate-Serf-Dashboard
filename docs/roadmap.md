@@ -63,7 +63,7 @@ Design rationale for shipped work lives in
   overview-hosted import, delete (user playlists only), and cleanup of user
   files superseded by bundled benchmarks. The whole library ships with the app
   without flooding dropdowns, and playlists are managed in the app instead of
-  by copying files. (PRs #87, #90, #92, and this PR) Design rationale distilled
+  by copying files. (PRs #87, #90, #92, and #98) Design rationale distilled
   into [`decision_log.md`](./decision_log.md).
 
 ---
