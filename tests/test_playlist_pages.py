@@ -579,6 +579,37 @@ def test_playlists_overview_last_played_follows_relative_time_conventions():
     assert "relativeTime(params.data.stalest_sort" in playlists.LAST_PLAYED_TOOLTIP
 
 
+def test_playlists_overview_header_tooltips_cover_exactly_the_cryptic_columns():
+    # Pin the exact set so adding a column forces a conscious tooltip decision.
+    fields_with_header_tooltip = {
+        column["field"]
+        for column in playlists.TABLE_COLUMN_DEFS
+        if "headerTooltip" in column
+    }
+
+    assert fields_with_header_tooltip == {
+        "type_display",
+        "played_sort",
+        "median_percentile_sort",
+        "lowest_percentile_sort",
+    }
+
+
+def test_playlists_overview_percentile_header_tooltips_explain_coverage_suffix():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    for field in ["median_percentile_sort", "lowest_percentile_sort"]:
+        assert "N/M" in columns[field]["headerTooltip"]
+
+
+def test_playlists_overview_visibility_column_has_reversibility_tooltip():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    assert columns[playlists.VISIBILITY_COLUMN_ID]["tooltipValueGetter"] == {
+        "function": playlists.VISIBILITY_TOOLTIP
+    }
+
+
 def test_playlists_overview_grid_rows_navigate_by_playlist_code():
     page = playlists.layout()
     grid = page.children[-1].children
@@ -850,6 +881,17 @@ def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
 
     assert columns["pb_cm360_sort"]["headerName"] == "PB cm/360"
     assert columns["pb_accuracy_sort"]["headerName"] == "PB Accuracy"
+
+
+def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
+    # Pin the exact set so adding a column forces a conscious tooltip decision.
+    fields_with_header_tooltip = {
+        column["field"]
+        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        if "headerTooltip" in column
+    }
+
+    assert fields_with_header_tooltip == {"percentile_sort", "pb_cm360_sort"}
 
 
 def test_playlist_scenarios_grid_uses_content_auto_size():

@@ -93,6 +93,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Percentile",
         "field": "percentile_sort",
+        "headerTooltip": (
+            "Your percentile on the scenario's global leaderboard - the share "
+            "of players you place above (higher is better)."
+        ),
         "valueFormatter": {"function": "params.data.percentile_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -109,6 +113,11 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "PB cm/360",
         "field": "pb_cm360_sort",
+        "headerTooltip": (
+            "Mouse sensitivity of your personal-best run, in centimeters of "
+            "mouse travel per full 360-degree turn (higher = lower "
+            "sensitivity)."
+        ),
         "valueFormatter": {"function": "params.data.pb_cm360_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
