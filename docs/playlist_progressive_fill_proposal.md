@@ -48,22 +48,34 @@ what it knows and stream in what it doesn't, with visible progress.
   accepted.
 - **R5 — Transport: registry + interval drain.** A module-level registry in
   the service layer, guarded by a lock:
-  `{generation_id: {pending row updates, done_count, total, complete,
-  cancel Event}}`. A `dcc.Interval` (~1 s) drains pending updates and applies
-  them via the grid's `rowTransaction` (update-only). Each pending update is
-  a **complete row dict** rebuilt via `format_playlist_scenario_rank_row`
-  (workers re-read local stats per scenario, as today's `as_completed` loop
-  does) — AG Grid update transactions swap row data wholesale, they never
-  merge, so partial rank-field patches would blank the local columns. This
-  registry+drain shape is the established in-repo pattern (watchdog
-  `message_queue` → Home interval drain); single-user app, so module-level
-  state is acceptable.
-- **R6 — Row identity = playlist code + position.** `getRowId` returns
-  `playlist_code + ':' + playlist_order` (stringified). The playlist_order
-  component exists because playlists may repeat a scenario; the
-  playlist_code namespace makes any stale in-flight transaction from a
-  previously open playlist inert (AG Grid skips update items whose row id is
-  not found).
+  `{generation_id: {pending row updates, done_count, unknown_count,
+  stale_count, total, complete, cancel Event}}`. A `dcc.Interval` (~1 s)
+  drains pending updates and applies them via the grid's `rowTransaction`
+  (update-only). Each pending update is a **complete row dict** rebuilt via
+  `format_playlist_scenario_rank_row` (workers re-read local stats per
+  scenario, as today's `as_completed` loop does) — AG Grid update
+  transactions swap row data wholesale, they never merge, so partial
+  rank-field patches would blank the local columns. The worker classifies
+  each scenario's outcome (fresh / served-stale / unknown) from the
+  `ScenarioRankInfo` **before** flattening it into the row dict — the
+  formatter discards rank metadata — and bumps the generation's counters
+  under the lock; the drain reads counters, never re-deriving outcomes from
+  row content. This registry+drain shape is the established in-repo pattern
+  (watchdog `message_queue` → Home interval drain); single-user app, so
+  module-level state is acceptable.
+- **R6 — Row identity = generation + position.** `getRowId` returns
+  `generation_token + ':' + playlist_order` (phase 1 stamps both into every
+  row; playlist_order exists because playlists may repeat a scenario). The
+  generation namespace is what makes any stale in-flight transaction inert —
+  from a previously open playlist *or from a cancelled fill of the same
+  playlist after a quick reopen*, where playlist-scoped ids would collide:
+  AG Grid matches update items by row id, replaces matched rows wholesale,
+  and skips ids not present, and no other generation's ids can exist in the
+  current grid. Registry-side token checks (R7) cannot revoke a drain
+  response already in flight over HTTP; row-id namespacing is what closes
+  that window. The playlist code is deliberately not part of the id — a
+  generation token is minted per page open, so it already uniquely implies
+  the playlist.
 - **R7 — Generation tokens, cancellation, tombstones.** Each page open mints
   a token held in its own `dcc.Store` (`playlist-scenarios-generation` —
   separate from `playlist-scenarios-code`, whose bare-string contract other
@@ -103,8 +115,15 @@ what it knows and stream in what it doesn't, with visible progress.
   occurred; otherwise any scenario served stale → yellow
   "M of N positions served from cache — KovaaK's was unreachable";
   all fresh → no toast (phase 2 is automatic, and green is reserved for
-  manual refreshes per the #112 model). Stale-serves are detected via the
-  staleness `warning_message` #112 attaches. The red tier must never mask
+  manual refreshes per the #112 model). K and M come from the R5 generation
+  counters, and stale-serve classification is **structural, not textual**:
+  the #112 fallback path gains a transient `served_stale` marker on the
+  returned `ScenarioRankInfo` (never persisted — the fallback path performs
+  no cache writes, and the field defaults to None so `exclude_none` drops it
+  from every other save). Inferring staleness from `warning_message` is
+  forbidden: that field is overloaded by the Steam-ID mismatch warning, and
+  #112 appends staleness text after any mismatch text, so presence-sniffing
+  would misreport a mismatch as an outage. The red tier must never mask
   the stale count: once the background percentile warmup is ambient,
   UNKNOWN requires an empty cache (rare) while an outage presents almost
   entirely as stale-serves — M, in both tiers and in the settled R4 status
@@ -147,6 +166,11 @@ what it knows and stream in what it doesn't, with visible progress.
   columns' minWidths absorb it.
 - Scenario-name clicks navigate from phase 1 onward (the name column is
   local; the existing `cellClicked` callback is unchanged).
+- An in-flight drain response that lands after a reopen can still write a
+  stale status line or toast — row ids (R6) guard only the grid. Accepted:
+  the status text self-heals on the next live tick (≤1 s), and the toast
+  carries a superseded generation's summary at worst once, immediately
+  followed by the live fill's own lifecycle.
 
 ## Out of scope
 
