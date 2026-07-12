@@ -561,6 +561,9 @@ def layout(**kwargs):  # noqa: ARG001
                                 checked=False,
                                 id="playlists-overview-show-hidden",
                                 label="Show hidden",
+                                # Remembered across visits (localStorage) so
+                                # the management view stays how it was left.
+                                persistence=True,
                                 size="sm",
                             ),
                             dmc.Button(

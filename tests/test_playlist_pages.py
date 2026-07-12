@@ -423,6 +423,9 @@ def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     )
 
     assert switch.checked is False
+    # The toggle is remembered across visits (localStorage) so the management
+    # view stays how the user left it.
+    assert switch.persistence is True
     assert grid.rowClassRules == {
         "playlist-overview-row-hidden": "params.data.hidden",
     }
