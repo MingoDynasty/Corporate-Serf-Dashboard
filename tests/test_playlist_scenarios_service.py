@@ -434,3 +434,23 @@ def test_hydration_failure_still_yields_full_rows(monkeypatch):
     rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
+    # A schema-drifted total-play cache can raise ValidationError/KeyError, not
+    # just RequestException. The hoisted hydration is best-effort, so an
+    # unexpected error must not take down the whole playlist page.
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": None, "Second": None})
+
+    def failing_hydrate(username, ttl):
+        raise KeyError("data")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        failing_hydrate,
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert [row["scenario"] for row in rows] == ["First", "Second"]

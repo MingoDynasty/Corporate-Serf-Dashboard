@@ -3,12 +3,9 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-import requests
-
 from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import (
-    UnknownKovaaksUserError,
     get_cached_leaderboard_id,
     get_scenario_rank_info,
     hydrate_leaderboard_id_cache,
@@ -190,7 +187,11 @@ def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
             username,
             config.scenario_metadata_cache_ttl_hours,
         )
-    except (requests.RequestException, UnknownKovaaksUserError) as exc:
+    except Exception as exc:  # noqa: BLE001
+        # Best-effort, mirroring the per-scenario fan-out's own catch-all: a
+        # malformed/schema-drifted total-play cache can raise ValidationError or
+        # KeyError beyond the expected request/unknown-user failures, and the
+        # per-scenario path resolves ranks fine without this pre-hydration.
         logger.warning(
             "Failed to hydrate leaderboard metadata for playlist open: %s",
             exc,
