@@ -117,7 +117,10 @@ TABLE_COLUMN_DEFS = [
         ),
         "cellRenderer": "TypeBadge",
         "sortable": True,
-        "minWidth": 110,
+        # Wide enough for the BENCHMARK pill plus cell padding: autoSize can
+        # run before rows arrive, leaving the column at this floor, and 110
+        # ellipsized the badge.
+        "minWidth": 140,
     },
     {
         "headerName": "Played",
