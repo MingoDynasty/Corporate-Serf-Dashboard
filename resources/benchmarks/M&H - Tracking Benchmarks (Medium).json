@@ -1,23 +1,23 @@
 {
-  "name": "M&H Tracking Benchmarks - Normal",
-  "code": "KovaaKsRocketingLongUfo",
+  "name": "M&H - Tracking Benchmarks (Medium)",
+  "code": "KovaaKsAcingTaggedReset",
   "scenarios": [
     {
       "name": "Extra SmoothSphere Better Easy",
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 2200.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2425.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 2675.0
         },
         {
@@ -32,17 +32,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 1750.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2125.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 2550.0
         },
         {
@@ -57,17 +57,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 1700.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2000.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 2300.0
         },
         {
@@ -82,17 +82,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 2300.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2600.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 2900.0
         },
         {
@@ -107,17 +107,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 5800.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 7100.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 8425.0
         },
         {
@@ -132,17 +132,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 7000.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 8250.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 9450.0
         },
         {
@@ -157,17 +157,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 10000.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 11500.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 13000.0
         },
         {
@@ -182,17 +182,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 4500.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 5825.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 7150.0
         },
         {
@@ -207,17 +207,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 3200.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 3400.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 3600.0
         },
         {
@@ -232,17 +232,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 2400.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2700.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 3000.0
         },
         {
@@ -257,17 +257,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 875.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 883.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 892.0
         },
         {
@@ -282,17 +282,17 @@
       "ranks": [
         {
           "name": "Gold",
-          "color": "#D4AF37",
+          "color": "#EFBF04",
           "threshold": 2000.0
         },
         {
           "name": "Platinum",
-          "color": "#8DD0D0",
+          "color": "#5990B3",
           "threshold": 2250.0
         },
         {
           "name": "Diamond",
-          "color": "#B9F2FF",
+          "color": "#00E7EB",
           "threshold": 2550.0
         },
         {
@@ -302,5 +302,29 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAcingTaggedReset",
+    "kovaaks_benchmark_id": 645,
+    "rank_colors": [
+      [
+        "Gold",
+        "#EFBF04"
+      ],
+      [
+        "Platinum",
+        "#5990B3"
+      ],
+      [
+        "Diamond",
+        "#00E7EB"
+      ],
+      [
+        "Emerald",
+        "#50C878"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:20:00.851229+00:00",
+    "generator": "benchmark_importer"
+  }
 }

@@ -1,6 +1,6 @@
 {
-  "name": "Aimerz+ Dynamic Clicking Benchmarks Easy",
-  "code": "KovaaKsBaitingEggplantLamp",
+  "name": "Dynamic Clicking Benchmarks Easy",
+  "code": "KovaaKsTrackingPlumAfk",
   "scenarios": [
     {
       "name": "pasu nqs reload",
@@ -38,7 +38,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 192.0
+          "threshold": 202.0
         }
       ]
     },
@@ -158,7 +158,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 238.0
+          "threshold": 240.0
         }
       ]
     },
@@ -398,7 +398,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 175.0
+          "threshold": 166.0
         }
       ]
     },
@@ -438,7 +438,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 1600.0
+          "threshold": 1650.0
         }
       ]
     },
@@ -478,9 +478,45 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 135.0
+          "threshold": 120.0
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrackingPlumAfk",
+    "kovaaks_benchmark_id": 582,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#A77138"
+      ],
+      [
+        "Silver",
+        "#C2D2D2"
+      ],
+      [
+        "Gold",
+        "#C4A12A"
+      ],
+      [
+        "Platinum",
+        "#00B3A5"
+      ],
+      [
+        "Diamond",
+        "#81D1FF"
+      ],
+      [
+        "Acolyte",
+        "#FFA000"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:53.282284+00:00",
+    "generator": "benchmark_importer"
+  }
 }

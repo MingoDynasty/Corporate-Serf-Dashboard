@@ -1,6 +1,6 @@
 {
-  "name": "cA Static Benchmark Season-1",
-  "code": "KovaaKsPeekingVermilionEntryfrag",
+  "name": "cA Static Benchmark",
+  "code": "KovaaKsCrouchingInvincibleFalldamage",
   "scenarios": [
     {
       "name": "cA x-axis flick",
@@ -562,5 +562,41 @@
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrouchingInvincibleFalldamage",
+    "kovaaks_benchmark_id": 535,
+    "rank_colors": [
+      [
+        "Glacier",
+        "#E1FCFF"
+      ],
+      [
+        "Rivulet",
+        "#D9E6FF"
+      ],
+      [
+        "Cloud",
+        "#ABD5FC"
+      ],
+      [
+        "Droplets",
+        "#7CBD9B"
+      ],
+      [
+        "Fluid",
+        "#3F3380"
+      ],
+      [
+        "Vapour",
+        "#9C3B3B"
+      ],
+      [
+        "Hydro",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:48.290459+00:00",
+    "generator": "benchmark_importer"
+  }
 }

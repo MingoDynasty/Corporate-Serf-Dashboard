@@ -1,6 +1,6 @@
 {
-  "name": "Aimerz+ Evasive Switch Easy - Worthless",
-  "code": "KovaaKsFinishingSalmonPerk",
+  "name": "Evasive Switching Benchmark Easy",
+  "code": "KovaaKsUltingPrismaticFov",
   "scenarios": [
     {
       "name": "tamTargetSwitch Control Hard 30% Larger",
@@ -78,7 +78,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 54.0
+          "threshold": 56.0
         }
       ]
     },
@@ -198,7 +198,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 860.0
+          "threshold": 800.0
         }
       ]
     },
@@ -318,7 +318,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 520.0
+          "threshold": 500.0
         }
       ]
     },
@@ -358,7 +358,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 830.0
+          "threshold": 800.0
         }
       ]
     },
@@ -438,7 +438,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 135.0
+          "threshold": 136.0
         }
       ]
     },
@@ -478,9 +478,45 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 107.0
+          "threshold": 110.0
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsUltingPrismaticFov",
+    "kovaaks_benchmark_id": 596,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#A77138"
+      ],
+      [
+        "Silver",
+        "#C2D2D2"
+      ],
+      [
+        "Gold",
+        "#C4A12A"
+      ],
+      [
+        "Platinum",
+        "#00B3A5"
+      ],
+      [
+        "Diamond",
+        "#81D1FF"
+      ],
+      [
+        "Acolyte",
+        "#FFA000"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:56.981096+00:00",
+    "generator": "benchmark_importer"
+  }
 }

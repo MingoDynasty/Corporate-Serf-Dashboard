@@ -1,6 +1,6 @@
 {
-  "name": "Aimerz+ SpeedTS Benchmarks Easy",
-  "code": "KovaaKsUltingJitteryInventory",
+  "name": "SpeedTS Benchmarks Easy",
+  "code": "KovaaKsTimewarpingPickedClutch",
   "scenarios": [
     {
       "name": "StaticSwitchingVox xxSmall",
@@ -38,7 +38,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 153.0
+          "threshold": 154.0
         }
       ]
     },
@@ -78,7 +78,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 3500.0
+          "threshold": 3600.0
         }
       ]
     },
@@ -158,7 +158,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 145.0
+          "threshold": 146.0
         }
       ]
     },
@@ -198,7 +198,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 4200.0
+          "threshold": 4240.0
         }
       ]
     },
@@ -238,7 +238,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 183.0
+          "threshold": 186.0
         }
       ]
     },
@@ -318,7 +318,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 160.0
+          "threshold": 161.0
         }
       ]
     },
@@ -358,7 +358,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 145.0
+          "threshold": 148.0
         }
       ]
     },
@@ -398,7 +398,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 155.0
+          "threshold": 156.0
         }
       ]
     },
@@ -438,7 +438,7 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 19500.0
+          "threshold": 20000.0
         }
       ]
     },
@@ -478,9 +478,45 @@
         {
           "name": "Transcendent",
           "color": "#B5F5DF",
-          "threshold": 3775.0
+          "threshold": 3800.0
         }
       ]
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTimewarpingPickedClutch",
+    "kovaaks_benchmark_id": 584,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#A77138"
+      ],
+      [
+        "Silver",
+        "#C2D2D2"
+      ],
+      [
+        "Gold",
+        "#C4A12A"
+      ],
+      [
+        "Platinum",
+        "#00B3A5"
+      ],
+      [
+        "Diamond",
+        "#81D1FF"
+      ],
+      [
+        "Acolyte",
+        "#FFA000"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:55.145484+00:00",
+    "generator": "benchmark_importer"
+  }
 }
