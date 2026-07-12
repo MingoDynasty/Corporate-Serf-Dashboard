@@ -217,6 +217,11 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                     defaultColDef={
                         "resizable": True,
                         "sortable": True,
+                        # Always reserve the sort-indicator slot (a faint
+                        # unsorted icon) so autoSize measures the header with
+                        # room for the arrow; clicking to sort then swaps the
+                        # icon in place instead of truncating the label to "…".
+                        "unSortIcon": True,
                     },
                     dashGridOptions={
                         "animateRows": False,
