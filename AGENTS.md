@@ -153,5 +153,5 @@ Current agreed behavior:
 ## UI Boundaries
 
 - UI code should consume `ScenarioRankInfo` and avoid endpoint-specific logic.
-- Service-layer expected KovaaK's API/domain failures should become `ScenarioRankInfo(status=UNKNOWN, error_message=...)`.
+- Service-layer expected KovaaK's API/domain failures should become `ScenarioRankInfo(status=UNKNOWN, error_message=...)` — except a rank-fetch failure with a resolved leaderboard, which first falls back to the last cached rank (TTL ignored, read-only) and only becomes UNKNOWN when nothing is cached.
 - Unexpected application bugs may still raise and can be handled by UI/background safety nets.
