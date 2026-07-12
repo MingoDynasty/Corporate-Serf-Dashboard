@@ -80,7 +80,7 @@ in the same PR — do not leave it for later:
    main checkout — from a worktree session, reach it by absolute path
    (`git worktree list`, first entry); a cloud session can't, so say so in
    the PR description instead. The `/merge-sweep` skill
-   (`.claude/skills/merge-sweep/`) is the scheduled backstop that archives
+   (`.claude/skills/merge-sweep/`) is the on-demand backstop that archives
    anything missed after merge.
 
 ## Testing Philosophy
