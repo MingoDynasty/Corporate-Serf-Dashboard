@@ -602,6 +602,7 @@ def resolve_leaderboard_id(
     username: str | None = None,
     metadata_cache_ttl_hours: int = 24,
     allow_network: bool = True,
+    allow_hydration: bool = True,
 ) -> int | None:
     """
     Resolve a selected scenario name to a leaderboard ID.
@@ -609,7 +610,9 @@ def resolve_leaderboard_id(
     The total-play cache is a best-effort metadata source. If it is unavailable,
     continue to exact scenario search rather than treating cache failure as a
     user-facing rank failure. When ``allow_network`` is false, only the permanent
-    local mapping cache is consulted.
+    local mapping cache is consulted. When ``allow_hydration`` is false, the
+    total-play hydration step is skipped so a caller that already hydrated once
+    (e.g. a playlist open) does not re-fan the full pagination per scenario.
 
     Fallback order:
     1. Permanent local mapping cache.
@@ -624,7 +627,7 @@ def resolve_leaderboard_id(
     if not allow_network:
         return None
 
-    if username:
+    if username and allow_hydration:
         # Hydration is opportunistic: it can fill many mappings at once, but
         # failure should not block exact search for the selected scenario.
         try:
@@ -1165,6 +1168,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     leaderboard_total_cache_ttl_hours: int = 168,
     force_refresh: bool = False,
     allow_network: bool = True,
+    allow_hydration: bool = True,
 ) -> ScenarioRankInfo:
     """
     Main rank lookup entry point for UI and background refresh callers.
@@ -1172,7 +1176,9 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
     code can display N/A without knowing endpoint or cache details.
     ``allow_network=False`` serves rank and total caches independent of TTL and
-    returns UNKNOWN on a miss without fetching.
+    returns UNKNOWN on a miss without fetching. ``allow_hydration=False`` skips
+    total-play hydration during leaderboard resolution, for callers that already
+    hydrated once before fanning out per scenario.
 
     Result states:
     - RANKED: leaderboard exists and the exact user has a score.
@@ -1195,6 +1201,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
             username,
             metadata_cache_ttl_hours,
             allow_network=allow_network,
+            allow_hydration=allow_hydration,
         )
     except UnknownKovaaksUserError as exc:
         return ScenarioRankInfo(
