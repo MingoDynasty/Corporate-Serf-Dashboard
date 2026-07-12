@@ -84,7 +84,7 @@ list in the roadmap.)
   care about, which is what makes shipping the full benchmark library
   tolerable.
 - **Bundled benchmark library** (PR #90; expanded by the 2026-07-11 curation
-  import). Every importer-generated benchmark (212 files) ships with the app
+  import). Every importer-generated benchmark (216 files) ships with the app
   and loads at startup; Voltaic and Viscose are visible by default and the
   rest wait behind "Show hidden" on the Playlists page. *Problem solved:* enabling a benchmark used to mean
   manually copying a JSON file and restarting — now it's one unhide click,

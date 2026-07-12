@@ -77,7 +77,9 @@ class Rank(BaseModel):
 
     icon: str
     name: str
-    color: str
+    # KovaaK's omits `color` on some rank tiers; the importer sources served
+    # rank colors from Evxl, not this field, so a missing value is harmless.
+    color: str | None = None
     frame: str
     description: str
     playercard_large: str

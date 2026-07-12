@@ -153,9 +153,11 @@ merges Evxl rank names/colors with this endpoint's per-scenario `rank_maxes`
 one-to-one):
 
 - The response's top-level `ranks[]` can omit display fields (observed:
-  `color`) on some tiers. A consumer that requires those fields rejects the
-  whole response. Observed on benchmark IDs 2108, 2450, 2477, 2487
-  (2026-07-11), which blocked importing those benchmarks.
+  `color`) on some tiers. Observed on benchmark IDs 2108, 2450, 2477, 2487
+  (2026-07-11), which initially blocked importing those benchmarks. The
+  importer never reads these display fields (served rank colors come from
+  Evxl), so `api_models.Rank.color` is now optional and a missing value no
+  longer fails response validation.
 - A benchmark's rank count can disagree with the Evxl rank ladder it is paired
   with, which aborts the 1:1 merge. Observed: benchmark 2412 ("Black Dawn /
   Celestial Forge") exposes 3 tiers (Emperor/Angelic/Morningstar) while Evxl
