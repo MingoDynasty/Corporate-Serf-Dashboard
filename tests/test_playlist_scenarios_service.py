@@ -1,6 +1,8 @@
 from datetime import datetime
 from types import SimpleNamespace
 
+import requests
+
 from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, RunData, Scenario, ScenarioStats
@@ -214,6 +216,12 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
             leaderboard_total_cache_ttl_hours=24,
         ),
     )
+    # All scenarios already mapped, so the hoisted hydration is skipped.
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        lambda scenario_name: 1,
+    )
     seen = []
 
     def fake_rank_lookup(
@@ -223,6 +231,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         metadata_cache_ttl_hours,
         rank_cache_ttl_hours,
         leaderboard_total_cache_ttl_hours,
+        allow_hydration=True,
     ):
         seen.append(scenario_name)
         assert username == "MingoDynasty"
@@ -230,6 +239,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         assert metadata_cache_ttl_hours == 24
         assert rank_cache_ttl_hours == 168
         assert leaderboard_total_cache_ttl_hours == 24
+        assert allow_hydration is False
         if scenario_name == "Second":
             raise RuntimeError("simulated rank failure")
         return ScenarioRankInfo(
@@ -315,3 +325,157 @@ def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():
     rows = build_playlist_scenario_rank_rows("MissingCode")
 
     assert rows == []
+
+
+def _setup_playlist_for_hydration(monkeypatch, *, mapped, username="MingoDynasty"):
+    """Register a two-scenario playlist and stub the per-scenario rank lookup.
+
+    ``mapped`` maps scenario name -> cached leaderboard id (or None to mark it
+    unmapped), driving the any-unmapped hydration gate.
+    """
+    playlist = PlaylistData(
+        name="Voltaic Benchmarks",
+        code="KovaaKsTestCode",
+        scenarios=[Scenario(name="First"), Scenario(name="Second")],
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_config",
+        lambda: SimpleNamespace(
+            kovaaks_username=username,
+            steam_id="steam-id",
+            scenario_metadata_cache_ttl_hours=24,
+            scenario_rank_cache_ttl_hours=168,
+            leaderboard_total_cache_ttl_hours=24,
+        ),
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        mapped.get,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "is_scenario_in_database",
+        lambda scenario_name: False,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_rank_info",
+        lambda *args, **kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            total_players=100,
+            percentile=90.0,
+        ),
+    )
+
+
+def test_hydration_runs_once_when_a_scenario_is_unmapped(monkeypatch):
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": 1, "Second": None})
+    calls = []
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        lambda username, ttl: calls.append((username, ttl)),
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert calls == [("MingoDynasty", 24)]
+    assert len(rows) == 2
+
+
+def test_hydration_skipped_when_every_scenario_is_mapped(monkeypatch):
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": 1, "Second": 2})
+    calls = []
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        lambda username, ttl: calls.append((username, ttl)),
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert calls == []
+    assert len(rows) == 2
+
+
+def test_hydration_skipped_when_username_unset(monkeypatch):
+    _setup_playlist_for_hydration(
+        monkeypatch, mapped={"First": None, "Second": None}, username=None
+    )
+    calls = []
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        lambda username, ttl: calls.append((username, ttl)),
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert calls == []
+    assert len(rows) == 2
+
+
+def test_hydration_failure_still_yields_full_rows(monkeypatch):
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": None, "Second": None})
+
+    def failing_hydrate(username, ttl):
+        raise requests.RequestException("simulated total-play failure")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        failing_hydrate,
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
+    # A schema-drifted total-play cache can raise ValidationError/KeyError, not
+    # just RequestException. The hoisted hydration is best-effort, so an
+    # unexpected error must not take down the whole playlist page.
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": None, "Second": None})
+
+    def failing_hydrate(username, ttl):
+        raise KeyError("data")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        failing_hydrate,
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+def test_hydration_probe_error_still_yields_full_rows(monkeypatch):
+    # get_cached_leaderboard_id can raise (e.g. int() on a malformed cached id).
+    # The any-unmapped probe runs inside the best-effort guard, so a probe
+    # failure must not take down the whole playlist page either.
+    _setup_playlist_for_hydration(monkeypatch, mapped={"First": 1, "Second": 2})
+
+    def failing_probe(scenario_name):
+        raise ValueError("malformed leaderboard_id in mapping cache")
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        failing_probe,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "hydrate_leaderboard_id_cache",
+        lambda username, ttl: None,
+    )
+
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+
+    assert [row["scenario"] for row in rows] == ["First", "Second"]

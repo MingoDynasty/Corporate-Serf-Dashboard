@@ -2,6 +2,7 @@
 
 import json
 import logging
+import uuid
 from datetime import datetime
 from typing import TypedDict
 
@@ -373,14 +374,32 @@ def get_scenario_rank(_, selected_scenario, _n_intervals) -> str:
 
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("rank-refresh-button", "n_clicks"),
     State("scenario-dropdown-selection", "value"),
+    # Show the button's spinner for the duration of the fetch. Mantine's
+    # loading state also swallows clicks, so the button cannot be spammed
+    # into repeat KovaaK's calls while one refresh is in flight.
+    running=[(Output("rank-refresh-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def refresh_rank(_, selected_scenario: str | None) -> str:
-    """Fetch and display authoritative board truth after an explicit user request."""
+def refresh_rank(n_clicks, selected_scenario: str | None):
+    """Fetch and display authoritative board truth after an explicit user request.
+
+    A green toast confirms a genuinely fresh refresh. Degraded paths already
+    toast through ``dash_logger`` -- red when the fetch failed with nothing
+    cached, yellow when it failed but a stale cached rank was served (or on a
+    steam-mismatch warning) -- so any error or warning suppresses the green
+    confirmation.
+
+    Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
+    fire once on initial page load despite ``prevent_initial_call``, and a
+    page load must not force a network refresh or pop a stray toast.
+    """
+    if not n_clicks:
+        return no_update, no_update
     if not selected_scenario:
-        return "N/A"
+        return "N/A", no_update
 
     try:
         rank_info = get_scenario_rank_info(
@@ -391,10 +410,23 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
         dash_logger.error("Position refresh for %s failed.", selected_scenario)
-        return "N/A"
+        return "N/A", no_update
 
     _emit_rank_messages(rank_info)
-    return format_scenario_rank(rank_info)
+    if rank_info.error_message or rank_info.warning_message:
+        return format_scenario_rank(rank_info), no_update
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": f"Refreshed position for {selected_scenario}.",
+        "color": "green",
+        # Fresh id per refresh: ``show`` silently ignores a duplicate id while
+        # the previous toast is still visible, which would eat the "done" cue
+        # on back-to-back refreshes.
+        "id": f"rank-refresh-notification-{uuid.uuid4()}",
+        "icon": local_icon("material-symbols:refresh-rounded"),
+    }
+    return format_scenario_rank(rank_info), [notification]
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
@@ -858,6 +890,7 @@ def layout(
     scenario_persistence = scenario is None
 
     return dmc.Box(
+        className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
@@ -907,7 +940,10 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    ml="xl",
+                                    # Indent only where the row has room; the
+                                    # margin plus min-width 100% would overflow
+                                    # a narrow viewport.
+                                    ml={"base": 0, "lg": "xl"},
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
@@ -920,7 +956,7 @@ def layout(
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
-                                    miw=400,
+                                    miw="min(400px, 100%)",
                                     persistence=scenario_persistence,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
@@ -1049,6 +1085,7 @@ def layout(
                                         ),
                                     ],
                                     w=300,
+                                    maw="100%",
                                 ),
                             ],
                             gap="md",
@@ -1057,7 +1094,7 @@ def layout(
                             direction="row",
                             wrap="wrap",
                         ),
-                        span=10,
+                        span={"base": 12, "lg": 10},
                     ),
                     dmc.GridCol(
                         dmc.Flex(
@@ -1188,7 +1225,7 @@ def layout(
                             direction="row",
                             wrap="wrap",
                         ),
-                        span="auto",
+                        span={"base": 12, "lg": "auto"},
                     ),
                 ],
                 gutter="xl",
@@ -1200,7 +1237,10 @@ def layout(
                     _SELECT_SCENARIO_PLOT_TITLE,
                     _SELECT_SCENARIO_PLOT_MESSAGE,
                 ).to_plotly_json(),
-                style={"height": "80vh"},
+                className="home-graph",
+                # Redraw the plot whenever the flex container resizes, not
+                # just on window resize.
+                responsive=True,
             ),
         ],
     )

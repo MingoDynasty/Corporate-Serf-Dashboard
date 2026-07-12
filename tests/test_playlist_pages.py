@@ -423,6 +423,9 @@ def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     )
 
     assert switch.checked is False
+    # The toggle is remembered across visits (localStorage) so the management
+    # view stays how the user left it.
+    assert switch.persistence is True
     assert grid.rowClassRules == {
         "playlist-overview-row-hidden": "params.data.hidden",
     }
@@ -554,6 +557,9 @@ def test_playlists_overview_type_column_uses_badge_renderer():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
 
     assert columns["type_display"]["cellRenderer"] == "TypeBadge"
+    # Regression: a 110px floor ellipsized the BENCHMARK pill when autoSize
+    # ran against a not-yet-loaded grid.
+    assert columns["type_display"]["minWidth"] == 140
 
 
 def test_playlists_overview_defaults_to_staleness_sort():
