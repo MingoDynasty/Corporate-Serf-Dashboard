@@ -1,32 +1,4 @@
-# Corporate Serf Dashboard
+<!-- Claude Code reads CLAUDE.md, not AGENTS.md. This shim imports the shared
+agent instructions; add Claude-specific notes below the import line. -->
 
-Dash (Plotly) web app that watches the local Kovaak's stats directory and
-plots scenario scores. Python 3.14, dependencies managed with uv.
-
-## Commands
-- Run: `uv run python source/app.py` (settings in `config.toml`, copied from
-  `example.toml`; the default port 8080 may already be taken by Steam)
-- Tests: `uv run pytest`
-- Lint: `uv run ruff check`
-- Types: `uv run mypy`
-- Format: ruff (`uv run ruff format .`), line length 88
-
-CI runs four checks — ruff format, ruff lint, mypy, and pytest — on every pull
-request and push to `main`; `.github/workflows/ci.yml` is the executable CI
-definition. Run the standard local validation in `AGENTS.md`, which additionally
-includes `compileall`, for the fastest feedback before calling a change done or
-approving a PR.
-
-## Layout
-- `source/` — application code. See `docs/architecture.md` for the module map
-  and runtime data flow (the "where does X live" index).
-- `tests/` — pytest suite
-- `resources/playlists/` — benchmark playlist JSON (files under `generated/`
-  are machine-generated; don't hand-edit)
-- `docs/` — living docs (architecture, `decision_log.md`, `product.md`) plus
-  proposals for in-flight work. One file per proposal (git is the version history — no
-  `_v2`/`_v3` filename suffixes); when a proposal ships, distill it into a
-  `decision_log.md` entry and delete the file **in the shipping PR** — full
-  checklist in AGENTS.md "Shipping a proposal". `tests/test_docs.py` enforces
-  proposal `Status:` lines and fails on dangling doc links. Review handoff
-  docs are ephemeral and never land on main (see the `/pr-review` skill).
+@AGENTS.md

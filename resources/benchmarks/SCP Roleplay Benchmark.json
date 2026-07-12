@@ -1,0 +1,500 @@
+{
+  "name": "SCP Roleplay Benchmark",
+  "code": "KovaaKsResettingLongXur",
+  "scenarios": [
+    {
+      "name": "SCP RP Smoothsphere",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 8050.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 13050.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 13600.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP SmoothBot Perfected",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 4775.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 5025.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP Whisphere",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 11100.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 16200.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 18500.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP Air Angelic",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 4175.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 4475.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 5100.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP RawControlSphere",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 5900.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 13200.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP B180TI Sparki",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 300.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 600.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP Close Tappy Strafes",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 15.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 19.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 24.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 32.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 40.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 49.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 56.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 62.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP Narrow Strafe",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 300.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 900.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "SCP RP Kindafar Long Strafes",
+      "ranks": [
+        {
+          "name": "Sideforce",
+          "color": "#b8c6d1",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mainforce",
+          "color": "#73d3e8",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Neuralis II",
+          "color": "#187e11",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Neuralis I",
+          "color": "#46a63f",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Strategos II",
+          "color": "#133da0",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Strategos I",
+          "color": "#3a6ad9",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Nomarch",
+          "color": "#8d1111",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Exovant",
+          "color": "#211c1c",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Zenon",
+          "color": "#951379",
+          "threshold": 17000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsResettingLongXur",
+    "kovaaks_benchmark_id": 2656,
+    "rank_colors": [
+      [
+        "Sideforce",
+        "#b8c6d1"
+      ],
+      [
+        "Mainforce",
+        "#73d3e8"
+      ],
+      [
+        "Neuralis II",
+        "#187e11"
+      ],
+      [
+        "Neuralis I",
+        "#46a63f"
+      ],
+      [
+        "Strategos II",
+        "#133da0"
+      ],
+      [
+        "Strategos I",
+        "#3a6ad9"
+      ],
+      [
+        "Nomarch",
+        "#8d1111"
+      ],
+      [
+        "Exovant",
+        "#211c1c"
+      ],
+      [
+        "Zenon",
+        "#951379"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:29.362386+00:00",
+    "generator": "benchmark_importer"
+  }
+}

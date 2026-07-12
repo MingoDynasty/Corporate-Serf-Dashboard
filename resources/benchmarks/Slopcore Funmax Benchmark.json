@@ -1,0 +1,838 @@
+{
+  "name": "Slopcore Funmax Benchmark",
+  "code": "KovaaKsBoomstickingRoyalpurpleSuper",
+  "scenarios": [
+    {
+      "name": "Tarzaning 360",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 24.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 28.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 32.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 36.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 40.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 44.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 48.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 52.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 56.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 60.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 62.0
+        }
+      ]
+    },
+    {
+      "name": "Frog Simulator - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 3750.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 4550.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 5800.0
+        }
+      ]
+    },
+    {
+      "name": "Reactive Flick hard",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 1340.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 1520.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 1640.0
+        }
+      ]
+    },
+    {
+      "name": "Awesome Dynamic hibi",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 950.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 955.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 958.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 961.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 964.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 966.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 968.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 970.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 972.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 974.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 975.0
+        }
+      ]
+    },
+    {
+      "name": "Aim Coaster",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 1250.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 1660.0
+        }
+      ]
+    },
+    {
+      "name": "WaveClick - KaliAIM",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 115.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 120.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 125.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 130.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 140.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 144.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 147.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 150.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 153.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 156.0
+        }
+      ]
+    },
+    {
+      "name": "Ballsheet BB",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 100.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 104.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 108.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 112.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 116.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 120.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 124.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 128.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 131.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 134.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 137.0
+        }
+      ]
+    },
+    {
+      "name": "VT Speedswitch 90 Entry",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 1780.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 1810.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 1840.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 1870.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 1930.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 1960.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 2100.0
+        }
+      ]
+    },
+    {
+      "name": "Pole Switching 360 Easy More Bots",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 125.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 128.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 131.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 134.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 137.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 140.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 142.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 144.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 146.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 148.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "B180TI Inverted",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 100.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 105.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 110.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 115.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 125.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 140.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 145.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 150.0
+        }
+      ]
+    },
+    {
+      "name": "Super Hoover Cart Racers",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 7110.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 7112.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 7114.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 7116.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 7118.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 7120.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 7122.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 7123.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 7124.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 7126.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 7127.0
+        }
+      ]
+    },
+    {
+      "name": "Worm The Eater - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 20.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 22.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 24.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 26.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 28.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 30.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 32.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 34.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 36.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 40.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 44.0
+        }
+      ]
+    },
+    {
+      "name": "Tennis - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#f50000",
+          "threshold": 1.0
+        },
+        {
+          "name": "Lowjennually",
+          "color": "#ff8442",
+          "threshold": 2.0
+        },
+        {
+          "name": "VRChat Aimer",
+          "color": "#FFD700",
+          "threshold": 3.0
+        },
+        {
+          "name": "Zergling",
+          "color": "#82bb81",
+          "threshold": 4.0
+        },
+        {
+          "name": "Barbie Girl",
+          "color": "#1af0ff",
+          "threshold": 5.0
+        },
+        {
+          "name": "Six",
+          "color": "#6e85e2",
+          "threshold": 6.0
+        },
+        {
+          "name": "Seven",
+          "color": "#0400ff",
+          "threshold": 7.0
+        },
+        {
+          "name": "Gem",
+          "color": "#a03cb4",
+          "threshold": 8.0
+        },
+        {
+          "name": "Sillyyyy",
+          "color": "#d400ff",
+          "threshold": 9.0
+        },
+        {
+          "name": "Slop Enjoyer",
+          "color": "#000000",
+          "threshold": 10.0
+        },
+        {
+          "name": "Estrogen",
+          "color": "#FFFFFF",
+          "threshold": 12.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBoomstickingRoyalpurpleSuper",
+    "kovaaks_benchmark_id": 1854,
+    "rank_colors": [
+      [
+        "Chud",
+        "#f50000"
+      ],
+      [
+        "Lowjennually",
+        "#ff8442"
+      ],
+      [
+        "VRChat Aimer",
+        "#FFD700"
+      ],
+      [
+        "Zergling",
+        "#82bb81"
+      ],
+      [
+        "Barbie Girl",
+        "#1af0ff"
+      ],
+      [
+        "Six",
+        "#6e85e2"
+      ],
+      [
+        "Seven",
+        "#0400ff"
+      ],
+      [
+        "Gem",
+        "#a03cb4"
+      ],
+      [
+        "Sillyyyy",
+        "#d400ff"
+      ],
+      [
+        "Slop Enjoyer",
+        "#000000"
+      ],
+      [
+        "Estrogen",
+        "#FFFFFF"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:47.259337+00:00",
+    "generator": "benchmark_importer"
+  }
+}

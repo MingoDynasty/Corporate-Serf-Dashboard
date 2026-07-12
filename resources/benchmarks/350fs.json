@@ -1,0 +1,1171 @@
+{
+  "name": "350fs",
+  "code": "KovaaKsCampingDownedBattleroyale",
+  "scenarios": [
+    {
+      "name": "cA 1ts ruohong",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 600.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 680.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 740.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 800.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 830.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 860.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 890.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Hard S1",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 145.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 160.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 170.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 180.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 190.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "uv VBR Micro 2ts",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 180.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 230.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 280.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 330.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 380.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 400.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Microcluster Horizontal",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 35.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 50.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 55.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 60.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 65.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 70.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 400% FIXED",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "PureG_Horizontal_Clicking_Valorant_small",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 15.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 35.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 50.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 60.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 70.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 80.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 85.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "FB StrafeGod",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 175.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 225.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 275.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 300.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 325.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 350.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 650.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "eth FarSkeet",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 200.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 325.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 500.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 700.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 850.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Amare Avasive Pressure Reflex V2",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 20.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 35.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 45.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 50.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 55.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 60.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 65.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "shimPressure Micro",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 150.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 200.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 250.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 275.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 300.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 325.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 350.0
+        }
+      ]
+    },
+    {
+      "name": "400ms strafing Reflex Micro++ Horizontalish valorant",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 30.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 55.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 65.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 75.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 85.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 90.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 95.0
+        }
+      ]
+    },
+    {
+      "name": "DevTS Goated NR Static Extra Small",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 300.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 450.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 500.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 550.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 575.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 600.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 625.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 650.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto Wide Wall 4 Targets Small",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 55.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 75.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 90.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 100.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 110.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 110.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 115.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS 20% Smaller & Faster",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 60.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 75.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 90.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 100.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 110.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 120.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 125.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "Amare BeanTS Smooth",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 15.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 30.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 35.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 40.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 45.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 50.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 55.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "eth Valorant Layered Control v3 40s",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 200.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 325.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 400.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 450.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 500.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 550.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 575.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 600.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Zeukos",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "ShakyTS Far Harder - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 350.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 450.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 500.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 550.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 600.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 650.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 675.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 700.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlstrafes Valorant Smaller & Slower",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible VAL",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy Far 30s",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "AmareRawControl Easy",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 11000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim Easy",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 16000.0
+        }
+      ]
+    },
+    {
+      "name": "Amare FlickerXYZ",
+      "ranks": [
+        {
+          "name": "Chud",
+          "color": "#604c2e",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mid",
+          "color": "#b070ff",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Impressive",
+          "color": "#7496fb",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Perfect",
+          "color": "#6eff6b",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Godlike",
+          "color": "#ff6161",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ownage",
+          "color": "#fffa75",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Wrecker",
+          "color": "#000000",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Challenger",
+          "color": "#ffffff",
+          "threshold": 3500.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCampingDownedBattleroyale",
+    "kovaaks_benchmark_id": 2476,
+    "rank_colors": [
+      [
+        "Chud",
+        "#604c2e"
+      ],
+      [
+        "Mid",
+        "#b070ff"
+      ],
+      [
+        "Impressive",
+        "#7496fb"
+      ],
+      [
+        "Perfect",
+        "#6eff6b"
+      ],
+      [
+        "Godlike",
+        "#ff6161"
+      ],
+      [
+        "Ownage",
+        "#fffa75"
+      ],
+      [
+        "Wrecker",
+        "#000000"
+      ],
+      [
+        "Challenger",
+        "#ffffff"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:52.539854+00:00",
+    "generator": "benchmark_importer"
+  }
+}

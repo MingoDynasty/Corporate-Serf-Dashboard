@@ -1,0 +1,1258 @@
+{
+  "name": "RXZU - VALORANT RANK EASY",
+  "code": "KovaaKsChattingJebaitedFieldupgrade",
+  "scenarios": [
+    {
+      "name": "Rxzu - TenZclick Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Mikruwka EZ",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Sinichka Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - KALibri EZ",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - DoubleShotik Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Doticlicko Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - 314Doors Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - 1WFP Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Phantomflick Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Astralis Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Smoochiez Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Wristie Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - SosiskaVAL Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - UGOL Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Zazoola Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform I EZ",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform II Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform III Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform IV Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    },
+    {
+      "name": "Rxzu - Multiform V Ez",
+      "ranks": [
+        {
+          "name": "WORM",
+          "color": "#999999",
+          "threshold": 200.0
+        },
+        {
+          "name": "MICROCHEL",
+          "color": "#a27c44",
+          "threshold": 300.0
+        },
+        {
+          "name": "PUPPIS",
+          "color": "#b8b31e",
+          "threshold": 400.0
+        },
+        {
+          "name": "PISCIS",
+          "color": "#f0c000",
+          "threshold": 500.0
+        },
+        {
+          "name": "POPUS",
+          "color": "#a33838",
+          "threshold": 600.0
+        },
+        {
+          "name": "PIVO",
+          "color": "#751515",
+          "threshold": 700.0
+        },
+        {
+          "name": "CHAMP",
+          "color": "#c70000",
+          "threshold": 800.0
+        },
+        {
+          "name": "BOSS",
+          "color": "#199eb8",
+          "threshold": 900.0
+        },
+        {
+          "name": "TITAN",
+          "color": "#3d87ff",
+          "threshold": 1000.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#f000b0",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#08fdec",
+          "threshold": 1200.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChattingJebaitedFieldupgrade",
+    "kovaaks_benchmark_id": 985,
+    "rank_colors": [
+      [
+        "WORM",
+        "#999999"
+      ],
+      [
+        "MICROCHEL",
+        "#a27c44"
+      ],
+      [
+        "PUPPIS",
+        "#b8b31e"
+      ],
+      [
+        "PISCIS",
+        "#f0c000"
+      ],
+      [
+        "POPUS",
+        "#a33838"
+      ],
+      [
+        "PIVO",
+        "#751515"
+      ],
+      [
+        "CHAMP",
+        "#c70000"
+      ],
+      [
+        "BOSS",
+        "#199eb8"
+      ],
+      [
+        "TITAN",
+        "#3d87ff"
+      ],
+      [
+        "IMMORTAL",
+        "#f000b0"
+      ],
+      [
+        "RADIANT",
+        "#08fdec"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:06.044503+00:00",
+    "generator": "benchmark_importer"
+  }
+}

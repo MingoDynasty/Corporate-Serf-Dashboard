@@ -1,0 +1,754 @@
+{
+  "name": "XYZ SMOOTHNESS BENCHMARKS MEDIUM",
+  "code": "KovaaKsPushingTaggedChat",
+  "scenarios": [
+    {
+      "name": "Vertical Smoothing 60 Altered Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5300.0
+        }
+      ]
+    },
+    {
+      "name": "Vertical Smoothing 120 Altered Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "VSTP Varied Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Vertical Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Altered Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "FarmTrack Goated Close Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5200.0
+        }
+      ]
+    },
+    {
+      "name": "Farmtrack Goated Fixed Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "FarmTrack Goated Far Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "SYF Smooth Your Fingers Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "SYW Smooth Your Wrist Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5400.0
+        }
+      ]
+    },
+    {
+      "name": "SYA Smooth Your Arm Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5150.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering I 90 Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5200.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering II 180 Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering III 240 Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Bipolar Centering 360 Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Anti-Centering Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4650.0
+        }
+      ]
+    },
+    {
+      "name": "GliderTrack Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3250.0
+        }
+      ]
+    },
+    {
+      "name": "Multi Angle Smoothness Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Close Smaller",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4175.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Smaller",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4850.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Very Far Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5200.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Medium",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 5400.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Small XFast",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Smaller Faster",
+      "ranks": [
+        {
+          "name": "Sentinel",
+          "color": "#85FA85",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#E37A00",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#FFDB00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#9F2B68",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3900.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPushingTaggedChat",
+    "kovaaks_benchmark_id": 2279,
+    "rank_colors": [
+      [
+        "Sentinel",
+        "#85FA85"
+      ],
+      [
+        "Oracle",
+        "#E37A00"
+      ],
+      [
+        "Mystic",
+        "#FFDB00"
+      ],
+      [
+        "Zenith",
+        "#9F2B68"
+      ],
+      [
+        "Prismatic",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:07:37.263608+00:00",
+    "generator": "benchmark_importer"
+  }
+}

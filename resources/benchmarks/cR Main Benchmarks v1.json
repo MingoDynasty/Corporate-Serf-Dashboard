@@ -1,0 +1,1081 @@
+{
+  "name": "cR Main Benchmarks v1",
+  "code": "KovaaKsCarryingCloseMomentum",
+  "scenarios": [
+    {
+      "name": "RawMousima",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 1780.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 1860.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 2020.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 2180.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 2340.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 2500.0
+        }
+      ]
+    },
+    {
+      "name": "vlav 1w2tes horizontal micro",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 112.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 128.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 136.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 144.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 161.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 177.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 194.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 210.0
+        }
+      ]
+    },
+    {
+      "name": "eth 1w4tes Micro",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 128.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 152.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 164.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 176.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 199.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 223.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 246.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 270.0
+        }
+      ]
+    },
+    {
+      "name": "headshot precision long distance 3 targets small",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 378.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 490.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 546.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 602.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 714.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 826.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 938.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 1050.0
+        }
+      ]
+    },
+    {
+      "name": "1W1T - VALORANT",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 524.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 620.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 668.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 716.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 812.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 908.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 1004.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ 1w4ts HF Hard S1",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 109.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 127.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 136.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 145.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 163.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 182.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 200.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 218.0
+        }
+      ]
+    },
+    {
+      "name": "5 Sphere Hipfire Extra Small",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 599.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 749.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 824.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 899.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 1049.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 10000.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Hard",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 1805.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 2871.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 3404.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 3937.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 5003.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 6068.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 7134.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 8200.0
+        }
+      ]
+    },
+    {
+      "name": "Swing Tracking",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 906.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 1088.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 1179.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 1453.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 1635.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 1818.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 2000.0
+        }
+      ]
+    },
+    {
+      "name": "VSTP Small TE",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 1422.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 1885.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 2116.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 2348.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 2811.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 3274.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 3737.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Centering II 90 No Strafes Fixed",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 7346.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 8622.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 9260.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 9898.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 11173.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 12449.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 13724.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 15000.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Extrasmooth Small TE",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 3482.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 4152.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 4487.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 4822.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 5491.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 6161.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 6830.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 7500.0
+        }
+      ]
+    },
+    {
+      "name": "GarfMicroTS",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 2.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 7.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 9.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 12.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 17.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 22.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 27.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 32.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 5800.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 6400.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 7000.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 6423.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 7686.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 8317.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 8949.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 10212.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 11474.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 12737.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 14000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 3756.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 5547.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 6442.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 7338.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 9128.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 10919.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 12709.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 400%",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 1646.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 2088.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 2309.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 2530.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 2973.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 3415.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 3858.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Fireworks Flick Horizontal - Far",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 202.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 360.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 439.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 518.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 676.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 834.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 992.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "eth Didy - S",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 126.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 245.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 304.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 364.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 483.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 602.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 721.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 840.0
+        }
+      ]
+    },
+    {
+      "name": "VT SiniClick Valorant",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 33.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 48.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 55.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 63.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 78.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 92.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 107.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 122.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 660.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 812.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 888.0
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 964.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 1115.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 1267.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 1418.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 1570.0
+        }
+      ]
+    },
+    {
+      "name": "Star Clicking Micro",
+      "ranks": [
+        {
+          "name": "Snowflake",
+          "color": "#ffffff",
+          "threshold": 246.0
+        },
+        {
+          "name": "Shard",
+          "color": "#00fffb",
+          "threshold": 355.0
+        },
+        {
+          "name": "Crystal",
+          "color": "#d872df",
+          "threshold": 409.5
+        },
+        {
+          "name": "Iceberg",
+          "color": "#19215d",
+          "threshold": 464.0
+        },
+        {
+          "name": "Hailstorm",
+          "color": "#2db48b",
+          "threshold": 573.0
+        },
+        {
+          "name": "Glacier",
+          "color": "#5f7fdd",
+          "threshold": 682.0
+        },
+        {
+          "name": "Avalanche",
+          "color": "#49158a",
+          "threshold": 791.0
+        },
+        {
+          "name": "Permafrost",
+          "color": "#990000",
+          "threshold": 900.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCarryingCloseMomentum",
+    "kovaaks_benchmark_id": 728,
+    "rank_colors": [
+      [
+        "Snowflake",
+        "#ffffff"
+      ],
+      [
+        "Shard",
+        "#00fffb"
+      ],
+      [
+        "Crystal",
+        "#d872df"
+      ],
+      [
+        "Iceberg",
+        "#19215d"
+      ],
+      [
+        "Hailstorm",
+        "#2db48b"
+      ],
+      [
+        "Glacier",
+        "#5f7fdd"
+      ],
+      [
+        "Avalanche",
+        "#49158a"
+      ],
+      [
+        "Permafrost",
+        "#990000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:54.270167+00:00",
+    "generator": "benchmark_importer"
+  }
+}

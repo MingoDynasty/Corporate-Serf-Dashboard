@@ -1,0 +1,505 @@
+{
+  "name": "773TS v3",
+  "code": "KovaaKsClearingBraveRaid",
+  "scenarios": [
+    {
+      "name": "773TS Always Right",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "773TS Always Left",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 45",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 90",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 115.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 135",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 95.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 180",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 45 2Steps",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 90 2Steps",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 105.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 115.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 125.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 135 2Steps",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "773TS 180 2Steps",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 120.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 130.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "773TS I",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 140.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 150.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 160.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "773TS M",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 155.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "773TS V",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 155.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "773TS W",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 155.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "773TS X",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 150.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 160.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 170.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "773TS Y",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 160.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 170.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 180.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 190.0
+        }
+      ]
+    },
+    {
+      "name": "773TS Run Locker",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 48.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 49.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 50.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 51.0
+        }
+      ]
+    },
+    {
+      "name": "773TS Run Underground",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 38.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 39.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 40.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 41.0
+        }
+      ]
+    },
+    {
+      "name": "773TS Run Metro",
+      "ranks": [
+        {
+          "name": "Fast",
+          "color": "#f0e3ff",
+          "threshold": 42.0
+        },
+        {
+          "name": "Quick",
+          "color": "#e6d1ff",
+          "threshold": 43.0
+        },
+        {
+          "name": "Swift",
+          "color": "#dcbfff",
+          "threshold": 44.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#c493ff",
+          "threshold": 45.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingBraveRaid",
+    "kovaaks_benchmark_id": 2005,
+    "rank_colors": [
+      [
+        "Fast",
+        "#f0e3ff"
+      ],
+      [
+        "Quick",
+        "#e6d1ff"
+      ],
+      [
+        "Swift",
+        "#dcbfff"
+      ],
+      [
+        "Rapid",
+        "#c493ff"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:19.640387+00:00",
+    "generator": "benchmark_importer"
+  }
+}

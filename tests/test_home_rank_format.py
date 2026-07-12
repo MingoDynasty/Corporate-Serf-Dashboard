@@ -32,7 +32,7 @@ def _walk_components(component):
 def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     monkeypatch.setattr(
         home,
-        "get_playlist_selector_options",
+        "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
     monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
@@ -50,7 +50,7 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
 def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     monkeypatch.setattr(
         home,
-        "get_playlist_selector_options",
+        "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
     monkeypatch.setattr(
@@ -89,7 +89,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
 
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     components = list(_walk_components(home.layout()))
@@ -144,7 +144,7 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     titles = {
@@ -160,7 +160,7 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
 
 
 def test_settings_modal_controls_have_help_tooltips(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     components = {
@@ -168,13 +168,13 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
         for component in _walk_components(home.layout())
     }
     expected_settings = {
-        "settings-modal-import-playlist-textinput": "import-playlist",
         "automatically-change-scenario-switch": "automatically-change-scenario",
         "rank-overlay-switch": "rank-overlay",
         "high-score-overlay-switch": "high-score-overlay",
         "score-threshold-overlay-switch": "score-threshold-overlay",
         "score-threshold-percentage": "score-threshold-percentage",
         "score-threshold-notification-switch": "score-threshold-notification",
+        "top_n_scores": "top-n-scores",
     }
 
     for component_id, help_key in expected_settings.items():
@@ -193,6 +193,27 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
 
     score_threshold_percentage = components["score-threshold-percentage"]
     assert score_threshold_percentage.min == 1
+
+
+def test_rank_refresh_button_has_tooltip(monkeypatch):
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    tooltips = [
+        component
+        for component in _walk_components(home.layout())
+        if isinstance(component, dmc.Tooltip)
+        and any(
+            getattr(child, "id", None) == "rank-refresh-button"
+            for child in _walk_components(component.children)
+        )
+    ]
+
+    assert len(tooltips) == 1
+    assert tooltips[0].label == home.RANK_REFRESH_TOOLTIP
+    assert tooltips[0].events == home.TOOLTIP_EVENTS
+    assert tooltips[0].withArrow is True
+    assert tooltips[0].multiline is True
 
 
 def test_get_scenario_num_runs_without_selection():
@@ -234,7 +255,7 @@ def test_get_scenario_num_runs_with_play_data(monkeypatch):
         12,
         last_played.timestamp(),
         "Never",
-        "2026-06-30 09:05:04 AM",
+        "Jun 30, 2026, 9:05 AM",
         "last-played-affordance",
         0,
         False,
@@ -336,8 +357,8 @@ def test_interval_rank_render_is_ttl_independent_and_never_fetches(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", None)
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -373,7 +394,7 @@ def test_interval_rank_render_does_not_fetch_or_cache_unresolved_scenario(
 ):
     scenario_name = "Local Custom Scenario"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", "MingoDynasty")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", "MingoDynasty")
     api_service.make_cache()
 
     def fail_network(*_args, **_kwargs):
@@ -421,8 +442,8 @@ def test_interval_rank_render_does_not_retoast_derived_warning(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", "configured-steam-id")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", "configured-steam-id")
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -486,8 +507,8 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.config, "kovaaks_username", username)
-    monkeypatch.setattr(home.config, "steam_id", None)
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -552,7 +573,7 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     page = home.layout()

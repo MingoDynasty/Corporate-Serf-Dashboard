@@ -1,0 +1,330 @@
+{
+  "name": "NRS - 360 Macro Benchmarks (hard)",
+  "code": "KovaaKsClickingVioletEnrage",
+  "scenarios": [
+    {
+      "name": "Pasu Voltaic 360",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 66.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 74.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 83.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 92.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Goated rAim",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 300.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 350.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 400.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 450.0
+        }
+      ]
+    },
+    {
+      "name": "6wall18targets extra small reload",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 85.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 92.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 100.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 108.0
+        }
+      ]
+    },
+    {
+      "name": "Floating Heads Timing 360",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 84.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 96.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 102.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Pauer",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 5200.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 5700.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Sky&Floorbot 90%",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 18500.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 21000.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 23500.0
+        }
+      ]
+    },
+    {
+      "name": "NRS Air",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Fundamentals Thin",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS 360",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 1310.0
+        }
+      ]
+    },
+    {
+      "name": "patTS Voltaic 360 30% Smaller",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 74.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 80.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 86.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 92.0
+        }
+      ]
+    },
+    {
+      "name": "KinTs 360 NR Varied small",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 19500.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 21000.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 22500.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch 360",
+      "ranks": [
+        {
+          "name": "Mercury",
+          "color": "#6A00CC",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Gemini",
+          "color": "#ff00ff",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Apollo",
+          "color": "#ff2262",
+          "threshold": 6600.0
+        },
+        {
+          "name": "Artemis",
+          "color": "#000000",
+          "threshold": 7200.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClickingVioletEnrage",
+    "kovaaks_benchmark_id": 2484,
+    "rank_colors": [
+      [
+        "Mercury",
+        "#6A00CC"
+      ],
+      [
+        "Gemini",
+        "#ff00ff"
+      ],
+      [
+        "Apollo",
+        "#ff2262"
+      ],
+      [
+        "Artemis",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:17.068683+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,879 @@
+{
+  "name": "XYZ SMOOTHNESS BENCHMARKS V2",
+  "code": "KovaaKsTeleportingSmoothNightfall",
+  "scenarios": [
+    {
+      "name": "SYE Smooth Your Everything",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering II 90",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering II 180 V2",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1275.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Bipolar Centering 360 V2",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "Anti-Centering V2",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1475.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "VS60",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1075.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4050.0
+        }
+      ]
+    },
+    {
+      "name": "VS120",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1725.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "VSTP Varied V2",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1625.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3375.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Vertical Altered",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3800.0
+        }
+      ]
+    },
+    {
+      "name": "Farmtrack Goated Fixed Altered",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1025.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1575.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3575.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS 45s",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3925.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "PTS FIXED",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1925.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 4025.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack 45s",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Multi Angle Smoothness V2",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1325.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 3550.0
+        }
+      ]
+    },
+    {
+      "name": "Petal Tracking 45s",
+      "ranks": [
+        {
+          "name": "Trainee",
+          "color": "#F6B26B",
+          "threshold": 1525.0
+        },
+        {
+          "name": "Initiate",
+          "color": "#FFD966",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Adept",
+          "color": "#93C47D",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Oracle",
+          "color": "#98fb98",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mystic",
+          "color": "#94c3ef",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Prodigy",
+          "color": "#674EA7",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Cerebral",
+          "color": "#FF8FF1",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#990000",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Savant",
+          "color": "#000000",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Prismatic",
+          "color": "#65F0D8",
+          "threshold": 4400.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTeleportingSmoothNightfall",
+    "kovaaks_benchmark_id": 2450,
+    "rank_colors": [
+      [
+        "Trainee",
+        "#F6B26B"
+      ],
+      [
+        "Initiate",
+        "#FFD966"
+      ],
+      [
+        "Adept",
+        "#93C47D"
+      ],
+      [
+        "Oracle",
+        "#98fb98"
+      ],
+      [
+        "Mystic",
+        "#94c3ef"
+      ],
+      [
+        "Prodigy",
+        "#674EA7"
+      ],
+      [
+        "Cerebral",
+        "#FF8FF1"
+      ],
+      [
+        "Ethereal",
+        "#990000"
+      ],
+      [
+        "Savant",
+        "#000000"
+      ],
+      [
+        "Prismatic",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:50.606739+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,458 @@
+{
+  "name": "XYZ SMOOTHNESS BENCHMARKS NEWCOMER",
+  "code": "KovaaKsRocketingCleared1x1",
+  "scenarios": [
+    {
+      "name": "Vertical Smoothing 60 Altered Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5800.0
+        }
+      ]
+    },
+    {
+      "name": "VSTP Varied Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Curvesphere Vertical Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5300.0
+        }
+      ]
+    },
+    {
+      "name": "Farmtrack Goated Fixed Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1425.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5375.0
+        }
+      ]
+    },
+    {
+      "name": "SYW Smooth Your Wrist Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 2925.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5900.0
+        }
+      ]
+    },
+    {
+      "name": "Spherical Centering II 180 Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5550.0
+        }
+      ]
+    },
+    {
+      "name": "Bipolar Centering 360 Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5500.0
+        }
+      ]
+    },
+    {
+      "name": "Anti-Centering Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5475.0
+        }
+      ]
+    },
+    {
+      "name": "GliderTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1475.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Multi Angle Smoothness Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 1825.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "ClockTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5700.0
+        }
+      ]
+    },
+    {
+      "name": "PTXS Newcomer",
+      "ranks": [
+        {
+          "name": "Level 1",
+          "color": "#F3F3F3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Level 2",
+          "color": "#E3E3E3",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Level 3",
+          "color": "#D2D2D2",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Level 4",
+          "color": "#C2C2C2",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Level 5",
+          "color": "#B2B2B2",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Bonus",
+          "color": "#999999",
+          "threshold": 5900.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRocketingCleared1x1",
+    "kovaaks_benchmark_id": 1908,
+    "rank_colors": [
+      [
+        "Level 1",
+        "#F3F3F3"
+      ],
+      [
+        "Level 2",
+        "#E3E3E3"
+      ],
+      [
+        "Level 3",
+        "#D2D2D2"
+      ],
+      [
+        "Level 4",
+        "#C2C2C2"
+      ],
+      [
+        "Level 5",
+        "#B2B2B2"
+      ],
+      [
+        "Bonus",
+        "#999999"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:07:36.349487+00:00",
+    "generator": "benchmark_importer"
+  }
+}

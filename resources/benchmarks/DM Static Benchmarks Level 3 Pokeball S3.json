@@ -1,0 +1,280 @@
+{
+  "name": "DM Static Benchmarks Level 3 Pokeball S3",
+  "code": "KovaaKsJumpingDownedDiff",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 960.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1710.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1830.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1760.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1880.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1800.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1920.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1830.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Pokeball Level 3 S3",
+      "ranks": [
+        {
+          "name": "Amethyst",
+          "color": "#9900FF",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#85FA85",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#8A2293",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1970.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsJumpingDownedDiff",
+    "kovaaks_benchmark_id": 2114,
+    "rank_colors": [
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Obsidian",
+        "#8A2293"
+      ],
+      [
+        "Vortex",
+        "#6B0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:03.138033+00:00",
+    "generator": "benchmark_importer"
+  }
+}

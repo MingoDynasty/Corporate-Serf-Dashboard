@@ -12,6 +12,7 @@ from scripts.benchmark_importer.models import (
     EvxlPlaylistScenario,
     ManifestEntry,
 )
+from source.utilities import atomic_write
 
 
 def _write_evxl_data(path: Path, benchmarks: list[dict]) -> None:
@@ -376,6 +377,29 @@ def test_rank_mismatch_is_typed():
         )
 
 
+def test_build_scenarios_strips_padded_scenario_names():
+    # KovaaK's occasionally returns padded scenario keys; CSV run import strips
+    # the `Scenario:` value, so unstripped playlist names never match lookups.
+    payload = _benchmark_response([100])
+    payload["categories"]["Clicking"]["scenarios"] = {
+        " 6 Sphere Hipfire 150% Size ": {
+            "score": 0,
+            "leaderboard_rank": None,
+            "scenario_rank": 0,
+            "rank_maxes": [100],
+            "leaderboard_id": 1,
+        }
+    }
+    response = script.BenchmarksAPIResponse.model_validate(payload)
+
+    scenarios = script.build_scenarios(
+        response,
+        EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"}),
+    )
+
+    assert [scenario.name for scenario in scenarios] == ["6 Sphere Hipfire 150% Size"]
+
+
 def test_run_importer_continues_after_item_failure(tmp_path, monkeypatch):
     calls = []
     sleeps = []
@@ -722,13 +746,13 @@ def test_generation_writes_output_before_manifest_and_deletes_renamed_file(
 def test_manifest_write_uses_atomic_replace(tmp_path, monkeypatch):
     path = tmp_path / "manifest.json"
     replacements = []
-    original_replace = script.os.replace
+    original_replace = atomic_write.os.replace
 
     def record_replace(source, destination):
         replacements.append((Path(source), Path(destination)))
         original_replace(source, destination)
 
-    monkeypatch.setattr(script.os, "replace", record_replace)
+    monkeypatch.setattr(atomic_write.os, "replace", record_replace)
     script.write_manifest({"KovaaKsGenerated": _manifest_entry()}, path)
 
     assert len(replacements) == 1
@@ -738,6 +762,48 @@ def test_manifest_write_uses_atomic_replace(tmp_path, monkeypatch):
         ("Bronze", "#111"),
         ("Silver", "#222"),
     ]
+
+
+def test_atomic_write_retries_replace_on_transient_permission_error(
+    tmp_path, monkeypatch, caplog
+):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    path = tmp_path / "out.json"
+    original_replace = atomic_write.os.replace
+    attempts = {"count": 0}
+
+    def flaky_replace(source, destination):
+        attempts["count"] += 1
+        if attempts["count"] == 1:
+            raise PermissionError("antivirus is holding the destination open")
+        original_replace(source, destination)
+
+    monkeypatch.setattr(atomic_write.os, "replace", flaky_replace)
+    monkeypatch.setattr(atomic_write.time, "sleep", lambda _seconds: None)
+
+    script._atomic_write_json(path, {"ok": True})
+
+    assert attempts["count"] == 2
+    assert json.loads(path.read_text(encoding="utf-8")) == {"ok": True}
+    assert any("Retrying replace" in message for message in caplog.messages)
+
+
+def test_atomic_write_reraises_and_cleans_up_after_exhausting_retries(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "out.json"
+
+    def always_locked(source, destination):
+        raise PermissionError("destination stays locked")
+
+    monkeypatch.setattr(atomic_write.os, "replace", always_locked)
+    monkeypatch.setattr(atomic_write.time, "sleep", lambda _seconds: None)
+
+    with pytest.raises(PermissionError):
+        script._atomic_write_json(path, {"ok": True})
+
+    assert not path.exists()
+    assert list(tmp_path.glob(f".{path.name}.*.tmp")) == []
 
 
 def test_load_manifest_treats_missing_and_malformed_as_empty(tmp_path, caplog):
@@ -845,13 +911,13 @@ def test_live_evxl_accept_removals_replaces_whole_candidate_atomically(
 
     monkeypatch.setattr(script, "_get_with_retry", lambda *_args, **_kwargs: Response())
     replacements = []
-    original_replace = script.os.replace
+    original_replace = atomic_write.os.replace
 
     def record_replace(source, destination):
         replacements.append((Path(source), Path(destination)))
         original_replace(source, destination)
 
-    monkeypatch.setattr(script.os, "replace", record_replace)
+    monkeypatch.setattr(atomic_write.os, "replace", record_replace)
 
     assert script.refresh_evxl_snapshot(path, accept_removals=True)
     assert json.loads(path.read_text(encoding="utf-8")) == candidate

@@ -6,20 +6,16 @@ import logging
 import os
 import re
 import threading
-import time
 from collections import Counter, deque
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import numpy as np
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
-from source.config.config_service import config
-from source.kovaaks.api_service import (
-    CACHE_REPLACE_RETRY_DELAYS_SECONDS,
-    get_playlist_data,
-)
+from source.config.config_service import get_config
+from source.kovaaks.api_service import get_playlist_data
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
@@ -27,14 +23,16 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.utilities.atomic_write import replace_with_retry
 from source.utilities.stopwatch import Stopwatch
 
-BUNDLED_PLAYLIST_DIRECTORY = "resources/playlists"
+# The bundled root is the full benchmark library (every committed file
+# carries rank data — CI-enforced); which of them the user sees is the
+# show/hide preference in playlist_visibility_service, not file state.
+BUNDLED_PLAYLIST_DIRECTORY = "resources/benchmarks"
 USER_PLAYLIST_DIRECTORY = "data/playlists"
-PLAYLIST_DIRECTORY = BUNDLED_PLAYLIST_DIRECTORY
 BUNDLED_PLAYLIST_DIRECTORY_PATH = Path(BUNDLED_PLAYLIST_DIRECTORY).resolve()
 USER_PLAYLIST_DIRECTORY_PATH = Path(USER_PLAYLIST_DIRECTORY).resolve()
-PLAYLIST_DIRECTORY_PATH = BUNDLED_PLAYLIST_DIRECTORY_PATH
 POSSIBLE_SUB_CSV_HEADERS = [
     # Latest CSV header
     "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # noqa: E501
@@ -45,8 +43,12 @@ POSSIBLE_SUB_CSV_HEADERS = [
 ]
 logger = logging.getLogger(__name__)
 
-# TODO: maybe at some point convert this to in-memory SQLite
-#  But a simple dictionary should suffice for now.
+# Deliberately unsynchronized: after startup the watchdog thread is the only
+# writer, and raced reads self-heal on re-render (the home page's polling
+# tick, or the next interaction on pages without a data-driving interval).
+# See the 2026-07-09 "Unsynchronized In-Memory Stores" entry in
+# docs/decision_log.md for the revisit triggers and why file-backed (WAL) is
+# the chosen shape for an eventual SQLite migration.
 kovaaks_database: dict = {}
 
 run_database: SortedList = SortedList(
@@ -56,6 +58,20 @@ run_database: SortedList = SortedList(
 
 
 playlist_database: dict[str, PlaylistData] = {}
+# Codes whose winning file came from data/playlists/ (or arrived via import).
+# Feeds the visibility first-run seed: user-root playlists must never be
+# hidden by the preference file's introduction.
+_user_root_playlist_codes: set[str] = set()
+# Every user-root file backing a code, so delete unlinks the real file(s)
+# instead of reconstructing a name that only matches import-written files (a
+# hand-dropped file with an arbitrary name would be missed). A list because
+# two user files can share one code — the loser is skipped at load but still
+# resurrects the playlist on restart, so delete must remove all of them.
+_user_root_playlist_files: dict[str, list[Path]] = {}
+# User-root files skipped at load because a bundled benchmark already served
+# their code (the pre-#90 copy-to-activate leftovers). Each entry is the dead
+# file plus the code it duplicated; the overview offers to clean them up.
+_superseded_user_playlist_files: list[tuple[Path, str]] = []
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -287,13 +303,13 @@ def get_time_vs_runs(
     scenario_name: str,
     top_n_scores: int,
     oldest_date: datetime,
-) -> dict[str, list[RunData]]:
+) -> dict[date, list[RunData]]:
     """Group a scenario's top runs by date within the selected time range."""
     # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
     #  Besides, this logic might get blown away if/when we migrate to SQLite.
 
     # 1. Build a dictionary with <Date, [RunData]>
-    data: dict[str, list[RunData]] = {}
+    data: dict[date, list[RunData]] = {}
     for run_data in kovaaks_database[scenario_name]["time_vs_runs"]:
         if run_data.datetime_object < oldest_date:
             continue
@@ -337,6 +353,20 @@ def get_playlist_selector_options() -> list[dict[str, str]]:
 def get_playlist_by_code(playlist_code: str) -> PlaylistData | None:
     """Find a locally imported playlist by its KovaaK's playlist code."""
     return playlist_database.get(playlist_code)
+
+
+def get_user_root_playlist_codes() -> set[str]:
+    """Get the codes loaded from the user root or imported this session."""
+    return set(_user_root_playlist_codes)
+
+
+def get_superseded_user_playlist_files() -> list[tuple[Path, str]]:
+    """Get the user-root files skipped because a bundled code already won.
+
+    Each entry is ``(file path, duplicated code)``. Refreshed on every
+    ``load_playlists()`` run; the overview surfaces these as cleanup targets.
+    """
+    return list(_superseded_user_playlist_files)
 
 
 def get_scenarios_from_playlist_code(playlist_code: str) -> list[str]:
@@ -535,7 +565,7 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 # sometimes the sens looks like 20.123456789, so round it to look cleaner
                 horizontal_sens = round(
                     float(str_horizontal_sens),
-                    config.sens_round_decimal_places,
+                    get_config().sens_round_decimal_places,
                 )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
@@ -569,6 +599,9 @@ def load_playlists() -> None:
     """Load valid playlist JSON files into the in-memory database."""
     playlist_database.clear()
     playlist_startup_warning_queue.clear()
+    _user_root_playlist_codes.clear()
+    _user_root_playlist_files.clear()
+    _superseded_user_playlist_files.clear()
     playlist_sources: dict[str, Path] = {}
     for root, missing_ok in (
         (BUNDLED_PLAYLIST_DIRECTORY_PATH, False),
@@ -598,30 +631,64 @@ def load_playlists() -> None:
                 continue
 
             if playlist_data.code in playlist_database:
+                winning_source = playlist_sources[playlist_data.code]
                 _record_startup_playlist_warning(
                     "Skipping playlist file "
                     f"{playlist_file}: playlist code {playlist_data.code} "
-                    f"already loaded from {playlist_sources[playlist_data.code]}."
+                    f"already loaded from {winning_source}."
                 )
+                if root == USER_PLAYLIST_DIRECTORY_PATH:
+                    if winning_source.is_relative_to(BUNDLED_PLAYLIST_DIRECTORY_PATH):
+                        # A user-root file whose code is served by a bundled
+                        # benchmark is a dead pre-#90 copy-to-activate leftover:
+                        # record it as a cleanup target for the alert.
+                        _superseded_user_playlist_files.append(
+                            (playlist_file, playlist_data.code)
+                        )
+                    else:
+                        # A user file shadowed by another user file: a plain
+                        # same-code duplicate. Track this copy too so delete
+                        # removes every file for the code and the playlist does
+                        # not reappear on the next restart.
+                        _user_root_playlist_files.setdefault(
+                            playlist_data.code, []
+                        ).append(playlist_file)
                 continue
             playlist_database[playlist_data.code] = playlist_data
             playlist_sources[playlist_data.code] = playlist_file
+            if root == USER_PLAYLIST_DIRECTORY_PATH:
+                _user_root_playlist_codes.add(playlist_data.code)
+                _user_root_playlist_files.setdefault(playlist_data.code, []).append(
+                    playlist_file
+                )
 
 
-def load_playlist_from_code(input_playlist_code: str) -> str | None:
-    """Import the single playlist matching a KovaaK's playlist code."""
+def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
+    """Import the single playlist matching a KovaaK's playlist code.
+
+    Returns ``(error_message, canonical_playlist_code)``. The second element
+    is the canonical ``playlistCode`` from KovaaK's — the imported code on a
+    successful import, or the conflicting existing code on a duplicate-code
+    refusal (so callers can, for example, ask whether that existing playlist
+    is hidden). It is None only when there is no canonical code to report:
+    the search returned nothing, was ambiguous, or the write failed. The
+    canonical code is what the store, the user-root tracking, and the
+    visibility show-list are keyed by; it can differ from the pasted input
+    (case normalization, non-exact search matches), so it must never be
+    derived from ``input_playlist_code``.
+    """
     response = get_playlist_data(input_playlist_code)
     if not response or not response.data:
         message = (
             f"Failed to load playlist data for playlist code: {input_playlist_code}"
         )
         logger.warning(message)
-        return message
+        return message, None
 
     if len(response.data) > 1:
         message = f"Found more than one playlist from code: {input_playlist_code}"
         logger.warning(message)
-        return message
+        return message, None
 
     playlist_data = PlaylistData(
         name=response.data[0].playlistName,
@@ -639,7 +706,10 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
             f"{existing_playlist.name} ({existing_playlist.code})."
         )
         logger.warning(message)
-        return message
+        # Duplicate refusal carries the conflicting existing code so the page
+        # layer can check its visibility without importing the visibility
+        # service (which would create an import cycle through data_service).
+        return message, playlist_data.code
     try:
         write_playlist_data_to_file(playlist_data)
     except ValueError:
@@ -648,15 +718,109 @@ def load_playlist_from_code(input_playlist_code: str) -> str | None:
             f"{playlist_data.name} ({playlist_data.code})"
         )
         logger.warning(message)
-        return message
+        return message, None
     except OSError:
         message = (
             f"Failed to save playlist data: {playlist_data.name} ({playlist_data.code})"
         )
         logger.warning(message)
-        return message
+        return message, None
     playlist_database[playlist_data.code] = playlist_data
+    _user_root_playlist_codes.add(playlist_data.code)
+    # Record the file just written so a later delete unlinks the real path
+    # (write_playlist_data_to_file builds it from the same helper). Import
+    # refuses existing codes, so this is always the first path for the code.
+    _user_root_playlist_files[playlist_data.code] = [
+        get_playlist_file_path(playlist_data.name, playlist_data.code)
+    ]
+    return None, playlist_data.code
+
+
+def delete_user_playlist(playlist_code: str) -> str | None:
+    """Delete a user playlist's file(s) and store entry.
+
+    Only user-root playlists are deletable — bundled benchmarks cannot be
+    removed (hiding is the equivalent), so a code absent from the user-root
+    tracking is refused with a user-visible message in the import flow's style.
+    Unlinks **every** user file tracked for the code — two user files can share
+    one code, and a leftover copy would resurrect the playlist on restart —
+    tolerating already-missing files.
+
+    The tracked list is ``[winner, ...duplicates]`` (the winner's data is what
+    the store serves). Deletion runs duplicates-first, winner-last, and stops
+    at the first hard failure, so the served file is only unlinked once every
+    other copy is gone. That keeps the store consistent with disk on a partial
+    failure: a locked duplicate leaves the served file (and store entry) intact
+    rather than deleting the served file while a copy survives — which would
+    serve a deleted file now and silently swap in the survivor on restart. On
+    full success the store entry and user-root tracking are dropped under
+    ``_PLAYLIST_IO_LOCK``. Returns an error message, or ``None`` on success.
+    """
+    with _PLAYLIST_IO_LOCK:
+        file_paths = _user_root_playlist_files.get(playlist_code)
+        if not file_paths:
+            message = (
+                f"Playlist code cannot be deleted: {playlist_code} is not a "
+                "user playlist."
+            )
+            logger.warning(message)
+            return message
+        error_message: str | None = None
+        deleted: set[Path] = set()
+        # reversed(): non-winning duplicates first, the served winner last.
+        for file_path in reversed(file_paths):
+            try:
+                file_path.unlink()
+            except FileNotFoundError:
+                # Already gone on disk (manual delete or a prior partial run).
+                deleted.add(file_path)
+                logger.warning("Playlist file already missing on delete: %s", file_path)
+            except OSError:
+                error_message = f"Failed to delete playlist file: {file_path}"
+                logger.warning(error_message, exc_info=True)
+                break
+            else:
+                deleted.add(file_path)
+        if error_message:
+            # Stop before touching the store: the served winner is untouched
+            # (or was the failure), so leaving the entry keeps store == disk.
+            _user_root_playlist_files[playlist_code] = [
+                path for path in file_paths if path not in deleted
+            ]
+            return error_message
+        playlist_database.pop(playlist_code, None)
+        _user_root_playlist_codes.discard(playlist_code)
+        _user_root_playlist_files.pop(playlist_code, None)
     return None
+
+
+def delete_superseded_user_playlist_files() -> str | None:
+    """Delete every recorded superseded user-root playlist file.
+
+    These files were skipped at load because a bundled benchmark already
+    served their code, so they hold no store entry — deletion only touches the
+    filesystem and the recorded list. Already-missing files are tolerated and
+    dropped; a file that fails to unlink for another reason is kept in the list
+    and its error reported. Returns an error message when any file failed, or
+    ``None`` when all recorded files are gone.
+    """
+    with _PLAYLIST_IO_LOCK:
+        remaining: list[tuple[Path, str]] = []
+        error_message: str | None = None
+        for file_path, code in _superseded_user_playlist_files:
+            try:
+                file_path.unlink()
+            except FileNotFoundError:
+                logger.warning(
+                    "Superseded playlist file already missing on delete: %s",
+                    file_path,
+                )
+            except OSError:
+                error_message = f"Failed to delete playlist file: {file_path}"
+                logger.warning(error_message, exc_info=True)
+                remaining.append((file_path, code))
+        _superseded_user_playlist_files[:] = remaining
+    return error_message
 
 
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
@@ -674,21 +838,7 @@ def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
                 file.write("\n")
                 file.flush()
                 os.fsync(file.fileno())
-            for retry_delay in (*CACHE_REPLACE_RETRY_DELAYS_SECONDS, None):
-                try:
-                    os.replace(temp_file, file_path)
-                    break
-                except PermissionError:
-                    if retry_delay is None:
-                        raise
-                    logger.warning(
-                        "Retrying playlist replace after PermissionError: %s",
-                        file_path,
-                    )
-                    time.sleep(retry_delay)
+            replace_with_retry(temp_file, file_path, logger=logger)
         finally:
             if temp_file.exists():
                 temp_file.unlink()
-
-
-load_playlists()

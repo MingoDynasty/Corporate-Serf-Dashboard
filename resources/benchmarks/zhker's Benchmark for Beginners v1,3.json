@@ -1,0 +1,634 @@
+{
+  "name": "zhker's Benchmark for Beginners v1,3",
+  "code": "KovaaKsBackflippingSeagreenHero",
+  "scenarios": [
+    {
+      "name": "RawMouseControlClickingXYZ",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 2200.0
+        }
+      ]
+    },
+    {
+      "name": "Fireworks Flick Easy",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 5200.0
+        }
+      ]
+    },
+    {
+      "name": "Reflex Flick - Fair",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "Ballsheet BB",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 80.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 85.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 90.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 95.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 105.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Angelic 20% Larger 80% Speed 30% larger",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 75.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 85.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 100.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 110.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 124.0
+        }
+      ]
+    },
+    {
+      "name": "Star Clicking 30% Larger",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 30.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 45.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 55.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 62.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "raspTS Click",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 25.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 30.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 40.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 55.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "DomiSphere Micro Easy",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "WhisphereRawControl Larger + Slowed 80% speed",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Poptrack Novice S5",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Glider GOATED Easy",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Suavetrack Novice",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Easy",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Easy Slowed",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 820.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 845.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 865.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 875.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 890.0
+        }
+      ]
+    },
+    {
+      "name": "Air NUNS AIO Easy",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "ww2t Voltaic Pokeball",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 80.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 85.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 93.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 97.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 107.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2 Large",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 85.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 100.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 110.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 120.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopTS Easy S1",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 40.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 50.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 55.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 65.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 77.0
+        }
+      ]
+    },
+    {
+      "name": "kinTargetSwitch 360 No Reload",
+      "ranks": [
+        {
+          "name": "Novum",
+          "color": "#c96e7c",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Isthmius",
+          "color": "#7a84cd",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Robustus",
+          "color": "#cfc27d",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Aesopi",
+          "color": "#2fb16e",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Sirasakae",
+          "color": "#62e4fe",
+          "threshold": 20000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBackflippingSeagreenHero",
+    "kovaaks_benchmark_id": 2256,
+    "rank_colors": [
+      [
+        "Novum",
+        "#c96e7c"
+      ],
+      [
+        "Isthmius",
+        "#7a84cd"
+      ],
+      [
+        "Robustus",
+        "#cfc27d"
+      ],
+      [
+        "Aesopi",
+        "#2fb16e"
+      ],
+      [
+        "Sirasakae",
+        "#62e4fe"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:37.451361+00:00",
+    "generator": "benchmark_importer"
+  }
+}

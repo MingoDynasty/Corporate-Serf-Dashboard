@@ -1,0 +1,668 @@
+{
+  "name": "Aimerz+ Medium S0 - Worthless",
+  "code": "KovaaKsGearingScarletMouse",
+  "scenarios": [
+    {
+      "name": "aimerz+ PipeClick Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 40.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 65.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 75.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 85.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 95.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ B180C Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 30.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 35.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 50.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 60.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ WaveClick Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 55.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 60.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 65.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ 1w3ts Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 70.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 80.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 90.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 100.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 110.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 120.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ ww6t Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 80.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 90.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 110.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 120.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ 1w4ts HF Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 80.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 100.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 115.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 130.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 145.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ Smoothbot Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ PTI Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 300.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 350.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 550.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ PreciseTrack Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 2950.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ PipeTrack Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ VariedStrafes Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ Air Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 6000.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ pivoTS Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 70.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 80.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 90.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 95.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 105.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ waveTS Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 45.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 50.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 55.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 60.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 65.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 70.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ swingTS Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 700.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 800.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 850.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 900.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ joeTS Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 50.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 60.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 70.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 75.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 80.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 85.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ B180TC Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 35.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 40.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 50.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 55.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 60.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ TomTS Normal",
+      "ranks": [
+        {
+          "name": "Iron",
+          "color": "#999999",
+          "threshold": 25.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#a77138",
+          "threshold": 30.0
+        },
+        {
+          "name": "Silver",
+          "color": "#c2d2d2",
+          "threshold": 35.0
+        },
+        {
+          "name": "Gold",
+          "color": "#c4a12a",
+          "threshold": 40.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#00b3a5",
+          "threshold": 45.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#81d1ff",
+          "threshold": 50.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGearingScarletMouse",
+    "kovaaks_benchmark_id": 1823,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#a77138"
+      ],
+      [
+        "Silver",
+        "#c2d2d2"
+      ],
+      [
+        "Gold",
+        "#c4a12a"
+      ],
+      [
+        "Platinum",
+        "#00b3a5"
+      ],
+      [
+        "Diamond",
+        "#81d1ff"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:48.840022+00:00",
+    "generator": "benchmark_importer"
+  }
+}

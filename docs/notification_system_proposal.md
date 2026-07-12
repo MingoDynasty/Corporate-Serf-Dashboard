@@ -90,8 +90,10 @@ every scenario switch and every new run, and reports the result as a red
 | 11 | 🟢/🟡 Score threshold pass/fail | Threshold switch on + prior PB exists | B | yes | **Merge into one run-verdict toast** (D5) |
 | 12 | 🔵 "Graph updated!" | Any run not threshold-judged (co-fires with the top-N toast, which does not suppress it) | B | yes | **Remove** |
 | 13 | 🔵/🟢/🟡 Backlog run summary | Runs accrued while Home was closed | B | yes | **Keep** |
-| 14 | 🟢/🔴 Playlist import result | Import button | B | yes | **Keep** |
+| 14 | 🟢/🔴 Playlist import result | Overview-page import modal at `/playlists` (the playlist-management work moved import out of Home's settings modal) | B | yes | **Keep** |
 | 15 | 🟡 Startup playlist warnings | Duplicate playlist codes at boot | B | yes | **Keep, make persistent** (no autoClose — fires when nobody may be looking) |
+| 16 | 🟢/🔴 Playlist delete result | Overview-page delete confirmation | B | yes | **Keep** |
+| 17 | 🟢/🔴 Superseded-file cleanup result | Overview-page cleanup confirmation | B | yes | **Keep** |
 
 Net effect: during normal play with the default config, the only toasts are the
 per-run verdict, the backlog summary, and the results of things the user

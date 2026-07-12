@@ -6,10 +6,12 @@ import datetime
 import logging
 import time
 from pathlib import Path
+from typing import cast
 
+from sortedcontainers import SortedKeyList
 from watchdog.events import FileSystemEventHandler
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_service import schedule_rank_freshness_refresh
 from source.kovaaks.data_service import (
     extract_data_from_file,
@@ -63,6 +65,7 @@ def _refresh_rank_after_high_score(
     scenario_name: str,
     expected_score: float,
 ) -> None:
+    config = get_config()
     if not config.kovaaks_username:
         return
 
@@ -164,11 +167,18 @@ class NewFileHandler(FileSystemEventHandler):
             return
 
         # Case 3: existing scenario and existing sensitivity, find nth score.
-        nth_score = 1
-        # TODO: O(n) linear search, should do O(log(n)) binary search instead
-        for prev_run_data in sensitivities_vs_runs[sensitivity_key]:
-            if prev_run_data.score > run_data.score:
-                nth_score += 1
+        # The value is a SortedKeyList keyed by score ascending (see
+        # data_service.load_csv_file_into_database); the annotation widens it to
+        # list, so cast to reach bisect_key_right. The count of runs scoring
+        # strictly higher than this run is len - bisect_key_right(score); the +1
+        # makes it a 1-based rank (ties are not counted as higher). The new run
+        # is not yet in the store, so this bisect ranks against the pre-insert
+        # list.
+        runs_by_score = cast(SortedKeyList, sensitivities_vs_runs[sensitivity_key])
+        higher_count = len(runs_by_score) - runs_by_score.bisect_key_right(
+            run_data.score
+        )
+        nth_score = higher_count + 1
         logger.debug(
             "%s has a new %s place score: %s",
             sensitivity_key,

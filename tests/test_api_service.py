@@ -13,12 +13,14 @@ import pytest
 
 from source.kovaaks import api_service
 from source.kovaaks.api_models import (
+    BenchmarksAPIResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
     ScenarioRankInfo,
     ScenarioRankStatus,
 )
+from source.utilities import atomic_write
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
@@ -470,6 +472,30 @@ def test_get_benchmark_json_returns_schema_valid_cache(tmp_path, monkeypatch):
     assert result == response_json
 
 
+def test_benchmarks_response_allows_rank_without_color():
+    """KovaaK's omits `color` on some rank tiers; validation must tolerate it."""
+    payload = {
+        "benchmark_progress": 42,
+        "overall_rank": 3,
+        "categories": {},
+        "ranks": [
+            {
+                "icon": "copper.png",
+                "name": "Copper",
+                "frame": "frame.png",
+                "description": "",
+                "playercard_large": "large.png",
+                "playercard_small": "small.png",
+            }
+        ],
+    }
+
+    response = BenchmarksAPIResponse.model_validate(payload)
+
+    assert response.ranks[0].color is None
+    assert response.ranks[0].name == "Copper"
+
+
 def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
     calls = []
 
@@ -505,7 +531,7 @@ def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
 def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
     response_json = {"benchmark_progress": 42}
     replacements = []
-    original_replace = api_service.os.replace
+    original_replace = atomic_write.os.replace
 
     def recording_replace(source, destination):
         replacements.append((Path(source), Path(destination)))
@@ -517,7 +543,7 @@ def test_get_benchmark_json_writes_cache_atomically(tmp_path, monkeypatch):
         "_get_with_retry",
         lambda *_args, **_kwargs: FakeResponse(response_json),
     )
-    monkeypatch.setattr(api_service.os, "replace", recording_replace)
+    monkeypatch.setattr(atomic_write.os, "replace", recording_replace)
 
     result = api_service.get_benchmark_json(123)
 
@@ -538,7 +564,7 @@ def test_write_json_retries_replace_after_transient_permission_error(
     cache_file = tmp_path / "cache.json"
     attempted_temp_files = []
     sleeps = []
-    original_replace = api_service.os.replace
+    original_replace = atomic_write.os.replace
 
     def flaky_replace(source, destination):
         attempted_temp_files.append(Path(source))
@@ -546,13 +572,13 @@ def test_write_json_retries_replace_after_transient_permission_error(
             raise PermissionError(13, "Access is denied")
         original_replace(source, destination)
 
-    monkeypatch.setattr(api_service.os, "replace", flaky_replace)
-    monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
+    monkeypatch.setattr(atomic_write.os, "replace", flaky_replace)
+    monkeypatch.setattr(atomic_write.time, "sleep", sleeps.append)
 
     api_service._write_json(cache_file, {"value": 1})
 
     assert len(attempted_temp_files) == 2
-    assert sleeps == [api_service.CACHE_REPLACE_RETRY_DELAYS_SECONDS[0]]
+    assert sleeps == [atomic_write.REPLACE_RETRY_DELAYS_SECONDS[0]]
     assert json.loads(cache_file.read_text(encoding="utf-8")) == {"value": 1}
     assert not attempted_temp_files[0].exists()
 
@@ -565,13 +591,13 @@ def test_write_json_raises_after_replace_retries_exhausted(tmp_path, monkeypatch
         attempted_temp_files.append(Path(source))
         raise PermissionError(13, "Access is denied")
 
-    monkeypatch.setattr(api_service.os, "replace", always_denied)
-    monkeypatch.setattr(api_service.time, "sleep", lambda _delay: None)
+    monkeypatch.setattr(atomic_write.os, "replace", always_denied)
+    monkeypatch.setattr(atomic_write.time, "sleep", lambda _delay: None)
 
     with pytest.raises(PermissionError):
         api_service._write_json(cache_file, {"value": 1})
 
-    expected_attempts = 1 + len(api_service.CACHE_REPLACE_RETRY_DELAYS_SECONDS)
+    expected_attempts = 1 + len(atomic_write.REPLACE_RETRY_DELAYS_SECONDS)
     assert len(attempted_temp_files) == expected_attempts
     assert not cache_file.exists()
     assert not attempted_temp_files[0].exists()

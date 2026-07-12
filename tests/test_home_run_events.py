@@ -62,7 +62,7 @@ def _walk_component_tree(component):
 
 
 def test_home_layout_initial_graph_has_empty_state(monkeypatch):
-    monkeypatch.setattr(home, "get_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
     page = home.layout()

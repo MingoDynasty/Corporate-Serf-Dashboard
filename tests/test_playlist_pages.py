@@ -1,4 +1,5 @@
 from datetime import datetime
+from pathlib import Path
 from types import SimpleNamespace
 
 import dash
@@ -9,7 +10,6 @@ from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
-from source.pages import playlist_components
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -33,27 +33,508 @@ def test_playlists_overview_cell_click_ignores_malformed_payloads():
     assert playlists.route_to_clicked_playlist({"rowId": 3}) is no_update
 
 
-def test_playlists_overview_page_loads_rows(monkeypatch):
-    expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
-    monkeypatch.setattr(
-        playlists,
-        "build_playlist_overview_rows",
-        lambda: expected_rows,
+def test_playlists_overview_visibility_cell_click_does_not_navigate():
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID}
+        )
+        is no_update
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True)
+
+def _trigger(monkeypatch, triggered_id):
+    monkeypatch.setattr(
+        playlists,
+        "ctx",
+        SimpleNamespace(triggered_id=triggered_id),
+    )
+
+
+def test_playlists_overview_page_loads_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
+    seen_include_hidden = []
+
+    def fake_build(include_hidden=False):
+        seen_include_hidden.append(include_hidden)
+        return expected_rows
+
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
 
     assert rows == expected_rows
     assert status == ""
+    assert seen_include_hidden == [False]
+
+
+def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-show-hidden")
+    seen_include_hidden = []
+
+    def fake_build(include_hidden=False):
+        seen_include_hidden.append(include_hidden)
+        return [{"code": "KovaaKsTestCode", "hidden": True}]
+
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
+
+    rows, _status = playlists.load_playlist_overview_rows(True, True, None, 0)
+
+    assert seen_include_hidden == [True]
+    assert rows[0]["hidden"] is True
+
+
+def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    toggled = []
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", toggled.append)
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(
+        True,
+        False,
+        {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
+        0,
+    )
+
+    assert toggled == ["KovaaKsTestCode"]
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    assert status == ""
+
+
+def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(
+        playlists,
+        "toggle_playlist_visibility",
+        lambda _code: pytest.fail("navigation clicks must not toggle visibility"),
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(
+        True,
+        False,
+        {"rowId": "KovaaKsTestCode", "colId": "name"},
+        0,
+    )
+
+    assert rows is no_update
+    assert status is no_update
 
 
 def test_playlists_overview_page_reports_empty_database(monkeypatch):
-    monkeypatch.setattr(playlists, "build_playlist_overview_rows", lambda: [])
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [],
+    )
 
-    rows, status = playlists.load_playlist_overview_rows(True)
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
 
     assert rows == []
     assert status == "No playlists are loaded."
+
+
+def test_playlists_overview_page_reports_all_hidden(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: (
+            [{"code": "KovaaKsTestCode", "hidden": True}] if include_hidden else []
+        ),
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
+
+    assert rows == []
+    assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
+
+
+def test_playlists_overview_visibility_column_config():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+    column = columns[playlists.VISIBILITY_COLUMN_ID]
+
+    assert column["cellRenderer"] == "VisibilityAction"
+    assert column["sortable"] is False
+
+
+def test_playlists_overview_delete_column_config():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+    column = columns[playlists.DELETE_COLUMN_ID]
+
+    assert column["cellRenderer"] == "DeleteAction"
+    assert column["sortable"] is False
+
+
+def test_playlists_overview_delete_cell_click_does_not_navigate():
+    assert (
+        playlists.route_to_clicked_playlist(
+            {"rowId": "UserCode", "colId": playlists.DELETE_COLUMN_ID}
+        )
+        is no_update
+    )
+
+
+def test_manage_delete_modal_opens_for_delete_cell(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "My Playlist"
+    )
+
+    opened, target, message = playlists.manage_delete_modal(
+        {"rowId": "UserCode", "colId": playlists.DELETE_COLUMN_ID}, 0
+    )
+
+    assert opened is True
+    assert target == "UserCode"
+    assert "My Playlist" in message
+    assert "UserCode" in message
+
+
+def test_manage_delete_modal_ignores_bundled_delete_cell(monkeypatch):
+    # A bundled row renders no Delete link, but its empty delete cell still
+    # emits cellClicked; the modal must not open for a non-user code (which
+    # delete_user_playlist would refuse anyway, after a misleading dialog).
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "get_user_root_playlist_codes", lambda: {"UserCode"})
+    monkeypatch.setattr(
+        playlists,
+        "get_playlist_display_label",
+        lambda _code: pytest.fail("bundled delete cell must not reach the modal"),
+    )
+
+    result = playlists.manage_delete_modal(
+        {"rowId": "BundledCode", "colId": playlists.DELETE_COLUMN_ID}, 0
+    )
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_manage_delete_modal_ignores_non_delete_cells(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-grid")
+
+    result = playlists.manage_delete_modal({"rowId": "UserCode", "colId": "name"}, 0)
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_manage_delete_modal_cancel_closes(monkeypatch):
+    _trigger(monkeypatch, "playlists-delete-cancel-button")
+
+    opened, target, message = playlists.manage_delete_modal(None, 1)
+
+    assert opened is False
+    assert target is no_update
+    assert message is no_update
+
+
+def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeypatch):
+    deleted = []
+    hidden = []
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda code: deleted.append(code) or None,
+    )
+    monkeypatch.setattr(playlists, "hide_playlist", hidden.append)
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert deleted == ["UserCode"]
+    # In a show-list, dropping membership IS forgetting the code, so
+    # preferences.json does not accumulate dead codes.
+    assert hidden == ["UserCode"]
+    assert notifications[0]["color"] == "green"
+    assert rows_refresh == 5
+    assert opened is False
+
+
+def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch):
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: "boom")
+    monkeypatch.setattr(
+        playlists,
+        "hide_playlist",
+        lambda _code: pytest.fail("a failed delete must not forget visibility"),
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "boom"
+    assert rows_refresh is no_update
+    assert opened is False
+
+
+def test_confirm_delete_playlist_without_target_noops(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda _code: pytest.fail("no target must not trigger a delete"),
+    )
+
+    result = playlists.confirm_delete_playlist(1, None, 0)
+
+    assert result == (no_update, no_update, no_update)
+
+
+def test_render_superseded_alert_hidden_when_no_files(monkeypatch):
+    monkeypatch.setattr(playlists, "get_superseded_user_playlist_files", lambda: [])
+
+    style, text = playlists.render_superseded_alert(True, 0)
+
+    assert style == {"display": "none"}
+    assert text == ""
+
+
+def test_render_superseded_alert_shows_count_when_files_exist(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: [(Path("a.json"), "C1"), (Path("b.json"), "C2")],
+    )
+
+    style, text = playlists.render_superseded_alert(True, 1)
+
+    assert style == {}
+    assert "2 leftover playlist files" in text
+
+
+def test_manage_superseded_modal_opens_with_count(monkeypatch):
+    _trigger(monkeypatch, "playlists-superseded-delete-button")
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: [(Path("a.json"), "C1")],
+    )
+
+    opened, message = playlists.manage_superseded_modal(1, 0)
+
+    assert opened is True
+    assert "1 leftover playlist file" in message
+
+
+def test_manage_superseded_modal_cancel_closes(monkeypatch):
+    _trigger(monkeypatch, "playlists-superseded-cancel-button")
+
+    opened, message = playlists.manage_superseded_modal(0, 1)
+
+    assert opened is False
+    assert message is no_update
+
+
+def test_confirm_delete_superseded_success_refreshes(monkeypatch):
+    monkeypatch.setattr(
+        playlists, "delete_superseded_user_playlist_files", lambda: None
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+
+    assert notifications[0]["color"] == "green"
+    assert rows_refresh == 3
+    assert opened is False
+
+
+def test_confirm_delete_superseded_failure_still_refreshes(monkeypatch):
+    # A partial failure still prunes the files it removed, so the alert must
+    # re-render with the reduced count even on error.
+    monkeypatch.setattr(
+        playlists, "delete_superseded_user_playlist_files", lambda: "nope"
+    )
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "nope"
+    assert rows_refresh == 3
+    assert opened is False
+
+
+def test_confirm_delete_superseded_ignores_initial_load(monkeypatch):
+    # Regression: under DashProxy an allow_duplicate callback can fire once on
+    # initial page load with n_clicks=None; a destructive handler must never
+    # delete without a real confirm click.
+    monkeypatch.setattr(
+        playlists,
+        "delete_superseded_user_playlist_files",
+        lambda: pytest.fail("must not delete files without a confirm click"),
+    )
+
+    assert playlists.confirm_delete_superseded(None, 0) == (
+        no_update,
+        no_update,
+        no_update,
+    )
+
+
+def test_confirm_delete_playlist_ignores_initial_load(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda _code: pytest.fail("must not delete without a confirm click"),
+    )
+
+    assert playlists.confirm_delete_playlist(None, "UserCode", 0) == (
+        no_update,
+        no_update,
+        no_update,
+    )
+
+
+def test_manage_superseded_modal_ignores_initial_load(monkeypatch):
+    _trigger(monkeypatch, None)
+    monkeypatch.setattr(
+        playlists,
+        "get_superseded_user_playlist_files",
+        lambda: pytest.fail("initial load must not open the cleanup modal"),
+    )
+
+    assert playlists.manage_superseded_modal(None, None) == (no_update, no_update)
+
+
+def _walk_components(component):
+    yield component
+    children = getattr(component, "children", None)
+    if children is None:
+        return
+    if isinstance(children, (list, tuple)):
+        for child in children:
+            yield from _walk_components(child)
+        return
+    yield from _walk_components(children)
+
+
+def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
+    page = playlists.layout()
+    grid = page.children[-1].children
+    switch = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlists-overview-show-hidden"
+    )
+
+    assert switch.checked is False
+    assert grid.rowClassRules == {
+        "playlist-overview-row-hidden": "params.data.hidden",
+    }
+
+
+def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
+    # KovaaK's canonicalizes pasted codes; the stored code is what visibility
+    # must persist, or a non-canonical paste imports hidden once a
+    # preferences file exists.
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (None, "CanonicalCode"),
+    )
+    shown = []
+    monkeypatch.setattr(playlists, "show_playlist", shown.append)
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "  canonicalcode  ", 0
+    )
+
+    assert shown == ["CanonicalCode"]
+    assert notifications[0]["color"] == "green"
+    # A successful import bumps the refresh store so the grid rebuilds, then
+    # closes the modal and clears the field so the user sees the new row.
+    assert import_refresh == 1
+    assert opened is False
+    assert value == ""
+
+
+def test_import_playlist_failure_does_not_show(monkeypatch):
+    monkeypatch.setattr(
+        playlists, "load_playlist_from_code", lambda _code: ("boom", None)
+    )
+    monkeypatch.setattr(
+        playlists,
+        "show_playlist",
+        lambda _code: pytest.fail("must not mark failed imports as shown"),
+    )
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "BadCode", 3
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"] == "boom"
+    # A failed import must not rebuild rows, and leaves the modal open with the
+    # pasted code intact so the user can correct it.
+    assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
+
+
+def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (
+            "Playlist code already exists: ExistingCode is already imported "
+            "as Same Name (ExistingCode).",
+            "ExistingCode",
+        ),
+    )
+    monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: False)
+    monkeypatch.setattr(
+        playlists,
+        "show_playlist",
+        lambda _code: pytest.fail("a refused import must not be shown"),
+    )
+
+    notifications, import_refresh, opened, value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
+
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["message"].endswith(playlists.HIDDEN_DUPLICATE_HINT)
+    assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
+
+
+def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (
+            "Playlist code already exists: ExistingCode is already imported "
+            "as Same Name (ExistingCode).",
+            "ExistingCode",
+        ),
+    )
+    monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: True)
+
+    notifications, _import_refresh, _opened, _value = playlists.import_playlist(
+        1, "ExistingCode", 0
+    )
+
+    assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
+
+
+def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
+    _trigger(monkeypatch, "playlists-rows-refresh")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
+    )
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, None, 1)
+
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    assert status == ""
 
 
 def test_playlists_overview_sortable_columns_use_nulls_last_comparator():
@@ -98,6 +579,37 @@ def test_playlists_overview_last_played_follows_relative_time_conventions():
     assert "relativeTime(params.data.stalest_sort" in playlists.LAST_PLAYED_TOOLTIP
 
 
+def test_playlists_overview_header_tooltips_cover_exactly_the_cryptic_columns():
+    # Pin the exact set so adding a column forces a conscious tooltip decision.
+    fields_with_header_tooltip = {
+        column["field"]
+        for column in playlists.TABLE_COLUMN_DEFS
+        if "headerTooltip" in column
+    }
+
+    assert fields_with_header_tooltip == {
+        "type_display",
+        "played_sort",
+        "median_percentile_sort",
+        "lowest_percentile_sort",
+    }
+
+
+def test_playlists_overview_percentile_header_tooltips_explain_coverage_suffix():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    for field in ["median_percentile_sort", "lowest_percentile_sort"]:
+        assert "N/M" in columns[field]["headerTooltip"]
+
+
+def test_playlists_overview_visibility_column_has_reversibility_tooltip():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    assert columns[playlists.VISIBILITY_COLUMN_ID]["tooltipValueGetter"] == {
+        "function": playlists.VISIBILITY_TOOLTIP
+    }
+
+
 def test_playlists_overview_grid_rows_navigate_by_playlist_code():
     page = playlists.layout()
     grid = page.children[-1].children
@@ -139,54 +651,10 @@ def test_playlists_overview_layout_includes_relative_time_refresh_interval():
     assert interval.n_intervals == 0
 
 
-def test_playlist_scenarios_selector_callback_builds_playlist_path(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
-    )
-
+def test_playlist_scenarios_cell_click_callback_builds_home_link():
     assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            "KovaaKsTestCode",
-            None,
-            "/playlists/OldCode",
-            "OldCode",
-        )
-        == "/playlists/KovaaKsTestCode"
-    )
-
-
-def test_playlist_scenarios_selector_callback_skips_current_path(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-selector"),
-    )
-
-    assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            "KovaaKsTestCode",
-            None,
-            "/playlists/KovaaKsTestCode",
-            "KovaaKsTestCode",
-        )
-        is no_update
-    )
-
-
-def test_playlist_scenarios_cell_click_callback_builds_home_link(monkeypatch):
-    monkeypatch.setattr(
-        playlist_scenarios,
-        "ctx",
-        SimpleNamespace(triggered_id="playlist-scenarios-grid"),
-    )
-
-    assert (
-        playlist_scenarios.route_from_playlist_interaction(
-            None,
+        playlist_scenarios.route_to_scenario_home(
             {"colId": "scenario", "value": "VT Pasu & Friends"},
-            "/playlists/Code/One",
             "Code/One",
         )
         == "/?playlist_code=Code%2FOne&scenario=VT+Pasu+%26+Friends"
@@ -198,6 +666,19 @@ def test_aim_training_journey_page_inherits_shell_theme_provider():
 
     assert isinstance(page, dmc.Box)
     assert all(not isinstance(child, dmc.MantineProvider) for child in page.children)
+
+
+def test_aim_training_journey_playlist_picker_shares_home_scroll_and_height():
+    picker = next(
+        component
+        for component in _walk_components(aim_training_journey.layout())
+        if getattr(component, "id", None) == "playlists-multi-select"
+    )
+
+    # Adopted from the Home filter via the shared preset so the two dropdowns
+    # scroll and cap height consistently once the library grows past a screen.
+    assert picker.scrollAreaProps == {"type": "always"}
+    assert picker.maxDropdownHeight == "75vh"
 
 
 def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
@@ -291,12 +772,6 @@ def test_aim_training_journey_filters_stale_values_and_disambiguates_labels(
 def test_aim_training_journey_waits_for_color_scheme():
     with pytest.raises(PreventUpdate):
         aim_training_journey.generate_graph(["Playlist"], 10, None)
-
-
-def test_playlist_selector_dropdown_scrollbar_is_always_visible():
-    selector = playlist_components.playlist_selector("playlists-selector")
-
-    assert selector.scrollAreaProps == {"type": "always"}
 
 
 def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
@@ -406,6 +881,17 @@ def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
 
     assert columns["pb_cm360_sort"]["headerName"] == "PB cm/360"
     assert columns["pb_accuracy_sort"]["headerName"] == "PB Accuracy"
+
+
+def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():
+    # Pin the exact set so adding a column forces a conscious tooltip decision.
+    fields_with_header_tooltip = {
+        column["field"]
+        for column in playlist_scenarios.TABLE_COLUMN_DEFS
+        if "headerTooltip" in column
+    }
+
+    assert fields_with_header_tooltip == {"percentile_sort", "pb_cm360_sort"}
 
 
 def test_playlist_scenarios_grid_uses_content_auto_size():

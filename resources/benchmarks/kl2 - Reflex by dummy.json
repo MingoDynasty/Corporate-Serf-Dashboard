@@ -1,0 +1,550 @@
+{
+  "name": "kl2 - Reflex by dummy",
+  "code": "KovaaKsFeedingKnockedFaq",
+  "scenarios": [
+    {
+      "name": "400ms strafing Reflex Micro++ Horizontalish valorant",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 40.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 50.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 60.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 65.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 70.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 75.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 80.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 85.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 90.0
+        }
+      ]
+    },
+    {
+      "name": "Reactive Flick v3 Micro",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 80.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 100.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 105.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 110.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 115.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 120.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 125.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "Cartoon's Micro RawMouseControlReact 30s",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 20.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 30.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 35.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 40.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 45.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 50.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 55.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 60.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 65.0
+        }
+      ]
+    },
+    {
+      "name": "1W1T - VALORANT",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 600.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 700.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 850.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 900.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 950.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 1050.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 1100.0
+        }
+      ]
+    },
+    {
+      "name": "shimPressure Micro",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 140.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 160.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 180.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 200.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 210.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 220.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 230.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 240.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 250.0
+        }
+      ]
+    },
+    {
+      "name": "VT PulseShot Valorant",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 13000.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 14500.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 18000.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 18500.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 19000.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 19500.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 20000.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive Micro Reflex Adapt",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 350.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 450.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 550.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 600.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 650.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 700.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 750.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 800.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 850.0
+        }
+      ]
+    },
+    {
+      "name": "eth Triflick Speed",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 20.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 24.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 28.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 32.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 36.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 40.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 44.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 47.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 50.0
+        }
+      ]
+    },
+    {
+      "name": "Valorant Microadjustment (Renon)",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 40.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 50.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 55.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 60.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 65.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 70.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 73.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 75.0
+        }
+      ]
+    },
+    {
+      "name": "eth FP OGG Micro 60",
+      "ranks": [
+        {
+          "name": "FNS",
+          "color": "#FFFFFF",
+          "threshold": 1000.0
+        },
+        {
+          "name": "karrigan",
+          "color": "#99f0ff",
+          "threshold": 2000.0
+        },
+        {
+          "name": "TenZ",
+          "color": "#ab94ff",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Kaajak",
+          "color": "#ff99f7",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Aspas",
+          "color": "#ff4d82",
+          "threshold": 4000.0
+        },
+        {
+          "name": "ropz",
+          "color": "#ffe852",
+          "threshold": 4500.0
+        },
+        {
+          "name": "ZywOo",
+          "color": "#ffb83d",
+          "threshold": 5000.0
+        },
+        {
+          "name": "m0NESY",
+          "color": "#7aff8a",
+          "threshold": 5300.0
+        },
+        {
+          "name": "donk",
+          "color": "#000000",
+          "threshold": 5500.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsFeedingKnockedFaq",
+    "kovaaks_benchmark_id": 997,
+    "rank_colors": [
+      [
+        "FNS",
+        "#FFFFFF"
+      ],
+      [
+        "karrigan",
+        "#99f0ff"
+      ],
+      [
+        "TenZ",
+        "#ab94ff"
+      ],
+      [
+        "Kaajak",
+        "#ff99f7"
+      ],
+      [
+        "Aspas",
+        "#ff4d82"
+      ],
+      [
+        "ropz",
+        "#ffe852"
+      ],
+      [
+        "ZywOo",
+        "#ffb83d"
+      ],
+      [
+        "m0NESY",
+        "#7aff8a"
+      ],
+      [
+        "donk",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:27.509842+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,668 @@
+{
+  "name": "Cat Burg benchmark",
+  "code": "KovaaKsPatrollingNerfedMouse",
+  "scenarios": [
+    {
+      "name": "cAt 3 cats wide",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 1560.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1690.0
+        }
+      ]
+    },
+    {
+      "name": "cA micropressure",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 170.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 179.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 188.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 197.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 206.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 220.0
+        }
+      ]
+    },
+    {
+      "name": "rx Chainshot Pokeball",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 1540.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 1660.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1820.0
+        }
+      ]
+    },
+    {
+      "name": "SpringClick Revosect Entry",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 900.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 950.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1300.0
+        }
+      ]
+    },
+    {
+      "name": "Star Clicking Micro",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 550.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 620.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 690.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 760.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 830.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1000.0
+        }
+      ]
+    },
+    {
+      "name": "CatClick",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 75.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 80.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 85.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 90.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 95.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "Microsphere",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 13600.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Smoothbot Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 4444.0
+        }
+      ]
+    },
+    {
+      "name": "Leaptrack Goated 80%",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 3350.0
+        }
+      ]
+    },
+    {
+      "name": "Deceptive Tracking XYZ",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 Invincible 5",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Intermediate S5 Bot 3 Invincible",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 4650.0
+        }
+      ]
+    },
+    {
+      "name": "cAt mealSwitch Normal",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1600.0
+        }
+      ]
+    },
+    {
+      "name": "AngleSwitch Revosect Int",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 1380.0
+        }
+      ]
+    },
+    {
+      "name": "vietTS Micro",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 104.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 112.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 120.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 127.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 133.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 142.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 68.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 72.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 76.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 80.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 84.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 91.0
+        }
+      ]
+    },
+    {
+      "name": "CatSwitch",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 45.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 47.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 49.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 51.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 53.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 57.0
+        }
+      ]
+    },
+    {
+      "name": "tamTargetSwitch Control Hard",
+      "ranks": [
+        {
+          "name": "Cedar",
+          "color": "#ce98e6",
+          "threshold": 38.0
+        },
+        {
+          "name": "Teak",
+          "color": "#c066c2",
+          "threshold": 40.0
+        },
+        {
+          "name": "Acacia",
+          "color": "#9a3c97",
+          "threshold": 42.0
+        },
+        {
+          "name": "Willow",
+          "color": "#922f7d",
+          "threshold": 44.0
+        },
+        {
+          "name": "Orchid",
+          "color": "#78175e",
+          "threshold": 46.0
+        },
+        {
+          "name": "Catburg",
+          "color": "#3f003f",
+          "threshold": 50.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPatrollingNerfedMouse",
+    "kovaaks_benchmark_id": 2174,
+    "rank_colors": [
+      [
+        "Cedar",
+        "#ce98e6"
+      ],
+      [
+        "Teak",
+        "#c066c2"
+      ],
+      [
+        "Acacia",
+        "#9a3c97"
+      ],
+      [
+        "Willow",
+        "#922f7d"
+      ],
+      [
+        "Orchid",
+        "#78175e"
+      ],
+      [
+        "Catburg",
+        "#3f003f"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:25.563357+00:00",
+    "generator": "benchmark_importer"
+  }
+}

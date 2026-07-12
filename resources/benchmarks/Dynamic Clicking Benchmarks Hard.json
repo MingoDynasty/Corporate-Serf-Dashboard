@@ -1,0 +1,458 @@
+{
+  "name": "Dynamic Clicking Benchmarks Hard",
+  "code": "KovaaKsTrollingPlumPlunder",
+  "scenarios": [
+    {
+      "name": "pasu small reload",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 98.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 106.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 114.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 124.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 132.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "1w4t Pasu Raspberry Grandmaster",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 70.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 76.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 84.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 96.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 112.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 132.0
+        }
+      ]
+    },
+    {
+      "name": "cAt purrClick Hard",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 880.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 980.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets_pasu Reload",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 162.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 172.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 182.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 194.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 210.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 240.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS angelic click",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 80.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 86.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 92.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 100.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 111.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 136.0
+        }
+      ]
+    },
+    {
+      "name": "Leapcorn Pure",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 66.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 72.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 78.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 84.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 95.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 114.0
+        }
+      ]
+    },
+    {
+      "name": "beanClick 250% Speed",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 118.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 130.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 142.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 156.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 170.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 195.0
+        }
+      ]
+    },
+    {
+      "name": "Star Clicking - @wa11p1per",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 58.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 66.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 74.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 82.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 90.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 106.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn Goated rAim",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 300.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 340.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 380.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 420.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 640.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Angelic",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 102.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 110.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 120.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 132.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 142.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ hopClick Med S1",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere Click",
+      "ranks": [
+        {
+          "name": "Prophet",
+          "color": "#9E0059",
+          "threshold": 54.0
+        },
+        {
+          "name": "Saint",
+          "color": "#5A189A",
+          "threshold": 62.0
+        },
+        {
+          "name": "Angelic",
+          "color": "#0F4C5C",
+          "threshold": 72.0
+        },
+        {
+          "name": "Seraphic",
+          "color": "#590D22",
+          "threshold": 80.0
+        },
+        {
+          "name": "Cherubim",
+          "color": "#03071E",
+          "threshold": 88.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#B5F5DF",
+          "threshold": 100.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrollingPlumPlunder",
+    "kovaaks_benchmark_id": 583,
+    "rank_colors": [
+      [
+        "Prophet",
+        "#9E0059"
+      ],
+      [
+        "Saint",
+        "#5A189A"
+      ],
+      [
+        "Angelic",
+        "#0F4C5C"
+      ],
+      [
+        "Seraphic",
+        "#590D22"
+      ],
+      [
+        "Cherubim",
+        "#03071E"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:54.220870+00:00",
+    "generator": "benchmark_importer"
+  }
+}

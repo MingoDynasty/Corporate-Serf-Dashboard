@@ -12,8 +12,11 @@ from source.kovaaks.data_service import (
     get_aim_training_checkpoints,
     get_aim_training_journey_for_playlists,
     get_playlist_display_label,
-    get_playlist_selector_options,
 )
+from source.kovaaks.playlist_visibility_service import (
+    get_visible_playlist_selector_options,
+)
+from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     apply_light_dark_mode,
     generate_aim_training_journey_plot,
@@ -86,19 +89,13 @@ def layout(**kwargs):  # noqa: ARG001
                         dmc.Flex(
                             children=[
                                 dmc.MultiSelect(
-                                    # allowDeselect=False,
-                                    # autoSelectOnBlur=True,
-                                    checkIconPosition="right",
-                                    # clearSearchOnFocus=True,
+                                    **PLAYLIST_SELECTOR_PRESET,
                                     clearable=True,
-                                    data=get_playlist_selector_options(),
+                                    data=get_visible_playlist_selector_options(),
                                     id="playlists-multi-select",
                                     label="Playlist filter",
-                                    miw=400,
                                     ml="xl",
                                     persistence=True,
-                                    placeholder="Select a playlist...",
-                                    searchable=True,
                                 ),
                                 dmc.NumberInput(
                                     id="checkpoint-hour",

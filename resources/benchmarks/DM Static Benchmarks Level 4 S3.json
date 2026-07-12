@@ -1,0 +1,280 @@
+{
+  "name": "DM Static Benchmarks Level 4 S3",
+  "code": "KovaaKsMainingEasyGod",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1690.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1810.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1740.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1860.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1780.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1810.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1930.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1830.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1950.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingEasyGod",
+    "kovaaks_benchmark_id": 2117,
+    "rank_colors": [
+      [
+        "Caterium",
+        "#F1C232"
+      ],
+      [
+        "Bauxite",
+        "#B45F06"
+      ],
+      [
+        "Uranium",
+        "#6AA84F"
+      ],
+      [
+        "Vortex",
+        "#6B0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:14.539467+00:00",
+    "generator": "benchmark_importer"
+  }
+}

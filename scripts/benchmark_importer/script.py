@@ -25,6 +25,7 @@ from source.kovaaks.api_service import (  # noqa: E402
     get_benchmark_json,
 )
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario  # noqa: E402
+from source.utilities.atomic_write import replace_with_retry  # noqa: E402
 
 from scripts.benchmark_importer.models import (  # noqa: E402
     EvxlData,
@@ -109,7 +110,7 @@ def _atomic_write_json(path: Path, payload: Any) -> None:
             temporary_file.write("\n")
             temporary_file.flush()
             os.fsync(temporary_file.fileno())
-        os.replace(temporary_path, path)
+        replace_with_retry(temporary_path, path, logger=logger)
         temporary_path = None
     finally:
         if temporary_path is not None:
@@ -464,7 +465,10 @@ def build_scenarios(
                 )
                 for index, (rank_name, rank_color) in enumerate(evxl_rank_data)
             ]
-            scenario_list.append(Scenario(name=scenario_name, ranks=ranks))
+            # Strip the KovaaK's scenario key: CSV run import strips the
+            # `Scenario:` value, so padded names would never match run/PB/rank
+            # lookups (all exact-match) once the benchmark is unhidden.
+            scenario_list.append(Scenario(name=scenario_name.strip(), ranks=ranks))
     return scenario_list
 
 

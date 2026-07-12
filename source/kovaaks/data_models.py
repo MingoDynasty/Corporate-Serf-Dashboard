@@ -44,6 +44,21 @@ class Scenario(BaseModel):
     name: str
     ranks: list[Rank] | None = None
 
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str) -> str:
+        """Normalize scenario names so they match local stats keys.
+
+        CSV run import strips the ``Scenario:`` value, so ``kovaaks_database``
+        keys are always stripped while every scenario lookup is exact-match. A
+        padded name from the KovaaK's playlist API (import) or a hand-edited
+        playlist file would otherwise never resolve runs / PB / rank overlays.
+        Kept lenient on empty (unlike ``code``): a whitespace-only name is an
+        odd upstream quirk, not a store key, so it must not reject the whole
+        playlist.
+        """
+        return value.strip()
+
 
 class PlaylistData(BaseModel):
     """Represent imported playlist metadata and scenarios."""

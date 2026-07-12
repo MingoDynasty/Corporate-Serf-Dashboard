@@ -1,0 +1,634 @@
+{
+  "name": "Jade Palace Air Benchmark - Hard",
+  "code": "KovaaKsImpactingNastyMilestone",
+  "scenarios": [
+    {
+      "name": "Air Palace Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 885.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 893.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 901.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 908.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 915.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Perfected",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 906.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 910.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 914.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 918.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 924.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 922.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 926.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 930.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 934.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 940.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 882.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 887.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 892.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 897.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 904.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 4",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 7",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuAirPalace",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4100.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL Harder",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 883.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 891.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 898.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 902.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 907.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 919.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 926.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 931.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 935.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 940.0
+        }
+      ]
+    },
+    {
+      "name": "Air Palace Smooth Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 892.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 907.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 912.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 918.0
+        }
+      ]
+    },
+    {
+      "name": "Air Smooth Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 884.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 892.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 900.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 907.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 914.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 882.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 890.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 898.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 905.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 912.0
+        }
+      ]
+    },
+    {
+      "name": "Leisphere",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4350.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "AA4V OW",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "Pasutrack RCT Evo",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere OW 150%",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 8400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 11200.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic invincible 6",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 5050.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Intermediate S5 Hard Bot 1",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4900.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Advanced S5 bot 2",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4500.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsImpactingNastyMilestone",
+    "kovaaks_benchmark_id": 2428,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ],
+      [
+        "Astra",
+        "#c4065b"
+      ],
+      [
+        "Celestial",
+        "#56e4fe"
+      ],
+      [
+        "Transcendent",
+        "#faa0fc"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:00.135216+00:00",
+    "generator": "benchmark_importer"
+  }
+}

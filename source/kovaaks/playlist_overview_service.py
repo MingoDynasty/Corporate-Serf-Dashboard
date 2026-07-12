@@ -4,7 +4,7 @@ import logging
 import statistics
 from datetime import datetime
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import PlaylistData, ScenarioStats
@@ -12,11 +12,13 @@ from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_selector_options,
     get_scenario_stats_snapshot,
+    get_user_root_playlist_codes,
 )
+from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
 
 logger = logging.getLogger(__name__)
 
-OverviewRow = dict[str, str | int | float | None]
+OverviewRow = dict[str, str | int | float | bool | None]
 
 
 def _format_int(value: int | None) -> str:
@@ -39,6 +41,7 @@ def _format_percentile_with_coverage(
 
 def _cached_rank_percentile(scenario_name: str) -> float | None:
     """Read a scenario's cached percentile without any network I/O."""
+    config = get_config()
     try:
         rank_info = get_scenario_rank_info(
             scenario_name,
@@ -141,27 +144,39 @@ def format_playlist_overview_row(
     }
 
 
-def build_playlist_overview_rows() -> list[OverviewRow]:
+def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewRow]:
     """
-    Build one overview row per loaded playlist, in selector label order.
+    Build one overview row per visible playlist, in selector label order.
 
     Reads only local run data and the existing rank caches
     (``allow_network=False``); the overview page must never trigger KovaaK's
     API calls. Percentile cells fill in as drilling into playlists warms the
     rank cache. Scenario stats are snapshotted once at entry (R11) so all
     rows of one render agree about every shared scenario.
+
+    ``include_hidden=True`` (the overview's "show hidden" mode) adds hidden
+    playlists' rows; every row carries a ``hidden`` flag for row muting and
+    the hide/unhide action cell.
     """
+    shown_codes = get_shown_playlist_codes()
+    # Only user-root playlists can be deleted (bundled benchmarks offer hide,
+    # not delete — proposal R5); the delete action cell keys off this flag.
+    deletable_codes = get_user_root_playlist_codes()
     stats_by_scenario = get_scenario_stats_snapshot()
     rows: list[OverviewRow] = []
     for option in get_playlist_selector_options():
+        hidden = option["value"] not in shown_codes
+        if hidden and not include_hidden:
+            continue
         playlist = get_playlist_by_code(option["value"])
         if playlist is None:
             continue
-        rows.append(
-            format_playlist_overview_row(
-                option["label"],
-                playlist,
-                stats_by_scenario,
-            )
+        row = format_playlist_overview_row(
+            option["label"],
+            playlist,
+            stats_by_scenario,
         )
+        row["hidden"] = hidden
+        row["deletable"] = option["value"] in deletable_codes
+        rows.append(row)
     return rows

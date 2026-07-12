@@ -50,41 +50,27 @@ Design rationale for shipped work lives in
   labels, duplicate codes warn visibly, and imported playlists live under
   `data/playlists/`. This shipped the enabling identity work for the
   playlist-level overview. (PR #67)
+- **Playlist-level overview and stats** — a sortable overview at `/playlists`,
+  one row per imported playlist with coverage, runs, last-played, and
+  aggregate-percentile stats; any row drills into that playlist's scenario
+  table. Surfaces stale and weak playlists at a glance to direct attention
+  across playlists. Completing this milestone also removed the transitional
+  per-playlist selector. (PRs #78, #83)
+- **Playlist management & benchmark library** — the overview became the single
+  playlist-management surface: per-code show/hide filtering every dropdown, the
+  full importer-generated benchmark library shipped flat under
+  `resources/benchmarks/` with Voltaic + Viscose visible by default, and
+  overview-hosted import, delete (user playlists only), and cleanup of user
+  files superseded by bundled benchmarks. The whole library ships with the app
+  without flooding dropdowns, and playlists are managed in the app instead of
+  by copying files. (PRs #87, #90, #92, and #98) Design rationale distilled
+  into [`decision_log.md`](./decision_log.md).
 
 ---
 
 ## Upcoming milestones
 
-### Playlist-level overview and stats
-
-**What:** A higher-level view of all imported playlists with aggregate stats —
-average percentile, last-played date, total runs — and a way to drill into
-any playlist to see its scenarios.
-
-**Why:** Playlists go stale. A player might have crushed a Voltaic benchmark
-six months ago and forgotten about it, only to come back later with
-significantly better mechanics and beat all their old scores. This view
-surfaces forgotten playlists worth revisiting, and gives a single-glance
-summary of which playlists are getting attention versus which are
-languishing.
-
-**Decided:** Lives as new dashboard real estate, not folded into an existing
-page (home, Aim Training Journey). Ships as its own page replacing the
-transitional selector content at `/playlists`; overview rows link to the
-existing per-playlist table, and the selector dropdowns are then removed.
-See the 2026-07-03 "Playlists Routes Are Stable" entry in
-[`decision_log.md`](./decision_log.md) for the route contract and the
-removal checklist.
-
-**Design:** [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)
-(accepted 2026-07-09). Phase 1 of the proposal completes this milestone;
-phases 2–3 continue as the "Playlist management & benchmark library" item
-under Future.
-
 ### Notification system redesign
-
-*(Ordering relative to playlist management after the overview ships is not
-yet decided.)*
 
 **What:** Collapse the two notification subsystems into one quiet-by-default
 toast layer: passive navigation never toasts errors, persistent conditions
@@ -97,6 +83,9 @@ noise that drowns the in-session feedback the toasts exist to deliver.
 **Design:** [`notification_system_proposal.md`](./notification_system_proposal.md)
 (Proposed). Ships as three PRs (noise kill → consolidation → copy rework); the
 noise kill alone resolves the audit complaint.
+
+The sequenced next candidate after this is **Run history and sessions** (see
+Future); it will be promoted here with a full entry when work on it starts.
 
 ---
 
@@ -116,14 +105,8 @@ expanded into its own roadmap entry when it becomes the next thing up.
 - **Aim Training Journey page polish** — the page already exists at
   `/aim-training-journey` (currently marked work-in-progress). It visualizes
   training-hour checkpoints across playlists, which is a different question
-  from the playlist-level overview milestone — so it remains a separate
+  from the shipped playlist-level overview — so it remains a separate
   concern to revisit later, not a replacement for it.
-- **Playlist management & benchmark library** — phases 2–3 of the accepted
-  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md): the
-  full bundled benchmark library ships under `resources/benchmarks/` with
-  per-code show/hide visibility (plain show-list), then overview-hosted
-  import, delete, and cleanup. Sequenced after the overview milestone ships;
-  ordering relative to the notification system redesign is not yet decided.
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start
@@ -132,8 +115,7 @@ expanded into its own roadmap entry when it becomes the next thing up.
   supersedes the interim console-log stopgap in `file_watchdog.py`. See
   [`run_history_proposal.md`](./run_history_proposal.md).
 - **Scenarios page** — scenario-first navigation for scenarios that live in
-  several playlists or in none, parked from the overview design (OQ-8 in
-  [`playlist_overview_proposal.md`](./playlist_overview_proposal.md)). The
+  several playlists or in none, parked from the playlist-overview design. The
   overview → scenario table → Home drill chain covers playlist-first
   navigation; this would answer "show me this scenario regardless of
   playlist."

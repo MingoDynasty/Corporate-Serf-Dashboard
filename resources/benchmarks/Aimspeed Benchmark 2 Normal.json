@@ -1,0 +1,762 @@
+{
+  "name": "Aimspeed Benchmark 2 Normal",
+  "code": "KovaaKsLosingMahoganyFullbuy",
+  "scenarios": [
+    {
+      "name": "voxTargetSwitch",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 104.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 108.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 112.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 116.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 120.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 124.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 128.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 115.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 120.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 125.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 130.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 140.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox Small",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 130.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 135.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 140.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 145.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 150.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 155.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 160.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 95.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 105.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 110.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 115.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 120.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 125.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch 90 NR v2",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 95.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 105.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 110.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 115.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 120.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 125.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 130.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingPat 90 Small",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 105.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 110.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 115.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 120.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 125.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 130.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 95.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 100.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 105.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 110.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 115.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 120.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "xenTargetSwitch Static",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 84.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 88.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 92.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 96.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 100.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 104.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 108.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 510.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 540.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 570.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 600.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 630.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 660.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 690.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 720.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 750.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 780.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 810.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 840.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 870.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "FloatTS Angelic Easy",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 105.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 110.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 115.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 120.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 125.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 130.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 135.0
+        }
+      ]
+    },
+    {
+      "name": "Floatswitch Intermediate",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 650.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 700.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 750.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 800.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 850.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 950.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 140.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 145.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 150.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 155.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 160.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 165.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "DotTS 30% Larger",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 150.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 155.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 160.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 165.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 170.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 175.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 180.0
+        }
+      ]
+    },
+    {
+      "name": "vietTS",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 1400.0
+        }
+      ]
+    },
+    {
+      "name": "3D Switching",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 480.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 510.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 540.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 570.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 600.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 630.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 660.0
+        }
+      ]
+    },
+    {
+      "name": "Skeet Tracking Goated v2",
+      "ranks": [
+        {
+          "name": "Steady",
+          "color": "#F5A351",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Progressive",
+          "color": "#FFD24D",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Brisk",
+          "color": "#8ABF73",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Rapid",
+          "color": "#6093EB",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Surging",
+          "color": "#9440C4",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Blazing",
+          "color": "#CCCCCC",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Speed",
+          "color": "#050000",
+          "threshold": 4400.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsLosingMahoganyFullbuy",
+    "kovaaks_benchmark_id": 2175,
+    "rank_colors": [
+      [
+        "Steady",
+        "#F5A351"
+      ],
+      [
+        "Progressive",
+        "#FFD24D"
+      ],
+      [
+        "Brisk",
+        "#8ABF73"
+      ],
+      [
+        "Rapid",
+        "#6093EB"
+      ],
+      [
+        "Surging",
+        "#9440C4"
+      ],
+      [
+        "Blazing",
+        "#CCCCCC"
+      ],
+      [
+        "Speed",
+        "#050000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:09.043259+00:00",
+    "generator": "benchmark_importer"
+  }
+}

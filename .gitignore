@@ -509,6 +509,7 @@ marimo/_lsp/
 __marimo__/
 
 config.toml
+# Legacy cache root, now data/cache/; kept ignored for pre-move checkouts
 cache/
 data/
 # Scratch dir: contents ignored, but the routing README is tracked
@@ -516,4 +517,7 @@ data/
 ignore/*
 !ignore/README.md
 scripts/benchmark_importer/generated/
-.claude/
+# Claude Code: local state ignored, but shared project skills are tracked
+# (same /* + ! pattern as ignore/ above)
+.claude/*
+!.claude/skills/

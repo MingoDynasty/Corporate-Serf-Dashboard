@@ -20,14 +20,13 @@ from dash import (
 )
 
 from source.components.local_icon import local_icon
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
     drain_startup_playlist_warnings,
     get_high_score,
     get_playlist_by_code,
-    get_playlist_selector_options,
     get_rank_data_from_playlist_code,
     get_scenario_stats,
     get_scenarios_from_playlist_code,
@@ -35,9 +34,12 @@ from source.kovaaks.data_service import (
     get_time_vs_runs,
     get_unique_scenarios,
     is_scenario_in_database,
-    load_playlist_from_code,
+)
+from source.kovaaks.playlist_visibility_service import (
+    get_visible_playlist_selector_options,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
     add_score_threshold_overlay,
@@ -47,7 +49,7 @@ from source.plot.plot_service import (
     generate_time_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
-from source.utilities.utilities import ordinal
+from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -55,10 +57,6 @@ SCENARIO_RANK_LOADING_DELAY_MS = 250
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
 SETTINGS_HELP_TEXT = {
-    "import-playlist": (
-        "Paste a KovaaK's playlist share code and press Import to add that "
-        "playlist to the playlist selector."
-    ),
     "automatically-change-scenario": (
         "Automatically selects the scenario you just played when a new run is detected."
     ),
@@ -81,7 +79,16 @@ SETTINGS_HELP_TEXT = {
     "score-threshold-notification": (
         "Notifies after each new run whether the score reached the score threshold."
     ),
+    "top-n-scores": (
+        "How many of your best scores to plot per sensitivity — or per day in "
+        "Score vs Time — within the selected date range. A new run that lands "
+        "in the top N also triggers a notification."
+    ),
 }
+RANK_REFRESH_TOOLTIP = (
+    "Fetch your current position live from the KovaaK's leaderboard. The "
+    "displayed value can come from a local cache and may lag the live board."
+)
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -279,7 +286,7 @@ def get_scenario_num_runs(
         scenario_stats.number_of_runs,
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
-        scenario_stats.date_last_played.strftime("%Y-%m-%d %I:%M:%S %p"),
+        format_absolute_timestamp(scenario_stats.date_last_played),
         "last-played-affordance",
         0,
         False,
@@ -320,7 +327,7 @@ def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
 
 def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
     """Return the shared rank-service arguments sourced from app configuration."""
-    rank_config = config
+    rank_config = get_config()
     return (
         rank_config.kovaaks_username,
         rank_config.steam_id,
@@ -539,6 +546,109 @@ def _build_run_event_notifications(
     return notifications
 
 
+def _empty_state_graph_response(title: str, message: str) -> tuple[str, object]:
+    """Return a cached empty-state plot with notifications left unchanged."""
+    return _empty_plot_json(title, message), no_update
+
+
+def _build_scenario_figure(  # noqa: PLR0913
+    x_axis_radiogroup: str,
+    selected_scenario: str,
+    top_n_scores: int,
+    oldest_datetime: datetime,
+    rank_overlay_switch: bool,
+    selected_playlist: str | None,
+) -> tuple[go.Figure, bool]:
+    """Query the selected x-axis mode and build its figure.
+
+    Returns the figure plus whether score overlays apply to it. Empty-range and
+    unsupported-mode placeholders return ``False`` so the caller skips overlays
+    and notifications.
+    """
+    if x_axis_radiogroup == "score_vs_sensitivity":
+        sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
+            selected_scenario,
+            top_n_scores,
+            oldest_datetime,
+        )
+        if not sensitivities_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return (
+                generate_empty_plot(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                False,
+            )
+
+        rank_data = (
+            get_rank_data_from_playlist_code(selected_playlist, selected_scenario)
+            if selected_playlist
+            else []
+        )
+
+        return (
+            generate_sensitivity_plot(
+                sensitivities_vs_runs,
+                selected_scenario,
+                rank_overlay_switch,
+                rank_data,
+            ),
+            True,
+        )
+
+    if x_axis_radiogroup == "score_vs_time":
+        time_vs_runs = get_time_vs_runs(
+            selected_scenario,
+            top_n_scores,
+            oldest_datetime,
+        )
+        if not time_vs_runs:
+            logger.warning(
+                "No scenario data found for (%s) for date range: %s",
+                selected_scenario,
+                oldest_datetime,
+            )
+            dash_logger.warning("No scenario data for the given date range.")
+            return (
+                generate_empty_plot(
+                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
+                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
+                ),
+                False,
+            )
+
+        rank_data = (
+            get_rank_data_from_playlist_code(selected_playlist, selected_scenario)
+            if selected_playlist
+            else []
+        )
+
+        return (
+            generate_time_plot(
+                time_vs_runs,
+                selected_scenario,
+                rank_overlay_switch,
+                rank_data,
+            ),
+            True,
+        )
+
+    logger.error("Unsupported radio option: %s", x_axis_radiogroup)
+    return (
+        generate_empty_plot(
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
+            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
+        ),
+        False,
+    )
+
+
 @callback(
     Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
@@ -555,7 +665,7 @@ def _build_run_event_notifications(
     State("playlist-dropdown-selection", "value"),
 )
 # This callback coordinates the page's graph controls and notification states.
-def generate_graph(  # noqa: PLR0912, PLR0913
+def generate_graph(  # noqa: PLR0913
     run_events,
     selected_scenario,
     top_n_scores,
@@ -580,32 +690,23 @@ def generate_graph(  # noqa: PLR0912, PLR0913
     :return: Figure serialized to JSON, Notification
     """
     if not selected_scenario:
-        return (
-            _empty_plot_json(
-                _SELECT_SCENARIO_PLOT_TITLE,
-                _SELECT_SCENARIO_PLOT_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _SELECT_SCENARIO_PLOT_TITLE,
+            _SELECT_SCENARIO_PLOT_MESSAGE,
         )
 
     if not top_n_scores or not selected_date:
-        return (
-            _empty_plot_json(
-                _INCOMPLETE_GRAPH_CONTROLS_TITLE,
-                _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _INCOMPLETE_GRAPH_CONTROLS_TITLE,
+            _INCOMPLETE_GRAPH_CONTROLS_MESSAGE,
         )
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
         dash_logger.warning("No scenario data found.")
-        return (
-            _empty_plot_json(
-                _NO_SCENARIO_DATA_PLOT_TITLE,
-                _NO_SCENARIO_DATA_PLOT_MESSAGE,
-            ),
-            no_update,
+        return _empty_state_graph_response(
+            _NO_SCENARIO_DATA_PLOT_TITLE,
+            _NO_SCENARIO_DATA_PLOT_MESSAGE,
         )
 
     oldest_datetime = datetime.combine(
@@ -613,81 +714,14 @@ def generate_graph(  # noqa: PLR0912, PLR0913
         datetime.min.time(),
     )
 
-    plot = go.Figure()
-    supports_overlays = True
-    if x_axis_radiogroup == "score_vs_sensitivity":
-        sensitivities_vs_runs = get_sensitivities_vs_runs_filtered(
-            selected_scenario,
-            top_n_scores,
-            oldest_datetime,
-        )
-        if not sensitivities_vs_runs:
-            logger.warning(
-                "No scenario data found for (%s) for date range: %s",
-                selected_scenario,
-                oldest_datetime,
-            )
-            dash_logger.warning("No scenario data for the given date range.")
-            return (
-                _empty_plot_json(
-                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
-                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
-                ),
-                no_update,
-            )
-
-        rank_data = None
-        if selected_playlist:
-            rank_data = get_rank_data_from_playlist_code(
-                selected_playlist, selected_scenario
-            )
-
-        plot = generate_sensitivity_plot(
-            sensitivities_vs_runs,
-            selected_scenario,
-            rank_overlay_switch,
-            rank_data,
-        )
-    elif x_axis_radiogroup == "score_vs_time":
-        time_vs_runs = get_time_vs_runs(
-            selected_scenario,
-            top_n_scores,
-            oldest_datetime,
-        )
-        if not time_vs_runs:
-            logger.warning(
-                "No scenario data found for (%s) for date range: %s",
-                selected_scenario,
-                oldest_datetime,
-            )
-            dash_logger.warning("No scenario data for the given date range.")
-            return (
-                _empty_plot_json(
-                    _NO_DATE_RANGE_DATA_PLOT_TITLE,
-                    _NO_DATE_RANGE_DATA_PLOT_MESSAGE,
-                ),
-                no_update,
-            )
-
-        rank_data = None
-        if selected_playlist:
-            rank_data = get_rank_data_from_playlist_code(
-                selected_playlist, selected_scenario
-            )
-
-        plot = generate_time_plot(
-            time_vs_runs,
-            selected_scenario,
-            rank_overlay_switch,
-            rank_data,
-        )
-    else:
-        logger.error("Unsupported radio option: %s", x_axis_radiogroup)
-        supports_overlays = False
-        plot = generate_empty_plot(
-            _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE,
-            _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE,
-        )
+    plot, supports_overlays = _build_scenario_figure(
+        x_axis_radiogroup,
+        selected_scenario,
+        top_n_scores,
+        oldest_datetime,
+        rank_overlay_switch,
+        selected_playlist,
+    )
 
     notifications = no_update
     if supports_overlays:
@@ -776,48 +810,13 @@ def modal_demo(_, opened):
 
 
 @callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Output("playlist-dropdown-selection", "data"),
-    Input("settings-modal-import-button", "n_clicks"),
-    State("settings-modal-import-playlist-textinput", "value"),
-    prevent_initial_call=True,
-)
-def import_playlist(_, playlist_to_import):
-    """Import a playlist code and report the result to the UI."""
-    if not playlist_to_import:
-        return no_update, no_update
-    playlist_to_import = playlist_to_import.strip()
-    logger.debug("Importing playlist '%s'", playlist_to_import)
-    error_message = load_playlist_from_code(playlist_to_import)
-    if error_message:
-        notification = {
-            "action": "show",
-            "title": "Playlist Import Failed",
-            "message": error_message,
-            "color": "red",
-            "id": "imported-playlist-failed-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
-    else:
-        notification = {
-            "action": "show",
-            "title": "Notification",
-            "message": "Successfully imported playlist!",
-            "color": "green",
-            "id": "imported-playlist-successful-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
-    return [notification], get_playlist_selector_options()
-
-
-@callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
 )
 def select_playlist(selected_playlist):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return get_unique_scenarios(config.stats_dir)
+        return get_unique_scenarios(get_config().stats_dir)
     return get_scenarios_from_playlist_code(selected_playlist)
 
 
@@ -834,7 +833,7 @@ def _home_initial_selection(
     scenario_options = (
         get_scenarios_from_playlist_code(selected_playlist)
         if selected_playlist
-        else get_unique_scenarios(config.stats_dir)
+        else get_unique_scenarios(get_config().stats_dir)
     )
     return selected_playlist, scenario_options, scenario or None
 
@@ -850,6 +849,7 @@ def layout(
     **_kwargs,
 ):
     """Build the interactive home dashboard."""
+    config = get_config()
     selected_playlist, scenario_options, selected_scenario = _home_initial_selection(
         scenario,
         playlist_code,
@@ -899,21 +899,16 @@ def layout(
                         dmc.Flex(
                             children=[
                                 dmc.Select(
+                                    **PLAYLIST_SELECTOR_PRESET,
                                     allowDeselect=False,
                                     autoSelectOnBlur=True,
-                                    checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     clearable=True,
-                                    data=get_playlist_selector_options(),
+                                    data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    maxDropdownHeight="75vh",
-                                    miw=400,
                                     ml="xl",
                                     persistence=playlist_persistence,
-                                    placeholder="Select a playlist...",
-                                    scrollAreaProps={"type": "always"},
-                                    searchable=True,
                                     value=selected_playlist,
                                 ),
                                 dmc.Select(
@@ -936,7 +931,10 @@ def layout(
                                 dmc.Space(h="xl"),
                                 dmc.NumberInput(
                                     id="top_n_scores",
-                                    label="Top N scores",
+                                    label=_settings_help_label(
+                                        "Top N scores",
+                                        SETTINGS_HELP_TEXT["top-n-scores"],
+                                    ),
                                     min=1,
                                     persistence=True,
                                     placeholder="Top N scores to consider...",
@@ -1028,15 +1026,22 @@ def layout(
                                                     ],
                                                     size="sm",
                                                 ),
-                                                dmc.Button(
-                                                    "Refresh",
-                                                    id="rank-refresh-button",
-                                                    variant="subtle",
-                                                    size="compact-xs",
-                                                    leftSection=local_icon(
-                                                        "material-symbols:refresh-rounded",
-                                                        width=14,
+                                                dmc.Tooltip(
+                                                    dmc.Button(
+                                                        "Refresh",
+                                                        id="rank-refresh-button",
+                                                        variant="subtle",
+                                                        size="compact-xs",
+                                                        leftSection=local_icon(
+                                                            "material-symbols:refresh-rounded",
+                                                            width=14,
+                                                        ),
                                                     ),
+                                                    label=RANK_REFRESH_TOOLTIP,
+                                                    events=TOOLTIP_EVENTS,
+                                                    multiline=True,
+                                                    withArrow=True,
+                                                    w=SETTINGS_HELP_TOOLTIP_WIDTH,
                                                 ),
                                             ],
                                             gap="xs",
@@ -1075,46 +1080,19 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                dmc.Tooltip(
-                                    dmc.Button(
-                                        "Settings",
-                                        id="settings-modal-open-button",
-                                        variant="default",
-                                        leftSection=local_icon(
-                                            "clarity:settings-line",
-                                            width=25,
-                                        ),
+                                dmc.Button(
+                                    "Settings",
+                                    id="settings-modal-open-button",
+                                    variant="default",
+                                    leftSection=local_icon(
+                                        "clarity:settings-line",
+                                        width=25,
                                     ),
-                                    label="Settings",
                                 ),
                                 dmc.Modal(
                                     title="Settings",
                                     id="settings-modal",
                                     children=[
-                                        dmc.Group(
-                                            gap="md",
-                                            grow=False,
-                                            children=[
-                                                dmc.TextInput(
-                                                    id="settings-modal-import-playlist-textinput",
-                                                    placeholder="KovaaK's playlist code...",
-                                                    label=_settings_help_label(
-                                                        "Import Playlist",
-                                                        SETTINGS_HELP_TEXT[
-                                                            "import-playlist"
-                                                        ],
-                                                    ),
-                                                    size="md",
-                                                    w="300px",
-                                                ),
-                                                dmc.Button(
-                                                    children="Import",
-                                                    id="settings-modal-import-button",
-                                                    mt="lg",
-                                                ),
-                                            ],
-                                        ),
-                                        dmc.Space(h="lg"),
                                         dmc.Title(
                                             "Display Settings",
                                             order=2,

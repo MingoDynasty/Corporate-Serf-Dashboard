@@ -62,8 +62,9 @@ share one in-memory run-event queue and are not synchronized with each other.
 
 In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
 the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
-common benchmarks. These files are in `resources/playlists/generated`. If you wish to include a specific benchmark into
-the app, then copy the desired JSON file from `resources/playlists/generated` to `data/playlists` and restart the app.
+common benchmarks. These files are in `resources/benchmarks` and the app loads all of them at startup. The most
+popular ones (Voltaic, Viscose) are visible by default; to enable any other benchmark, toggle "Show hidden" on the
+Playlists page and unhide it — no file copying needed.
 
 Playlist JSON must include a non-blank `code` field. The app uses that code as the playlist identity for routes,
 selectors, imports, and filenames; playlist names are only display labels.

@@ -90,21 +90,25 @@ github_component = dmc.Tooltip(
     label="View this app on GitHub",
 )
 
-theme_switch_component = dmc.ColorSchemeToggle(
-    lightIcon=local_icon(
-        "radix-icons:sun",
-        width=25,
-        color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
+theme_switch_component = dmc.Tooltip(
+    dmc.ColorSchemeToggle(
+        lightIcon=local_icon(
+            "radix-icons:sun",
+            width=25,
+            color=dmc.DEFAULT_THEME["colors"]["yellow"][8],
+        ),
+        darkIcon=local_icon(
+            "radix-icons:moon",
+            width=25,
+            color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
+        ),
+        id="color-scheme-switch",
+        color="gray",
+        size="lg",
+        mr="xl",
+        **{"aria-label": "Toggle color scheme"},
     ),
-    darkIcon=local_icon(
-        "radix-icons:moon",
-        width=25,
-        color=dmc.DEFAULT_THEME["colors"]["yellow"][6],
-    ),
-    id="color-scheme-switch",
-    color="gray",
-    size="lg",
-    mr="xl",
+    label="Switch between light and dark theme.",
 )
 
 
@@ -157,7 +161,7 @@ def layout(**kwargs):  # noqa: ARG001
                                                 target="_self",
                                                 underline="never",
                                                 style={
-                                                    "color": "var(--mantine-font-family-headings)",
+                                                    "color": "var(--mantine-color-text)",
                                                 },
                                             ),
                                         ],

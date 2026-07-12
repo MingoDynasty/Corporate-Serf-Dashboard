@@ -34,6 +34,39 @@ def test_app_shell_layout_exposes_native_theme_provider_and_toggle():
     assert isinstance(theme_switch, dmc.ColorSchemeToggle)
 
 
+def _walk_components(root):
+    components = deque([root])
+    while components:
+        component = components.popleft()
+        yield component
+        children = getattr(component, "children", None)
+        if children is None:
+            continue
+        if isinstance(children, (list, tuple)):
+            components.extend(children)
+        else:
+            components.append(children)
+
+
+def test_theme_toggle_is_wrapped_in_tooltip():
+    shell = app_shell.layout()
+
+    tooltips = [
+        component
+        for component in _walk_components(shell)
+        if isinstance(component, dmc.Tooltip)
+        and any(
+            getattr(child, "id", None) == "color-scheme-switch"
+            for child in _walk_components(component.children)
+        )
+    ]
+
+    assert len(tooltips) == 1
+    assert tooltips[0].label
+    toggle = _find_component_by_id(tooltips[0], "color-scheme-switch")
+    assert toggle.to_plotly_json()["props"]["aria-label"] == "Toggle color scheme"
+
+
 def test_color_scheme_is_restored_before_styles_load():
     script_position = app_shell.APP_INDEX_STRING.index(
         'const colorSchemeKey = "mantine-color-scheme-value"',

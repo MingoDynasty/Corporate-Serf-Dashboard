@@ -20,60 +20,16 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Refactors
 
-### Linear search to binary search for nth-place score
-
-`source/my_watchdog/file_watchdog.py` has a `TODO` in the run processing path indicating that the nth-place score is calculated via linear search. It could be optimized to binary search since the data is sorted.
-
-Low priority: runs are processed one at a time and the data sets are not large enough for the current approach to be a performance problem.
-
-### Unsynchronized shared in-memory stores
-
-The watchdog observer thread writes `kovaaks_database` and `run_database`
-(module globals in `source/kovaaks/data_service.py`) while Dash callbacks read
-them from server threads, with no lock. `message_queue` is a `deque` (its
-append/popleft are atomic), but the stores themselves have no synchronization.
-Fine in practice for a single local user; worth a lock or a serialized writer
-if corruption is ever observed or the write paths grow.
-
-### Duplicated plot-building logic
-
-`generate_sensitivity_plot` and `generate_time_plot` in
-`source/plot/plot_service.py` share most of their structure (empty-data guard,
-scatter+line traces, hover templates, legend setup, rank overlays). A shared
-helper taking axis descriptors would remove the duplication.
-
-### Decompose large home-page callbacks
-
-`source/pages/home.py` callbacks mix UI wiring, query orchestration, plotting
-decisions, and notification composition. Extract pure functions (filter
-parsing, graph data preparation, notification derivation) to make them
-independently testable.
-
-### Config still loads at import time
-
-`source/config/config_service.py` runs `config = load_config()` at module
-import. Missing or invalid config now exits with a concise setup instruction,
-but loading config explicitly inside the application startup path would avoid
-module-import side effects and make startup easier to test.
-
 ## Tooling
 
 ### Single-command local quality gate
 
-CI now enforces the five-command merge bar. Add one local entry point (task
-runner or script) only if repeatedly typing the commands becomes burdensome.
+CI enforces four of the five standard checks (ruff format, ruff lint, mypy,
+pytest); `compileall` runs only in the local pre-handoff validation. Add one
+local entry point (task runner or script) only if repeatedly typing the five
+commands becomes burdensome.
 
 ## UI/UX
-
-### Dropdown UX consistency pass — revisit after the overview ships
-
-The three playlist dropdowns intentionally differ by role today (Home:
-clearable persisted filter; playlist pages: non-clearable navigator,
-transitional on `/playlists`; Aim Training Journey: `MultiSelect` comparison
-picker). Once the playlist-level overview replaces the transitional navigator,
-revisit whether the survivors should share visual/interaction conventions (a
-shared props preset), beyond the shared code-valued options contract from the
-playlist re-key work.
 
 ### Audit static inline styles
 

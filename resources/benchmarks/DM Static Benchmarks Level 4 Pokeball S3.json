@@ -1,0 +1,280 @@
+{
+  "name": "DM Static Benchmarks Level 4 Pokeball S3",
+  "code": "KovaaKsLosingDynamicRando",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1640.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1760.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1690.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1810.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1730.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1850.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1760.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1880.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1780.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Pokeball Level 4 S3",
+      "ranks": [
+        {
+          "name": "Caterium",
+          "color": "#F1C232",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Bauxite",
+          "color": "#B45F06",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Uranium",
+          "color": "#6AA84F",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1900.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsLosingDynamicRando",
+    "kovaaks_benchmark_id": 2116,
+    "rank_colors": [
+      [
+        "Caterium",
+        "#F1C232"
+      ],
+      [
+        "Bauxite",
+        "#B45F06"
+      ],
+      [
+        "Uranium",
+        "#6AA84F"
+      ],
+      [
+        "Vortex",
+        "#6B0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:07.204724+00:00",
+    "generator": "benchmark_importer"
+  }
+}

@@ -1,0 +1,856 @@
+{
+  "name": "M&H - Reactive Tracking Benchmarks (Easier)",
+  "code": "KovaaKsRaidingInvincibleXur",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky V3",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 839.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 852.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 864.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 874.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 881.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 889.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 896.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 901.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuSmoothGround",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2850.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky Quake",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 832.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 843.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 855.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 864.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 871.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 879.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 888.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 894.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 830.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 839.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 848.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 857.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 865.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 873.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 881.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 886.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuGround Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 797.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 810.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 823.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 836.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 848.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 861.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 874.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 883.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 860.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 882.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 887.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 892.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 895.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 898.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 902.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 908.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawGround Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3750.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 906.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 912.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 916.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 920.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 923.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 926.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 929.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 931.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 839.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 848.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 857.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 866.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 873.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 882.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 892.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 897.0
+        }
+      ]
+    },
+    {
+      "name": "Air no UFO no SKYBOTS",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 766.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 781.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 796.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 811.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 827.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 842.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 857.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 870.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 806.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 816.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 827.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 837.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 848.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 858.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 868.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 876.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic rAim Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 876.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 883.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 891.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 898.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 905.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 911.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 918.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 923.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawAir Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3150.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Wide React Goated Easy",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect Int",
+      "ranks": [
+        {
+          "name": "Copper",
+          "color": "#E56352",
+          "threshold": 851.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#D99652",
+          "threshold": 860.0
+        },
+        {
+          "name": "Iron",
+          "color": "#5B5B5B",
+          "threshold": 865.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0D1D4",
+          "threshold": 870.0
+        },
+        {
+          "name": "Gold",
+          "color": "#EFBF04",
+          "threshold": 875.0
+        },
+        {
+          "name": "Platinum",
+          "color": "#5990B3",
+          "threshold": 880.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#00E7EB",
+          "threshold": 886.0
+        },
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 890.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRaidingInvincibleXur",
+    "kovaaks_benchmark_id": 2108,
+    "rank_colors": [
+      [
+        "Copper",
+        "#E56352"
+      ],
+      [
+        "Bronze",
+        "#D99652"
+      ],
+      [
+        "Iron",
+        "#5B5B5B"
+      ],
+      [
+        "Silver",
+        "#C0D1D4"
+      ],
+      [
+        "Gold",
+        "#EFBF04"
+      ],
+      [
+        "Platinum",
+        "#5990B3"
+      ],
+      [
+        "Diamond",
+        "#00E7EB"
+      ],
+      [
+        "Emerald",
+        "#50C878"
+      ]
+    ],
+    "generated_at": "2026-07-11T19:19:51.425928+00:00",
+    "generator": "benchmark_importer"
+  }
+}

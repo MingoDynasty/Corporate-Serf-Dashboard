@@ -1,0 +1,634 @@
+{
+  "name": "Jade Palace Ground Benchmark - Hard",
+  "code": "KovaaKsScreamingJumpyBlueberry",
+  "scenarios": [
+    {
+      "name": "Plaza Palace",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 899.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 906.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 911.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 916.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 921.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic Goated",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 885.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 890.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 895.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 901.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 908.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawGround",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 3300.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible - Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 11200.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 13700.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 15400.0
+        }
+      ]
+    },
+    {
+      "name": "Midrange Fast Strafes Invincible Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 9400.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 13700.0
+        }
+      ]
+    },
+    {
+      "name": "Midrange Short Strafes Invincible Raspberry",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 9450.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 10100.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 11400.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 898.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 905.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 911.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 916.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 921.0
+        }
+      ]
+    },
+    {
+      "name": "MFSI v3 Raspberry",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 8650.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 9350.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 11300.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 874.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 881.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 888.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 894.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 901.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky V3 Thin",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 892.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 897.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 902.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 907.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 912.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Elite",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4750.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Perfected",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 3900.0
+        }
+      ]
+    },
+    {
+      "name": "Smooth Thin Strafes Raspberry",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 7750.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 8450.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 10500.0
+        }
+      ]
+    },
+    {
+      "name": "Close Needle Thin Easy",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 2900.0
+        }
+      ]
+    },
+    {
+      "name": "midrange long strafe invincible demotori edition",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 13200.0
+        }
+      ]
+    },
+    {
+      "name": "midrange long strafes invincible demotori edit",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 8900.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 10700.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 12600.0
+        }
+      ]
+    },
+    {
+      "name": "controlstrafes midrange",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Close Fast Strafes Invincible Precise+",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 10950.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 13150.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Smooth 2",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "VT Ground Advanced S5 Bot 3",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 4200.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsScreamingJumpyBlueberry",
+    "kovaaks_benchmark_id": 959,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ],
+      [
+        "Astra",
+        "#c4065b"
+      ],
+      [
+        "Celestial",
+        "#56e4fe"
+      ],
+      [
+        "Transcendent",
+        "#faa0fc"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:33.938290+00:00",
+    "generator": "benchmark_importer"
+  }
+}

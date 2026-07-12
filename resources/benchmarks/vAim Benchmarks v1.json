@@ -1,0 +1,586 @@
+{
+  "name": "vAim Benchmarks v1",
+  "code": "KovaaKsWipingBrightEngine",
+  "scenarios": [
+    {
+      "name": "VT 1w6ts Rasp Novice",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 350.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 575.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 800.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 975.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 1275.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 25.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 45.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 65.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 82.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 96.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 108.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 117.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "widewall3targets",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 32.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 57.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 82.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 104.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 121.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 136.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 148.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 158.0
+        }
+      ]
+    },
+    {
+      "name": "CatClick Easier",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 19.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 35.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 50.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 63.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 74.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 83.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 96.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn MV Novice",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 95.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 170.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 250.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 315.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 370.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 415.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 450.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 480.0
+        }
+      ]
+    },
+    {
+      "name": "BlinkClick Valorant Precision Very Easy",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 920.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 4325.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 6800.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 8450.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 9750.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 12100.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO Easy Slowed",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 185.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 325.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 480.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 605.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 710.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 795.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 865.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 918.0
+        }
+      ]
+    },
+    {
+      "name": "Aimerz+ Smoothbot Easy S1",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 2775.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 4625.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 5300.0
+        }
+      ]
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 22.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 40.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 58.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 73.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 85.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 96.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 104.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 111.0
+        }
+      ]
+    },
+    {
+      "name": "devTS Goated NR Static Small",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 140.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 245.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 360.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 455.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 535.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 600.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 650.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 690.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Easy",
+      "ranks": [
+        {
+          "name": "Rookie",
+          "color": "#c86d19",
+          "threshold": 1460.0
+        },
+        {
+          "name": "Shooter",
+          "color": "#c29566",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Gunslinger",
+          "color": "#d7f401",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Marksman",
+          "color": "#276832",
+          "threshold": 4825.0
+        },
+        {
+          "name": "Deadeye",
+          "color": "#07ed60",
+          "threshold": 5650.0
+        },
+        {
+          "name": "Hitman",
+          "color": "#1d597c",
+          "threshold": 6350.0
+        },
+        {
+          "name": "Legend",
+          "color": "#0aefff",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Myth",
+          "color": "#fd0dc9",
+          "threshold": 7300.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsWipingBrightEngine",
+    "kovaaks_benchmark_id": 2416,
+    "rank_colors": [
+      [
+        "Rookie",
+        "#c86d19"
+      ],
+      [
+        "Shooter",
+        "#c29566"
+      ],
+      [
+        "Gunslinger",
+        "#d7f401"
+      ],
+      [
+        "Marksman",
+        "#276832"
+      ],
+      [
+        "Deadeye",
+        "#07ed60"
+      ],
+      [
+        "Hitman",
+        "#1d597c"
+      ],
+      [
+        "Legend",
+        "#0aefff"
+      ],
+      [
+        "Myth",
+        "#fd0dc9"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:11.650601+00:00",
+    "generator": "benchmark_importer"
+  }
+}

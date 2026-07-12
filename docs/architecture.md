@@ -46,7 +46,7 @@ flowchart TD
 
     Queue[["message_queue (deque of NewFileMessage)"]]
     Stores[("data_service module-global stores<br/>kovaaks_database, run_database,<br/>playlist_database")]
-    Cache[("JSON cache under cache/<br/>rank, leaderboard, benchmark data")]
+    Cache[("JSON cache under data/cache/<br/>rank, leaderboard, benchmark data")]
     API["KovaaK's HTTP API"]
 
     Game --> Handler
@@ -74,7 +74,7 @@ flowchart TD
 
     Queue[["message_queue (deque of NewFileMessage)"]]
     Stores[("data_service module-global stores")]
-    Cache[("JSON cache under cache/")]
+    Cache[("JSON cache under data/cache/")]
     API["KovaaK's HTTP API"]
 
     Check -->|"drains and summarizes"| Queue
@@ -99,15 +99,20 @@ that summary and never accesses the queue directly.
   - `kovaaks_database` — scenario stats keyed by scenario name
   - `run_database` — a `SortedList` of all runs ordered by time
   - `playlist_database` — loaded playlists keyed by code. Startup loads
-    top-level JSON files from bundled `resources/playlists/` first and user
+    top-level JSON files from the bundled `resources/benchmarks/` library
+    (all of it — visibility, not file presence, decides what users see) and user
     `data/playlists/` second; the first file for a code wins, duplicate-code
     files warn visibly after the UI mounts, and a missing user root is treated
     as empty. New imports are written atomically under `data/playlists/`.
 - **Cache layer** — KovaaK's API responses and resolved rank/leaderboard data
-  persist as JSON under `cache/` (not committed), written atomically and read
-  tolerantly. Subtrees include `scenario_leaderboards/`,
+  persist as JSON under `data/cache/` (not committed), written atomically and
+  read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
+- **User preferences** — `data/preferences.json` (not committed) holds the
+  playlist show-list (`playlist_visibility_service.py`): written atomically on
+  each show/hide, read once and cached in-process, absent until the first
+  show/hide (reads fall back to the first-run seed).
 
 ## Module map
 
@@ -127,7 +132,6 @@ flowchart LR
         Playlists["playlists.py"]
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
-        Components["playlist_components.py"]
     end
 
     subgraph SharedUI["Shared UI"]
@@ -138,6 +142,8 @@ flowchart LR
         DataService["kovaaks/<br/>data_service.py"]
         ApiService["kovaaks/<br/>api_service.py"]
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
+        OverviewService["kovaaks/playlist_<br/>overview_service.py"]
+        Visibility["kovaaks/playlist_<br/>visibility_service.py"]
         PlotService["plot/<br/>plot_service.py"]
     end
 
@@ -156,16 +162,22 @@ flowchart LR
     Home --> PlotService
     Home --> Queue
     Home --> LocalIcon
-    Playlists --> Components
-    PlaylistScenarios --> Components
+    Playlists --> OverviewService
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
-    Components --> DataService
     Journey --> DataService
     Journey --> PlotService
 
+    Home --> Visibility
+    Journey --> Visibility
+    Playlists --> Visibility
+
     PlaylistService --> DataService
     PlaylistService --> ApiService
+    OverviewService --> DataService
+    OverviewService --> ApiService
+    OverviewService --> Visibility
+    Visibility --> DataService
     DataService --> ApiService
 
     FileWatchdog --> DataService
@@ -180,19 +192,28 @@ flowchart LR
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
-  settings modal, playlist import. Owns the live-update callbacks
+  settings modal. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
-  per loaded playlist with coverage, runs, last-played, and cached-percentile
-  aggregates; any cell click navigates to that playlist's scenario table. Row
-  data comes from local run data and rank caches only — this page never
-  triggers KovaaK's API calls.
+  per visible playlist with coverage, runs, last-played, and cached-percentile
+  aggregates; any cell click navigates to that playlist's scenario table.
+  Overview row rendering is local-only — it draws from local run data and rank
+  caches and never triggers KovaaK's API calls. Also hosts the visibility
+  controls: a per-row Hide/Unhide action cell and a "Show hidden" toggle that
+  reveals hidden playlists as muted rows. Hosts playlist import (share-code
+  modal) — the one networked action on this page: `load_playlist_from_code`
+  calls the API, and on success a refresh store bump rebuilds the grid with the
+  new visible row without a page reload. Hosts playlist deletion: a per-row
+  Delete action cell (user playlists only; bundled rows render nothing) opens a
+  confirmation modal, then `delete_user_playlist` unlinks the file and the same
+  refresh store rebuilds the grid. When the loader recorded user files
+  superseded by bundled benchmarks, an alert above the grid offers a one-click
+  cleanup (`delete_superseded_user_playlist_files`).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
-  overview (AG Grid). `load_playlist_scenario_rows` is driven by mounted route
-  state, not the selector directly (see decision log).
+  overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
+  mounted-route store, not the URL directly (see decision log).
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
-- `playlist_components.py` — shared `playlist_selector` component.
 
 ### Shared UI components
 - `components/local_icon.py` — local SVG icon registry/helper used by the shell
@@ -202,7 +223,12 @@ flowchart LR
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
-  `get_sensitivities_vs_runs`, and the playlist loaders/getters.
+  `get_sensitivities_vs_runs`, and the playlist loaders/getters. `load_playlists`
+  records each winning user-root code's actual file path (so deletion targets
+  the real file, not a reconstructed name) and the user files it skips because
+  a bundled code already won; `delete_user_playlist` and
+  `delete_superseded_user_playlist_files` are the write paths that unlink those
+  files under the playlist I/O lock, keeping startup itself read-only.
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
@@ -215,7 +241,14 @@ flowchart LR
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
-  `allow_network=False`).
+  `allow_network=False`), filtered by visibility unless the overview's "show
+  hidden" mode asks for everything.
+- `playlist_visibility_service.py` — per-code show/hide preferences (plain
+  show-list persisted at `data/preferences.json`, atomic writes under a module
+  lock). A missing file yields the first-run seed (bundled defaults plus
+  user-root codes) without writing. `get_visible_playlist_selector_options()`
+  is the single visibility filter every playlist option list consumes (Home
+  filter, Journey picker, overview).
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
   `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus
@@ -234,7 +267,8 @@ flowchart LR
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
-  notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`).
+  notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
+  `atomic_write` (Windows-lock-tolerant `os.replace` with retry).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
 
@@ -254,7 +288,8 @@ flowchart LR
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Any plot/figure | `plot/plot_service.py` |
-| The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
+| The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
+| Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |

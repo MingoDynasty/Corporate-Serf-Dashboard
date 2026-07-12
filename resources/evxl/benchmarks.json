@@ -12586,12 +12586,12 @@
         "kovaaksBenchmarkId": 2477,
         "sharecode": "KovaaKsDinkingVibrantInfiltration",
         "rankColors": {
-          "1": "#C5C3F2",
-          "2": "#B2CBEA",
-          "3": "#BAF6FC",
-          "4": "#7bcaf0",
-          "5": "#6B94DF",
-          "6": "#5558AA"
+          "Caspian": "#C5C3F2",
+          "Ribbon": "#B2CBEA",
+          "Weddell": "#BAF6FC",
+          "Harbour": "#7bcaf0",
+          "Harp": "#6B94DF",
+          "Baikal": "#5558AA"
         },
         "categories": [
           {
@@ -13386,9 +13386,10 @@
         "kovaaksBenchmarkId": 2622,
         "sharecode": "KovaaKsVibratingPeachGasmask",
         "rankColors": {
-          "Novice": "#dae444",
-          "Regular": "#44e4a9",
-          "Confirmed": "#0f8ddb",
+          "Novice": "#ff4d00",
+          "Regular": "#eeff00",
+          "Confirmed": "#44e4a9",
+          "Elite": "#0f8ddb",
           "Dominant": "#600193",
           "Primordial": "#000000",
           "Sovereign": "#FFFFFF"
@@ -13412,6 +13413,439 @@
                 "subcategoryName": "Wide",
                 "scenarioCount": 3,
                 "color": "#fc74fc"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "SCP: Roleplay Benchmark",
+    "rankCalculation": "generic-energy",
+    "abbreviation": "SCPRP",
+    "color": "#1E90FF",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-07-08",
+    "difficulties": [
+      {
+        "difficultyName": "All",
+        "kovaaksBenchmarkId": 2656,
+        "sharecode": "KovaaKsResettingLongXur",
+        "rankColors": {
+          "Sideforce": "#b8c6d1",
+          "Mainforce": "#73d3e8",
+          "Neuralis II": "#187e11",
+          "Neuralis I": "#46a63f",
+          "Strategos II": "#133da0",
+          "Strategos I": "#3a6ad9",
+          "Nomarch": "#8d1111",
+          "Exovant": "#211c1c",
+          "Zenon": "#951379"
+        },
+        "categories": [
+          {
+            "categoryName": "Tracking",
+            "color": "#00aaff",
+            "subcategories": [
+              {
+                "subcategoryName": "Smooth",
+                "scenarioCount": 5,
+                "color": "#8bc7e5"
+              },
+              {
+                "subcategoryName": "Reactive",
+                "scenarioCount": 3,
+                "color": "#20698d"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "Leica control bench",
+    "rankCalculation": "aplus-alt",
+    "abbreviation": "LEI",
+    "color": "#0c052e",
+    "spreadsheetURL": "",
+    "dateAdded": "2026-07-09",
+    "difficulties": [
+      {
+        "difficultyName": "Hard",
+        "kovaaksBenchmarkId": 2683,
+        "sharecode": "KovaaKsUltingMauvePopcorn",
+        "rankColors": {
+          "Comet": "#00fa11",
+          "Star": "#e1ff00",
+          "Blaze": "#ff4d4d",
+          "Nebula": "#8965ec",
+          "Cosmic": "#0c052e"
+        },
+        "categories": [
+          {
+            "categoryName": "Control tracking",
+            "color": "#0c052e",
+            "subcategories": [
+              {
+                "subcategoryName": "Control",
+                "scenarioCount": 12,
+                "color": "#0c052e"
+              },
+              {
+                "subcategoryName": "Micro control",
+                "scenarioCount": 4,
+                "color": "#0c052e"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "benchmarkName": "\u4e8c\u4e09\u7684\u4e09\u89d2\u6d32\u884c\u52a8\u7784\u51c6\u57fa\u51c6\u6d4b\u8bd5",
+    "rankCalculation": "basic",
+    "abbreviation": "\u4e8c\u4e09",
+    "color": "#ebbeff",
+    "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1WeuEk444WOkTpvOGMYiertxwlI9gRQSapYiwxjFbT08/edit?usp=sharing",
+    "dateAdded": "2026-07-09",
+    "difficulties": [
+      {
+        "difficultyName": "\u8f7b\u677e",
+        "kovaaksBenchmarkId": 2672,
+        "sharecode": "",
+        "rankColors": {
+          "\u767d\u94f6": "#7d7d7d",
+          "\u767d\u94f6\u2161": "#a9a7a7",
+          "\u9ec4\u91d1": "#d69f6b",
+          "\u9ec4\u91d1\u2161": "#e29750",
+          "\u94c2\u91d1": "#5782cb",
+          "\u94c2\u91d1\u2161": "#417ce1",
+          "\u7fe1\u7fe0": "#5bbe91",
+          "\u7fe1\u7fe0\u2161": "#39db92"
+        },
+        "categories": [
+          {
+            "categoryName": "\u5b9a\u4f4d",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u5fae\u8c03",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 3,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8ddf\u67aa",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "\u5e73\u6ed1",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7cbe\u51c6\u5ea6",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 2,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u52a8\u6001\u70b9\u51fb",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4\u611f",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u8ddf\u8e2a",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 2,
+                "color": "#404074"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8f6c\u706b",
+            "color": "#151547",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7cbe\u51c6\u5ea6",
+                "scenarioCount": 2,
+                "color": "#404074"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 2,
+                "color": "#404074"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "\u4e2d\u7b49",
+        "kovaaksBenchmarkId": 2693,
+        "sharecode": "",
+        "rankColors": {
+          "\u94c2\u91d1": "#5782cb",
+          "\u94c2\u91d1\u2161": "#417ce1",
+          "\u7fe1\u7fe0": "#5bbe91",
+          "\u7fe1\u7fe0\u2161": "#39db92",
+          "\u94bb\u77f3": "#2cc8e8",
+          "\u94bb\u77f3\u2161": "#18c9ec",
+          "\u5927\u5e08": "#9337be",
+          "\u5927\u5e08\u2161": "#a026d9"
+        },
+        "categories": [
+          {
+            "categoryName": "\u5b9a\u4f4d",
+            "color": "#434343",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u5fae\u8c03",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 4,
+                "color": "#666666"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8ddf\u67aa",
+            "color": "#434343",
+            "subcategories": [
+              {
+                "subcategoryName": "\u5e73\u6ed1",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7cbe\u51c6\u5ea6",
+                "scenarioCount": 1,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u53d8\u5411",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 3,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u52a8\u6001\u70b9\u51fb",
+            "color": "#434343",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u8ddf\u8e2a",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 3,
+                "color": "#666666"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8f6c\u706b",
+            "color": "#434343",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7cbe\u51c6",
+                "scenarioCount": 2,
+                "color": "#666666"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 2,
+                "color": "#666666"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "difficultyName": "\u56f0\u96be",
+        "kovaaksBenchmarkId": 2686,
+        "sharecode": "",
+        "rankColors": {
+          "\u7fe1\u7fe0": "#36a673",
+          "\u7fe1\u7fe0\u2161": "#23e78e",
+          "\u94bb\u77f3": "#2cc8e8",
+          "\u94bb\u77f3\u2161": "#18c9ec",
+          "\u5927\u5e08": "#6f2790",
+          "\u5927\u5e08\u2161": "#8f1cc4",
+          "\u5b97\u5e08": "#a43269",
+          "\u6700\u5f3a\u738b\u8005": "#dd7631",
+          "TOP": "#931a1a"
+        },
+        "categories": [
+          {
+            "categoryName": "\u5b9a\u4f4d",
+            "color": "#9ED3FF",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u5fae\u8c03",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 3,
+                "color": "#9EB3BD"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8ddf\u8e2a",
+            "color": "#9ED3FF",
+            "subcategories": [
+              {
+                "subcategoryName": "\u5e73\u6ed1",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u7cbe\u51c6\u5ea6",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u53d8\u5411",
+                "scenarioCount": 1,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 3,
+                "color": "#EEEEEE"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u52a8\u6001\u70b9\u51fb",
+            "color": "#9ED3FF",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u786e\u8ba4",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781",
+                "scenarioCount": 3,
+                "color": "#9EB3BD"
+              }
+            ]
+          },
+          {
+            "categoryName": "\u8f6c\u706b",
+            "color": "#9ED3FF",
+            "subcategories": [
+              {
+                "subcategoryName": "\u901f\u5ea6",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": " \u7cbe\u51c6\u5ea6",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
+              },
+              {
+                "subcategoryName": "\u7ec8\u6781\u76ee\u6807",
+                "scenarioCount": 2,
+                "color": "#9EB3BD"
               }
             ]
           }

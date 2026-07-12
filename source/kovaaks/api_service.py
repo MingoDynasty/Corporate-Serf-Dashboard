@@ -28,6 +28,7 @@ from source.kovaaks.api_models import (
     UserScenarioTotalPlayAPIResponse,
 )
 from source.kovaaks.request_logging import request_exception_summary
+from source.utilities.atomic_write import replace_with_retry
 from source.utilities.dash_logging import get_dash_logger
 
 TIMEOUT = 10  # Default timeout for KovaaK's API requests.
@@ -38,7 +39,6 @@ TRANSIENT_GET_EXCEPTIONS = (
     requests.ConnectionError,
 )  # Safe GET-only retry failures.
 ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
-CACHE_REPLACE_RETRY_DELAYS_SECONDS = (0.05, 0.1)  # Windows AV/indexer file locks.
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -46,7 +46,7 @@ _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
 
-CACHE_DIR = "cache"
+CACHE_DIR = "data/cache"
 
 
 class UnknownKovaaksUserError(ValueError):
@@ -281,20 +281,7 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
                 file.write("\n")
                 file.flush()
                 os.fsync(file.fileno())
-            for retry_delay in (*CACHE_REPLACE_RETRY_DELAYS_SECONDS, None):
-                try:
-                    os.replace(temp_file, cache_file)
-                    break
-                except PermissionError:
-                    # On Windows, antivirus/indexer scans can briefly hold the
-                    # destination open, failing the replace transiently.
-                    if retry_delay is None:
-                        raise
-                    logger.warning(
-                        "Retrying cache replace after PermissionError: %s",
-                        cache_file,
-                    )
-                    time.sleep(retry_delay)
+            replace_with_retry(temp_file, cache_file, logger=logger)
         finally:
             if temp_file.exists():
                 temp_file.unlink()

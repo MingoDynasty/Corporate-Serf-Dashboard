@@ -1,0 +1,1403 @@
+{
+  "name": "Viscose Benchmark S2 - Expert",
+  "code": "KovaaKsRaidingPeriwinkleWindow",
+  "scenarios": [
+    {
+      "name": "Smoothsphere Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 12500.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 20500.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 22000.0
+        }
+      ]
+    },
+    {
+      "name": "SmoothBot Perfected Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 5150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 5400.0
+        }
+      ]
+    },
+    {
+      "name": "Leapstrafes Control wobin Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere SuperbAim Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 12100.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 13500.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Slightly Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 4250.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Viscose Expert 50cm",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 10900.0
+        }
+      ]
+    },
+    {
+      "name": "Flower Expert 50cm",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 4350.0
+        }
+      ]
+    },
+    {
+      "name": "PGTI Voltaic",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 881.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 885.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 889.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 893.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 896.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 899.0
+        }
+      ]
+    },
+    {
+      "name": "RawControlSphere Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 10300.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 13200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 14100.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky V3 Thin",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 890.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 894.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 897.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 903.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 906.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral Harder",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 914.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 918.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 922.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 925.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 927.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 929.0
+        }
+      ]
+    },
+    {
+      "name": "VT Aether Advanced S5 bot 1",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 3550.0
+        }
+      ]
+    },
+    {
+      "name": "Plink Palace Hard",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 3650.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 899.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 902.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 905.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 908.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 911.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 914.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic Invincible 4",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 4300.0
+        }
+      ]
+    },
+    {
+      "name": "ww3t Voltaic 10% Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 152.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 158.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 163.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 168.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 173.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 178.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetSwitch 2 20% Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 122.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 126.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 130.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 133.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 136.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 139.0
+        }
+      ]
+    },
+    {
+      "name": "aimerz+ Static Switching",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 139.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 144.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 148.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 153.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 158.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 163.0
+        }
+      ]
+    },
+    {
+      "name": "1w4ts Voltaic",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 138.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 144.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 150.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 156.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 161.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 167.0
+        }
+      ]
+    },
+    {
+      "name": "beanTS 200% Slightly Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 132.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 137.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 142.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 146.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "StaticSwitchingVox xxSmall",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 128.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 132.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 136.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 140.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 144.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 148.0
+        }
+      ]
+    },
+    {
+      "name": "1w2ts reload smallflicks 25% smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 146.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 152.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 158.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 163.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 168.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 173.0
+        }
+      ]
+    },
+    {
+      "name": "eth Pasu Micro Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 1325.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 1475.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 1625.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 1700.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS Elite",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 146.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 152.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 157.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 162.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 167.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 172.0
+        }
+      ]
+    },
+    {
+      "name": "kinTS Voltaic Elite",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 72.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 77.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 81.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 85.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 89.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 93.0
+        }
+      ]
+    },
+    {
+      "name": "domiSwitch Harder",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 5300.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 5700.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 6900.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 7300.0
+        }
+      ]
+    },
+    {
+      "name": "B180T Voltaic 15% Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 72.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 77.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 81.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 85.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 89.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 93.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Voltaic Reload 15% Smaller",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 95.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 103.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 108.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 113.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 118.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "VT Bounceshot Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 820.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 900.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 970.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "CatClick Harder",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 70.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 78.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 85.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 92.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 98.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 104.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated 10% small",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 1550.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn MV Advanced",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 400.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 430.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 460.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 490.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 520.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 550.0
+        }
+      ]
+    },
+    {
+      "name": "skyClick Goated Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 114.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 121.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 128.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 135.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 142.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 149.0
+        }
+      ]
+    },
+    {
+      "name": "VoxTS Click Hard",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 110.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 118.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 125.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 132.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 139.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 146.0
+        }
+      ]
+    },
+    {
+      "name": "VT Floating Heads Viscose Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 880.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 940.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 1180.0
+        }
+      ]
+    },
+    {
+      "name": "psalmTS Viscose Click Expert",
+      "ranks": [
+        {
+          "name": "Interloper",
+          "color": "#f8c9f8",
+          "threshold": 76.0
+        },
+        {
+          "name": "Attuned",
+          "color": "#ef92ef",
+          "threshold": 85.0
+        },
+        {
+          "name": "Heroic",
+          "color": "#e967e9",
+          "threshold": 93.0
+        },
+        {
+          "name": "Mythic",
+          "color": "#cc91f0",
+          "threshold": 101.0
+        },
+        {
+          "name": "Ascension",
+          "color": "#b966ea",
+          "threshold": 109.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#62148f",
+          "threshold": 115.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRaidingPeriwinkleWindow",
+    "kovaaks_benchmark_id": 2338,
+    "rank_colors": [
+      [
+        "Interloper",
+        "#f8c9f8"
+      ],
+      [
+        "Attuned",
+        "#ef92ef"
+      ],
+      [
+        "Heroic",
+        "#e967e9"
+      ],
+      [
+        "Mythic",
+        "#cc91f0"
+      ],
+      [
+        "Ascension",
+        "#b966ea"
+      ],
+      [
+        "Eclipse",
+        "#62148f"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:12:38.463972+00:00",
+    "generator": "benchmark_importer"
+  }
+}

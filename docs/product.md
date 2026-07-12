@@ -69,6 +69,26 @@ list in the roadmap.)
 
 ### Planning: what should I train
 
+- **Playlist-level overview** (PRs #78, #83). A sortable table at `/playlists`,
+  one row per imported playlist with coverage, runs, last-played, and
+  aggregate-percentile stats; each row drills into that playlist's scenario
+  table. *Problem solved:* the scenario table answers "where am I weak *within*
+  a playlist," but not "*which* playlist deserves attention" — this surfaces
+  stale and weak playlists at a glance and directs training focus across
+  playlists, the way the scenario table already does within one.
+- **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
+  overview, a "Show hidden" toggle for managing hidden ones, and hiding
+  filters every playlist dropdown (Home filter, Journey picker). Hidden
+  playlists stay loaded — routes and rank overlays keep working. *Problem
+  solved:* focus — dropdowns and the overview show only the playlists you
+  care about, which is what makes shipping the full benchmark library
+  tolerable.
+- **Bundled benchmark library** (PR #90; expanded by the 2026-07-11 curation
+  import). Every importer-generated benchmark (216 files) ships with the app
+  and loads at startup; Voltaic and Viscose are visible by default and the
+  rest wait behind "Show hidden" on the Playlists page. *Problem solved:* enabling a benchmark used to mean
+  manually copying a JSON file and restarting — now it's one unhide click,
+  and app updates refresh the whole library automatically.
 - **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
@@ -86,10 +106,20 @@ list in the roadmap.)
 
 ### Getting data in
 
-- **Playlist import via sharecode** (Settings modal). *Problem solved:*
-  onboarding a playlist takes one code paste, not hand-building a scenario
-  list. The only part of the app that requires an internet connection besides
-  rank lookups.
+- **Playlist import via sharecode** (Playlists overview page, PR #92;
+  previously the Home Settings modal). *Problem solved:* onboarding a playlist
+  takes one code paste, not hand-building a scenario list. Lives on the
+  playlist management surface, where the imported playlist lands as a new
+  visible row; a duplicate-code refusal whose playlist is hidden points the
+  user at the "Show hidden" toggle. The only part of the app that requires an
+  internet connection besides rank lookups.
+- **Playlist delete & superseded-copy cleanup** (Playlists overview page, PR
+  #98). A per-row Delete on user playlists removes the `data/playlists/` file
+  after confirmation (bundled benchmarks offer Hide instead — a share-code
+  re-import would come back rank-less); a one-click cleanup clears user files
+  left dead by the bundled library flip. *Problem solved:* the user prunes
+  playlists and stale copies in the app — with a confirmation guard and no
+  filesystem surgery — instead of hunting down JSON files by hand.
 - **Code-based playlist identity** (PR #67). Playlist
   codes, not names, identify imported and bundled playlists; duplicate names
   stay visible with disambiguated labels, and imports are stored under
@@ -98,23 +128,14 @@ list in the roadmap.)
   longer live in the committed bundled-playlist root.
 - **Benchmark importer** (`scripts/benchmark_importer/`, PRs #45–#48). Merges
   Evxl playlist resolution with KovaaK's rank thresholds into reviewable
-  benchmark files under `resources/playlists/generated/`. *Problem solved:*
+  benchmark files under `resources/benchmarks/`. *Problem solved:*
   rank overlays need threshold data that no single public API provides; the
   importer builds it reproducibly, with provenance, instead of by hand.
 
 ## Where it's going
 
-**Next up: the playlist-level overview** — the same "direct my attention"
-logic, one level above the scenario table. As the user put it: if Playlist A
-hasn't been played in over a year, it's worth revisiting to measure new
-skills against old scores; if Playlist B shows a low average or median
-percentile, that's a weakness worth targeted work. At a glance, the app
-should tell the player where to focus across *playlists*, the way the
-scenario table already does within one. Sequencing and design state live in
-the [roadmap](./roadmap.md).
-
-Behind it, the unsolved user problems (each becomes a roadmap milestone when
-it's next up):
+Sequencing and design state live in the [roadmap](./roadmap.md). The unsolved
+user problems (each becomes a roadmap milestone when it's next up):
 
 - *"Is my current training working?"* — a per-scenario improving /
   plateauing / declining verdict, not just a plot to squint at.

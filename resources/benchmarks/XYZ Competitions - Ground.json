@@ -1,0 +1,78 @@
+{
+  "name": "XYZ Competitions - Ground",
+  "code": "KovaaKsAscendingPulledDodge",
+  "scenarios": [
+    {
+      "name": "DeceptiveStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4405.0
+        }
+      ]
+    },
+    {
+      "name": "ElusiveStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4106.0
+        }
+      ]
+    },
+    {
+      "name": "IcyStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4159.0
+        }
+      ]
+    },
+    {
+      "name": "SnappyStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4056.0
+        }
+      ]
+    },
+    {
+      "name": "PlazaStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4301.0
+        }
+      ]
+    },
+    {
+      "name": "WiggleStrafes",
+      "ranks": [
+        {
+          "name": "World Record",
+          "color": "#65F0D8",
+          "threshold": 4480.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAscendingPulledDodge",
+    "kovaaks_benchmark_id": 924,
+    "rank_colors": [
+      [
+        "World Record",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:10:36.537998+00:00",
+    "generator": "benchmark_importer"
+  }
+}

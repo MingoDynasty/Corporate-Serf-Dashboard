@@ -95,6 +95,39 @@
     white-space: pre-line;
 }
 
+/* Hidden playlists revealed by the overview's "Show hidden" toggle render
+   muted so visible rows keep the visual focus. */
+.playlist-overview-grid .playlist-overview-row-hidden {
+    opacity: 0.55;
+}
+
+/* Hide/Unhide link in the overview's visibility column (VisibilityAction
+   renderer in dashAgGridComponentFunctions.js). */
+.visibility-action {
+    color: var(--mantine-color-blue-filled);
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+}
+
+.visibility-action:hover {
+    color: var(--mantine-color-blue-filled-hover);
+}
+
+/* Delete link in the overview's delete column (DeleteAction renderer in
+   dashAgGridComponentFunctions.js). Styled like .visibility-action but red to
+   signal the destructive, user-playlist-only action. */
+.delete-action {
+    color: var(--mantine-color-red-filled);
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-underline-offset: 0.15em;
+}
+
+.delete-action:hover {
+    color: var(--mantine-color-red-filled-hover);
+}
+
 /* Benchmark/Playlist pill in the overview's Type column (TypeBadge renderer
    in dashAgGridComponentFunctions.js). */
 .type-badge {

@@ -15,8 +15,8 @@ RANKS = [Rank(name="Bronze", color="#a97142", threshold=100)]
 def _configure(monkeypatch):
     monkeypatch.setattr(
         playlist_overview_service,
-        "config",
-        SimpleNamespace(
+        "get_config",
+        lambda: SimpleNamespace(
             kovaaks_username="MingoDynasty",
             steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,
@@ -61,6 +61,14 @@ def _install_stats_snapshot(monkeypatch, stats_by_scenario):
         playlist_overview_service,
         "get_scenario_stats_snapshot",
         lambda: dict(stats_by_scenario),
+    )
+
+
+def _install_shown_codes(monkeypatch, shown_codes):
+    monkeypatch.setattr(
+        playlist_overview_service,
+        "get_shown_playlist_codes",
+        lambda: set(shown_codes),
     )
 
 
@@ -326,6 +334,7 @@ def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
     )
     _install_stats_snapshot(monkeypatch, {})
     _install_cached_ranks(monkeypatch, {})
+    _install_shown_codes(monkeypatch, {"CodeA", "CodeB", "CodeC"})
 
     rows = build_playlist_overview_rows()
 
@@ -334,11 +343,74 @@ def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
         ("Same Name (CodeA)", "CodeA"),
         ("Same Name (CodeB)", "CodeB"),
     ]
+    assert all(row["hidden"] is False for row in rows)
+
+
+def test_build_playlist_overview_rows_filters_hidden_playlists(monkeypatch):
+    _configure(monkeypatch)
+    shown = PlaylistData(
+        name="Shown",
+        code="ShownCode",
+        scenarios=[Scenario(name="First")],
+    )
+    hidden = PlaylistData(
+        name="Hidden",
+        code="HiddenCode",
+        scenarios=[Scenario(name="Second")],
+    )
+    monkeypatch.setattr(
+        data_service,
+        "playlist_database",
+        {shown.code: shown, hidden.code: hidden},
+    )
+    _install_stats_snapshot(monkeypatch, {})
+    _install_cached_ranks(monkeypatch, {})
+    _install_shown_codes(monkeypatch, {"ShownCode"})
+
+    default_rows = build_playlist_overview_rows()
+    all_rows = build_playlist_overview_rows(include_hidden=True)
+
+    assert [row["code"] for row in default_rows] == ["ShownCode"]
+    assert [(row["code"], row["hidden"]) for row in all_rows] == [
+        ("HiddenCode", True),
+        ("ShownCode", False),
+    ]
+
+
+def test_build_playlist_overview_rows_marks_only_user_playlists_deletable(
+    monkeypatch,
+):
+    _configure(monkeypatch)
+    user = PlaylistData(
+        name="User", code="UserCode", scenarios=[Scenario(name="First")]
+    )
+    bundled = PlaylistData(
+        name="Bundled", code="BundledCode", scenarios=[Scenario(name="Second")]
+    )
+    monkeypatch.setattr(
+        data_service,
+        "playlist_database",
+        {user.code: user, bundled.code: bundled},
+    )
+    _install_stats_snapshot(monkeypatch, {})
+    _install_cached_ranks(monkeypatch, {})
+    _install_shown_codes(monkeypatch, {"UserCode", "BundledCode"})
+    monkeypatch.setattr(
+        playlist_overview_service,
+        "get_user_root_playlist_codes",
+        lambda: {"UserCode"},
+    )
+
+    rows = {row["code"]: row for row in build_playlist_overview_rows()}
+
+    assert rows["UserCode"]["deletable"] is True
+    assert rows["BundledCode"]["deletable"] is False
 
 
 def test_build_playlist_overview_rows_skips_unknown_selector_codes(monkeypatch):
     _configure(monkeypatch)
     _install_stats_snapshot(monkeypatch, {})
+    _install_shown_codes(monkeypatch, {"MissingCode"})
     monkeypatch.setattr(
         playlist_overview_service,
         "get_playlist_selector_options",

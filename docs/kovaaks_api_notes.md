@@ -148,6 +148,28 @@ Important limitation:
 - Works for benchmark playlists, but not every playlist is a benchmark.
 - Scenario rank display should not depend on this endpoint.
 
+Benchmark rank-data quirks (surfaced by `scripts/benchmark_importer`, which
+merges Evxl rank names/colors with this endpoint's per-scenario `rank_maxes`
+one-to-one):
+
+- The response's top-level `ranks[]` can omit display fields (observed:
+  `color`) on some tiers. Observed on benchmark IDs 2108, 2450, 2477, 2487
+  (2026-07-11), which initially blocked importing those benchmarks. The
+  importer never reads these display fields (served rank colors come from
+  Evxl), so `api_models.Rank.color` is now optional and a missing value no
+  longer fails response validation.
+- A benchmark's rank count can disagree with the Evxl rank ladder it is paired
+  with, which aborts the 1:1 merge. Observed: benchmark 2412 ("Black Dawn /
+  Celestial Forge") exposes 3 tiers (Emperor/Angelic/Morningstar) while Evxl
+  lists 9.
+- Upstream-adjacent gap: a mis-cased `sharecode` in Evxl's benchmark snapshot
+  makes Evxl's own `playlist-by-code` endpoint return HTTP 400, blocking the
+  import before this endpoint is reached (observed: `KovaaksBottingRockyBm`,
+  which should be `KovaaKsBottingRockyBm`).
+
+These are upstream data issues, not app bugs; the affected benchmarks import
+normally once the source data is corrected.
+
 ## Derived Data
 
 Percentile is derived from current rank and unfiltered leaderboard total:

@@ -3,7 +3,7 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from source.config.config_service import config
+from source.config.config_service import get_config
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import RunData, ScenarioStats
@@ -135,6 +135,7 @@ def format_playlist_scenario_rank_row(
 def _lookup_rank_info(
     scenario_name: str,
 ) -> ScenarioRankInfo:
+    config = get_config()
     return get_scenario_rank_info(
         scenario_name,
         config.kovaaks_username,

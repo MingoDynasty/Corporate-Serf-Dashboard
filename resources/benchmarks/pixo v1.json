@@ -1,0 +1,528 @@
+{
+  "name": "pixo v1",
+  "code": "KovaaKsClearingJumpyBomb",
+  "scenarios": [
+    {
+      "name": "beanTS",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 130.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 135.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 140.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 145.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 150.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 155.0
+        }
+      ]
+    },
+    {
+      "name": "waldoTS",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 145.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 150.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 155.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 160.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 165.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 170.0
+        }
+      ]
+    },
+    {
+      "name": "Pokeball Frenzy Auto 1w6ts",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 105.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 115.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 120.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 125.0
+        }
+      ]
+    },
+    {
+      "name": "1w3ts reload",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 100.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 105.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 110.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 120.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 130.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 140.0
+        }
+      ]
+    },
+    {
+      "name": "1wall5targets_pasu Reload",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 115.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 130.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 140.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 145.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 155.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 165.0
+        }
+      ]
+    },
+    {
+      "name": "Popcorn MV Intermediate",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 250.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 300.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 350.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 400.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 450.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 500.0
+        }
+      ]
+    },
+    {
+      "name": "voxTargetClick 20% Small",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 85.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 95.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 100.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 105.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 110.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 115.0
+        }
+      ]
+    },
+    {
+      "name": "Flicker Plaza rAim Easy",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 900.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 905.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 910.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 915.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 920.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 925.0
+        }
+      ]
+    },
+    {
+      "name": "Leaptrack Goated 75% Slightly Larger",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 2250.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 3000.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 3250.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere rAim Easy",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 11000.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 14000.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 15000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Novice S5 Hard",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 3000.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 3750.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 4000.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl Easy",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 8000.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 11000.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Whisphere Small & Slow 75%",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 11000.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 17000.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 19000.0
+        }
+      ]
+    },
+    {
+      "name": "Controlsphere OW",
+      "ranks": [
+        {
+          "name": "No Thumbs",
+          "color": "#C2D2D2",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Haiden on Alt",
+          "color": "#a53131",
+          "threshold": 7000.0
+        },
+        {
+          "name": "SlyGL",
+          "color": "#d6d930",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Mophead",
+          "color": "#60c62a",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Slime",
+          "color": "#0065b3",
+          "threshold": 10000.0
+        },
+        {
+          "name": "LeToothless",
+          "color": "#8816d4",
+          "threshold": 11000.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingJumpyBomb",
+    "kovaaks_benchmark_id": 1950,
+    "rank_colors": [
+      [
+        "No Thumbs",
+        "#C2D2D2"
+      ],
+      [
+        "Haiden on Alt",
+        "#a53131"
+      ],
+      [
+        "SlyGL",
+        "#d6d930"
+      ],
+      [
+        "Mophead",
+        "#60c62a"
+      ],
+      [
+        "Slime",
+        "#0065b3"
+      ],
+      [
+        "LeToothless",
+        "#8816d4"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:24.777154+00:00",
+    "generator": "benchmark_importer"
+  }
+}

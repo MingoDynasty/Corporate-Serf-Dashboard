@@ -3,12 +3,21 @@ import logging
 from types import SimpleNamespace
 
 import pytest
+from sortedcontainers import SortedList
 
 from source.kovaaks.data_models import RunData
 from source.my_watchdog import file_watchdog
 
 SCENARIO_NAME = "VT Pasu Intermediate S5"
 SENSITIVITY_KEY = "2.0 Overwatch"
+
+
+def _sorted_runs(*scores: float) -> SortedList:
+    """Build the score-ascending SortedKeyList the production stores hold."""
+    return SortedList(
+        [_run_data(score) for score in scores],
+        key=lambda item: item.score,
+    )
 
 
 def _capture_log(messages):
@@ -57,10 +66,14 @@ def _patch_common(monkeypatch, run_data):
         "schedule_rank_freshness_refresh",
         lambda *args: schedules.append(args),
     )
-    monkeypatch.setattr(file_watchdog.config, "kovaaks_username", "MingoDynasty")
-    monkeypatch.setattr(file_watchdog.config, "steam_id", "steam-id")
     monkeypatch.setattr(
-        file_watchdog.config,
+        file_watchdog.get_config(),
+        "kovaaks_username",
+        "MingoDynasty",
+    )
+    monkeypatch.setattr(file_watchdog.get_config(), "steam_id", "steam-id")
+    monkeypatch.setattr(
+        file_watchdog.get_config(),
         "scenario_metadata_cache_ttl_hours",
         24,
     )
@@ -92,7 +105,9 @@ def test_on_created_schedules_score_aware_refresh_for_all_pb_paths(
             "get_high_score",
             lambda _scenario: 90.0,
         )
-        sensitivities = {} if path_kind == "new_sensitivity" else {SENSITIVITY_KEY: []}
+        sensitivities = (
+            {} if path_kind == "new_sensitivity" else {SENSITIVITY_KEY: _sorted_runs()}
+        )
         monkeypatch.setattr(
             file_watchdog,
             "get_sensitivities_vs_runs",
@@ -126,7 +141,7 @@ def test_on_created_parses_absolute_source_path_outside_stats_dir(
     source_path = (tmp_path / "outside-stats" / "run.csv").resolve()
     parsed_paths = []
 
-    monkeypatch.setattr(file_watchdog.config, "stats_dir", str(stats_dir))
+    monkeypatch.setattr(file_watchdog.get_config(), "stats_dir", str(stats_dir))
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",
@@ -163,7 +178,7 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     monkeypatch.setattr(
         file_watchdog,
         "get_sensitivities_vs_runs",
-        lambda _scenario: {SENSITIVITY_KEY: []},
+        lambda _scenario: {SENSITIVITY_KEY: _sorted_runs()},
     )
 
     file_watchdog.NewFileHandler().on_created(
@@ -173,6 +188,41 @@ def test_on_created_does_not_schedule_refresh_for_non_pb(monkeypatch):
     assert len(messages) == 1
     assert loads == ["run.csv"]
     assert schedules == []
+
+
+@pytest.mark.parametrize(
+    ("new_score", "expected_nth"),
+    [
+        (115.0, 2),  # slots between 110 and 120
+        (120.0, 1),  # ties the top score; ties are not counted as higher
+        (90.0, 4),  # below every existing run
+    ],
+)
+def test_on_created_computes_nth_place_via_bisect(
+    monkeypatch,
+    new_score,
+    expected_nth,
+):
+    run_data = _run_data(score=new_score)
+    messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: True,
+    )
+    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _scenario: 120.0)
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_sensitivities_vs_runs",
+        lambda _scenario: {SENSITIVITY_KEY: _sorted_runs(100.0, 110.0, 120.0)},
+    )
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path="run.csv")
+    )
+
+    assert len(messages) == 1
+    assert messages[0].nth_score == expected_nth
 
 
 def test_on_created_preserves_detection_log_for_non_csv(caplog):
@@ -241,7 +291,7 @@ def test_on_created_loads_before_enqueuing(monkeypatch):
         "message_queue",
         SimpleNamespace(append=lambda _message: events.append("enqueue")),
     )
-    monkeypatch.setattr(file_watchdog.config, "kovaaks_username", None)
+    monkeypatch.setattr(file_watchdog.get_config(), "kovaaks_username", None)
 
     file_watchdog.NewFileHandler().on_created(
         SimpleNamespace(is_directory=False, src_path="run.csv")

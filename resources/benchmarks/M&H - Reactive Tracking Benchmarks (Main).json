@@ -1,0 +1,668 @@
+{
+  "name": "M&H - Reactive Tracking Benchmarks (Main)",
+  "code": "KovaaKsReloadingJebaitedOfftank",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky V3 Thin",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 888.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 894.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 898.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 902.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 906.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 912.0
+        }
+      ]
+    },
+    {
+      "name": "VT Plaza Viscose Elite",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 4450.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 4750.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuSmoothGround Thin",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 3100.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky Quake Thin",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 883.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 889.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 893.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 897.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 901.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 907.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Voltaic",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 875.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 882.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 891.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 905.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 909.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuGround",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 3700.0
+        }
+      ]
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW Thin",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 864.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 874.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 883.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 890.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 896.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 901.0
+        }
+      ]
+    },
+    {
+      "name": "Plaza Pure Revosect",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 893.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 900.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 905.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 910.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 915.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 920.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawGround",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 3200.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic 4 Voltaic",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 4800.0
+        }
+      ]
+    },
+    {
+      "name": "Air Spectral",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 914.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 920.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 925.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 929.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 933.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 938.0
+        }
+      ]
+    },
+    {
+      "name": "Air CELESTIAL No UFO",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 894.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 900.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 904.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 908.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 912.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 916.0
+        }
+      ]
+    },
+    {
+      "name": "Air no UFO no SKYBOTS",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 870.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 878.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 886.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 892.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 896.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 900.0
+        }
+      ]
+    },
+    {
+      "name": "Air Voltaic",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 861.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 871.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 883.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 894.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 899.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 903.0
+        }
+      ]
+    },
+    {
+      "name": "Air Angelic",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 913.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 920.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 927.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 932.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 936.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 938.0
+        }
+      ]
+    },
+    {
+      "name": "hizkuRawAir",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 3600.0
+        }
+      ]
+    },
+    {
+      "name": "Pasu Track Wide React Goated",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 3400.0
+        }
+      ]
+    },
+    {
+      "name": "Air Pure Revosect",
+      "ranks": [
+        {
+          "name": "Emerald",
+          "color": "#50C878",
+          "threshold": 877.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#E0115F",
+          "threshold": 886.0
+        },
+        {
+          "name": "Sapphire",
+          "color": "#0F52BA",
+          "threshold": 892.0
+        },
+        {
+          "name": "Amethyst",
+          "color": "#9966CC",
+          "threshold": 898.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#4D004D",
+          "threshold": 904.0
+        },
+        {
+          "name": "Zenith",
+          "color": "#47B7BE",
+          "threshold": 910.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsReloadingJebaitedOfftank",
+    "kovaaks_benchmark_id": 2109,
+    "rank_colors": [
+      [
+        "Emerald",
+        "#50C878"
+      ],
+      [
+        "Ruby",
+        "#E0115F"
+      ],
+      [
+        "Sapphire",
+        "#0F52BA"
+      ],
+      [
+        "Amethyst",
+        "#9966CC"
+      ],
+      [
+        "Obsidian",
+        "#4D004D"
+      ],
+      [
+        "Zenith",
+        "#47B7BE"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:07:46.936731+00:00",
+    "generator": "benchmark_importer"
+  }
+}

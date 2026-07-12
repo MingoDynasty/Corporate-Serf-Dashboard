@@ -1,0 +1,280 @@
+{
+  "name": "DM Static Benchmarks Level 2 Pokeball S3",
+  "code": "KovaaKsImpactingDiagonalShard",
+  "scenarios": [
+    {
+      "name": "DM 1w2ts Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 830.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 930.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1780.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww2t Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 900.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w3ts Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 880.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 980.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1830.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww3t Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 950.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1950.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w4ts Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 920.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1870.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww4t Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 990.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1990.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w5ts Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 950.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1900.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww5t Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2020.0
+        }
+      ]
+    },
+    {
+      "name": "DM 1w6ts Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 970.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 1920.0
+        }
+      ]
+    },
+    {
+      "name": "DM ww6t Pokeball Level 2 S3",
+      "ranks": [
+        {
+          "name": "Gold",
+          "color": "#CAB148",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#CC0000",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Opal",
+          "color": "#4A86E8",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Vortex",
+          "color": "#6B0000",
+          "threshold": 2040.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsImpactingDiagonalShard",
+    "kovaaks_benchmark_id": 2112,
+    "rank_colors": [
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Vortex",
+        "#6B0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:59.228775+00:00",
+    "generator": "benchmark_importer"
+  }
+}

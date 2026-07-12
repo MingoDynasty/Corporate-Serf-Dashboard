@@ -1,0 +1,514 @@
+{
+  "name": "Leica Control Bench",
+  "code": "KovaaKsUltingMauvePopcorn",
+  "scenarios": [
+    {
+      "name": "Avasive Control Track Hard",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 10600.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 11600.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 12600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 13000.0
+        }
+      ]
+    },
+    {
+      "name": "VT Controlsphere Viscose Expert",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "VT Raw Control Advanced S5",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Avasphere Euphoric",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "Leisphere",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4350.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4600.0
+        }
+      ]
+    },
+    {
+      "name": "AbyssTrack",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "voidTrack",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4700.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 5000.0
+        }
+      ]
+    },
+    {
+      "name": "Silo",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "RawControlSphere Expert",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 12600.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 13800.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 14500.0
+        }
+      ]
+    },
+    {
+      "name": "Aethercontrol",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Extra Controlsphere",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "SteadyTrack - Small",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4500.0
+        }
+      ]
+    },
+    {
+      "name": "Avasive bukeTrack Hard",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 11500.0
+        }
+      ]
+    },
+    {
+      "name": "Swing Tracking",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 3000.0
+        }
+      ]
+    },
+    {
+      "name": "cloverRawControl",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 12000.0
+        }
+      ]
+    },
+    {
+      "name": "Flower Expert",
+      "ranks": [
+        {
+          "name": "Comet",
+          "color": "#00fa11",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Star",
+          "color": "#e1ff00",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Blaze",
+          "color": "#ff4d4d",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Nebula",
+          "color": "#8965ec",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#0c052e",
+          "threshold": 4400.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsUltingMauvePopcorn",
+    "kovaaks_benchmark_id": 2683,
+    "rank_colors": [
+      [
+        "Comet",
+        "#00fa11"
+      ],
+      [
+        "Star",
+        "#e1ff00"
+      ],
+      [
+        "Blaze",
+        "#ff4d4d"
+      ],
+      [
+        "Nebula",
+        "#8965ec"
+      ],
+      [
+        "Cosmic",
+        "#0c052e"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:05.905982+00:00",
+    "generator": "benchmark_importer"
+  }
+}

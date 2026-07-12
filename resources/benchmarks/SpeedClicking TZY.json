@@ -1,0 +1,274 @@
+{
+  "name": "SpeedClicking TZY",
+  "code": "KovaaKsEntryfraggingBuggedLowground",
+  "scenarios": [
+    {
+      "name": "Gridshot",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 158.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 164.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 174.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 185.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 195.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot Large",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 165.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 175.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 195.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 208.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 215.0
+        }
+      ]
+    },
+    {
+      "name": "GridShot 3x3",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 148000.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 151800.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 154000.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 160000.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 168000.0
+        }
+      ]
+    },
+    {
+      "name": "Gridshot 3x3 50% Smaller",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 98000.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 108000.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 116000.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 120100.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 125000.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 155.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 165.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 177.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 187.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 200.0
+        }
+      ]
+    },
+    {
+      "name": "Tile Frenzy Mini",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 178.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 188.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 195.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 205.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 215.0
+        }
+      ]
+    },
+    {
+      "name": "1wall9000targets",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 310.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 318.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 326.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 337.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 360.0
+        }
+      ]
+    },
+    {
+      "name": "Jumbo1wall9000targets",
+      "ranks": [
+        {
+          "name": "Regular",
+          "color": "#7ad3b2",
+          "threshold": 325.0
+        },
+        {
+          "name": "Ranker",
+          "color": "#83c7ff",
+          "threshold": 345.0
+        },
+        {
+          "name": "High Ranker",
+          "color": "#6d62ff",
+          "threshold": 352.0
+        },
+        {
+          "name": "Irregular",
+          "color": "#dc98dc",
+          "threshold": 370.0
+        },
+        {
+          "name": "Axis",
+          "color": "#a61c00",
+          "threshold": 390.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsEntryfraggingBuggedLowground",
+    "kovaaks_benchmark_id": 908,
+    "rank_colors": [
+      [
+        "Regular",
+        "#7ad3b2"
+      ],
+      [
+        "Ranker",
+        "#83c7ff"
+      ],
+      [
+        "High Ranker",
+        "#6d62ff"
+      ],
+      [
+        "Irregular",
+        "#dc98dc"
+      ],
+      [
+        "Axis",
+        "#a61c00"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:13:26.590173+00:00",
+    "generator": "benchmark_importer"
+  }
+}

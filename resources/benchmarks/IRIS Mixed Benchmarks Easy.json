@@ -1,0 +1,762 @@
+{
+  "name": "IRIS Mixed Benchmarks Easy",
+  "code": "KovaaKsDeathballingFlyJump",
+  "scenarios": [
+    {
+      "name": "IRIS Pasu Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 75.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 80.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 100.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 110.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 119.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 123.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Popcorn Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 350.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 400.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 450.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 500.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 550.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 590.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 630.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS 1w6ts Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 1500.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Wide Wall Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 105.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 110.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 115.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 120.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 130.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 140.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 145.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS voxTS Click Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 90.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 100.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 110.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 120.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 130.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 137.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 139.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Controlsphere Click Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 50.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 55.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 60.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 65.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 70.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 78.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 83.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Smoothbot Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 4700.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Leaptrack Goated Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 4400.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Air Nuns Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 4200.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Ground Plaza Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 3500.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Controlsphere Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 14800.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 15100.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 15300.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS WhisphereRawControl Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 16000.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SlideTS Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 700.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 750.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 950.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 1150.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SpeedSwitch Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 1650.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS PasuTS Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 250.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 300.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 350.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 400.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 460.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 530.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 580.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS SmoothbotTS Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 40.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 45.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 50.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 55.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 60.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 65.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 71.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS Popswitch Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 35.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 40.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 45.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 50.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 55.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 60.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 63.0
+        }
+      ]
+    },
+    {
+      "name": "IRIS 3D Switching Easy",
+      "ranks": [
+        {
+          "name": "Seed",
+          "color": "#000000",
+          "threshold": 400.0
+        },
+        {
+          "name": "Lavender",
+          "color": "#c57cdf",
+          "threshold": 450.0
+        },
+        {
+          "name": "Carnation",
+          "color": "#d400ff",
+          "threshold": 500.0
+        },
+        {
+          "name": "Cattleya",
+          "color": "#f5cc00",
+          "threshold": 550.0
+        },
+        {
+          "name": "Dahlia",
+          "color": "#d788dd",
+          "threshold": 600.0
+        },
+        {
+          "name": "Cosmos",
+          "color": "#FFFFFF",
+          "threshold": 650.0
+        },
+        {
+          "name": "Rose",
+          "color": "#ff0000",
+          "threshold": 680.0
+        }
+      ]
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDeathballingFlyJump",
+    "kovaaks_benchmark_id": 2384,
+    "rank_colors": [
+      [
+        "Seed",
+        "#000000"
+      ],
+      [
+        "Lavender",
+        "#c57cdf"
+      ],
+      [
+        "Carnation",
+        "#d400ff"
+      ],
+      [
+        "Cattleya",
+        "#f5cc00"
+      ],
+      [
+        "Dahlia",
+        "#d788dd"
+      ],
+      [
+        "Cosmos",
+        "#FFFFFF"
+      ],
+      [
+        "Rose",
+        "#ff0000"
+      ]
+    ],
+    "generated_at": "2026-07-11T12:11:21.853784+00:00",
+    "generator": "benchmark_importer"
+  }
+}
