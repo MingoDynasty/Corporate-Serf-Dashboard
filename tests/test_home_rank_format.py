@@ -594,7 +594,7 @@ def test_manual_rank_refresh_warning_suppresses_green_toast(monkeypatch):
             rank=50,
             leaderboard_id=1,
             scenario_name="Scenario",
-            warning_message="KovaaK's is unreachable; showing the last "
+            warning_message="Couldn't refresh from KovaaK's; showing the last "
             "cached position for Scenario.",
         )
 
@@ -603,7 +603,7 @@ def test_manual_rank_refresh_warning_suppresses_green_toast(monkeypatch):
 
     rank_text, notifications = home.refresh_rank(1, "Scenario")
     assert notifications is no_update
-    assert warnings and "unreachable" in warnings[0]
+    assert warnings and "last cached position" in warnings[0]
     assert rank_text != "N/A"
 
 

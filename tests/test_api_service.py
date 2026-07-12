@@ -1516,11 +1516,25 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
-def _seed_expired_rank_cache(monkeypatch, *, with_total):
+def _raise_request_exception(*_args, **_kwargs):
+    raise api_service.requests.RequestException("leaderboard unavailable")
+
+
+def _raise_validation_error(*_args, **_kwargs):
+    # A successful HTTP response with a schema-invalid body: model_validate is
+    # what fetch_scenario_rank runs under the hood, so this reproduces the real
+    # ValidationError shape rather than fabricating one.
+    api_service.LeaderboardAPIResponse.model_validate({"unexpected": "shape"})
+    raise AssertionError("model_validate should have raised")  # pragma: no cover
+
+
+def _seed_expired_rank_cache(monkeypatch, *, with_total, fetch_fake=None):
     """Seed an expired rank cache (scenario_name absent) for fallback tests.
 
-    Returns the backdated rank cache file, its pre-call bytes, and its mtime so
-    callers can assert the fallback read path never rewrites the cache.
+    ``fetch_fake`` replaces ``fetch_scenario_rank`` (defaults to raising
+    ``RequestException``). Returns the backdated rank cache file, its pre-call
+    bytes, and its mtime so callers can assert the fallback read path never
+    rewrites the cache.
     """
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
@@ -1545,13 +1559,10 @@ def _seed_expired_rank_cache(monkeypatch, *, with_total):
         total_cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
         os.utime(total_cache_file, (stale_timestamp, stale_timestamp))
 
-    def fail_fetch_scenario_rank(*_args, **_kwargs):
-        raise api_service.requests.RequestException("leaderboard unavailable")
-
     monkeypatch.setattr(
         api_service,
         "fetch_scenario_rank",
-        fail_fetch_scenario_rank,
+        fetch_fake or _raise_request_exception,
     )
 
     return (
@@ -1616,6 +1627,58 @@ def test_get_scenario_rank_info_serves_stale_rank_without_total_cache(monkeypatc
 
     assert rank_cache_file.read_bytes() == cache_bytes
     assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_serves_stale_rank_when_response_invalid(monkeypatch):
+    # A schema-invalid (but successful) leaderboard response raises
+    # ValidationError, not RequestException; it must reach the same stale
+    # fallback rather than escaping to N/A.
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=True,
+        fetch_fake=_raise_validation_error,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.total_players == 200
+    assert rank_info.warning_message is not None
+
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_returns_unknown_when_response_invalid_no_cache(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", _raise_validation_error)
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNKNOWN
+    assert rank_info.leaderboard_id == 98330
+    assert (
+        rank_info.error_message
+        == "Invalid leaderboard response for VT Pasu Intermediate S5."
+    )
+    rank_cache_file = (
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
+    )
+    assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
