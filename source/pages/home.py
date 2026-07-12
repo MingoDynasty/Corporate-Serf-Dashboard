@@ -1080,17 +1080,14 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                dmc.Tooltip(
-                                    dmc.Button(
-                                        "Settings",
-                                        id="settings-modal-open-button",
-                                        variant="default",
-                                        leftSection=local_icon(
-                                            "clarity:settings-line",
-                                            width=25,
-                                        ),
+                                dmc.Button(
+                                    "Settings",
+                                    id="settings-modal-open-button",
+                                    variant="default",
+                                    leftSection=local_icon(
+                                        "clarity:settings-line",
+                                        width=25,
                                     ),
-                                    label="Settings",
                                 ),
                                 dmc.Modal(
                                     title="Settings",
