@@ -79,7 +79,16 @@ SETTINGS_HELP_TEXT = {
     "score-threshold-notification": (
         "Notifies after each new run whether the score reached the score threshold."
     ),
+    "top-n-scores": (
+        "How many of your best scores to plot per sensitivity — or per day in "
+        "Score vs Time — within the selected date range. A new run that lands "
+        "in the top N also triggers a notification."
+    ),
 }
+RANK_REFRESH_TOOLTIP = (
+    "Fetch your current position live from the KovaaK's leaderboard. The "
+    "displayed value can come from a local cache and may lag the live board."
+)
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -922,7 +931,10 @@ def layout(
                                 dmc.Space(h="xl"),
                                 dmc.NumberInput(
                                     id="top_n_scores",
-                                    label="Top N scores",
+                                    label=_settings_help_label(
+                                        "Top N scores",
+                                        SETTINGS_HELP_TEXT["top-n-scores"],
+                                    ),
                                     min=1,
                                     persistence=True,
                                     placeholder="Top N scores to consider...",
@@ -1014,15 +1026,22 @@ def layout(
                                                     ],
                                                     size="sm",
                                                 ),
-                                                dmc.Button(
-                                                    "Refresh",
-                                                    id="rank-refresh-button",
-                                                    variant="subtle",
-                                                    size="compact-xs",
-                                                    leftSection=local_icon(
-                                                        "material-symbols:refresh-rounded",
-                                                        width=14,
+                                                dmc.Tooltip(
+                                                    dmc.Button(
+                                                        "Refresh",
+                                                        id="rank-refresh-button",
+                                                        variant="subtle",
+                                                        size="compact-xs",
+                                                        leftSection=local_icon(
+                                                            "material-symbols:refresh-rounded",
+                                                            width=14,
+                                                        ),
                                                     ),
+                                                    label=RANK_REFRESH_TOOLTIP,
+                                                    events=TOOLTIP_EVENTS,
+                                                    multiline=True,
+                                                    withArrow=True,
+                                                    w=SETTINGS_HELP_TOOLTIP_WIDTH,
                                                 ),
                                             ],
                                             gap="xs",
@@ -1061,17 +1080,14 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                dmc.Tooltip(
-                                    dmc.Button(
-                                        "Settings",
-                                        id="settings-modal-open-button",
-                                        variant="default",
-                                        leftSection=local_icon(
-                                            "clarity:settings-line",
-                                            width=25,
-                                        ),
+                                dmc.Button(
+                                    "Settings",
+                                    id="settings-modal-open-button",
+                                    variant="default",
+                                    leftSection=local_icon(
+                                        "clarity:settings-line",
+                                        width=25,
                                     ),
-                                    label="Settings",
                                 ),
                                 dmc.Modal(
                                     title="Settings",
