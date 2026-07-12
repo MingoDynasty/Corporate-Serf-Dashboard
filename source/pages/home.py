@@ -386,8 +386,11 @@ def get_scenario_rank(_, selected_scenario, _n_intervals) -> str:
 def refresh_rank(n_clicks, selected_scenario: str | None):
     """Fetch and display authoritative board truth after an explicit user request.
 
-    A green toast confirms the refresh completed; failure paths already toast
-    red through ``dash_logger``, so they skip the confirmation.
+    A green toast confirms a genuinely fresh refresh. Degraded paths already
+    toast through ``dash_logger`` -- red when the fetch failed with nothing
+    cached, yellow when it failed but a stale cached rank was served (or on a
+    steam-mismatch warning) -- so any error or warning suppresses the green
+    confirmation.
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     fire once on initial page load despite ``prevent_initial_call``, and a
@@ -410,7 +413,7 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
         return "N/A", no_update
 
     _emit_rank_messages(rank_info)
-    if rank_info.error_message:
+    if rank_info.error_message or rank_info.warning_message:
         return format_scenario_rank(rank_info), no_update
     notification = {
         "action": "show",

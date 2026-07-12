@@ -1159,6 +1159,43 @@ def schedule_rank_freshness_refresh(
     )
 
 
+def _stale_rank_fallback(
+    leaderboard_id: int,
+    username: str,
+    steam_id: str | None,
+    scenario_name: str,
+) -> ScenarioRankInfo | None:
+    """Return the last cached rank tagged as stale, or None if nothing is cached.
+
+    Used when an authoritative rank fetch fails -- unreachable endpoint or an
+    unusable (schema-invalid) response -- but the leaderboard already resolved:
+    the app should never display less than it knows, mirroring the TTL-free
+    ``allow_network=False`` read path. Read-only: never writes the cache, so
+    stale data is not laundered into TTL-fresh on the next read.
+    """
+    stale_rank = _cached_rank(leaderboard_id, username)
+    if stale_rank is None:
+        return None
+    if stale_rank.scenario_name is None:
+        stale_rank = stale_rank.model_copy(update={"scenario_name": scenario_name})
+    total_players = _cached_leaderboard_total(leaderboard_id)
+    if total_players is not None:
+        stale_rank = stale_rank.model_copy(update={"total_players": total_players})
+        stale_rank = _with_percentile(stale_rank)
+    # Tag the degraded result so the UI can warn (yellow) rather than falsely
+    # confirm a refresh (green) or error out (red). Derive the steam-mismatch
+    # warning first -- it clobbers warning_message -- then append the staleness
+    # note so both can coexist.
+    stale_rank = _with_derived_rank_warning(stale_rank, username, steam_id)
+    stale_warning = (
+        f"Couldn't refresh from KovaaK's; showing the last cached position "
+        f"for {scenario_name}."
+    )
+    if stale_rank.warning_message:
+        stale_warning = f"{stale_rank.warning_message} {stale_warning}"
+    return stale_rank.model_copy(update={"warning_message": stale_warning})
+
+
 def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     scenario_name: str,
     username: str | None,
@@ -1174,7 +1211,10 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     Main rank lookup entry point for UI and background refresh callers.
 
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
-    code can display N/A without knowing endpoint or cache details.
+    code can display N/A without knowing endpoint or cache details -- except a
+    rank fetch that fails after the leaderboard resolved, which falls back to
+    the last cached rank (TTL ignored, read-only) tagged with a
+    ``warning_message``; UNKNOWN only when nothing is cached.
     ``allow_network=False`` serves rank and total caches independent of TTL and
     returns UNKNOWN on a miss without fetching. ``allow_hydration=False`` skips
     total-play hydration during leaderboard resolution, for callers that already
@@ -1276,6 +1316,10 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
     # is not used here because it can lag behind the leaderboard endpoint.
+    # Graceful degradation: a fetch that fails -- unreachable endpoint
+    # (RequestException) or an unusable response (ValidationError) -- should not
+    # hide a rank we already know. Fall back to the last cached rank; UNKNOWN
+    # only when nothing is cached.
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException as exc:
@@ -1284,11 +1328,33 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
             scenario_name,
             request_exception_summary(exc),
         )
+        stale_rank = _stale_rank_fallback(
+            leaderboard_id, username, steam_id, scenario_name
+        )
+        if stale_rank is not None:
+            return stale_rank
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
             leaderboard_id=leaderboard_id,
             scenario_name=scenario_name,
             error_message=f"Failed to fetch leaderboard position for {scenario_name}.",
+        )
+    except ValidationError:
+        logger.warning(
+            "Invalid leaderboard response for %s",
+            scenario_name,
+            exc_info=True,
+        )
+        stale_rank = _stale_rank_fallback(
+            leaderboard_id, username, steam_id, scenario_name
+        )
+        if stale_rank is not None:
+            return stale_rank
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            error_message=f"Invalid leaderboard response for {scenario_name}.",
         )
     if rank_info.status == ScenarioRankStatus.UNRANKED:
         # A missing leaderboard row normally means the user has not played the

@@ -582,6 +582,31 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
     assert errors == ["Rank lookup failed."]
 
 
+def test_manual_rank_refresh_warning_suppresses_green_toast(monkeypatch):
+    # A failed fetch served from stale cache returns a RANKED result carrying a
+    # warning_message (yellow) but no error_message. The green "refreshed"
+    # confirmation must not fire on top of it.
+    warnings = []
+
+    def get_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=1,
+            scenario_name="Scenario",
+            warning_message="Couldn't refresh from KovaaK's; showing the last "
+            "cached position for Scenario.",
+        )
+
+    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
+
+    rank_text, notifications = home.refresh_rank(1, "Scenario")
+    assert notifications is no_update
+    assert warnings and "last cached position" in warnings[0]
+    assert rank_text != "N/A"
+
+
 def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
     # Under DashProxy an allow_duplicate callback can fire once on page load
     # with n_clicks=None; that must not force a network refresh or toast.
