@@ -93,8 +93,14 @@ what it knows and stream in what it doesn't, with visible progress.
   `disabled=True`; the phase-1 callback enables it when it starts phase 2,
   and it stays enabled for the life of the page instance — nothing ever sets
   `disabled=True` back. After the drain observes a terminal tombstone,
-  subsequent ticks are `no_update` no-ops (one dict lookup per second, local
-  single-user app). Never disabling eliminates by construction the
+  every subsequent tick **reasserts the settled status line** — re-derived
+  from the tombstone's final counters: cleared for a clean fill, the R4
+  degraded summary otherwise — while row transactions and notifications stay
+  `no_update`. Reassertion is a cheap constant write (local single-user
+  app), and it is what heals a stale status written by a superseded
+  generation's in-flight response *after* the current fill has settled —
+  post-terminal `no_update` ticks would leave that stale text standing until
+  the next page load. Never disabling eliminates by construction the
   cross-navigation race where a stale `disabled=True` response lands after
   the next page's phase 1 enabled the interval, which would otherwise stall
   that fill permanently. The drain callback is idempotent, mutates the
@@ -167,10 +173,14 @@ what it knows and stream in what it doesn't, with visible progress.
 - Scenario-name clicks navigate from phase 1 onward (the name column is
   local; the existing `cellClicked` callback is unchanged).
 - An in-flight drain response that lands after a reopen can still write a
-  stale status line or toast — row ids (R6) guard only the grid. Accepted:
-  the status text self-heals on the next live tick (≤1 s), and the toast
-  carries a superseded generation's summary at worst once, immediately
-  followed by the live fill's own lifecycle.
+  stale status line or toast — row ids (R6) guard only the grid. The status
+  line self-heals within one tick in *both* fill states: live ticks
+  overwrite it, and post-terminal ticks reassert the settled text (R8). The
+  toast residual is accepted: a superseded generation's summary may appear
+  at most once and autocloses; the status line is the durable, authoritative
+  surface. (Generation-gating the UI outputs client-side was considered and
+  rejected: a new store + clientside compare-and-apply layer to close a
+  thin local race that reassertion already bounds to one tick.)
 
 ## Out of scope
 
