@@ -267,7 +267,9 @@ flowchart LR
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
-  notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
+  notifications; records logged outside a callback context are queued and
+  drained by a Home interval callback, so background threads can log too),
+  `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
