@@ -1170,7 +1170,10 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     Main rank lookup entry point for UI and background refresh callers.
 
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
-    code can display N/A without knowing endpoint or cache details.
+    code can display N/A without knowing endpoint or cache details -- except a
+    rank fetch that fails after the leaderboard resolved, which falls back to
+    the last cached rank (TTL ignored, read-only) tagged with a
+    ``warning_message``; UNKNOWN only when nothing is cached.
     ``allow_network=False`` serves rank and total caches independent of TTL and
     returns UNKNOWN on a miss without fetching.
 
@@ -1295,7 +1298,18 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
                     update={"total_players": total_players}
                 )
                 stale_rank = _with_percentile(stale_rank)
-            return _with_derived_rank_warning(stale_rank, username, steam_id)
+            # Tag the degraded result so the UI can warn (yellow) rather than
+            # falsely confirm a refresh (green) or error out (red). Derive the
+            # steam-mismatch warning first -- it clobbers warning_message -- then
+            # append the staleness note so both can coexist.
+            stale_rank = _with_derived_rank_warning(stale_rank, username, steam_id)
+            stale_warning = (
+                f"KovaaK's is unreachable; showing the last cached position "
+                f"for {scenario_name}."
+            )
+            if stale_rank.warning_message:
+                stale_warning = f"{stale_rank.warning_message} {stale_warning}"
+            return stale_rank.model_copy(update={"warning_message": stale_warning})
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
             leaderboard_id=leaderboard_id,

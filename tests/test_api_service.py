@@ -1583,6 +1583,10 @@ def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
     assert rank_info.scenario_name == "VT Pasu Intermediate S5"
     assert rank_info.total_players == 200
     assert round(rank_info.percentile, 2) == 75.25
+    # The degraded result is tagged so the UI can warn (yellow) instead of
+    # falsely confirming a refresh (green).
+    assert rank_info.warning_message is not None
+    assert "VT Pasu Intermediate S5" in rank_info.warning_message
 
     # The fallback is read-only: the stale cache must not be laundered into a
     # TTL-fresh file by a rewrite (content and mtime both unchanged).
@@ -1608,6 +1612,7 @@ def test_get_scenario_rank_info_serves_stale_rank_without_total_cache(monkeypatc
     assert rank_info.scenario_name == "VT Pasu Intermediate S5"
     assert rank_info.total_players is None
     assert rank_info.percentile is None
+    assert rank_info.warning_message is not None
 
     assert rank_cache_file.read_bytes() == cache_bytes
     assert rank_cache_file.stat().st_mtime == cache_mtime
