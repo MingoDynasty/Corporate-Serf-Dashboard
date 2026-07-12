@@ -90,8 +90,15 @@ any user-facing path.
   re-probes each once (accepted cost; a negative-resolution cache is a future
   lever, not v1).
 - **R11 — Fatal failures stop the queue.** `UnknownKovaaksUserError` means
-  every remaining item would fail identically: stop the worker and emit one
-  `dash_logger.error`, mirroring the rank-freshness Timer chain.
+  every remaining item would fail identically: the worker stops and records
+  the fatal state in its module-level progress state. The user-visible
+  surface is the R12 status line, plus one toast emitted from the R13
+  interval callback when it drains that state — NOT `dash_logger` from the
+  worker thread: dash_extensions delivers via `set_props`, which raises
+  `LookupError` outside callback context, so plain-background-thread
+  `dash_logger` calls never reach the UI (a pre-existing bug the
+  rank-freshness Timer chain has today, tracked separately; found by the
+  progressive-fill deep pass).
 - **R12 — Status line: remaining-only.** The overview page shows
   "Updating percentile data: N remaining (~ETA)" where N counts unique names
   in the queue (spam-proof) and ETA = N × recent average pace; during outage
@@ -100,7 +107,8 @@ any user-facing path.
   would visibly run backward. Transient failures never toast — a deliberate
   deviation from the "background failures notify via `dash_logger.error`"
   convention, because an outage is ambient state, not an event; only R11
-  notifies.
+  notifies. (That convention's documented route is also currently broken
+  from plain threads — see R11.)
 - **R13 — Live overview refresh while warming.** A `dcc.Interval` on the
   overview page, enabled only while the queue is non-empty, re-runs the
   normal cache-only row build each tick so rows fill in as the user watches.
@@ -113,7 +121,10 @@ any user-facing path.
   classifies exceptions itself (the `_run_attempt` precedent), because the UI
   entry point deliberately flattens failures into UNKNOWN. Partial success
   composes: if the rank saved but the totals call failed, the retry only
-  re-pays the cheap totals call.
+  re-pays the cheap totals call. The PR #112 stale-rank fallback lives above
+  this layer (in `get_scenario_rank_info`), so the worker still sees raw
+  exceptions — correct, since its job is repairing the cache, not serving
+  degraded reads.
 - **R15 — Kill switch.** `percentile_warmup_enabled` (config.toml, default
   true) disables the warmer only — never interactive fetches.
 - **R16 — Testability.** The worker is a pure "process one item" step
@@ -137,7 +148,8 @@ Contract points:
 
 1. The R7 activity signal is the one integration: progressive-fill phase-2
    workers (its R11) and the Home refresh bump it; whichever PR lands first
-   defines the ~5-line primitive.
+   defines the ~5-line primitive. (Adopted on their side as its R13,
+   pending their register triage.)
 2. The overview deliberately does not reuse the progressive-fill registry
    transport (R13 here); different data planes.
 3. Status lines share a phrase family but deliberately different counters:
