@@ -41,6 +41,27 @@
     font-size: 1em;
 }
 
+/* Home fills the viewport below the AppShell header so the graph can flex to
+   whatever height the controls leave over. A fixed-height graph forced
+   vertical scrolling to reach the X axis whenever zoom or a narrow window
+   made the controls wrap taller. */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 0rem)
+    );
+}
+
+/* Floor the graph height so extreme zoom degrades to page scroll instead of
+   a crushed, unreadable plot. */
+.home-graph {
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
 .last-played-affordance {
     cursor: help;
     text-decoration-line: underline;
