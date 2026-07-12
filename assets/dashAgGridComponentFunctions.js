@@ -22,13 +22,20 @@ dagcomponentfuncs.TypeBadge = function (props) {
 
 // Hide/Unhide action for the playlist overview's visibility column. Clicks
 // are handled server-side via the grid's cellClicked payload (colId
-// "hidden"); this renderer only draws the link-styled label.
+// "hidden"); this renderer only draws the eye icon (masked SVG, styled by
+// the .visibility-action rules in stylesheet.css). Layers-panel convention:
+// the eye mirrors the row's current state — open eye = visible (click
+// hides), struck-out eye = hidden (click unhides) — while the column's
+// tooltip carries the click consequence.
 dagcomponentfuncs.VisibilityAction = function (props) {
-  return React.createElement(
-    "span",
-    { className: "visibility-action" },
-    props.data && props.data.hidden ? "Unhide" : "Hide"
-  );
+  var hidden = props.data && props.data.hidden;
+  return React.createElement("span", {
+    className:
+      "visibility-action " +
+      (hidden ? "visibility-action-hidden" : "visibility-action-visible"),
+    role: "img",
+    "aria-label": hidden ? "Unhide" : "Hide",
+  });
 };
 
 // Delete action for the playlist overview's delete column. Only user

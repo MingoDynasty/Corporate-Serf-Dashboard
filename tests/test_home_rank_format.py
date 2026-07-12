@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import dcc
+from dash import dcc, no_update
 
 from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
@@ -541,7 +541,13 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
         lambda rank_info, _ttl: rank_info,
     )
 
-    assert home.refresh_rank(1, scenario_name) == expected
+    rank_text, notifications = home.refresh_rank(1, scenario_name)
+    assert rank_text == expected
+    # Any completed refresh — ranked or unranked — confirms with a green
+    # toast; a fresh id per refresh so back-to-back clicks each confirm.
+    assert notifications[0]["color"] == "green"
+    assert scenario_name in notifications[0]["message"]
+    assert notifications[0]["id"].startswith("rank-refresh-notification-")
     assert fetched == [True]
     stored = api_service._cached_rank(leaderboard_id, username)
     assert stored is not None
@@ -566,10 +572,40 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
     monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
     monkeypatch.setattr(home.dash_logger, "error", errors.append)
 
-    assert home.refresh_rank(1, "Scenario") == "N/A"
+    rank_text, notifications = home.refresh_rank(1, "Scenario")
+    assert rank_text == "N/A"
+    # The error already toasts red through dash_logger; a green "refreshed"
+    # confirmation on top would be contradictory.
+    assert notifications is no_update
     assert calls == [{"force_refresh": True}]
     assert warnings == ["Check the configured Steam ID."]
     assert errors == ["Rank lookup failed."]
+
+
+def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
+    # Under DashProxy an allow_duplicate callback can fire once on page load
+    # with n_clicks=None; that must not force a network refresh or toast.
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "an initial-load fire must not hit the network"
+        ),
+    )
+
+    assert home.refresh_rank(None, "Scenario") == (no_update, no_update)
+
+
+def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "a refresh without a scenario must not hit the network"
+        ),
+    )
+
+    assert home.refresh_rank(1, None) == ("N/A", no_update)
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):

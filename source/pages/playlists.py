@@ -90,8 +90,8 @@ LOWEST_PERCENTILE_TOOLTIP = (
     "params.value == null ? null : ('Lowest: ' + params.data.lowest_scenario)"
 )
 
-# The Hide/Unhide labels act immediately with no confirm step, so the hover
-# copy carries the consequence and the way back (Show hidden).
+# The eye toggle acts immediately with no confirm step, so the hover copy
+# carries the action, its consequence, and the way back (Show hidden).
 VISIBILITY_TOOLTIP = (
     "params.data.hidden"
     " ? 'Show this playlist again in the overview and playlist selectors'"
@@ -117,7 +117,10 @@ TABLE_COLUMN_DEFS = [
         ),
         "cellRenderer": "TypeBadge",
         "sortable": True,
-        "minWidth": 110,
+        # Wide enough for the BENCHMARK pill plus cell padding: autoSize can
+        # run before rows arrive, leaving the column at this floor, and 110
+        # ellipsized the badge.
+        "minWidth": 140,
     },
     {
         "headerName": "Played",
@@ -561,6 +564,9 @@ def layout(**kwargs):  # noqa: ARG001
                                 checked=False,
                                 id="playlists-overview-show-hidden",
                                 label="Show hidden",
+                                # Remembered across visits (localStorage) so
+                                # the management view stays how it was left.
+                                persistence=True,
                                 size="sm",
                             ),
                             dmc.Button(
