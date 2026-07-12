@@ -41,6 +41,45 @@
     font-size: 1em;
 }
 
+/* The AppShell header is a fixed 4em band; keep its content on one line and
+   truncate the title so a narrow window can't wrap it over the page content
+   below (the home page height calc assumes the header stays inside its
+   offset). */
+.app-header-title-col,
+.app-header-title-anchor {
+    /* Every flex level above the title must be allowed to shrink below its
+       content, or the nowrap title's min-content width wraps the icons
+       column onto a second header row instead of truncating. */
+    min-width: 0;
+}
+
+.app-header-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Home fills the viewport below the AppShell header so the graph can flex to
+   whatever height the controls leave over. A fixed-height graph forced
+   vertical scrolling to reach the X axis whenever zoom or a narrow window
+   made the controls wrap taller. */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 0rem)
+    );
+}
+
+/* Floor the graph height so extreme zoom degrades to page scroll instead of
+   a crushed, unreadable plot. */
+.home-graph {
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
 .last-played-affordance {
     cursor: help;
     text-decoration-line: underline;

@@ -887,6 +887,7 @@ def layout(
     scenario_persistence = scenario is None
 
     return dmc.Box(
+        className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
@@ -936,7 +937,10 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    ml="xl",
+                                    # Indent only where the row has room; the
+                                    # margin plus min-width 100% would overflow
+                                    # a narrow viewport.
+                                    ml={"base": 0, "lg": "xl"},
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
@@ -949,7 +953,7 @@ def layout(
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
-                                    miw=400,
+                                    miw="min(400px, 100%)",
                                     persistence=scenario_persistence,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
@@ -1078,6 +1082,7 @@ def layout(
                                         ),
                                     ],
                                     w=300,
+                                    maw="100%",
                                 ),
                             ],
                             gap="md",
@@ -1086,7 +1091,7 @@ def layout(
                             direction="row",
                             wrap="wrap",
                         ),
-                        span=10,
+                        span={"base": 12, "lg": 10},
                     ),
                     dmc.GridCol(
                         dmc.Flex(
@@ -1217,7 +1222,7 @@ def layout(
                             direction="row",
                             wrap="wrap",
                         ),
-                        span="auto",
+                        span={"base": 12, "lg": "auto"},
                     ),
                 ],
                 gutter="xl",
@@ -1229,7 +1234,10 @@ def layout(
                     _SELECT_SCENARIO_PLOT_TITLE,
                     _SELECT_SCENARIO_PLOT_MESSAGE,
                 ).to_plotly_json(),
-                style={"height": "80vh"},
+                className="home-graph",
+                # Redraw the plot whenever the flex container resizes, not
+                # just on window resize.
+                responsive=True,
             ),
         ],
     )

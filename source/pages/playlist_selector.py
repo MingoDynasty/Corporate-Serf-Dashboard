@@ -15,7 +15,9 @@ splats it and adds its own role-specific props.
 PLAYLIST_SELECTOR_PRESET = {
     "checkIconPosition": "right",
     "maxDropdownHeight": "75vh",
-    "miw": 400,
+    # Shrink with the container below 400px so narrow windows and high page
+    # zoom don't force horizontal overflow.
+    "miw": "min(400px, 100%)",
     "placeholder": "Select a playlist...",
     "scrollAreaProps": {"type": "always"},
     "searchable": True,

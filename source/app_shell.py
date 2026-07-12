@@ -155,11 +155,13 @@ def layout(**kwargs):  # noqa: ARG001
                                                 children=[
                                                     dmc.Title(
                                                         "Corporate Serf Dashboard",
+                                                        className="app-header-title",
                                                     ),
                                                 ],
                                                 href="/",
                                                 target="_self",
                                                 underline="never",
+                                                className="app-header-title-anchor",
                                                 style={
                                                     "color": "var(--mantine-color-text)",
                                                 },
@@ -167,8 +169,10 @@ def layout(**kwargs):  # noqa: ARG001
                                         ],
                                         h="100%",
                                         px="md",
+                                        wrap="nowrap",
                                     ),
-                                    span=6,
+                                    className="app-header-title-col",
+                                    span="auto",
                                 ),
                                 dmc.GridCol(
                                     dmc.Group(
@@ -180,8 +184,9 @@ def layout(**kwargs):  # noqa: ARG001
                                         h="100%",
                                         px="md",
                                         justify="flex-end",
+                                        wrap="nowrap",
                                     ),
-                                    span=6,
+                                    span="content",
                                 ),
                             ],
                         ),
