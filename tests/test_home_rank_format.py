@@ -174,6 +174,7 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
         "score-threshold-overlay-switch": "score-threshold-overlay",
         "score-threshold-percentage": "score-threshold-percentage",
         "score-threshold-notification-switch": "score-threshold-notification",
+        "top_n_scores": "top-n-scores",
     }
 
     for component_id, help_key in expected_settings.items():
@@ -192,6 +193,27 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
 
     score_threshold_percentage = components["score-threshold-percentage"]
     assert score_threshold_percentage.min == 1
+
+
+def test_rank_refresh_button_has_tooltip(monkeypatch):
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    tooltips = [
+        component
+        for component in _walk_components(home.layout())
+        if isinstance(component, dmc.Tooltip)
+        and any(
+            getattr(child, "id", None) == "rank-refresh-button"
+            for child in _walk_components(component.children)
+        )
+    ]
+
+    assert len(tooltips) == 1
+    assert tooltips[0].label == home.RANK_REFRESH_TOOLTIP
+    assert tooltips[0].events == home.TOOLTIP_EVENTS
+    assert tooltips[0].withArrow is True
+    assert tooltips[0].multiline is True
 
 
 def test_get_scenario_num_runs_without_selection():
