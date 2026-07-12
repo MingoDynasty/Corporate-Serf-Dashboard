@@ -90,6 +90,15 @@ LOWEST_PERCENTILE_TOOLTIP = (
     "params.value == null ? null : ('Lowest: ' + params.data.lowest_scenario)"
 )
 
+# The Hide/Unhide labels act immediately with no confirm step, so the hover
+# copy carries the consequence and the way back (Show hidden).
+VISIBILITY_TOOLTIP = (
+    "params.data.hidden"
+    " ? 'Show this playlist again in the overview and playlist selectors'"
+    " : 'Hide this playlist from the overview and playlist selectors;"
+    " restore it later via Show hidden'"
+)
+
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
@@ -102,6 +111,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Type",
         "field": "type_display",
+        "headerTooltip": (
+            "Benchmarks carry rank thresholds (Bronze, Silver, ...) for their "
+            "scenarios; playlists are plain scenario lists."
+        ),
         "cellRenderer": "TypeBadge",
         "sortable": True,
         "minWidth": 110,
@@ -109,6 +122,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Played",
         "field": "played_sort",
+        "headerTooltip": (
+            "Scenarios you have played at least once, out of the scenarios in "
+            "the playlist."
+        ),
         "valueFormatter": {"function": "params.data.played_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -141,6 +158,12 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Median Percentile",
         "field": "median_percentile_sort",
+        "headerTooltip": (
+            "Median leaderboard percentile across this playlist's scenarios "
+            "with a cached position. N/M = scenarios with a cached position "
+            "out of scenarios in the playlist - fills in as you open "
+            "playlists."
+        ),
         "valueFormatter": {"function": "params.data.median_percentile_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -149,6 +172,11 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Lowest Percentile",
         "field": "lowest_percentile_sort",
+        "headerTooltip": (
+            "The playlist's weakest scenario by leaderboard percentile, over "
+            "the same N/M coverage as Median Percentile. Hover a value to see "
+            "which scenario."
+        ),
         "valueFormatter": {"function": "params.data.lowest_percentile_display"},
         "tooltipValueGetter": {"function": LOWEST_PERCENTILE_TOOLTIP},
         "comparator": {"function": "nullsLastComparator"},
@@ -161,6 +189,7 @@ TABLE_COLUMN_DEFS = [
         "headerName": "",
         "field": VISIBILITY_COLUMN_ID,
         "cellRenderer": "VisibilityAction",
+        "tooltipValueGetter": {"function": VISIBILITY_TOOLTIP},
         "sortable": False,
         "resizable": False,
         "minWidth": 90,
