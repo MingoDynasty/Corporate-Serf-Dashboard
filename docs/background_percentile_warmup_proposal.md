@@ -148,8 +148,9 @@ Contract points:
    rare and self-explaining, accepted.
 5. R15's kill switch never disables progressive fill (user-initiated
    traffic).
-6. Its two speed-fix dependencies (total-play hydration hoist, stale-rank
-   fallback) benefit the warmer but do not block it: the warmer hydrates the
+6. Its two speed-fix dependencies already merged (PR #113 total-play
+   hydration hoist, PR #112 stale-rank fallback), so neither proposal has a
+   sequencing constraint left; the warmer additionally hydrates the
    leaderboard-id mapping once up front on its own.
 
 (Referenced by filename, not linked: the two proposals live on separate
