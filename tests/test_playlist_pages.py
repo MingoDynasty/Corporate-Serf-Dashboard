@@ -155,6 +155,12 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
     assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
 
 
+def test_playlists_overview_name_column_uses_link_renderer():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    assert columns["name"]["cellRenderer"] == "PlaylistNameLink"
+
+
 def test_playlists_overview_visibility_column_config():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
     column = columns[playlists.VISIBILITY_COLUMN_ID]
@@ -828,8 +834,30 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
     rows, status = playlist_scenarios.load_playlist_scenario_rows("KovaaKsTestCode")
 
     assert rows == expected_rows
+    # Each row gains an anchor href for the ScenarioLink renderer.
+    assert rows[0]["href"] == playlist_scenarios.scenario_home_href(
+        "First", "KovaaKsTestCode"
+    )
     assert status == ""
     assert playlist_scenarios.layout("KovaaKsTestCode") is not None
+
+
+def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
+    playlist = PlaylistData(
+        name="Voltaic Benchmarks",
+        code="KovaaKsTestCode",
+        scenarios=[Scenario(name="VT Pasu Air")],
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "build_playlist_scenario_rank_rows",
+        lambda _code: [{"scenario": "VT Pasu Air"}],
+    )
+
+    rows, _status = playlist_scenarios.load_playlist_scenario_rows("KovaaKsTestCode")
+
+    assert rows[0]["href"] == "/?playlist_code=KovaaKsTestCode&scenario=VT+Pasu+Air"
 
 
 def test_playlist_scenarios_layout_includes_quick_filter_input():
@@ -1045,5 +1073,7 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
 
     assert column["flex"] == 1
     assert column["maxWidth"] == 400
-    assert column["cellClass"] == "playlist-scenario-link-cell"
+    # Link styling now rides on the anchor the renderer emits, not the cell.
+    assert column["cellRenderer"] == "ScenarioLink"
+    assert "cellClass" not in column
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS

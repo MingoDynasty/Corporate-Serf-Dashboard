@@ -60,11 +60,15 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Scenario",
         "field": "scenario",
+        # Real anchor to the scenario's Home plot. The renderer reads the
+        # prebuilt row "href" and carries the link styling on the anchor
+        # itself, so new-tab / copy-link work; the cellClicked callback still
+        # handles the fast in-app left-click nav.
+        "cellRenderer": "ScenarioLink",
         "sortable": True,
         "flex": 1,
         "minWidth": 280,
         "maxWidth": 400,
-        "cellClass": "playlist-scenario-link-cell",
     },
     {
         "headerName": "Last Played",
@@ -192,7 +196,12 @@ def load_playlist_scenario_rows(playlist_code):
     if playlist is None:
         return [], f"Playlist code is not imported: {playlist_code}"
 
-    return build_playlist_scenario_rank_rows(playlist_code), ""
+    rows = build_playlist_scenario_rank_rows(playlist_code)
+    # Attach the anchor href here so the ScenarioLink renderer has a real URL to
+    # link to, keeping query-string encoding in Python via scenario_home_href.
+    for row in rows:
+        row["href"] = scenario_home_href(str(row["scenario"]), playlist_code)
+    return rows, ""
 
 
 clientside_callback(

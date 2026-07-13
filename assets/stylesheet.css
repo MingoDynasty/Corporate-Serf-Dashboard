@@ -87,14 +87,20 @@
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell {
+/* Navigation anchors rendered inside the playlist/scenario grid cells
+   (PlaylistNameLink / ScenarioLink in dashAgGridComponentFunctions.js). The
+   class carries the link styling on the anchor itself, overriding the UA
+   default link color for every state; the --mantine-color-blue-* variables are
+   theme-aware, so the color stays legible in dark mode. */
+a.playlist-scenario-link-cell,
+a.playlist-scenario-link-cell:visited {
     color: var(--mantine-color-blue-filled);
     cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell:hover {
+a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 

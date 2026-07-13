@@ -103,6 +103,10 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
         "field": "name",
+        # Real anchor to /playlists/<code> (built client-side from the row's
+        # share code). Whole-row click nav still works; the anchor adds
+        # new-tab / copy-link affordances a server-callback nav can't.
+        "cellRenderer": "PlaylistNameLink",
         "sortable": True,
         "flex": 1,
         "minWidth": 280,
