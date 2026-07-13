@@ -14,10 +14,16 @@ https://kovaaks.com/webapp-backend
 
 KovaaK's may return HTTP `429 Too Many Requests` during bursty access patterns, especially cold-cache playlist table loads that fetch many scenario ranks and totals.
 
+KovaaK's also has slow spells where `/leaderboard/scores/global` takes 9–28
+seconds to respond but still returns valid data (measured 2026-07-13). The
+request timeout must clear that band: it defaults to 30 seconds, configurable
+via `kovaaks_api_timeout_seconds` in `config.toml`.
+
 Project retry policy:
 
 - Retry GET requests once on HTTP `429`.
-- Retry GET requests once on narrow transient network failures: `requests.Timeout` and `requests.ConnectionError`.
+- Retry GET requests once on connection-level failures (`requests.ConnectionError`, which includes `ConnectTimeout`): the request never reached the server, so a retry is safe.
+- Never retry read timeouts (`requests.ReadTimeout`): the server received the request and is still working on it — abandoning the read does not cancel the server-side query — so an immediate duplicate doubles KovaaK's load with almost no chance of finishing sooner (2 of 63 retries succeeded during the 2026-07-13 slow spell).
 - Honor `Retry-After` when present.
 - Fall back to a short default delay when `Retry-After` is absent or invalid.
 - Cap the retry delay so the UI does not stall for a long server-requested wait.
