@@ -66,12 +66,19 @@ any user-facing path.
   immediately unhide the benchmarks they care about — so this hook is core.
 - **R7 — Interactive traffic bypasses the queue and preempts the worker.**
   Drill-in loads (see coordination below) and the Home refresh button fetch
-  directly, as today. A module-level "interactive activity" signal
-  (last-started / last-succeeded timestamps in `api_service`) is bumped by
-  those paths; the worker sleeps while activity is recent, so user-facing
-  bursts get full API bandwidth. Existing monotonic rank writes under
-  `_rank_save_lock` make concurrent writers safe; the worst race is one
-  duplicate in-flight request.
+  directly, as today. A module-level signal in `api_service` carries two
+  timestamps with deliberately split semantics:
+  - *last interactive activity* — bumped per interactive lookup, cache hits
+    included (it means only "the user is active, stay out of the way");
+    drives the worker's yielding.
+  - *last network success* — bumped only on a real HTTP success in the
+    shared GET helper, never on cache-served returns; drives the
+    outage-backoff wake (R9). A cache hit is not evidence KovaaK's
+    recovered: interactive lookups over a warm cache make zero HTTP
+    requests.
+
+  Existing monotonic rank writes under `_rank_save_lock` make concurrent
+  writers safe; the worst race is one duplicate in-flight request.
 - **R8 — Single TTL.** v1 keeps `scenario_rank_cache_ttl_hours` (168 h) for
   both interactive and background freshness. A separate longer background TTL
   is a real lever (percentile drift is glacial) but only pays once the visible
@@ -83,8 +90,9 @@ any user-facing path.
   converges to ~1 probe per 30 min, which doubles as the recovery detector.
   Tail (not head) requeue keeps one flaky scenario from blocking the queue
   behind its own backoffs. Per-item cap: 3 transient attempts per session,
-  then drop (the next restart retries). A success on the interactive path
-  also wakes the worker early (R7 signal).
+  then drop (the next restart retries). Any real network success — the
+  worker's own probes or another path's HTTP success (R7's *last network
+  success*) — wakes the worker early; cache-served results never do.
 - **R10 — Permanent failures skip immediately.** Unresolvable leaderboard IDs
   and validation failures are logged and dropped without retries; a restart
   re-probes each once (accepted cost; a negative-resolution cache is a future
@@ -147,9 +155,12 @@ cache-fresh completing in milliseconds).
 Contract points:
 
 1. The R7 activity signal is the one integration: progressive-fill phase-2
-   workers (its R11) and the Home refresh bump it; whichever PR lands first
-   defines the ~5-line primitive. (Adopted on their side as its R13,
-   pending their register triage.)
+   workers (its R11) and the Home refresh bump the activity timestamp, and
+   the shared GET helper bumps the network-success timestamp; whichever PR
+   lands first defines the ~5-line primitive with R7's split semantics.
+   (Adopted on their side as its R13 and confirmed in their register
+   triage; the split came from a PR #114 review finding — a cache hit must
+   not wake the worker from outage backoff.)
 2. The overview deliberately does not reuse the progressive-fill registry
    transport (R13 here); different data planes.
 3. Status lines share a phrase family but deliberately different counters:
