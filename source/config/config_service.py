@@ -27,6 +27,7 @@ class ConfigData:
     scenario_metadata_cache_ttl_hours: int = 24
     scenario_rank_cache_ttl_hours: int = 168
     leaderboard_total_cache_ttl_hours: int = 168
+    kovaaks_api_timeout_seconds: int = 30
 
 
 def load_config() -> ConfigData:

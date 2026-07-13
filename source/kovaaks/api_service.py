@@ -31,7 +31,11 @@ from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.dash_logging import get_dash_logger
 
-TIMEOUT = 10  # Default timeout for KovaaK's API requests.
+# KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
+# responses stay valid, so the default must clear that band (see the
+# 2026-07-13 decision log entry). Configurable via kovaaks_api_timeout_seconds.
+DEFAULT_TIMEOUT_SECONDS = 30
+_timeout_seconds = DEFAULT_TIMEOUT_SECONDS
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
 TRANSIENT_GET_EXCEPTIONS = (
@@ -51,6 +55,17 @@ CACHE_DIR = "data/cache"
 
 class UnknownKovaaksUserError(ValueError):
     """Raised when KovaaK's returns no user for the configured username."""
+
+
+def set_request_timeout(seconds: int) -> None:
+    """Apply the configured timeout for all KovaaK's API requests.
+
+    Called once at app startup with ``kovaaks_api_timeout_seconds``; callers
+    that never configure it (tests, scripts) get ``DEFAULT_TIMEOUT_SECONDS``.
+    """
+    # Startup-only mutation; requests read it per call, so no lock is needed.
+    global _timeout_seconds  # noqa: PLW0603
+    _timeout_seconds = seconds
 
 
 class Endpoints(StrEnum):
@@ -139,7 +154,7 @@ def _get_with_retry(
     loads. After all attempts fail, normal caller-level error handling decides
     whether the UI sees UNKNOWN/N/A.
     """
-    kwargs.setdefault("timeout", TIMEOUT)
+    kwargs.setdefault("timeout", _timeout_seconds)
     backoff_schedule = backoff_seconds or (0.0,)
 
     for attempt in range(attempts):
@@ -183,7 +198,7 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
     """Fetch playlist metadata matching a KovaaK's playlist code."""
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 
-    response = _get_with_retry(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
+    response = _get_with_retry(Endpoints.PLAYLIST, params=params)
     return PlaylistAPIResponse.model_validate(response.json())
 
 
@@ -214,7 +229,6 @@ def get_benchmark_json(
     response = _get_with_retry(
         Endpoints.BENCHMARKS,
         params=params,
-        timeout=TIMEOUT,
         attempts=attempts,
         backoff_seconds=backoff_seconds,
     )
@@ -246,7 +260,7 @@ def get_leaderboard_scores(
     }
     if username_search:
         params["usernameSearch"] = username_search
-    response = _get_with_retry(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
+    response = _get_with_retry(Endpoints.LEADERBOARD, params=params)
 
     return LeaderboardAPIResponse.model_validate(response.json())
 
@@ -474,7 +488,6 @@ def get_user_scenario_total_play(
             response = _get_with_retry(
                 Endpoints.USER_SCENARIO_TOTAL_PLAY,
                 params=params,
-                timeout=TIMEOUT,
             )
             response.raise_for_status()
 
@@ -575,7 +588,6 @@ def search_scenario_exact(scenario_name: str) -> int | None:
     response = _get_with_retry(
         Endpoints.SEARCH_SCENARIO,
         params=params,
-        timeout=TIMEOUT,
     )
 
     search_response = ScenarioSearchAPIResponse.model_validate(response.json())

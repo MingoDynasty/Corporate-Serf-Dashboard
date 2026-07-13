@@ -17,6 +17,7 @@ from watchdog.observers import Observer
 
 from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import CONFIG_ERROR_MESSAGE, get_config
+from source.kovaaks.api_service import set_request_timeout
 from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
 from source.my_watchdog.file_watchdog import NewFileHandler
 
@@ -88,6 +89,8 @@ def main() -> None:
         "Loaded config:\n%s",
         json.dumps(asdict(config), indent=2),
     )
+
+    set_request_timeout(config.kovaaks_api_timeout_seconds)
 
     load_playlists()
 

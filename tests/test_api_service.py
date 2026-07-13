@@ -103,13 +103,32 @@ def test_get_with_retry_reuses_session_within_thread(monkeypatch):
     assert created_sessions[0].calls == [
         (
             "https://example.test/first",
-            {"timeout": api_service.TIMEOUT},
+            {"timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
         (
             "https://example.test/second",
-            {"params": {"a": 1}, "timeout": api_service.TIMEOUT},
+            {"params": {"a": 1}, "timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
     ]
+
+
+def test_set_request_timeout_applies_to_requests(monkeypatch):
+    calls = []
+
+    def fake_get(_url, **kwargs):
+        calls.append(kwargs)
+        return FakeResponse({"ok": True})
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    # setattr registers teardown restoration before set_request_timeout mutates.
+    monkeypatch.setattr(
+        api_service, "_timeout_seconds", api_service.DEFAULT_TIMEOUT_SECONDS
+    )
+
+    api_service.set_request_timeout(45)
+    api_service._get_with_retry("https://example.test")
+
+    assert calls == [{"timeout": 45}]
 
 
 def test_get_thread_session_is_thread_local(monkeypatch):
@@ -520,7 +539,6 @@ def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
                     "benchmarkId": 123,
                     "steamId": "00000000000000000",
                 },
-                "timeout": api_service.TIMEOUT,
                 "attempts": 4,
                 "backoff_seconds": (2, 4, 8),
             },
@@ -604,8 +622,7 @@ def test_write_json_raises_after_replace_retries_exhausted(tmp_path, monkeypatch
 
 
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
-    def fake_get_with_retry(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+    def fake_get_with_retry(_url, params):
         assert params == {
             "page": 2,
             "max": 25,
@@ -774,7 +791,7 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -841,7 +858,7 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(responses[params["page"]])
 
@@ -877,7 +894,7 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(None)
 
@@ -971,7 +988,7 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -1003,7 +1020,7 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     api_service.make_cache()
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,
@@ -1420,7 +1437,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
         return LeaderboardAPIResponse(page=0, max=50, total=0, data=[])
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         assert params["username"] == "UnknownUser"
         return FakeResponse(None)
 
@@ -2030,7 +2047,7 @@ def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
     def fake_get(_url, params, timeout):
         assert params["scenarioNameSearch"] == "VT Pasu Intermediate S5"
         assert params["max"] == 100
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,
