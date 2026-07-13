@@ -64,7 +64,10 @@ what it knows and stream in what it doesn't, with visible progress.
 - **R5 — Transport: registry + interval drain.** A module-level registry in
   the service layer, guarded by a lock:
   `{generation_id: {pending row updates, done_count, unknown_count,
-  stale_count, total, complete, cancel Event}}`. A `dcc.Interval` (~1 s)
+  stale_count, total, playlist_code, unresolved indices,
+  terminal flag (complete | cancelled), consumed flag, cancel Event}}` —
+  the terminal-state fields' lifecycle is defined in R7. A `dcc.Interval`
+  (~1 s)
   drains pending updates and applies them via the grid's `rowTransaction`
   (update-only). Each pending update is a **complete row dict** rebuilt via
   `format_playlist_scenario_rank_row` (workers re-read local stats per
@@ -104,13 +107,18 @@ what it knows and stream in what it doesn't, with visible progress.
   tombstones — final counters, the terminal flag, the playlist code, the
   set of unresolved row indices, and a **consumed flag** — so the owning
   drain can observe the end state through R8's terminal protocol.
-  Retention is consumption-aware: the page-load sweep evicts consumed
-  tombstones immediately, while unconsumed ones are retained up to a small
-  fixed cap (oldest evicted first) — unconditional eviction could destroy
-  a tombstone in the sub-second window between cancellation and the owning
-  tab's next tick (two quick page opens suffice), resurrecting the
-  permanent-pending bug; the cap keeps abandoned tabs' tombstones from
-  accumulating while a merely slow tab keeps its chance to settle.
+  Retention is bounded, not immediate: all terminal tombstones — consumed
+  or not — live in one retention set capped at a small fixed size, and the
+  page-load sweep evicts only beyond the cap, consumed before unconsumed,
+  oldest first within each class. Eviction on any faster trigger destroys
+  state some tab still needs: an *unconsumed* tombstone lost in the
+  sub-second window between cancellation and the owning tab's next tick
+  (two quick page opens suffice) resurrects the permanent-pending bug, and
+  a *consumed* one lost to another tab's sweep severs R8's reassertion
+  healing while a superseded generation's response can still straggle in.
+  Consumption shrinks a tombstone to a stub — final counters plus flags;
+  the unresolved set and pending queue are dropped — so retained consumed
+  tombstones cost almost nothing.
   A cancelled fill must not strand animated pending cells on a
   still-visible grid (the two-tab case): the consuming tick (R8)
   **finalizes** — rebuilds the tombstone's unresolved rows cache-only
@@ -139,13 +147,17 @@ what it knows and stream in what it doesn't, with visible progress.
   app), and it is what heals a stale status written by a superseded
   generation's in-flight response *after* the current fill has settled —
   post-terminal `no_update` ticks would leave that stale text standing until
-  the next page load. Never disabling eliminates by construction the
+  the next page load. The healing exists only while the tombstone does —
+  which is why R7 retains consumed tombstones in the bounded set instead of
+  evicting them on the next sweep. Never disabling eliminates by
+  construction the
   cross-navigation race where a stale `disabled=True` response lands after
   the next page's phase 1 enabled the interval, which would otherwise stall
   that fill permanently. The drain callback is idempotent, mutates the
-  registry only by draining its own token's pending queue, and returns
-  `no_update` everywhere on an unknown or missing token — which also makes
-  it safe against DashProxy's known spurious initial-load fire.
+  registry only under its own token — draining the pending queue and
+  atomically flipping the consumed flag — and returns `no_update`
+  everywhere on an unknown or missing token, which also makes it safe
+  against DashProxy's known spurious initial-load fire.
 - **R9 — Failure display: aggregated three-tier summary.** A scenario whose
   refresh fails keeps existing UNKNOWN → "N/A" semantics in its row; there
   is never per-scenario toast spam. On completion the **drain callback** —
