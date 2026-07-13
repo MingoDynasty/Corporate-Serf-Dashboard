@@ -846,6 +846,69 @@ def test_playlist_scenarios_layout_includes_quick_filter_input():
     assert "playlist-scenarios-quick-filter-sink" in sink_ids
 
 
+def _text_content(component):
+    return "".join(
+        str(child.children)
+        for child in _walk_components(component)
+        if isinstance(child, (dmc.Title, dmc.Text)) and isinstance(child.children, str)
+    )
+
+
+def test_playlist_scenarios_header_shows_display_label_and_code(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "get_playlist_display_label",
+        lambda code: f"Voltaic Benchmarks ({code})",
+    )
+
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    header_text = _text_content(page)
+
+    assert "Voltaic Benchmarks (KovaaKsTestCode)" in header_text
+    assert "KovaaKsTestCode" in header_text
+
+
+def test_playlist_scenarios_layout_without_code_renders_no_header(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "get_playlist_display_label",
+        lambda _code: pytest.fail("no header must be rendered without a playlist code"),
+    )
+
+    page = playlist_scenarios.layout(None)
+    titles = [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Title)
+    ]
+
+    assert titles == []
+
+
+def test_playlist_scenarios_page_title_carries_label_for_known_code(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "get_playlist_display_label",
+        lambda code: f"Voltaic Benchmarks ({code})",
+    )
+
+    assert (
+        playlist_scenarios._page_title("KovaaKsTestCode")
+        == "Voltaic Benchmarks (KovaaKsTestCode) - Playlist Scenarios"
+    )
+
+
+def test_playlist_scenarios_page_title_falls_back_without_code(monkeypatch):
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "get_playlist_display_label",
+        lambda _code: pytest.fail("falsy code must not reach the label lookup"),
+    )
+
+    assert playlist_scenarios._page_title() == "Playlist Scenarios"
+    assert playlist_scenarios._page_title(None) == "Playlist Scenarios"
+
+
 def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):
     monkeypatch.setattr(data_service, "playlist_database", {})
 

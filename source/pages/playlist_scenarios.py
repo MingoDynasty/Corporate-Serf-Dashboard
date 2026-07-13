@@ -15,13 +15,29 @@ from dash import (
     no_update,
 )
 
-from source.kovaaks.data_service import get_playlist_by_code
+from source.kovaaks.data_service import (
+    get_playlist_by_code,
+    get_playlist_display_label,
+)
 from source.kovaaks.playlist_scenarios_service import build_playlist_scenario_rank_rows
+
+
+def _page_title(playlist_code=None, **_kwargs):
+    """Carry the playlist name into the browser tab title.
+
+    Dash Pages calls this per request with the route's path variables, after
+    startup's ``load_playlists()`` has filled the playlist store, so the label
+    lookup is safe here.
+    """
+    if not playlist_code:
+        return "Playlist Scenarios"
+    return f"{get_playlist_display_label(playlist_code)} - Playlist Scenarios"
+
 
 dash.register_page(
     __name__,
     path_template="/playlists/<playlist_code>",
-    title="Playlist Scenarios",
+    title=_page_title,
 )
 
 AUTO_SIZE_COLUMN_KEYS = [
@@ -223,6 +239,18 @@ clientside_callback(
 )
 
 
+def _page_header(playlist_code: str) -> dmc.Group:
+    """Title the page with the playlist's display label and its share code."""
+    return dmc.Group(
+        align="baseline",
+        gap="sm",
+        children=[
+            dmc.Title(get_playlist_display_label(playlist_code), order=2),
+            dmc.Text(playlist_code, c="dimmed", size="sm"),
+        ],
+    )
+
+
 def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
     """Build the per-playlist scenario table page."""
     return dmc.Stack(
@@ -241,6 +269,10 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 interval=30_000,
                 n_intervals=0,
             ),
+            # No playlist selected: skip the header and let the status line
+            # in the filter row below prompt the user to pick one from the
+            # Playlists page.
+            *([_page_header(playlist_code)] if playlist_code is not None else []),
             dmc.Group(
                 children=[
                     dmc.TextInput(
