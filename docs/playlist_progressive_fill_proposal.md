@@ -107,14 +107,22 @@ what it knows and stream in what it doesn't, with visible progress.
   tombstones — final counters, the terminal flag, the playlist code, the
   set of unresolved row indices, and a **consumed flag** — so the owning
   drain can observe the end state through R8's terminal protocol.
-  Retention is bounded, not immediate: all terminal tombstones — consumed
-  or not — live in one retention set capped at a small fixed size, and the
-  page-load sweep evicts only beyond the cap, consumed before unconsumed,
-  oldest first within each class. Eviction on any faster trigger destroys
-  state some tab still needs: an *unconsumed* tombstone lost in the
-  sub-second window between cancellation and the owning tab's next tick
-  (two quick page opens suffice) resurrects the permanent-pending bug, and
-  a *consumed* one lost to another tab's sweep severs R8's reassertion
+  Terminal transitions are pinned: cancellation tombstones a generation
+  **synchronously at cancel time** (the canceller marks it; straggler
+  workers are already token-refused), and completion tombstones it when
+  the fill's thread finishes. Retention is bounded, not immediate: all
+  terminal tombstones — consumed or not — live in one retention set capped
+  at a small fixed size, and **the cap is enforced under the registry lock
+  at every terminal transition** — the insertion point — not by any
+  page-load sweep, because insertions can happen after the last page load
+  (a burst of rapid navigations whose fills finish afterwards would
+  otherwise exceed the cap forever, with no later trigger to prune it).
+  Eviction beyond the cap takes consumed before unconsumed, oldest first
+  within each class. Eviction on any faster trigger destroys state some
+  tab still needs: an *unconsumed* tombstone lost in the sub-second window
+  between cancellation and the owning tab's next tick (two quick page
+  opens suffice) resurrects the permanent-pending bug, and a *consumed*
+  one lost to eviction from another tab's activity severs R8's reassertion
   healing while a superseded generation's response can still straggle in.
   Consumption shrinks a tombstone to a stub — final counters plus flags;
   the unresolved set and pending queue are dropped — so retained consumed
@@ -149,7 +157,7 @@ what it knows and stream in what it doesn't, with visible progress.
   post-terminal `no_update` ticks would leave that stale text standing until
   the next page load. The healing exists only while the tombstone does —
   which is why R7 retains consumed tombstones in the bounded set instead of
-  evicting them on the next sweep. Never disabling eliminates by
+  evicting them eagerly on consumption. Never disabling eliminates by
   construction the
   cross-navigation race where a stale `disabled=True` response lands after
   the next page's phase 1 enabled the interval, which would otherwise stall
