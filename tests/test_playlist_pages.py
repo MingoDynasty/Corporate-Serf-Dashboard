@@ -431,6 +431,20 @@ def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     }
 
 
+def test_playlists_overview_layout_includes_quick_filter_input():
+    page = playlists.layout()
+    quick_filter = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlists-overview-quick-filter"
+    )
+    sink_ids = {getattr(child, "id", None) for child in page.children}
+
+    assert quick_filter.placeholder == "Filter playlists..."
+    # The client-side callback needs a sink store to output into.
+    assert "playlists-overview-quick-filter-sink" in sink_ids
+
+
 def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
     # KovaaK's canonicalizes pasted codes; the stored code is what visibility
     # must persist, or a non-canonical paste imports hidden once a
@@ -816,6 +830,20 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
     assert rows == expected_rows
     assert status == ""
     assert playlist_scenarios.layout("KovaaKsTestCode") is not None
+
+
+def test_playlist_scenarios_layout_includes_quick_filter_input():
+    page = playlist_scenarios.layout("KovaaKsTestCode")
+    quick_filter = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlist-scenarios-quick-filter"
+    )
+    sink_ids = {getattr(child, "id", None) for child in page.children}
+
+    assert quick_filter.placeholder == "Filter scenarios..."
+    # The client-side callback needs a sink store to output into.
+    assert "playlist-scenarios-quick-filter-sink" in sink_ids
 
 
 def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):

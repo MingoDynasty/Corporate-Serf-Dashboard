@@ -536,6 +536,29 @@ clientside_callback(
 )
 
 
+# Client-side quick filter: pipe the text input straight into AG Grid's built-in
+# quick filter so rows narrow as the user types, with no server round-trip.
+clientside_callback(
+    """
+    async (value) => {
+        if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+            return window.dash_clientside.no_update;
+        }
+
+        try {
+            const gridApi = await window.dash_ag_grid.getApiAsync("playlists-overview-grid");
+            gridApi.setGridOption("quickFilterText", value || "");
+        } catch (error) {
+            console.warn("Failed to apply playlist overview quick filter.", error);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("playlists-overview-quick-filter-sink", "data"),
+    Input("playlists-overview-quick-filter", "value"),
+)
+
+
 def layout(**kwargs):  # noqa: ARG001
     """Build the playlist-level overview page."""
     return dmc.Stack(
@@ -550,6 +573,8 @@ def layout(**kwargs):  # noqa: ARG001
             # Holds the code the delete confirmation modal is targeting.
             dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
+            # Dummy sink for the client-side quick-filter callback's output.
+            dcc.Store(id="playlists-overview-quick-filter-sink"),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
                 interval=30_000,
@@ -557,7 +582,19 @@ def layout(**kwargs):  # noqa: ARG001
             ),
             dmc.Group(
                 children=[
-                    dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                    dmc.Group(
+                        children=[
+                            dmc.TextInput(
+                                id="playlists-overview-quick-filter",
+                                placeholder="Filter playlists...",
+                                size="sm",
+                                w=240,
+                            ),
+                            dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                        ],
+                        gap="md",
+                        align="center",
+                    ),
                     dmc.Group(
                         children=[
                             dmc.Switch(
