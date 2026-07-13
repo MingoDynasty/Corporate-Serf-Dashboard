@@ -169,6 +169,18 @@ def _get_with_retry(
             response = _session_get(url, **kwargs)
         except requests.RequestException as exc:
             elapsed_seconds = time.monotonic() - started
+            # Outcome line for every failed attempt, retried or not: the
+            # WARNING below has no params, so during concurrent loads this is
+            # what ties a failure to its leaderboard.
+            logger.debug(
+                "GET %s %s failed after %.1fs (attempt %d/%d): %s",
+                url,
+                kwargs.get("params"),
+                elapsed_seconds,
+                attempt + 1,
+                attempts,
+                request_exception_summary(exc),
+            )
             if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
                 logger.warning(
                     "Transient GET failure at %s after %.1fs (attempt %d/%d); "
@@ -185,15 +197,6 @@ def _get_with_retry(
                 if delay_seconds > 0:
                     time.sleep(delay_seconds)
                 continue
-            logger.debug(
-                "GET %s %s failed after %.1fs (attempt %d/%d): %s",
-                url,
-                kwargs.get("params"),
-                elapsed_seconds,
-                attempt + 1,
-                attempts,
-                request_exception_summary(exc),
-            )
             raise
 
         logger.debug(
