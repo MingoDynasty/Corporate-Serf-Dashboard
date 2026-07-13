@@ -398,7 +398,7 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
     assert caplog.messages == [
-        "Transient GET failure at https://evxl.gg/api "
+        "Transient GET failure at https://evxl.gg/api after 0.0s "
         "(attempt 1/3); retrying: connection dropped"
     ]
 
