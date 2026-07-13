@@ -16,7 +16,8 @@ the in-memory stores from existing CSVs, starts a watchdog `Observer` on
 
 Threads at runtime:
 
-- **Server thread(s)** — Waitress/Flask serving Dash; runs the page callbacks.
+- **Server thread(s)** — Waitress (8 workers) or Flask serving Dash; runs the
+  page callbacks.
 - **Watchdog observer thread** — `NewFileHandler` fires on each new CSV.
 - **Rank freshness timers** — after a new high score, `api_service.py` uses a
   bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's

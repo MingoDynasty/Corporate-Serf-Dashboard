@@ -116,7 +116,10 @@ def main() -> None:
                 port=config.port,
             )
         else:
-            serve(app.server, host="127.0.0.1", port=config.port)
+            # Each Home poll tick bursts several callback POSTs at once;
+            # Waitress's default 4 threads left no headroom (task queue depth
+            # warnings with a single open tab).
+            serve(app.server, host="127.0.0.1", port=config.port, threads=8)
     finally:
         observer.stop()
         observer.join()  # Wait until the observer thread terminates
