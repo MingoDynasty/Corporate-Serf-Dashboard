@@ -18,7 +18,9 @@ what it knows and stream in what it doesn't, with visible progress.
   with cache-only rank reads (`get_scenario_rank_info(allow_network=False)`,
   the overview page's path) plus local stats, and returns immediately.
   Phase 2: a server-side daemon thread re-runs the normal network path and
-  streams per-row updates to the grid.
+  streams per-row updates to the grid. One phase-2 run for one page open is
+  a **fill**; the R7 generation token is a fill's identity, and "the fill"
+  below always means the current generation's run.
 - **R2 — Phase 2 covers all scenarios through the existing network path.**
   It runs `get_scenario_rank_info(allow_network=True)` for every scenario:
   cache-fresh scenarios complete in milliseconds without network, so
@@ -26,8 +28,13 @@ what it knows and stream in what it doesn't, with visible progress.
   (TTL-expired entries refresh, fresh ones don't). No bespoke "which rows
   are stale" logic to maintain.
 - **R3 — Pending vs. N/A.** A network cell (Position / Total Players /
-  Percentile) renders a dimmed ellipsis placeholder (semantic CSS class,
-  visually distinct from a final "N/A") when its value is None and the row
+  Percentile) renders a dimmed **animated** ellipsis placeholder — cycling
+  `.` → `..` → `…` via a pure-CSS `steps()` keyframe on the pending cell's
+  semantic class (a `::after` `content` animation in
+  `assets/stylesheet.css`; the base rule's static `…` is the automatic
+  fallback in browsers that don't animate `content`), so pending reads as
+  activity rather than truncation, with no custom cellRenderer — when its
+  value is None and the row
   has not yet been resolved by the current generation; once resolved,
   placeholders become values or "N/A". "…" always means "still being
   decided", "N/A" always means "decided: unavailable". The rule is per-cell
