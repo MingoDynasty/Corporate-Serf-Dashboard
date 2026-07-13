@@ -33,15 +33,21 @@ what it knows and stream in what it doesn't, with visible progress.
   semantic class (a `::after` `content` animation in
   `assets/stylesheet.css`; the base rule's static `…` is the automatic
   fallback in browsers that don't animate `content`), so pending reads as
-  activity rather than truncation, with no custom cellRenderer — when its
-  value is None and the row
-  has not yet been resolved by the current generation; once resolved,
-  placeholders become values or "N/A". "…" always means "still being
-  decided", "N/A" always means "decided: unavailable". The rule is per-cell
-  and status-independent: e.g. a cached-UNRANKED row shows "Unranked" in
-  Position immediately while Percentile shows "…" until resolution (phase 2
-  may flip UNRANKED to RANKED). Rows whose three network cells are all
-  populated render normally and may update silently in place.
+  activity rather than truncation, with no custom cellRenderer. Pending is
+  an **explicit per-cell flag** (`rank_pending`, `total_pending`,
+  `percentile_pending`) stamped by phase 1 — never inferred from value
+  nullity: the grid columns bind the `*_sort` fields, and `rank_sort` is
+  legitimately None on a *resolved* UNRANKED row (display "Unranked"), so a
+  `params.value == null` predicate cannot tell pending from resolved-N/A.
+  A flagged cell's valueFormatter returns an empty string (suppressing the
+  "N/A" display text) and its cellClass adds the pending class whose
+  `::after` draws the dots; every row emitted by phase 2 or by cancellation
+  finalization (R7) carries all three flags cleared. "…" always means
+  "still being decided", "N/A" always means "decided: unavailable". The
+  rule is per-cell and status-independent: e.g. a cached-UNRANKED row shows
+  "Unranked" in Position immediately while Percentile shows "…" until
+  resolution (phase 2 may flip UNRANKED to RANKED). Rows with no flagged
+  cells render normally and may update silently in place.
 - **R4 — Progress counter.** The existing status Text
   (`playlist-scenarios-status`) shows
   `Updating positions from KovaaK's… done/total` (total = all scenarios,
@@ -49,7 +55,9 @@ what it knows and stream in what it doesn't, with visible progress.
   completion (any UNKNOWN or stale-served rows, per R9) it settles to a
   compact persistent summary — e.g.
   `2 of 34 positions unavailable · 30 from cache — KovaaK's unreachable` —
-  until the next fill. The R9 toast is transient; a degraded page must not
+  until the next fill; a cancelled fill settles to the interrupted variant,
+  e.g. `Update interrupted · 12 of 34 refreshed` (R7 finalization). The R9
+  toast is transient; a degraded page must not
   look identical to a fresh one ten seconds later. All-fresh playlists
   complete within roughly one interval tick; a brief counter flash is
   accepted.
@@ -93,16 +101,27 @@ what it knows and stream in what it doesn't, with visible progress.
   server-side); workers check the cancel Event before each scenario fetch,
   so an abandoned load stops within one in-flight scenario per worker.
   Terminal generations (complete or cancelled) remain in the registry as
-  tombstones — final counts plus the terminal flag — so the owning drain can
-  observe the end state, perform a final drain, and settle its status line;
-  tombstones are evicted by the next page-load sweep.
+  tombstones — final counters, the terminal flag, the playlist code, and
+  the set of unresolved row indices — so the owning drain can observe the
+  end state, perform a final drain, and settle its status line; tombstones
+  are evicted by the next page-load sweep. A cancelled fill must not strand
+  animated pending cells on a still-visible grid (the two-tab case): when
+  the owning drain observes a *cancelled* tombstone it **finalizes** —
+  rebuilds the tombstone's unresolved rows cache-only
+  (`allow_network=False`, pending flags cleared; the cache may meanwhile
+  hold the cancelled workers' banked fetches, so finalized cells can even
+  improve), applies them as its final transaction, and settles the status
+  to the interrupted variant (R4). Same-tab navigation destroys the old
+  page — no drain ever ticks, so finalization costs nothing in the common
+  case.
 - **R8 — Interval lifecycle: enable-only.** The drain interval renders
   `disabled=True`; the phase-1 callback enables it when it starts phase 2,
   and it stays enabled for the life of the page instance — nothing ever sets
   `disabled=True` back. After the drain observes a terminal tombstone,
   every subsequent tick **reasserts the settled status line** — re-derived
   from the tombstone's final counters: cleared for a clean fill, the R4
-  degraded summary otherwise — while row transactions and notifications stay
+  degraded or interrupted summary otherwise — while row transactions and
+  notifications stay
   `no_update`. Reassertion is a cheap constant write (local single-user
   app), and it is what heals a stale status written by a superseded
   generation's in-flight response *after* the current fill has settled —
@@ -117,8 +136,10 @@ what it knows and stream in what it doesn't, with visible progress.
 - **R9 — Failure display: aggregated three-tier summary.** A scenario whose
   refresh fails keeps existing UNKNOWN → "N/A" semantics in its row; there
   is never per-scenario toast spam. On completion the **drain callback** —
-  not the phase-2 thread, which has no callback context (`set_props`-based
-  `dash_logger` raises `LookupError` from a plain thread) — emits at most
+  not the phase-2 thread: since PR #115, `dash_logger` records from plain
+  threads are queued and flushed only by the Home page's interval, so a
+  fill summary logged from the worker would surface on the wrong page,
+  whenever Home is next visited — emits at most
   one summary via the notification container's `sendNotifications` output,
   with a per-fill unique notification id (dmc silently swallows a "show"
   with a duplicate id). Tiers mirror the PR #112 three-tier toast model,
@@ -156,12 +177,17 @@ what it knows and stream in what it doesn't, with visible progress.
 - **R12 — No persistence.** The registry is in-memory only. A page reload or
   app restart simply starts a new generation; phase-2 results already written
   to the normal disk caches are free progress for the next open.
-- **R13 — Interactive-activity signal (coordination).** Phase-2 workers bump
-  the shared module-level "interactive activity" signal in `api_service` —
-  two timestamps: last interactive fetch started, last succeeded — so the
-  background percentile warmup worker (see Coordination below) yields to
-  user-facing bursts and wakes early from outage backoff. Whichever PR lands
-  first defines the ~5-line primitive; the other adopts it.
+- **R13 — Interactive-activity signal (coordination).** A shared
+  module-level signal in `api_service`, two timestamps with deliberately
+  different semantics. *Last interactive activity* is bumped per
+  interactive lookup — cache hits included, since it only means "the user
+  is active, stay out of the way" — and drives the warmup worker's
+  yielding. *Last network success* is bumped only inside the real HTTP
+  request-success path and is what wakes the warmer from outage backoff.
+  R2 makes the distinction load-bearing: a warm-cache page open performs
+  zero requests, and letting its cache hits signal recovery would wake the
+  warmer without any evidence KovaaK's recovered. Whichever PR lands first
+  defines the primitive; the other adopts it.
 
 ## Edge cases (deliberate)
 
@@ -169,7 +195,8 @@ what it knows and stream in what it doesn't, with visible progress.
   previous live generations are cancelled per R7.
 - Two browser tabs → single-user assumption: the second open cancels the
   first tab's fill; the first tab's drain observes the cancelled tombstone,
-  settles, and idles. Its already-rendered rows stay visible.
+  finalizes its unresolved rows, settles to the interrupted status, and
+  idles (R7). Its rows stay visible with no cell left animating.
 - Sorting mid-fill: AG Grid re-applies the active sort to updated rows
   (doc-verified), so rows may reposition as values land. Accepted for v1;
   `suppressModelUpdateAfterUpdateTransaction` exists as an opt-out if it
@@ -195,6 +222,9 @@ what it knows and stream in what it doesn't, with visible progress.
   covered by the background-percentile-warmup proposal — see Coordination).
 - Staleness indicators (e.g. `fetched_at` tooltips) on served cached values.
 - Retry/backoff tuning and per-load network deadlines.
+- A `prefers-reduced-motion` override for the R3 animation — deliberately
+  omitted: single-user app whose one user runs without that preference; a
+  three-line CSS addition if the audience ever grows.
 
 ## Coordination
 
