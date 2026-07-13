@@ -1,6 +1,7 @@
 """Build playlist scenario table rows for the playlist overview page."""
 
 import logging
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from source.config.config_service import get_config
@@ -226,6 +227,8 @@ def build_playlist_scenario_rank_rows(
     # TODO: Back Stopwatch with time.perf_counter() so elapsed timings are monotonic.
     stopwatch = Stopwatch()
     stopwatch.start()
+    status_counts: Counter[ScenarioRankStatus] = Counter()
+    warning_count = 0
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {
             executor.submit(
@@ -240,6 +243,9 @@ def build_playlist_scenario_rank_rows(
                 rank_info = future.result()
             except Exception as exc:  # noqa: BLE001
                 rank_info = _unknown_rank_info(scenario_name, exc)
+            status_counts[rank_info.status] += 1
+            if rank_info.warning_message:
+                warning_count += 1
             rows[index] = format_playlist_scenario_rank_row(
                 scenario_name,
                 index,
@@ -250,9 +256,14 @@ def build_playlist_scenario_rank_rows(
 
     stopwatch.stop()
     logger.info(
-        "Loaded playlist scenario rows for %s (%d scenarios) in %.2f seconds",
+        "Loaded playlist scenario rows for %s (%d scenarios: %d ranked, "
+        "%d unranked, %d unknown, %d with warnings) in %.2f seconds",
         playlist.name,
         len(playlist.scenarios),
+        status_counts[ScenarioRankStatus.RANKED],
+        status_counts[ScenarioRankStatus.UNRANKED],
+        status_counts[ScenarioRankStatus.UNKNOWN],
+        warning_count,
         stopwatch.elapsed(),
     )
     return [row for row in rows if row is not None]
