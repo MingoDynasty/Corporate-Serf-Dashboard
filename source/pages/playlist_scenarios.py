@@ -216,6 +216,29 @@ clientside_callback(
 )
 
 
+# Client-side quick filter: pipe the text input straight into AG Grid's built-in
+# quick filter so rows narrow as the user types, with no server round-trip.
+clientside_callback(
+    """
+    async (value) => {
+        if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+            return window.dash_clientside.no_update;
+        }
+
+        try {
+            const gridApi = await window.dash_ag_grid.getApiAsync("playlist-scenarios-grid");
+            gridApi.setGridOption("quickFilterText", value || "");
+        } catch (error) {
+            console.warn("Failed to apply playlist scenario quick filter.", error);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("playlist-scenarios-quick-filter-sink", "data"),
+    Input("playlist-scenarios-quick-filter", "value"),
+)
+
+
 def _page_header(playlist_code: str) -> dmc.Group:
     """Title the page with the playlist's display label and its share code."""
     return dmc.Group(
@@ -239,15 +262,30 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
             # one load for the new playlist.
             dcc.Store(id="playlist-scenarios-code", data=playlist_code),
             dcc.Store(id="playlist-scenarios-relative-time-refresh"),
+            # Dummy sink for the client-side quick-filter callback's output.
+            dcc.Store(id="playlist-scenarios-quick-filter-sink"),
             dcc.Interval(
                 id="playlist-scenarios-relative-time-interval",
                 interval=30_000,
                 n_intervals=0,
             ),
             # No playlist selected: skip the header and let the status line
-            # below prompt the user to pick one from the Playlists page.
+            # in the filter row below prompt the user to pick one from the
+            # Playlists page.
             *([_page_header(playlist_code)] if playlist_code is not None else []),
-            dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
+            dmc.Group(
+                children=[
+                    dmc.TextInput(
+                        id="playlist-scenarios-quick-filter",
+                        placeholder="Filter scenarios...",
+                        size="sm",
+                        w=240,
+                    ),
+                    dmc.Text("", c="dimmed", id="playlist-scenarios-status"),
+                ],
+                gap="md",
+                align="center",
+            ),
             dcc.Loading(
                 dag.AgGrid(
                     id="playlist-scenarios-grid",
