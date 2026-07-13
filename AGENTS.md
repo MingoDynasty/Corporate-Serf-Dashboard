@@ -144,6 +144,8 @@ Current agreed behavior:
 - `ScenarioRankStatus` uses `StrEnum` with stable JSON values.
 - `scenario_rank_cache_ttl_hours` defaults to `168`.
 - `leaderboard_total_cache_ttl_hours` defaults to `168`.
+- `kovaaks_api_timeout_seconds` defaults to `30` (KovaaK's slow spells reach
+  ~28s); read timeouts are never retried, connection errors are.
 - New high scores trigger a bounded score-aware background refresh through a
   daemon `threading.Timer` chain.
 - Background refresh failures should notify the UI through

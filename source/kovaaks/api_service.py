@@ -38,10 +38,12 @@ DEFAULT_TIMEOUT_SECONDS = 30
 _timeout_seconds = DEFAULT_TIMEOUT_SECONDS
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
-TRANSIENT_GET_EXCEPTIONS = (
-    requests.Timeout,
-    requests.ConnectionError,
-)  # Safe GET-only retry failures.
+# Read timeouts are deliberately not retried: the server received the request
+# and is still working on it (KovaaK's slow spells reach ~28s), so an immediate
+# duplicate doubles server load with almost no chance of finishing sooner
+# (observed 2/63 retry successes on 2026-07-13). ConnectTimeout still retries
+# through its ConnectionError base -- those requests never reached the server.
+TRANSIENT_GET_EXCEPTIONS = (requests.ConnectionError,)
 ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)

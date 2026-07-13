@@ -265,7 +265,6 @@ def test_get_with_retry_gives_up_after_second_429(monkeypatch):
 @pytest.mark.parametrize(
     "transient_exception",
     [
-        api_service.requests.ReadTimeout("read timed out"),
         api_service.requests.ConnectTimeout("connect timed out"),
         api_service.requests.ConnectionError("connection dropped"),
     ],
@@ -300,14 +299,31 @@ def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with pytest.raises(api_service.requests.ConnectionError):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 2
+
+
+def test_get_with_retry_does_not_retry_read_timeouts(monkeypatch):
+    # Regression: a read timeout means the server got the request and is still
+    # working (KovaaK's slow spells reach ~28s), so retrying just doubles load.
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("read timed out")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     with pytest.raises(api_service.requests.ReadTimeout):
         api_service._get_with_retry("https://example.test")
 
-    assert len(calls) == 2
+    assert len(calls) == 1
 
 
 def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
@@ -316,12 +332,12 @@ def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
-    with pytest.raises(api_service.requests.ReadTimeout):
+    with pytest.raises(api_service.requests.ConnectionError):
         api_service._get_with_retry(
             "https://example.test",
             attempts=5,
@@ -366,7 +382,7 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
 
 def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog):
     responses = [
-        api_service.requests.ReadTimeout("read timed out"),
+        api_service.requests.ConnectionError("connection dropped"),
         FakeResponse({"ok": True}),
     ]
 
@@ -383,7 +399,7 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
 
     assert caplog.messages == [
         "Transient GET failure at https://evxl.gg/api "
-        "(attempt 1/3); retrying: read timed out"
+        "(attempt 1/3); retrying: connection dropped"
     ]
 
 
