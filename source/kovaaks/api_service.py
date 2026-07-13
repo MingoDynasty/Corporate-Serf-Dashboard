@@ -1196,7 +1196,7 @@ def _stale_rank_fallback(
     return stale_rank.model_copy(update={"warning_message": stale_warning})
 
 
-def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
+def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     scenario_name: str,
     username: str | None,
     steam_id: str | None = None,
@@ -1320,6 +1320,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     # (RequestException) or an unusable response (ValidationError) -- should not
     # hide a rank we already know. Fall back to the last cached rank; UNKNOWN
     # only when nothing is cached.
+    logger.debug("Fetching current position for %s.", scenario_name)
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException as exc:
@@ -1385,6 +1386,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     rank_info = rank_info.model_copy(
         update={"scenario_name": rank_info.scenario_name or scenario_name}
     )
+    logger.debug("Fetching total positions for %s.", scenario_name)
     rank_info = _with_leaderboard_total(
         rank_info,
         leaderboard_total_cache_ttl_hours,
