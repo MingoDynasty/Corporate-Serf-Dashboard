@@ -101,28 +101,41 @@ what it knows and stream in what it doesn't, with visible progress.
   server-side); workers check the cancel Event before each scenario fetch,
   so an abandoned load stops within one in-flight scenario per worker.
   Terminal generations (complete or cancelled) remain in the registry as
-  tombstones — final counters, the terminal flag, the playlist code, and
-  the set of unresolved row indices — so the owning drain can observe the
-  end state, perform a final drain, and settle its status line; tombstones
-  are evicted by the next page-load sweep. A cancelled fill must not strand
-  animated pending cells on a still-visible grid (the two-tab case): when
-  the owning drain observes a *cancelled* tombstone it **finalizes** —
-  rebuilds the tombstone's unresolved rows cache-only
+  tombstones — final counters, the terminal flag, the playlist code, the
+  set of unresolved row indices, and a **consumed flag** — so the owning
+  drain can observe the end state through R8's terminal protocol.
+  Retention is consumption-aware: the page-load sweep evicts consumed
+  tombstones immediately, while unconsumed ones are retained up to a small
+  fixed cap (oldest evicted first) — unconditional eviction could destroy
+  a tombstone in the sub-second window between cancellation and the owning
+  tab's next tick (two quick page opens suffice), resurrecting the
+  permanent-pending bug; the cap keeps abandoned tabs' tombstones from
+  accumulating while a merely slow tab keeps its chance to settle.
+  A cancelled fill must not strand animated pending cells on a
+  still-visible grid (the two-tab case): the consuming tick (R8)
+  **finalizes** — rebuilds the tombstone's unresolved rows cache-only
   (`allow_network=False`, pending flags cleared; the cache may meanwhile
   hold the cancelled workers' banked fetches, so finalized cells can even
-  improve), applies them as its final transaction, and settles the status
-  to the interrupted variant (R4). Same-tab navigation destroys the old
-  page — no drain ever ticks, so finalization costs nothing in the common
-  case.
+  improve), applies them as that tick's transaction, and settles the
+  status to the interrupted variant (R4). Same-tab navigation destroys the
+  old page — no drain ever ticks, its unconsumed tombstone ages out via
+  the cap, and finalization costs nothing in the common case.
 - **R8 — Interval lifecycle: enable-only.** The drain interval renders
   `disabled=True`; the phase-1 callback enables it when it starts phase 2,
   and it stays enabled for the life of the page instance — nothing ever sets
-  `disabled=True` back. After the drain observes a terminal tombstone,
-  every subsequent tick **reasserts the settled status line** — re-derived
-  from the tombstone's final counters: cleared for a clean fill, the R4
-  degraded or interrupted summary otherwise — while row transactions and
-  notifications stay
-  `no_update`. Reassertion is a cheap constant write (local single-user
+  `disabled=True` back. Terminal handling is a **two-stage protocol** keyed
+  on the tombstone's consumed flag, checked and set atomically under the
+  registry lock. The **consuming tick** — the first tick to observe
+  terminality — flips the flag and performs the one-shots exactly once:
+  drains any remaining pending updates, applies the R7 finalization
+  transaction (cancelled fills), emits the R9 summary toast (completed
+  fills), and writes the settled status. Every **post-consumption tick**
+  only reasserts the settled status line — re-derived from the tombstone's
+  final counters: cleared for a clean fill, the R4 degraded or interrupted
+  summary otherwise — while row transactions and notifications stay
+  `no_update`; without the flag, every terminal tick would repeat the
+  finalization rebuild and the toast emission, and no state would say the
+  work was done. Reassertion is a cheap constant write (local single-user
   app), and it is what heals a stale status written by a superseded
   generation's in-flight response *after* the current fill has settled —
   post-terminal `no_update` ticks would leave that stale text standing until
@@ -139,10 +152,12 @@ what it knows and stream in what it doesn't, with visible progress.
   not the phase-2 thread: since PR #115, `dash_logger` records from plain
   threads are queued and flushed only by the Home page's interval, so a
   fill summary logged from the worker would surface on the wrong page,
-  whenever Home is next visited — emits at most
-  one summary via the notification container's `sendNotifications` output,
-  with a per-fill unique notification id (dmc silently swallows a "show"
-  with a duplicate id). Tiers mirror the PR #112 three-tier toast model,
+  whenever Home is next visited — emits the summary exactly once, on R8's
+  consuming tick, via the notification container's `sendNotifications`
+  output, with a per-fill unique notification id. (dmc's silent
+  duplicate-id suppression would additionally absorb an accidental
+  re-send — defense in depth, not the mechanism; the consumed flag is the
+  mechanism.) Tiers mirror the PR #112 three-tier toast model,
   aggregated: any scenario ended UNKNOWN → red
   "Couldn't update K of N positions" (K counts only UNKNOWN rows), with
   "; M more served from cache" appended whenever stale-serves also
