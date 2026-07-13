@@ -50,17 +50,33 @@ dagcomponentfuncs.DeleteAction = function (props) {
   return React.createElement("span", { className: "delete-action" }, "Delete");
 };
 
-// Shared onClick for the navigation anchors below. An unmodified left-click is
-// suppressed so the grid's cellClicked server callback does the fast in-app
-// nav; a modified click (Ctrl/Cmd/Shift/Alt) falls through to the native
-// anchor, opening a full Dash page load in a new tab. Middle-click arrives as
-// auxclick (not click), so it stays native with no handling here. We never
-// call stopPropagation() — cellClicked must keep firing to carry the in-app
-// nav.
-function suppressPlainLeftClick(event) {
-  if (!event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
-    event.preventDefault();
+// Shared ref binder wiring the hybrid click behavior on the navigation anchors
+// below. The handler is attached as a NATIVE listener on the anchor itself
+// (not a React onClick), and that placement is load-bearing: AG Grid's
+// cellClicked fires from a native listener on an ancestor, and a native
+// listener on the anchor (the event target) runs first, whereas React's onClick
+// is delegated at the app root and runs too late to influence it.
+//   - Plain left-click: preventDefault() suppresses the native anchor and lets
+//     the click bubble to cellClicked, which does the fast in-app nav.
+//   - Modified click (Ctrl/Cmd/Shift/Alt): keep the native anchor default (open
+//     a new tab) but stopPropagation() so cellClicked does NOT also navigate
+//     the current tab.
+// Middle-click arrives as auxclick, not click, so it never reaches this handler
+// or cellClicked and stays native with no handling. The listener reads only the
+// event's modifier flags, so it never goes stale as row data changes; the
+// once-guard keeps a reused anchor node from stacking duplicate listeners.
+function bindGridNavAnchor(element) {
+  if (!element || element.__gridNavBound) {
+    return;
   }
+  element.__gridNavBound = true;
+  element.addEventListener("click", function (event) {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+      event.stopPropagation();
+    } else {
+      event.preventDefault();
+    }
+  });
 }
 
 // Real anchor for the playlist overview's Playlist name column. The href is
@@ -75,7 +91,7 @@ dagcomponentfuncs.PlaylistNameLink = function (props) {
     {
       href: href,
       className: "playlist-scenario-link-cell",
-      onClick: suppressPlainLeftClick,
+      ref: bindGridNavAnchor,
     },
     props.value
   );
@@ -92,7 +108,7 @@ dagcomponentfuncs.ScenarioLink = function (props) {
     {
       href: href,
       className: "playlist-scenario-link-cell",
-      onClick: suppressPlainLeftClick,
+      ref: bindGridNavAnchor,
     },
     props.value
   );
