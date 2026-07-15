@@ -173,7 +173,7 @@ def _get_with_retry(
             # WARNING below has no params, so during concurrent loads this is
             # what ties a failure to its leaderboard.
             logger.debug(
-                "GET %s %s failed after %.1fs (attempt %d/%d): %s",
+                "GET %s %s failed after %.2fs (attempt %d/%d): %s",
                 url,
                 kwargs.get("params"),
                 elapsed_seconds,
@@ -183,7 +183,7 @@ def _get_with_retry(
             )
             if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
                 logger.warning(
-                    "Transient GET failure at %s after %.1fs (attempt %d/%d); "
+                    "Transient GET failure at %s after %.2fs (attempt %d/%d); "
                     "retrying: %s",
                     url,
                     elapsed_seconds,
@@ -200,7 +200,7 @@ def _get_with_retry(
             raise
 
         logger.debug(
-            "GET %s %s -> HTTP %d in %.1fs (attempt %d/%d)",
+            "GET %s %s -> HTTP %d in %.2fs (attempt %d/%d)",
             url,
             kwargs.get("params"),
             response.status_code,
