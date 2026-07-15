@@ -419,6 +419,19 @@ def _walk_components(component):
     yield from _walk_components(children)
 
 
+def test_playlists_overview_layout_includes_page_title():
+    page = playlists.layout()
+    titles = [
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Title)
+    ]
+
+    assert len(titles) == 1
+    assert titles[0].children == "Playlists"
+    assert titles[0].order == 2
+
+
 def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     page = playlists.layout()
     grid = page.children[-1].children
