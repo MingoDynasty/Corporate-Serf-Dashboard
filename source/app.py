@@ -7,6 +7,7 @@ import logging
 import sys
 import tomllib
 from dataclasses import asdict
+from importlib.metadata import version
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -63,7 +64,7 @@ configure_logging()
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = "Corporate Serf Dashboard v1.0.0"  # TODO: is this used elsewhere in the app?
+APP_NAME = f"Corporate Serf Dashboard v{version('Corporate-Serf-Dashboard')}"
 app = DashProxy(
     title=APP_NAME,
     update_title=None,
