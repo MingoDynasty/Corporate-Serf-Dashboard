@@ -7,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
+from itertools import count
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,12 @@ from source.kovaaks.api_models import (
 from source.utilities import atomic_write
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
+
+
+def _ticking_monotonic():
+    """Deterministic time.monotonic stand-in: each call advances 1.0s."""
+    ticks = count(step=1.0)
+    return lambda: float(next(ticks))
 
 
 class FakeResponse:
@@ -393,13 +400,52 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
         return response
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
     caplog.set_level(logging.WARNING, logger=api_service.__name__)
 
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
     assert caplog.messages == [
-        "Transient GET failure at https://evxl.gg/api "
+        "Transient GET failure at https://evxl.gg/api after 1.0s "
         "(attempt 1/3); retrying: connection dropped"
+    ]
+
+
+def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog):
+    # Regression: retried failures must also emit the DEBUG outcome line --
+    # it is the only line carrying params, which tie a failure to its
+    # leaderboard during concurrent playlist loads.
+    responses = [
+        api_service.requests.ConnectionError("connection dropped"),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://example.test",
+        params={"leaderboardId": 98330},
+    )
+
+    debug_messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
+    assert debug_messages == [
+        "GET https://example.test {'leaderboardId': 98330} failed after 1.0s "
+        "(attempt 1/2): connection dropped",
+        "GET https://example.test {'leaderboardId': 98330} -> HTTP 200 in 1.0s "
+        "(attempt 2/2)",
     ]
 
 

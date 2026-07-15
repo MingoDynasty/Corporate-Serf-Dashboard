@@ -155,18 +155,38 @@ def _get_with_retry(
     Rate limits and narrow network failures can happen during cold-cache playlist
     loads. After all attempts fail, normal caller-level error handling decides
     whether the UI sees UNKNOWN/N/A.
+
+    Every attempt's outcome is logged at DEBUG with its duration, so slow spells
+    (e.g. successes landing just under the timeout) are visible without
+    cross-referencing urllib3 connection lines by timestamp.
     """
     kwargs.setdefault("timeout", _timeout_seconds)
     backoff_schedule = backoff_seconds or (0.0,)
 
     for attempt in range(attempts):
+        started = time.monotonic()
         try:
             response = _session_get(url, **kwargs)
-        except TRANSIENT_GET_EXCEPTIONS as exc:
-            if attempt < attempts - 1:
+        except requests.RequestException as exc:
+            elapsed_seconds = time.monotonic() - started
+            # Outcome line for every failed attempt, retried or not: the
+            # WARNING below has no params, so during concurrent loads this is
+            # what ties a failure to its leaderboard.
+            logger.debug(
+                "GET %s %s failed after %.1fs (attempt %d/%d): %s",
+                url,
+                kwargs.get("params"),
+                elapsed_seconds,
+                attempt + 1,
+                attempts,
+                request_exception_summary(exc),
+            )
+            if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
                 logger.warning(
-                    "Transient GET failure at %s (attempt %d/%d); retrying: %s",
+                    "Transient GET failure at %s after %.1fs (attempt %d/%d); "
+                    "retrying: %s",
                     url,
+                    elapsed_seconds,
                     attempt + 1,
                     attempts,
                     request_exception_summary(exc),
@@ -179,6 +199,15 @@ def _get_with_retry(
                 continue
             raise
 
+        logger.debug(
+            "GET %s %s -> HTTP %d in %.1fs (attempt %d/%d)",
+            url,
+            kwargs.get("params"),
+            response.status_code,
+            time.monotonic() - started,
+            attempt + 1,
+            attempts,
+        )
         if response.status_code != 429 or attempt == attempts - 1:
             response.raise_for_status()
             return response
@@ -273,6 +302,27 @@ def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
 
     modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime, UTC)
     return datetime.now(UTC) - modified_at < timedelta(hours=ttl_hours)
+
+
+def _cache_age_hours(cache_file: Path) -> float | None:
+    """Return the cache file's age in hours, or None if it cannot be read."""
+    try:
+        modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime, UTC)
+    except OSError:
+        return None
+    return (datetime.now(UTC) - modified_at).total_seconds() / 3600
+
+
+def _describe_cache_state(cache_file: Path, ttl_hours: int) -> str:
+    """Describe why a TTL-guarded cache read returned nothing, for debug logs."""
+    age_hours = _cache_age_hours(cache_file)
+    if age_hours is None:
+        return "miss (no cache file)"
+    if ttl_hours <= 0:
+        return f"disabled (ttl {ttl_hours}h, age {age_hours:.1f}h)"
+    if age_hours < ttl_hours:
+        return f"unreadable (age {age_hours:.1f}h, ttl {ttl_hours}h)"
+    return f"expired (age {age_hours:.1f}h > ttl {ttl_hours}h)"
 
 
 def _read_json(cache_file: Path) -> dict | list | None:
@@ -848,8 +898,17 @@ def get_leaderboard_total(
     """Return a cached leaderboard total, refreshing it when stale or missing."""
     cached_total = get_cached_leaderboard_total(leaderboard_id, cache_ttl_hours)
     if cached_total is not None:
+        logger.debug("Totals cache hit for leaderboard %s.", leaderboard_id)
         return cached_total
 
+    logger.debug(
+        "Totals cache %s for leaderboard %s; fetching.",
+        _describe_cache_state(
+            _leaderboard_total_cache_file(leaderboard_id),
+            cache_ttl_hours,
+        ),
+        leaderboard_id,
+    )
     total_players = fetch_leaderboard_total(leaderboard_id)
     save_leaderboard_total(leaderboard_id, total_players)
     return total_players
@@ -898,7 +957,8 @@ def _with_leaderboard_total(
         )
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch leaderboard total for %s: %s",
+            "Failed to fetch leaderboard total for %s (leaderboard %s): %s",
+            rank_info.scenario_name or "?",
             rank_info.leaderboard_id,
             request_exception_summary(exc),
         )
@@ -1190,6 +1250,14 @@ def _stale_rank_fallback(
     stale_rank = _cached_rank(leaderboard_id, username)
     if stale_rank is None:
         return None
+    age_hours = _cache_age_hours(_rank_cache_file(leaderboard_id, username))
+    logger.warning(
+        "Serving stale cached position for %s (leaderboard %s, age %s) "
+        "after failed refresh.",
+        scenario_name,
+        leaderboard_id,
+        f"{age_hours:.1f}h" if age_hours is not None else "unknown",
+    )
     if stale_rank.scenario_name is None:
         stale_rank = stale_rank.model_copy(update={"scenario_name": scenario_name})
     total_players = _cached_leaderboard_total(leaderboard_id)
@@ -1289,6 +1357,24 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
                 username,
                 rank_cache_ttl_hours,
             )
+            # Verdict logging only on the network path: the cache-only branch
+            # serves Home's per-second interval ticks and would spam debug.log.
+            if cached_rank:
+                logger.debug(
+                    "Rank cache hit for %s (leaderboard %s).",
+                    scenario_name,
+                    leaderboard_id,
+                )
+            else:
+                logger.debug(
+                    "Rank cache %s for %s (leaderboard %s).",
+                    _describe_cache_state(
+                        _rank_cache_file(leaderboard_id, username),
+                        rank_cache_ttl_hours,
+                    ),
+                    scenario_name,
+                    leaderboard_id,
+                )
         else:
             cached_rank = _cached_rank(leaderboard_id, username)
         if cached_rank:
@@ -1334,13 +1420,18 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     # (RequestException) or an unusable response (ValidationError) -- should not
     # hide a rank we already know. Fall back to the last cached rank; UNKNOWN
     # only when nothing is cached.
-    logger.debug("Fetching current position for %s.", scenario_name)
+    logger.debug(
+        "Fetching current position for %s (leaderboard %s).",
+        scenario_name,
+        leaderboard_id,
+    )
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch scenario rank for %s: %s",
+            "Failed to fetch scenario rank for %s (leaderboard %s): %s",
             scenario_name,
+            leaderboard_id,
             request_exception_summary(exc),
         )
         stale_rank = _stale_rank_fallback(
@@ -1400,7 +1491,11 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     rank_info = rank_info.model_copy(
         update={"scenario_name": rank_info.scenario_name or scenario_name}
     )
-    logger.debug("Fetching total positions for %s.", scenario_name)
+    logger.debug(
+        "Fetching total positions for %s (leaderboard %s).",
+        scenario_name,
+        leaderboard_id,
+    )
     rank_info = _with_leaderboard_total(
         rank_info,
         leaderboard_total_cache_ttl_hours,
