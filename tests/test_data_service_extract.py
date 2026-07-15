@@ -189,13 +189,13 @@ def test_load_csv_file_into_database_reports_extract_failure(
     assert "Failed to get run data for CSV file: broken.csv" in caplog.messages
 
 
-def test_initialize_kovaaks_data_logs_loaded_and_skipped_counts(
+def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
     monkeypatch,
     tmp_path,
     caplog,
 ) -> None:
     (tmp_path / "loaded.csv").touch()
-    (tmp_path / "skipped.csv").touch()
+    (tmp_path / "failed.csv").touch()
     (tmp_path / "ignored.txt").touch()
     monkeypatch.setattr(
         data_service,
@@ -208,7 +208,7 @@ def test_initialize_kovaaks_data_logs_loaded_and_skipped_counts(
 
     assert any(
         message.startswith(
-            "CSV startup load complete: 2 scanned, 1 loaded, 1 skipped in "
+            "CSV startup load complete: 2 scanned, 1 loaded, 1 failed in "
         )
         and message.endswith(" seconds.")
         for message in caplog.messages

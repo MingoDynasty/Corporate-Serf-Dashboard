@@ -422,7 +422,7 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
     )
     stopwatch.stop()
     logger.debug(
-        "CSV startup load complete: %d scanned, %d loaded, %d skipped in %.2f seconds.",
+        "CSV startup load complete: %d scanned, %d loaded, %d failed in %.2f seconds.",
         len(csv_files),
         loaded_count,
         len(csv_files) - loaded_count,
