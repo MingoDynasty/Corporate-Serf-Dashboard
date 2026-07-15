@@ -406,7 +406,7 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
     assert caplog.messages == [
-        "Transient GET failure at https://evxl.gg/api after 1.0s "
+        "Transient GET failure at https://evxl.gg/api after 1.00s "
         "(attempt 1/3); retrying: connection dropped"
     ]
 
@@ -442,9 +442,9 @@ def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog
         if record.levelno == logging.DEBUG
     ]
     assert debug_messages == [
-        "GET https://example.test {'leaderboardId': 98330} failed after 1.0s "
+        "GET https://example.test {'leaderboardId': 98330} failed after 1.00s "
         "(attempt 1/2): connection dropped",
-        "GET https://example.test {'leaderboardId': 98330} -> HTTP 200 in 1.0s "
+        "GET https://example.test {'leaderboardId': 98330} -> HTTP 200 in 1.00s "
         "(attempt 2/2)",
     ]
 

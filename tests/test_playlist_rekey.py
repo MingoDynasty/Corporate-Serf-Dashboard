@@ -1,3 +1,4 @@
+import logging
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
@@ -111,6 +112,7 @@ def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
 def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
@@ -119,9 +121,14 @@ def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
     # count as a user-root code either.
     _write_playlist(user_root / "shadowed.json", _playlist("Shadow", "BundledCode"))
 
-    data_service.load_playlists()
+    with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
+        data_service.load_playlists()
 
     assert data_service.get_user_root_playlist_codes() == {"UserCode"}
+    assert (
+        "Playlist startup load complete: loaded=2 bundled=1 user=1 warnings=1 "
+        "superseded_files=1." in caplog.messages
+    )
 
 
 def test_load_playlists_treats_missing_user_root_as_empty(monkeypatch, tmp_path):
