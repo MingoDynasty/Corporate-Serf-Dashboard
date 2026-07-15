@@ -15,9 +15,10 @@ def test_app_name_uses_installed_project_version() -> None:
         cwd=repo_root,
         capture_output=True,
         text=True,
-        check=True,
+        check=False,
     )
 
+    assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == (
         f"Corporate Serf Dashboard v{version('Corporate-Serf-Dashboard')}"
     )
