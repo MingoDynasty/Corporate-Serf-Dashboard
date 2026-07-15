@@ -417,13 +417,16 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
             if entry.is_file() and entry.name.endswith(".csv"):
                 csv_files.append(entry.path)
 
-    for csv_file in csv_files:
-        load_csv_file_into_database(csv_file)
+    loaded_count = sum(
+        1 for csv_file in csv_files if load_csv_file_into_database(csv_file)
+    )
     stopwatch.stop()
     logger.debug(
-        "Loaded %d CSV files in %.2f seconds.",
+        "CSV startup load complete: %d scanned, %d loaded, %d skipped in %.2f seconds.",
         len(csv_files),
-        round(stopwatch.elapsed(), 2),
+        loaded_count,
+        len(csv_files) - loaded_count,
+        stopwatch.elapsed(),
     )
 
 
@@ -661,6 +664,15 @@ def load_playlists() -> None:
                 _user_root_playlist_files.setdefault(playlist_data.code, []).append(
                     playlist_file
                 )
+    logger.debug(
+        "Playlist startup load complete: loaded=%d bundled=%d user=%d "
+        "warnings=%d superseded_files=%d.",
+        len(playlist_database),
+        len(playlist_database) - len(_user_root_playlist_codes),
+        len(_user_root_playlist_codes),
+        len(playlist_startup_warning_queue),
+        len(_superseded_user_playlist_files),
+    )
 
 
 def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:

@@ -1154,7 +1154,18 @@ def _run_attempt(  # noqa: PLR0913
             and _score_is_fresh(rank_info, expected_score)
         ):
             rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-            _, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            winner, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            logger.debug(
+                "Rank freshness complete for %s on attempt %d/%d "
+                "(leaderboard %s, cached rank %s, cached score %s, cache=%s).",
+                scenario_name,
+                attempt_index + 1,
+                len(ATTEMPT_DELAYS_SECONDS),
+                leaderboard_id,
+                winner.rank,
+                f"{winner.score:.2f}" if winner.score is not None else "N/A",
+                "updated" if wrote else "kept-existing",
+            )
             if wrote:
                 try:
                     _with_leaderboard_total(
@@ -1169,7 +1180,30 @@ def _run_attempt(  # noqa: PLR0913
             return
 
         next_index = attempt_index + 1
-        if next_index >= len(ATTEMPT_DELAYS_SECONDS):
+        status = rank_info.status.value if rank_info is not None else "NO_RESULT"
+        board_score = (
+            f"{rank_info.score:.2f}"
+            if rank_info is not None and rank_info.score is not None
+            else "N/A"
+        )
+        attempts_exhausted = next_index >= len(ATTEMPT_DELAYS_SECONDS)
+        next_action = (
+            "attempts exhausted"
+            if attempts_exhausted
+            else f"retrying in {ATTEMPT_DELAYS_SECONDS[next_index]}s"
+        )
+        logger.debug(
+            "Rank freshness attempt %d/%d for %s not ready "
+            "(status=%s, board score=%s, expected score >= %.2f); %s.",
+            attempt_index + 1,
+            len(ATTEMPT_DELAYS_SECONDS),
+            scenario_name,
+            status,
+            board_score,
+            _floor_2dp(expected_score),
+            next_action,
+        )
+        if attempts_exhausted:
             _notify_exhaustion(scenario_name, expected_score, rank_info)
             return
 
@@ -1223,6 +1257,14 @@ def schedule_rank_freshness_refresh(
     metadata_cache_ttl_hours: int = 24,
 ) -> None:
     """Start a bounded score-aware refresh after a new local high score."""
+    logger.debug(
+        "Scheduled rank freshness refresh for %s "
+        "(expected score >= %.2f; first attempt in %ds, %d attempts total).",
+        scenario_name,
+        _floor_2dp(expected_score),
+        ATTEMPT_DELAYS_SECONDS[0],
+        len(ATTEMPT_DELAYS_SECONDS),
+    )
     _schedule_attempt(
         scenario_name,
         username,
