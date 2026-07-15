@@ -584,6 +584,7 @@ def layout(**kwargs):  # noqa: ARG001
                 interval=30_000,
                 n_intervals=0,
             ),
+            dmc.Title("Playlists", order=2),
             dmc.Group(
                 children=[
                     dmc.Group(
