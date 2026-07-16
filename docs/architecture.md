@@ -16,7 +16,8 @@ the in-memory stores from existing CSVs, starts a watchdog `Observer` on
 
 Threads at runtime:
 
-- **Server thread(s)** — Waitress/Flask serving Dash; runs the page callbacks.
+- **Server thread(s)** — Waitress (8 workers) or Flask serving Dash; runs the
+  page callbacks.
 - **Watchdog observer thread** — `NewFileHandler` fires on each new CSV.
 - **Rank freshness timers** — after a new high score, `api_service.py` uses a
   bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's
@@ -212,7 +213,11 @@ flowchart LR
   cleanup (`delete_superseded_user_playlist_files`).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
-  mounted-route store, not the URL directly (see decision log).
+  mounted-route store, not the URL directly (see decision log). It paints
+  cache-only phase-1 rows, stores a per-open generation token, enables the
+  fill interval, and drains complete phase-2 rows through update-only AG Grid
+  transactions. The drain callback owns progress text, cancellation
+  finalization, and the one-shot aggregate completion toast.
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 
 ### Shared UI components
@@ -232,12 +237,16 @@ flowchart LR
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
   helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
-  bounded `schedule_rank_freshness_refresh` Timer poll. UI consumes
-  `ScenarioRankInfo` and never calls endpoints directly. See
+  bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
+  its returned `ScenarioRankInfo` structurally without persisting the marker;
+  split interactive-activity/network-success timestamps coordinate future
+  background API work. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.
-- `playlist_scenarios_service.py` — builds rows for the per-playlist scenario
-  table (`build_playlist_scenario_rank_rows`), merging local stats with rank
-  info.
+- `playlist_scenarios_service.py` — builds cache-only first-paint rows for the
+  per-playlist scenario table, then owns the generation-keyed progressive-fill
+  registry, synchronous cancellation/tombstones, four-worker fill, and atomic
+  interval drain. Every streamed/finalized item is a complete row merging
+  freshly read local stats with rank info.
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
@@ -267,7 +276,9 @@ flowchart LR
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
-  notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
+  notifications; records logged outside a callback context are queued and
+  drained by a Home interval callback, so background threads can log too),
+  `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
@@ -278,6 +289,8 @@ flowchart LR
   (`playlists.py`, `playlist_scenarios.py`) reference these from their column
   defs and run with `dangerously_allow_code=True`. Custom grid sort/format
   behavior belongs here — see the decision log.
+- `assets/stylesheet.css` — shared semantic presentation rules, including the
+  explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
 
 ## Where to look first

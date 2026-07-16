@@ -144,9 +144,14 @@ Current agreed behavior:
 - `ScenarioRankStatus` uses `StrEnum` with stable JSON values.
 - `scenario_rank_cache_ttl_hours` defaults to `168`.
 - `leaderboard_total_cache_ttl_hours` defaults to `168`.
+- `kovaaks_api_timeout_seconds` defaults to `30` (KovaaK's slow spells reach
+  ~28s); read timeouts are never retried, connection errors are.
 - New high scores trigger a bounded score-aware background refresh through a
   daemon `threading.Timer` chain.
-- Background refresh failures should notify the UI through `dash_logger.error(...)`.
+- Background refresh failures should notify the UI through
+  `dash_logger.error(...)`. The handler is safe to call from plain threads:
+  records logged outside a Dash callback context are queued in `dash_logging`
+  and delivered to the notification container by a Home interval callback.
 - Leaderboard total enrichment is best-effort. If total lookup fails, preserve the valid rank/unranked result.
 - Percentile is derived from rank plus leaderboard total when rank info is returned; do not store it in rank cache.
 

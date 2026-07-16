@@ -49,7 +49,10 @@ from source.plot.plot_service import (
     generate_sensitivity_plot,
     generate_time_plot,
 )
-from source.utilities.dash_logging import get_dash_logger
+from source.utilities.dash_logging import (
+    drain_background_notifications,
+    get_dash_logger,
+)
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -251,6 +254,25 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 
 
 @callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Input("interval-component", "n_intervals"),
+    prevent_initial_call=True,
+)
+def flush_background_notifications(_n_intervals):
+    """Deliver notifications queued by threads without a callback context.
+
+    The file watchdog and the rank-freshness Timer chain log through
+    ``dash_logger`` from plain threads, where ``set_props`` is unavailable;
+    the handler queues those records and this callback hands them to the
+    notification container on the next poll tick.
+    """
+    notifications = drain_background_notifications()
+    if not notifications:
+        return no_update
+    return notifications
+
+
+@callback(
     Output("scenario_num_runs", "children"),
     Output("last-played-ts", "data"),
     Output("last-played-empty-value", "data"),
@@ -348,6 +370,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
             selected_scenario,
             *_rank_lookup_config(),
             allow_network=allow_network,
+            record_activity=allow_network,
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
@@ -973,11 +996,11 @@ def layout(
                                     ),
                                     min=1,
                                     persistence=True,
-                                    placeholder="Top N scores to consider...",
                                     radius="sm",
                                     size="sm",
                                     variant="default",
                                     value=5,
+                                    w="8rem",
                                 ),
                                 dmc.DatePickerInput(
                                     id="date-picker",
@@ -1088,7 +1111,7 @@ def layout(
                                     maw="100%",
                                 ),
                             ],
-                            gap="md",
+                            gap="sm",
                             justify="flex-start",
                             align="flex-start",
                             direction="row",

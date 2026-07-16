@@ -13,6 +13,47 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-07-13: KovaaK's Timeout Is 30s (Configurable); Read Timeouts Are Not Retried
+
+Status: Accepted
+
+Decision: All KovaaK's API requests share one timeout, default 30 seconds,
+configurable via `kovaaks_api_timeout_seconds` in `config.toml` and applied at
+app startup through `api_service.set_request_timeout()`. `_get_with_retry`
+retries only `requests.ConnectionError` (which covers `ConnectTimeout`); a
+`ReadTimeout` fails immediately instead of being retried.
+
+Supersedes: the `requests.Timeout` clause of the 2026-04-28 transient-retry
+decision. The `429`/`Retry-After` policy and the `ConnectionError` retry from
+that entry stand, and the 2026-06-21 keep-the-hand-rolled-retry decision is
+reaffirmed, not revisited.
+
+Rationale: measured 2026-07-13 during a KovaaK's slow spell,
+`/leaderboard/scores/global` latency ranged 9–28s while responses stayed
+valid — a Postman probe succeeded after ~28s, and in-app fetches succeeded at
+9.0–9.4s, just under the old hardcoded 10s wire. With a 10s timeout every
+attempt during the spell died, and because the stale-rank fallback is
+deliberately read-only (see the 2026-07-12 entry), the same expired cache
+entry re-timed-out on every page open — one expired scenario added ~20s to
+every playlist load until a fetch succeeded. A read timeout also does not
+cancel the server-side query, so the old immediate retry doubled KovaaK's
+load for almost nothing (2 of 63 retries succeeded that night); a connection
+error, by contrast, means the request never reached the server and remains
+safe to retry. 30s clears the observed worst case, and the config knob is the
+escape hatch if slow spells drift past it.
+
+Constraints:
+
+- Deliberately a single timeout value — no connect/read split and no
+  urllib3 `Retry` adoption (the 2026-06-21 entry holds the full migration
+  analysis). Beyond that entry's reasons: the per-retry warnings in
+  `_get_with_retry` are the primary forensic log, and the benchmark importer
+  depends on its per-call `attempts`/`backoff_seconds` knobs, which
+  `requests` cannot express per request through adapter-mounted `Retry`.
+- The importer shares the helper, so its retry schedule now governs only
+  connection errors and 429s; a read timeout fails the sharecode
+  immediately.
+
 ## 2026-07-12: Rank-Fetch Failure Degrades To The Last Cached Rank
 
 Status: Accepted
@@ -403,7 +444,7 @@ Consequences: When new endpoint behavior or failure modes are discovered, update
 
 ## 2026-04-28: Retry KovaaK's GET Transient Failures Once
 
-Status: Accepted
+Status: Superseded in part by the 2026-07-13 timeout/read-timeout decision — `requests.Timeout` is no longer in the retry set (read timeouts fail immediately); the `429`/`Retry-After` policy and the `requests.ConnectionError` retry stand
 
 Decision: KovaaK's GET requests should retry exactly once on HTTP `429 Too Many Requests`, `requests.Timeout`, and `requests.ConnectionError`. `429` retries should honor `Retry-After` when present and cap the wait.
 
@@ -753,3 +794,57 @@ cache — lives under one ignored `data/` root. A legacy `cache/` root left in
 place is silently ignored; `.gitignore` keeps its entry so pre-move checkouts
 stay clean. Revisit an in-app migration only if the app gains users beyond
 its author.
+
+## 2026-07-15: Stream Playlist Positions With Generation-Scoped Progressive Fill
+
+Status: Accepted
+
+Supersedes: The blocking all-scenarios load and Dash Loading wrapper for the
+per-playlist scenario grid. The bounded, grid-owned scrolling decision from
+2026-07-06 remains in force.
+
+Decision: Opening `/playlists/<code>` has two phases. Phase 1 paints every row
+from local stats plus TTL-ignored rank caches, with explicit per-cell pending
+flags for unresolved Position, Total Players, and Percentile values. Phase 2
+hydrates leaderboard IDs once, then runs the normal cache/network lookup path
+through the existing four-worker fan-out in one daemon-thread fill. Workers
+stream complete row dictionaries into a lock-guarded in-memory registry keyed
+by a per-open generation token. A one-second, enable-only interval drains those
+rows through AG Grid update transactions; row identity is
+`generation_token:playlist_order`, so a superseded response cannot update the
+current grid.
+
+Starting a fill synchronously cancels every other live generation. Completion
+and cancellation become bounded tombstones with final counters, a terminal
+state, and an atomic consumed flag. The first terminal tick alone drains final
+updates, rebuilds unresolved cancelled rows cache-only, settles the status, and
+emits any aggregate completion toast; later ticks only reassert the settled
+status. Consumed tombstones drop queued rows and finalization payloads, but stay
+in the same eight-item retention set as unconsumed tombstones. Overflow evicts
+consumed before unconsumed, oldest first within each class, and the cap is
+enforced at every terminal transition.
+
+Pending state is never inferred from null values: resolved `UNRANKED` Position
+is valid with a null sort key. Completed/finalized rows clear all pending flags.
+Outcomes are counted before row formatting as fresh, `UNKNOWN`, or structurally
+`served_stale`; the transient stale marker is never written to the rank cache.
+Completion uses the existing red/yellow/silent failure tiers without
+per-scenario toast spam. The API coordination signal keeps two monotonic
+timestamps: interactive rank activity includes cache hits, while network
+success changes only after a real successful HTTP response.
+
+Why: Cold or flaky playlist opens previously hid six locally available columns
+behind minutes of blocking API work. Progressive fill makes the training table
+useful immediately while preserving the existing cache freshness and lookup
+semantics. Generation-scoped row IDs plus consumed tombstones close the races
+created by navigation, two tabs, callback responses already in flight, and
+DashProxy's spurious initial callback behavior without adding a persistent job
+system.
+
+Consequences: The grid no longer uses `dcc.Loading`; animated CSS placeholders
+and a `done/total` status provide progress. Clean fills clear the status and stay
+silent, degraded fills retain a compact summary, and cancelled fills settle as
+interrupted with no cell left pending. The registry is process-local and
+single-user: reloads start a new fill, a second tab cancels the first tab's
+network work, and completed API calls still warm the normal atomic disk caches.
+Shipped in PR #127.

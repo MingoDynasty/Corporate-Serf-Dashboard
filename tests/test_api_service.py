@@ -7,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
+from itertools import count
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,12 @@ from source.kovaaks.api_models import (
 from source.utilities import atomic_write
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
+
+
+def _ticking_monotonic():
+    """Deterministic time.monotonic stand-in: each call advances 1.0s."""
+    ticks = count(step=1.0)
+    return lambda: float(next(ticks))
 
 
 class FakeResponse:
@@ -103,13 +110,47 @@ def test_get_with_retry_reuses_session_within_thread(monkeypatch):
     assert created_sessions[0].calls == [
         (
             "https://example.test/first",
-            {"timeout": api_service.TIMEOUT},
+            {"timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
         (
             "https://example.test/second",
-            {"params": {"a": 1}, "timeout": api_service.TIMEOUT},
+            {"params": {"a": 1}, "timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
     ]
+
+
+def test_get_with_retry_records_real_network_success(monkeypatch):
+    monkeypatch.setattr(api_service, "_last_network_success", 0.0)
+    monkeypatch.setattr(api_service.time, "monotonic", lambda: 42.0)
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse({"ok": True}),
+    )
+
+    api_service._get_with_retry("https://example.test/success")
+
+    _interactive, network_success = api_service.get_api_activity_timestamps()
+    assert network_success == 42.0
+
+
+def test_set_request_timeout_applies_to_requests(monkeypatch):
+    calls = []
+
+    def fake_get(_url, **kwargs):
+        calls.append(kwargs)
+        return FakeResponse({"ok": True})
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    # setattr registers teardown restoration before set_request_timeout mutates.
+    monkeypatch.setattr(
+        api_service, "_timeout_seconds", api_service.DEFAULT_TIMEOUT_SECONDS
+    )
+
+    api_service.set_request_timeout(45)
+    api_service._get_with_retry("https://example.test")
+
+    assert calls == [{"timeout": 45}]
 
 
 def test_get_thread_session_is_thread_local(monkeypatch):
@@ -246,7 +287,6 @@ def test_get_with_retry_gives_up_after_second_429(monkeypatch):
 @pytest.mark.parametrize(
     "transient_exception",
     [
-        api_service.requests.ReadTimeout("read timed out"),
         api_service.requests.ConnectTimeout("connect timed out"),
         api_service.requests.ConnectionError("connection dropped"),
     ],
@@ -281,14 +321,31 @@ def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with pytest.raises(api_service.requests.ConnectionError):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 2
+
+
+def test_get_with_retry_does_not_retry_read_timeouts(monkeypatch):
+    # Regression: a read timeout means the server got the request and is still
+    # working (KovaaK's slow spells reach ~28s), so retrying just doubles load.
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("read timed out")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     with pytest.raises(api_service.requests.ReadTimeout):
         api_service._get_with_retry("https://example.test")
 
-    assert len(calls) == 2
+    assert len(calls) == 1
 
 
 def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
@@ -297,12 +354,12 @@ def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
-    with pytest.raises(api_service.requests.ReadTimeout):
+    with pytest.raises(api_service.requests.ConnectionError):
         api_service._get_with_retry(
             "https://example.test",
             attempts=5,
@@ -347,7 +404,7 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
 
 def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog):
     responses = [
-        api_service.requests.ReadTimeout("read timed out"),
+        api_service.requests.ConnectionError("connection dropped"),
         FakeResponse({"ok": True}),
     ]
 
@@ -358,13 +415,52 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
         return response
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
     caplog.set_level(logging.WARNING, logger=api_service.__name__)
 
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
     assert caplog.messages == [
-        "Transient GET failure at https://evxl.gg/api "
-        "(attempt 1/3); retrying: read timed out"
+        "Transient GET failure at https://evxl.gg/api after 1.00s "
+        "(attempt 1/3); retrying: connection dropped"
+    ]
+
+
+def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog):
+    # Regression: retried failures must also emit the DEBUG outcome line --
+    # it is the only line carrying params, which tie a failure to its
+    # leaderboard during concurrent playlist loads.
+    responses = [
+        api_service.requests.ConnectionError("connection dropped"),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://example.test",
+        params={"leaderboardId": 98330},
+    )
+
+    debug_messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
+    assert debug_messages == [
+        "GET https://example.test {'leaderboardId': 98330} failed after 1.00s "
+        "(attempt 1/2): connection dropped",
+        "GET https://example.test {'leaderboardId': 98330} -> HTTP 200 in 1.00s "
+        "(attempt 2/2)",
     ]
 
 
@@ -520,7 +616,6 @@ def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
                     "benchmarkId": 123,
                     "steamId": "00000000000000000",
                 },
-                "timeout": api_service.TIMEOUT,
                 "attempts": 4,
                 "backoff_seconds": (2, 4, 8),
             },
@@ -604,8 +699,7 @@ def test_write_json_raises_after_replace_retries_exhausted(tmp_path, monkeypatch
 
 
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
-    def fake_get_with_retry(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+    def fake_get_with_retry(_url, params):
         assert params == {
             "page": 2,
             "max": 25,
@@ -774,7 +868,7 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -841,7 +935,7 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(responses[params["page"]])
 
@@ -877,7 +971,7 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(None)
 
@@ -971,7 +1065,7 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -1003,7 +1097,7 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     api_service.make_cache()
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,
@@ -1120,6 +1214,8 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
         raise AssertionError("fresh cache should avoid network calls")
 
     monkeypatch.setattr(api_service, "_session_get", fail_get)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 0.0)
+    monkeypatch.setattr(api_service, "_last_network_success", 123.0)
 
     rank_info = api_service.get_scenario_rank_info(
         "Cached Scenario",
@@ -1130,6 +1226,9 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     assert rank_info.rank == 99
     assert rank_info.total_players == 123
     assert round(rank_info.percentile, 2) == 19.92
+    interactive, network_success = api_service.get_api_activity_timestamps()
+    assert interactive > 0
+    assert network_success == 123.0
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -1420,7 +1519,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
         return LeaderboardAPIResponse(page=0, max=50, total=0, data=[])
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         assert params["username"] == "UnknownUser"
         return FakeResponse(None)
 
@@ -1598,11 +1697,13 @@ def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
     # falsely confirming a refresh (green).
     assert rank_info.warning_message is not None
     assert "VT Pasu Intermediate S5" in rank_info.warning_message
+    assert rank_info.served_stale is True
 
     # The fallback is read-only: the stale cache must not be laundered into a
     # TTL-fresh file by a rewrite (content and mtime both unchanged).
     assert rank_cache_file.read_bytes() == cache_bytes
     assert rank_cache_file.stat().st_mtime == cache_mtime
+    assert b"served_stale" not in rank_cache_file.read_bytes()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -2030,7 +2131,7 @@ def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
     def fake_get(_url, params, timeout):
         assert params["scenarioNameSearch"] == "VT Pasu Intermediate S5"
         assert params["max"] == 100
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,

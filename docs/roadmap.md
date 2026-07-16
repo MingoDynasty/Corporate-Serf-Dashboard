@@ -36,6 +36,10 @@ Design rationale for shipped work lives in
   runs, high score, and PB cm/360 + accuracy for every scenario in the
   playlist. Long playlists use grid-owned scrolling so their column headers
   remain visible. (PRs #12, #15, #16, on retry groundwork from #11)
+- **Progressive playlist position fill** — opening a playlist now paints the
+  full local/cache-backed table immediately, then streams Position, Total
+  Players, and Percentile updates into stable rows with visible progress and
+  aggregate outage/interruption summaries. (PR #127)
 - **Relative "last played" timestamps** — humanized staleness display with
   exact-time tooltips, live-ticking on home and the playlist grid.
   (PRs #17, #19, #23)

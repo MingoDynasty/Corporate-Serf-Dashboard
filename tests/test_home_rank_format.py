@@ -88,6 +88,31 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     assert scenario_dropdown.persistence is False
 
 
+def test_home_top_n_input_uses_compact_width(monkeypatch):
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    top_n_scores = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "top_n_scores"
+    )
+    controls_flex = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Flex)
+        and any(
+            getattr(child, "id", None) == "top_n_scores" for child in component.children
+        )
+    )
+
+    assert top_n_scores.w == "8rem"
+    assert getattr(top_n_scores, "placeholder", None) is None
+    assert controls_flex.gap == "sm"
+    assert controls_flex.wrap == "wrap"
+
+
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
@@ -329,6 +354,7 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
 
     assert home._rank_allows_network([{"prop_id": "."}]) is True
     assert home._rank_allows_network([interval]) is False
+    assert home._rank_allows_network([{"prop_id": "run-events.data"}]) is True
     assert (
         home._rank_allows_network(
             [
@@ -338,6 +364,44 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
         )
         is True
     )
+
+
+def test_rank_render_records_only_interactive_activity(monkeypatch, tmp_path):
+    scenario_name = "Cached Scenario"
+    leaderboard_id = 98330
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            score=100.0,
+        ),
+    )
+    api_service.save_leaderboard_total(leaderboard_id, 100)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 10.0)
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=False)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interval_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interval_activity == 10.0
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=True)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interactive_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interactive_activity > interval_activity
 
 
 @pytest.mark.parametrize(

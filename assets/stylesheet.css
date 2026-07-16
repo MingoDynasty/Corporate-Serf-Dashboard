@@ -87,14 +87,20 @@
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell {
+/* Navigation anchors rendered inside the playlist/scenario grid cells
+   (PlaylistNameLink / ScenarioLink in dashAgGridComponentFunctions.js). The
+   class carries the link styling on the anchor itself, overriding the UA
+   default link color for every state; the --mantine-color-blue-* variables are
+   theme-aware, so the color stays legible in dark mode. */
+a.playlist-scenario-link-cell,
+a.playlist-scenario-link-cell:visited {
     color: var(--mantine-color-blue-filled);
     cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell:hover {
+a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
@@ -223,4 +229,31 @@
     --ag-odd-row-background-color: var(--mantine-color-dark-6);
     --ag-row-hover-color: var(--mantine-color-dark-5);
     --ag-selected-row-background-color: var(--mantine-color-blue-9);
+}
+
+/* Explicit progressive-fill state: values can legitimately be null after a
+   lookup resolves, so the row's pending flags -- never value nullity -- enable
+   this activity affordance. The static ellipsis is the animation fallback. */
+.playlist-rank-pending {
+    color: var(--mantine-color-dimmed);
+}
+
+.playlist-rank-pending::after {
+    animation: playlist-rank-pending-ellipsis 1.2s steps(3, end) infinite;
+    content: "…";
+}
+
+@keyframes playlist-rank-pending-ellipsis {
+    0% {
+        content: ".";
+    }
+
+    34% {
+        content: "..";
+    }
+
+    67%,
+    100% {
+        content: "…";
+    }
 }

@@ -1,6 +1,10 @@
+import logging
+import threading
+import time
 from datetime import datetime
 from types import SimpleNamespace
 
+import pytest
 import requests
 
 from source.kovaaks import data_service, playlist_scenarios_service
@@ -231,6 +235,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         metadata_cache_ttl_hours,
         rank_cache_ttl_hours,
         leaderboard_total_cache_ttl_hours,
+        allow_network=True,
         allow_hydration=True,
     ):
         seen.append(scenario_name)
@@ -239,6 +244,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         assert metadata_cache_ttl_hours == 24
         assert rank_cache_ttl_hours == 168
         assert leaderboard_total_cache_ttl_hours == 24
+        assert allow_network is False
         assert allow_hydration is False
         if scenario_name == "Second":
             raise RuntimeError("simulated rank failure")
@@ -302,7 +308,7 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         personal_best_runs.__getitem__,
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
 
     assert {row["scenario"] for row in rows} == {"First", "Second", "Third"}
     assert set(seen) == {"First", "Second", "Third"}
@@ -319,10 +325,11 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
     assert rows[2]["high_score_display"] == "3,000.5"
     assert rows[2]["pb_cm360_display"] == "45"
     assert rows[2]["pb_accuracy_display"] == "82.34%"
+    assert all(row["generation_token"] == "generation-1" for row in rows)
 
 
 def test_build_playlist_scenario_rank_rows_returns_empty_for_unknown_playlist():
-    rows = build_playlist_scenario_rank_rows("MissingCode")
+    rows = build_playlist_scenario_rank_rows("MissingCode", "generation-1")
 
     assert rows == []
 
@@ -381,10 +388,9 @@ def test_hydration_runs_once_when_a_scenario_is_unmapped(monkeypatch):
         lambda username, ttl: calls.append((username, ttl)),
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
 
     assert calls == [("MingoDynasty", 24)]
-    assert len(rows) == 2
 
 
 def test_hydration_skipped_when_every_scenario_is_mapped(monkeypatch):
@@ -396,10 +402,9 @@ def test_hydration_skipped_when_every_scenario_is_mapped(monkeypatch):
         lambda username, ttl: calls.append((username, ttl)),
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
 
     assert calls == []
-    assert len(rows) == 2
 
 
 def test_hydration_skipped_when_username_unset(monkeypatch):
@@ -413,10 +418,9 @@ def test_hydration_skipped_when_username_unset(monkeypatch):
         lambda username, ttl: calls.append((username, ttl)),
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
 
     assert calls == []
-    assert len(rows) == 2
 
 
 def test_hydration_failure_still_yields_full_rows(monkeypatch):
@@ -431,7 +435,8 @@ def test_hydration_failure_still_yields_full_rows(monkeypatch):
         failing_hydrate,
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
 
@@ -451,7 +456,8 @@ def test_hydration_unexpected_error_still_yields_full_rows(monkeypatch):
         failing_hydrate,
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
 
@@ -476,6 +482,302 @@ def test_hydration_probe_error_still_yields_full_rows(monkeypatch):
         lambda username, ttl: None,
     )
 
-    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode")
+    playlist_scenarios_service._hydrate_playlist_leaderboard_ids(["First", "Second"])
+    rows = build_playlist_scenario_rank_rows("KovaaKsTestCode", "generation-1")
 
     assert [row["scenario"] for row in rows] == ["First", "Second"]
+
+
+@pytest.fixture
+def isolated_fill_registry():
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        for state in playlist_scenarios_service._FILL_REGISTRY.values():
+            state.cancel_event.set()
+        playlist_scenarios_service._FILL_REGISTRY.clear()
+    yield
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        for state in playlist_scenarios_service._FILL_REGISTRY.values():
+            state.cancel_event.set()
+        playlist_scenarios_service._FILL_REGISTRY.clear()
+
+
+def test_phase_one_pending_flags_are_explicit_per_cell():
+    rank_info = ScenarioRankInfo(
+        status=ScenarioRankStatus.UNRANKED,
+        total_players=100,
+    )
+
+    row = format_playlist_scenario_rank_row(
+        "Cached Unranked",
+        0,
+        rank_info,
+        generation_token="generation-1",
+        playlist_code="KovaaKsTestCode",
+        mark_unresolved_pending=True,
+    )
+
+    assert row["rank_sort"] is None
+    assert row["rank_display"] == "Unranked"
+    assert row["rank_pending"] is False
+    assert row["total_pending"] is False
+    assert row["percentile_pending"] is True
+    assert row["href"].endswith("scenario=Cached+Unranked")
+
+
+def test_fill_drain_consumes_terminal_updates_once(isolated_fill_registry):
+    state = playlist_scenarios_service._FillState(
+        playlist_code="KovaaKsTestCode",
+        scenario_names=("First",),
+        total=1,
+        unresolved_indices=set(),
+        pending_updates=[{"scenario": "First"}],
+        done_count=1,
+        terminal="complete",
+    )
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        playlist_scenarios_service._FILL_REGISTRY["generation-1"] = state
+
+    consuming = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+    post_consumption = playlist_scenarios_service.drain_playlist_scenario_fill(
+        "generation-1"
+    )
+
+    assert consuming is not None
+    assert consuming.consuming_terminal is True
+    assert consuming.updates == [{"scenario": "First"}]
+    assert post_consumption is not None
+    assert post_consumption.consuming_terminal is False
+    assert post_consumption.updates == []
+
+
+def test_fill_outcomes_use_structural_stale_marker(isolated_fill_registry):
+    state = playlist_scenarios_service._FillState(
+        playlist_code="KovaaKsTestCode",
+        scenario_names=("Mismatch", "Stale", "Unknown"),
+        total=3,
+        unresolved_indices={0, 1, 2},
+    )
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        playlist_scenarios_service._FILL_REGISTRY["generation-1"] = state
+
+    playlist_scenarios_service._record_fill_result(
+        "generation-1",
+        0,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            warning_message="Configured Steam ID differs.",
+        ),
+        {"scenario": "Mismatch"},
+    )
+    playlist_scenarios_service._record_fill_result(
+        "generation-1",
+        1,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            warning_message="Showing cached data.",
+            served_stale=True,
+        ),
+        {"scenario": "Stale"},
+    )
+    playlist_scenarios_service._record_fill_result(
+        "generation-1",
+        2,
+        ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN),
+        {"scenario": "Unknown"},
+    )
+
+    snapshot = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert snapshot is not None
+    assert snapshot.done_count == 3
+    assert snapshot.stale_count == 1
+    assert snapshot.unknown_count == 1
+
+
+def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
+    monkeypatch,
+    caplog,
+    isolated_fill_registry,
+):
+    scenario_names = ("First", "Second")
+    state = playlist_scenarios_service._FillState(
+        playlist_code="KovaaKsTestCode",
+        scenario_names=scenario_names,
+        total=len(scenario_names),
+        unresolved_indices=set(range(len(scenario_names))),
+    )
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        playlist_scenarios_service._FILL_REGISTRY["generation-1"] = state
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_hydrate_playlist_leaderboard_ids",
+        lambda _scenario_names: None,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_fetch_fill_row",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_lookup_rank_info",
+        lambda scenario_name, *, allow_network: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            scenario_name=scenario_name,
+        ),
+    )
+
+    with caplog.at_level(logging.ERROR):
+        playlist_scenarios_service._run_playlist_scenario_fill(
+            "generation-1",
+            scenario_names,
+            state.cancel_event,
+        )
+
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        assert state.terminal == "cancelled"
+        assert state.cancel_event.is_set()
+    assert "Playlist scenario fill failed for generation generation-1" in caplog.text
+
+    drain = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert drain is not None
+    assert drain.terminal == "cancelled"
+    assert drain.consuming_terminal is True
+    assert len(drain.updates) == len(scenario_names)
+    assert all(row["rank_pending"] is False for row in drain.updates)
+    assert all(row["total_pending"] is False for row in drain.updates)
+    assert all(row["percentile_pending"] is False for row in drain.updates)
+
+
+def test_tombstone_retention_evicts_consumed_before_unconsumed(
+    monkeypatch,
+    isolated_fill_registry,
+):
+    monkeypatch.setattr(playlist_scenarios_service, "FILL_TOMBSTONE_LIMIT", 3)
+
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        for token, consumed in (
+            ("unconsumed-old", False),
+            ("consumed-newer", True),
+            ("unconsumed-newer", False),
+            ("incoming", False),
+        ):
+            state = playlist_scenarios_service._FillState(
+                playlist_code=token,
+                scenario_names=(),
+                total=0,
+                unresolved_indices=set(),
+                consumed=consumed,
+            )
+            playlist_scenarios_service._FILL_REGISTRY[token] = state
+            playlist_scenarios_service._transition_terminal_locked(
+                state,
+                "complete",
+            )
+
+        retained = set(playlist_scenarios_service._FILL_REGISTRY)
+
+    assert retained == {"unconsumed-old", "unconsumed-newer", "incoming"}
+
+
+def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
+    monkeypatch,
+    isolated_fill_registry,
+):
+    playlist = PlaylistData(
+        name="Voltaic Benchmarks",
+        code="KovaaKsTestCode",
+        scenarios=[
+            Scenario(name="First"),
+            Scenario(name="Second"),
+            Scenario(name="Third"),
+        ],
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_config",
+        lambda: SimpleNamespace(
+            kovaaks_username="MingoDynasty",
+            steam_id="steam-id",
+            scenario_metadata_cache_ttl_hours=24,
+            scenario_rank_cache_ttl_hours=168,
+            leaderboard_total_cache_ttl_hours=24,
+        ),
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_cached_leaderboard_id",
+        lambda _name: 1,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "is_scenario_in_database",
+        lambda _name: False,
+    )
+    monkeypatch.setattr(playlist_scenarios_service, "PLAYLIST_RANK_MAX_WORKERS", 1)
+
+    network_started = threading.Event()
+    release_network = threading.Event()
+    network_finished = threading.Event()
+    network_calls = []
+
+    def fake_rank_lookup(scenario_name, *_args, **kwargs):
+        if kwargs["allow_network"]:
+            network_calls.append(scenario_name)
+            network_started.set()
+            assert release_network.wait(timeout=2)
+            network_finished.set()
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            total_players=100,
+            percentile=90.5,
+        )
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "get_scenario_rank_info",
+        fake_rank_lookup,
+    )
+
+    assert playlist_scenarios_service.start_playlist_scenario_fill(
+        playlist.code,
+        "generation-1",
+    )
+    assert network_started.wait(timeout=2)
+
+    class UnstartedThread:
+        def __init__(self, **_kwargs):
+            pass
+
+        def start(self):
+            pass
+
+    monkeypatch.setattr(threading, "Thread", UnstartedThread)
+    assert playlist_scenarios_service.start_playlist_scenario_fill(
+        playlist.code,
+        "generation-2",
+    )
+
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        cancelled = playlist_scenarios_service._FILL_REGISTRY["generation-1"]
+        assert cancelled.terminal == "cancelled"
+        assert cancelled.cancel_event.is_set()
+
+    release_network.set()
+    assert network_finished.wait(timeout=2)
+    time.sleep(0.05)
+
+    drain = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert network_calls == ["First"]
+    assert drain is not None
+    assert drain.terminal == "cancelled"
+    assert drain.done_count == 0
+    assert len(drain.updates) == 3
+    assert all(row["rank_pending"] is False for row in drain.updates)
+    assert all(row["total_pending"] is False for row in drain.updates)
+    assert all(row["percentile_pending"] is False for row in drain.updates)

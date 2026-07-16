@@ -16,8 +16,13 @@ CONFIG_ERROR_MESSAGE = (
         None,
         "not valid toml",
         'stats_dir = "missing required fields"',
+        'stats_dir = "x"\n'
+        "polling_interval = 1000\n"
+        "port = 8080\n"
+        "sens_round_decimal_places = 1\n"
+        "kovaaks_api_timeout_seconds = 0",
     ],
-    ids=["missing", "invalid-toml", "invalid-schema"],
+    ids=["missing", "invalid-toml", "invalid-schema", "non-positive-timeout"],
 )
 def test_startup_with_missing_or_invalid_config_exits_cleanly(
     tmp_path: Path,
