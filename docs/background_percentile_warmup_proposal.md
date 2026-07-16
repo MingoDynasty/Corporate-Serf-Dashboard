@@ -42,9 +42,14 @@ any user-facing path.
 - **R2 — Queue scope = played ∩ visible.** Only scenarios that appear in a
   visible playlist and have local runs are enqueued: nothing else can
   contribute a percentile to the overview (the aggregator skips unplayed
-  scenarios; hidden playlists aren't rendered). The Home page's on-demand
-  fetch covers everything outside this set. This bounds the worst case at
-  "played and visible", not the user's full history.
+  scenarios; hidden playlists aren't rendered in the default view). The
+  temporary "Show hidden" management mode does render hidden rows with
+  cache-only aggregates; those stay unwarmed by design — muted row styling
+  plus the R18 coverage suffix mark the partial sample honestly, and
+  unhiding is precisely the promotion path that enqueues them (R6). The
+  Home page's on-demand fetch covers everything outside this set. This
+  bounds the worst case at "played and visible", not the user's full
+  history.
 - **R3 — Playlist-completion ordering.** The startup queue is grouped by
   playlist (most recently played first); within a playlist, scenarios with no
   displayable percentile come first, then by last-played recency. Completing
@@ -192,12 +197,19 @@ any user-facing path.
   "invalid username". The worker therefore requires one successful
   per-session total-play validation of the configured username (a
   successful hydration counts) before it will *cache* an UNRANKED result:
-  while unvalidated, UNRANKED is not written and the item tail-requeues as
-  transient so validation retries with it; an unknown-username answer
-  triggers R11. Without this, a typo'd username would bulk-cache every
-  candidate as fresh UNRANKED instead of stopping the queue. RANKED results
-  need no such gate — an exact Steam-ID/username match is itself
-  validation.
+  while unvalidated, an UNRANKED result is never written. Validation is
+  itself a subject of the R5 outcome map — one reserved entry with the same
+  R9 taxonomy, so the item's disposition inherits the validation failure's
+  category: connection-error/5xx/429 validation failures tail-requeue the
+  item and count against validation's own 3-attempt budget, while a
+  validation read timeout marks validation terminal for the session per the
+  no-ReadTimeout-retry contract, and while validation is terminal every
+  unvalidated UNRANKED item goes terminal too (no writes; the next restart
+  re-probes) rather than re-firing total-play once per queued scenario. An
+  unknown-username answer triggers R11. Without this gate, a typo'd
+  username would bulk-cache every candidate as fresh UNRANKED instead of
+  stopping the queue. RANKED results need no such gate — an exact
+  Steam-ID/username match is itself validation.
 - **R15 — Kill switch, and off-by-configuration.** `percentile_warmup_enabled`
   (config.toml, default true) disables the warmer only — never interactive
   fetches. Independently, a falsey `kovaaks_username` disables the warmer
@@ -213,13 +225,18 @@ any user-facing path.
 - **R17 — Logging.** DEBUG per item, INFO per playlist batch and per state
   change (backoff entered/exited, fatal stop), one INFO summary at
   completion.
-- **R18 — Coverage suffix denominator becomes played.** The overview's
-  percentile cells change to `median · cached/played`, not the shipped
-  `cached/scenario_count`: unplayed scenarios can never contribute a
-  percentile (R2), and the Played column already carries `played/total`, so
-  the old denominator would leave a fully-warmed 10-of-20-played row
-  reading `· 10/20` — permanently partial-looking with no work left to do.
-  With the played denominator, `n/n` is exactly the R3 "trustworthy" state.
+- **R18 — Coverage suffix = resolved/played.** The overview's percentile
+  cells change to `median · resolved/played` (shipped today:
+  cached-percentile count over `scenario_count`). Both ends move. The
+  denominator becomes played because unplayed scenarios can never
+  contribute (R2) and the Played column already carries `played/total` —
+  the old denominator left a fully-warmed 10-of-20-played row reading
+  `· 10/20` forever. The numerator counts *resolved* entries — fresh RANKED
+  or fresh UNRANKED — because R4 treats fresh UNRANKED as complete, so a
+  numerator of cached percentiles alone would leave any playlist containing
+  an unranked scenario permanently short of `n/n` with no work left to do.
+  The median itself still aggregates RANKED percentiles only; `n/n` is
+  exactly the R3 "trustworthy" state.
 
 ## Coordination with progressive fill (shipped: PRs #114/#127)
 
