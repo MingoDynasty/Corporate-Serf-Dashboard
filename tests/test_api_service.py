@@ -119,6 +119,21 @@ def test_get_with_retry_reuses_session_within_thread(monkeypatch):
     ]
 
 
+def test_get_with_retry_records_real_network_success(monkeypatch):
+    monkeypatch.setattr(api_service, "_last_network_success", 0.0)
+    monkeypatch.setattr(api_service.time, "monotonic", lambda: 42.0)
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse({"ok": True}),
+    )
+
+    api_service._get_with_retry("https://example.test/success")
+
+    _interactive, network_success = api_service.get_api_activity_timestamps()
+    assert network_success == 42.0
+
+
 def test_set_request_timeout_applies_to_requests(monkeypatch):
     calls = []
 
@@ -1199,6 +1214,8 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
         raise AssertionError("fresh cache should avoid network calls")
 
     monkeypatch.setattr(api_service, "_session_get", fail_get)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 0.0)
+    monkeypatch.setattr(api_service, "_last_network_success", 123.0)
 
     rank_info = api_service.get_scenario_rank_info(
         "Cached Scenario",
@@ -1209,6 +1226,9 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     assert rank_info.rank == 99
     assert rank_info.total_players == 123
     assert round(rank_info.percentile, 2) == 19.92
+    interactive, network_success = api_service.get_api_activity_timestamps()
+    assert interactive > 0
+    assert network_success == 123.0
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -1677,11 +1697,13 @@ def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
     # falsely confirming a refresh (green).
     assert rank_info.warning_message is not None
     assert "VT Pasu Intermediate S5" in rank_info.warning_message
+    assert rank_info.served_stale is True
 
     # The fallback is read-only: the stale cache must not be laundered into a
     # TTL-fresh file by a rewrite (content and mtime both unchanged).
     assert rank_cache_file.read_bytes() == cache_bytes
     assert rank_cache_file.stat().st_mtime == cache_mtime
+    assert b"served_stale" not in rank_cache_file.read_bytes()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 

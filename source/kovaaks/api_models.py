@@ -231,3 +231,7 @@ class ScenarioRankInfo(BaseModel):
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
     warning_message: str | None = Field(default=None, exclude=True)
+    # Transient structural marker for the stale-rank fallback. That path is
+    # read-only, and every normal cache write drops the default None via
+    # exclude_none, so this never becomes persisted rank data.
+    served_stale: bool | None = None
