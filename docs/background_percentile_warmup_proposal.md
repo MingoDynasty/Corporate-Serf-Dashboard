@@ -35,7 +35,10 @@ any user-facing path.
   ingest completes (it needs the played set), processes a queue of scenario
   names sequentially with a small politeness gap (~2 s) between network items.
   No parallelism: sequential fetches at ~6–8 s/scenario are inherently gentle
-  (<0.4 req/s sustained).
+  (<0.4 req/s sustained). The worker lives for the app's lifetime: when the
+  queue and in-flight work drain, it blocks on a condition variable, and the
+  R6 enqueue hooks signal that condition — an unhide hours after the queue
+  emptied wakes the same worker; nothing is restarted.
 - **R2 — Queue scope = played ∩ visible.** Only scenarios that appear in a
   visible playlist and have local runs are enqueued: nothing else can
   contribute a percentile to the overview (the aggregator skips unplayed
@@ -48,19 +51,28 @@ any user-facing path.
   one playlist at a time flips overview rows from "partial" to "trustworthy"
   one by one, instead of leaving every row partially covered for the whole
   warm.
-- **R4 — "Needs work" = rank or total missing/stale.** A scenario is skipped
-  at dequeue only if its rank cache is TTL-fresh AND its totals cache is
-  TTL-fresh (`leaderboard_total_cache_ttl_hours`). Percentile needs both; a
-  rank-only check would leave permanent N/A holes wherever a totals fetch
-  once failed, and because the overview's cache-only read path serves totals
-  regardless of age, a stale totals file would otherwise never be repaired.
-  The asymmetry is cheap: a fresh-rank/stale-totals item re-pays only the
+- **R4 — Completion = fresh UNRANKED, or fresh RANKED plus fresh total.** A
+  scenario is skipped at dequeue if its rank cache is TTL-fresh UNRANKED, or
+  TTL-fresh RANKED with a TTL-fresh totals cache
+  (`leaderboard_total_cache_ttl_hours`). Percentile needs rank and total
+  together, but only for RANKED entries — the overview derives percentiles
+  exclusively from RANKED cache entries, so totals buy nothing for a fresh
+  UNRANKED. (The drill-in page does show totals on unranked rows; that is
+  the shipped fill's on-demand territory.) For RANKED entries, a rank-only
+  check would leave permanent N/A holes wherever a totals fetch once failed,
+  and because the overview's cache-only read path serves totals regardless
+  of age, a stale totals file would otherwise never be repaired. The
+  asymmetry is cheap: a fresh-RANKED/stale-totals item re-pays only the
   ~0.5 s totals call (R14).
-- **R5 — Dequeue-time freshness check is the universal dedup.** Every pop
-  re-checks R4 and skips satisfied items in microseconds (file stats, no
-  network). All duplication — unhide spam, races with interactive fetches,
-  tail requeues — resolves here. The queue needs no uniqueness invariant, no
-  promotion, no scanning: a dumb deque.
+- **R5 — The dequeue-time check is the universal dedup.** Every pop consults
+  two things: the R4 cache predicate, and a per-session outcome map keyed by
+  scenario name holding transient attempt counts and terminal outcomes
+  (permanent failure, read-timeout drop, cap exhaustion). Satisfied or
+  terminal names skip in microseconds (file stats plus a dict lookup, no
+  network), so duplication from any source — unhide spam, races with
+  interactive fetches, tail requeues — resolves here, and failure duplicates
+  can neither re-fire requests nor evade the R9 cap. The queue itself needs
+  no uniqueness invariant, no promotion, no scanning: a dumb deque.
 - **R6 — Unhide and import prepend, unconditionally.** When the user unhides
   a playlist or imports one (imports are auto-visible), its played scenarios
   are batch-prepended (most recent user action first). No in-queue dedup (R5
@@ -95,19 +107,21 @@ any user-facing path.
   (30 s → 2 m → 5 m → 15 m → 30 m cap), reset on any success. Read timeouts
   are the deliberate exception, honoring the 2026-07-13 no-ReadTimeout-retry
   decision: the server may still be processing that exact query, so the item
-  is dropped for the session (the next restart re-probes it) — but the
-  failure still trips the same global backoff, because a read timeout is the
+  is marked terminal in the R5 outcome map (the next restart re-probes it) —
+  but the failure still trips the same global backoff, because a read timeout is the
   primary symptom of a KovaaK's slow spell and the worker should slow down,
   not plow through the queue timing out item after item. During an outage
   the worker converges to ~1 probe per 30 min, which doubles as the recovery
   detector.
   Tail (not head) requeue keeps one flaky scenario from blocking the queue
   behind its own backoffs. Per-item cap: 3 transient attempts per session,
-  then drop (the next restart retries). Any real network success — the
+  counted in the R5 outcome map by scenario name (duplicates share the same
+  budget), then mark terminal (the next restart retries). Any real network success — the
   worker's own probes or another path's HTTP success (R7's *last network
   success*) — wakes the worker early; cache-served results never do.
 - **R10 — Permanent failures skip immediately.** Unresolvable leaderboard IDs
-  and validation failures are logged and dropped without retries; a restart
+  and validation failures are logged and marked terminal in the R5 outcome
+  map without retries; a restart
   re-probes each once (accepted cost; a negative-resolution cache is a future
   lever, not v1).
 - **R11 — Fatal failures stop the queue.** `UnknownKovaaksUserError` means
@@ -119,8 +133,9 @@ any user-facing path.
   (`flush_background_notifications`), the same route the rank-freshness
   Timer chain uses.
 - **R12 — Status line: remaining-only.** The overview page shows
-  "Updating percentile data: N remaining (~ETA)" where N counts unique names
-  in the queue (spam-proof) and ETA = N × recent average pace; during outage
+  "Updating percentile data: N remaining (~ETA)" where N counts unique
+  non-terminal names queued or in flight (spam-proof) and ETA = N × recent
+  average pace; during outage
   backoff it shows a paused note with the retry time. No done/total: the
   denominator is dynamic (unhides grow it, dedup shrinks it), so a ratio
   would visibly run backward. Transient failures never toast — a deliberate
@@ -128,9 +143,13 @@ any user-facing path.
   convention, because an outage is ambient state, not an event; only R11
   notifies.
 - **R13 — Live overview refresh while warming.** A `dcc.Interval` on the
-  overview page, enabled only while the queue is non-empty, re-runs the
-  normal cache-only row build each tick so rows fill in as the user watches.
-  Full rebuild from disk cache — deliberately NOT the progressive-fill
+  overview page, enabled while the worker is busy — queued items or an item
+  in flight; queue emptiness alone is not idleness, because the final item
+  is popped before its fetch completes — re-runs the normal cache-only row
+  build each tick so rows fill in as the user watches. On observing the
+  worker go idle, the callback performs one last rebuild before disabling
+  itself, so the final cache write is never left invisible. Full rebuild
+  from disk cache — deliberately NOT the progressive-fill
   registry/rowTransaction transport, which streams in-memory generation
   state; the overview's data plane is the disk cache and its build is
   already cheap.
@@ -195,14 +214,17 @@ Contract points:
   already zero.
 - Unhide racing an in-flight fetch: the single worker serializes; the
   duplicate is freshness-skipped after the in-flight item saves. If the
-  in-flight fetch failed, the duplicate acts as a free retry.
+  in-flight fetch failed transiently, the duplicate acts as a free retry —
+  counted against the same per-name budget in the R5 outcome map; terminal
+  names skip instead.
 - Scenario played for the first time mid-session: the watchdog's new-scenario
   path already schedules the Timer-chain refresh (`file_watchdog.py`), so the
   queue never needs mid-session additions from gameplay.
 - A playlist repeats a scenario (the shipped fill keys grid rows by playlist
   position for the same reason): the second occurrence freshness-skips.
-- Cached UNRANKED: fresh → skipped; correct (the user isn't on that board; a
-  new local score routes through the Timer chain).
+- Cached UNRANKED: fresh → skipped without a totals fetch (R4's UNRANKED
+  arm); correct (the user isn't on that board, and the overview renders no
+  percentile for it; a new local score routes through the Timer chain).
 - Debug mode: `app.py` runs `use_reloader=False`, so the worker starts once,
   like the watchdog observer.
 - Shutdown mid-warm: the daemon thread dies; atomic cache writes can't tear;
