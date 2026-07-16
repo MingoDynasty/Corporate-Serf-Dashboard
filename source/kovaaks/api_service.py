@@ -51,6 +51,9 @@ dash_logger = get_dash_logger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
+_ACTIVITY_LOCK = threading.Lock()
+_last_interactive_activity = 0.0
+_last_network_success = 0.0
 
 CACHE_DIR = "data/cache"
 
@@ -68,6 +71,26 @@ def set_request_timeout(seconds: int) -> None:
     # Startup-only mutation; requests read it per call, so no lock is needed.
     global _timeout_seconds  # noqa: PLW0603
     _timeout_seconds = seconds
+
+
+def record_interactive_activity() -> None:
+    """Record one user-facing rank lookup, including cache-served lookups."""
+    global _last_interactive_activity  # noqa: PLW0603
+    with _ACTIVITY_LOCK:
+        _last_interactive_activity = time.monotonic()
+
+
+def get_api_activity_timestamps() -> tuple[float, float]:
+    """Return last interactive activity and last successful HTTP request."""
+    with _ACTIVITY_LOCK:
+        return _last_interactive_activity, _last_network_success
+
+
+def _record_network_success() -> None:
+    """Record successful real HTTP traffic for outage-recovery coordination."""
+    global _last_network_success  # noqa: PLW0603
+    with _ACTIVITY_LOCK:
+        _last_network_success = time.monotonic()
 
 
 class Endpoints(StrEnum):
@@ -210,6 +233,7 @@ def _get_with_retry(
         )
         if response.status_code != 429 or attempt == attempts - 1:
             response.raise_for_status()
+            _record_network_success()
             return response
 
         delay_seconds = _retry_after_seconds(response)
@@ -1317,7 +1341,9 @@ def _stale_rank_fallback(
     )
     if stale_rank.warning_message:
         stale_warning = f"{stale_rank.warning_message} {stale_warning}"
-    return stale_rank.model_copy(update={"warning_message": stale_warning})
+    return stale_rank.model_copy(
+        update={"warning_message": stale_warning, "served_stale": True}
+    )
 
 
 def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
@@ -1330,6 +1356,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     force_refresh: bool = False,
     allow_network: bool = True,
     allow_hydration: bool = True,
+    record_activity: bool = True,
 ) -> ScenarioRankInfo:
     """
     Main rank lookup entry point for UI and background refresh callers.
@@ -1351,6 +1378,9 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     - UNKNOWN: missing config, invalid username, unresolved leaderboard, or API
       failure.
     """
+    if record_activity:
+        record_interactive_activity()
+
     if not username:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,

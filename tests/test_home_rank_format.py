@@ -354,6 +354,7 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
 
     assert home._rank_allows_network([{"prop_id": "."}]) is True
     assert home._rank_allows_network([interval]) is False
+    assert home._rank_allows_network([{"prop_id": "run-events.data"}]) is True
     assert (
         home._rank_allows_network(
             [
@@ -363,6 +364,44 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
         )
         is True
     )
+
+
+def test_rank_render_records_only_interactive_activity(monkeypatch, tmp_path):
+    scenario_name = "Cached Scenario"
+    leaderboard_id = 98330
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
+    monkeypatch.setattr(home.get_config(), "steam_id", None)
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            score=100.0,
+        ),
+    )
+    api_service.save_leaderboard_total(leaderboard_id, 100)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 10.0)
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=False)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interval_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interval_activity == 10.0
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=True)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interactive_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interactive_activity > interval_activity
 
 
 @pytest.mark.parametrize(

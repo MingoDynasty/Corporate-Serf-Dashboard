@@ -89,14 +89,18 @@ list in the roadmap.)
   rest wait behind "Show hidden" on the Playlists page. *Problem solved:* enabling a benchmark used to mean
   manually copying a JSON file and restarting — now it's one unhide click,
   and app updates refresh the whole library automatically.
-- **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
+- **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
+  PR #127). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
-  the column labels remain visible while scanning deep rows. *Problem solved:*
-  the headline use case is *"show me the scenarios where I'm worst, sorted
-  ascending — that's my training priority list."* It also surfaces scenarios
-  gone stale. A session-planning tool, checked at the start of a training
-  session.
+  the column labels remain visible while scanning deep rows. The local and
+  cached parts paint immediately; unresolved leaderboard cells animate and
+  stream into place with a counter instead of hiding the table behind a
+  minutes-long spinner. *Problem solved:* the headline use case is *"show me
+  the scenarios where I'm worst, sorted ascending — that's my training
+  priority list."* It also surfaces scenarios gone stale, and remains usable
+  while KovaaK's is slow or unreachable. A session-planning tool, checked at
+  the start of a training session.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
