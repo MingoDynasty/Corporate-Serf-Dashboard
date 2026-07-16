@@ -453,54 +453,71 @@ def _run_playlist_scenario_fill(
     """Hydrate once, fan out rank lookups, and stream results to the registry."""
     stopwatch = Stopwatch()
     stopwatch.start()
-    if not cancel_event.is_set():
-        _hydrate_playlist_leaderboard_ids(list(scenario_names))
+    playlist_code = ""
+    completed_normally = False
+    completion_metrics: tuple[Counter[str], int, int] | None = None
+    try:
+        if not cancel_event.is_set():
+            _hydrate_playlist_leaderboard_ids(list(scenario_names))
 
-    with _FILL_REGISTRY_LOCK:
-        state = _FILL_REGISTRY.get(generation_token)
-        playlist_code = state.playlist_code if state is not None else ""
+        with _FILL_REGISTRY_LOCK:
+            state = _FILL_REGISTRY.get(generation_token)
+            playlist_code = state.playlist_code if state is not None else ""
 
-    if playlist_code and not cancel_event.is_set():
-        max_workers = max(1, PLAYLIST_RANK_MAX_WORKERS)
-        with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            futures = [
-                executor.submit(
-                    _fetch_fill_row,
-                    generation_token,
-                    playlist_code,
-                    index,
-                    scenario_name,
-                    cancel_event,
-                )
-                for index, scenario_name in enumerate(scenario_names)
-            ]
-            for future in as_completed(futures):
-                result = future.result()
-                if result is None:
-                    continue
-                playlist_order, rank_info, row = result
-                _record_fill_result(
-                    generation_token,
-                    playlist_order,
-                    rank_info,
-                    row,
-                )
-
-    stopwatch.stop()
-    with _FILL_REGISTRY_LOCK:
-        state = _FILL_REGISTRY.get(generation_token)
-        if state is None or state.terminal is not None:
-            return
-        _transition_terminal_locked(state, "complete")
-        status_counts = Counter(
-            {
-                "unknown": state.unknown_count,
-                "stale": state.stale_count,
-                "fresh": state.done_count - state.unknown_count - state.stale_count,
-            }
+        if playlist_code and not cancel_event.is_set():
+            max_workers = max(1, PLAYLIST_RANK_MAX_WORKERS)
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                futures = [
+                    executor.submit(
+                        _fetch_fill_row,
+                        generation_token,
+                        playlist_code,
+                        index,
+                        scenario_name,
+                        cancel_event,
+                    )
+                    for index, scenario_name in enumerate(scenario_names)
+                ]
+                for future in as_completed(futures):
+                    result = future.result()
+                    if result is None:
+                        continue
+                    playlist_order, rank_info, row = result
+                    _record_fill_result(
+                        generation_token,
+                        playlist_order,
+                        rank_info,
+                        row,
+                    )
+        completed_normally = True
+    except Exception:  # noqa: BLE001
+        logger.exception(
+            "Playlist scenario fill failed for generation %s",
+            generation_token,
         )
-        done_count = state.done_count
-        total = state.total
+    finally:
+        stopwatch.stop()
+        with _FILL_REGISTRY_LOCK:
+            state = _FILL_REGISTRY.get(generation_token)
+            if state is not None and state.terminal is None:
+                if completed_normally:
+                    _transition_terminal_locked(state, "complete")
+                    status_counts = Counter(
+                        {
+                            "unknown": state.unknown_count,
+                            "stale": state.stale_count,
+                            "fresh": state.done_count
+                            - state.unknown_count
+                            - state.stale_count,
+                        }
+                    )
+                    completion_metrics = status_counts, state.done_count, state.total
+                else:
+                    _transition_terminal_locked(state, "cancelled")
+
+    if completion_metrics is None:
+        return
+    status_counts, done_count, total = completion_metrics
     logger.info(
         "Filled playlist scenario rows for %s (%d/%d: %d fresh, %d stale, "
         "%d unknown) in %.2f seconds",

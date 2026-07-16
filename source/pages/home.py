@@ -370,6 +370,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
             selected_scenario,
             *_rank_lookup_config(),
             allow_network=allow_network,
+            record_activity=allow_network,
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)

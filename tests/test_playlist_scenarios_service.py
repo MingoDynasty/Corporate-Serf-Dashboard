@@ -1,3 +1,4 @@
+import logging
 import threading
 import time
 from datetime import datetime
@@ -591,6 +592,63 @@ def test_fill_outcomes_use_structural_stale_marker(isolated_fill_registry):
     assert snapshot.done_count == 3
     assert snapshot.stale_count == 1
     assert snapshot.unknown_count == 1
+
+
+def test_fill_worker_exception_cancels_and_finalizes_pending_rows(
+    monkeypatch,
+    caplog,
+    isolated_fill_registry,
+):
+    scenario_names = ("First", "Second")
+    state = playlist_scenarios_service._FillState(
+        playlist_code="KovaaKsTestCode",
+        scenario_names=scenario_names,
+        total=len(scenario_names),
+        unresolved_indices=set(range(len(scenario_names))),
+    )
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        playlist_scenarios_service._FILL_REGISTRY["generation-1"] = state
+
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_hydrate_playlist_leaderboard_ids",
+        lambda _scenario_names: None,
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_fetch_fill_row",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+    monkeypatch.setattr(
+        playlist_scenarios_service,
+        "_lookup_rank_info",
+        lambda scenario_name, *, allow_network: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            scenario_name=scenario_name,
+        ),
+    )
+
+    with caplog.at_level(logging.ERROR):
+        playlist_scenarios_service._run_playlist_scenario_fill(
+            "generation-1",
+            scenario_names,
+            state.cancel_event,
+        )
+
+    with playlist_scenarios_service._FILL_REGISTRY_LOCK:
+        assert state.terminal == "cancelled"
+        assert state.cancel_event.is_set()
+    assert "Playlist scenario fill failed for generation generation-1" in caplog.text
+
+    drain = playlist_scenarios_service.drain_playlist_scenario_fill("generation-1")
+
+    assert drain is not None
+    assert drain.terminal == "cancelled"
+    assert drain.consuming_terminal is True
+    assert len(drain.updates) == len(scenario_names)
+    assert all(row["rank_pending"] is False for row in drain.updates)
+    assert all(row["total_pending"] is False for row in drain.updates)
+    assert all(row["percentile_pending"] is False for row in drain.updates)
 
 
 def test_tombstone_retention_evicts_consumed_before_unconsumed(
