@@ -88,6 +88,31 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     assert scenario_dropdown.persistence is False
 
 
+def test_home_top_n_input_uses_compact_width(monkeypatch):
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    top_n_scores = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "top_n_scores"
+    )
+    controls_flex = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Flex)
+        and any(
+            getattr(child, "id", None) == "top_n_scores" for child in component.children
+        )
+    )
+
+    assert top_n_scores.w == "8rem"
+    assert getattr(top_n_scores, "placeholder", None) is None
+    assert controls_flex.gap == "sm"
+    assert controls_flex.wrap == "wrap"
+
+
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
