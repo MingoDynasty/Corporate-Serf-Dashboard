@@ -166,7 +166,13 @@ any user-facing path.
   actual trigger — the DashProxy `allow_duplicate` initial-fire hazard),
   because the enqueue condition variable wakes only the server-side worker,
   not a disabled browser interval; without the re-arm, work enqueued after
-  an earlier idle would warm caches invisibly until a reload. Full rebuild
+  an earlier idle would warm caches invisibly until a reload. Automated
+  rebuilds must pass `record_activity=False` down the overview build path —
+  its cache-only reads record interactive activity by default, so each tick
+  would otherwise bump R7's activity timestamp and the interval, which runs
+  precisely while the worker is busy, would perpetually postpone the worker
+  it reports on. Home's interval tick already models the fix
+  (`record_activity=allow_network`); a regression test pins it. Full rebuild
   from disk cache — deliberately NOT the progressive-fill
   registry/rowTransaction transport, which streams in-memory generation
   state; the overview's data plane is the disk cache and its build is
@@ -207,6 +213,13 @@ any user-facing path.
 - **R17 — Logging.** DEBUG per item, INFO per playlist batch and per state
   change (backoff entered/exited, fatal stop), one INFO summary at
   completion.
+- **R18 — Coverage suffix denominator becomes played.** The overview's
+  percentile cells change to `median · cached/played`, not the shipped
+  `cached/scenario_count`: unplayed scenarios can never contribute a
+  percentile (R2), and the Played column already carries `played/total`, so
+  the old denominator would leave a fully-warmed 10-of-20-played row
+  reading `· 10/20` — permanently partial-looking with no work left to do.
+  With the played denominator, `n/n` is exactly the R3 "trustworthy" state.
 
 ## Coordination with progressive fill (shipped: PRs #114/#127)
 
