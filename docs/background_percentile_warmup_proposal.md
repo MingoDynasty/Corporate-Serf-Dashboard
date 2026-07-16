@@ -66,8 +66,10 @@ any user-facing path.
   immediately unhide the benchmarks they care about — so this hook is core.
 - **R7 — Interactive traffic bypasses the queue and preempts the worker.**
   Drill-in loads (see coordination below) and the Home refresh button fetch
-  directly, as today. A module-level signal in `api_service` carries two
-  timestamps with deliberately split semantics:
+  directly, as today. The module-level signal in `api_service` (shipped with
+  PR #127: `record_interactive_activity()` / `get_api_activity_timestamps()`;
+  the worker consumes it as-is) carries two timestamps with deliberately
+  split semantics:
   - *last interactive activity* — bumped per interactive lookup, cache hits
     included (it means only "the user is active, stay out of the way");
     drives the worker's yielding.
@@ -98,15 +100,13 @@ any user-facing path.
   re-probes each once (accepted cost; a negative-resolution cache is a future
   lever, not v1).
 - **R11 — Fatal failures stop the queue.** `UnknownKovaaksUserError` means
-  every remaining item would fail identically: the worker stops and records
-  the fatal state in its module-level progress state. The user-visible
-  surface is the R12 status line, plus one toast emitted from the R13
-  interval callback when it drains that state — NOT `dash_logger` from the
-  worker thread: dash_extensions delivers via `set_props`, which raises
-  `LookupError` outside callback context, so plain-background-thread
-  `dash_logger` calls never reach the UI (a pre-existing bug the
-  rank-freshness Timer chain has today, tracked separately; found by the
-  progressive-fill deep pass).
+  every remaining item would fail identically: the worker stops, records the
+  fatal state in its module-level progress state (surfaced by the R12 status
+  line), and emits one `dash_logger.error`. Background-thread `dash_logger`
+  calls are safe since the drained-queue fix: records logged without a
+  callback context are queued and delivered by the Home interval drain
+  (`flush_background_notifications`), the same route the rank-freshness
+  Timer chain uses.
 - **R12 — Status line: remaining-only.** The overview page shows
   "Updating percentile data: N remaining (~ETA)" where N counts unique names
   in the queue (spam-proof) and ETA = N × recent average pace; during outage
@@ -115,8 +115,7 @@ any user-facing path.
   would visibly run backward. Transient failures never toast — a deliberate
   deviation from the "background failures notify via `dash_logger.error`"
   convention, because an outage is ambient state, not an event; only R11
-  notifies. (That convention's documented route is also currently broken
-  from plain threads — see R11.)
+  notifies.
 - **R13 — Live overview refresh while warming.** A `dcc.Interval` on the
   overview page, enabled only while the queue is non-empty, re-runs the
   normal cache-only row build each tick so rows fill in as the user watches.
@@ -142,43 +141,39 @@ any user-facing path.
   change (backoff entered/exited, fatal stop), one INFO summary at
   completion.
 
-## Coordination with `playlist_progressive_fill_proposal.md`
+## Coordination with progressive fill (shipped: PRs #114/#127)
 
-That proposal (drafted in parallel) owns the drill-in page
-(`/playlists/<code>`): two-phase load, pending placeholders, registry +
-interval drain, per-generation progress. This proposal owns the ambient queue
-and the overview page. They compose through the disk cache with no new shared
-state: progressive fill's phase 2 warms a playlist → R5 skips those
-scenarios; the warmer's results make phase 2 near-instant (its R2 relies on
-cache-fresh completing in milliseconds).
+The progressive-fill design (drafted in parallel with this proposal, now
+shipped) owns the drill-in page (`/playlists/<code>`): two-phase load,
+pending placeholders, registry + interval drain, per-generation progress.
+Its durable record is the 2026-07-15 entry "Stream Playlist Positions With
+Generation-Scoped Progressive Fill" in [decision_log.md](decision_log.md).
+This proposal owns the ambient queue and the overview page. They compose
+through the disk cache with no new shared state: a drill-in's phase 2 warms
+a playlist → R5 skips those scenarios; the warmer's results make phase 2
+near-instant (cache-fresh lookups complete in milliseconds without network).
 
 Contract points:
 
-1. The R7 activity signal is the one integration: progressive-fill phase-2
-   workers (its R11) and the Home refresh bump the activity timestamp, and
-   the shared GET helper bumps the network-success timestamp; whichever PR
-   lands first defines the ~5-line primitive with R7's split semantics.
-   (Adopted on their side as its R13 and confirmed in their register
-   triage; the split came from a PR #114 review finding — a cache hit must
-   not wake the worker from outage backoff.)
+1. The R7 signal is the one integration, and it shipped with PR #127
+   (`record_interactive_activity()` / `get_api_activity_timestamps()` in
+   `api_service.py`) with exactly R7's split semantics — the split came from
+   a PR #114 review finding that a cache hit must not wake the worker from
+   outage backoff. The worker consumes the primitive as-is; nothing is left
+   to define.
 2. The overview deliberately does not reuse the progressive-fill registry
    transport (R13 here); different data planes.
 3. Status lines share a phrase family but deliberately different counters:
    done/total there (static per-generation total), remaining-only here
    (dynamic queue). Not a consistency bug.
 4. Notification conventions align (no per-scenario spam). A misconfigured
-   username can produce both its fill-summary toast and R11's fatal toast;
+   username can produce both the fill-summary toast and R11's fatal toast;
    rare and self-explaining, accepted.
 5. R15's kill switch never disables progressive fill (user-initiated
    traffic).
-6. Its two speed-fix dependencies already merged (PR #113 total-play
-   hydration hoist, PR #112 stale-rank fallback), so neither proposal has a
-   sequencing constraint left; the warmer additionally hydrates the
-   leaderboard-id mapping once up front on its own.
-
-(Referenced by filename, not linked: the two proposals live on separate
-branches until merged, and `tests/test_docs.py` fails dangling relative
-links.)
+6. Both former speed-fix dependencies merged as well (PR #113 total-play
+   hydration hoist, PR #112 stale-rank fallback); the warmer additionally
+   hydrates the leaderboard-id mapping once up front on its own.
 
 ## Edge cases (deliberate)
 
@@ -193,8 +188,8 @@ links.)
 - Scenario played for the first time mid-session: the watchdog's new-scenario
   path already schedules the Timer-chain refresh (`file_watchdog.py`), so the
   queue never needs mid-session additions from gameplay.
-- A playlist repeats a scenario (progressive fill's R6): the second
-  occurrence freshness-skips.
+- A playlist repeats a scenario (the shipped fill keys grid rows by playlist
+  position for the same reason): the second occurrence freshness-skips.
 - Cached UNRANKED: fresh → skipped; correct (the user isn't on that board; a
   new local score routes through the Timer chain).
 - Debug mode: `app.py` runs `use_reloader=False`, so the worker starts once,
@@ -208,7 +203,7 @@ links.)
 
 ## Out of scope
 
-- Drill-in page UX (progressive fill proposal).
+- Drill-in page UX (shipped progressive fill; see the decision log).
 - Home page rank display.
 - Second/background TTL tier (R8) and negative-resolution cache (R10) —
   documented levers, not v1.
