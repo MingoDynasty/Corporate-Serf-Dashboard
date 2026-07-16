@@ -116,9 +116,13 @@ any user-facing path.
   Tail (not head) requeue keeps one flaky scenario from blocking the queue
   behind its own backoffs. Per-item cap: 3 transient attempts per session,
   counted in the R5 outcome map by scenario name (duplicates share the same
-  budget), then mark terminal (the next restart retries). Any real network success — the
-  worker's own probes or another path's HTTP success (R7's *last network
-  success*) — wakes the worker early; cache-served results never do.
+  budget), then mark terminal (the next restart retries). Backoff sleeps are
+  sliced (~10 s chunks), each slice re-reading R7's *last network success*
+  timestamp, so any real HTTP success — the worker's own probes or another
+  path's — wakes the worker within one slice; cache-served results never do.
+  Sliced polling rather than a notification bridge is deliberate: the
+  shipped primitive exposes read-only timestamps, and having `api_service`
+  signal the worker's condition variable would invert the coupling.
 - **R10 — Permanent failures skip immediately.** Unresolvable leaderboard IDs
   and validation failures are logged and marked terminal in the R5 outcome
   map without retries; a restart
@@ -162,8 +166,15 @@ any user-facing path.
   this layer (in `get_scenario_rank_info`), so the worker still sees raw
   exceptions — correct, since its job is repairing the cache, not serving
   degraded reads.
-- **R15 — Kill switch.** `percentile_warmup_enabled` (config.toml, default
-  true) disables the warmer only — never interactive fetches.
+- **R15 — Kill switch, and off-by-configuration.** `percentile_warmup_enabled`
+  (config.toml, default true) disables the warmer only — never interactive
+  fetches. Independently, a falsey `kovaaks_username` disables the warmer
+  identically: no startup enumeration, no network work, and the R6 enqueue
+  hooks no-op. An empty username is the documented fully-offline
+  configuration (README), which must stay offline regardless of the warmup
+  default — and the worker's resolution fallback would otherwise still
+  reach the scenario-search endpoint without a username. R11 covers only an
+  API-confirmed invalid username; an unset one never reaches the network.
 - **R16 — Testability.** The worker is a pure "process one item" step
   function with injected pacing/sleep, driven by a thin thread loop — the
   split is the better production design, not a test-only seam.
