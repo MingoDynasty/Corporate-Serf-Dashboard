@@ -90,7 +90,7 @@ list in the roadmap.)
   manually copying a JSON file and restarting — now it's one unhide click,
   and app updates refresh the whole library automatically.
 - **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
-  this PR). A sortable table of
+  PR #127). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
   the column labels remain visible while scanning deep rows. The local and

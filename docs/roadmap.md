@@ -39,7 +39,7 @@ Design rationale for shipped work lives in
 - **Progressive playlist position fill** — opening a playlist now paints the
   full local/cache-backed table immediately, then streams Position, Total
   Players, and Percentile updates into stable rows with visible progress and
-  aggregate outage/interruption summaries. (this PR)
+  aggregate outage/interruption summaries. (PR #127)
 - **Relative "last played" timestamps** — humanized staleness display with
   exact-time tooltips, live-ticking on home and the playlist grid.
   (PRs #17, #19, #23)

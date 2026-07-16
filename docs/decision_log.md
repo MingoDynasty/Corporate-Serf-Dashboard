@@ -847,4 +847,4 @@ silent, degraded fills retain a compact summary, and cancelled fills settle as
 interrupted with no cell left pending. The registry is process-local and
 single-user: reloads start a new fill, a second tab cancels the first tab's
 network work, and completed API calls still warm the normal atomic disk caches.
-Shipped in this PR.
+Shipped in PR #127.
