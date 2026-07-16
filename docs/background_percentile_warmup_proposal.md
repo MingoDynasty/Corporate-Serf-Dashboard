@@ -97,6 +97,14 @@ any user-facing path.
 
   Existing monotonic rank writes under `_rank_save_lock` make concurrent
   writers safe; the worst race is one duplicate in-flight request.
+  Startup hydration honors the same contract at coarser grain: the
+  total-play helper paginates the full play history in one call
+  (⌈played/100⌉ fast metadata GETs — 6+ pages for the reference user), so
+  the worker only *starts* hydration inside an interactive quiet window. A
+  burst that begins mid-hydration overlaps at most that bounded, cheap
+  pagination — accepted, rather than making the shared helper yieldable
+  (its interactive callers want it fast, and a 24 h-fresh metadata cache
+  usually answers with zero requests anyway).
 - **R8 — Single TTL.** v1 keeps `scenario_rank_cache_ttl_hours` (168 h) for
   both interactive and background freshness. A separate longer background TTL
   is a real lever (percentile drift is glacial) but only pays once the visible
@@ -152,7 +160,13 @@ any user-facing path.
   is popped before its fetch completes — re-runs the normal cache-only row
   build each tick so rows fill in as the user watches. On observing the
   worker go idle, the callback performs one last rebuild before disabling
-  itself, so the final cache write is never left invisible. Full rebuild
+  itself, so the final cache write is never left invisible. The R6 hooks
+  re-arm it: the unhide and import callbacks live on this same page and
+  additionally output `disabled=False` on the interval (guarded on their
+  actual trigger — the DashProxy `allow_duplicate` initial-fire hazard),
+  because the enqueue condition variable wakes only the server-side worker,
+  not a disabled browser interval; without the re-arm, work enqueued after
+  an earlier idle would warm caches invisibly until a reload. Full rebuild
   from disk cache — deliberately NOT the progressive-fill
   registry/rowTransaction transport, which streams in-memory generation
   state; the overview's data plane is the disk cache and its build is
@@ -165,7 +179,19 @@ any user-facing path.
   re-pays the cheap totals call. The PR #112 stale-rank fallback lives above
   this layer (in `get_scenario_rank_info`), so the worker still sees raw
   exceptions — correct, since its job is repairing the cache, not serving
-  degraded reads.
+  degraded reads. One wrapper safeguard the direct path must replicate:
+  `fetch_scenario_rank` returns UNRANKED whenever no matching player is
+  found — including for a misspelled username — and only the wrapper's
+  total-play check disambiguates "valid user, not on this board" from
+  "invalid username". The worker therefore requires one successful
+  per-session total-play validation of the configured username (a
+  successful hydration counts) before it will *cache* an UNRANKED result:
+  while unvalidated, UNRANKED is not written and the item tail-requeues as
+  transient so validation retries with it; an unknown-username answer
+  triggers R11. Without this, a typo'd username would bulk-cache every
+  candidate as fresh UNRANKED instead of stopping the queue. RANKED results
+  need no such gate — an exact Steam-ID/username match is itself
+  validation.
 - **R15 — Kill switch, and off-by-configuration.** `percentile_warmup_enabled`
   (config.toml, default true) disables the warmer only — never interactive
   fetches. Independently, a falsey `kovaaks_username` disables the warmer
