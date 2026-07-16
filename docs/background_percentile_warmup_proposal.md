@@ -165,13 +165,18 @@ any user-facing path.
   is popped before its fetch completes — re-runs the normal cache-only row
   build each tick so rows fill in as the user watches. On observing the
   worker go idle, the callback performs one last rebuild before disabling
-  itself, so the final cache write is never left invisible. The R6 hooks
-  re-arm it: the unhide and import callbacks live on this same page and
-  additionally output `disabled=False` on the interval (guarded on their
-  actual trigger — the DashProxy `allow_duplicate` initial-fire hazard),
-  because the enqueue condition variable wakes only the server-side worker,
-  not a disabled browser interval; without the re-arm, work enqueued after
-  an earlier idle would warm caches invisibly until a reload. Automated
+  itself, so the final cache write is never left invisible. Re-arming after
+  idle is needed because the enqueue condition variable wakes only the
+  server-side worker, never a disabled browser interval — but the
+  interval's `disabled` property gets a single callback owner, no
+  `allow_duplicate`: one callback, fed by both the interval tick and the
+  refresh store the R6 unhide/import callbacks already bump, computes
+  `disabled` from current worker state tagged with an enqueue generation
+  counter, so a response computed against an older generation can never
+  override a newer rearm. (Two independent writers would race: Dash does
+  not order duplicate-output updates, and an idle-tick `disabled=True`
+  landing after an enqueue's rearm would freeze live updates invisibly —
+  the exact failure the rearm exists to prevent.) Automated
   rebuilds must pass `record_activity=False` down the overview build path —
   its cache-only reads record interactive activity by default, so each tick
   would otherwise bump R7's activity timestamp and the interval, which runs
@@ -206,7 +211,15 @@ any user-facing path.
   no-ReadTimeout-retry contract, and while validation is terminal every
   unvalidated UNRANKED item goes terminal too (no writes; the next restart
   re-probes) rather than re-firing total-play once per queued scenario. An
-  unknown-username answer triggers R11. Without this gate, a typo'd
+  unknown-username answer triggers R11. Validation may succeed only from a
+  positively valid live or cached total-play response: a stale
+  `unknown_username` cache marker must always raise
+  `UnknownKovaaksUserError` and never counts as success. Today the helper's
+  stale-cache fallback launders that marker — it checks the marker only on
+  the fresh path, and the fallback's `model_validate` discards the marker's
+  extra fields, yielding an apparently valid empty response — so the warmup
+  PR hardens the fallback with a regression test (this also fixes the same
+  latent laundering for interactive callers). Without this gate, a typo'd
   username would bulk-cache every candidate as fresh UNRANKED instead of
   stopping the queue. RANKED results need no such gate — an exact
   Steam-ID/username match is itself validation.
