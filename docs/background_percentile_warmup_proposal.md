@@ -49,9 +49,13 @@ any user-facing path.
   one by one, instead of leaving every row partially covered for the whole
   warm.
 - **R4 — "Needs work" = rank or total missing/stale.** A scenario is skipped
-  at dequeue only if its rank cache is TTL-fresh AND its totals cache exists.
-  Percentile needs both files; a rank-only check would leave permanent N/A
-  holes wherever a totals fetch once failed.
+  at dequeue only if its rank cache is TTL-fresh AND its totals cache is
+  TTL-fresh (`leaderboard_total_cache_ttl_hours`). Percentile needs both; a
+  rank-only check would leave permanent N/A holes wherever a totals fetch
+  once failed, and because the overview's cache-only read path serves totals
+  regardless of age, a stale totals file would otherwise never be repaired.
+  The asymmetry is cheap: a fresh-rank/stale-totals item re-pays only the
+  ~0.5 s totals call (R14).
 - **R5 — Dequeue-time freshness check is the universal dedup.** Every pop
   re-checks R4 and skips satisfied items in microseconds (file stats, no
   network). All duplication — unhide spam, races with interactive fetches,
@@ -86,10 +90,17 @@ any user-facing path.
   is a real lever (percentile drift is glacial) but only pays once the visible
   set grows several-fold; it's a one-line config addition when needed.
 - **R9 — Transient failures: tail requeue + escalating global backoff.**
-  Timeouts, connection errors, 5xx, and post-retry 429s send the item to the
-  tail and sleep the worker on an escalating schedule (30 s → 2 m → 5 m →
-  15 m → 30 m cap), reset on any success. During an outage the worker
-  converges to ~1 probe per 30 min, which doubles as the recovery detector.
+  Connection errors (including connect timeouts), 5xx, and post-retry 429s
+  send the item to the tail and sleep the worker on an escalating schedule
+  (30 s → 2 m → 5 m → 15 m → 30 m cap), reset on any success. Read timeouts
+  are the deliberate exception, honoring the 2026-07-13 no-ReadTimeout-retry
+  decision: the server may still be processing that exact query, so the item
+  is dropped for the session (the next restart re-probes it) — but the
+  failure still trips the same global backoff, because a read timeout is the
+  primary symptom of a KovaaK's slow spell and the worker should slow down,
+  not plow through the queue timing out item after item. During an outage
+  the worker converges to ~1 probe per 30 min, which doubles as the recovery
+  detector.
   Tail (not head) requeue keeps one flaky scenario from blocking the queue
   behind its own backoffs. Per-item cap: 3 transient attempts per session,
   then drop (the next restart retries). Any real network success — the
