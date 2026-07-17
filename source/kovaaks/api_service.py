@@ -608,12 +608,16 @@ def get_user_scenario_total_play(
         # A network failure is not proof that the user has no plays. Reuse stale
         # metadata if we have it; otherwise let the caller decide how to degrade.
         if os.path.exists(cache_file):
+            cache_data = _read_json(cache_file)
+            if _is_unknown_username_total_play_response(cache_data):
+                raise UnknownKovaaksUserError(
+                    f"KovaaK's username '{username}' was not found."
+                )
             logger.warning(
                 "Using stale total-play cache for %s after failed request: %s",
                 username,
                 request_exception_summary(exc),
             )
-            cache_data = _read_json(cache_file)
             if isinstance(cache_data, dict):
                 return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
         raise
