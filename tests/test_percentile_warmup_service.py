@@ -168,6 +168,47 @@ def test_run_logs_initial_queue_size_before_processing(caplog):
     assert "Percentile warmup progress: processed=0 remaining=2" in messages
 
 
+def test_completion_summary_counts_unique_scenarios(monkeypatch, caplog):
+    """Duplicate queue entries must not inflate skipped past the heartbeat count."""
+    fresh = {"B"}
+    monkeypatch.setattr(
+        warmup,
+        "_freshly_satisfied",
+        lambda scenario_name, _config: scenario_name in fresh,
+    )
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A", "B", "A"],
+        sleep=lambda _seconds: None,
+    )
+
+    # Draining the queue logs the summary and then blocks on the condition;
+    # have the wait stop the worker so _next_item returns instead.
+    def _stop_worker(timeout=None):
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+    complete = warmup.WarmupStepResult(
+        warmup.StepDisposition.COMPLETE,
+        success=True,
+    )
+
+    assert worker._next_item() == "A"
+    assert worker._apply_item_result("A", complete, 1.0)
+    # Processing "A" cached its percentile, so its duplicate entry is now fresh.
+    fresh.add("A")
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert worker._next_item() is None
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(
+        message.startswith(
+            "Percentile warmup complete: processed=1 terminal=0 skipped=1 "
+        )
+        for message in messages
+    )
+
+
 def test_run_with_empty_queue_logs_zero_remaining(caplog):
     worker = warmup.PercentileWarmupWorker(_config(), [])
     worker._fatal_state = "stop"

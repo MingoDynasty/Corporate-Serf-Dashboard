@@ -498,6 +498,10 @@ class PercentileWarmupWorker:
         self._batch_processed = 0
         self._batch_terminal = 0
         self._batch_skipped = 0
+        # Names already accounted for this batch, so duplicate queue entries
+        # (one per playlist) don't inflate skipped past the deduplicated
+        # remaining count the progress heartbeat reports.
+        self._batch_seen: set[str] = set()
 
     def start(self) -> threading.Thread:
         """Start this worker exactly once."""
@@ -582,6 +586,7 @@ class PercentileWarmupWorker:
         self._batch_processed = 0
         self._batch_terminal = 0
         self._batch_skipped = 0
+        self._batch_seen.clear()
 
     def _log_completed_batch_locked(self) -> None:
         if not self._batch_active or self._in_flight is not None or self._queue:
@@ -637,8 +642,11 @@ class PercentileWarmupWorker:
                         scenario_name,
                         self.context.config,
                     ):
-                        self._batch_skipped += 1
+                        if scenario_name not in self._batch_seen:
+                            self._batch_seen.add(scenario_name)
+                            self._batch_skipped += 1
                         continue
+                    self._batch_seen.add(scenario_name)
                     self._in_flight = scenario_name
                     return scenario_name
                 self._log_completed_batch_locked()
