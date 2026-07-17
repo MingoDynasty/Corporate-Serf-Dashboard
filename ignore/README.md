@@ -11,6 +11,7 @@ a subdirectory — don't drop them at the top level.
 | Completed review handoff docs | `pr-reviews/done/` — move a review here once it's no longer in flight: its PR merged/closed, or (for a proposal review) the proposal shipped or was abandoned. Keeps the top level as reviews-in-flight only; everything here is untracked, so move, never delete |
 | Kickoff / implementation prompts for agent sessions | `prompts/` — the live queue: only prompts not yet consumed by a merged PR, so `ls ignore/prompts/*.md` answers "what's ready to start?" (consumed ones live in the `done/` subdir) |
 | Consumed kickoff prompts | `prompts/done/` — move a prompt here when the PR that consumes it merges. Kept as the house-style reference corpus for writing new prompts; everything here is untracked, so move, never delete |
+| Parked kickoff prompts (valid but deliberately not queued — e.g. a contingency that didn't fire) | `prompts/icebox/` — keeps the live queue meaning "ready to fire"; add a dated parking note at the top of the prompt; move back to `prompts/` to reactivate |
 | One-off scripts, runners, experiments in code | `scripts/` |
 | Data samples: API responses, stats CSVs, tool test outputs | `data/` |
 | Downloaded playlist JSONs | `playlists/` |
