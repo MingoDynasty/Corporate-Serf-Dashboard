@@ -48,6 +48,7 @@ BACKOFF_SLICE_SECONDS = 10.0
 BACKOFF_DELAYS_SECONDS = (30.0, 120.0, 300.0, 900.0, 1800.0)
 MAX_TRANSIENT_ATTEMPTS = 3
 PACE_SAMPLE_SIZE = 10
+PROGRESS_HEARTBEAT_EVERY_ITEMS = 10
 _USERNAME_VALIDATION_OUTCOME = "\0username-validation"
 
 
@@ -600,6 +601,27 @@ class PercentileWarmupWorker:
         self._batch_active = False
         self._batch_started_at = None
 
+    def _log_progress_heartbeat(self, processed: int) -> None:
+        """Emit one INFO progress line per few completed items.
+
+        Console-visible progress between the startup queue dump and the
+        completion summary; per-item detail stays at DEBUG.
+        """
+        state = self.snapshot()
+        if state.recent_pace_seconds is None:
+            logger.info(
+                "Percentile warmup progress: processed=%d remaining=%d",
+                processed,
+                state.remaining_count,
+            )
+            return
+        logger.info(
+            "Percentile warmup progress: processed=%d remaining=%d eta=%.0fs",
+            processed,
+            state.remaining_count,
+            state.remaining_count * state.recent_pace_seconds,
+        )
+
     def _next_item(self) -> str | None:
         with self._condition:
             while True:
@@ -698,11 +720,14 @@ class PercentileWarmupWorker:
         result: WarmupStepResult,
         elapsed: float,
     ) -> bool:
+        heartbeat_processed: int | None = None
         with self._condition:
             self._in_flight = None
             self._recent_paces.append(elapsed + POLITENESS_GAP_SECONDS)
             if result.disposition == StepDisposition.COMPLETE:
                 self._batch_processed += 1
+                if self._batch_processed % PROGRESS_HEARTBEAT_EVERY_ITEMS == 0:
+                    heartbeat_processed = self._batch_processed
             elif result.disposition == StepDisposition.RETRY:
                 self._queue.append(scenario_name)
             elif result.disposition == StepDisposition.TERMINAL:
@@ -713,6 +738,8 @@ class PercentileWarmupWorker:
             elif result.disposition == StepDisposition.FATAL:
                 pass
 
+        if heartbeat_processed is not None:
+            self._log_progress_heartbeat(heartbeat_processed)
         if result.success:
             self._reset_backoff()
         if result.disposition == StepDisposition.FATAL:
