@@ -241,8 +241,12 @@ any user-facing path.
   completion.
 - **R18 — All-or-nothing aggregates: resolution gates display.** The
   overview's percentile aggregates render only when every played scenario
-  in the playlist is *display-resolved*; until then the cells show a
-  placeholder with the count (`… · 12/17`). No partial medians: a partial
+  in the playlist is *display-resolved*; until then the cells show a dimmed
+  placeholder stating the count: `12/17 cached` (chosen over the fill's
+  ellipsis vocabulary — motion-neutral, since hidden and terminal-failure
+  rows may hold the placeholder indefinitely, where "…" would promise
+  resolution; a tooltip notes that opening the playlist fetches the gaps
+  now). No partial medians: a partial
   median is the original complaint this proposal exists to fix — it skews,
   it sorts 3-sample noise against 17-sample signal (the sort values stay
   null until complete, so NULLS LAST keeps undecided rows out of the
@@ -256,12 +260,16 @@ any user-facing path.
   R4's TTL-fresh *worker* predicate: display tolerates stale (a week-stale
   percentile is within display precision, per the decision log), the
   worker repairs it. Presence-based resolution makes the complete state
-  monotonic — a row that reaches `n/n` never regresses on TTL expiry; only
-  playing a brand-new scenario briefly regresses it until the Timer chain
-  caches the first score. Placeholder ≠ N/A, mirroring the fill's
+  monotonic — a row that reaches full resolution never regresses on TTL
+  expiry; only playing a brand-new scenario briefly regresses it until the
+  Timer chain caches the first score. Complete rows show the bare value
+  (`61.42%`) with no coverage suffix at all: under the gate a suffix would
+  always read `n/n` — pure noise — and a number's presence itself now
+  means fully covered. Placeholder ≠ N/A, mirroring the fill's
   pending-vs-decided semantics: a complete playlist whose entries are all
-  UNRANKED shows `N/A · n/n` (decided — no percentile exists); `… · 12/17`
-  always means undecided. Hidden rows and terminal-failure rows simply
+  UNRANKED shows a plain `N/A` (decided — no percentile exists);
+  `12/17 cached` always means undecided. Hidden rows and terminal-failure
+  rows simply
   keep the placeholder; for failures, drill-in force-fetches the gaps, and
   the count makes that discoverable. If real usage ever shows most rows
   stuck incomplete, partial aggregates can return as a fallback — the
