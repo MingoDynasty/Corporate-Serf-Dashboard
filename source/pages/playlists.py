@@ -115,6 +115,14 @@ PERCENTILE_CELL_CLASS = (
     " ? null : 'playlist-overview-percentile-placeholder'"
 )
 
+# Unlike Median, a resolved Lowest value carries hover-only detail (which
+# scenario is the weakest), so it gets the shared dotted-underline affordance.
+LOWEST_PERCENTILE_CELL_CLASS = (
+    "params.data.percentile_aggregates_resolved"
+    " ? (params.value == null ? null : 'cell-tooltip-affordance')"
+    " : 'playlist-overview-percentile-placeholder'"
+)
+
 # The eye toggle acts immediately with no confirm step, so the hover copy
 # carries the action, its consequence, and the way back (Show hidden).
 VISIBILITY_TOOLTIP = (
@@ -181,7 +189,7 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
         "tooltipValueGetter": {"function": LAST_PLAYED_TOOLTIP},
         "cellClass": {
-            "function": "params.value == null ? null : 'last-played-affordance'"
+            "function": "params.value == null ? null : 'cell-tooltip-affordance'"
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -212,7 +220,7 @@ TABLE_COLUMN_DEFS = [
         ),
         "valueFormatter": {"function": "params.data.lowest_percentile_display"},
         "tooltipValueGetter": {"function": LOWEST_PERCENTILE_TOOLTIP},
-        "cellClass": {"function": PERCENTILE_CELL_CLASS},
+        "cellClass": {"function": LOWEST_PERCENTILE_CELL_CLASS},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 160,
