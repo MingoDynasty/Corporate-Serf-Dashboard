@@ -1004,6 +1004,88 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "error": "unknown_username",
         "username": "UnknownUser",
     }
+
+    with pytest.raises(api_service.UnknownKovaaksUserError):
+        api_service.get_user_scenario_total_play("UnknownUser")
+
+    assert fetched_pages == [0]
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_rejects_stale_unknown_username_marker(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
+    api_service._write_json(
+        cache_file,
+        {
+            "page": 0,
+            "max": 100,
+            "total": 0,
+            "data": [],
+            "error": "unknown_username",
+            "username": "UnknownUser",
+        },
+    )
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_get(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+    with pytest.raises(api_service.UnknownKovaaksUserError) as exc_info:
+        api_service.get_user_scenario_total_play("UnknownUser")
+
+    assert str(exc_info.value) == "KovaaK's username 'UnknownUser' was not found."
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_serves_stale_valid_cache_after_failure(
+    monkeypatch,
+    caplog,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    api_service._write_json(
+        cache_file,
+        {
+            "page": 0,
+            "max": 100,
+            "total": 1,
+            "data": [
+                {
+                    "leaderboardId": "1",
+                    "scenarioName": "Cached Scenario",
+                    "counts": {"plays": 10},
+                    "rank": 12,
+                    "score": 100,
+                }
+            ],
+        },
+    )
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_get(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        response = api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert response.total == 1
+    assert [scenario.scenarioName for scenario in response.data] == ["Cached Scenario"]
+    assert "Using stale total-play cache for MingoDynasty" in caplog.text
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
