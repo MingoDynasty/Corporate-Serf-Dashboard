@@ -425,7 +425,8 @@ def _ordered_played_scenarios(
             item[0],
         )
     )
-    return [scenario_name for _, scenario_name, _ in played]
+    # A playlist can list the same scenario more than once; queue it once.
+    return list(dict.fromkeys(scenario_name for _, scenario_name, _ in played))
 
 
 def _startup_queue(config: ConfigData) -> list[str]:
@@ -452,14 +453,30 @@ def _startup_queue(config: ConfigData) -> list[str]:
         )
     )
     queue: list[str] = []
+    queued: set[str] = set()
     for _, playlist_name, playlist_code, scenarios in batches:
-        logger.info(
-            "Percentile warmup queued playlist %s (%s): %d played scenarios",
-            playlist_name,
-            playlist_code,
-            len(scenarios),
-        )
-        queue.extend(scenarios)
+        # Scenarios shared with a more recent playlist are already queued;
+        # enqueue each scenario once so queue counts match unique scenarios.
+        new_names = [name for name in scenarios if name not in queued]
+        queued.update(new_names)
+        duplicates = len(scenarios) - len(new_names)
+        if duplicates:
+            logger.info(
+                "Percentile warmup queued playlist %s (%s): %d played scenarios "
+                "(%d already queued)",
+                playlist_name,
+                playlist_code,
+                len(new_names),
+                duplicates,
+            )
+        else:
+            logger.info(
+                "Percentile warmup queued playlist %s (%s): %d played scenarios",
+                playlist_name,
+                playlist_code,
+                len(new_names),
+            )
+        queue.extend(new_names)
     return queue
 
 
@@ -498,6 +515,11 @@ class PercentileWarmupWorker:
         self._batch_processed = 0
         self._batch_terminal = 0
         self._batch_skipped = 0
+        # Names already reflected in a summary counter (processed, terminal,
+        # or skipped) this batch, so duplicate queue entries don't inflate
+        # skipped past the deduplicated remaining count the progress heartbeat
+        # reports. A RETRY leaves its name unmarked: nothing counted it yet.
+        self._batch_seen: set[str] = set()
 
     def start(self) -> threading.Thread:
         """Start this worker exactly once."""
@@ -531,6 +553,10 @@ class PercentileWarmupWorker:
         with self._condition:
             if self._fatal_state is not None:
                 return 0
+            # Move-to-front rather than duplicate: drop any queued occurrence
+            # of the prepended names so each scenario is queued at most once.
+            prepended = set(scenarios)
+            self._queue = deque(name for name in self._queue if name not in prepended)
             for scenario_name in reversed(scenarios):
                 self._queue.appendleft(scenario_name)
             self._enqueue_generation += 1
@@ -582,6 +608,7 @@ class PercentileWarmupWorker:
         self._batch_processed = 0
         self._batch_terminal = 0
         self._batch_skipped = 0
+        self._batch_seen.clear()
 
     def _log_completed_batch_locked(self) -> None:
         if not self._batch_active or self._in_flight is not None or self._queue:
@@ -637,7 +664,9 @@ class PercentileWarmupWorker:
                         scenario_name,
                         self.context.config,
                     ):
-                        self._batch_skipped += 1
+                        if scenario_name not in self._batch_seen:
+                            self._batch_seen.add(scenario_name)
+                            self._batch_skipped += 1
                         continue
                     self._in_flight = scenario_name
                     return scenario_name
@@ -728,6 +757,7 @@ class PercentileWarmupWorker:
             self._in_flight = None
             self._recent_paces.append(elapsed + POLITENESS_GAP_SECONDS)
             if result.disposition == StepDisposition.COMPLETE:
+                self._batch_seen.add(scenario_name)
                 self._batch_processed += 1
                 if self._batch_processed % PROGRESS_HEARTBEAT_EVERY_ITEMS == 0:
                     heartbeat_processed = self._batch_processed
@@ -737,6 +767,7 @@ class PercentileWarmupWorker:
                 outcome = _outcome(self.context, scenario_name)
                 outcome.terminal = True
                 outcome.reason = result.reason
+                self._batch_seen.add(scenario_name)
                 self._batch_terminal += 1
             elif result.disposition == StepDisposition.FATAL:
                 pass

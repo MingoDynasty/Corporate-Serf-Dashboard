@@ -66,6 +66,32 @@ def test_startup_queue_groups_recent_playlists_and_prioritizes_missing_percentil
     assert warmup._startup_queue(_config()) == ["B", "A", "C", "D"]
 
 
+def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
+    # "A" is listed twice inside Recent; "Shared" appears in both playlists.
+    playlists = {
+        "Recent": _playlist("Recent playlist", "Recent", "A", "A", "Shared"),
+        "Older": _playlist("Older playlist", "Older", "Shared", "C"),
+    }
+    stats = {"A": _stats(10), "Shared": _stats(5), "C": _stats(4)}
+    monkeypatch.setattr(warmup, "get_shown_playlist_codes", lambda: set(playlists))
+    monkeypatch.setattr(warmup, "get_playlist_by_code", playlists.get)
+    monkeypatch.setattr(warmup, "get_scenario_stats_snapshot", lambda: stats)
+    monkeypatch.setattr(
+        warmup,
+        "_has_displayable_percentile",
+        lambda _scenario_name, _config: False,
+    )
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert warmup._startup_queue(_config()) == ["A", "Shared", "C"]
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert (
+        "Percentile warmup queued playlist Older playlist (Older): "
+        "1 played scenarios (1 already queued)"
+    ) in messages
+
+
 def test_snapshot_deduplicates_queue_and_counts_in_flight_once():
     worker = warmup.PercentileWarmupWorker(
         _config(),
@@ -118,6 +144,28 @@ def test_enqueue_batch_prepends_in_order_and_bumps_generation(monkeypatch):
     assert state.enqueue_generation == 1
 
 
+def test_enqueue_moves_already_queued_scenarios_to_front(monkeypatch):
+    playlist = _playlist("New", "Code", "A", "B")
+    monkeypatch.setattr(warmup, "get_playlist_by_code", lambda _code: playlist)
+    monkeypatch.setattr(
+        warmup,
+        "get_scenario_stats_snapshot",
+        lambda: {"A": _stats(10), "B": _stats(1)},
+    )
+    monkeypatch.setattr(
+        warmup,
+        "_has_displayable_percentile",
+        lambda scenario_name, _config: scenario_name == "A",
+    )
+    worker = warmup.PercentileWarmupWorker(_config(), ["Tail", "A"])
+
+    assert worker.enqueue_playlist("Code") == 2
+
+    # "A" was already queued behind "Tail"; the prepend moves it to the
+    # front instead of queueing a duplicate entry.
+    assert worker.snapshot().queued_names == ("B", "A", "Tail")
+
+
 def test_progress_heartbeat_logs_every_tenth_completed_item(caplog):
     worker = warmup.PercentileWarmupWorker(
         _config(),
@@ -166,6 +214,90 @@ def test_run_logs_initial_queue_size_before_processing(caplog):
 
     messages = [record.getMessage() for record in caplog.records]
     assert "Percentile warmup progress: processed=0 remaining=2" in messages
+
+
+def test_completion_summary_counts_unique_scenarios(monkeypatch, caplog):
+    """Duplicate queue entries must not inflate skipped past the heartbeat count."""
+    fresh = {"B"}
+    monkeypatch.setattr(
+        warmup,
+        "_freshly_satisfied",
+        lambda scenario_name, _config: scenario_name in fresh,
+    )
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A", "B", "A"],
+        sleep=lambda _seconds: None,
+    )
+
+    # Draining the queue logs the summary and then blocks on the condition;
+    # have the wait stop the worker so _next_item returns instead.
+    def _stop_worker(timeout=None):
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+    complete = warmup.WarmupStepResult(
+        warmup.StepDisposition.COMPLETE,
+        success=True,
+    )
+
+    assert worker._next_item() == "A"
+    assert worker._apply_item_result("A", complete, 1.0)
+    # Processing "A" cached its percentile, so its duplicate entry is now fresh.
+    fresh.add("A")
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert worker._next_item() is None
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(
+        message.startswith(
+            "Percentile warmup complete: processed=1 terminal=0 skipped=1 "
+        )
+        for message in messages
+    )
+
+
+def test_retried_scenario_counts_as_skipped_when_cache_turns_fresh(
+    monkeypatch,
+    caplog,
+):
+    """A RETRY leaves no counter behind, so a later fresh skip must count."""
+    fresh: set[str] = set()
+    monkeypatch.setattr(
+        warmup,
+        "_freshly_satisfied",
+        lambda scenario_name, _config: scenario_name in fresh,
+    )
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A"],
+        sleep=lambda _seconds: None,
+    )
+
+    def _stop_worker(timeout=None):
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+
+    assert worker._next_item() == "A"
+    assert worker._apply_item_result(
+        "A",
+        warmup.WarmupStepResult(warmup.StepDisposition.RETRY),
+        1.0,
+    )
+    # Another caller (e.g. a UI rank fetch) refreshed the cache before the
+    # retry was dequeued.
+    fresh.add("A")
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert worker._next_item() is None
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(
+        message.startswith(
+            "Percentile warmup complete: processed=0 terminal=0 skipped=1 "
+        )
+        for message in messages
+    )
 
 
 def test_run_with_empty_queue_logs_zero_remaining(caplog):
