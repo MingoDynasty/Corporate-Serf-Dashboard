@@ -20,6 +20,9 @@ from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import CONFIG_ERROR_MESSAGE, get_config
 from source.kovaaks.api_service import set_request_timeout
 from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
+from source.kovaaks.percentile_warmup_service import (
+    start_percentile_warmup_worker,
+)
 from source.my_watchdog.file_watchdog import NewFileHandler
 
 # Logging setup
@@ -97,6 +100,10 @@ def main() -> None:
 
     # Initialize scenario data
     initialize_kovaaks_data(config.stats_dir)
+
+    # The warmup queue is the played/visible intersection, so it can only be
+    # assembled after both playlists and local CSV stats have loaded.
+    start_percentile_warmup_worker(config)
 
     # Monitor for new files
     event_handler = NewFileHandler()

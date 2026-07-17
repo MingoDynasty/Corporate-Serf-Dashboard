@@ -1,6 +1,6 @@
 # Proposal: background percentile warmup for the playlists overview
 
-Status: Proposed
+Status: In progress
 
 ## Problem
 

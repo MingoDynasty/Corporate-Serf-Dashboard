@@ -36,6 +36,10 @@ scenario_rank_cache_ttl_hours = 168
 # How long to reuse cached leaderboard total player counts before fetching them again.
 leaderboard_total_cache_ttl_hours = 168
 
+# Slowly fill playlist-overview percentile caches in one background thread.
+# Disable this without affecting user-initiated KovaaK's rank lookups.
+percentile_warmup_enabled = true
+
 # Timeout (in seconds) for KovaaK's API requests. KovaaK's has slow spells where
 # the leaderboard endpoint takes close to 30 seconds to respond but still returns
 # valid data; raise this if position lookups keep timing out.

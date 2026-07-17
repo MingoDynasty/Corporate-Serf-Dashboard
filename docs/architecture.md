@@ -22,6 +22,9 @@ Threads at runtime:
 - **Rank freshness timers** — after a new high score, `api_service.py` uses a
   bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's
   leaderboard reflects the local score.
+- **Percentile warmup worker** — one daemon thread fills stale rank/total
+  caches for played scenarios in visible playlists, yields to recent
+  interactive activity, and blocks on a condition variable when idle.
 - KovaaK's GETs use a **thread-local `requests.Session`**; cache file I/O is
   guarded by a single `threading.RLock` (`_CACHE_IO_LOCK` in `api_service.py`).
 
@@ -142,6 +145,7 @@ flowchart LR
     subgraph Services["Domain & plotting services"]
         DataService["kovaaks/<br/>data_service.py"]
         ApiService["kovaaks/<br/>api_service.py"]
+        WarmupService["kovaaks/percentile_<br/>warmup_service.py"]
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
         OverviewService["kovaaks/playlist_<br/>overview_service.py"]
         Visibility["kovaaks/playlist_<br/>visibility_service.py"]
@@ -155,6 +159,7 @@ flowchart LR
 
     App --> Shell
     App --> DataService
+    App --> WarmupService
     App --> FileWatchdog
 
     Shell --> LocalIcon
@@ -164,6 +169,10 @@ flowchart LR
     Home --> Queue
     Home --> LocalIcon
     Playlists --> OverviewService
+    Playlists --> WarmupService
+    WarmupService --> ApiService
+    WarmupService --> DataService
+    WarmupService --> Visibility
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
     Journey --> DataService
@@ -239,9 +248,14 @@ flowchart LR
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
   bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
   its returned `ScenarioRankInfo` structurally without persisting the marker;
-  split interactive-activity/network-success timestamps coordinate future
-  background API work. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
+  split interactive-activity/network-success timestamps coordinate the
+  percentile warmup worker. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.
+- `percentile_warmup_service.py` — app-lifetime daemon worker for the
+  played/visible percentile cache queue. It owns playlist-completion ordering,
+  dequeue-time freshness/dedup, username validation before UNRANKED writes,
+  direct rank/total fetch classification, outage backoff, and the read-only
+  progress snapshot consumed by the overview UI.
 - `playlist_scenarios_service.py` — builds cache-only first-paint rows for the
   per-playlist scenario table, then owns the generation-keyed progressive-fill
   registry, synchronous cancellation/tombstones, four-worker fill, and atomic
@@ -300,6 +314,7 @@ flowchart LR
 | The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
+| Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` |
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
