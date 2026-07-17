@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import no_update
+from dash import dcc, no_update
 from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
@@ -434,7 +434,7 @@ def test_playlists_overview_layout_includes_page_title():
 
 def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     page = playlists.layout()
-    grid = page.children[-1].children
+    grid = page.children[-1]
     switch = next(
         component
         for component in _walk_components(page)
@@ -670,7 +670,7 @@ def test_playlists_overview_visibility_column_has_reversibility_tooltip():
 
 def test_playlists_overview_grid_rows_navigate_by_playlist_code():
     page = playlists.layout()
-    grid = page.children[-1].children
+    grid = page.children[-1]
 
     assert grid.dashGridOptions["getRowId"] == {"function": "params.data.code"}
     assert grid.dashGridOptions["tooltipShowDelay"] == 0
@@ -679,8 +679,7 @@ def test_playlists_overview_grid_rows_navigate_by_playlist_code():
 
 def test_playlists_overview_grid_uses_bounded_viewport_layout():
     page = playlists.layout()
-    loading = page.children[-1]
-    grid = loading.children
+    grid = page.children[-1]
 
     assert page.style == {
         "height": (
@@ -688,14 +687,21 @@ def test_playlists_overview_grid_uses_bounded_viewport_layout():
             "- 2*var(--app-shell-padding, 1rem))"
         )
     }
-    assert loading.parent_style == {
+    assert grid.style == {
         "flex": 1,
-        "minHeight": 0,
-        "display": "flex",
-        "flexDirection": "column",
+        "height": "100%",
+        "width": "100%",
+        "minHeight": 300,
     }
+    assert not any(isinstance(component, dcc.Loading) for component in page.children)
     assert grid.columnSize == "autoSize"
     assert grid.columnSizeOptions == playlists.COLUMN_SIZE_OPTIONS
+
+
+def test_playlists_overview_grid_has_no_initial_row_data():
+    grid = playlists.layout().children[-1]
+
+    assert "rowData" not in grid.to_plotly_json()["props"]
 
 
 def test_playlists_overview_layout_includes_relative_time_refresh_interval():
@@ -737,6 +743,62 @@ def test_aim_training_journey_playlist_picker_shares_home_scroll_and_height():
     # scroll and cap height consistently once the library grows past a screen.
     assert picker.scrollAreaProps == {"type": "always"}
     assert picker.maxDropdownHeight == "75vh"
+
+
+def test_aim_training_journey_layout_uses_graph_placeholder():
+    graph = next(
+        component
+        for component in _walk_components(aim_training_journey.layout())
+        if getattr(component, "id", None) == "aim-training-journey-graph"
+    )
+
+    assert not graph.figure.layout.annotations
+    assert graph.figure.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert graph.figure.layout.plot_bgcolor == "rgba(0,0,0,0)"
+    assert graph.figure.layout.xaxis.visible is False
+    assert graph.figure.layout.yaxis.visible is False
+    assert graph.figure.layout.dragmode is False
+
+
+def test_aim_training_journey_no_selection_returns_themed_empty_state(monkeypatch):
+    dmc.add_figure_templates()
+    monkeypatch.setattr(
+        aim_training_journey,
+        "filter_known_playlist_codes",
+        lambda _selected_playlists: [],
+    )
+
+    for selected_playlists in (None, ["Unknown playlist"]):
+        figure = aim_training_journey.generate_graph(
+            selected_playlists,
+            10,
+            "dark",
+        )
+
+        assert figure.layout.annotations[0].text == "<b>No playlists selected</b>"
+        assert figure.layout.annotations[1].text == (
+            "Choose one or more playlists to compare progress."
+        )
+        assert figure.layout.template.layout.paper_bgcolor == "#242424"
+
+
+def test_aim_training_journey_missing_checkpoint_returns_themed_empty_state(
+    monkeypatch,
+):
+    dmc.add_figure_templates()
+    monkeypatch.setattr(
+        aim_training_journey,
+        "filter_known_playlist_codes",
+        lambda selected_playlists: selected_playlists,
+    )
+
+    figure = aim_training_journey.generate_graph(["Playlist"], None, "light")
+
+    assert figure.layout.annotations[0].text == "<b>Graph settings incomplete</b>"
+    assert figure.layout.annotations[1].text == (
+        "Choose a Checkpoint Hour value to plot progress."
+    )
+    assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
 
 
 def test_aim_training_journey_graph_applies_selected_theme(monkeypatch):
@@ -1257,6 +1319,12 @@ def test_playlist_scenarios_grid_uses_content_auto_size():
 
     assert ag_grid.columnSize == "autoSize"
     assert ag_grid.columnSizeOptions == playlist_scenarios.COLUMN_SIZE_OPTIONS
+
+
+def test_playlist_scenarios_grid_has_no_initial_row_data():
+    ag_grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1]
+
+    assert "rowData" not in ag_grid.to_plotly_json()["props"]
 
 
 def test_playlist_scenarios_grid_uses_bounded_viewport_layout():

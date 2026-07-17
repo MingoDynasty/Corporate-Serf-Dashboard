@@ -46,6 +46,7 @@ from source.plot.plot_service import (
     add_score_threshold_overlay,
     apply_light_dark_mode,
     generate_empty_plot,
+    generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
@@ -118,6 +119,11 @@ dash.register_page(
 def _empty_plot_json(title: str, message: str) -> str:
     """Serialize an empty-state graph for the cached plot store."""
     return generate_empty_plot(title, message).to_json()
+
+
+def _placeholder_plot_json() -> str:
+    """Serialize the neutral pre-hydration graph placeholder."""
+    return generate_placeholder_plot().to_json()
 
 
 class RunEventData(TypedDict):
@@ -816,10 +822,7 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     :return: Figure with theme applied.
     """
     if not plot_json:
-        plot_json = _empty_plot_json(
-            _SELECT_SCENARIO_PLOT_TITLE,
-            _SELECT_SCENARIO_PLOT_MESSAGE,
-        )
+        plot_json = _placeholder_plot_json()
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
@@ -918,17 +921,14 @@ def layout(
             dcc.Store(id="run-events"),
             dcc.Store(
                 id="cached-plot",
-                data=_empty_plot_json(
-                    _SELECT_SCENARIO_PLOT_TITLE,
-                    _SELECT_SCENARIO_PLOT_MESSAGE,
-                ),
+                data=_placeholder_plot_json(),
             ),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
             dcc.Store(
                 id="last-played-empty-value",
-                data="—",
+                data="",
             ),
             dcc.Interval(
                 id="startup-playlist-warning-interval",
@@ -1031,7 +1031,7 @@ def layout(
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Text(
-                                                        "—",
+                                                        "",
                                                         id="scenario_datetime_last_played",
                                                         span=True,
                                                         size="sm",
@@ -1256,10 +1256,7 @@ def layout(
             ),
             dcc.Graph(
                 id="graph-content",
-                figure=generate_empty_plot(
-                    _SELECT_SCENARIO_PLOT_TITLE,
-                    _SELECT_SCENARIO_PLOT_MESSAGE,
-                ).to_plotly_json(),
+                figure=generate_placeholder_plot().to_plotly_json(),
                 className="home-graph",
                 # Redraw the plot whenever the flex container resizes, not
                 # just on window resize.

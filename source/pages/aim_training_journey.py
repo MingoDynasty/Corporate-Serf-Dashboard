@@ -20,6 +20,8 @@ from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     apply_light_dark_mode,
     generate_aim_training_journey_plot,
+    generate_empty_plot,
+    generate_placeholder_plot,
 )
 from source.utilities.dash_logging import get_dash_logger
 
@@ -42,11 +44,31 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
     """Build a themed progress graph for the selected playlists."""
     if color_scheme not in {"dark", "light"}:
         raise PreventUpdate
-    if not selected_playlist or not checkpoint_hour:
-        return None
+    if not selected_playlist:
+        return apply_light_dark_mode(
+            generate_empty_plot(
+                "No playlists selected",
+                "Choose one or more playlists to compare progress.",
+            ),
+            color_scheme,
+        )
     selected_playlist_codes = filter_known_playlist_codes(selected_playlist)
     if not selected_playlist_codes:
-        return None
+        return apply_light_dark_mode(
+            generate_empty_plot(
+                "No playlists selected",
+                "Choose one or more playlists to compare progress.",
+            ),
+            color_scheme,
+        )
+    if not checkpoint_hour:
+        return apply_light_dark_mode(
+            generate_empty_plot(
+                "Graph settings incomplete",
+                "Choose a Checkpoint Hour value to plot progress.",
+            ),
+            color_scheme,
+        )
 
     journey_data = get_aim_training_journey_for_playlists(selected_playlist_codes)
     labeled_journey_data = {
@@ -119,6 +141,10 @@ def layout(**kwargs):  # noqa: ARG001
                     ),
                 ],
             ),
-            dcc.Graph(id="aim-training-journey-graph", style={"height": "80vh"}),
+            dcc.Graph(
+                id="aim-training-journey-graph",
+                figure=generate_placeholder_plot(),
+                style={"height": "80vh"},
+            ),
         ],
     )
