@@ -756,12 +756,10 @@ class PercentileWarmupWorker:
 
     def _run(self) -> None:
         logger.info("Percentile warmup worker started")
-        with self._condition:
-            initial_work = bool(self._queue)
-        if initial_work:
-            # The cadence heartbeat stays silent for the first ten items;
-            # answer "how much is queued?" before the first fetch.
-            self._log_progress_heartbeat(0)
+        # Answer "how much is queued?" before the first fetch — the cadence
+        # heartbeat stays silent for ten items, and remaining=0 is the
+        # positive confirmation that nothing needs warming.
+        self._log_progress_heartbeat(0)
         while True:
             # Hydration is deferred until actual work exists and only begins in
             # a quiet window; an empty startup queue therefore touches no API.

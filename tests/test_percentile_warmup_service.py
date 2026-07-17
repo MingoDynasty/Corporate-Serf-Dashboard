@@ -168,16 +168,15 @@ def test_run_logs_initial_queue_size_before_processing(caplog):
     assert "Percentile warmup progress: processed=0 remaining=2" in messages
 
 
-def test_run_with_empty_queue_logs_no_initial_heartbeat(caplog):
+def test_run_with_empty_queue_logs_zero_remaining(caplog):
     worker = warmup.PercentileWarmupWorker(_config(), [])
     worker._fatal_state = "stop"
 
     with caplog.at_level(logging.INFO, logger=warmup.__name__):
         worker._run()
 
-    assert not [
-        record for record in caplog.records if "warmup progress" in record.getMessage()
-    ]
+    messages = [record.getMessage() for record in caplog.records]
+    assert "Percentile warmup progress: processed=0 remaining=0" in messages
 
 
 @pytest.mark.parametrize(
