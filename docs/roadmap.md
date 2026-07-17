@@ -40,6 +40,12 @@ Design rationale for shipped work lives in
   full local/cache-backed table immediately, then streams Position, Total
   Players, and Percentile updates into stable rows with visible progress and
   aggregate outage/interruption summaries. (PR #127)
+- **Background playlist percentile warmup** — the Playlists overview now
+  fills cold percentile caches in one polite background queue, keeps partial
+  aggregates behind honest coverage placeholders, and shows remaining/ETA or
+  paused/fatal status while rows update live. Unhiding or importing a playlist
+  moves its played scenarios to the front without blocking the page. (PRs
+  #129, #130, #132, #133; design in #128)
 - **Relative "last played" timestamps** — humanized staleness display with
   exact-time tooltips, live-ticking on home and the playlist grid.
   (PRs #17, #19, #23)

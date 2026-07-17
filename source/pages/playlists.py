@@ -1,6 +1,7 @@
 """Playlist-level overview page at the playlists landing route."""
 
 import logging
+import math
 
 import dash
 import dash_ag_grid as dag
@@ -26,7 +27,9 @@ from source.kovaaks.data_service import (
     load_playlist_from_code,
 )
 from source.kovaaks.percentile_warmup_service import (
+    PercentileWarmupSnapshot,
     enqueue_playlist_percentile_warmup,
+    get_percentile_warmup_state,
 )
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
 from source.kovaaks.playlist_visibility_service import (
@@ -42,6 +45,7 @@ VISIBILITY_COLUMN_ID = "hidden"
 # The delete action cell's colId. Matches the ``deletable`` row flag so the
 # renderer can hide itself on bundled rows; excluded from row navigation.
 DELETE_COLUMN_ID = "deletable"
+WARMUP_REFRESH_INTERVAL_MS = 1_000
 
 # Reused from the former Settings-modal import control, with the trailing
 # clause reworded for the overview: importing here lands the playlist as a new
@@ -258,37 +262,124 @@ def route_to_clicked_playlist(cell_clicked):
 
 
 @callback(
+    Output("playlists-rows-refresh", "data", allow_duplicate=True),
+    Input("playlists-overview-grid", "cellClicked"),
+    State("playlists-rows-refresh", "data"),
+    prevent_initial_call=True,
+)
+def update_playlist_visibility(cell_clicked, rows_refresh):
+    """Toggle one visibility cell and wake warmup work after an unhide."""
+    if (
+        ctx.triggered_id != "playlists-overview-grid"
+        or not isinstance(cell_clicked, dict)
+        or cell_clicked.get("colId") != VISIBILITY_COLUMN_ID
+        or not isinstance(cell_clicked.get("rowId"), str)
+        or not cell_clicked["rowId"]
+    ):
+        return no_update
+
+    playlist_code = cell_clicked["rowId"]
+    if toggle_playlist_visibility(playlist_code):
+        enqueue_playlist_percentile_warmup(playlist_code)
+    # Hides need an ordinary row rebuild. Unhides additionally need this
+    # explicit bump so the disabled warmup interval's owner observes the new
+    # enqueue generation and re-arms it.
+    return (rows_refresh or 0) + 1
+
+
+@callback(
     Output("playlists-overview-grid", "rowData"),
     Output("playlists-overview-status", "children"),
+    Output("playlists-overview-warmup-interval", "disabled"),
+    Output("playlists-overview-warmup-status", "children"),
+    Output("playlists-overview-warmup-generation", "data"),
     Input("playlists-overview-mounted", "data"),
     Input("playlists-overview-show-hidden", "checked"),
-    Input("playlists-overview-grid", "cellClicked"),
     Input("playlists-rows-refresh", "data"),
+    Input("playlists-overview-warmup-interval", "n_intervals"),
+    State("playlists-overview-warmup-generation", "data"),
 )
-def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _rows_refresh):
-    """Build overview rows from local run data and rank caches (no network).
-
-    Also handles hide/unhide: a click on the visibility action cell toggles
-    that playlist's preference, then the rows rebuild from the new state.
-    """
-    if ctx.triggered_id == "playlists-overview-grid":
-        if (
-            not isinstance(cell_clicked, dict)
-            or cell_clicked.get("colId") != VISIBILITY_COLUMN_ID
-            or not isinstance(cell_clicked.get("rowId"), str)
-            or not cell_clicked["rowId"]
-        ):
-            return no_update, no_update
-        playlist_code = cell_clicked["rowId"]
-        if toggle_playlist_visibility(playlist_code):
-            enqueue_playlist_percentile_warmup(playlist_code)
-
-    rows = build_playlist_overview_rows(include_hidden=bool(show_hidden))
+def load_playlist_overview_rows(
+    _mounted,
+    show_hidden,
+    _rows_refresh,
+    _warmup_tick,
+    observed_generation,
+):
+    """Snapshot warmup state, then build cache-only rows before disabling."""
+    warmup_outputs = _playlist_overview_warmup_state(observed_generation)
+    record_activity = ctx.triggered_id != "playlists-overview-warmup-interval"
+    rows = build_playlist_overview_rows(
+        include_hidden=bool(show_hidden),
+        record_activity=record_activity,
+    )
     if not rows:
-        if build_playlist_overview_rows(include_hidden=True):
-            return [], 'All playlists are hidden. Toggle "Show hidden" to manage them.'
-        return [], "No playlists are loaded."
-    return rows, ""
+        if build_playlist_overview_rows(
+            include_hidden=True,
+            record_activity=record_activity,
+        ):
+            return (
+                [],
+                'All playlists are hidden. Toggle "Show hidden" to manage them.',
+                *warmup_outputs,
+            )
+        return [], "No playlists are loaded.", *warmup_outputs
+    return rows, "", *warmup_outputs
+
+
+def _format_warmup_eta(seconds: float) -> str:
+    """Format a deliberately approximate queue ETA without false precision."""
+    if seconds < 60:
+        return "<1 min"
+    minutes = math.ceil(seconds / 60)
+    if minutes < 60:
+        return f"{minutes} min"
+    hours, remainder = divmod(minutes, 60)
+    if not remainder:
+        return f"{hours} hr"
+    return f"{hours} hr {remainder} min"
+
+
+def _format_retry_time(snapshot: PercentileWarmupSnapshot) -> str:
+    """Render the worker's UTC deadline in the desktop's local time."""
+    if snapshot.paused_until is None:
+        return ""
+    return snapshot.paused_until.astimezone().strftime("%I:%M %p").lstrip("0")
+
+
+def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
+    if snapshot.fatal_state:
+        return f"Percentile update stopped: {snapshot.fatal_state}"
+    if not snapshot.remaining_count:
+        return ""
+
+    status = f"Updating percentile data: {snapshot.remaining_count} remaining"
+    if snapshot.paused_until is not None:
+        return f"{status} · paused; retrying at {_format_retry_time(snapshot)}"
+    if snapshot.recent_pace_seconds is not None:
+        eta = snapshot.remaining_count * snapshot.recent_pace_seconds
+        status += f" (~{_format_warmup_eta(eta)})"
+    return status
+
+
+def _playlist_overview_warmup_state(observed_generation):
+    """Compute interval outputs before the caller's sequenced row rebuild."""
+    snapshot = get_percentile_warmup_state()
+    observed_generation = (
+        observed_generation if isinstance(observed_generation, int) else 0
+    )
+
+    # A callback response based on an older snapshot must never disable an
+    # interval that has already observed and re-armed for a newer enqueue.
+    if snapshot.enqueue_generation < observed_generation:
+        return False, no_update, observed_generation
+
+    busy = bool(snapshot.queued_names) or snapshot.in_flight is not None
+    new_generation = snapshot.enqueue_generation > observed_generation
+    disabled = not (busy or new_generation)
+    if snapshot.fatal_state:
+        disabled = True
+    return disabled, _format_warmup_status(snapshot), snapshot.enqueue_generation
 
 
 @callback(
@@ -312,7 +403,7 @@ def toggle_import_modal(_, opened):
     State("playlists-rows-refresh", "data"),
     prevent_initial_call=True,
 )
-def import_playlist(_, playlist_to_import, rows_refresh):
+def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
@@ -323,7 +414,11 @@ def import_playlist(_, playlist_to_import, rows_refresh):
     it; a duplicate-code refusal whose conflicting playlist is hidden gets the
     unhide hint appended (R14).
     """
-    if not playlist_to_import:
+    if (
+        ctx.triggered_id != "playlists-import-button"
+        or not n_clicks
+        or not playlist_to_import
+    ):
         return no_update, no_update, no_update, no_update
     playlist_to_import = playlist_to_import.strip()
     logger.debug("Importing playlist '%s'", playlist_to_import)
@@ -597,9 +692,12 @@ def layout(**kwargs):  # noqa: ARG001
             # The row load is driven by this layout-bound store so revisiting
             # the page rebuilds rows exactly once from current local state.
             dcc.Store(id="playlists-overview-mounted", data=True),
-            # Bumped by a successful import or delete so the row-load callback
-            # (and the superseded alert) rebuild without a page reload.
+            # Bumped by visibility, import, or delete actions so row consumers
+            # rebuild without a page reload; warmup also uses it to re-arm.
             dcc.Store(id="playlists-rows-refresh", data=0),
+            # Browser-observed worker generation. The warmup interval owner
+            # uses this to preserve re-arms across idle/enqueue races.
+            dcc.Store(id="playlists-overview-warmup-generation", data=0),
             # Holds the code the delete confirmation modal is targeting.
             dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
@@ -609,6 +707,12 @@ def layout(**kwargs):  # noqa: ARG001
                 id="playlists-overview-relative-time-interval",
                 interval=30_000,
                 n_intervals=0,
+            ),
+            dcc.Interval(
+                id="playlists-overview-warmup-interval",
+                interval=WARMUP_REFRESH_INTERVAL_MS,
+                n_intervals=0,
+                disabled=True,
             ),
             dmc.Title("Playlists", order=2),
             dmc.Group(
@@ -622,6 +726,11 @@ def layout(**kwargs):  # noqa: ARG001
                                 w=240,
                             ),
                             dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                            dmc.Text(
+                                "",
+                                c="dimmed",
+                                id="playlists-overview-warmup-status",
+                            ),
                         ],
                         gap="md",
                         align="center",

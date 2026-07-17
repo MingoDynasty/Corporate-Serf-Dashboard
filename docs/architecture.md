@@ -210,12 +210,22 @@ flowchart LR
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.
   Overview row rendering is local-only — it draws from local run data and rank
-  caches and never triggers KovaaK's API calls. Also hosts the visibility
-  controls: a per-row Hide/Unhide action cell and a "Show hidden" toggle that
-  reveals hidden playlists as muted rows. Hosts playlist import (share-code
+  caches and never triggers KovaaK's API calls. While the warmup worker is
+  busy, a one-second interval rebuilds those rows with activity recording
+  suppressed, shows remaining/ETA or paused/fatal state, and disables after a
+  final idle rebuild. One callback snapshots worker state, rebuilds rows, then
+  returns the rows and interval state together; an idle snapshot therefore
+  precedes the final cache read and cannot race it. That callback tracks the
+  worker's enqueue generation, and the shared row-refresh store re-arms it
+  after idle.
+  Also hosts the visibility controls: a per-row Hide/Unhide action cell and a
+  "Show hidden" toggle that reveals hidden playlists as muted rows. Unhide
+  prepends the playlist's played scenarios to warmup before bumping that
+  refresh store. Hosts playlist import (share-code
   modal) — the one networked action on this page: `load_playlist_from_code`
   calls the API, and on success a refresh store bump rebuilds the grid with the
-  new visible row without a page reload. Hosts playlist deletion: a per-row
+  new visible row without a page reload and re-arms any enqueued warmup work.
+  Hosts playlist deletion: a per-row
   Delete action cell (user playlists only; bundled rows render nothing) opens a
   confirmation modal, then `delete_user_playlist` unlinks the file and the same
   refresh store rebuilds the grid. When the loader recorded user files
@@ -266,7 +276,9 @@ flowchart LR
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
   `allow_network=False`), filtered by visibility unless the overview's "show
-  hidden" mode asks for everything.
+  hidden" mode asks for everything. Automated warmup-interval builds thread
+  `record_activity=False` into those reads so polling does not postpone the
+  worker.
 - `playlist_visibility_service.py` — per-code show/hide preferences (plain
   show-list persisted at `data/preferences.json`, atomic writes under a module
   lock). A missing file yields the first-run seed (bundled defaults plus
@@ -315,7 +327,7 @@ flowchart LR
 | The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
-| Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` |
+| Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
