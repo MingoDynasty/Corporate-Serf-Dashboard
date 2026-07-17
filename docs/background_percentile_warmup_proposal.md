@@ -1,0 +1,391 @@
+# Proposal: background percentile warmup for the playlists overview
+
+Status: Proposed
+
+## Problem
+
+On first app load (or any cold cache) the playlists overview at `/playlists`
+shows almost no percentile data: its rows are deliberately cache-only
+(`allow_network=False`), and the rank cache only warms when the user drills
+into individual playlists. Until then the median/lowest percentile aggregates
+are computed over a biased sample — whichever playlists happen to have been
+drilled into — which skews them in confusing directions despite the
+`· cached/total` coverage suffix.
+
+The fix is a background warmer that fills the rank + totals caches for exactly
+the scenarios the overview can display, slowly and politely, without blocking
+any user-facing path.
+
+## Sizing (measured 2026-07-12)
+
+- One scenario costs two API calls: rank (`/leaderboard/scores/global` with
+  `usernameSearch`) measured at 2.3–9.2 s (avg ~4.8 s, n=4), and leaderboard
+  total (~0.4–0.6 s, one 4 s outlier). ~6–8 s per scenario; the API's own
+  latency does most of the throttling.
+- Reference user: 865 unique scenarios played locally; 126 of them in the
+  current visible-playlist set (the actual queue); 638 if every bundled Evxl
+  benchmark (2,629 unique scenarios) were unhidden.
+- Cold warm of the default visible set ≈ 15 min. Pathological
+  all-benchmarks-visible ≈ 75 min. Steady-state restart top-up (168 h TTL,
+  daily restart) ≈ 2 min/day.
+
+## Decisions (register)
+
+- **R1 — One background worker.** A single daemon thread, started after CSV
+  ingest completes (it needs the played set), processes a queue of scenario
+  names sequentially with a small politeness gap (~2 s) between network items.
+  No parallelism: sequential fetches at ~6–8 s/scenario are inherently gentle
+  (<0.4 req/s sustained). The worker lives for the app's lifetime: when the
+  queue and in-flight work drain, it blocks on a condition variable, and the
+  R6 enqueue hooks signal that condition — an unhide hours after the queue
+  emptied wakes the same worker; nothing is restarted.
+- **R2 — Queue scope = played ∩ visible.** Only scenarios that appear in a
+  visible playlist and have local runs are enqueued: nothing else can
+  contribute a percentile to the overview (the aggregator skips unplayed
+  scenarios; hidden playlists aren't rendered in the default view). The
+  temporary "Show hidden" management mode does render hidden rows; those
+  stay unwarmed by design and typically keep the R18 placeholder — muted
+  styling marks them as second-class, and unhiding is precisely the
+  promotion path that enqueues them (R6). The
+  Home page's on-demand fetch covers everything outside this set. This
+  bounds the worst case at "played and visible", not the user's full
+  history.
+- **R3 — Playlist-completion ordering.** The startup queue is grouped by
+  playlist (most recently played first); within a playlist, scenarios with no
+  displayable percentile come first, then by last-played recency. Completing
+  one playlist at a time flips each row's aggregates from the R18
+  placeholder to a final value one by one, instead of leaving every row
+  undecided for the whole warm.
+- **R4 — Completion = fresh UNRANKED, or fresh RANKED plus fresh total.** A
+  scenario is skipped at dequeue if its rank cache is TTL-fresh UNRANKED, or
+  TTL-fresh RANKED with a TTL-fresh totals cache
+  (`leaderboard_total_cache_ttl_hours`). Percentile needs rank and total
+  together, but only for RANKED entries — the overview derives percentiles
+  exclusively from RANKED cache entries, so totals buy nothing for a fresh
+  UNRANKED. (The drill-in page does show totals on unranked rows; that is
+  the shipped fill's on-demand territory.) For RANKED entries, a rank-only
+  check would leave permanent N/A holes wherever a totals fetch once failed,
+  and because the overview's cache-only read path serves totals regardless
+  of age, a stale totals file would otherwise never be repaired. The
+  asymmetry is cheap: a fresh-RANKED/stale-totals item re-pays only the
+  ~0.5 s totals call (R14).
+- **R5 — The dequeue-time check is the universal dedup.** Every pop consults
+  two things: the R4 cache predicate, and a per-session outcome map keyed by
+  scenario name holding transient attempt counts and terminal outcomes
+  (permanent failure, read-timeout drop, cap exhaustion). Satisfied or
+  terminal names skip in microseconds (file stats plus a dict lookup, no
+  network), so duplication from any source — unhide spam, races with
+  interactive fetches, tail requeues — resolves here, and failure duplicates
+  can neither re-fire requests nor evade the R9 cap. The queue itself needs
+  no uniqueness invariant, no promotion, no scanning: a dumb deque.
+- **R6 — Unhide and import prepend, unconditionally.** When the user unhides
+  a playlist or imports one (imports are auto-visible), its played scenarios
+  are batch-prepended (most recent user action first). No in-queue dedup (R5
+  makes duplicates free) and no removal when a playlist is hidden or deleted
+  (worst case: one playlist of fetches whose results are cached for later).
+  Visibility changes are the primary onboarding flow — first-run users
+  immediately unhide the benchmarks they care about — so this hook is core.
+- **R7 — Interactive traffic bypasses the queue and preempts the worker.**
+  Drill-in loads (see coordination below) and the Home refresh button fetch
+  directly, as today. The module-level signal in `api_service` (shipped with
+  PR #127: `record_interactive_activity()` / `get_api_activity_timestamps()`;
+  the worker consumes it as-is) carries two timestamps with deliberately
+  split semantics:
+  - *last interactive activity* — bumped per interactive lookup, cache hits
+    included (it means only "the user is active, stay out of the way");
+    drives the worker's yielding.
+  - *last network success* — bumped only on a real HTTP success in the
+    shared GET helper, never on cache-served returns; drives the
+    outage-backoff wake (R9). A cache hit is not evidence KovaaK's
+    recovered: interactive lookups over a warm cache make zero HTTP
+    requests.
+
+  Existing monotonic rank writes under `_rank_save_lock` make concurrent
+  writers safe; the worst race is one duplicate in-flight request.
+  Startup hydration honors the same contract at coarser grain: the
+  total-play helper paginates the full play history in one call
+  (⌈played/100⌉ fast metadata GETs — 6+ pages for the reference user), so
+  the worker only *starts* hydration inside an interactive quiet window. A
+  burst that begins mid-hydration overlaps at most that bounded, cheap
+  pagination — accepted, rather than making the shared helper yieldable
+  (its interactive callers want it fast, and a 24 h-fresh metadata cache
+  usually answers with zero requests anyway).
+- **R8 — Single TTL.** v1 keeps `scenario_rank_cache_ttl_hours` (168 h) for
+  both interactive and background freshness. A separate longer background TTL
+  is a real lever (percentile drift is glacial) but only pays once the visible
+  set grows several-fold; it's a one-line config addition when needed.
+- **R9 — Transient failures: tail requeue + escalating global backoff.**
+  Connection errors (including connect timeouts), 5xx, and post-retry 429s
+  send the item to the tail and sleep the worker on an escalating schedule
+  (30 s → 2 m → 5 m → 15 m → 30 m cap), reset on any success. Read timeouts
+  are the deliberate exception, honoring the 2026-07-13 no-ReadTimeout-retry
+  decision: the server may still be processing that exact query, so the item
+  is marked terminal in the R5 outcome map (the next restart re-probes it) —
+  but the failure still trips the same global backoff, because a read timeout is the
+  primary symptom of a KovaaK's slow spell and the worker should slow down,
+  not plow through the queue timing out item after item. During an outage
+  the worker converges to ~1 probe per 30 min, which doubles as the recovery
+  detector.
+  Tail (not head) requeue keeps one flaky scenario from blocking the queue
+  behind its own backoffs. Per-item cap: 3 transient attempts per session,
+  counted in the R5 outcome map by scenario name (duplicates share the same
+  budget), then mark terminal (the next restart retries). Backoff sleeps are
+  sliced (~10 s chunks), each slice re-reading R7's *last network success*
+  timestamp, so any real HTTP success — the worker's own probes or another
+  path's — wakes the worker within one slice; cache-served results never do.
+  Sliced polling rather than a notification bridge is deliberate: the
+  shipped primitive exposes read-only timestamps, and having `api_service`
+  signal the worker's condition variable would invert the coupling.
+- **R10 — Permanent failures skip immediately.** Unresolvable leaderboard IDs
+  and validation failures are logged and marked terminal in the R5 outcome
+  map without retries; a restart
+  re-probes each once (accepted cost; a negative-resolution cache is a future
+  lever, not v1).
+- **R11 — Fatal failures stop the queue.** `UnknownKovaaksUserError` means
+  every remaining item would fail identically: the worker stops, records the
+  fatal state in its module-level progress state (surfaced by the R12 status
+  line), and emits one `dash_logger.error`. Background-thread `dash_logger`
+  calls are safe since the drained-queue fix: records logged without a
+  callback context are queued and delivered by the Home interval drain
+  (`flush_background_notifications`), the same route the rank-freshness
+  Timer chain uses.
+- **R12 — Status line: remaining-only.** The overview page shows
+  "Updating percentile data: N remaining (~ETA)" where N counts unique
+  non-terminal names queued or in flight (spam-proof), recomputed per tick
+  from a queue snapshot rather than incrementally refcounted, and ETA = N ×
+  recent average pace; during outage
+  backoff it shows a paused note with the retry time. No done/total: the
+  denominator is dynamic (unhides grow it, dedup shrinks it), so a ratio
+  would visibly run backward. Transient failures never toast — a deliberate
+  deviation from the "background failures notify via `dash_logger.error`"
+  convention, because an outage is ambient state, not an event; only R11
+  notifies.
+- **R13 — Live overview refresh while warming.** A `dcc.Interval` on the
+  overview page, enabled while the worker is busy — queued items or an item
+  in flight; queue emptiness alone is not idleness, because the final item
+  is popped before its fetch completes — re-runs the normal cache-only row
+  build each tick so rows fill in as the user watches. On observing the
+  worker go idle, the callback performs one last rebuild before disabling
+  itself, so the final cache write is never left invisible. Re-arming after
+  idle is needed because the enqueue condition variable wakes only the
+  server-side worker, never a disabled browser interval — but the
+  interval's `disabled` property gets a single callback owner, no
+  `allow_duplicate`: one callback, fed by both the interval tick and the
+  `playlists-rows-refresh` store, computes `disabled` from current worker
+  state tagged with an enqueue generation counter, so a response computed
+  against an older generation can never override a newer rearm. One wiring
+  gap to close during implementation: only the import callback bumps that
+  store today — the unhide path is a branch inside the row-load callback
+  that toggles visibility without touching the store — so the warmup PR
+  adds an explicit post-enqueue bump on the unhide path. (Two independent writers would race: Dash does
+  not order duplicate-output updates, and an idle-tick `disabled=True`
+  landing after an enqueue's rearm would freeze live updates invisibly —
+  the exact failure the rearm exists to prevent.) Automated
+  rebuilds must pass `record_activity=False` down the overview build path —
+  its cache-only reads record interactive activity by default, so each tick
+  would otherwise bump R7's activity timestamp and the interval, which runs
+  precisely while the worker is busy, would perpetually postpone the worker
+  it reports on. Home's interval tick already models the fix
+  (`record_activity=allow_network`); a regression test pins it. Full rebuild
+  from disk cache — deliberately NOT the progressive-fill
+  registry/rowTransaction transport, which streams in-memory generation
+  state; the overview's data plane is the disk cache and its build is
+  already cheap.
+- **R14 — Layering: the worker sits at the Timer-chain layer.** It calls
+  `resolve_leaderboard_id` / `fetch_scenario_rank` / totals directly and
+  classifies exceptions itself (the `_run_attempt` precedent), because the UI
+  entry point deliberately flattens failures into UNKNOWN. Partial success
+  composes: if the rank saved but the totals call failed, the retry only
+  re-pays the cheap totals call. The PR #112 stale-rank fallback lives above
+  this layer (in `get_scenario_rank_info`), so the worker still sees raw
+  exceptions — correct, since its job is repairing the cache, not serving
+  degraded reads. One wrapper safeguard the direct path must replicate:
+  `fetch_scenario_rank` returns UNRANKED whenever no matching player is
+  found — including for a misspelled username — and only the wrapper's
+  total-play check disambiguates "valid user, not on this board" from
+  "invalid username". The worker therefore requires one successful
+  per-session total-play validation of the configured username (a
+  successful hydration counts) before it will *cache* an UNRANKED result:
+  while unvalidated, an UNRANKED result is never written. Validation is
+  itself a subject of the R5 outcome map — one reserved entry with the same
+  R9 taxonomy, so the item's disposition inherits the validation failure's
+  category: connection-error/5xx/429 validation failures tail-requeue the
+  item and count against validation's own 3-attempt budget, while a
+  validation read timeout marks validation terminal for the session per the
+  no-ReadTimeout-retry contract, and while validation is terminal every
+  unvalidated UNRANKED item goes terminal too (no writes; the next restart
+  re-probes) rather than re-firing total-play once per queued scenario. An
+  unknown-username answer triggers R11. Validation may succeed only from a
+  positively valid live or cached total-play response: a stale
+  `unknown_username` cache marker must always raise
+  `UnknownKovaaksUserError` and never counts as success. Today the helper's
+  stale-cache fallback launders that marker — it checks the marker only on
+  the fresh path, and the fallback's `model_validate` discards the marker's
+  extra fields, yielding an apparently valid empty response — so the warmup
+  PR hardens the fallback with a regression test (this also fixes the same
+  latent laundering for interactive callers). Without this gate, a typo'd
+  username would bulk-cache every candidate as fresh UNRANKED instead of
+  stopping the queue. RANKED results need no such gate — an exact
+  Steam-ID/username match is itself validation.
+- **R15 — Kill switch, and off-by-configuration.** `percentile_warmup_enabled`
+  (config.toml, default true) disables the warmer only — never interactive
+  fetches. Independently, a falsey `kovaaks_username` disables the warmer
+  identically: no startup enumeration, no network work, and the R6 enqueue
+  hooks no-op. An empty username is the documented fully-offline
+  configuration (README), which must stay offline regardless of the warmup
+  default — and the worker's resolution fallback would otherwise still
+  reach the scenario-search endpoint without a username. R11 covers only an
+  API-confirmed invalid username; an unset one never reaches the network.
+- **R16 — Testability.** The worker is a pure "process one item" step
+  function with injected pacing/sleep, driven by a thin thread loop — the
+  split is the better production design, not a test-only seam.
+- **R17 — Logging.** DEBUG per item, INFO per playlist batch and per state
+  change (backoff entered/exited, fatal stop), one INFO summary at
+  completion.
+- **R18 — All-or-nothing aggregates: resolution gates display.** The
+  overview's percentile aggregates render only when every played scenario
+  in the playlist is *display-resolved*; until then the cells show a dimmed
+  placeholder stating the count: `12/17 cached` (chosen over the fill's
+  ellipsis vocabulary — motion-neutral, since hidden and terminal-failure
+  rows may hold the placeholder indefinitely, where "…" would promise
+  resolution; a tooltip notes that opening the playlist fetches the gaps
+  now). No partial medians: a partial
+  median is the original complaint this proposal exists to fix — it skews,
+  it sorts 3-sample noise against 17-sample signal (the sort values stay
+  null until complete, so NULLS LAST keeps undecided rows out of the
+  ranking), and it changes under the user's eyes as the warmer lands
+  values; the placeholder's climbing count carries the progress signal
+  instead. Definitions: the numerator counts resolved entries over played
+  (unplayed can never contribute per R2, and the Played column already
+  carries `played/total`); *display*-resolved means a rank cache entry is
+  present — any age, matching the overview's TTL-free reads — and, for
+  RANKED entries, a totals entry present. This is deliberately weaker than
+  R4's TTL-fresh *worker* predicate: display tolerates stale (a week-stale
+  percentile is within display precision, per the decision log), the
+  worker repairs it. Presence-based resolution makes the complete state
+  monotonic — a row that reaches full resolution never regresses on TTL
+  expiry; only playing a brand-new scenario briefly regresses it until the
+  Timer chain caches the first score. Complete rows show the bare value
+  (`61.42%`) with no coverage suffix at all: under the gate a suffix would
+  always read `n/n` — pure noise — and a number's presence itself now
+  means fully covered. Placeholder ≠ N/A, mirroring the fill's
+  pending-vs-decided semantics: a complete playlist whose entries are all
+  UNRANKED shows a plain `N/A` (decided — no percentile exists);
+  `12/17 cached` always means undecided. Hidden rows and terminal-failure
+  rows simply
+  keep the placeholder; for failures, drill-in force-fetches the gaps, and
+  the count makes that discoverable. If real usage ever shows most rows
+  stuck incomplete, partial aggregates can return as a fallback — the
+  warmer exists to make that state rare.
+
+## Coordination with progressive fill (shipped: PRs #114/#127)
+
+The progressive-fill design (drafted in parallel with this proposal, now
+shipped) owns the drill-in page (`/playlists/<code>`): two-phase load,
+pending placeholders, registry + interval drain, per-generation progress.
+Its durable record is the 2026-07-15 entry "Stream Playlist Positions With
+Generation-Scoped Progressive Fill" in [decision_log.md](decision_log.md).
+This proposal owns the ambient queue and the overview page. They compose
+through the disk cache with no new shared state: a drill-in's phase 2 warms
+a playlist → R5 skips those scenarios; the warmer's results make phase 2
+near-instant (cache-fresh lookups complete in milliseconds without network).
+
+Contract points:
+
+1. The R7 signal is the one integration, and it shipped with PR #127
+   (`record_interactive_activity()` / `get_api_activity_timestamps()` in
+   `api_service.py`) with exactly R7's split semantics — the split came from
+   a PR #114 review finding that a cache hit must not wake the worker from
+   outage backoff. The worker consumes the primitive as-is; nothing is left
+   to define.
+2. The overview deliberately does not reuse the progressive-fill registry
+   transport (R13 here); different data planes.
+3. Status lines share a phrase family but deliberately different counters:
+   done/total there (static per-generation total), remaining-only here
+   (dynamic queue). Not a consistency bug.
+4. Notification conventions align (no per-scenario spam). A misconfigured
+   username can produce both the fill-summary toast and R11's fatal toast;
+   rare and self-explaining, accepted.
+5. R15's kill switch never disables progressive fill (user-initiated
+   traffic).
+6. Both former speed-fix dependencies merged as well (PR #113 total-play
+   hydration hoist, PR #112 stale-rank fallback); the warmer additionally
+   hydrates the leaderboard-id mapping once up front on its own.
+
+## Edge cases (deliberate)
+
+- Hide/unhide spam: duplicates are free (R5) and invisible in the counter
+  (R12's unique-name count). A head-batch-comparison guard was considered and
+  rejected: it stops firing the moment the worker consumes one item of the
+  batch (timing-dependent behavior) while defending against a cost that is
+  already zero.
+- Unhide racing an in-flight fetch: the single worker serializes; the
+  duplicate is freshness-skipped after the in-flight item saves. If the
+  in-flight fetch failed transiently, the duplicate acts as a free retry —
+  counted against the same per-name budget in the R5 outcome map; terminal
+  names skip instead.
+- Scenario played for the first time mid-session: the watchdog's new-scenario
+  path already schedules the Timer-chain refresh (`file_watchdog.py`), so the
+  queue never needs mid-session additions from gameplay.
+- A playlist repeats a scenario (the shipped fill keys grid rows by playlist
+  position for the same reason): the second occurrence freshness-skips.
+- Cached UNRANKED: fresh → skipped without a totals fetch (R4's UNRANKED
+  arm); correct (the user isn't on that board, and the overview renders no
+  percentile for it; a new local score routes through the Timer chain).
+- Debug mode: `app.py` runs `use_reloader=False`, so the worker starts once,
+  like the watchdog observer.
+- Shutdown mid-warm: the daemon thread dies; atomic cache writes can't tear;
+  the next startup rebuilds the queue from staleness. No persisted queue
+  state.
+- Empty stats directory (brand-new user): the queue is empty; nothing to warm
+  and nothing to display anyway. "Cleared local stats but has KovaaK's
+  history" is explicitly unsupported.
+
+## Implementation acceptance tests
+
+Consolidated from the review rounds. These pin behavior the register
+promises but only a test can enforce; each maps to one of the
+implementation PRs.
+
+- A stale `unknown_username` marker plus a network failure still raises
+  `UnknownKovaaksUserError` — the stale-cache fallback must not launder the
+  marker into "valid user, zero plays" (R14).
+- An interval response computed against an older enqueue generation cannot
+  re-disable the interval after a newer rearm (R13).
+- The worker still reports busy while the final dequeued item's fetch and
+  cache write are in flight; the last row rebuild happens after that write
+  (R13).
+- Worker idle, then unhide: the browser interval re-arms and live updates
+  resume — this exercises the new store bump on the unhide path (R6/R13).
+- Worker cache writes go through the monotonic save path: a concurrent
+  newer result is preserved, and a rejected stale candidate neither
+  refreshes cache metadata nor retries unboundedly (R7).
+- With an empty `kovaaks_username` or `percentile_warmup_enabled = false`,
+  startup performs no queue enumeration and no network requests (R15).
+- Automated overview rebuilds pass `record_activity=False`, so the
+  reporting interval never postpones the worker it reports on (R13).
+- A mixed RANKED/UNRANKED playlist renders aggregates only once every
+  played scenario is display-resolved; an all-UNRANKED complete playlist
+  shows a plain `N/A` (R18).
+- Duplicate scenario names — spam unhide, repeated imports, a playlist that
+  repeats a scenario — neither re-fire requests nor inflate the remaining
+  counter (R5/R12).
+
+## Out of scope
+
+- Drill-in page UX (shipped progressive fill; see the decision log).
+- Home page rank display.
+- Second/background TTL tier (R8) and negative-resolution cache (R10) —
+  documented levers, not v1.
+- Queue persistence across restarts.
+
+## Rejected alternatives
+
+- Bulk-seeding ranks from `/user/scenario/total-play`: halves the calls, but
+  the endpoint lags the leaderboard (decision log: metadata/upsert only) and
+  lacks per-leaderboard totals, so per-scenario calls remain; not worth a
+  provisional trust tier in the rank cache.
+- A mutable priority queue with runtime priorities: user actions already
+  bypass the queue (R7); prepend + dequeue-time freshness (R5/R6) delivers
+  the same semantics with a dumb deque.
+- Warming the user's full played history: no UI surface consumes it (R2).
