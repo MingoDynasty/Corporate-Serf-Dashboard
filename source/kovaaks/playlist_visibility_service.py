@@ -37,6 +37,11 @@ DEFAULT_VISIBLE_CODES = frozenset(
         "KovaaKsQuestingMaximumblueNightfall",  # Viscose benchmarks hard
         "KovaaKsPushingMauveWeaponlevel",  # Viscose benchmarks medium
         "KovaaKsRaidingMediumFaction",  # Viscose benchmarks easier
+        "KovaaKsDinkingVibrantInfiltration",  # Viscose Entry Benchmarks
+        "KovaaKsScreamingPulledEgg",  # Viscose Benchmark S2 - Easier
+        "KovaaKsPeakingNarrowImpact",  # Viscose Benchmark S2 - Medium
+        "KovaaKsPlunderingOlivegreenClutch",  # Viscose Benchmark S2 - Hard
+        "KovaaKsRaidingPeriwinkleWindow",  # Viscose Benchmark S2 - Expert
     }
 )
 
