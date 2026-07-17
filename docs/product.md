@@ -76,6 +76,12 @@ list in the roadmap.)
   a playlist," but not "*which* playlist deserves attention" — this surfaces
   stale and weak playlists at a glance and directs training focus across
   playlists, the way the scenario table already does within one.
+- **Live percentile warmup** (PRs #129, #130, #132, #133). Played scenarios
+  from visible playlists fill their percentile caches politely in the
+  background; the overview shows honest coverage placeholders and live
+  remaining/ETA or paused status until complete. *Problem solved:* a cold cache
+  no longer produces misleading partial medians or makes the user open every
+  playlist by hand before cross-playlist weakness comparisons become useful.
 - **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
   filters every playlist dropdown (Home filter, Journey picker). Hidden

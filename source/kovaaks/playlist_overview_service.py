@@ -39,7 +39,11 @@ def _format_percentile_aggregate(
     return f"{value:.2f}%"
 
 
-def _cached_rank_resolution(scenario_name: str) -> tuple[bool, float | None]:
+def _cached_rank_resolution(
+    scenario_name: str,
+    *,
+    record_activity: bool = True,
+) -> tuple[bool, float | None]:
     """Classify one scenario from a single cache-only rank lookup.
 
     UNRANKED is resolved without a percentile. RANKED is resolved only when
@@ -56,6 +60,7 @@ def _cached_rank_resolution(scenario_name: str) -> tuple[bool, float | None]:
             config.scenario_rank_cache_ttl_hours,
             config.leaderboard_total_cache_ttl_hours,
             allow_network=False,
+            record_activity=record_activity,
         )
     except Exception:  # noqa: BLE001 - one bad cache entry must not empty the page
         logger.warning(
@@ -75,6 +80,8 @@ def format_playlist_overview_row(
     display_label: str,
     playlist: PlaylistData,
     stats_by_scenario: dict[str, ScenarioStats],
+    *,
+    record_activity: bool = True,
 ) -> OverviewRow:
     """Create one overview AG Grid row with separate display and sort values.
 
@@ -106,7 +113,10 @@ def format_playlist_overview_row(
         if stalest_played is None or stats.date_last_played < stalest_played:
             stalest_played = stats.date_last_played
             stalest_scenario = scenario_name
-        resolved, percentile = _cached_rank_resolution(scenario_name)
+        resolved, percentile = _cached_rank_resolution(
+            scenario_name,
+            record_activity=record_activity,
+        )
         if resolved:
             resolved_count += 1
         if percentile is not None:
@@ -156,7 +166,11 @@ def format_playlist_overview_row(
     }
 
 
-def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewRow]:
+def build_playlist_overview_rows(
+    include_hidden: bool = False,
+    *,
+    record_activity: bool = True,
+) -> list[OverviewRow]:
     """
     Build one overview row per visible playlist, in selector label order.
 
@@ -168,7 +182,8 @@ def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewR
 
     ``include_hidden=True`` (the overview's "show hidden" mode) adds hidden
     playlists' rows; every row carries a ``hidden`` flag for row muting and
-    the hide/unhide action cell.
+    the hide/unhide action cell. Automated warmup-interval builds pass
+    ``record_activity=False`` so cache polling does not postpone the worker.
     """
     shown_codes = get_shown_playlist_codes()
     # Only user-root playlists can be deleted (bundled benchmarks offer hide,
@@ -187,6 +202,7 @@ def build_playlist_overview_rows(include_hidden: bool = False) -> list[OverviewR
             option["label"],
             playlist,
             stats_by_scenario,
+            record_activity=record_activity,
         )
         row["hidden"] = hidden
         row["deletable"] = option["value"] in deletable_codes

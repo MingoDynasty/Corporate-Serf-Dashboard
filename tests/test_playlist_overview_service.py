@@ -26,7 +26,12 @@ def _configure(monkeypatch):
     )
 
 
-def _install_cached_ranks(monkeypatch, rank_infos_by_scenario):
+def _install_cached_ranks(
+    monkeypatch,
+    rank_infos_by_scenario,
+    *,
+    expected_record_activity=True,
+):
     """Serve canned cache-only rank info and enforce the zero-network seam."""
 
     def fake_rank_lookup(
@@ -37,8 +42,10 @@ def _install_cached_ranks(monkeypatch, rank_infos_by_scenario):
         rank_cache_ttl_hours,
         leaderboard_total_cache_ttl_hours,
         allow_network=True,
+        record_activity=True,
     ):
         assert allow_network is False
+        assert record_activity is expected_record_activity
         assert username == "MingoDynasty"
         assert steam_id == "steam-id"
         assert metadata_cache_ttl_hours == 24
@@ -427,6 +434,31 @@ def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
         ("Same Name (CodeB)", "CodeB"),
     ]
     assert all(row["hidden"] is False for row in rows)
+
+
+def test_build_playlist_overview_rows_threads_record_activity_false(monkeypatch):
+    _configure(monkeypatch)
+    playlist = PlaylistData(
+        name="Automated Refresh",
+        code="RefreshCode",
+        scenarios=[Scenario(name="Played")],
+    )
+    monkeypatch.setattr(
+        data_service,
+        "playlist_database",
+        {playlist.code: playlist},
+    )
+    _install_stats_snapshot(monkeypatch, _played_stats("Played"))
+    _install_shown_codes(monkeypatch, {playlist.code})
+    _install_cached_ranks(
+        monkeypatch,
+        {"Played": ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED)},
+        expected_record_activity=False,
+    )
+
+    rows = build_playlist_overview_rows(record_activity=False)
+
+    assert rows[0]["percentile_aggregates_resolved"] is True
 
 
 def test_build_playlist_overview_rows_filters_hidden_playlists(monkeypatch):

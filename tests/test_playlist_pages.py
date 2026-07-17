@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -10,6 +10,7 @@ from dash.exceptions import PreventUpdate
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Scenario
+from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -50,13 +51,35 @@ def _trigger(monkeypatch, triggered_id):
     )
 
 
+def _warmup_snapshot(
+    *,
+    queued_names=(),
+    in_flight=None,
+    remaining_count=0,
+    paused_until=None,
+    fatal_state=None,
+    enqueue_generation=0,
+    recent_pace_seconds=None,
+):
+    return PercentileWarmupSnapshot(
+        queued_names=queued_names,
+        in_flight=in_flight,
+        remaining_count=remaining_count,
+        paused_until=paused_until,
+        backoff_seconds=None,
+        fatal_state=fatal_state,
+        enqueue_generation=enqueue_generation,
+        recent_pace_seconds=recent_pace_seconds,
+    )
+
+
 def test_playlists_overview_page_loads_rows(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-mounted")
     expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
     seen_include_hidden = []
 
-    def fake_build(include_hidden=False):
-        seen_include_hidden.append(include_hidden)
+    def fake_build(include_hidden=False, *, record_activity=True):
+        seen_include_hidden.append((include_hidden, record_activity))
         return expected_rows
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
@@ -65,26 +88,26 @@ def test_playlists_overview_page_loads_rows(monkeypatch):
 
     assert rows == expected_rows
     assert status == ""
-    assert seen_include_hidden == [False]
+    assert seen_include_hidden == [(False, True)]
 
 
 def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-show-hidden")
     seen_include_hidden = []
 
-    def fake_build(include_hidden=False):
-        seen_include_hidden.append(include_hidden)
+    def fake_build(include_hidden=False, *, record_activity=True):
+        seen_include_hidden.append((include_hidden, record_activity))
         return [{"code": "KovaaKsTestCode", "hidden": True}]
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
     rows, _status = playlists.load_playlist_overview_rows(True, True, None, 0)
 
-    assert seen_include_hidden == [True]
+    assert seen_include_hidden == [(True, True)]
     assert rows[0]["hidden"] is True
 
 
-def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
+def test_playlists_overview_visibility_click_toggles_and_bumps_refresh(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-grid")
     toggled = []
     enqueued = []
@@ -99,23 +122,14 @@ def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
         "enqueue_playlist_percentile_warmup",
         enqueued.append,
     )
-    monkeypatch.setattr(
-        playlists,
-        "build_playlist_overview_rows",
-        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
-    )
-
-    rows, status = playlists.load_playlist_overview_rows(
-        True,
-        False,
+    rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
-        0,
+        7,
     )
 
     assert toggled == ["KovaaKsTestCode"]
     assert enqueued == ["KovaaKsTestCode"]
-    assert rows == [{"code": "KovaaKsTestCode"}]
-    assert status == ""
+    assert rows_refresh == 8
 
 
 def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
@@ -126,15 +140,158 @@ def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
         lambda _code: pytest.fail("navigation clicks must not toggle visibility"),
     )
 
-    rows, status = playlists.load_playlist_overview_rows(
-        True,
-        False,
+    rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": "name"},
         0,
     )
 
-    assert rows is no_update
+    assert rows_refresh is no_update
+
+
+def test_playlists_overview_visibility_callback_ignores_phantom_initial_fire(
+    monkeypatch,
+):
+    _trigger(monkeypatch, None)
+    monkeypatch.setattr(
+        playlists,
+        "toggle_playlist_visibility",
+        lambda _code: pytest.fail("phantom initial fire must not toggle visibility"),
+    )
+
+    assert playlists.update_playlist_visibility(None, 3) is no_update
+
+
+def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
+    state = [_warmup_snapshot()]
+    monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
+
+    disabled, status, generation = playlists.control_playlist_overview_warmup(1, 0, 0)
+    assert disabled is True
+    assert status == ""
+    assert generation == 0
+
+    _trigger(monkeypatch, "playlists-overview-grid")
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", lambda _code: True)
+
+    def enqueue(_code):
+        state[0] = _warmup_snapshot(
+            queued_names=("Scenario",),
+            remaining_count=1,
+            enqueue_generation=1,
+        )
+        return 1
+
+    monkeypatch.setattr(playlists, "enqueue_playlist_percentile_warmup", enqueue)
+    rows_refresh = playlists.update_playlist_visibility(
+        {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
+        0,
+    )
+
+    disabled, status, generation = playlists.control_playlist_overview_warmup(
+        1, rows_refresh, 0
+    )
+    assert rows_refresh == 1
+    assert disabled is False
+    assert status == "Updating percentile data: 1 remaining"
+    assert generation == 1
+
+
+def test_older_warmup_generation_cannot_disable_newer_rearm(monkeypatch):
+    monkeypatch.setattr(
+        playlists,
+        "get_percentile_warmup_state",
+        lambda: _warmup_snapshot(enqueue_generation=2),
+    )
+
+    disabled, status, generation = playlists.control_playlist_overview_warmup(7, 4, 3)
+
+    assert disabled is False
     assert status is no_update
+    assert generation == 3
+
+
+def test_warmup_status_formats_eta_pause_and_fatal_state(monkeypatch):
+    state = [
+        _warmup_snapshot(
+            queued_names=("A", "B", "C"),
+            remaining_count=3,
+            enqueue_generation=1,
+            recent_pace_seconds=50,
+        )
+    ]
+    monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
+
+    disabled, status, _generation = playlists.control_playlist_overview_warmup(1, 0, 0)
+    assert disabled is False
+    assert status == "Updating percentile data: 3 remaining (~3 min)"
+
+    state[0] = _warmup_snapshot(
+        queued_names=("A",),
+        remaining_count=1,
+        paused_until=datetime.now(UTC) + timedelta(minutes=2),
+        enqueue_generation=1,
+    )
+    _disabled, status, _generation = playlists.control_playlist_overview_warmup(2, 0, 1)
+    assert status.startswith("Updating percentile data: 1 remaining · paused;")
+    assert "retrying at" in status
+
+    state[0] = _warmup_snapshot(fatal_state="unknown username")
+    disabled, status, _generation = playlists.control_playlist_overview_warmup(3, 0, 0)
+    assert disabled is True
+    assert status == "Percentile update stopped: unknown username"
+
+
+def test_interval_rebuild_does_not_record_interactive_activity(monkeypatch):
+    _trigger(monkeypatch, "playlists-overview-warmup-interval")
+    seen_record_activity = []
+
+    def fake_build(include_hidden=False, *, record_activity=True):
+        seen_record_activity.append(record_activity)
+        return [{"code": "KovaaKsTestCode"}]
+
+    monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
+
+    rows, status = playlists.load_playlist_overview_rows(True, False, 0, 1)
+
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    assert status == ""
+    assert seen_record_activity == [False]
+
+
+def test_final_in_flight_item_keeps_interval_enabled_until_last_rebuild(monkeypatch):
+    state = [
+        _warmup_snapshot(
+            in_flight="Final",
+            remaining_count=1,
+            enqueue_generation=1,
+        )
+    ]
+    monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
+
+    disabled, _status, generation = playlists.control_playlist_overview_warmup(1, 0, 1)
+    assert disabled is False
+
+    cache_write_complete = True
+    state[0] = _warmup_snapshot(enqueue_generation=1)
+    _trigger(monkeypatch, "playlists-overview-warmup-interval")
+
+    def build_after_write(include_hidden=False, *, record_activity=True):
+        assert cache_write_complete is True
+        assert record_activity is False
+        return [{"code": "KovaaKsTestCode", "percentile": "ready"}]
+
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        build_after_write,
+    )
+    rows, _status = playlists.load_playlist_overview_rows(True, False, 0, 2)
+    disabled, _status, _generation = playlists.control_playlist_overview_warmup(
+        2, 0, generation
+    )
+
+    assert rows[0]["percentile"] == "ready"
+    assert disabled is True
 
 
 def test_playlists_overview_page_reports_empty_database(monkeypatch):
@@ -142,7 +299,7 @@ def test_playlists_overview_page_reports_empty_database(monkeypatch):
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",
-        lambda include_hidden=False: [],
+        lambda include_hidden=False, *, record_activity=True: [],
     )
 
     rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
@@ -156,7 +313,7 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",
-        lambda include_hidden=False: (
+        lambda include_hidden=False, *, record_activity=True: (
             [{"code": "KovaaKsTestCode", "hidden": True}] if include_hidden else []
         ),
     )
@@ -477,6 +634,7 @@ def test_playlists_overview_layout_includes_quick_filter_input():
 
 
 def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-button")
     # KovaaK's canonicalizes pasted codes; the stored code is what visibility
     # must persist, or a non-canonical paste imports hidden once a
     # preferences file exists.
@@ -508,7 +666,21 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
     assert value == ""
 
 
+def test_import_playlist_ignores_phantom_initial_fire(monkeypatch):
+    _trigger(monkeypatch, None)
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: pytest.fail("phantom initial fire must not import"),
+    )
+
+    result = playlists.import_playlist(None, "KovaaKsTestCode", 2)
+
+    assert result == (no_update, no_update, no_update, no_update)
+
+
 def test_import_playlist_failure_does_not_show(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-button")
     monkeypatch.setattr(
         playlists, "load_playlist_from_code", lambda _code: ("boom", None)
     )
@@ -532,6 +704,7 @@ def test_import_playlist_failure_does_not_show(monkeypatch):
 
 
 def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-button")
     monkeypatch.setattr(
         playlists,
         "load_playlist_from_code",
@@ -560,6 +733,7 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
 
 
 def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-button")
     monkeypatch.setattr(
         playlists,
         "load_playlist_from_code",
@@ -583,7 +757,9 @@ def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",
-        lambda include_hidden=False: [{"code": "KovaaKsTestCode"}],
+        lambda include_hidden=False, *, record_activity=True: [
+            {"code": "KovaaKsTestCode"}
+        ],
     )
 
     rows, status = playlists.load_playlist_overview_rows(True, False, None, 1)
@@ -726,6 +902,18 @@ def test_playlists_overview_layout_includes_relative_time_refresh_interval():
     assert "playlists-overview-relative-time-refresh" in children_by_id
     assert interval.interval == 30_000
     assert interval.n_intervals == 0
+
+
+def test_playlists_overview_layout_includes_enable_only_warmup_interval():
+    page = playlists.layout()
+    children_by_id = {getattr(child, "id", None): child for child in page.children}
+
+    interval = children_by_id["playlists-overview-warmup-interval"]
+
+    assert "playlists-overview-warmup-generation" in children_by_id
+    assert interval.interval == playlists.WARMUP_REFRESH_INTERVAL_MS
+    assert interval.n_intervals == 0
+    assert interval.disabled is True
 
 
 def test_playlist_scenarios_cell_click_callback_builds_home_link():
