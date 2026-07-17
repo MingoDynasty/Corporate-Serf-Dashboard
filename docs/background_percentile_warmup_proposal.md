@@ -171,10 +171,13 @@ any user-facing path.
   server-side worker, never a disabled browser interval — but the
   interval's `disabled` property gets a single callback owner, no
   `allow_duplicate`: one callback, fed by both the interval tick and the
-  refresh store the R6 unhide/import callbacks already bump, computes
-  `disabled` from current worker state tagged with an enqueue generation
-  counter, so a response computed against an older generation can never
-  override a newer rearm. (Two independent writers would race: Dash does
+  `playlists-rows-refresh` store, computes `disabled` from current worker
+  state tagged with an enqueue generation counter, so a response computed
+  against an older generation can never override a newer rearm. One wiring
+  gap to close during implementation: only the import callback bumps that
+  store today — the unhide path is a branch inside the row-load callback
+  that toggles visibility without touching the store — so the warmup PR
+  adds an explicit post-enqueue bump on the unhide path. (Two independent writers would race: Dash does
   not order duplicate-output updates, and an idle-tick `disabled=True`
   landing after an enqueue's rearm would freeze live updates invisibly —
   the exact failure the rearm exists to prevent.) Automated
@@ -337,6 +340,36 @@ Contract points:
 - Empty stats directory (brand-new user): the queue is empty; nothing to warm
   and nothing to display anyway. "Cleared local stats but has KovaaK's
   history" is explicitly unsupported.
+
+## Implementation acceptance tests
+
+Consolidated from the review rounds. These pin behavior the register
+promises but only a test can enforce; each maps to one of the
+implementation PRs.
+
+- A stale `unknown_username` marker plus a network failure still raises
+  `UnknownKovaaksUserError` — the stale-cache fallback must not launder the
+  marker into "valid user, zero plays" (R14).
+- An interval response computed against an older enqueue generation cannot
+  re-disable the interval after a newer rearm (R13).
+- The worker still reports busy while the final dequeued item's fetch and
+  cache write are in flight; the last row rebuild happens after that write
+  (R13).
+- Worker idle, then unhide: the browser interval re-arms and live updates
+  resume — this exercises the new store bump on the unhide path (R6/R13).
+- Worker cache writes go through the monotonic save path: a concurrent
+  newer result is preserved, and a rejected stale candidate neither
+  refreshes cache metadata nor retries unboundedly (R7).
+- With an empty `kovaaks_username` or `percentile_warmup_enabled = false`,
+  startup performs no queue enumeration and no network requests (R15).
+- Automated overview rebuilds pass `record_activity=False`, so the
+  reporting interval never postpones the worker it reports on (R13).
+- A mixed RANKED/UNRANKED playlist renders aggregates only once every
+  played scenario is display-resolved; an all-UNRANKED complete playlist
+  shows a plain `N/A` (R18).
+- Duplicate scenario names — spam unhide, repeated imports, a playlist that
+  repeats a scenario — neither re-fire requests nor inflate the remaining
+  counter (R5/R12).
 
 ## Out of scope
 
