@@ -425,7 +425,8 @@ def _ordered_played_scenarios(
             item[0],
         )
     )
-    return [scenario_name for _, scenario_name, _ in played]
+    # A playlist can list the same scenario more than once; queue it once.
+    return list(dict.fromkeys(scenario_name for _, scenario_name, _ in played))
 
 
 def _startup_queue(config: ConfigData) -> list[str]:
@@ -452,14 +453,30 @@ def _startup_queue(config: ConfigData) -> list[str]:
         )
     )
     queue: list[str] = []
+    queued: set[str] = set()
     for _, playlist_name, playlist_code, scenarios in batches:
-        logger.info(
-            "Percentile warmup queued playlist %s (%s): %d played scenarios",
-            playlist_name,
-            playlist_code,
-            len(scenarios),
-        )
-        queue.extend(scenarios)
+        # Scenarios shared with a more recent playlist are already queued;
+        # enqueue each scenario once so queue counts match unique scenarios.
+        new_names = [name for name in scenarios if name not in queued]
+        queued.update(new_names)
+        duplicates = len(scenarios) - len(new_names)
+        if duplicates:
+            logger.info(
+                "Percentile warmup queued playlist %s (%s): %d played scenarios "
+                "(%d already queued)",
+                playlist_name,
+                playlist_code,
+                len(new_names),
+                duplicates,
+            )
+        else:
+            logger.info(
+                "Percentile warmup queued playlist %s (%s): %d played scenarios",
+                playlist_name,
+                playlist_code,
+                len(new_names),
+            )
+        queue.extend(new_names)
     return queue
 
 
@@ -536,6 +553,10 @@ class PercentileWarmupWorker:
         with self._condition:
             if self._fatal_state is not None:
                 return 0
+            # Move-to-front rather than duplicate: drop any queued occurrence
+            # of the prepended names so each scenario is queued at most once.
+            prepended = set(scenarios)
+            self._queue = deque(name for name in self._queue if name not in prepended)
             for scenario_name in reversed(scenarios):
                 self._queue.appendleft(scenario_name)
             self._enqueue_generation += 1

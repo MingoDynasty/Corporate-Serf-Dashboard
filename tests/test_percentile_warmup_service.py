@@ -66,6 +66,32 @@ def test_startup_queue_groups_recent_playlists_and_prioritizes_missing_percentil
     assert warmup._startup_queue(_config()) == ["B", "A", "C", "D"]
 
 
+def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
+    # "A" is listed twice inside Recent; "Shared" appears in both playlists.
+    playlists = {
+        "Recent": _playlist("Recent playlist", "Recent", "A", "A", "Shared"),
+        "Older": _playlist("Older playlist", "Older", "Shared", "C"),
+    }
+    stats = {"A": _stats(10), "Shared": _stats(5), "C": _stats(4)}
+    monkeypatch.setattr(warmup, "get_shown_playlist_codes", lambda: set(playlists))
+    monkeypatch.setattr(warmup, "get_playlist_by_code", playlists.get)
+    monkeypatch.setattr(warmup, "get_scenario_stats_snapshot", lambda: stats)
+    monkeypatch.setattr(
+        warmup,
+        "_has_displayable_percentile",
+        lambda _scenario_name, _config: False,
+    )
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert warmup._startup_queue(_config()) == ["A", "Shared", "C"]
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert (
+        "Percentile warmup queued playlist Older playlist (Older): "
+        "1 played scenarios (1 already queued)"
+    ) in messages
+
+
 def test_snapshot_deduplicates_queue_and_counts_in_flight_once():
     worker = warmup.PercentileWarmupWorker(
         _config(),
@@ -116,6 +142,28 @@ def test_enqueue_batch_prepends_in_order_and_bumps_generation(monkeypatch):
     state = worker.snapshot()
     assert state.queued_names == ("B", "A", "Tail")
     assert state.enqueue_generation == 1
+
+
+def test_enqueue_moves_already_queued_scenarios_to_front(monkeypatch):
+    playlist = _playlist("New", "Code", "A", "B")
+    monkeypatch.setattr(warmup, "get_playlist_by_code", lambda _code: playlist)
+    monkeypatch.setattr(
+        warmup,
+        "get_scenario_stats_snapshot",
+        lambda: {"A": _stats(10), "B": _stats(1)},
+    )
+    monkeypatch.setattr(
+        warmup,
+        "_has_displayable_percentile",
+        lambda scenario_name, _config: scenario_name == "A",
+    )
+    worker = warmup.PercentileWarmupWorker(_config(), ["Tail", "A"])
+
+    assert worker.enqueue_playlist("Code") == 2
+
+    # "A" was already queued behind "Tail"; the prepend moves it to the
+    # front instead of queueing a duplicate entry.
+    assert worker.snapshot().queued_names == ("B", "A", "Tail")
 
 
 def test_progress_heartbeat_logs_every_tenth_completed_item(caplog):
