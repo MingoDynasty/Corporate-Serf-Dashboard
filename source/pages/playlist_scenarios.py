@@ -87,7 +87,7 @@ TABLE_COLUMN_DEFS = [
             )
         },
         "cellClass": {
-            "function": "params.value == null ? null : 'last-played-affordance'"
+            "function": "params.value == null ? null : 'cell-tooltip-affordance'"
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,

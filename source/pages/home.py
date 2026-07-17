@@ -316,7 +316,7 @@ def get_scenario_num_runs(
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
         format_absolute_timestamp(scenario_stats.date_last_played),
-        "last-played-affordance",
+        "cell-tooltip-affordance",
         0,
         False,
     )

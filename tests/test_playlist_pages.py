@@ -852,11 +852,19 @@ def test_playlists_overview_percentile_placeholders_are_dimmed_and_explained():
 
     for field in ["median_percentile_sort", "lowest_percentile_sort"]:
         column = columns[field]
-        assert column["cellClass"] == {"function": playlists.PERCENTILE_CELL_CLASS}
-        assert "percentile_aggregates_resolved" in column["cellClass"]["function"]
+        cell_class = column["cellClass"]["function"]
+        assert "percentile_aggregates_resolved" in cell_class
+        assert "playlist-overview-percentile-placeholder" in cell_class
         tooltip = column["tooltipValueGetter"]["function"]
         assert "played_count" in tooltip
         assert "open the playlist to fetch now" in tooltip
+
+    assert columns["median_percentile_sort"]["cellClass"] == {
+        "function": playlists.PERCENTILE_CELL_CLASS
+    }
+    assert columns["lowest_percentile_sort"]["cellClass"] == {
+        "function": playlists.LOWEST_PERCENTILE_CELL_CLASS
+    }
 
     assert columns["median_percentile_sort"]["tooltipValueGetter"] == {
         "function": playlists.PERCENTILE_TOOLTIP
@@ -864,6 +872,16 @@ def test_playlists_overview_percentile_placeholders_are_dimmed_and_explained():
     assert columns["lowest_percentile_sort"]["tooltipValueGetter"] == {
         "function": playlists.LOWEST_PERCENTILE_TOOLTIP
     }
+
+
+def test_playlists_overview_lowest_percentile_values_signal_their_tooltip():
+    # The "Lowest: <scenario>" detail is hover-only, so a resolved value must
+    # carry the dotted-underline affordance — otherwise nobody knows to hover.
+    assert playlists.LOWEST_PERCENTILE_CELL_CLASS == (
+        "params.data.percentile_aggregates_resolved"
+        " ? (params.value == null ? null : 'cell-tooltip-affordance')"
+        " : 'playlist-overview-percentile-placeholder'"
+    )
 
 
 def test_playlists_overview_visibility_column_has_reversibility_tooltip():
@@ -1484,7 +1502,7 @@ def test_playlist_scenarios_last_played_has_immediate_tooltip_affordance():
     grid = playlist_scenarios.layout("KovaaKsTestCode").children[-1]
 
     assert column["cellClass"] == {
-        "function": "params.value == null ? null : 'last-played-affordance'"
+        "function": "params.value == null ? null : 'cell-tooltip-affordance'"
     }
     assert column["tooltipValueGetter"] == {
         "function": (

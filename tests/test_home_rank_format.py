@@ -287,7 +287,7 @@ def test_get_scenario_num_runs_with_play_data(monkeypatch):
         last_played.timestamp(),
         "Never",
         "Jun 30, 2026, 9:05 AM",
-        "last-played-affordance",
+        "cell-tooltip-affordance",
         0,
         False,
     )

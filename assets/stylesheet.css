@@ -80,7 +80,10 @@
     min-height: 20rem;
 }
 
-.last-played-affordance {
+/* Grid cells whose value carries hover-only detail (exact timestamps on Last
+   Played, the weakest scenario on Lowest Percentile). The dotted underline
+   plus help cursor signals "there is more on hover". */
+.cell-tooltip-affordance {
     cursor: help;
     text-decoration-line: underline;
     text-decoration-style: dotted;
