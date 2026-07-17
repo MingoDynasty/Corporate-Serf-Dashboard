@@ -27,20 +27,25 @@ def _format_int(value: int | None) -> str:
     return f"{value:,}"
 
 
-def _format_percentile_with_coverage(
+def _format_percentile_aggregate(
     value: float | None,
-    cached_count: int,
-    scenario_count: int,
+    resolved_count: int,
+    played_count: int,
 ) -> str:
-    # The coverage suffix keeps partial aggregates honest: a median over 2 of
-    # 20 scenarios must not read as playlist-wide truth.
+    if resolved_count != played_count:
+        return f"{resolved_count}/{played_count} cached"
     if value is None:
         return "N/A"
-    return f"{value:.2f}% · {cached_count}/{scenario_count}"
+    return f"{value:.2f}%"
 
 
-def _cached_rank_percentile(scenario_name: str) -> float | None:
-    """Read a scenario's cached percentile without any network I/O."""
+def _cached_rank_resolution(scenario_name: str) -> tuple[bool, float | None]:
+    """Classify one scenario from a single cache-only rank lookup.
+
+    UNRANKED is resolved without a percentile. RANKED is resolved only when
+    the totals cache supplied a percentile; UNKNOWN and cache read failures
+    remain unresolved.
+    """
     config = get_config()
     try:
         rank_info = get_scenario_rank_info(
@@ -58,10 +63,12 @@ def _cached_rank_percentile(scenario_name: str) -> float | None:
             scenario_name,
             exc_info=True,
         )
-        return None
-    if rank_info.status != ScenarioRankStatus.RANKED:
-        return None
-    return rank_info.percentile
+        return False, None
+    if rank_info.status == ScenarioRankStatus.UNRANKED:
+        return True, None
+    if rank_info.status == ScenarioRankStatus.RANKED:
+        return rank_info.percentile is not None, rank_info.percentile
+    return False, None
 
 
 def format_playlist_overview_row(
@@ -84,10 +91,11 @@ def format_playlist_overview_row(
     stalest_played: datetime | None = None
     stalest_scenario: str | None = None
     percentiles: list[tuple[float, str]] = []
+    resolved_count = 0
     for scenario_name in scenario_names:
-        # Percentile aggregates cover played scenarios with cached rank info
-        # (proposal R9): a scenario ranked in cache but absent locally (e.g.
-        # pruned CSVs) is excluded, so coverage can never exceed Played.
+        # Percentile aggregates cover played scenarios (proposal R2/R18): a
+        # scenario ranked in cache but absent locally (e.g. pruned CSVs) is
+        # excluded, so resolution can never exceed Played.
         stats = stats_by_scenario.get(scenario_name)
         if stats is None:
             continue
@@ -98,20 +106,22 @@ def format_playlist_overview_row(
         if stalest_played is None or stats.date_last_played < stalest_played:
             stalest_played = stats.date_last_played
             stalest_scenario = scenario_name
-        percentile = _cached_rank_percentile(scenario_name)
+        resolved, percentile = _cached_rank_resolution(scenario_name)
+        if resolved:
+            resolved_count += 1
         if percentile is not None:
             percentiles.append((percentile, scenario_name))
 
+    percentile_aggregates_resolved = resolved_count == played_count
     median_percentile: float | None = None
     lowest_percentile: float | None = None
     lowest_scenario: str | None = None
-    if percentiles:
+    if percentile_aggregates_resolved and percentiles:
         median_percentile = statistics.median(
             [percentile for percentile, _ in percentiles]
         )
         lowest_percentile, lowest_scenario = min(percentiles)
 
-    cached_count = len(percentiles)
     is_benchmark = any(scenario.ranks for scenario in playlist.scenarios)
     return {
         "name": display_label,
@@ -119,6 +129,7 @@ def format_playlist_overview_row(
         "type_display": "Benchmark" if is_benchmark else "Playlist",
         "played_display": f"{played_count}/{scenario_count}",
         "played_sort": (played_count / scenario_count) if scenario_count else None,
+        "played_count": played_count,
         "runs_display": _format_int(total_runs),
         "runs_sort": total_runs,
         "last_played_sort": (
@@ -128,16 +139,17 @@ def format_playlist_overview_row(
         "stalest_sort": (
             stalest_played.timestamp() if stalest_played is not None else None
         ),
-        "median_percentile_display": _format_percentile_with_coverage(
+        "percentile_aggregates_resolved": percentile_aggregates_resolved,
+        "median_percentile_display": _format_percentile_aggregate(
             median_percentile,
-            cached_count,
-            scenario_count,
+            resolved_count,
+            played_count,
         ),
         "median_percentile_sort": median_percentile,
-        "lowest_percentile_display": _format_percentile_with_coverage(
+        "lowest_percentile_display": _format_percentile_aggregate(
             lowest_percentile,
-            cached_count,
-            scenario_count,
+            resolved_count,
+            played_count,
         ),
         "lowest_percentile_sort": lowest_percentile,
         "lowest_scenario": lowest_scenario,

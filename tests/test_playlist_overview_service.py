@@ -125,14 +125,16 @@ def test_format_playlist_overview_row_aggregates_played_and_cached_scenarios(
         "type_display": "Benchmark",
         "played_display": "2/3",
         "played_sort": 2 / 3,
+        "played_count": 2,
         "runs_display": "30",
         "runs_sort": 30,
         "last_played_sort": datetime(2026, 6, 3, 12, 0, 0).timestamp(),
         "stalest_scenario": "First",
         "stalest_sort": datetime(2026, 4, 1, 12, 0, 0).timestamp(),
-        "median_percentile_display": "80.50% · 2/3",
+        "percentile_aggregates_resolved": True,
+        "median_percentile_display": "80.50%",
         "median_percentile_sort": 80.5,
-        "lowest_percentile_display": "70.50% · 2/3",
+        "lowest_percentile_display": "70.50%",
         "lowest_percentile_sort": 70.5,
         "lowest_scenario": "Third",
     }
@@ -152,11 +154,13 @@ def test_format_playlist_overview_row_never_played(monkeypatch):
     assert row["type_display"] == "Playlist"
     assert row["played_display"] == "0/2"
     assert row["played_sort"] == 0
+    assert row["played_count"] == 0
     assert row["runs_display"] == "0"
     assert row["runs_sort"] == 0
     assert row["last_played_sort"] is None
     assert row["stalest_scenario"] is None
     assert row["stalest_sort"] is None
+    assert row["percentile_aggregates_resolved"] is True
     assert row["median_percentile_display"] == "N/A"
     assert row["median_percentile_sort"] is None
     assert row["lowest_percentile_display"] == "N/A"
@@ -188,7 +192,78 @@ def _played_stats(*scenario_names):
     }
 
 
-def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch):
+def test_format_playlist_overview_row_complete_mixed_statuses_renders_aggregates(
+    monkeypatch,
+):
+    _configure(monkeypatch)
+    playlist = PlaylistData(
+        name="Mixed",
+        code="KovaaKsMixed",
+        scenarios=[
+            Scenario(name="High", ranks=RANKS),
+            Scenario(name="Low", ranks=RANKS),
+            Scenario(name="Unranked", ranks=RANKS),
+        ],
+    )
+    stats_by_scenario = _played_stats("High", "Low", "Unranked")
+    _install_cached_ranks(
+        monkeypatch,
+        {
+            "High": ScenarioRankInfo(
+                status=ScenarioRankStatus.RANKED,
+                rank=10,
+                total_players=100,
+                percentile=90.0,
+            ),
+            "Low": ScenarioRankInfo(
+                status=ScenarioRankStatus.RANKED,
+                rank=50,
+                total_players=100,
+                percentile=50.0,
+            ),
+            "Unranked": ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED),
+        },
+    )
+
+    row = format_playlist_overview_row("Mixed", playlist, stats_by_scenario)
+
+    assert row["percentile_aggregates_resolved"] is True
+    assert row["median_percentile_display"] == "70.00%"
+    assert row["median_percentile_sort"] == 70.0
+    assert row["lowest_percentile_display"] == "50.00%"
+    assert row["lowest_percentile_sort"] == 50.0
+    assert row["lowest_scenario"] == "Low"
+
+
+def test_format_playlist_overview_row_complete_all_unranked_is_decided_na(
+    monkeypatch,
+):
+    _configure(monkeypatch)
+    playlist = PlaylistData(
+        name="All Unranked",
+        code="KovaaKsAllUnranked",
+        scenarios=[Scenario(name="First"), Scenario(name="Second")],
+    )
+    stats_by_scenario = _played_stats("First", "Second")
+    _install_cached_ranks(
+        monkeypatch,
+        {
+            "First": ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED),
+            "Second": ScenarioRankInfo(status=ScenarioRankStatus.UNRANKED),
+        },
+    )
+
+    row = format_playlist_overview_row("All Unranked", playlist, stats_by_scenario)
+
+    assert row["percentile_aggregates_resolved"] is True
+    assert row["median_percentile_display"] == "N/A"
+    assert row["median_percentile_sort"] is None
+    assert row["lowest_percentile_display"] == "N/A"
+    assert row["lowest_percentile_sort"] is None
+    assert row["lowest_scenario"] is None
+
+
+def test_format_playlist_overview_row_gates_unresolved_scenarios(monkeypatch):
     _configure(monkeypatch)
     playlist = PlaylistData(
         name="Partial",
@@ -226,10 +301,12 @@ def test_format_playlist_overview_row_excludes_uncached_and_unranked(monkeypatch
 
     row = format_playlist_overview_row("Partial", playlist, stats_by_scenario)
 
-    assert row["median_percentile_display"] == "95.00% · 1/4"
-    assert row["median_percentile_sort"] == 95.0
-    assert row["lowest_percentile_display"] == "95.00% · 1/4"
-    assert row["lowest_scenario"] == "Cached"
+    assert row["percentile_aggregates_resolved"] is False
+    assert row["median_percentile_display"] == "2/4 cached"
+    assert row["median_percentile_sort"] is None
+    assert row["lowest_percentile_display"] == "2/4 cached"
+    assert row["lowest_percentile_sort"] is None
+    assert row["lowest_scenario"] is None
 
 
 def test_format_playlist_overview_row_excludes_ranked_but_unplayed_scenarios(
@@ -269,7 +346,9 @@ def test_format_playlist_overview_row_excludes_ranked_but_unplayed_scenarios(
     row = format_playlist_overview_row("Pruned", playlist, stats_by_scenario)
 
     assert row["played_display"] == "1/2"
-    assert row["median_percentile_display"] == "90.00% · 1/2"
+    assert row["played_count"] == 1
+    assert row["percentile_aggregates_resolved"] is True
+    assert row["median_percentile_display"] == "90.00%"
     assert row["lowest_percentile_sort"] == 90.0
     assert row["lowest_scenario"] == "Played"
 
@@ -305,7 +384,11 @@ def test_format_playlist_overview_row_isolates_cache_read_failures(monkeypatch):
 
     row = format_playlist_overview_row("Fragile", playlist, stats_by_scenario)
 
-    assert row["median_percentile_display"] == "95.00% · 1/2"
+    assert row["percentile_aggregates_resolved"] is False
+    assert row["median_percentile_display"] == "1/2 cached"
+    assert row["median_percentile_sort"] is None
+    assert row["lowest_percentile_display"] == "1/2 cached"
+    assert row["lowest_percentile_sort"] is None
 
 
 def test_build_playlist_overview_rows_uses_disambiguated_selector_labels(
