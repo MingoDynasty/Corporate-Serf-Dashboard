@@ -37,6 +37,7 @@ from source.kovaaks.data_service import (
 )
 from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
 from source.utilities.dash_logging import get_dash_logger
+from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -616,10 +617,12 @@ class PercentileWarmupWorker:
             )
             return
         logger.info(
-            "Percentile warmup progress: processed=%d remaining=%d eta=%.0fs",
+            "Percentile warmup progress: processed=%d remaining=%d (~%s)",
             processed,
             state.remaining_count,
-            state.remaining_count * state.recent_pace_seconds,
+            format_approximate_duration(
+                state.remaining_count * state.recent_pace_seconds
+            ),
         )
 
     def _next_item(self) -> str | None:

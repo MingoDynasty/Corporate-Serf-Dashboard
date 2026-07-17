@@ -153,7 +153,7 @@ def test_progress_heartbeat_logs_every_tenth_completed_item(caplog):
     message = records[0].getMessage()
     assert "processed=10" in message
     assert "remaining=2" in message
-    assert "eta=" in message
+    assert "(~<1 min)" in message
 
 
 def test_run_logs_initial_queue_size_before_processing(caplog):

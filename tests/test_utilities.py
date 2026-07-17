@@ -1,8 +1,11 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytest
+
 from source.utilities.utilities import (
     format_absolute_timestamp,
+    format_approximate_duration,
     format_decimal,
     ordinal,
 )
@@ -56,3 +59,20 @@ def test_format_absolute_timestamp_include_seconds() -> None:
         format_absolute_timestamp(datetime(2026, 4, 9, 19, 4, 22), include_seconds=True)
         == "Apr 9, 2026, 7:04:22 PM"
     )
+
+
+@pytest.mark.parametrize(
+    ("seconds", "expected"),
+    [
+        (0, "<1 min"),
+        (59.9, "<1 min"),
+        (60, "1 min"),
+        (61, "2 min"),
+        (254, "5 min"),
+        (3600, "1 hr"),
+        (5940, "1 hr 39 min"),
+        (98765, "27 hr 27 min"),
+    ],
+)
+def test_format_approximate_duration(seconds: float, expected: str) -> None:
+    assert format_approximate_duration(seconds) == expected
