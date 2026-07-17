@@ -466,7 +466,10 @@ def _run_playlist_scenario_fill(
 
         if playlist_code and not cancel_event.is_set():
             max_workers = max(1, PLAYLIST_RANK_MAX_WORKERS)
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            with ThreadPoolExecutor(
+                max_workers=max_workers,
+                thread_name_prefix="playlist-fetch",
+            ) as executor:
                 futures = [
                     executor.submit(
                         _fetch_fill_row,
