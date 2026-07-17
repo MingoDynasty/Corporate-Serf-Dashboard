@@ -49,7 +49,7 @@ def configure_logging() -> None:
     """Configure stdout and rotating file logging for the app process."""
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.INFO)
 
     logging.basicConfig(
         level=logging.DEBUG,
