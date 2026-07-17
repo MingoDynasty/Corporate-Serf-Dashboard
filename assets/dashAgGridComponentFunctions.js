@@ -42,12 +42,18 @@ dagcomponentfuncs.VisibilityAction = function (props) {
 // playlists are deletable (bundled benchmarks offer hide instead), so this
 // renders nothing for non-deletable rows. The click is handled server-side
 // via the grid's cellClicked payload (colId "deletable"), which opens a
-// confirmation modal; this renderer only draws the link-styled label.
+// confirmation modal; this renderer only draws the trash icon (masked SVG,
+// styled by the .delete-action rules in stylesheet.css). The icon has no
+// text label, so the column's tooltip carries the click consequence.
 dagcomponentfuncs.DeleteAction = function (props) {
   if (!props.data || !props.data.deletable) {
     return null;
   }
-  return React.createElement("span", { className: "delete-action" }, "Delete");
+  return React.createElement("span", {
+    className: "delete-action",
+    role: "img",
+    "aria-label": "Delete",
+  });
 };
 
 // Shared ref binder wiring the hybrid click behavior on the navigation anchors

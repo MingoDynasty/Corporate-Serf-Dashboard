@@ -132,6 +132,13 @@ VISIBILITY_TOOLTIP = (
     " restore it later via Show hidden'"
 )
 
+# The delete icon carries no text label, so the tooltip supplies the click
+# consequence. Bundled rows render no icon; return null there so no tooltip
+# shows on the empty cell.
+DELETE_TOOLTIP = (
+    "params.data.deletable ? 'Delete this playlist (asks to confirm)' : null"
+)
+
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
@@ -244,6 +251,7 @@ TABLE_COLUMN_DEFS = [
         "headerName": "",
         "field": DELETE_COLUMN_ID,
         "cellRenderer": "DeleteAction",
+        "tooltipValueGetter": {"function": DELETE_TOOLTIP},
         "sortable": False,
         "resizable": False,
         "minWidth": 90,
