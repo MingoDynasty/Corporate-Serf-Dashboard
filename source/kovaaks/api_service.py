@@ -1273,6 +1273,7 @@ def _schedule_attempt(  # noqa: PLR0913
             attempt_index,
         ),
     )
+    timer.name = f"rank-refresh-{scenario_name}"
     timer.daemon = True
     timer.start()
 

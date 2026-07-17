@@ -27,7 +27,7 @@ from source.my_watchdog.file_watchdog import NewFileHandler
 
 # Logging setup
 LOG_DIR = Path("data") / "logs"
-LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
 LOG_MAX_BYTES = 5 * 1024 * 1024
 LOG_BACKUP_COUNT = 3
 
