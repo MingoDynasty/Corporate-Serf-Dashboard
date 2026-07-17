@@ -634,11 +634,30 @@ def test_playlists_overview_header_tooltips_cover_exactly_the_cryptic_columns():
     }
 
 
-def test_playlists_overview_percentile_header_tooltips_explain_coverage_suffix():
+def test_playlists_overview_percentile_header_tooltips_explain_resolution_gate():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
 
     for field in ["median_percentile_sort", "lowest_percentile_sort"]:
-        assert "N/M" in columns[field]["headerTooltip"]
+        assert "once every played scenario" in columns[field]["headerTooltip"]
+
+
+def test_playlists_overview_percentile_placeholders_are_dimmed_and_explained():
+    columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
+
+    for field in ["median_percentile_sort", "lowest_percentile_sort"]:
+        column = columns[field]
+        assert column["cellClass"] == {"function": playlists.PERCENTILE_CELL_CLASS}
+        assert "percentile_aggregates_resolved" in column["cellClass"]["function"]
+        tooltip = column["tooltipValueGetter"]["function"]
+        assert "played_count" in tooltip
+        assert "open the playlist to fetch now" in tooltip
+
+    assert columns["median_percentile_sort"]["tooltipValueGetter"] == {
+        "function": playlists.PERCENTILE_TOOLTIP
+    }
+    assert columns["lowest_percentile_sort"]["tooltipValueGetter"] == {
+        "function": playlists.LOWEST_PERCENTILE_TOOLTIP
+    }
 
 
 def test_playlists_overview_visibility_column_has_reversibility_tooltip():

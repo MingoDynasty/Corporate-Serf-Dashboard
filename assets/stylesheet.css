@@ -146,6 +146,13 @@ a.playlist-scenario-link-cell:hover {
     opacity: 0.55;
 }
 
+/* Percentile aggregates remain undecided until every played scenario has
+   cache data. The placeholder is deliberately motion-neutral because hidden
+   or terminal-failure rows may retain it indefinitely. */
+.playlist-overview-grid .playlist-overview-percentile-placeholder {
+    color: var(--mantine-color-dimmed);
+}
+
 /* Hide/Unhide eye toggle in the overview's visibility column
    (VisibilityAction renderer in dashAgGridComponentFunctions.js). The span is
    a masked SVG recolored via background-color, matching the local_icon

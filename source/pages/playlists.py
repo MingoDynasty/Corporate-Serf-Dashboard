@@ -86,8 +86,26 @@ LAST_PLAYED_TOOLTIP = (
     " + relativeTime(params.data.stalest_sort, 'Never')))"
 )
 
+PERCENTILE_PLACEHOLDER_TOOLTIP = (
+    "('Shown once all ' + params.data.played_count"
+    " + ' played scenarios have data — open the playlist to fetch now')"
+)
+
+PERCENTILE_TOOLTIP = (
+    "params.data.percentile_aggregates_resolved ? null : "
+    f"{PERCENTILE_PLACEHOLDER_TOOLTIP}"
+)
+
 LOWEST_PERCENTILE_TOOLTIP = (
-    "params.value == null ? null : ('Lowest: ' + params.data.lowest_scenario)"
+    "params.data.percentile_aggregates_resolved"
+    " ? (params.value == null ? null : ('Lowest: '"
+    " + params.data.lowest_scenario))"
+    f" : {PERCENTILE_PLACEHOLDER_TOOLTIP}"
+)
+
+PERCENTILE_CELL_CLASS = (
+    "params.data.percentile_aggregates_resolved"
+    " ? null : 'playlist-overview-percentile-placeholder'"
 )
 
 # The eye toggle acts immediately with no confirm step, so the hover copy
@@ -166,12 +184,13 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Median Percentile",
         "field": "median_percentile_sort",
         "headerTooltip": (
-            "Median leaderboard percentile across this playlist's scenarios "
-            "with a cached position. N/M = scenarios with a cached position "
-            "out of scenarios in the playlist - fills in as you open "
-            "playlists."
+            "Median leaderboard percentile across ranked scenarios you have "
+            "played. Shown once every played scenario has enough cached "
+            "leaderboard data."
         ),
         "valueFormatter": {"function": "params.data.median_percentile_display"},
+        "tooltipValueGetter": {"function": PERCENTILE_TOOLTIP},
+        "cellClass": {"function": PERCENTILE_CELL_CLASS},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 160,
@@ -180,12 +199,13 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Lowest Percentile",
         "field": "lowest_percentile_sort",
         "headerTooltip": (
-            "The playlist's weakest scenario by leaderboard percentile, over "
-            "the same N/M coverage as Median Percentile. Hover a value to see "
-            "which scenario."
+            "The weakest leaderboard percentile among ranked scenarios you "
+            "have played. Shown once every played scenario has enough cached "
+            "leaderboard data; hover a value to see which scenario."
         ),
         "valueFormatter": {"function": "params.data.lowest_percentile_display"},
         "tooltipValueGetter": {"function": LOWEST_PERCENTILE_TOOLTIP},
+        "cellClass": {"function": PERCENTILE_CELL_CLASS},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 160,
