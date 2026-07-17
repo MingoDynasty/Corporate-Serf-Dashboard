@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from datetime import UTC, datetime
@@ -115,6 +116,44 @@ def test_enqueue_batch_prepends_in_order_and_bumps_generation(monkeypatch):
     state = worker.snapshot()
     assert state.queued_names == ("B", "A", "Tail")
     assert state.enqueue_generation == 1
+
+
+def test_progress_heartbeat_logs_every_tenth_completed_item(caplog):
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["Left A", "Left B"],
+        sleep=lambda _seconds: None,
+    )
+    complete = warmup.WarmupStepResult(
+        warmup.StepDisposition.COMPLETE,
+        success=True,
+    )
+    terminal = warmup.WarmupStepResult(
+        warmup.StepDisposition.TERMINAL,
+        reason="gone",
+    )
+
+    def progress_records() -> list[logging.LogRecord]:
+        return [
+            record
+            for record in caplog.records
+            if "warmup progress" in record.getMessage()
+        ]
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        for index in range(warmup.PROGRESS_HEARTBEAT_EVERY_ITEMS - 1):
+            assert worker._apply_item_result(f"Done {index}", complete, 1.0)
+        # Only COMPLETE items advance the heartbeat cadence.
+        assert worker._apply_item_result("Gone", terminal, 1.0)
+        assert not progress_records()
+        assert worker._apply_item_result("Done last", complete, 1.0)
+
+    records = progress_records()
+    assert len(records) == 1
+    message = records[0].getMessage()
+    assert "processed=10" in message
+    assert "remaining=2" in message
+    assert "eta=" in message
 
 
 @pytest.mark.parametrize(
