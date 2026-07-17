@@ -1,7 +1,6 @@
 """Playlist-level overview page at the playlists landing route."""
 
 import logging
-import math
 
 import dash
 import dash_ag_grid as dag
@@ -38,6 +37,7 @@ from source.kovaaks.playlist_visibility_service import (
     show_playlist,
     toggle_playlist_visibility,
 )
+from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
 
@@ -327,19 +327,6 @@ def load_playlist_overview_rows(
     return rows, "", *warmup_outputs
 
 
-def _format_warmup_eta(seconds: float) -> str:
-    """Format a deliberately approximate queue ETA without false precision."""
-    if seconds < 60:
-        return "<1 min"
-    minutes = math.ceil(seconds / 60)
-    if minutes < 60:
-        return f"{minutes} min"
-    hours, remainder = divmod(minutes, 60)
-    if not remainder:
-        return f"{hours} hr"
-    return f"{hours} hr {remainder} min"
-
-
 def _format_retry_time(snapshot: PercentileWarmupSnapshot) -> str:
     """Render the worker's UTC deadline in the desktop's local time."""
     if snapshot.paused_until is None:
@@ -358,7 +345,7 @@ def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
         return f"{status} · paused; retrying at {_format_retry_time(snapshot)}"
     if snapshot.recent_pace_seconds is not None:
         eta = snapshot.remaining_count * snapshot.recent_pace_seconds
-        status += f" (~{_format_warmup_eta(eta)})"
+        status += f" (~{format_approximate_duration(eta)})"
     return status
 
 
