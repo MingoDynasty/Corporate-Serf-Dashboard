@@ -406,7 +406,6 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 id="playlist-scenarios-grid",
                 className="ag-theme-quartz playlist-scenarios-grid",
                 columnDefs=TABLE_COLUMN_DEFS,
-                rowData=[],
                 defaultColDef={
                     "resizable": True,
                     "sortable": True,

@@ -752,45 +752,37 @@ def layout(**kwargs):  # noqa: ARG001
                     ],
                 ),
             ),
-            dcc.Loading(
-                dag.AgGrid(
-                    id="playlists-overview-grid",
-                    className="ag-theme-quartz playlist-overview-grid",
-                    columnDefs=TABLE_COLUMN_DEFS,
-                    rowData=[],
-                    rowClassRules={
-                        "playlist-overview-row-hidden": "params.data.hidden",
-                    },
-                    defaultColDef={
-                        "resizable": True,
-                        "sortable": True,
-                        # Always reserve the sort-indicator slot (a faint
-                        # unsorted icon) so autoSize measures the header with
-                        # room for the arrow; clicking to sort then swaps the
-                        # icon in place instead of truncating the label to "…".
-                        "unSortIcon": True,
-                    },
-                    dashGridOptions={
-                        "animateRows": False,
-                        "tooltipShowDelay": 0,
-                        # Row ids carry the playlist code so any cell click can
-                        # navigate to /playlists/{code}.
-                        "getRowId": {"function": "params.data.code"},
-                    },
-                    columnSize="autoSize",
-                    columnSizeOptions=COLUMN_SIZE_OPTIONS,
-                    dangerously_allow_code=True,
-                    style={
-                        "height": "100%",
-                        "width": "100%",
-                        "minHeight": 300,
-                    },
-                ),
-                parent_style={
+            dag.AgGrid(
+                id="playlists-overview-grid",
+                className="ag-theme-quartz playlist-overview-grid",
+                columnDefs=TABLE_COLUMN_DEFS,
+                rowClassRules={
+                    "playlist-overview-row-hidden": "params.data.hidden",
+                },
+                defaultColDef={
+                    "resizable": True,
+                    "sortable": True,
+                    # Always reserve the sort-indicator slot (a faint
+                    # unsorted icon) so autoSize measures the header with
+                    # room for the arrow; clicking to sort then swaps the
+                    # icon in place instead of truncating the label to "…".
+                    "unSortIcon": True,
+                },
+                dashGridOptions={
+                    "animateRows": False,
+                    "tooltipShowDelay": 0,
+                    # Row ids carry the playlist code so any cell click can
+                    # navigate to /playlists/{code}.
+                    "getRowId": {"function": "params.data.code"},
+                },
+                columnSize="autoSize",
+                columnSizeOptions=COLUMN_SIZE_OPTIONS,
+                dangerously_allow_code=True,
+                style={
                     "flex": 1,
-                    "minHeight": 0,
-                    "display": "flex",
-                    "flexDirection": "column",
+                    "height": "100%",
+                    "width": "100%",
+                    "minHeight": 300,
                 },
             ),
         ],

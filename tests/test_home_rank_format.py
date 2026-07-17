@@ -128,8 +128,14 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
         for component in components
         if getattr(component, "id", None) == "last-played-tooltip"
     )
+    empty_value = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "last-played-empty-value"
+    )
 
-    assert last_played.children == "—"
+    assert last_played.children == ""
+    assert empty_value.data == ""
     assert getattr(last_played, "style", None) is None
     assert getattr(last_played, "className", None) is None
     assert getattr(last_played, "tabIndex", None) is None

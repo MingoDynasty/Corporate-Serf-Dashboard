@@ -6,6 +6,7 @@ from source.kovaaks.data_models import Rank, RunData
 from source.plot.plot_service import (
     _add_rank_overlays,
     generate_empty_plot,
+    generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
@@ -49,6 +50,18 @@ def test_generate_empty_plot_has_intentional_empty_state() -> None:
 
     assert "No scenario selected" in fig.layout.annotations[0].text
     assert fig.layout.annotations[1].text == "Select a scenario."
+    assert fig.layout.dragmode is False
+    assert fig.layout.xaxis.visible is False
+    assert fig.layout.yaxis.visible is False
+    assert len(fig.data) == 0
+
+
+def test_generate_placeholder_plot_is_neutral_and_transparent() -> None:
+    fig = generate_placeholder_plot()
+
+    assert not fig.layout.annotations
+    assert fig.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert fig.layout.plot_bgcolor == "rgba(0,0,0,0)"
     assert fig.layout.dragmode is False
     assert fig.layout.xaxis.visible is False
     assert fig.layout.yaxis.visible is False

@@ -4,7 +4,7 @@ import logging
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
 from source.utilities.dash_logging import log_handler
@@ -223,15 +223,17 @@ def layout(**kwargs):  # noqa: ARG001
     )
 
 
-@callback(
+clientside_callback(
+    """
+    (opened, navbar) => ({
+        ...navbar,
+        collapsed: {
+            mobile: !opened,
+            desktop: !opened,
+        },
+    })
+    """,
     Output("appshell", "navbar"),
     Input("burger", "opened"),
     State("appshell", "navbar"),
 )
-def toggle_navbar(opened, navbar):
-    """Synchronize the navbar's collapsed state with the burger control."""
-    navbar["collapsed"] = {
-        "mobile": not opened,
-        "desktop": not opened,
-    }
-    return navbar

@@ -61,7 +61,18 @@ def _walk_component_tree(component):
         yield from _walk_component_tree(child)
 
 
-def test_home_layout_initial_graph_has_empty_state(monkeypatch):
+def _assert_placeholder_figure(figure) -> None:
+    placeholder = go.Figure(figure)
+
+    assert not placeholder.layout.annotations
+    assert placeholder.layout.paper_bgcolor == "rgba(0,0,0,0)"
+    assert placeholder.layout.plot_bgcolor == "rgba(0,0,0,0)"
+    assert placeholder.layout.dragmode is False
+    assert placeholder.layout.xaxis.visible is False
+    assert placeholder.layout.yaxis.visible is False
+
+
+def test_home_layout_initial_graph_has_placeholder(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
@@ -80,32 +91,15 @@ def test_home_layout_initial_graph_has_empty_state(monkeypatch):
     figure = graph.figure
     cached_plot_data = json.loads(cached_plot.data)
 
-    assert "No scenario selected" in figure["layout"]["annotations"][0]["text"]
-    assert figure["layout"]["annotations"][1]["text"] == (
-        "Select a scenario to see your score history."
-    )
-    assert figure["layout"]["dragmode"] is False
-    assert figure["layout"]["xaxis"]["visible"] is False
-    assert figure["layout"]["yaxis"]["visible"] is False
-    assert (
-        "No scenario selected" in cached_plot_data["layout"]["annotations"][0]["text"]
-    )
-    assert cached_plot_data["layout"]["annotations"][1]["text"] == (
-        "Select a scenario to see your score history."
-    )
-    assert cached_plot_data["layout"]["dragmode"] is False
+    _assert_placeholder_figure(figure)
+    _assert_placeholder_figure(cached_plot_data)
 
 
-def test_graph_theme_callback_falls_back_to_initial_empty_state():
+def test_graph_theme_callback_falls_back_to_initial_placeholder():
     figure = home.apply_light_dark_theme_to_graph("light", None)
 
-    assert "No scenario selected" in figure.layout.annotations[0].text
-    assert figure.layout.annotations[1].text == (
-        "Select a scenario to see your score history."
-    )
-    assert figure.layout.dragmode is False
-    assert figure.layout.xaxis.visible is False
-    assert figure.layout.yaxis.visible is False
+    _assert_placeholder_figure(figure)
+    assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
 
 
 def test_drain_run_events_summarizes_single_scenario_backlog(monkeypatch):
