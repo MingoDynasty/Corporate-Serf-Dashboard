@@ -87,7 +87,18 @@ def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch)
 def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-grid")
     toggled = []
-    monkeypatch.setattr(playlists, "toggle_playlist_visibility", toggled.append)
+    enqueued = []
+
+    def show_on_toggle(code):
+        toggled.append(code)
+        return True
+
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", show_on_toggle)
+    monkeypatch.setattr(
+        playlists,
+        "enqueue_playlist_percentile_warmup",
+        enqueued.append,
+    )
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",
@@ -102,6 +113,7 @@ def test_playlists_overview_visibility_click_toggles_and_rebuilds(monkeypatch):
     )
 
     assert toggled == ["KovaaKsTestCode"]
+    assert enqueued == ["KovaaKsTestCode"]
     assert rows == [{"code": "KovaaKsTestCode"}]
     assert status == ""
 
@@ -474,13 +486,20 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
         lambda _code: (None, "CanonicalCode"),
     )
     shown = []
+    enqueued = []
     monkeypatch.setattr(playlists, "show_playlist", shown.append)
+    monkeypatch.setattr(
+        playlists,
+        "enqueue_playlist_percentile_warmup",
+        enqueued.append,
+    )
 
     notifications, import_refresh, opened, value = playlists.import_playlist(
         1, "  canonicalcode  ", 0
     )
 
     assert shown == ["CanonicalCode"]
+    assert enqueued == ["CanonicalCode"]
     assert notifications[0]["color"] == "green"
     # A successful import bumps the refresh store so the grid rebuilds, then
     # closes the modal and clears the field so the user sees the new row.

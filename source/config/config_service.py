@@ -29,6 +29,7 @@ class ConfigData:
     scenario_metadata_cache_ttl_hours: int = 24
     scenario_rank_cache_ttl_hours: int = 168
     leaderboard_total_cache_ttl_hours: int = 168
+    percentile_warmup_enabled: bool = True
     # gt=0: requests raises an unhandled ValueError on timeout<=0, so reject it
     # at config validation where the startup error message is actionable.
     kovaaks_api_timeout_seconds: Annotated[int, Field(gt=0)] = 30

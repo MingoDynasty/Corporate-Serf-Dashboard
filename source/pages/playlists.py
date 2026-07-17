@@ -25,6 +25,9 @@ from source.kovaaks.data_service import (
     get_user_root_playlist_codes,
     load_playlist_from_code,
 )
+from source.kovaaks.percentile_warmup_service import (
+    enqueue_playlist_percentile_warmup,
+)
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
 from source.kovaaks.playlist_visibility_service import (
     hide_playlist,
@@ -276,7 +279,9 @@ def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _rows_refre
             or not cell_clicked["rowId"]
         ):
             return no_update, no_update
-        toggle_playlist_visibility(cell_clicked["rowId"])
+        playlist_code = cell_clicked["rowId"]
+        if toggle_playlist_visibility(playlist_code):
+            enqueue_playlist_percentile_warmup(playlist_code)
 
     rows = build_playlist_overview_rows(include_hidden=bool(show_hidden))
     if not rows:
@@ -345,6 +350,7 @@ def import_playlist(_, playlist_to_import, rows_refresh):
     # here, but never persist a None into the shown-set if that ever changes.
     if canonical_code is not None:
         show_playlist(canonical_code)
+        enqueue_playlist_percentile_warmup(canonical_code)
     notification = {
         "action": "show",
         "title": "Notification",
