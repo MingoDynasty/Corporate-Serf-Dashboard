@@ -43,19 +43,19 @@ any user-facing path.
   visible playlist and have local runs are enqueued: nothing else can
   contribute a percentile to the overview (the aggregator skips unplayed
   scenarios; hidden playlists aren't rendered in the default view). The
-  temporary "Show hidden" management mode does render hidden rows with
-  cache-only aggregates; those stay unwarmed by design — muted row styling
-  plus the R18 coverage suffix mark the partial sample honestly, and
-  unhiding is precisely the promotion path that enqueues them (R6). The
+  temporary "Show hidden" management mode does render hidden rows; those
+  stay unwarmed by design and typically keep the R18 placeholder — muted
+  styling marks them as second-class, and unhiding is precisely the
+  promotion path that enqueues them (R6). The
   Home page's on-demand fetch covers everything outside this set. This
   bounds the worst case at "played and visible", not the user's full
   history.
 - **R3 — Playlist-completion ordering.** The startup queue is grouped by
   playlist (most recently played first); within a playlist, scenarios with no
   displayable percentile come first, then by last-played recency. Completing
-  one playlist at a time flips overview rows from "partial" to "trustworthy"
-  one by one, instead of leaving every row partially covered for the whole
-  warm.
+  one playlist at a time flips each row's aggregates from the R18
+  placeholder to a final value one by one, instead of leaving every row
+  undecided for the whole warm.
 - **R4 — Completion = fresh UNRANKED, or fresh RANKED plus fresh total.** A
   scenario is skipped at dequeue if its rank cache is TTL-fresh UNRANKED, or
   TTL-fresh RANKED with a TTL-fresh totals cache
@@ -151,8 +151,9 @@ any user-facing path.
   Timer chain uses.
 - **R12 — Status line: remaining-only.** The overview page shows
   "Updating percentile data: N remaining (~ETA)" where N counts unique
-  non-terminal names queued or in flight (spam-proof) and ETA = N × recent
-  average pace; during outage
+  non-terminal names queued or in flight (spam-proof), recomputed per tick
+  from a queue snapshot rather than incrementally refcounted, and ETA = N ×
+  recent average pace; during outage
   backoff it shows a paused note with the retry time. No done/total: the
   denominator is dynamic (unhides grow it, dedup shrinks it), so a ratio
   would visibly run backward. Transient failures never toast — a deliberate
@@ -238,18 +239,33 @@ any user-facing path.
 - **R17 — Logging.** DEBUG per item, INFO per playlist batch and per state
   change (backoff entered/exited, fatal stop), one INFO summary at
   completion.
-- **R18 — Coverage suffix = resolved/played.** The overview's percentile
-  cells change to `median · resolved/played` (shipped today:
-  cached-percentile count over `scenario_count`). Both ends move. The
-  denominator becomes played because unplayed scenarios can never
-  contribute (R2) and the Played column already carries `played/total` —
-  the old denominator left a fully-warmed 10-of-20-played row reading
-  `· 10/20` forever. The numerator counts *resolved* entries — fresh RANKED
-  or fresh UNRANKED — because R4 treats fresh UNRANKED as complete, so a
-  numerator of cached percentiles alone would leave any playlist containing
-  an unranked scenario permanently short of `n/n` with no work left to do.
-  The median itself still aggregates RANKED percentiles only; `n/n` is
-  exactly the R3 "trustworthy" state.
+- **R18 — All-or-nothing aggregates: resolution gates display.** The
+  overview's percentile aggregates render only when every played scenario
+  in the playlist is *display-resolved*; until then the cells show a
+  placeholder with the count (`… · 12/17`). No partial medians: a partial
+  median is the original complaint this proposal exists to fix — it skews,
+  it sorts 3-sample noise against 17-sample signal (the sort values stay
+  null until complete, so NULLS LAST keeps undecided rows out of the
+  ranking), and it changes under the user's eyes as the warmer lands
+  values; the placeholder's climbing count carries the progress signal
+  instead. Definitions: the numerator counts resolved entries over played
+  (unplayed can never contribute per R2, and the Played column already
+  carries `played/total`); *display*-resolved means a rank cache entry is
+  present — any age, matching the overview's TTL-free reads — and, for
+  RANKED entries, a totals entry present. This is deliberately weaker than
+  R4's TTL-fresh *worker* predicate: display tolerates stale (a week-stale
+  percentile is within display precision, per the decision log), the
+  worker repairs it. Presence-based resolution makes the complete state
+  monotonic — a row that reaches `n/n` never regresses on TTL expiry; only
+  playing a brand-new scenario briefly regresses it until the Timer chain
+  caches the first score. Placeholder ≠ N/A, mirroring the fill's
+  pending-vs-decided semantics: a complete playlist whose entries are all
+  UNRANKED shows `N/A · n/n` (decided — no percentile exists); `… · 12/17`
+  always means undecided. Hidden rows and terminal-failure rows simply
+  keep the placeholder; for failures, drill-in force-fetches the gaps, and
+  the count makes that discoverable. If real usage ever shows most rows
+  stuck incomplete, partial aggregates can return as a fallback — the
+  warmer exists to make that state rare.
 
 ## Coordination with progressive fill (shipped: PRs #114/#127)
 
