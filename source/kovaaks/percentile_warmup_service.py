@@ -498,9 +498,10 @@ class PercentileWarmupWorker:
         self._batch_processed = 0
         self._batch_terminal = 0
         self._batch_skipped = 0
-        # Names already accounted for this batch, so duplicate queue entries
-        # (one per playlist) don't inflate skipped past the deduplicated
-        # remaining count the progress heartbeat reports.
+        # Names already reflected in a summary counter (processed, terminal,
+        # or skipped) this batch, so duplicate queue entries don't inflate
+        # skipped past the deduplicated remaining count the progress heartbeat
+        # reports. A RETRY leaves its name unmarked: nothing counted it yet.
         self._batch_seen: set[str] = set()
 
     def start(self) -> threading.Thread:
@@ -646,7 +647,6 @@ class PercentileWarmupWorker:
                             self._batch_seen.add(scenario_name)
                             self._batch_skipped += 1
                         continue
-                    self._batch_seen.add(scenario_name)
                     self._in_flight = scenario_name
                     return scenario_name
                 self._log_completed_batch_locked()
@@ -736,6 +736,7 @@ class PercentileWarmupWorker:
             self._in_flight = None
             self._recent_paces.append(elapsed + POLITENESS_GAP_SECONDS)
             if result.disposition == StepDisposition.COMPLETE:
+                self._batch_seen.add(scenario_name)
                 self._batch_processed += 1
                 if self._batch_processed % PROGRESS_HEARTBEAT_EVERY_ITEMS == 0:
                     heartbeat_processed = self._batch_processed
@@ -745,6 +746,7 @@ class PercentileWarmupWorker:
                 outcome = _outcome(self.context, scenario_name)
                 outcome.terminal = True
                 outcome.reason = result.reason
+                self._batch_seen.add(scenario_name)
                 self._batch_terminal += 1
             elif result.disposition == StepDisposition.FATAL:
                 pass

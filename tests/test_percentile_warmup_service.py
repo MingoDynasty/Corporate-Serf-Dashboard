@@ -209,6 +209,49 @@ def test_completion_summary_counts_unique_scenarios(monkeypatch, caplog):
     )
 
 
+def test_retried_scenario_counts_as_skipped_when_cache_turns_fresh(
+    monkeypatch,
+    caplog,
+):
+    """A RETRY leaves no counter behind, so a later fresh skip must count."""
+    fresh: set[str] = set()
+    monkeypatch.setattr(
+        warmup,
+        "_freshly_satisfied",
+        lambda scenario_name, _config: scenario_name in fresh,
+    )
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A"],
+        sleep=lambda _seconds: None,
+    )
+
+    def _stop_worker(timeout=None):
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+
+    assert worker._next_item() == "A"
+    assert worker._apply_item_result(
+        "A",
+        warmup.WarmupStepResult(warmup.StepDisposition.RETRY),
+        1.0,
+    )
+    # Another caller (e.g. a UI rank fetch) refreshed the cache before the
+    # retry was dequeued.
+    fresh.add("A")
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert worker._next_item() is None
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(
+        message.startswith(
+            "Percentile warmup complete: processed=0 terminal=0 skipped=1 "
+        )
+        for message in messages
+    )
+
+
 def test_run_with_empty_queue_logs_zero_remaining(caplog):
     worker = warmup.PercentileWarmupWorker(_config(), [])
     worker._fatal_state = "stop"
