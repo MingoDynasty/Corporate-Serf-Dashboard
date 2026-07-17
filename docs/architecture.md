@@ -188,8 +188,9 @@ flowchart LR
 
 ### Entry & shell
 - `source/app.py` — entry point (`main`): wiring described above.
-- `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`,
-  `toggle_navbar`), theme toggle, Dash `page_container`, and the notification host.
+- `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
+  collapse applied by a clientside callback), theme toggle, Dash `page_container`,
+  and the notification host.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
