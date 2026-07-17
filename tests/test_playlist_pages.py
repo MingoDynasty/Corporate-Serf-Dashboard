@@ -84,7 +84,7 @@ def test_playlists_overview_page_loads_rows(monkeypatch):
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
     assert rows == expected_rows
     assert status == ""
@@ -101,7 +101,7 @@ def test_playlists_overview_show_hidden_switch_includes_hidden_rows(monkeypatch)
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
-    rows, _status = playlists.load_playlist_overview_rows(True, True, None, 0)
+    rows, _status, *_ = playlists.load_playlist_overview_rows(True, True, None, 0, 0)
 
     assert seen_include_hidden == [(True, True)]
     assert rows[0]["hidden"] is True
@@ -165,7 +165,7 @@ def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
     state = [_warmup_snapshot()]
     monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
 
-    disabled, status, generation = playlists.control_playlist_overview_warmup(1, 0, 0)
+    disabled, status, generation = playlists._playlist_overview_warmup_state(0)
     assert disabled is True
     assert status == ""
     assert generation == 0
@@ -187,9 +187,7 @@ def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
         0,
     )
 
-    disabled, status, generation = playlists.control_playlist_overview_warmup(
-        1, rows_refresh, 0
-    )
+    disabled, status, generation = playlists._playlist_overview_warmup_state(0)
     assert rows_refresh == 1
     assert disabled is False
     assert status == "Updating percentile data: 1 remaining"
@@ -203,7 +201,7 @@ def test_older_warmup_generation_cannot_disable_newer_rearm(monkeypatch):
         lambda: _warmup_snapshot(enqueue_generation=2),
     )
 
-    disabled, status, generation = playlists.control_playlist_overview_warmup(7, 4, 3)
+    disabled, status, generation = playlists._playlist_overview_warmup_state(3)
 
     assert disabled is False
     assert status is no_update
@@ -221,7 +219,7 @@ def test_warmup_status_formats_eta_pause_and_fatal_state(monkeypatch):
     ]
     monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
 
-    disabled, status, _generation = playlists.control_playlist_overview_warmup(1, 0, 0)
+    disabled, status, _generation = playlists._playlist_overview_warmup_state(0)
     assert disabled is False
     assert status == "Updating percentile data: 3 remaining (~3 min)"
 
@@ -231,12 +229,12 @@ def test_warmup_status_formats_eta_pause_and_fatal_state(monkeypatch):
         paused_until=datetime.now(UTC) + timedelta(minutes=2),
         enqueue_generation=1,
     )
-    _disabled, status, _generation = playlists.control_playlist_overview_warmup(2, 0, 1)
+    _disabled, status, _generation = playlists._playlist_overview_warmup_state(1)
     assert status.startswith("Updating percentile data: 1 remaining · paused;")
     assert "retrying at" in status
 
     state[0] = _warmup_snapshot(fatal_state="unknown username")
-    disabled, status, _generation = playlists.control_playlist_overview_warmup(3, 0, 0)
+    disabled, status, _generation = playlists._playlist_overview_warmup_state(0)
     assert disabled is True
     assert status == "Percentile update stopped: unknown username"
 
@@ -251,7 +249,7 @@ def test_interval_rebuild_does_not_record_interactive_activity(monkeypatch):
 
     monkeypatch.setattr(playlists, "build_playlist_overview_rows", fake_build)
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, 0, 1)
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, 0, 1, 0)
 
     assert rows == [{"code": "KovaaKsTestCode"}]
     assert status == ""
@@ -266,32 +264,45 @@ def test_final_in_flight_item_keeps_interval_enabled_until_last_rebuild(monkeypa
             enqueue_generation=1,
         )
     ]
-    monkeypatch.setattr(playlists, "get_percentile_warmup_state", lambda: state[0])
-
-    disabled, _status, generation = playlists.control_playlist_overview_warmup(1, 0, 1)
-    assert disabled is False
-
-    cache_write_complete = True
-    state[0] = _warmup_snapshot(enqueue_generation=1)
     _trigger(monkeypatch, "playlists-overview-warmup-interval")
+    events = []
+    cache_write_complete = [False]
+
+    def get_state():
+        events.append("snapshot")
+        return state[0]
+
+    monkeypatch.setattr(playlists, "get_percentile_warmup_state", get_state)
 
     def build_after_write(include_hidden=False, *, record_activity=True):
-        assert cache_write_complete is True
+        events.append("build")
         assert record_activity is False
-        return [{"code": "KovaaKsTestCode", "percentile": "ready"}]
+        percentile = "ready" if cache_write_complete[0] else "stale"
+        return [{"code": "KovaaKsTestCode", "percentile": percentile}]
 
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",
         build_after_write,
     )
-    rows, _status = playlists.load_playlist_overview_rows(True, False, 0, 2)
-    disabled, _status, _generation = playlists.control_playlist_overview_warmup(
-        2, 0, generation
+
+    rows, _status, disabled, _warmup_status, generation = (
+        playlists.load_playlist_overview_rows(True, False, 0, 1, 1)
+    )
+    assert rows[0]["percentile"] == "stale"
+    assert disabled is False
+    assert events == ["snapshot", "build"]
+
+    cache_write_complete[0] = True
+    state[0] = _warmup_snapshot(enqueue_generation=1)
+    events.clear()
+    rows, _status, disabled, _warmup_status, _generation = (
+        playlists.load_playlist_overview_rows(True, False, 0, 2, generation)
     )
 
     assert rows[0]["percentile"] == "ready"
     assert disabled is True
+    assert events == ["snapshot", "build"]
 
 
 def test_playlists_overview_page_reports_empty_database(monkeypatch):
@@ -302,7 +313,7 @@ def test_playlists_overview_page_reports_empty_database(monkeypatch):
         lambda include_hidden=False, *, record_activity=True: [],
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
     assert rows == []
     assert status == "No playlists are loaded."
@@ -318,7 +329,7 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
         ),
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None, 0)
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
     assert rows == []
     assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
@@ -762,7 +773,7 @@ def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
         ],
     )
 
-    rows, status = playlists.load_playlist_overview_rows(True, False, None, 1)
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 1, 0)
 
     assert rows == [{"code": "KovaaKsTestCode"}]
     assert status == ""

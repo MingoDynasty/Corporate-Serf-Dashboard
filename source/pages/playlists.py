@@ -290,13 +290,24 @@ def update_playlist_visibility(cell_clicked, rows_refresh):
 @callback(
     Output("playlists-overview-grid", "rowData"),
     Output("playlists-overview-status", "children"),
+    Output("playlists-overview-warmup-interval", "disabled"),
+    Output("playlists-overview-warmup-status", "children"),
+    Output("playlists-overview-warmup-generation", "data"),
     Input("playlists-overview-mounted", "data"),
     Input("playlists-overview-show-hidden", "checked"),
     Input("playlists-rows-refresh", "data"),
     Input("playlists-overview-warmup-interval", "n_intervals"),
+    State("playlists-overview-warmup-generation", "data"),
 )
-def load_playlist_overview_rows(_mounted, show_hidden, _rows_refresh, _warmup_tick):
-    """Build overview rows from local run data and rank caches (no network)."""
+def load_playlist_overview_rows(
+    _mounted,
+    show_hidden,
+    _rows_refresh,
+    _warmup_tick,
+    observed_generation,
+):
+    """Snapshot warmup state, then build cache-only rows before disabling."""
+    warmup_outputs = _playlist_overview_warmup_state(observed_generation)
     record_activity = ctx.triggered_id != "playlists-overview-warmup-interval"
     rows = build_playlist_overview_rows(
         include_hidden=bool(show_hidden),
@@ -307,9 +318,13 @@ def load_playlist_overview_rows(_mounted, show_hidden, _rows_refresh, _warmup_ti
             include_hidden=True,
             record_activity=record_activity,
         ):
-            return [], 'All playlists are hidden. Toggle "Show hidden" to manage them.'
-        return [], "No playlists are loaded."
-    return rows, ""
+            return (
+                [],
+                'All playlists are hidden. Toggle "Show hidden" to manage them.',
+                *warmup_outputs,
+            )
+        return [], "No playlists are loaded.", *warmup_outputs
+    return rows, "", *warmup_outputs
 
 
 def _format_warmup_eta(seconds: float) -> str:
@@ -347,20 +362,8 @@ def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
     return status
 
 
-@callback(
-    Output("playlists-overview-warmup-interval", "disabled"),
-    Output("playlists-overview-warmup-status", "children"),
-    Output("playlists-overview-warmup-generation", "data"),
-    Input("playlists-overview-warmup-interval", "n_intervals"),
-    Input("playlists-rows-refresh", "data"),
-    State("playlists-overview-warmup-generation", "data"),
-)
-def control_playlist_overview_warmup(
-    _n_intervals,
-    _rows_refresh,
-    observed_generation,
-):
-    """Own interval state and retain one final rebuild per enqueue generation."""
+def _playlist_overview_warmup_state(observed_generation):
+    """Compute interval outputs before the caller's sequenced row rebuild."""
     snapshot = get_percentile_warmup_state()
     observed_generation = (
         observed_generation if isinstance(observed_generation, int) else 0

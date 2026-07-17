@@ -212,8 +212,11 @@ flowchart LR
   caches and never triggers KovaaK's API calls. While the warmup worker is
   busy, a one-second interval rebuilds those rows with activity recording
   suppressed, shows remaining/ETA or paused/fatal state, and disables after a
-  final idle rebuild. One callback owns interval state and tracks the worker's
-  enqueue generation; the shared row-refresh store re-arms it after idle.
+  final idle rebuild. One callback snapshots worker state, rebuilds rows, then
+  returns the rows and interval state together; an idle snapshot therefore
+  precedes the final cache read and cannot race it. That callback tracks the
+  worker's enqueue generation, and the shared row-refresh store re-arms it
+  after idle.
   Also hosts the visibility controls: a per-row Hide/Unhide action cell and a
   "Show hidden" toggle that reveals hidden playlists as muted rows. Unhide
   prepends the playlist's played scenarios to warmup before bumping that
