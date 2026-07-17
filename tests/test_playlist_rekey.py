@@ -4,6 +4,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import requests
+from pydantic import ValidationError
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
@@ -334,6 +336,40 @@ def test_import_reports_write_failures_without_updating_database(
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
+
+
+def _validation_error() -> ValidationError:
+    """Build a genuine pydantic ``ValidationError`` for the API-garbage case."""
+    try:
+        PlaylistData.model_validate({})
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("expected PlaylistData.model_validate({}) to raise")
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        requests.HTTPError("400 Client Error: Bad Request"),
+        _validation_error(),
+    ],
+    ids=["http-error", "validation-error"],
+)
+def test_import_degrades_api_failure_to_refusal(monkeypatch, exc):
+    # A gibberish code makes KovaaK's return HTTP 400 (and a slow spell can
+    # time out or return schema-invalid JSON). The import flow must degrade any
+    # of these to a refusal naming the pasted code, never let it escape as a
+    # raw callback error.
+    def raise_exc(_code):
+        raise exc
+
+    monkeypatch.setattr(data_service, "get_playlist_data", raise_exc)
+
+    message, imported_code = data_service.load_playlist_from_code("zzzznotacode!!")
+
+    assert imported_code is None
+    assert message is not None
+    assert "zzzznotacode!!" in message
 
 
 def test_write_playlist_data_to_file_retries_transient_replace_errors(

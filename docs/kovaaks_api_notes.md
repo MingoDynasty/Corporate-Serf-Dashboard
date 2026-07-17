@@ -143,6 +143,11 @@ Observed behavior:
 - Returns playlist-level metadata and `scenarioList`.
 - `scenarioList` includes scenario names/authors/aim types.
 - Observed responses do not include `leaderboardId`, so this endpoint is not enough for rank lookup.
+- Returns HTTP 400 on some invalid/gibberish `search` input (e.g. a pasted
+  code with stray punctuation). The playlist import flow
+  (`load_playlist_from_code`) catches this — along with timeouts, connection
+  failures, and schema-invalid responses — and degrades it to a refusal
+  message naming the pasted code rather than a raw callback error.
 
 ## `/benchmarks/player-progress-rank-benchmark`
 

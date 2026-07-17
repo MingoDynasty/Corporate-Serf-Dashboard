@@ -11,6 +11,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 import numpy as np
+import requests
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
@@ -23,6 +24,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.stopwatch import Stopwatch
 
@@ -675,7 +677,9 @@ def load_playlists() -> None:
     )
 
 
-def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
+def load_playlist_from_code(  # noqa: PLR0911
+    input_playlist_code: str,
+) -> tuple[str | None, str | None]:
     """Import the single playlist matching a KovaaK's playlist code.
 
     Returns ``(error_message, canonical_playlist_code)``. The second element
@@ -689,7 +693,28 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
     (case normalization, non-exact search matches), so it must never be
     derived from ``input_playlist_code``.
     """
-    response = get_playlist_data(input_playlist_code)
+    try:
+        response = get_playlist_data(input_playlist_code)
+    except (requests.RequestException, ValidationError) as exc:
+        # KovaaK's returns HTTP 400 on some gibberish codes, and a slow spell
+        # can time out or return schema-invalid JSON. Degrade any of these to a
+        # refusal naming the pasted code rather than letting the exception
+        # escape as a raw Dash callback error (AGENTS.md "UI Boundaries").
+        detail = (
+            request_exception_summary(exc)
+            if isinstance(exc, requests.RequestException)
+            else exc.__class__.__name__
+        )
+        logger.warning(
+            "Failed to look up playlist code %s: %s",
+            input_playlist_code,
+            detail,
+        )
+        message = (
+            f"Failed to look up playlist code {input_playlist_code}: "
+            "KovaaK's API error."
+        )
+        return message, None
     if not response or not response.data:
         message = (
             f"Failed to load playlist data for playlist code: {input_playlist_code}"
