@@ -427,6 +427,28 @@ def test_import_refuses_when_search_empty_and_evxl_connection_error(
     assert imported_code is None
 
 
+def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    # EvxlPlaylist accepts any str code, but PlaylistData rejects a blank one.
+    # That ValidationError must degrade to the refusal, not escape into the
+    # Dash import callback (which has no safety net around this service call).
+    evxl = _evxl_playlist("Nameless", "   ", ["Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+
+    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
 def test_import_falls_back_to_evxl_when_search_is_ambiguous(monkeypatch, tmp_path):
     _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
     two_records = SimpleNamespace(

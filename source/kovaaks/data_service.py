@@ -729,6 +729,18 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
 
         try:
             evxl_playlist = get_evxl_playlist(input_playlist_code)
+            # Built inside the guard on purpose: EvxlPlaylist accepts any str
+            # code, but PlaylistData rejects a blank one, so a structurally
+            # valid payload can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            playlist_data = PlaylistData(
+                name=evxl_playlist.playlist_name.strip(),
+                code=evxl_playlist.playlist_code.strip(),
+                scenarios=[
+                    Scenario(name=item.scenario_name)
+                    for item in evxl_playlist.scenario_list
+                ],
+            )
         except (requests.RequestException, ValidationError) as exc:
             # Includes Evxl's HTTP 400 for unknown or mis-cased codes. The user
             # sees the same refusal as before the fallback existed.
@@ -742,15 +754,7 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
         logger.info(
             "Resolved %s through Evxl playlist-by-code (canonical code %s).",
             input_playlist_code,
-            evxl_playlist.playlist_code.strip(),
-        )
-        playlist_data = PlaylistData(
-            name=evxl_playlist.playlist_name.strip(),
-            code=evxl_playlist.playlist_code.strip(),
-            scenarios=[
-                Scenario(name=item.scenario_name)
-                for item in evxl_playlist.scenario_list
-            ],
+            playlist_data.code,
         )
 
     if playlist_data.code in playlist_database:
