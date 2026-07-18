@@ -536,6 +536,9 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     """
     if not n_clicks or not target_code:
         return no_update, no_update, no_update
+    # Look up the label before the delete: afterwards the code is gone from
+    # the playlist database and the lookup falls back to the raw code.
+    label = get_playlist_display_label(target_code)
     error_message = delete_user_playlist(target_code)
     if error_message:
         notification = {
@@ -550,7 +553,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     notification = {
         "action": "show",
         "title": "Playlist Deleted",
-        "message": "Deleted playlist.",
+        "message": f'Deleted "{label}" ({target_code}).',
         "color": "green",
         "id": "deleted-playlist-successful-notification",
     }

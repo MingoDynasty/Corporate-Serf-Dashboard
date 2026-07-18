@@ -429,6 +429,17 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
         lambda code: deleted.append(code) or None,
     )
     monkeypatch.setattr(playlists, "hide_playlist", hidden.append)
+    # After the delete the code is gone from the playlist database, so the
+    # label lookup must happen first — a late lookup fails the test.
+    monkeypatch.setattr(
+        playlists,
+        "get_playlist_display_label",
+        lambda code: (
+            pytest.fail("label must be looked up before the delete")
+            if deleted
+            else "User Label"
+        ),
+    )
 
     notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
         1, "UserCode", 4
@@ -439,6 +450,7 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
     # preferences.json does not accumulate dead codes.
     assert hidden == ["UserCode"]
     assert notifications[0]["color"] == "green"
+    assert notifications[0]["message"] == 'Deleted "User Label" (UserCode).'
     assert rows_refresh == 5
     assert opened is False
 
