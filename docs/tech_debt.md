@@ -14,7 +14,17 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-*(none currently tracked)*
+### Unguarded `PlaylistData` build on the KovaaK's import path
+
+`load_playlist_from_code` (`source/kovaaks/data_service.py`) builds
+`PlaylistData` from the single-record KovaaK's search result outside any
+`try`. A blank/whitespace `playlistCode` from the API raises a pydantic
+`ValidationError` that escapes into the Dash import callback (which has no
+safety net) instead of returning the documented refusal. The Evxl fallback
+path was guarded for exactly this in PR #142; the KovaaK's path was left
+alone to honor that PR's no-drive-by constraint. Low likelihood, cheap fix:
+wrap the construction and reuse the "Invalid playlist data returned by API"
+message.
 
 ## Code Smells
 
