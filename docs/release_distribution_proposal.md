@@ -1,14 +1,15 @@
 # Proposal: release, versioning, and distribution model
 
-Status: Proposed — revision 3, 2026-07-18. The r0 draft, r1 (this PR's
-initial revision), and r2 each received an external design review (Codex);
-every finding across the three rounds was triaged (fix / accept / defer)
-and the fixes are folded into the decisions below. Finding-by-finding
-dispositions live in the review handoff doc (untracked,
-`ignore/pr-reviews/pr150-review.md`). Revision 3 closes the review loop:
-further design changes require a new P1-class finding, not another polish
-round — remaining risk lives in the implementation PRs, which get their own
-reviews.
+Status: Proposed — revision 4, 2026-07-18. Four external design-review
+rounds (Codex): r0–r2 general, then a scoped round-4 P1 hunt against
+revision 3's freeze, which produced five confirmed release blockers —
+the freeze rule (design changes require a P1-class finding) working as
+intended. All are folded in below; finding-by-finding dispositions live in
+the review handoff doc (untracked, `ignore/pr-reviews/pr150-review.md`).
+The freeze is re-declared as of r4 on the same rule. Two round-4 claims
+were verified empirically in-house before adoption: this repo's Python
+3.14 `tomllib` rejects both a UTF-8 BOM and raw backslash Windows paths in
+TOML basic strings.
 
 ## Background
 
@@ -55,7 +56,18 @@ Two problems motivate this proposal:
   existing tags at execution time;
 - serializes via a fixed concurrency group with `cancel-in-progress: false`
   and `queue: max` (GitHub Actions has supported >1 queued run per group
-  since May 2026), so concurrent pushes cannot race the `.N` computation;
+  since May 2026), so concurrent pushes cannot race the `.N` computation.
+  Serialization does **not** establish source order — FIFO is by
+  wait-start time, and a newer push with faster tests can release first —
+  so the job also enforces a **Latest invariant**: inside the critical
+  section it checks ancestry (`git merge-base --is-ancestor`) against
+  already-published releases; if a published release's commit descends
+  from the job's SHA, the job publishes its release explicitly with
+  `make_latest: false` (older source must never displace newer source as
+  Latest — `make_latest` defaults to true and would otherwise let a slow
+  older run silently downgrade every `latest`-tracking install). After
+  claiming Latest, the job asserts `releases/latest` resolves to the tag
+  it just published;
 - is idempotent across every partial-failure state, not just
   tag-without-release: a rerun reuses a tag already pointing at `HEAD`,
   locates and **resumes an existing draft** (re-attaching assets) rather
@@ -207,14 +219,27 @@ open indefinitely if a release job fails. The installer:
   directory exists, and writes it into `config.toml`. Existing `config.toml`
   and `data/` are never touched (they live in the state root, which version
   swaps never write to);
-- writes the install manifest (D2) atomically and creates a desktop
-  shortcut.
+- targets **Windows PowerShell 5.1** (stock Windows 11 — the shell the
+  one-liner actually lands in) and treats serialization as a contract:
+  every machine-readable file (`config.toml`, `install.json`) is written
+  UTF-8 **without BOM** via `System.Text.UTF8Encoding($false)` — 5.1's
+  `-Encoding UTF8` emits a BOM — and paths are written with forward
+  slashes. Verified against this repo's Python 3.14: `tomllib` rejects
+  both a BOM and raw `\` in TOML basic strings, and either alone would
+  yield a config the app can never parse — which the
+  preserve-existing-config rule would then make permanent;
+- validates before it commits: after writing `config.toml`, it round-trip
+  parses the generated file with the installed Python's `tomllib`, and
+  only then writes the install manifest (D2) atomically and creates the
+  desktop shortcut — a config the app cannot parse must fail the install
+  loudly, never surface later as a permanently broken first launch.
 
 The README documents a manual alternative (download the release zip
-yourself, inspect, run the script from the extract) for users who won't pipe
-a script from the internet, and notes that `-ExecutionPolicy Bypass` does
-not and should not defeat enterprise Group Policy/AppLocker — home machines
-are the audience.
+yourself, inspect it, then run the installer with an exact copy-pastable
+terminal command — double-clicking a `.ps1` deliberately does not execute
+it on Windows) for users who won't pipe a script from the internet, and
+notes that `-ExecutionPolicy Bypass` does not and should not defeat
+enterprise Group Policy/AppLocker — home machines are the audience.
 
 **Why.** The user's machine needs exactly one bootstrapped tool (uv),
 acquired the way rustup/uv themselves are distributed, and app-local
@@ -229,8 +254,14 @@ Rejected alternatives).
 delegate to the selected version's launcher, nothing else. Per-tag
 directories get pruned, so the shortcut must never point into one; and
 because the bootstrap does almost nothing, it should almost never need
-changing — when it does, the versioned launcher overwrites it on a higher
-embedded version marker (no richer update protocol than that).
+changing — when it does, the versioned launcher replaces it on a higher
+embedded version marker, and the replacement must be **atomic**: write a
+same-directory temp file (UTF-8, no BOM), validate its marker and
+PowerShell syntax, then rename over `launch.ps1`. Never truncate the live
+file in place — Windows PowerShell keeps executing the already-parsed body,
+so an interrupted in-place write leaves a working session now and a bricked
+entrypoint for every launch after it (review empirically confirmed a
+running 5.1 script is replaceable without a lock error).
 
 The launcher is **single-instance**: it takes a named mutex scoped to the
 install root and holds it for the launcher+app lifetime. A second
@@ -258,9 +289,12 @@ The versioned launcher then applies the manifest policy:
   readiness failure can also be config-caused, in which case the previous
   version fails identically and the launcher surfaces the app's error
   output; it does not try to attribute blame.) On any network/API failure:
-  run the existing install unchanged (fail-open, offline-safe). One
-  unauthenticated API call per launch is well inside GitHub's 60/hour/IP
-  limit; no caching layer is warranted for one call.
+  run the existing install unchanged (fail-open, offline-safe). A
+  schema-incompatible release (D8) also fails open, but **loudly**: run
+  the existing install and tell the user to re-run the install one-liner —
+  silent permanent stranding is the one failure this design must never
+  produce. One unauthenticated API call per launch is well inside GitHub's
+  60/hour/IP limit; no caching layer is warranted for one call.
 - `update_policy: "pinned"` + `pinned_tag`: skip the update check entirely
   and run the pinned version. A rollback install (`install.ps1 -Tag
   v2026.07.17`) **writes this pin**; without it, the next launch would
@@ -299,6 +333,33 @@ It is also what forces D1's draft-first flow, since immutable release
 assets lock at publication. The named asset zip gives stable bytes with a
 GitHub-provided digest; launcher-side checksum verification is deferred
 (HTTPS to github.com is the trust anchor for this audience).
+
+### D8. Update wire contract v1 — the first launcher is supported forever
+
+**Mechanism.** A pinned or long-offline install may legitimately jump from
+the first PR-4 launcher straight to any future release, and the launcher
+executing that update is always the *old* one. Everything old launchers
+parse or act on is therefore a frozen, versioned wire contract from day
+one:
+
+- `release.json` and `install.json` both carry `schema_version: 1`. The v1
+  field set — names, types, required fields, release asset names/paths,
+  and the uv/Python provisioning inputs — freezes when PR 4 ships.
+- Evolution rule: changes within v1 are additive-only (new optional
+  fields; v1 consumers ignore what they don't recognize). A breaking
+  change bumps `schema_version` and dual-publishes the v1 envelope
+  alongside the new one for as long as v1 launchers may exist.
+- A launcher that meets an unknown `schema_version` — or any parse
+  failure — runs the existing install and surfaces an actionable message
+  ("update requires reinstalling: re-run the install one-liner") instead
+  of failing silently. Re-running the one-liner always recovers, because
+  `get.ps1` pairs a fresh installer with a fresh payload (D5).
+
+**Why.** Fail-open alone converts a wire-contract break into *silent
+permanent stranding*: every launch retries the parse, fails, runs the old
+version, and never tells the user. The contract freeze makes breaks rare;
+the loud incompatible-schema path makes the rare break user-recoverable
+without support.
 
 ## Rejected alternatives
 
@@ -380,7 +441,11 @@ state-format break.
   `/health` identity endpoint (BuildInfo + launch-token echo),
   `.python-version` (trivial rider — every later PR then inherits the
   pinned interpreter), tests including the empirical export-subst check
-  against GitHub's zip download. No dependencies.
+  against GitHub's zip download of the pushed commit
+  (`/archive/<sha>.zip` — works before any release exists), run as a
+  dedicated retried CI step rather than inside the default pytest gate so
+  a network flake blocks a merge without polluting local test runs. No
+  dependencies.
 - **PR 2 — state root**: `CSD_STATE_DIR` + paths module, package-relative
   `resources/`, an actionable startup error when `stats_dir` does not exist
   (today the watchdog observer throws a raw traceback at the "Change me!"
@@ -391,14 +456,23 @@ state-format break.
   draft→publish). The D7 immutable-releases setting is flipped **before
   merge**; post-merge verification re-downloads the first release's assets
   to confirm the in-workflow validation.
-- **PR 4 — installer + launcher + README**: D5 + D6 (`get.ps1` shim +
-  tag-versioned `install.ps1`, first-run stats-dir detection, root
-  bootstrap, single-instance mutex, per-release uv provisioning,
-  pending-activation update with identity probe), README "Easy install",
-  rollback, and uninstall sections. Depends on PRs 1–3 (needs a real
-  release, the state root, the `/health` endpoint, and the manifest
-  reader). As the PR that
-  finishes shipping this proposal, it also owes the AGENTS.md "Shipping a
-  proposal" definition of done: distill durable decisions into
-  `docs/decision_log.md`, delete this file, update `docs/roadmap.md` /
-  `docs/product.md` / `docs/tech_debt.md`, and repair references.
+- **PR 4 — installer + launcher (mechanics only, unadvertised)**: D5 + D6
+  + D8 (`get.ps1` shim + tag-versioned `install.ps1`, first-run stats-dir
+  detection, root bootstrap, single-instance mutex, per-release uv
+  provisioning, pending-activation update with identity probe,
+  `schema_version: 1` manifests). Deliberately does **not** touch the
+  README: advertising the one-liner in the same PR opens a window —
+  between merge and the release job finishing, or indefinitely if that
+  job fails — where `get.ps1` resolves a latest tag containing no
+  `install.ps1`. The shim still gets a friendly "release not ready yet —
+  try again shortly" message for that 404 as bootstrap-era safety.
+  Depends on PRs 1–3 (needs a real release, the state root, the
+  `/health` endpoint, and the manifest reader).
+- **PR 5 — activation (docs-only)**: after PR 4's release is verified
+  end-to-end on a clean machine (one-liner → running dashboard), add the
+  README "Easy install", rollback, and uninstall sections. Docs-only, so
+  the D1 blocklist means it cuts no release — and none is needed. As the
+  PR that finishes shipping this proposal, it owes the AGENTS.md
+  "Shipping a proposal" definition of done: distill durable decisions
+  into `docs/decision_log.md`, delete this file, update `docs/roadmap.md`
+  / `docs/product.md` / `docs/tech_debt.md`, and repair references.
