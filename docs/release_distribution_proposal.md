@@ -114,12 +114,18 @@ recovery remain real, small, costs.
    (D1) — the defined source for the exact SHA. This is the authoritative
    identity for installed copies — the export-subst stamp alone cannot
    carry the tag name.
-2. **`version.txt`** committed with the placeholder `$Format:%H %cs$` plus a
-   `.gitattributes` line `version.txt export-subst`. GitHub's archive
-   endpoints run `git archive`, which expands the placeholder, so any zip
-   download — even outside the installer — carries its full SHA + commit
-   date; `BuildInfo` shortens the SHA for display only. (Same mechanism as
-   setuptools-scm's `.git_archival.txt`.)
+2. **`version.txt`** committed in labeled `key: value` form with git
+   placeholders — `sha: $Format:%H$` and `commit-date: $Format:%cs$`,
+   preceded by an explanatory comment header — plus a `.gitattributes`
+   line `version.txt export-subst` (the `.git_archival.txt` idiom).
+   GitHub's archive endpoints run `git archive`, which expands the
+   placeholders, so any zip download — even outside the installer —
+   carries its full SHA + commit date; `BuildInfo` shortens the SHA for
+   display only. Deliberately plain text rather than JSON: the committed
+   file needs its comment header (a raw placeholder looks broken to repo
+   browsers), and export-subst output is not JSON-escaped, so a JSON
+   envelope would silently constrain future placeholders to escape-safe
+   expansions.
 3. **Git fallback**: if the placeholder is unexpanded, we're in a checkout —
    `git rev-parse HEAD`; else `unknown`.
 
