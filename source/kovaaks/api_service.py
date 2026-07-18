@@ -19,6 +19,8 @@ from pydantic import ValidationError
 
 from source.kovaaks.api_models import (
     BenchmarksAPIResponse,
+    EvxlPlaylist,
+    EvxlPlaylistByCodeResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
@@ -56,6 +58,11 @@ _last_interactive_activity = 0.0
 _last_network_success = 0.0
 
 CACHE_DIR = "data/cache"
+
+# Evxl's exact-sharecode playlist lookup. Not a KovaaK's endpoint (so it is not
+# in the Endpoints enum); used as a fallback when KovaaK's own playlist search
+# returns null records for a real playlist (see get_evxl_playlist).
+EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 
 
 class UnknownKovaaksUserError(ValueError):
@@ -255,6 +262,22 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
 
     response = _get_with_retry(Endpoints.PLAYLIST, params=params)
     return PlaylistAPIResponse.model_validate(response.json())
+
+
+def get_evxl_playlist(sharecode: str) -> EvxlPlaylist:
+    """Resolve one playlist through Evxl's exact-sharecode endpoint.
+
+    Fallback for KovaaK's null-hydration quirk (its search counts a match but
+    returns a null record for some real playlists). Evxl returns HTTP 400 for
+    unknown or mis-cased codes, which ``_get_with_retry`` surfaces as an
+    immediate ``requests.HTTPError``; that and ``ValidationError`` propagate to
+    the caller, which decides how to degrade.
+    """
+    response = _get_with_retry(
+        EVXL_PLAYLIST_BY_CODE_URL,
+        params={"shareCode": sharecode.strip()},
+    )
+    return EvxlPlaylistByCodeResponse.model_validate(response.json()).playlist
 
 
 def get_benchmark_json(

@@ -11,11 +11,12 @@ from datetime import date, datetime
 from pathlib import Path
 
 import numpy as np
+import requests
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from source.config.config_service import get_config
-from source.kovaaks.api_service import get_playlist_data
+from source.kovaaks.api_service import get_evxl_playlist, get_playlist_data
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
@@ -679,36 +680,83 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
     """Import the single playlist matching a KovaaK's playlist code.
 
     Returns ``(error_message, canonical_playlist_code)``. The second element
-    is the canonical ``playlistCode`` from KovaaK's — the imported code on a
-    successful import, or the conflicting existing code on a duplicate-code
-    refusal (so callers can, for example, ask whether that existing playlist
-    is hidden). It is None only when there is no canonical code to report:
-    the search returned nothing, was ambiguous, or the write failed. The
-    canonical code is what the store, the user-root tracking, and the
-    visibility show-list are keyed by; it can differ from the pasted input
-    (case normalization, non-exact search matches), so it must never be
-    derived from ``input_playlist_code``.
+    is the canonical code from whichever source resolved it — KovaaK's search
+    (``playlistCode``) or the Evxl by-code fallback (``playlist_code``) — the
+    imported code on a successful import, or the conflicting existing code on
+    a duplicate-code refusal (so callers can, for example, ask whether that
+    existing playlist is hidden). It is None only when there is no canonical
+    code to report: neither the search nor the Evxl fallback resolved the
+    code, or the write failed. The canonical code is what the store, the
+    user-root tracking, and the visibility show-list are keyed by; it can
+    differ from the pasted input (case normalization, non-exact search
+    matches), so it must never be derived from ``input_playlist_code``.
     """
     response = get_playlist_data(input_playlist_code)
-    if not response or not response.data:
-        message = (
-            f"Failed to load playlist data for playlist code: {input_playlist_code}"
+    if response and len(response.data) == 1:
+        # KovaaK's search produced exactly one usable record: the happy path,
+        # no Evxl call.
+        playlist_data = PlaylistData(
+            name=response.data[0].playlistName,
+            code=response.data[0].playlistCode,
+            scenarios=[
+                Scenario(name=item.scenarioName)
+                for item in response.data[0].scenarioList
+            ],
         )
-        logger.warning(message)
-        return message, None
+    else:
+        # KovaaK's search failed to produce exactly one usable record: zero
+        # records (its null-hydration quirk drops the match through the
+        # ignore_null_playlist_items validator) or an ambiguous multi-match.
+        # Fall back to Evxl's exact by-code lookup before refusing.
+        if not response or not response.data:
+            refusal_message = (
+                f"Failed to load playlist data for playlist code: {input_playlist_code}"
+            )
+            logger.info(
+                "KovaaK's search returned no usable record for %s; "
+                "trying Evxl playlist-by-code.",
+                input_playlist_code,
+            )
+        else:
+            refusal_message = (
+                f"Found more than one playlist from code: {input_playlist_code}"
+            )
+            logger.info(
+                "KovaaK's search returned %d records for %s; "
+                "trying Evxl playlist-by-code.",
+                len(response.data),
+                input_playlist_code,
+            )
 
-    if len(response.data) > 1:
-        message = f"Found more than one playlist from code: {input_playlist_code}"
-        logger.warning(message)
-        return message, None
+        try:
+            evxl_playlist = get_evxl_playlist(input_playlist_code)
+            # Built inside the guard on purpose: EvxlPlaylist accepts any str
+            # code, but PlaylistData rejects a blank one, so a structurally
+            # valid payload can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            playlist_data = PlaylistData(
+                name=evxl_playlist.playlist_name.strip(),
+                code=evxl_playlist.playlist_code.strip(),
+                scenarios=[
+                    Scenario(name=item.scenario_name)
+                    for item in evxl_playlist.scenario_list
+                ],
+            )
+        except (requests.RequestException, ValidationError) as exc:
+            # Includes Evxl's HTTP 400 for unknown or mis-cased codes. The user
+            # sees the same refusal as before the fallback existed.
+            logger.warning(
+                "Evxl playlist-by-code fallback failed for %s: %s",
+                input_playlist_code,
+                exc,
+            )
+            return refusal_message, None
 
-    playlist_data = PlaylistData(
-        name=response.data[0].playlistName,
-        code=response.data[0].playlistCode,
-        scenarios=[
-            Scenario(name=item.scenarioName) for item in response.data[0].scenarioList
-        ],
-    )
+        logger.info(
+            "Resolved %s through Evxl playlist-by-code (canonical code %s).",
+            input_playlist_code,
+            playlist_data.code,
+        )
 
     if playlist_data.code in playlist_database:
         existing_playlist = playlist_database[playlist_data.code]
