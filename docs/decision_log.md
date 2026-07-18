@@ -1029,7 +1029,13 @@ Consequences: `api_service` is no longer fully stateless — this one file has
 an in-memory mirror, with the invariant that every serve is preceded by a
 fresh `stat()` proof. The signature includes the resolved path so tests that
 repoint `CACHE_DIR` cannot alias a stale copy; `st_size` guards against
-same-mtime rewrites on coarse-timestamp filesystems. A missing mapping file no
+same-mtime rewrites on coarse-timestamp filesystems. Metadata revalidation
+inherently cannot detect a rewrite that preserves both size and timestamp
+(deliberate `os.utime` forgery — the known limit of every mtime-keyed cache,
+`.pyc` included), so a matching signature is trusted for at most 60 seconds
+(`_MAPPING_FORCED_REFRESH_SECONDS`) before the next read re-parses anyway:
+worst-case staleness is bounded, not indefinite, at a cost of ~1ms/min
+(raised by PR #147 review). A missing mapping file no
 longer logs a read-failure warning per lookup (the stat short-circuits the
 read), and a malformed file warns once per file version instead of once per
 lookup. All `resolve_leaderboard_id` callers (Home rank display, playlist

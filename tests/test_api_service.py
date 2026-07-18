@@ -833,6 +833,37 @@ def _reset_mapping_cache(monkeypatch, tmp_path):
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
     monkeypatch.setattr(api_service, "_leaderboard_mapping_cache", None)
     monkeypatch.setattr(api_service, "_leaderboard_mapping_signature", None)
+    monkeypatch.setattr(api_service, "_leaderboard_mapping_loaded_at", 0.0)
+
+
+def test_mapping_cache_forced_refresh_bounds_same_signature_rewrite(
+    monkeypatch, tmp_path
+):
+    """A rewrite forging the old mtime and size is served stale for at most
+    the forced-refresh interval, never indefinitely."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    fake_now = {"value": 0.0}
+    monkeypatch.setattr(api_service.time, "monotonic", lambda: fake_now["value"])
+
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    mapping_file = api_service._leaderboard_mapping_file()
+    stat_before = mapping_file.stat()
+    original = mapping_file.read_text(encoding="utf-8")
+    rewritten = original.replace("111", "999")
+    assert len(rewritten) == len(original)
+    mapping_file.write_text(rewritten, encoding="utf-8")
+    os.utime(mapping_file, ns=(stat_before.st_atime_ns, stat_before.st_mtime_ns))
+    stat_after = mapping_file.stat()
+    assert stat_after.st_mtime_ns == stat_before.st_mtime_ns
+    assert stat_after.st_size == stat_before.st_size
+
+    # Metadata revalidation cannot see this rewrite: bounded staleness window.
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    fake_now["value"] = api_service._MAPPING_FORCED_REFRESH_SECONDS + 1.0
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 999
 
 
 def test_leaderboard_mapping_cache_parses_file_once(monkeypatch, tmp_path):

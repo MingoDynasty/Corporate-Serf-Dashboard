@@ -490,8 +490,14 @@ def _leaderboard_mapping_file() -> Path:
 # the per-read stat catches in-process writes, other processes, manual edits,
 # and cache-directory deletion alike. Guarded by _CACHE_IO_LOCK, which
 # _write_json also holds, so a lookup cannot interleave with a write.
+# Metadata alone cannot detect a same-size rewrite that also preserves the
+# timestamp (e.g. os.utime after an in-place edit), so a matching signature is
+# only trusted this long before the next read re-parses anyway, bounding
+# worst-case staleness instead of trusting metadata forever.
+_MAPPING_FORCED_REFRESH_SECONDS = 60.0
 _leaderboard_mapping_cache: dict | None = None
 _leaderboard_mapping_signature: tuple[str, int, int] | None = None
+_leaderboard_mapping_loaded_at = 0.0
 
 
 def _load_leaderboard_mapping() -> dict:
@@ -499,11 +505,15 @@ def _load_leaderboard_mapping() -> dict:
 
     The mapping is one large, rarely-written JSON dict consulted once per rank
     lookup; parsing it per read dominated the playlist overview build (see the
-    2026-07-18 decision log entry). A missing or malformed file yields an empty
-    mapping, matching the tolerant-read cache convention. Callers must treat
-    the returned dict as read-only.
+    2026-07-18 decision log entry). A matching signature is served from memory
+    for at most _MAPPING_FORCED_REFRESH_SECONDS before being re-parsed. A
+    missing or malformed file yields an empty mapping, matching the
+    tolerant-read cache convention. Callers must treat the returned dict as
+    read-only.
     """
-    global _leaderboard_mapping_cache, _leaderboard_mapping_signature  # noqa: PLW0603
+    global _leaderboard_mapping_cache  # noqa: PLW0603
+    global _leaderboard_mapping_signature  # noqa: PLW0603
+    global _leaderboard_mapping_loaded_at  # noqa: PLW0603
     with _CACHE_IO_LOCK:
         cache_file = _leaderboard_mapping_file()
         try:
@@ -514,11 +524,14 @@ def _load_leaderboard_mapping() -> dict:
         if (
             _leaderboard_mapping_cache is not None
             and signature == _leaderboard_mapping_signature
+            and time.monotonic() - _leaderboard_mapping_loaded_at
+            < _MAPPING_FORCED_REFRESH_SECONDS
         ):
             return _leaderboard_mapping_cache
         cache_data = _read_json(cache_file) if signature is not None else None
         _leaderboard_mapping_cache = cache_data if isinstance(cache_data, dict) else {}
         _leaderboard_mapping_signature = signature
+        _leaderboard_mapping_loaded_at = time.monotonic()
         return _leaderboard_mapping_cache
 
 
