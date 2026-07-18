@@ -68,3 +68,12 @@ class ManifestEntry(BaseModel):
 
 class Manifest(RootModel[dict[str, ManifestEntry]]):
     pass
+
+
+class FailureEntry(BaseModel):
+    error: str
+    recorded_at: str
+
+
+class FailureLedger(RootModel[dict[str, FailureEntry]]):
+    pass

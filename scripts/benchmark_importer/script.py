@@ -32,6 +32,8 @@ from scripts.benchmark_importer.models import (  # noqa: E402
     EvxlDatabaseItem,
     EvxlPlaylist,
     EvxlPlaylistByCodeResponse,
+    FailureEntry,
+    FailureLedger,
     Manifest,
     ManifestEntry,
 )
@@ -47,6 +49,7 @@ logger = logging.getLogger(__name__)
 EVXL_BENCHMARKS_JSON_FILE = REPO_ROOT / "resources" / "evxl" / "benchmarks.json"
 GENERATED_DIR = SCRIPT_DIR / "generated"
 MANIFEST_FILE = GENERATED_DIR / "manifest.json"
+FAILURES_FILE = GENERATED_DIR / "failures.json"
 EVXL_BENCHMARKS_URL = "https://evxl.app/data/benchmarks"
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 RETRY_ATTEMPTS = 4
@@ -81,10 +84,13 @@ class RunSummary:
     generated: list[str] = field(default_factory=list)
     skipped: list[str] = field(default_factory=list)
     failed: dict[str, str] = field(default_factory=dict)
+    known_bad: dict[str, str] = field(default_factory=dict)
     conflicts: dict[str, list[DuplicateClaimant]] = field(default_factory=dict)
 
     @property
     def exit_code(self) -> int:
+        # Known-bad skips are informational: the failure was already reported by
+        # the run that recorded it.
         return int(bool(self.failed or self.conflicts))
 
 
@@ -135,6 +141,46 @@ def write_manifest(
     payload = {
         sharecode: entry.model_dump(mode="json")
         for sharecode, entry in manifest.items()
+    }
+    _atomic_write_json(path, payload)
+
+
+def _is_deterministic_failure(exc: BaseException) -> bool:
+    """Report whether a failure stems from bad upstream data rather than a bad day.
+
+    Deterministic failures recur on every attempt, so they are recorded and skipped
+    instead of counting toward the transient-error circuit breaker.
+    """
+    if isinstance(exc, (BenchmarkDataMismatchError, ValidationError)):
+        return True
+    if isinstance(exc, requests.HTTPError):
+        response = exc.response
+        if response is None:
+            return False
+        # 429 is rate limiting: the same request succeeds once we back off.
+        return 400 <= response.status_code < 500 and response.status_code != 429
+    return False
+
+
+def load_failure_ledger(path: Path = FAILURES_FILE) -> dict[str, FailureEntry]:
+    """Load known-bad state, treating missing or malformed state as empty."""
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return FailureLedger.model_validate(payload).root
+    except (OSError, UnicodeError, json.JSONDecodeError, ValidationError) as exc:
+        logger.warning(
+            "Failure ledger is missing or malformed; starting empty: %s", exc
+        )
+        return {}
+
+
+def write_failure_ledger(
+    ledger: dict[str, FailureEntry],
+    path: Path = FAILURES_FILE,
+) -> None:
+    """Atomically persist known-bad state."""
+    payload = {
+        sharecode: entry.model_dump(mode="json") for sharecode, entry in ledger.items()
     }
     _atomic_write_json(path, payload)
 
@@ -600,6 +646,10 @@ def run_importer(
     ownership, unowned = scan_generated_ownership(generated_dir)
     manifest_path = generated_dir / "manifest.json"
     manifest = load_manifest(manifest_path)
+    ledger_path = generated_dir / "failures.json"
+    ledger = load_failure_ledger(ledger_path)
+    # Naming a sharecode explicitly is a retry intent, so it is always attempted.
+    explicitly_requested = set(only or ())
     for sharecode in sorted(manifest.keys() - known_sharecodes):
         logger.warning(
             "Manifest contains removed Evxl sharecode %s; leaving its file untouched",
@@ -621,6 +671,22 @@ def run_importer(
             logger.info("Skipping current generated playlist: %s", sharecode)
             summary.skipped.append(sharecode)
             continue
+
+        ledger_entry = ledger.get(sharecode)
+        if (
+            ledger_entry is not None
+            and not force
+            and sharecode not in explicitly_requested
+        ):
+            logger.info(
+                "Skipping known-bad sharecode %s (recorded %s): %s",
+                sharecode,
+                ledger_entry.recorded_at,
+                ledger_entry.error,
+            )
+            summary.known_bad[sharecode] = ledger_entry.error
+            continue
+
         if made_network_request:
             time.sleep(POLITENESS_DELAY_SECONDS)
 
@@ -649,10 +715,24 @@ def run_importer(
         ) as exc:
             logger.error("Failed to generate %s: %s", sharecode, exc)
             summary.failed[sharecode] = str(exc)
+            if _is_deterministic_failure(exc):
+                # Bad upstream data: retrying cannot help, and letting it feed the
+                # breaker would abort sweeps that are otherwise healthy.
+                logger.error(
+                    "Recording %s as known-bad; later sweeps skip it unless it is "
+                    "named with --only or the run uses --force",
+                    sharecode,
+                )
+                ledger[sharecode] = FailureEntry(
+                    error=str(exc),
+                    recorded_at=datetime.now(UTC).isoformat(),
+                )
+                write_failure_ledger(ledger, ledger_path)
+                continue
             consecutive_failures += 1
             if consecutive_failures >= max_consecutive_failures:
                 logger.error(
-                    "Aborting after %d consecutive failures",
+                    "Aborting after %d consecutive transient failures",
                     consecutive_failures,
                 )
                 break
@@ -661,6 +741,9 @@ def run_importer(
         logger.info("Generated %s at %s", sharecode, path)
         summary.generated.append(sharecode)
         consecutive_failures = 0
+        if ledger.pop(sharecode, None) is not None:
+            logger.info("Clearing known-bad record for %s", sharecode)
+            write_failure_ledger(ledger, ledger_path)
 
     return summary
 
@@ -668,15 +751,19 @@ def run_importer(
 def log_summary(summary: RunSummary) -> None:
     """Log end-of-run result buckets and conflict details."""
     logger.info(
-        "Run summary: generated=%d, skipped=%d, failed=%d, conflicts=%d",
+        "Run summary: generated=%d, skipped=%d, failed=%d, known_bad=%d, conflicts=%d",
         len(summary.generated),
         len(summary.skipped),
         len(summary.failed),
+        len(summary.known_bad),
         len(summary.conflicts),
     )
     logger.info("Generated sharecodes: %s", summary.generated or "none")
     logger.info("Skipped sharecodes: %s", summary.skipped or "none")
     logger.info("Failed sharecodes: %s", list(summary.failed) or "none")
+    logger.info("Known-bad sharecodes: %s", list(summary.known_bad) or "none")
+    for sharecode, reason in summary.known_bad.items():
+        logger.info("  %s: %s", sharecode, reason)
     logger.info("Conflicting sharecodes: %s", list(summary.conflicts) or "none")
     for sharecode, claimants in summary.conflicts.items():
         logger.error("Conflicting Evxl entries for %s:", sharecode)
@@ -714,7 +801,10 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--max-consecutive-failures",
         type=_positive_int,
         default=3,
-        help="abort after this many consecutive item failures (default: 3)",
+        help=(
+            "abort after this many consecutive transient item failures "
+            "(default: 3); deterministic failures never count toward it"
+        ),
     )
     parser.add_argument(
         "--offline",
