@@ -45,10 +45,6 @@ commands becomes burdensome.
 
 ## UI/UX
 
-### Audit static inline styles
-
-Scan `source/` for static inline style dictionaries that would be clearer as semantic classes in `assets/stylesheet.css`, especially styles toggled by callbacks. Keep runtime-computed values and small, highly local layout adjustments inline; migrate incrementally and verify theme and responsive behavior.
-
 ### Watch for `is_scenario_in_database` early-return pattern
 
 `source/pages/home.py` previously had a bug where the rank callback short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.

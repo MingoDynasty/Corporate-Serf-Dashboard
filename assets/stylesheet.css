@@ -53,6 +53,12 @@
     min-width: 0;
 }
 
+/* The title is a link home, but it reads as the app's wordmark rather than a
+   link, so it takes the plain text color instead of Mantine's anchor blue. */
+.app-header-title-anchor {
+    color: var(--mantine-color-text);
+}
+
 .app-header-title {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -70,6 +76,18 @@
         100dvh
         - var(--app-shell-header-offset, 0rem)
         - 2 * var(--app-shell-padding, 0rem)
+    );
+}
+
+/* Outer column for the grid pages (playlists overview, playlist scenarios).
+   Pinning the column to the viewport minus the AppShell header offset and the
+   shell's vertical padding leaves the grid to own its own scrolling, so the
+   grid headers stay put instead of the whole page scrolling away. */
+.page-fill-column {
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 1rem)
     );
 }
 
@@ -105,6 +123,12 @@ a.playlist-scenario-link-cell:visited {
 
 a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
+}
+
+/* The overview's leftover-files alert ships hidden and is revealed by the
+   render_superseded_alert callback, which toggles this class on and off. */
+.playlists-superseded-alert-hidden {
+    display: none;
 }
 
 .settings-help-icon {

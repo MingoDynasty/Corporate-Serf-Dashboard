@@ -437,10 +437,5 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
             ),
         ],
         gap="md",
-        style={
-            "height": (
-                "calc(100dvh - var(--app-shell-header-offset, 0rem) "
-                "- 2*var(--app-shell-padding, 1rem))"
-            )
-        },
+        className="page-fill-column",
     )

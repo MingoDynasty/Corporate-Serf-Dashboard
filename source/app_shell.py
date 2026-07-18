@@ -162,9 +162,6 @@ def layout(**kwargs):  # noqa: ARG001
                                                 target="_self",
                                                 underline="never",
                                                 className="app-header-title-anchor",
-                                                style={
-                                                    "color": "var(--mantine-color-text)",
-                                                },
                                             ),
                                         ],
                                         h="100%",
