@@ -13,6 +13,61 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-07-18: Accept Dash's First-Request Pages Race Instead of Warming the App
+
+Status: Accepted
+
+Decision: The browser-console noise on the first page load after a server
+start — a `TypeError: Cannot read properties of undefined (reading 'apply')`
+from `handleClientside`, plus a flood of ~86 "ID not found in layout" entries
+in the dev-tools overlay — is a known upstream Dash defect. We accept it and
+do not work around it. Treat it as expected baseline noise during browser
+checks; reload the page before judging whether the console is clean.
+
+Why: Dash's `enable_pages()` registers its page router as a `before_request`
+hook (`dash/dash.py`, in `router_sync`/`router_async`). The hook sets its
+`_got_first_request["pages"]` guard flag *before* it finishes its work, and
+takes no lock:
+
+```python
+if self._got_first_request["pages"]:
+    return
+self._got_first_request["pages"] = True
+...   # builds validation_layout, registers the document.title clientside callback
+```
+
+Inline clientside function bodies are injected into the index HTML at render
+time. Under a threaded server — Waitress with `threads=8` in production,
+Flask's threaded dev server when `debug = true` — a concurrent early request
+sees the flag already set, returns immediately, and serves an index page whose
+script block is missing, while `/_dash-dependencies` still advertises the
+callback. The renderer looks the function up, gets `undefined`, and calls
+`.apply` on it. `validation_layout` is populated in the same unfinished hook
+body, which is why the "ID not found in layout" flood appears alongside: one
+root cause, two symptoms.
+
+Measured 2026-07-18 on dash 4.4.0: eight simultaneous first requests produced
+**seven of eight** renders missing the script; every later render has it. A
+browser triggers it because it opens several connections at startup.
+
+The missing function is Dash's own `_pages_dummy` `document.title` setter, not
+application code — all six of our clientside callbacks register correctly every
+time. It is not a dash-extensions defect either: `DashProxy._setup_server`
+correctly takes a `setup_server_lock`, and plain `dash.Dash` races identically.
+It reproduces on dash 4.3.0 and 4.4.0 alike, so it is not a regression from the
+PR #146 dependency upgrade.
+
+Impact is cosmetic and self-healing: on an affected load `document.title` shows
+the app-level title instead of the page title, and any reload fixes it. No app
+feature is affected, so a workaround for someone else's bug is not worth
+carrying.
+
+Validated mitigation, should this ever become worth fixing: prime the app with
+one synchronous in-process request before serving — `with
+app.server.test_client() as c: c.get("/")` in `main()`, ahead of `serve(...)` /
+`app.run(...)`. Measured under the same eight-way concurrency test, this took
+seven-of-eight failures down to zero. Deliberately not applied.
+
 ## 2026-07-17: Playlist Import Falls Back to Evxl Exact By-Code
 
 Status: Accepted

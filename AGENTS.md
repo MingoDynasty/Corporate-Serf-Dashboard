@@ -65,6 +65,12 @@ Codex <codex@local>
 
 - PRs opened through the GitHub connector may still show as opened by
   `MingoDynasty` because the connector uses the user's GitHub authorization.
+- On the **first** page load after a server start, the browser console shows a
+  `handleClientside` "Cannot read properties of undefined (reading 'apply')"
+  error and a flood of "ID not found in layout" entries. This is a known
+  upstream Dash race, not app code — it self-heals on reload. Reload before
+  judging console cleanliness, and don't attribute it to whatever you just
+  changed. Details in `docs/decision_log.md` (2026-07-18 entry).
 
 ## Documentation Habits
 
