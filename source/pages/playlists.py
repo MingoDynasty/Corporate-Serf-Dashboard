@@ -132,6 +132,13 @@ VISIBILITY_TOOLTIP = (
     " restore it later via Show hidden'"
 )
 
+# The delete icon carries no text label, so the tooltip supplies the click
+# consequence. Bundled rows render no icon; return null there so no tooltip
+# shows on the empty cell.
+DELETE_TOOLTIP = (
+    "params.data.deletable ? 'Delete this playlist (asks to confirm)' : null"
+)
+
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
@@ -244,6 +251,7 @@ TABLE_COLUMN_DEFS = [
         "headerName": "",
         "field": DELETE_COLUMN_ID,
         "cellRenderer": "DeleteAction",
+        "tooltipValueGetter": {"function": DELETE_TOOLTIP},
         "sortable": False,
         "resizable": False,
         "minWidth": 90,
@@ -393,9 +401,15 @@ def toggle_import_modal(_, opened):
     Output("playlists-rows-refresh", "data"),
     Output("playlists-import-modal", "opened", allow_duplicate=True),
     Output("playlists-import-textinput", "value"),
+    Output("playlists-import-textinput", "error"),
     Input("playlists-import-button", "n_clicks"),
     State("playlists-import-textinput", "value"),
     State("playlists-rows-refresh", "data"),
+    # The Import button spins (and, via Mantine's loading state, refuses further
+    # clicks) for the duration of the fetch. The playlist search is the
+    # timeout-prone endpoint, so a slow import can hang for tens of seconds; the
+    # spinner is the whole loading design and the disable covers spam-clicks.
+    running=[(Output("playlists-import-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
 def import_playlist(n_clicks, playlist_to_import, rows_refresh):
@@ -408,14 +422,19 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     leaves the modal open with the pasted code intact so the user can correct
     it; a duplicate-code refusal whose conflicting playlist is hidden gets the
     unhide hint appended (R14).
+
+    An empty or whitespace-only submit is a local validation problem, not an
+    event, so it sets an inline field error rather than sending a notification;
+    any non-empty submit clears that error. The phantom initial fire (guarded
+    on ``ctx.triggered_id``/``n_clicks``) must leave the error untouched.
     """
-    if (
-        ctx.triggered_id != "playlists-import-button"
-        or not n_clicks
-        or not playlist_to_import
-    ):
-        return no_update, no_update, no_update, no_update
-    playlist_to_import = playlist_to_import.strip()
+    if ctx.triggered_id != "playlists-import-button" or not n_clicks:
+        return no_update, no_update, no_update, no_update, no_update
+    playlist_to_import = (playlist_to_import or "").strip()
+    if not playlist_to_import:
+        # Inline field error, not a notification: this is a local validation
+        # problem. Touch nothing else so the modal and field stay as they are.
+        return no_update, no_update, no_update, no_update, "Enter a playlist code."
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
 
@@ -432,7 +451,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
             "id": "imported-playlist-failed-notification",
             "icon": local_icon("material-symbols:upload"),
         }
-        return [notification], no_update, no_update, no_update
+        return [notification], no_update, no_update, no_update, None
 
     # Importing is the intent to see: new playlists arrive visible. Mark the
     # canonical stored code, which can differ from the pasted input. The
@@ -441,15 +460,22 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     if canonical_code is not None:
         show_playlist(canonical_code)
         enqueue_playlist_percentile_warmup(canonical_code)
+    # Name the imported playlist using the canonical stored code (never the
+    # pasted input, which can differ in case) so the toast confirms exactly
+    # what landed. The fallback mirrors the guard above: the service contract
+    # guarantees a code here, but never render a "None" into the toast — or
+    # pass one to the str-typed label lookup — if that ever changes.
+    imported_code = canonical_code if canonical_code is not None else playlist_to_import
+    label = get_playlist_display_label(imported_code)
     notification = {
         "action": "show",
-        "title": "Notification",
-        "message": "Successfully imported playlist!",
+        "title": "Playlist Imported",
+        "message": f'Imported "{label}" ({imported_code}).',
         "color": "green",
         "id": "imported-playlist-successful-notification",
         "icon": local_icon("material-symbols:upload"),
     }
-    return [notification], (rows_refresh or 0) + 1, False, ""
+    return [notification], (rows_refresh or 0) + 1, False, "", None
 
 
 @callback(
@@ -530,7 +556,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     hide_playlist(target_code)
     notification = {
         "action": "show",
-        "title": "Notification",
+        "title": "Playlist Deleted",
         "message": "Deleted playlist.",
         "color": "green",
         "id": "deleted-playlist-successful-notification",
@@ -627,7 +653,7 @@ def confirm_delete_superseded(n_clicks, rows_refresh):
         return [notification], next_refresh, False
     notification = {
         "action": "show",
-        "title": "Notification",
+        "title": "Leftover Files Deleted",
         "message": "Deleted leftover playlist files.",
         "color": "green",
         "id": "superseded-cleanup-successful-notification",

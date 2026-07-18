@@ -184,18 +184,23 @@ a.playlist-scenario-link-cell:hover {
     mask: url("icons/material-symbols-visibility-off-outline.svg") no-repeat center / contain;
 }
 
-/* Delete link in the overview's delete column (DeleteAction renderer in
-   dashAgGridComponentFunctions.js). Red to
+/* Delete action icon in the overview's delete column (DeleteAction renderer
+   in dashAgGridComponentFunctions.js). A masked SVG recolored via
+   background-color, mirroring the .visibility-action technique above. Red to
    signal the destructive, user-playlist-only action. */
 .delete-action {
-    color: var(--mantine-color-red-filled);
+    -webkit-mask: url("icons/material-symbols-delete-outline.svg") no-repeat center / contain;
+    background-color: var(--mantine-color-red-filled);
     cursor: pointer;
-    text-decoration-line: underline;
-    text-underline-offset: 0.15em;
+    display: inline-block;
+    height: 18px;
+    mask: url("icons/material-symbols-delete-outline.svg") no-repeat center / contain;
+    vertical-align: middle;
+    width: 18px;
 }
 
 .delete-action:hover {
-    color: var(--mantine-color-red-filled-hover);
+    background-color: var(--mantine-color-red-filled-hover);
 }
 
 /* Benchmark/Playlist pill in the overview's Type column (TypeBadge renderer

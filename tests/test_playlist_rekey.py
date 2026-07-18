@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 import requests
+from pydantic import ValidationError
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
@@ -333,6 +334,78 @@ def test_import_reports_write_failures_without_updating_database(
 
     assert message == "Failed to save playlist data: Locked Playlist (LockedCode)"
     assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def _validation_error() -> ValidationError:
+    """Build a genuine pydantic ``ValidationError`` for the API-garbage case."""
+    try:
+        PlaylistData.model_validate({})
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("expected PlaylistData.model_validate({}) to raise")
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        requests.HTTPError("400 Client Error: Bad Request"),
+        _validation_error(),
+    ],
+    ids=["http-error", "validation-error"],
+)
+def test_import_degrades_api_failure_to_refusal(monkeypatch, exc):
+    # A gibberish code makes KovaaK's return HTTP 400 (and a slow spell can
+    # time out or return schema-invalid JSON). The import flow must degrade any
+    # of these to a refusal naming the pasted code, never let it escape as a
+    # raw callback error.
+    def raise_exc(_code):
+        raise exc
+
+    monkeypatch.setattr(data_service, "get_playlist_data", raise_exc)
+
+    message, imported_code = data_service.load_playlist_from_code("zzzznotacode!!")
+
+    assert imported_code is None
+    assert message is not None
+    assert "zzzznotacode!!" in message
+
+
+def test_import_refuses_blank_code_from_search_without_raising(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # PlaylistAPIResponse accepts a whitespace-only playlistCode as a plain
+    # string, but PlaylistData.strip_and_require_code rejects it. A
+    # structurally valid search response can therefore still fail domain
+    # validation, and that must degrade to a refusal rather than escape into
+    # the Dash callback.
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: SimpleNamespace(
+            data=[
+                SimpleNamespace(
+                    playlistName="Blank Code Playlist",
+                    playlistCode="   ",
+                    scenarioList=[SimpleNamespace(scenarioName="Scenario")],
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        data_service,
+        "get_evxl_playlist",
+        lambda _code: pytest.fail(
+            "a single-record build failure must refuse, not widen to the fallback"
+        ),
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("BlankCode")
+
+    assert imported_code is None
+    assert message == (
+        "Invalid playlist data returned by API for playlist code: BlankCode"
+    )
     assert data_service.playlist_database == {}
     assert not user_root.exists()
 

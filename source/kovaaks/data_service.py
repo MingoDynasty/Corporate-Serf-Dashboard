@@ -24,6 +24,7 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.stopwatch import Stopwatch
 
@@ -676,7 +677,9 @@ def load_playlists() -> None:
     )
 
 
-def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
+def load_playlist_from_code(  # noqa: PLR0911
+    input_playlist_code: str,
+) -> tuple[str | None, str | None]:
     """Import the single playlist matching a KovaaK's playlist code.
 
     Returns ``(error_message, canonical_playlist_code)``. The second element
@@ -691,18 +694,54 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
     differ from the pasted input (case normalization, non-exact search
     matches), so it must never be derived from ``input_playlist_code``.
     """
-    response = get_playlist_data(input_playlist_code)
+    try:
+        response = get_playlist_data(input_playlist_code)
+    except (requests.RequestException, ValidationError) as exc:
+        # KovaaK's returns HTTP 400 on some gibberish codes, and a slow spell
+        # can time out or return schema-invalid JSON. Degrade any of these to a
+        # refusal naming the pasted code rather than letting the exception
+        # escape as a raw Dash callback error (AGENTS.md "UI Boundaries").
+        # Deliberately no Evxl fallback here: widening the fallback to fire
+        # when the search itself *raises* is a design change, not a bug fix.
+        detail = (
+            request_exception_summary(exc)
+            if isinstance(exc, requests.RequestException)
+            else exc.__class__.__name__
+        )
+        logger.warning(
+            "Failed to look up playlist code %s: %s",
+            input_playlist_code,
+            detail,
+        )
+        message = (
+            f"Failed to look up playlist code {input_playlist_code}: "
+            "KovaaK's API error."
+        )
+        return message, None
     if response and len(response.data) == 1:
         # KovaaK's search produced exactly one usable record: the happy path,
         # no Evxl call.
-        playlist_data = PlaylistData(
-            name=response.data[0].playlistName,
-            code=response.data[0].playlistCode,
-            scenarios=[
-                Scenario(name=item.scenarioName)
-                for item in response.data[0].scenarioList
-            ],
-        )
+        try:
+            playlist_data = PlaylistData(
+                name=response.data[0].playlistName,
+                code=response.data[0].playlistCode,
+                scenarios=[
+                    Scenario(name=item.scenarioName)
+                    for item in response.data[0].scenarioList
+                ],
+            )
+        except ValidationError:
+            # Built inside a guard for the same reason as the Evxl build below:
+            # PlaylistAPIResponse accepts any str playlistCode, but PlaylistData
+            # rejects a blank/whitespace one, so a structurally valid search
+            # response can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            message = (
+                "Invalid playlist data returned by API for playlist code: "
+                f"{input_playlist_code}"
+            )
+            logger.warning(message)
+            return message, None
     else:
         # KovaaK's search failed to produce exactly one usable record: zero
         # records (its null-hydration quirk drops the match through the

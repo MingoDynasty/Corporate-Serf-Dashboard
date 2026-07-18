@@ -663,18 +663,25 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
         enqueued.append,
     )
 
-    notifications, import_refresh, opened, value = playlists.import_playlist(
+    notifications, import_refresh, opened, value, error = playlists.import_playlist(
         1, "  canonicalcode  ", 0
     )
 
     assert shown == ["CanonicalCode"]
     assert enqueued == ["CanonicalCode"]
     assert notifications[0]["color"] == "green"
+    # The toast names the playlist by its canonical stored code, not the pasted
+    # input. "CanonicalCode" is not in the database, so its display label is the
+    # code itself.
+    assert notifications[0]["title"] == "Playlist Imported"
+    assert notifications[0]["message"] == 'Imported "CanonicalCode" (CanonicalCode).'
     # A successful import bumps the refresh store so the grid rebuilds, then
     # closes the modal and clears the field so the user sees the new row.
     assert import_refresh == 1
     assert opened is False
     assert value == ""
+    # Any non-empty submit clears the inline validation error.
+    assert error is None
 
 
 def test_import_playlist_ignores_phantom_initial_fire(monkeypatch):
@@ -687,7 +694,7 @@ def test_import_playlist_ignores_phantom_initial_fire(monkeypatch):
 
     result = playlists.import_playlist(None, "KovaaKsTestCode", 2)
 
-    assert result == (no_update, no_update, no_update, no_update)
+    assert result == (no_update, no_update, no_update, no_update, no_update)
 
 
 def test_import_playlist_failure_does_not_show(monkeypatch):
@@ -701,7 +708,7 @@ def test_import_playlist_failure_does_not_show(monkeypatch):
         lambda _code: pytest.fail("must not mark failed imports as shown"),
     )
 
-    notifications, import_refresh, opened, value = playlists.import_playlist(
+    notifications, import_refresh, opened, value, error = playlists.import_playlist(
         1, "BadCode", 3
     )
 
@@ -712,6 +719,8 @@ def test_import_playlist_failure_does_not_show(monkeypatch):
     assert import_refresh is no_update
     assert opened is no_update
     assert value is no_update
+    # A non-empty (if refused) submit still clears the inline validation error.
+    assert error is None
 
 
 def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
@@ -732,7 +741,7 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
         lambda _code: pytest.fail("a refused import must not be shown"),
     )
 
-    notifications, import_refresh, opened, value = playlists.import_playlist(
+    notifications, import_refresh, opened, value, error = playlists.import_playlist(
         1, "ExistingCode", 0
     )
 
@@ -741,6 +750,7 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
     assert import_refresh is no_update
     assert opened is no_update
     assert value is no_update
+    assert error is None
 
 
 def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
@@ -756,11 +766,56 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
     )
     monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: True)
 
-    notifications, _import_refresh, _opened, _value = playlists.import_playlist(
+    notifications, _import_refresh, _opened, _value, _error = playlists.import_playlist(
         1, "ExistingCode", 0
     )
 
     assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
+
+
+@pytest.mark.parametrize("submitted", ["", "   "])
+def test_import_playlist_empty_code_sets_inline_error(monkeypatch, submitted):
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: pytest.fail("empty submit must not hit the import service"),
+    )
+
+    notifications, import_refresh, opened, value, error = playlists.import_playlist(
+        1, submitted, 0
+    )
+
+    # A local validation problem: an inline field error, no notification, and
+    # nothing else touched.
+    assert error == "Enter a playlist code."
+    assert notifications is no_update
+    assert import_refresh is no_update
+    assert opened is no_update
+    assert value is no_update
+
+
+def test_import_playlist_success_message_uses_display_label(monkeypatch):
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (None, "CanonicalCode"),
+    )
+    # The disambiguated display label can differ from the raw code; the toast
+    # must use it, paired with the canonical code.
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "My Playlist"
+    )
+    monkeypatch.setattr(playlists, "show_playlist", lambda _code: None)
+    monkeypatch.setattr(
+        playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
+    )
+
+    notifications, *_ = playlists.import_playlist(1, "canonicalcode", 0)
+
+    assert notifications[0]["title"] == "Playlist Imported"
+    assert notifications[0]["message"] == 'Imported "My Playlist" (CanonicalCode).'
 
 
 def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
