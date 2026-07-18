@@ -372,6 +372,44 @@ def test_import_degrades_api_failure_to_refusal(monkeypatch, exc):
     assert "zzzznotacode!!" in message
 
 
+def test_import_refuses_blank_code_from_search_without_raising(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # PlaylistAPIResponse accepts a whitespace-only playlistCode as a plain
+    # string, but PlaylistData.strip_and_require_code rejects it. A
+    # structurally valid search response can therefore still fail domain
+    # validation, and that must degrade to a refusal rather than escape into
+    # the Dash callback.
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: SimpleNamespace(
+            data=[
+                SimpleNamespace(
+                    playlistName="Blank Code Playlist",
+                    playlistCode="   ",
+                    scenarioList=[SimpleNamespace(scenarioName="Scenario")],
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        data_service,
+        "get_evxl_playlist",
+        lambda _code: pytest.fail(
+            "a single-record build failure must refuse, not widen to the fallback"
+        ),
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("BlankCode")
+
+    assert imported_code is None
+    assert message == (
+        "Invalid playlist data returned by API for playlist code: BlankCode"
+    )
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
 def _evxl_playlist(name, code, scenario_names):
     """Build an Evxl playlist-by-code stand-in with snake_case attributes."""
     return SimpleNamespace(

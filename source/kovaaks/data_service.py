@@ -721,14 +721,27 @@ def load_playlist_from_code(  # noqa: PLR0911
     if response and len(response.data) == 1:
         # KovaaK's search produced exactly one usable record: the happy path,
         # no Evxl call.
-        playlist_data = PlaylistData(
-            name=response.data[0].playlistName,
-            code=response.data[0].playlistCode,
-            scenarios=[
-                Scenario(name=item.scenarioName)
-                for item in response.data[0].scenarioList
-            ],
-        )
+        try:
+            playlist_data = PlaylistData(
+                name=response.data[0].playlistName,
+                code=response.data[0].playlistCode,
+                scenarios=[
+                    Scenario(name=item.scenarioName)
+                    for item in response.data[0].scenarioList
+                ],
+            )
+        except ValidationError:
+            # Built inside a guard for the same reason as the Evxl build below:
+            # PlaylistAPIResponse accepts any str playlistCode, but PlaylistData
+            # rejects a blank/whitespace one, so a structurally valid search
+            # response can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            message = (
+                "Invalid playlist data returned by API for playlist code: "
+                f"{input_playlist_code}"
+            )
+            logger.warning(message)
+            return message, None
     else:
         # KovaaK's search failed to produce exactly one usable record: zero
         # records (its null-hydration quirk drops the match through the
