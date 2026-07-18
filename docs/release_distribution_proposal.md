@@ -1,9 +1,10 @@
 # Proposal: release, versioning, and distribution model
 
-Status: revision 1, 2026-07-18. Revision 0 received an external design review
-(Codex); every finding was triaged (fix / accept / defer) and the fixes are
-folded into the decisions below. The finding-by-finding disposition lives in
-the review handoff doc (untracked, `ignore/pr-reviews/`).
+Status: Proposed — revision 2, 2026-07-18. Revision 0 received an external
+design review (Codex) before PR #150 opened; revision 2 folds in the second
+Codex round from the PR itself. Every finding was triaged (fix / accept /
+defer); the finding-by-finding dispositions live in the review handoff doc
+(untracked, `ignore/pr-reviews/pr150-review.md`).
 
 ## Background
 
@@ -39,9 +40,13 @@ Two problems motivate this proposal:
 (`.github/workflows/ci.yml`), running only on push to `main` with
 `needs: test` — a commit that fails gates never becomes a release. The job:
 
-- is skipped when the push touches no runnable paths (`source/`, `assets/`,
-  `resources/`, `pyproject.toml`, `uv.lock`, `version.txt`) — docs/tests-only
-  pushes produce no release noise;
+- is skipped only when the push touches nothing outside known non-runtime
+  paths (`docs/**`, `tests/**`, `**/*.md`, `.gitignore`,
+  `.pre-commit-config.yaml`, `.github/**`) — a blocklist, not an allowlist,
+  because the failure directions are asymmetric: a redundant release is
+  noise, while a missed release strands distribution inputs (`install.ps1`,
+  the launcher, `example.toml`, `.python-version`, `.gitattributes`) at an
+  older tag. When in doubt, release;
 - computes the next tag `vYYYY.MM.DD` (`.N` suffix for same-day repeats) from
   existing tags at execution time;
 - serializes via a fixed concurrency group with `cancel-in-progress: false`
@@ -49,8 +54,12 @@ Two problems motivate this proposal:
   since May 2026), so concurrent pushes cannot race the `.N` computation;
 - is idempotent: if a tag already points at `HEAD`, it is reused and a
   missing release is repaired rather than allocating a new suffix;
-- creates the tag + GitHub Release, and uploads the source zip as a named
-  release asset (stable bytes/digest, unlike on-demand source archives);
+- creates the tag, then a **draft** release, attaches the source zip, and
+  only then publishes — required once releases are immutable (D7), because
+  assets cannot be added after publication. The zip is produced by
+  `git archive --format=zip <tag SHA>` — the only producer that expands the
+  export-subst stamp (D2); zipping a checkout would ship `version.txt`
+  unexpanded;
 - holds `contents: write` at job scope only; the workflow keeps its current
   top-level `contents: read`.
 
@@ -86,11 +95,14 @@ recovery remain real, small, costs.
 
 Precedence: manifest → expanded `version.txt` → git → `unknown`. All
 user-visible identity (D3) derives from this one `BuildInfo`.
-Implementation must verify the export-subst expansion empirically (download
-the repo zip and check) before building on it: the mechanism is documented
+Implementation must verify the export-subst expansion empirically before
+building on it: the mechanism is documented
 (`git-scm.com/docs/gitattributes`, GitHub source archives are `git archive`
 output), but our research run's adversarial verification of this specific
-claim was lost to infrastructure errors, not confirmed.
+claim was lost to infrastructure errors, not confirmed. PR 1 checks GitHub's
+on-demand zip download; PR 3's verification checks the named release asset
+itself once the first release publishes (the asset is what the launcher
+actually consumes).
 
 **Why manifest + stamp, not a CI-committed version file.** A bot committing
 a version file on every push is self-defeating: the commit changes the SHA
@@ -139,22 +151,31 @@ launcher — not the app — owns choosing the directories.
 `irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main/install.ps1 | iex`.
 The script:
 
-- installs the **exact pinned uv** (`tool.uv.required-version`, currently
-  `==0.11.26`) **app-locally** via `UV_UNMANAGED_INSTALL` into the install
-  tree, invoked by absolute path thereafter — it neither uses nor disturbs
-  any uv already on the machine (a user's global uv would fail the exact pin;
-  a global install of ours could downgrade their tooling);
-- lets uv provision CPython per the committed `.python-version` (3.14 —
-  pinned explicitly rather than inferred from `requires-python = ">=3.14"`,
-  which would silently float to 3.15+);
+- makes the **entire toolchain app-local**, not just the uv binary:
+  `UV_UNMANAGED_INSTALL` places the exact pinned uv
+  (`tool.uv.required-version`, currently `==0.11.26`) in the install tree,
+  invoked by absolute path; `UV_PYTHON_INSTALL_DIR` keeps managed CPython
+  under the install root and `--managed-python` forbids silently selecting
+  whatever Python the machine happens to have; `UV_CACHE_DIR` keeps the
+  cache inside too. Nothing uses or disturbs any uv/Python already on the
+  machine, and uninstall is honest: delete the folder and the shortcut;
+- provisions CPython per a committed `.python-version` (3.14). **This file
+  does not exist yet** — creating it is assigned to PR 1 — because
+  `requires-python = ">=3.14"` alone would silently float to 3.15+;
 - downloads the **latest release asset zip** (not `main`'s tip; falls back
   to the tag's source archive if the asset is missing), extracts the code
   into a per-tag directory under `%LOCALAPPDATA%\CorporateSerfDashboard`,
   and syncs with `--locked --no-dev` (dev group is synced by default
   otherwise; `uv.lock` is committed and CI already enforces `--locked`);
-- creates `config.toml` from `example.toml` only if absent; never touches
-  existing `config.toml` or `data/` (they live in the state root, which
-  version swaps never write to);
+- on first run, does not merely copy `example.toml` (whose
+  `stats_dir = "Change me!"` placeholder would crash the first launch when
+  the watchdog observer schedules a nonexistent directory): it locates the
+  KovaaK's stats directory itself — Steam's registry `InstallPath` plus
+  `libraryfolders.vdf` → `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`
+  — confirms it with the user, falls back to a prompt, validates that the
+  directory exists, and writes it into `config.toml`. Existing `config.toml`
+  and `data/` are never touched (they live in the state root, which version
+  swaps never write to);
 - writes the install manifest (D2) atomically and creates a desktop
   shortcut.
 
@@ -172,15 +193,30 @@ Rejected alternatives).
 
 ### D6. Update UX: launcher with a persistent update policy; tags are rollback
 
-**Mechanism.** The desktop shortcut runs a launcher that reads the manifest
-policy:
+**Mechanism.** The desktop shortcut targets a deliberately trivial,
+**stable bootstrap** at the install root (`launch.ps1`): read the manifest,
+delegate to the selected version's launcher, nothing else. Per-tag
+directories get pruned, so the shortcut must never point into one; and
+because the bootstrap does almost nothing, it should almost never need
+changing — when it does, the versioned launcher overwrites it on a higher
+embedded version marker (no richer update protocol than that). The
+versioned launcher then applies the manifest policy:
 
 - `update_policy: "latest"` (default): query `releases/latest` with a short
   timeout; if its tag differs from the installed one, download into a new
-  per-tag directory, sync, atomically update the manifest, then run. On any
-  network/API failure: run the existing install unchanged (fail-open,
-  offline-safe). One unauthenticated API call per launch is well inside
-  GitHub's 60/hour/IP limit; no caching layer is warranted for one call.
+  per-tag directory and sync — but do **not** promote yet. The new version
+  starts as a pending activation: the launcher polls
+  `http://localhost:<port>` for readiness (the same poll that decides when
+  to open the browser), and only a ready app gets the manifest atomically
+  rewritten to make it authoritative. On timeout or early exit, the
+  launcher starts the previous version instead and leaves the manifest
+  untouched — a crashing release never becomes the recorded install. (A
+  readiness failure can also be config-caused, in which case the previous
+  version fails identically and the launcher surfaces the app's error
+  output; it does not try to attribute blame.) On any network/API failure:
+  run the existing install unchanged (fail-open, offline-safe). One
+  unauthenticated API call per launch is well inside GitHub's 60/hour/IP
+  limit; no caching layer is warranted for one call.
 - `update_policy: "pinned"` + `pinned_tag`: skip the update check entirely
   and run the pinned version. A rollback install (`install.ps1 -Tag
   v2026.07.17`) **writes this pin**; without it, the next launch would
@@ -201,11 +237,13 @@ the deferrable part, identity is not.
 ### D7. Immutability is enforced, not assumed
 
 **Mechanism.** Enable GitHub's immutable-releases setting on the repo so
-tags/releases cannot be moved or deleted (manual one-time repo setting —
-recorded as a post-merge step in the shipping PR, per house convention).
-The named asset zip from D1 gives stable bytes with a GitHub-provided
-digest; launcher-side checksum verification is deferred (HTTPS to
-github.com is the trust anchor for this audience).
+tags/releases cannot be moved or deleted. The setting is not retroactive,
+and merging PR 3 itself cuts the first release — so this is a **pre-merge**
+step of PR 3, not post-merge, or that first release stays mutable forever.
+It is also what forces D1's draft-first flow, since immutable release
+assets lock at publication. The named asset zip gives stable bytes with a
+GitHub-provided digest; launcher-side checksum verification is deferred
+(HTTPS to github.com is the trust anchor for this audience).
 
 ## Rejected alternatives
 
@@ -282,12 +320,23 @@ a second audience, or evidence of tampering risk.
 
 - **PR 1 — build identity**: `version.txt` + `.gitattributes`, `BuildInfo`
   reader with the D2 precedence chain, tooltip + log line + title fix,
-  tests (including the empirical export-subst zip check). No dependencies.
+  `.python-version` (trivial rider — every later PR then inherits the
+  pinned interpreter), tests including the empirical export-subst check
+  against GitHub's zip download. No dependencies.
 - **PR 2 — state root**: `CSD_STATE_DIR` + paths module, package-relative
-  `resources/`, tests. Independent of PR 1.
-- **PR 3 — release job in CI**: D1 in full (gating, path filter,
-  concurrency, idempotency, asset upload). Independent; after merge, one
-  manual repo step (D7's immutable-releases setting).
-- **PR 4 — installer + launcher + README**: D5 + D6, README "Easy install"
-  and rollback sections. Depends on PRs 1–3 (needs a real release, the
-  state root, and the manifest reader).
+  `resources/`, an actionable startup error when `stats_dir` does not exist
+  (today the watchdog observer throws a raw traceback at the "Change me!"
+  placeholder), tests. Independent of PR 1.
+- **PR 3 — release job in CI**: D1 in full (blocklist gating, concurrency,
+  idempotency, `git archive` asset, draft→publish). The D7
+  immutable-releases setting is flipped **before merge**; post-merge
+  verification downloads the first release's named asset and asserts the
+  export-subst stamp expanded.
+- **PR 4 — installer + launcher + README**: D5 + D6 (first-run stats-dir
+  detection, root bootstrap, pending-activation update), README "Easy
+  install", rollback, and uninstall sections. Depends on PRs 1–3 (needs a
+  real release, the state root, and the manifest reader). As the PR that
+  finishes shipping this proposal, it also owes the AGENTS.md "Shipping a
+  proposal" definition of done: distill durable decisions into
+  `docs/decision_log.md`, delete this file, update `docs/roadmap.md` /
+  `docs/product.md` / `docs/tech_debt.md`, and repair references.
