@@ -829,6 +829,105 @@ def test_save_leaderboard_id_handles_concurrent_upserts(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def _reset_mapping_cache(monkeypatch, tmp_path):
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_leaderboard_mapping_cache", None)
+    monkeypatch.setattr(api_service, "_leaderboard_mapping_signature", None)
+
+
+def test_mapping_cache_serves_forged_signature_rewrite_until_next_write(
+    monkeypatch, tmp_path
+):
+    """A same-size rewrite forging the old mtime is deliberately NOT detected
+    (accepted limitation, 2026-07-18 decision log entry): the cache promises
+    fast reads until the next write, and the next real write is detected."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    mapping_file = api_service._leaderboard_mapping_file()
+    stat_before = mapping_file.stat()
+    original = mapping_file.read_text(encoding="utf-8")
+    rewritten = original.replace("111", "999")
+    assert len(rewritten) == len(original)
+    mapping_file.write_text(rewritten, encoding="utf-8")
+    os.utime(mapping_file, ns=(stat_before.st_atime_ns, stat_before.st_mtime_ns))
+    stat_after = mapping_file.stat()
+    assert stat_after.st_mtime_ns == stat_before.st_mtime_ns
+    assert stat_after.st_size == stat_before.st_size
+
+    # The forged rewrite is invisible to metadata revalidation: accepted.
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    # The next genuine write changes the signature and reloads everything,
+    # surfacing the forged content too.
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 999
+
+
+def test_leaderboard_mapping_cache_parses_file_once(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+
+    reads = []
+    original_read_json = api_service._read_json
+
+    def counting_read_json(cache_file):
+        reads.append(cache_file)
+        return original_read_json(cache_file)
+
+    monkeypatch.setattr(api_service, "_read_json", counting_read_json)
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+    assert api_service.get_cached_leaderboard_id("Missing") is None
+    assert len(reads) == 1
+
+
+def test_save_leaderboard_id_invalidates_mapping_cache(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") is None
+
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+
+
+def test_mapping_cache_reflects_external_rewrite(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    api_service._leaderboard_mapping_file().write_text(
+        json.dumps({"Scenario A": {"leaderboard_id": 999, "source": "external"}}),
+        encoding="utf-8",
+    )
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 999
+
+
+def test_mapping_cache_tolerates_file_deletion(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    api_service._leaderboard_mapping_file().unlink()
+    assert api_service.get_cached_leaderboard_id("Scenario A") is None
+
+    api_service.save_leaderboard_id("Scenario A", 112, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 112
+
+
+def test_mapping_cache_tolerates_malformed_file(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    mapping_file = api_service._leaderboard_mapping_file()
+    mapping_file.parent.mkdir(parents=True)
+    mapping_file.write_text("not json", encoding="utf-8")
+    assert api_service.get_cached_leaderboard_id("Scenario A") is None
+
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+
 def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     monkeypatch,
 ):

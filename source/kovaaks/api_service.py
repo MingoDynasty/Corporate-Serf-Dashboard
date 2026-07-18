@@ -484,13 +484,53 @@ def _leaderboard_mapping_file() -> Path:
     )
 
 
+# In-memory mirror of the mapping file, revalidated on every read against the
+# file's identity (path, mtime_ns, size). Disk stays the source of truth:
+# writes go around this cache (save_leaderboard_id writes the file only), and
+# the per-read stat catches in-process writes, other processes, manual edits,
+# and cache-directory deletion alike. Guarded by _CACHE_IO_LOCK, which
+# _write_json also holds, so a lookup cannot interleave with a write.
+# Metadata alone cannot detect a same-size rewrite that also preserves the
+# timestamp (deliberate os.utime forgery after an in-place edit). Accepted
+# limitation, per the 2026-07-18 decision log entry: no realistic writer does
+# this (atomic replace, editors, and restores all shift mtime_ns or size),
+# and a periodic redundant reload would betray the cache's purpose — fast
+# reads until the next write.
+_leaderboard_mapping_cache: dict | None = None
+_leaderboard_mapping_signature: tuple[str, int, int] | None = None
+
+
+def _load_leaderboard_mapping() -> dict:
+    """Return the parsed mapping file, re-parsing only when the file changes.
+
+    The mapping is one large, rarely-written JSON dict consulted once per rank
+    lookup; parsing it per read dominated the playlist overview build (see the
+    2026-07-18 decision log entry). A missing or malformed file yields an
+    empty mapping, matching the tolerant-read cache convention. Callers must
+    treat the returned dict as read-only.
+    """
+    global _leaderboard_mapping_cache, _leaderboard_mapping_signature  # noqa: PLW0603
+    with _CACHE_IO_LOCK:
+        cache_file = _leaderboard_mapping_file()
+        try:
+            stat = cache_file.stat()
+            signature = (str(cache_file), stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            signature = None
+        if (
+            _leaderboard_mapping_cache is not None
+            and signature == _leaderboard_mapping_signature
+        ):
+            return _leaderboard_mapping_cache
+        cache_data = _read_json(cache_file) if signature is not None else None
+        _leaderboard_mapping_cache = cache_data if isinstance(cache_data, dict) else {}
+        _leaderboard_mapping_signature = signature
+        return _leaderboard_mapping_cache
+
+
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     """Return the stored leaderboard ID for an exact scenario name."""
-    cache_data = _read_json(_leaderboard_mapping_file())
-    if not isinstance(cache_data, dict):
-        return None
-
-    scenario_data = cache_data.get(scenario_name)
+    scenario_data = _load_leaderboard_mapping().get(scenario_name)
     if not isinstance(scenario_data, dict):
         return None
 
