@@ -462,12 +462,15 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
         enqueue_playlist_percentile_warmup(canonical_code)
     # Name the imported playlist using the canonical stored code (never the
     # pasted input, which can differ in case) so the toast confirms exactly
-    # what landed.
-    label = get_playlist_display_label(canonical_code)
+    # what landed. The fallback mirrors the guard above: the service contract
+    # guarantees a code here, but never render a "None" into the toast — or
+    # pass one to the str-typed label lookup — if that ever changes.
+    imported_code = canonical_code if canonical_code is not None else playlist_to_import
+    label = get_playlist_display_label(imported_code)
     notification = {
         "action": "show",
         "title": "Playlist Imported",
-        "message": f'Imported "{label}" ({canonical_code}).',
+        "message": f'Imported "{label}" ({imported_code}).',
         "color": "green",
         "id": "imported-playlist-successful-notification",
         "icon": local_icon("material-symbols:upload"),
