@@ -1,10 +1,14 @@
 # Proposal: release, versioning, and distribution model
 
-Status: Proposed — revision 2, 2026-07-18. Revision 0 received an external
-design review (Codex) before PR #150 opened; revision 2 folds in the second
-Codex round from the PR itself. Every finding was triaged (fix / accept /
-defer); the finding-by-finding dispositions live in the review handoff doc
-(untracked, `ignore/pr-reviews/pr150-review.md`).
+Status: Proposed — revision 3, 2026-07-18. The r0 draft, r1 (this PR's
+initial revision), and r2 each received an external design review (Codex);
+every finding across the three rounds was triaged (fix / accept / defer)
+and the fixes are folded into the decisions below. Finding-by-finding
+dispositions live in the review handoff doc (untracked,
+`ignore/pr-reviews/pr150-review.md`). Revision 3 closes the review loop:
+further design changes require a new P1-class finding, not another polish
+round — remaining risk lives in the implementation PRs, which get their own
+reviews.
 
 ## Background
 
@@ -52,14 +56,25 @@ Two problems motivate this proposal:
 - serializes via a fixed concurrency group with `cancel-in-progress: false`
   and `queue: max` (GitHub Actions has supported >1 queued run per group
   since May 2026), so concurrent pushes cannot race the `.N` computation;
-- is idempotent: if a tag already points at `HEAD`, it is reused and a
-  missing release is repaired rather than allocating a new suffix;
-- creates the tag, then a **draft** release, attaches the source zip, and
-  only then publishes — required once releases are immutable (D7), because
-  assets cannot be added after publication. The zip is produced by
-  `git archive --format=zip <tag SHA>` — the only producer that expands the
-  export-subst stamp (D2); zipping a checkout would ship `version.txt`
-  unexpanded;
+- is idempotent across every partial-failure state, not just
+  tag-without-release: a rerun reuses a tag already pointing at `HEAD`,
+  locates and **resumes an existing draft** (re-attaching assets) rather
+  than creating a second release, and only then publishes;
+- creates the tag, then a **draft** release, attaches assets, validates,
+  and only then publishes — required once releases are immutable (D7),
+  because assets lock at publication, which also means validation must run
+  pre-publish (after publishing an immutable release it is too late to fix
+  one). The zip is produced by `git archive --format=zip <tag SHA>` — the
+  only producer that expands the export-subst stamp (D2); zipping a
+  checkout would ship `version.txt` unexpanded — and the validation step
+  unzips the built asset and asserts the stamp actually expanded;
+- attaches a second, tiny asset: `release.json` — machine-readable release
+  metadata carrying the tag, the **full commit SHA**, the commit date, and
+  the release's `tool.uv.required-version` and `.python-version` values.
+  Installer and launcher consume this instead of parsing TOML from
+  PowerShell or making extra API calls for the exact SHA
+  (`releases/latest` alone reports `target_commitish`, which may be a
+  branch name rather than a SHA);
 - holds `contents: write` at job scope only; the workflow keeps its current
   top-level `contents: read`.
 
@@ -83,15 +98,18 @@ recovery remain real, small, costs.
 
 1. **Install manifest** (`install.json`, written atomically by the
    installer/launcher, never by the app): tag, full SHA, commit date, and
-   update policy (see D6). This is the authoritative identity for installed
-   copies — the export-subst stamp alone cannot carry the tag name.
-2. **`version.txt`** committed with the placeholder `$Format:%h %cs$` plus a
+   update policy (see D6), copied from the release's `release.json` asset
+   (D1) — the defined source for the exact SHA. This is the authoritative
+   identity for installed copies — the export-subst stamp alone cannot
+   carry the tag name.
+2. **`version.txt`** committed with the placeholder `$Format:%H %cs$` plus a
    `.gitattributes` line `version.txt export-subst`. GitHub's archive
    endpoints run `git archive`, which expands the placeholder, so any zip
-   download — even outside the installer — carries its short SHA + commit
-   date. (Same mechanism as setuptools-scm's `.git_archival.txt`.)
+   download — even outside the installer — carries its full SHA + commit
+   date; `BuildInfo` shortens the SHA for display only. (Same mechanism as
+   setuptools-scm's `.git_archival.txt`.)
 3. **Git fallback**: if the placeholder is unexpanded, we're in a checkout —
-   `git rev-parse --short HEAD`; else `unknown`.
+   `git rev-parse HEAD`; else `unknown`.
 
 Precedence: manifest → expanded `version.txt` → git → `unknown`. All
 user-visible identity (D3) derives from this one `BuildInfo`.
@@ -147,18 +165,31 @@ launcher — not the app — owns choosing the directories.
 
 ### D5. Install path: PowerShell one-liner, app-local toolchain
 
-**Mechanism.** `install.ps1` at repo root; user instruction is one line:
-`irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main/install.ps1 | iex`.
-The script:
+**Mechanism.** Two scripts, so the installer is always the same age as its
+payload. The one-liner fetches a deliberately trivial, permanently
+backward-compatible shim from `main` — `get.ps1`: resolve the latest
+release tag, fetch that tag's `install.ps1`, run it, nothing else:
+`irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main/get.ps1 | iex`.
+The real installer (`install.ps1`, fetched at the tag it installs) can then
+change freely between releases without ever running against an older
+payload whose layout it no longer matches — the skew that would otherwise
+open every time an installer change merges ahead of its release, and stay
+open indefinitely if a release job fails. The installer:
 
 - makes the **entire toolchain app-local**, not just the uv binary:
-  `UV_UNMANAGED_INSTALL` places the exact pinned uv
-  (`tool.uv.required-version`, currently `==0.11.26`) in the install tree,
-  invoked by absolute path; `UV_PYTHON_INSTALL_DIR` keeps managed CPython
-  under the install root and `--managed-python` forbids silently selecting
-  whatever Python the machine happens to have; `UV_CACHE_DIR` keeps the
-  cache inside too. Nothing uses or disturbs any uv/Python already on the
-  machine, and uninstall is honest: delete the folder and the shortcut;
+  `UV_UNMANAGED_INSTALL` places uv in the install tree, invoked by absolute
+  path; `UV_PYTHON_INSTALL_DIR` keeps managed CPython under the install
+  root and `--managed-python` forbids silently selecting whatever Python
+  the machine happens to have; `UV_CACHE_DIR` keeps the cache inside too.
+  Nothing uses or disturbs any uv/Python already on the machine, and
+  uninstall is honest: delete the folder and the shortcut. The uv version
+  is **per release, not per install**: installer and launcher read the
+  target release's `release.json` (D1) and ensure that exact uv
+  (`tool.uv.required-version`, currently `==0.11.26`) is present
+  app-locally *before* syncing that release. An install-time-frozen uv
+  would brick the first update that bumps the pin — the old binary rejects
+  the new project, and `UV_UNMANAGED_INSTALL` disables uv self-update — so
+  the toolchain upgrade must ride the same update transaction as the code;
 - provisions CPython per a committed `.python-version` (3.14). **This file
   does not exist yet** — creating it is assigned to PR 1 — because
   `requires-python = ">=3.14"` alone would silently float to 3.15+;
@@ -199,16 +230,29 @@ delegate to the selected version's launcher, nothing else. Per-tag
 directories get pruned, so the shortcut must never point into one; and
 because the bootstrap does almost nothing, it should almost never need
 changing — when it does, the versioned launcher overwrites it on a higher
-embedded version marker (no richer update protocol than that). The
-versioned launcher then applies the manifest policy:
+embedded version marker (no richer update protocol than that).
+
+The launcher is **single-instance**: it takes a named mutex scoped to the
+install root and holds it for the launcher+app lifetime. A second
+double-click sees the mutex, opens the browser at the running instance,
+and exits — it does not update, sync, or touch the manifest. Without this,
+two quick launches race the same per-tag extract, the manifest, and the
+port; atomic manifest writes protect one file, not the whole transaction.
+The versioned launcher then applies the manifest policy:
 
 - `update_policy: "latest"` (default): query `releases/latest` with a short
   timeout; if its tag differs from the installed one, download into a new
   per-tag directory and sync — but do **not** promote yet. The new version
-  starts as a pending activation: the launcher polls
-  `http://localhost:<port>` for readiness (the same poll that decides when
-  to open the browser), and only a ready app gets the manifest atomically
-  rewritten to make it authoritative. On timeout or early exit, the
+  starts as a pending activation: the launcher polls a small identity
+  endpoint (`/health`, added in PR 1) that reports the app's `BuildInfo`
+  and echoes back a per-launch token passed via environment variable — a
+  bare HTTP 200 is not proof of life, because an already-running instance
+  or an unrelated service (Steam famously squats on the default port 8080)
+  can answer while the pending process failed to bind. Promotion requires
+  the child process still alive **and** the response identity matching the
+  expected tag/SHA and token; the same poll decides when to open the
+  browser. Only then is the manifest atomically rewritten to make the new
+  version authoritative. On timeout or early exit, the
   launcher starts the previous version instead and leaves the manifest
   untouched — a crashing release never becomes the recorded install. (A
   readiness failure can also be config-caused, in which case the previous
@@ -227,6 +271,17 @@ versioned launcher then applies the manifest policy:
 
 The previous version's directory is kept until the new one has started
 successfully once, then pruned (keep last two).
+
+Rollback protects **code**; durable state is governed by a compatibility
+rule rather than machinery. Releases must read older state (missing keys
+get defaults — already the norm here) and must not rewrite user-authored
+files (`config.toml` is user-owned after install; the app writes only
+under `data/`). The durable state is a handful of tiny, schema-stable
+files (preferences.json, imported playlist JSONs), so a release that
+genuinely changes a state format is rare enough to be called out in its
+PR/release notes with a manual step — the house convention for a
+single-digit user base. State snapshot/restore machinery is deferred, not
+built (see Deferred).
 
 **Why.** This preserves "everyone runs latest" as the default with one
 double-click, while making a bad morning push recoverable *durably*.
@@ -313,13 +368,16 @@ unworkable at this size); the Zed auto-update post-mortem went unverified.
 
 Channel separation (stable/nightly); PyPI + `uvx` distribution;
 launcher-side checksum verification; ETag/conditional-request caching of the
-update check; in-app update UI. Each has a trigger to revisit: more users,
-a second audience, or evidence of tampering risk.
+update check; in-app update UI; state snapshot/restore on rollback (the D6
+compatibility rule covers it at this scale). Each has a trigger to revisit:
+more users, a second audience, evidence of tampering risk, or a real
+state-format break.
 
 ## Delivery plan
 
 - **PR 1 — build identity**: `version.txt` + `.gitattributes`, `BuildInfo`
-  reader with the D2 precedence chain, tooltip + log line + title fix,
+  reader with the D2 precedence chain, tooltip + log line + title fix, the
+  `/health` identity endpoint (BuildInfo + launch-token echo),
   `.python-version` (trivial rider — every later PR then inherits the
   pinned interpreter), tests including the empirical export-subst check
   against GitHub's zip download. No dependencies.
@@ -328,14 +386,18 @@ a second audience, or evidence of tampering risk.
   (today the watchdog observer throws a raw traceback at the "Change me!"
   placeholder), tests. Independent of PR 1.
 - **PR 3 — release job in CI**: D1 in full (blocklist gating, concurrency,
-  idempotency, `git archive` asset, draft→publish). The D7
-  immutable-releases setting is flipped **before merge**; post-merge
-  verification downloads the first release's named asset and asserts the
-  export-subst stamp expanded.
-- **PR 4 — installer + launcher + README**: D5 + D6 (first-run stats-dir
-  detection, root bootstrap, pending-activation update), README "Easy
-  install", rollback, and uninstall sections. Depends on PRs 1–3 (needs a
-  real release, the state root, and the manifest reader). As the PR that
+  draft-resume idempotency, `git archive` asset, `release.json` metadata,
+  pre-publish validation of the expanded stamp inside the built zip,
+  draft→publish). The D7 immutable-releases setting is flipped **before
+  merge**; post-merge verification re-downloads the first release's assets
+  to confirm the in-workflow validation.
+- **PR 4 — installer + launcher + README**: D5 + D6 (`get.ps1` shim +
+  tag-versioned `install.ps1`, first-run stats-dir detection, root
+  bootstrap, single-instance mutex, per-release uv provisioning,
+  pending-activation update with identity probe), README "Easy install",
+  rollback, and uninstall sections. Depends on PRs 1–3 (needs a real
+  release, the state root, the `/health` endpoint, and the manifest
+  reader). As the PR that
   finishes shipping this proposal, it also owes the AGENTS.md "Shipping a
   proposal" definition of done: distill durable decisions into
   `docs/decision_log.md`, delete this file, update `docs/roadmap.md` /
