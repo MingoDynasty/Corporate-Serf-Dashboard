@@ -680,15 +680,16 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
     """Import the single playlist matching a KovaaK's playlist code.
 
     Returns ``(error_message, canonical_playlist_code)``. The second element
-    is the canonical ``playlistCode`` from KovaaK's — the imported code on a
-    successful import, or the conflicting existing code on a duplicate-code
-    refusal (so callers can, for example, ask whether that existing playlist
-    is hidden). It is None only when there is no canonical code to report:
-    the search returned nothing, was ambiguous, or the write failed. The
-    canonical code is what the store, the user-root tracking, and the
-    visibility show-list are keyed by; it can differ from the pasted input
-    (case normalization, non-exact search matches), so it must never be
-    derived from ``input_playlist_code``.
+    is the canonical code from whichever source resolved it — KovaaK's search
+    (``playlistCode``) or the Evxl by-code fallback (``playlist_code``) — the
+    imported code on a successful import, or the conflicting existing code on
+    a duplicate-code refusal (so callers can, for example, ask whether that
+    existing playlist is hidden). It is None only when there is no canonical
+    code to report: neither the search nor the Evxl fallback resolved the
+    code, or the write failed. The canonical code is what the store, the
+    user-root tracking, and the visibility show-list are keyed by; it can
+    differ from the pasted input (case normalization, non-exact search
+    matches), so it must never be derived from ``input_playlist_code``.
     """
     response = get_playlist_data(input_playlist_code)
     if response and len(response.data) == 1:
