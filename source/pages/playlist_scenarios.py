@@ -131,7 +131,7 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Percentile",
         "field": "percentile_sort",
         "headerTooltip": (
-            "Your percentile on the scenario's global leaderboard - the share "
+            "Your percentile on the scenario's global leaderboard — the share "
             "of players you place above (higher is better)."
         ),
         "valueFormatter": {

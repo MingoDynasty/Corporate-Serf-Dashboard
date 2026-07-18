@@ -82,7 +82,7 @@ SETTINGS_HELP_TEXT = {
         "the run against the personal best it was chasing."
     ),
     "score-threshold-notification": (
-        "Notifies after each new run whether the score reached the score threshold."
+        "Notifies after each new run whether it reached the score threshold."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "

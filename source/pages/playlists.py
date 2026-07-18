@@ -124,20 +124,17 @@ LOWEST_PERCENTILE_CELL_CLASS = (
 )
 
 # The eye toggle acts immediately with no confirm step, so the hover copy
-# carries the action, its consequence, and the way back (Show hidden).
+# carries the action and its consequence.
 VISIBILITY_TOOLTIP = (
     "params.data.hidden"
     " ? 'Show this playlist again in the overview and playlist selectors'"
-    " : 'Hide this playlist from the overview and playlist selectors;"
-    " restore it later via Show hidden'"
+    " : 'Hide this playlist from the overview and playlist selectors'"
 )
 
 # The delete icon carries no text label, so the tooltip supplies the click
 # consequence. Bundled rows render no icon; return null there so no tooltip
 # shows on the empty cell.
-DELETE_TOOLTIP = (
-    "params.data.deletable ? 'Delete this playlist (asks to confirm)' : null"
-)
+DELETE_TOOLTIP = "params.data.deletable ? 'Delete this playlist' : null"
 
 TABLE_COLUMN_DEFS = [
     {
@@ -169,10 +166,7 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Played",
         "field": "played_sort",
-        "headerTooltip": (
-            "Scenarios you have played at least once, out of the scenarios in "
-            "the playlist."
-        ),
+        "headerTooltip": "Scenarios played / total scenarios",
         "valueFormatter": {"function": "params.data.played_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -512,8 +506,7 @@ def manage_delete_modal(cell_clicked, _cancel):
         return no_update, no_update, no_update
     label = get_playlist_display_label(playlist_code)
     message = (
-        f'Delete "{label}" ({playlist_code})? This removes its playlist file '
-        "from data/playlists. You can re-import it later by share code."
+        f'Delete "{label}" ({playlist_code})? You can re-import it later by share code.'
     )
     return True, playlist_code, message
 
