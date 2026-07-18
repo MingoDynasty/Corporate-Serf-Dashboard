@@ -833,18 +833,15 @@ def _reset_mapping_cache(monkeypatch, tmp_path):
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
     monkeypatch.setattr(api_service, "_leaderboard_mapping_cache", None)
     monkeypatch.setattr(api_service, "_leaderboard_mapping_signature", None)
-    monkeypatch.setattr(api_service, "_leaderboard_mapping_loaded_at", 0.0)
 
 
-def test_mapping_cache_forced_refresh_bounds_same_signature_rewrite(
+def test_mapping_cache_serves_forged_signature_rewrite_until_next_write(
     monkeypatch, tmp_path
 ):
-    """A rewrite forging the old mtime and size is served stale for at most
-    the forced-refresh interval, never indefinitely."""
+    """A same-size rewrite forging the old mtime is deliberately NOT detected
+    (accepted limitation, 2026-07-18 decision log entry): the cache promises
+    fast reads until the next write, and the next real write is detected."""
     _reset_mapping_cache(monkeypatch, tmp_path)
-    fake_now = {"value": 0.0}
-    monkeypatch.setattr(api_service.time, "monotonic", lambda: fake_now["value"])
-
     api_service.save_leaderboard_id("Scenario A", 111, "test")
     assert api_service.get_cached_leaderboard_id("Scenario A") == 111
 
@@ -859,10 +856,13 @@ def test_mapping_cache_forced_refresh_bounds_same_signature_rewrite(
     assert stat_after.st_mtime_ns == stat_before.st_mtime_ns
     assert stat_after.st_size == stat_before.st_size
 
-    # Metadata revalidation cannot see this rewrite: bounded staleness window.
+    # The forged rewrite is invisible to metadata revalidation: accepted.
     assert api_service.get_cached_leaderboard_id("Scenario A") == 111
 
-    fake_now["value"] = api_service._MAPPING_FORCED_REFRESH_SECONDS + 1.0
+    # The next genuine write changes the signature and reloads everything,
+    # surfacing the forged content too.
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
     assert api_service.get_cached_leaderboard_id("Scenario A") == 999
 
 

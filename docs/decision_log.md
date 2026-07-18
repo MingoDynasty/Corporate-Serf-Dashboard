@@ -1031,11 +1031,20 @@ fresh `stat()` proof. The signature includes the resolved path so tests that
 repoint `CACHE_DIR` cannot alias a stale copy; `st_size` guards against
 same-mtime rewrites on coarse-timestamp filesystems. Metadata revalidation
 inherently cannot detect a rewrite that preserves both size and timestamp
-(deliberate `os.utime` forgery — the known limit of every mtime-keyed cache,
-`.pyc` included), so a matching signature is trusted for at most 60 seconds
-(`_MAPPING_FORCED_REFRESH_SECONDS`) before the next read re-parses anyway:
-worst-case staleness is bounded, not indefinite, at a cost of ~1ms/min
-(raised by PR #147 review). A missing mapping file no
+(deliberate `os.utime` forgery after an in-place edit — the known limit of
+every mtime-keyed cache, `.pyc` included). This is an accepted risk, not an
+oversight: the PR #147 review asked for a bounded forced refresh and a
+60-second re-parse backstop was briefly added, then removed at the
+maintainer's direction — a periodic redundant reload with no intervening
+write contradicts the cache's purpose (fast reads until the next write), no
+realistic writer forges timestamps (atomic replace, editors, and restores
+all shift mtime_ns or size), and the only actor who could is the single
+user poisoning their own local cache. A content-hash key was also rejected:
+it must read the whole file per check (~146ms vs ~27ms per toggle build for
+`stat`), returning a third of the original cost to buy a guarantee only the
+forgery scenario needs. A regression test pins the accepted behavior
+(forged rewrite served until the next genuine write) so it reads as
+deliberate. A missing mapping file no
 longer logs a read-failure warning per lookup (the stat short-circuits the
 read), and a malformed file warns once per file version instead of once per
 lookup. All `resolve_leaderboard_id` callers (Home rank display, playlist
