@@ -1060,30 +1060,33 @@ def layout(
                                         ),
                                         dmc.Group(
                                             [
-                                                dmc.Text(
+                                                dmc.Group(
                                                     [
                                                         dmc.Text(
-                                                            "Position: ",
+                                                            "Position:",
                                                             fw=700,
                                                             span=True,
+                                                            size="sm",
                                                         ),
+                                                        # dcc.Loading renders
+                                                        # divs, which cannot
+                                                        # nest inside a Text's
+                                                        # default <p> root, so
+                                                        # it sits beside the
+                                                        # label in a Group
+                                                        # (like "Last played:"
+                                                        # above).
                                                         dcc.Loading(
                                                             dmc.Text(
                                                                 id="scenario_rank",
                                                                 span=True,
+                                                                size="sm",
                                                             ),
                                                             delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
                                                             show_initially=False,
-                                                            parent_style={
-                                                                "display": "inline-block",
-                                                                "verticalAlign": "baseline",
-                                                            },
-                                                            style={
-                                                                "display": "inline-block",
-                                                            },
                                                         ),
                                                     ],
-                                                    size="sm",
+                                                    gap="0.25em",
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Button(
