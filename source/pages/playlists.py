@@ -561,7 +561,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
 
 
 @callback(
-    Output("playlists-superseded-alert", "style"),
+    Output("playlists-superseded-alert", "className"),
     Output("playlists-superseded-text", "children"),
     Input("playlists-overview-mounted", "data"),
     Input("playlists-rows-refresh", "data"),
@@ -575,7 +575,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
     """
     superseded_files = get_superseded_user_playlist_files()
     if not superseded_files:
-        return {"display": "none"}, ""
+        return "playlists-superseded-alert-hidden", ""
     count = len(superseded_files)
     noun = "file" if count == 1 else "files"
     verb = "is" if count == 1 else "are"
@@ -583,7 +583,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
         f"{count} leftover playlist {noun} in data/playlists {verb} superseded "
         "by bundled benchmarks."
     )
-    return {}, message
+    return "", message
 
 
 @callback(
@@ -832,12 +832,12 @@ def layout(**kwargs):  # noqa: ARG001
                 ),
             ),
             # Cleanup affordance for user files superseded by bundled
-            # benchmarks. Hidden (display:none) until superseded files exist.
+            # benchmarks. Hidden until superseded files exist.
             dmc.Alert(
                 id="playlists-superseded-alert",
                 title="Leftover playlist files",
                 color="yellow",
-                style={"display": "none"},
+                className="playlists-superseded-alert-hidden",
                 children=dmc.Group(
                     justify="space-between",
                     align="center",
@@ -913,10 +913,5 @@ def layout(**kwargs):  # noqa: ARG001
             ),
         ],
         gap="md",
-        style={
-            "height": (
-                "calc(100dvh - var(--app-shell-header-offset, 0rem) "
-                "- 2*var(--app-shell-padding, 1rem))"
-            )
-        },
+        className="page-fill-column",
     )

@@ -488,9 +488,9 @@ def test_confirm_delete_playlist_without_target_noops(monkeypatch):
 def test_render_superseded_alert_hidden_when_no_files(monkeypatch):
     monkeypatch.setattr(playlists, "get_superseded_user_playlist_files", lambda: [])
 
-    style, text = playlists.render_superseded_alert(True, 0)
+    class_name, text = playlists.render_superseded_alert(True, 0)
 
-    assert style == {"display": "none"}
+    assert class_name == "playlists-superseded-alert-hidden"
     assert text == ""
 
 
@@ -501,9 +501,9 @@ def test_render_superseded_alert_shows_count_when_files_exist(monkeypatch):
         lambda: [(Path("a.json"), "C1"), (Path("b.json"), "C2")],
     )
 
-    style, text = playlists.render_superseded_alert(True, 1)
+    class_name, text = playlists.render_superseded_alert(True, 1)
 
-    assert style == {}
+    assert class_name == ""
     assert "2 leftover playlist files" in text
 
 
@@ -972,12 +972,7 @@ def test_playlists_overview_grid_uses_bounded_viewport_layout():
     page = playlists.layout()
     grid = page.children[-1]
 
-    assert page.style == {
-        "height": (
-            "calc(100dvh - var(--app-shell-header-offset, 0rem) "
-            "- 2*var(--app-shell-padding, 1rem))"
-        )
-    }
+    assert page.className == "page-fill-column"
     assert grid.style == {
         "flex": 1,
         "height": "100%",
@@ -1634,12 +1629,7 @@ def test_playlist_scenarios_grid_uses_bounded_viewport_layout():
     page = playlist_scenarios.layout("KovaaKsTestCode")
     ag_grid = page.children[-1]
 
-    assert page.style == {
-        "height": (
-            "calc(100dvh - var(--app-shell-header-offset, 0rem) "
-            "- 2*var(--app-shell-padding, 1rem))"
-        )
-    }
+    assert page.className == "page-fill-column"
     assert "domLayout" not in ag_grid.dashGridOptions
     assert ag_grid.style == {
         "flex": 1,
