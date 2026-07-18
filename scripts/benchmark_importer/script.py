@@ -50,6 +50,8 @@ EVXL_BENCHMARKS_JSON_FILE = REPO_ROOT / "resources" / "evxl" / "benchmarks.json"
 GENERATED_DIR = SCRIPT_DIR / "generated"
 MANIFEST_FILE = GENERATED_DIR / "manifest.json"
 FAILURES_FILE = GENERATED_DIR / "failures.json"
+# Importer state that shares the output directory with playlists but is not one.
+RESERVED_GENERATED_FILENAMES = frozenset({"manifest.json", "failures.json"})
 EVXL_BENCHMARKS_URL = "https://evxl.app/data/benchmarks"
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 RETRY_ATTEMPTS = 4
@@ -428,7 +430,7 @@ def scan_generated_ownership(
 
     for path in generated_dir.glob("*.json"):
         key = path.name.casefold()
-        if key == "manifest.json":
+        if key in RESERVED_GENERATED_FILENAMES:
             continue
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
@@ -458,6 +460,16 @@ def choose_generated_path(
 ) -> Path:
     """Choose a collision-safe output path and warn before replacing junk."""
     stem = sanitize_playlist_name(playlist_name, sharecode)
+    if f"{stem}.json".casefold() in RESERVED_GENERATED_FILENAMES:
+        # Importer state is excluded from the ownership scan, so without this a
+        # playlist named "manifest" or "failures" would overwrite it silently.
+        logger.warning(
+            "Playlist name for %s collides with importer state %s.json; "
+            "suffixing sharecode",
+            sharecode,
+            stem,
+        )
+        stem = f"{stem}_{sharecode}"
     candidate = generated_dir / f"{stem}.json"
     owner = ownership.get(candidate.name.casefold())
 

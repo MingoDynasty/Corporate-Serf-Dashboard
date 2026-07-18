@@ -1275,3 +1275,48 @@ def test_load_failure_ledger_treats_missing_and_malformed_as_empty(tmp_path, cap
     path.write_text(json.dumps({"Bad": {"error": "no timestamp"}}), encoding="utf-8")
     assert script.load_failure_ledger(path) == {}
     assert sum("missing or malformed" in message for message in caplog.messages) == 3
+
+
+def test_importer_state_files_are_not_scanned_as_playlists(tmp_path, caplog):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    script.write_manifest({"Code": _manifest_entry()}, tmp_path / "manifest.json")
+    script.write_failure_ledger(
+        {
+            "Code": script.FailureEntry(
+                error="bad ladder",
+                recorded_at="2026-07-03T12:00:00+00:00",
+            )
+        },
+        tmp_path / "failures.json",
+    )
+
+    ownership, unowned = script.scan_generated_ownership(tmp_path)
+
+    assert ownership == {}
+    assert unowned == set()
+    assert caplog.messages == []
+
+
+@pytest.mark.parametrize("reserved", ["manifest", "failures"])
+def test_playlist_named_after_importer_state_does_not_overwrite_it(reserved, tmp_path):
+    path = script.choose_generated_path(reserved, "KovaaKsCode", {}, set(), tmp_path)
+
+    assert path == tmp_path / f"{reserved}_KovaaKsCode.json"
+
+
+def test_ledger_survives_a_sweep_that_scans_the_generated_directory(
+    tmp_path, monkeypatch
+):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError("bad ladder")
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    script.run_importer(database, {}, generated_dir=tmp_path)
+
+    # A later sweep must still read the ledger it wrote.
+    second = script.run_importer(database, {}, generated_dir=tmp_path)
+
+    assert second.known_bad == {"Bad": "bad ladder"}
