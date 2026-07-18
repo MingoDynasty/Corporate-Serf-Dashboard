@@ -85,9 +85,17 @@ Dash upgrade: load the app once, reload, and see whether the first-load console
 noise is gone.
 
 Impact is cosmetic and self-healing: on an affected load `document.title` shows
-the app-level title instead of the page title, and any reload fixes it. No app
-feature is affected, so a workaround for someone else's bug is not worth
-carrying.
+the app-level title instead of the page title, and any reload fixes it. A
+workaround for someone else's bug is not worth carrying for that.
+
+"No feature is affected" is measured, not assumed. Exercised on a load
+confirmed to have lost the race — six of seven clientside functions registered,
+86 "ID not found in layout" entries, the app-level title — the Home page still
+rendered fully, the Plotly graph mounted (a beat later than usual), server
+callbacks fired and returned 200, and toggling the x-axis radio round-tripped
+end to end and updated the figure. The only observable defect was
+`document.title`. The "ID not found in layout" flood is the renderer reporting
+a transient state it recovers from, not callbacks being dropped.
 
 Validated mitigation, should this ever become worth fixing: prime the app with
 one synchronous in-process request before serving — `with
