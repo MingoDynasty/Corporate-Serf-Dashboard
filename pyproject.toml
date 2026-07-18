@@ -82,10 +82,9 @@ testpaths = ["tests"]
 dev = [
     "datamodel-code-generator>=0.68.1",
     "mypy>=2.3.0",
-    # Deliberately a compatible-release pin, not a floor: left as-is by the
-    # floor refresh. NOTE: this tracks pandas 2.3.x while pandas itself is now
-    # locked at 3.0.x — see the tech-debt entry.
-    "pandas-stubs~=2.3.3",
+    # Compatible-release pin rather than a floor: stubs describe a specific
+    # pandas major/minor, so bump this in step with pandas itself.
+    "pandas-stubs~=3.0.3",
     "pre-commit>=4.6.0",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
