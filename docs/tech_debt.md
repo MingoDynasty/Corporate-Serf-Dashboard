@@ -14,6 +14,22 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
+### `pandas-stubs` tracks pandas 2.3.x while pandas is locked at 3.0.x
+
+`pyproject.toml` pins `pandas-stubs~=2.3.3` (a deliberate compatible-release
+pin, so it cannot follow pandas past 2.3.x), but `pandas` itself is now locked
+at 3.0.3 — a major version that arrived through an earlier `uv sync --upgrade`
+without being declared. `mypy source` is green, so nothing is visibly broken,
+but the type checker is validating pandas 3.0 usage against 2.3 stubs, which
+can both miss real errors and flag phantom ones.
+
+Deliberately left alone by the floor refresh (PR for
+`claude/refresh-dependency-floors`) because resolving it is a judgment call,
+not a mechanical bump: it needs a decision about which `pandas-stubs` line
+matches pandas 3.0, and whether the `~=` pin should stay a compatible-release
+pin at all. Worth pairing with a look at whether the pandas 3.0 jump changed
+anything in the data path.
+
 ## Code Smells
 
 ## Refactors
