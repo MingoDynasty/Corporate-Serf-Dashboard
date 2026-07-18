@@ -7,7 +7,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
-from source.utilities.dash_logging import log_handler
+from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +135,7 @@ def layout(**kwargs):  # noqa: ARG001
         children=[
             dmc.AppShell(
                 children=[
-                    dmc.NotificationContainer(id="notification-container"),
+                    dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
                     dmc.AppShellHeader(
                         dmc.Grid(
                             children=[
@@ -218,8 +218,7 @@ def layout(**kwargs):  # noqa: ARG001
                 },
                 id="appshell",
             ),
-        ]
-        + log_handler.embed(),
+        ],
     )
 
 
