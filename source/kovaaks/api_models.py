@@ -53,6 +53,30 @@ class PlaylistAPIResponse(BaseModel):
         return value
 
 
+class EvxlPlaylistScenario(BaseModel):
+    """Represent one scenario in an Evxl playlist-by-code response."""
+
+    scenario_name: str
+
+
+class EvxlPlaylist(BaseModel):
+    """Represent the playlist payload in an Evxl playlist-by-code response.
+
+    Evxl returns snake_case fields and several extras (``is_private``,
+    ``author_name``, ...) the app does not need; pydantic ignores them.
+    """
+
+    playlist_name: str
+    playlist_code: str
+    scenario_list: list[EvxlPlaylistScenario]
+
+
+class EvxlPlaylistByCodeResponse(BaseModel):
+    """Represent Evxl's exact-sharecode playlist lookup response."""
+
+    playlist: EvxlPlaylist
+
+
 class BenchmarkScenario(BaseModel):
     """Represent one scenario's progress in a benchmark."""
 

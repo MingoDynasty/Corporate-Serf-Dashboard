@@ -372,6 +372,213 @@ def test_import_degrades_api_failure_to_refusal(monkeypatch, exc):
     assert "zzzznotacode!!" in message
 
 
+def _evxl_playlist(name, code, scenario_names):
+    """Build an Evxl playlist-by-code stand-in with snake_case attributes."""
+    return SimpleNamespace(
+        playlist_name=name,
+        playlist_code=code,
+        scenario_list=[SimpleNamespace(scenario_name=n) for n in scenario_names],
+    )
+
+
+def test_import_falls_back_to_evxl_when_search_returns_null_records(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # KovaaK's null-hydration quirk: the match is counted but the record is
+    # null, so ignore_null_playlist_items drops it and data is empty.
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    evxl = _evxl_playlist(
+        "VDIM Adept S5 - Clicking I",
+        "KovaaKsCarryingGodlikeTile",
+        ["Scenario A", "Scenario B"],
+    )
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    # Paste a mis-cased code to pin that the stored code is Evxl's canonical one,
+    # never the pasted input.
+    message, imported_code = data_service.load_playlist_from_code(
+        "kovaakscarryinggodliketile"
+    )
+
+    assert message is None
+    assert imported_code == "KovaaKsCarryingGodlikeTile"
+    stored = data_service.playlist_database["KovaaKsCarryingGodlikeTile"]
+    assert stored.name == "VDIM Adept S5 - Clicking I"
+    assert [scenario.name for scenario in stored.scenarios] == [
+        "Scenario A",
+        "Scenario B",
+    ]
+    imported_file = (
+        user_root / "VDIM Adept S5 - Clicking I [KovaaKsCarryingGodlikeTile].json"
+    )
+    assert imported_file.exists()
+
+
+def test_import_refuses_when_search_empty_and_evxl_returns_http_400(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+
+    def evxl_not_found(_code):
+        # Evxl returns HTTP 400 for unknown/mis-cased codes; _get_with_retry
+        # surfaces it as an immediate HTTPError.
+        raise requests.HTTPError("400 Client Error")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_not_found)
+
+    message, imported_code = data_service.load_playlist_from_code("GarbageCode")
+
+    assert message == "Failed to load playlist data for playlist code: GarbageCode"
+    assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def test_import_refuses_when_search_empty_and_evxl_connection_error(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+
+    def evxl_down(_code):
+        raise requests.ConnectionError("evxl unreachable")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_down)
+
+    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+
+    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert imported_code is None
+
+
+def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    # EvxlPlaylist accepts any str code, but PlaylistData rejects a blank one.
+    # That ValidationError must degrade to the refusal, not escape into the
+    # Dash import callback (which has no safety net around this service call).
+    evxl = _evxl_playlist("Nameless", "   ", ["Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+
+    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def test_import_falls_back_to_evxl_when_search_is_ambiguous(monkeypatch, tmp_path):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    two_records = SimpleNamespace(
+        data=[
+            SimpleNamespace(playlistName="One", playlistCode="One", scenarioList=[]),
+            SimpleNamespace(playlistName="Two", playlistCode="Two", scenarioList=[]),
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: two_records)
+    evxl = _evxl_playlist("Resolved Name", "ResolvedCode", ["Only Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    message, imported_code = data_service.load_playlist_from_code("AmbiguousCode")
+
+    assert message is None
+    assert imported_code == "ResolvedCode"
+    stored = data_service.playlist_database["ResolvedCode"]
+    assert stored.name == "Resolved Name"
+    assert [scenario.name for scenario in stored.scenarios] == ["Only Scenario"]
+
+
+def test_import_preserves_ambiguity_refusal_when_evxl_also_fails(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    two_records = SimpleNamespace(
+        data=[
+            SimpleNamespace(playlistName="One", playlistCode="One", scenarioList=[]),
+            SimpleNamespace(playlistName="Two", playlistCode="Two", scenarioList=[]),
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: two_records)
+
+    def evxl_not_found(_code):
+        raise requests.HTTPError("400 Client Error")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_not_found)
+
+    message, imported_code = data_service.load_playlist_from_code("AmbiguousCode")
+
+    assert message == "Found more than one playlist from code: AmbiguousCode"
+    assert imported_code is None
+
+
+def test_import_does_not_call_evxl_when_search_is_unambiguous(monkeypatch, tmp_path):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Solo Playlist",
+                playlistCode="SoloCode",
+                scenarioList=[SimpleNamespace(scenarioName="Imported Scenario")],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    def fail_if_called(_code):
+        raise AssertionError("Evxl fallback must not run for a single search match")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", fail_if_called)
+
+    message, imported_code = data_service.load_playlist_from_code("SoloCode")
+
+    assert message is None
+    assert imported_code == "SoloCode"
+
+
+def test_evxl_fallback_duplicate_code_refusal_carries_canonical_code(
+    monkeypatch,
+    tmp_path,
+):
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    existing = _playlist("Existing Name", "SharedCode")
+    _write_playlist(bundled_root / "existing.json", existing)
+    data_service.load_playlists()
+
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    evxl = _evxl_playlist("Existing Name", "SharedCode", ["Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    # Paste a mis-cased code; the fallback resolves to the canonical already-
+    # imported code and the duplicate refusal must carry that canonical code.
+    message, imported_code = data_service.load_playlist_from_code("sharedcode")
+
+    assert message == (
+        "Playlist code already exists: SharedCode is already imported as "
+        "Existing Name (SharedCode)."
+    )
+    assert imported_code == "SharedCode"
+
+
 def test_write_playlist_data_to_file_retries_transient_replace_errors(
     monkeypatch,
     tmp_path,

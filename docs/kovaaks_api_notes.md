@@ -149,6 +149,19 @@ Observed behavior:
   failures, and schema-invalid responses — and degrades it to a refusal
   message naming the pasted code rather than a raw callback error.
 
+Null-hydration quirk (diagnosed 2026-07-17): for some real, public playlists
+the search counts the match but returns a `null` record instead of the
+payload. Observed for `KovaaKsCarryingGodlikeTile` ("VDIM Adept S5 -
+Clicking I", 30 scenarios) — a code search returns `{"total": 1, "data":
+[null]}` (a 43-byte body, confirmed live and in the app's debug.log); a search
+on its display name returns 2 matches, both null. It is not a privacy setting:
+Evxl reports `is_private: false`. The app's `ignore_null_playlist_items`
+validator (`api_models.PlaylistAPIResponse`) drops the null so the response
+looks like zero results. Import handles this by falling back to Evxl's exact
+`playlist-by-code` lookup (below) whenever the search does not yield exactly
+one usable record; only if that fallback also fails does the user see the
+refusal.
+
 ## `/benchmarks/player-progress-rank-benchmark`
 
 Existing app behavior uses this endpoint for benchmark progress.
@@ -180,6 +193,37 @@ one-to-one):
 
 These are upstream data issues, not app bugs; the affected benchmarks import
 normally once the source data is corrected.
+
+## Evxl `playlist-by-code` (external fallback)
+
+Not a KovaaK's endpoint — a third-party Evxl service the app uses as the
+playlist-import fallback for the null-hydration quirk above.
+
+```text
+GET https://api.evxl.app/kovaaks/playlist-by-code?shareCode=KovaaKsCarryingGodlikeTile
+```
+
+Observed behavior:
+
+- Exact-sharecode lookup. Resolves arbitrary community playlists (verified
+  against "GON MACHINE for VALO v2" and "MICRO GOLD MINE"), not just Evxl
+  benchmarks.
+- Response is snake_case: top-level `playlist_b64` (the raw KovaaK's offline
+  playlist JSON — the app ignores it), `updated` (epoch; Evxl's copy is cached
+  and can be days stale — acceptable for import), and `playlist` with
+  `playlist_name`, `playlist_code`, `scenario_list[].scenario_name`, plus
+  extras (`is_private`, `author_name`, `description`, `playlist_id`,
+  `author_steam_id`) the app does not need.
+- Unknown or **mis-cased** codes return HTTP 400. `_get_with_retry`
+  `raise_for_status()`es this immediately (no retry), so the import fallback
+  sees one `requests.HTTPError` and refuses.
+- There is no first-party KovaaK's by-code endpoint (path and query variants
+  404 or ignore the parameter).
+
+The app consumes only `playlist_name`, `playlist_code`, and
+`scenario_list[].scenario_name` (see `api_service.get_evxl_playlist` and the
+`Evxl*` models in `api_models.py`). The stored code is Evxl's canonical
+`playlist_code`, never the pasted input.
 
 ## Derived Data
 
