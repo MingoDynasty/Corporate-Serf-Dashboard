@@ -124,20 +124,17 @@ LOWEST_PERCENTILE_CELL_CLASS = (
 )
 
 # The eye toggle acts immediately with no confirm step, so the hover copy
-# carries the action, its consequence, and the way back (Show hidden).
+# carries the action and its consequence.
 VISIBILITY_TOOLTIP = (
     "params.data.hidden"
     " ? 'Show this playlist again in the overview and playlist selectors'"
-    " : 'Hide this playlist from the overview and playlist selectors;"
-    " restore it later via Show hidden'"
+    " : 'Hide this playlist from the overview and playlist selectors'"
 )
 
 # The delete icon carries no text label, so the tooltip supplies the click
 # consequence. Bundled rows render no icon; return null there so no tooltip
 # shows on the empty cell.
-DELETE_TOOLTIP = (
-    "params.data.deletable ? 'Delete this playlist (asks to confirm)' : null"
-)
+DELETE_TOOLTIP = "params.data.deletable ? 'Delete this playlist' : null"
 
 TABLE_COLUMN_DEFS = [
     {
@@ -169,10 +166,7 @@ TABLE_COLUMN_DEFS = [
     {
         "headerName": "Played",
         "field": "played_sort",
-        "headerTooltip": (
-            "Scenarios you have played at least once, out of the scenarios in "
-            "the playlist."
-        ),
+        "headerTooltip": "Scenarios played / total scenarios",
         "valueFormatter": {"function": "params.data.played_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -506,14 +500,13 @@ def manage_delete_modal(cell_clicked, _cancel):
     # Bundled rows render no Delete link, but their (empty) delete cell still
     # emits cellClicked with this colId. Refuse non-user codes here — same
     # source of truth as the row's ``deletable`` flag — so a bundled row can
-    # never open a misleading "will be removed from data/playlists" dialog
-    # (delete_user_playlist would refuse it anyway, but only after a scare).
+    # never open a misleading delete-confirm dialog (delete_user_playlist
+    # would refuse it anyway, but only after a scare).
     if playlist_code not in get_user_root_playlist_codes():
         return no_update, no_update, no_update
     label = get_playlist_display_label(playlist_code)
     message = (
-        f'Delete "{label}" ({playlist_code})? This removes its playlist file '
-        "from data/playlists. You can re-import it later by share code."
+        f'Delete "{label}" ({playlist_code})? You can re-import it later by share code.'
     )
     return True, playlist_code, message
 
@@ -543,6 +536,9 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     """
     if not n_clicks or not target_code:
         return no_update, no_update, no_update
+    # Look up the label before the delete: afterwards the code is gone from
+    # the playlist database and the lookup falls back to the raw code.
+    label = get_playlist_display_label(target_code)
     error_message = delete_user_playlist(target_code)
     if error_message:
         notification = {
@@ -557,7 +553,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     notification = {
         "action": "show",
         "title": "Playlist Deleted",
-        "message": "Deleted playlist.",
+        "message": f'Deleted "{label}" ({target_code}).',
         "color": "green",
         "id": "deleted-playlist-successful-notification",
     }

@@ -108,7 +108,7 @@ theme_switch_component = dmc.Tooltip(
         mr="xl",
         **{"aria-label": "Toggle color scheme"},
     ),
-    label="Switch between light and dark theme.",
+    label="Toggle light and dark theme",
 )
 
 
