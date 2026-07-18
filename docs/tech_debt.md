@@ -20,6 +20,22 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Refactors
 
+### Split Evxl out of the `kovaaks` package
+
+`EvxlPlaylist`/`EvxlPlaylistByCodeResponse` (`source/kovaaks/api_models.py`) and
+`EVXL_PLAYLIST_BY_CODE_URL`/`get_evxl_playlist` (`source/kovaaks/api_service.py`)
+are a third-party service living in KovaaK's-named modules. Deliberately left
+there: `get_evxl_playlist` reuses the private `_get_with_retry` (thread-local
+sessions, timeout config, the network-success signal), so a `source/evxl`
+package would either reach into a private helper and depend on `kovaaks`
+backwards, or require extracting a neutral shared HTTP client first.
+
+Revisit when Evxl gains a **second** runtime endpoint — then extract
+`source/http_client.py` and `source/evxl/` together (and update the
+architecture.md module map). Not worth it for one fallback call. Note
+`scripts/benchmark_importer/models.py` has its own duplicate Evxl models; a
+split should decide whether they converge.
+
 ## Tooling
 
 ### Single-command local quality gate
