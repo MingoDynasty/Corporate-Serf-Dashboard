@@ -951,7 +951,7 @@ def test_playlists_overview_lowest_percentile_values_signal_their_tooltip():
     )
 
 
-def test_playlists_overview_visibility_column_has_reversibility_tooltip():
+def test_playlists_overview_visibility_column_has_tooltip():
     columns = {column["field"]: column for column in playlists.TABLE_COLUMN_DEFS}
 
     assert columns[playlists.VISIBILITY_COLUMN_ID]["tooltipValueGetter"] == {
