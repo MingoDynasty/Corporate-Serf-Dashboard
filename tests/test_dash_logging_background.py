@@ -17,6 +17,7 @@ from dash._callback_context import context_value
 from dash._utils import AttributeDict
 
 from source.utilities.dash_logging import (
+    NOTIFICATION_CONTAINER_ID,
     drain_background_notifications,
     get_dash_logger,
 )
@@ -71,7 +72,7 @@ def test_warning_level_queues_yellow_notification() -> None:
 
 
 def test_callback_context_records_bypass_the_queue() -> None:
-    """Inside a callback the handler must keep the direct set_props path."""
+    """Inside a callback the handler must keep the direct updated_props path."""
     ctx = AttributeDict(updated_props={})
     token = context_value.set(ctx)
     try:
@@ -80,7 +81,25 @@ def test_callback_context_records_bypass_the_queue() -> None:
         context_value.reset(token)
 
     assert drain_background_notifications() == []
-    assert ctx.updated_props  # the notification went out through set_props
+    sent = ctx.updated_props[NOTIFICATION_CONTAINER_ID]["sendNotifications"]
+    assert [n["message"] for n in sent] == ["in-context failure"]
+    assert sent[0]["color"] == "red"
+    assert sent[0]["action"] == "show"
+
+
+def test_repeated_in_context_records_accumulate() -> None:
+    """A second record in the same callback must not overwrite the first toast."""
+    ctx = AttributeDict(updated_props={})
+    token = context_value.set(ctx)
+    try:
+        dash_logger.warning("first toast")
+        dash_logger.error("second toast")
+    finally:
+        context_value.reset(token)
+
+    sent = ctx.updated_props[NOTIFICATION_CONTAINER_ID]["sendNotifications"]
+    assert [n["message"] for n in sent] == ["first toast", "second toast"]
+    assert [n["color"] for n in sent] == ["yellow", "red"]
 
 
 def test_flush_delivers_queued_notifications_once() -> None:
