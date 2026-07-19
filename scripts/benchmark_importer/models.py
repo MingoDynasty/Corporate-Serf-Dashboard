@@ -68,3 +68,17 @@ class ManifestEntry(BaseModel):
 
 class Manifest(RootModel[dict[str, ManifestEntry]]):
     pass
+
+
+class FailureEntry(BaseModel):
+    error: str
+    recorded_at: str
+    # The Evxl metadata the failure was recorded against. Entries written before
+    # these fields existed default to a signature no live item can match, so they
+    # are retried rather than skipped forever.
+    kovaaks_benchmark_id: int | None = None
+    rank_colors: list[tuple[str, str]] | None = None
+
+
+class FailureLedger(RootModel[dict[str, FailureEntry]]):
+    pass
