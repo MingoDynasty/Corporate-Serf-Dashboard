@@ -36,6 +36,39 @@ split should decide whether they converge.
 
 ## Tooling
 
+### `scripts/**` is exempt from the lint and type gates
+
+`[tool.ruff.lint] exclude = ["scripts/**"]` (frozen decision 3) plus mypy's
+`files = ["source"]` leave `scripts/release_job.py` gated only by its unit
+tests and `compileall` — and that file picks release tags and is the last
+check before an immutable release publishes.
+
+Measured 2026-07-19 during the PR #158 review:
+
+- Ruff, run over all five files with explicit paths, reports **40 findings** —
+  mostly `D100`/`D101`/`D103` docstring rules in the two legacy script trees,
+  plus `G004` and `PLR0915`. So the exclusion cannot simply be dropped.
+- `scripts/release_job.py` contributes exactly **one**: `PLR0913` on
+  `validate_release` (7 keyword-only arguments > 5). Settled during the PR #158
+  review: keep the signature and silence the rule with a targeted per-file
+  ignore. The arguments are all required and explicit, and bundling them into a
+  dataclass to satisfy a heuristic would cost call-site clarity for no
+  correctness gain. So narrowing the exclusion to the two legacy trees is
+  mechanical, not a design question.
+- `mypy scripts/release_job.py` is clean, but `mypy scripts` fails on
+  `Duplicate module named "models"` — `benchmark_importer/` and `Leaderboard
+  Sensitivities/` each have one and neither has an `__init__.py`. That is a
+  packaging fix, not type errors.
+
+Measure with explicit file paths. `ruff check --no-force-exclude scripts` is a
+**false pass**: `--no-force-exclude` only re-admits paths named explicitly, so
+directory traversal still prunes everything under the `scripts/**` exclusion
+and exits 0 having checked nothing. `--show-files` lists the five files anyway,
+which makes the false pass look convincing.
+
+Revisit when the tooling spec is next opened; changing it was out of scope for
+the release-job PR that surfaced it.
+
 ### Single-command local quality gate
 
 CI enforces four of the five standard checks (ruff format, ruff lint, mypy,
