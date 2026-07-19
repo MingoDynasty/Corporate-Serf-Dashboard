@@ -214,15 +214,24 @@ jobs:
                   TAG: ${{ steps.tag.outputs.tag }}
               run: |
                   set -euo pipefail
-                  if state=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>/dev/null); then
+                  # Only a genuine "not found" may take the create path. A
+                  # transient API error must not look like "no release yet":
+                  # GitHub accepts a second draft for a tag that already has
+                  # one, and the duplicate would then compete for the assets
+                  # and the publish.
+                  if state=$(gh release view "$TAG" --json isDraft --jq .isDraft 2>view-error.txt); then
                       if [ "$state" = "false" ]; then
                           echo "Release $TAG is already published; nothing to do."
                           echo "already_published=true" >> "$GITHUB_OUTPUT"
                           exit 0
                       fi
                       echo "Resuming the existing draft for $TAG"
-                  else
+                  elif grep -qi 'release not found' view-error.txt; then
                       gh release create "$TAG" --draft --title "$TAG" --generate-notes
+                  else
+                      cat view-error.txt >&2
+                      echo "::error::could not determine whether $TAG already has a release"
+                      exit 1
                   fi
                   echo "already_published=false" >> "$GITHUB_OUTPUT"
 
