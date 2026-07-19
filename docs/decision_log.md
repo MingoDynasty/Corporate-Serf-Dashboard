@@ -56,6 +56,17 @@ Scope: the `config.debug` Flask development-server path is unchanged; it is a
 dev-only convenience. The bind happens immediately before `serve()`, so a
 duplicate instance still does its ~2s of startup work before exiting.
 
+POSIX footnote: binding the socket ourselves means waitress's pre-bind
+`SO_REUSEADDR` no longer applies, and on POSIX that flag is what lets a
+server rebind a port whose old connections are still in `TIME_WAIT`. A fast
+restart there could now be refused. Windows is unaffected — verified that an
+immediate rebind succeeds with a genuine `TIME_WAIT` pair on the port. We
+accept this because nothing serves on POSIX: the app targets Windows and CI
+runs `windows-latest` only. If that ever changes, set `SO_REUSEADDR` before
+`bind()` on non-Windows platforms — on POSIX it permits the `TIME_WAIT`
+rebind without letting a second live server share the port, so it restores
+the old behavior without weakening the Windows guarantee.
+
 ## 2026-07-19: Default Port Is 8050, Not 8080
 
 Status: Accepted
