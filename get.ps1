@@ -46,10 +46,16 @@ try {
 }
 
 # Run from a file rather than iex so the installer's param block works and
-# its `exit` cannot close the user's console.
+# its `exit` cannot close the user's console. The file runs in a child
+# Windows PowerShell with a process-scoped Bypass: stock clients default to
+# the Restricted execution policy, which runs piped iex content but refuses
+# script FILES -- invoking the temp file directly would die with "running
+# scripts is disabled". The child also guarantees 5.1 semantics even when
+# the one-liner was pasted into pwsh.
 $csdContent = $csdInstaller.Content
 if ($csdContent -is [byte[]]) { $csdContent = [System.Text.Encoding]::UTF8.GetString($csdContent) }
 $csdInstallerPath = Join-Path $env:TEMP "csd-install-$csdTag.ps1"
 [System.IO.File]::WriteAllText($csdInstallerPath, [string]$csdContent, `
         [System.Text.UTF8Encoding]::new($false))
-& $csdInstallerPath -LatestTag $csdTag @args
+& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile `
+    -ExecutionPolicy Bypass -File $csdInstallerPath -LatestTag $csdTag @args
