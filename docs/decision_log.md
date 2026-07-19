@@ -135,9 +135,12 @@ Alternatives rejected:
 
 - Dropping the prop silences the warning but loses the `keys`/`skipHeader`
   autosize configuration — real behavior traded for cosmetics.
-- AG Grid's old blanket switch `suppressPropertyNamesCheck` no longer exists
-  in the bundled AG Grid v35 (zero occurrences in the bundle), and would have
-  hidden real typos in our own colDefs anyway.
+- AG Grid's blanket switch `suppressPropertyNamesCheck` would silence it —
+  the bundled v35 validator still honors the flag — but the option is
+  deprecated since v33 (AG Grid's deprecation message calls it redundant now
+  that `context` exists for arbitrary user data), so enabling it trades the
+  invalid-property warning for a deprecation warning while also disabling
+  the check that catches real typos in our own gridOptions and colDefs.
 - Re-implementing autosizing through a clientside grid-API call just to avoid
   the prop is a workaround for someone else's cosmetic bug — the same bar the
   pages-race entry above declines to meet.
