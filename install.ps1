@@ -44,7 +44,7 @@ $Repo = 'MingoDynasty/Corporate-Serf-Dashboard'
 $ApiBase = 'https://api.github.com'
 $DownloadBase = 'https://github.com'
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-$DefaultPort = 8080
+$DefaultPort = 8050
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -162,10 +162,17 @@ function Install-ReleaseVersion($Release, [string]$UvExe) {
         if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
     } catch {
         $message = $_.Exception.Message
-        if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
-        if ($backupDir -and (Test-Path -LiteralPath $backupDir)) {
-            Move-Item -LiteralPath $backupDir -Destination $targetDir
-            Stop-Fatal "install of $releaseTag failed ($message); the previously installed copy was restored."
+        # The restore itself can fail (a lingering handle on the partial
+        # tree, AV holding a fresh DLL); never let that second failure
+        # replace the first one's message or hide where the good copy is.
+        try {
+            if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
+            if ($backupDir -and (Test-Path -LiteralPath $backupDir)) {
+                Move-Item -LiteralPath $backupDir -Destination $targetDir
+                Stop-Fatal "install of $releaseTag failed ($message); the previously installed copy was restored."
+            }
+        } catch {
+            Stop-Fatal "install of $releaseTag failed ($message), and the previous copy could not be restored automatically. It is intact at $backupDir -- move it back to $targetDir, or re-run the install one-liner."
         }
         Stop-Fatal "install of $releaseTag failed ($message)."
     }
@@ -227,26 +234,6 @@ function Resolve-StatsDir {
     Stop-Fatal 'no valid stats directory provided; run the installer again once you know the path.'
 }
 
-function Test-PortFree([int]$Port) {
-    try {
-        $listener = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Loopback, $Port)
-        $listener.Start()
-        $listener.Stop()
-        return $true
-    } catch {
-        return $false
-    }
-}
-
-function Select-Port {
-    # Steam commonly holds 8080 on gaming machines, so probe before writing
-    # the default into a fresh config.
-    foreach ($candidate in $DefaultPort..($DefaultPort + 19)) {
-        if (Test-PortFree $candidate) { return $candidate }
-    }
-    return $DefaultPort
-}
-
 function Write-FirstRunConfig([string]$StatsDir, [int]$Port) {
     $statsDirToml = $StatsDir.Replace('\', '/')
     $lines = @(
@@ -261,7 +248,8 @@ function Write-FirstRunConfig([string]$StatsDir, [int]$Port) {
         '# How often to poll for updates (in milliseconds).',
         'polling_interval = 1000',
         '',
-        '# Port for the local dashboard server.',
+        '# Port for the local dashboard server. If another program already',
+        '# uses it, the dashboard says so at startup -- pick a different port here.',
         "port = $Port",
         '',
         '# How many decimal places to round the Sensitivity.',
@@ -327,23 +315,25 @@ if (Test-Path -LiteralPath $configPath) {
     Write-Host 'Keeping the existing config.toml.'
 } else {
     $statsDir = Resolve-StatsDir
-    $port = Select-Port
-    if ($port -ne $DefaultPort) {
-        Write-Host "Port $DefaultPort is in use (often Steam); using port $port instead."
-    }
-    Write-FirstRunConfig -StatsDir $statsDir -Port $port
-    Write-Host "Wrote $configPath (dashboard port $port)."
+    Write-FirstRunConfig -StatsDir $statsDir -Port $DefaultPort
+    Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
 }
 
-# Round-trip the config through the installed Python's tomllib BEFORE the
+# Round-trip the config through the installed app's own loader BEFORE the
 # manifest or shortcut exist: a config the app cannot parse must fail the
-# install loudly, never surface later as a broken first launch.
+# install loudly, never surface later as a broken first launch. Using
+# load_config (tomllib underneath, plus the app's schema validation) rather
+# than bare tomllib catches missing/mistyped required fields too -- the
+# config is kept on reinstall, so a schema miss here would never self-heal.
 $python = Join-Path $versionDir '.venv\Scripts\python.exe'
-# NB: single quotes inside a double-quoted PowerShell string -- 5.1's native
-# argument quoting strips embedded double quotes.
-& $python -c "import sys, tomllib; tomllib.load(open(sys.argv[1], 'rb'))" $configPath
+$env:CSD_STATE_DIR = $InstallRoot
+try {
+    & $python -c 'from source.config.config_service import load_config; load_config()'
+} finally {
+    Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+}
 if ($LASTEXITCODE -ne 0) {
-    Stop-Fatal "the installed Python cannot parse $configPath -- fix or delete it and run the installer again."
+    Stop-Fatal "the installed app cannot load $configPath (details above) -- fix or delete it and run the installer again."
 }
 
 # Manifest (install.json, schema v1): the authoritative install identity.
@@ -373,7 +363,7 @@ $shortcutPath = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Corporate S
 $shell = New-Object -ComObject WScript.Shell
 $shortcut = $shell.CreateShortcut($shortcutPath)
 $shortcut.TargetPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
-$shortcut.Arguments = "-ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
+$shortcut.Arguments = "-NoProfile -ExecutionPolicy Bypass -File ""$(Join-Path $InstallRoot 'launch.ps1')"""
 $shortcut.WorkingDirectory = $InstallRoot
 $shortcut.Save()
 
