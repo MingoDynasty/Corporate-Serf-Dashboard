@@ -36,6 +36,27 @@ split should decide whether they converge.
 
 ## Tooling
 
+### `scripts/**` is exempt from the lint and type gates
+
+`[tool.ruff.lint] exclude = ["scripts/**"]` (frozen decision 3) plus mypy's
+`files = ["source"]` leave `scripts/release_job.py` gated only by its unit
+tests and `compileall` — and that file picks release tags and is the last
+check before an immutable release publishes.
+
+Measured 2026-07-19 during the PR #158 review, so the cleanup is small and the
+blockers are known:
+
+- `ruff check --no-force-exclude scripts` passes on all five files, so the
+  lint exclusion hides nothing today. It could be narrowed to the two legacy
+  `scripts/<name>/script.py` trees or dropped outright.
+- `mypy scripts/release_job.py` is clean, but `mypy scripts` fails on
+  `Duplicate module named "models"` — `benchmark_importer/` and `Leaderboard
+  Sensitivities/` each have one and neither has an `__init__.py`. That is a
+  packaging fix, not type errors.
+
+Revisit when the tooling spec is next opened; changing it was out of scope for
+the release-job PR that surfaced it.
+
 ### Single-command local quality gate
 
 CI enforces four of the five standard checks (ruff format, ruff lint, mypy,
