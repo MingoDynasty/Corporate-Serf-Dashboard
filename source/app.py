@@ -9,7 +9,6 @@ import tomllib
 from dataclasses import asdict
 from importlib.metadata import version
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
@@ -24,9 +23,10 @@ from source.kovaaks.percentile_warmup_service import (
     start_percentile_warmup_worker,
 )
 from source.my_watchdog.file_watchdog import NewFileHandler
+from source.utilities.paths import state_dir
 
 # Logging setup
-LOG_DIR = Path("data") / "logs"
+LOG_DIR = state_dir() / "data" / "logs"
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
 LOG_MAX_BYTES = 5 * 1024 * 1024
 LOG_BACKUP_COUNT = 3
