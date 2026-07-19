@@ -9,6 +9,7 @@ import tomllib
 from dataclasses import asdict
 from importlib.metadata import version
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
@@ -16,7 +17,11 @@ from waitress import serve
 from watchdog.observers import Observer
 
 from source.app_shell import APP_INDEX_STRING, layout
-from source.config.config_service import CONFIG_ERROR_MESSAGE, get_config
+from source.config.config_service import (
+    CONFIG_ERROR_MESSAGE,
+    config_file_path,
+    get_config,
+)
 from source.kovaaks.api_service import set_request_timeout
 from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
 from source.kovaaks.percentile_warmup_service import (
@@ -88,6 +93,19 @@ def main() -> None:
     except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
         print(CONFIG_ERROR_MESSAGE, file=sys.stderr)
         raise SystemExit(1) from None
+
+    # Checked before anything uses it: the watchdog observer is the first
+    # consumer and throws a raw traceback at a missing directory, which is
+    # what example.toml's "Change me!" placeholder produces on first run.
+    if not Path(config.stats_dir).is_dir():
+        print(
+            f'Configuration error: stats_dir "{config.stats_dir}" is not an '
+            f"existing directory -- edit {config_file_path()} and set "
+            "stats_dir to your KovaaK's stats folder, usually "
+            "<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
 
     logger.debug(
         "Loaded config:\n%s",
