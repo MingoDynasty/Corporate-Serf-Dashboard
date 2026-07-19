@@ -58,15 +58,27 @@ treatment:
   breaker.
 
 Deterministic failures are recorded in `generated/failures.json`, a ledger
-mapping sharecode to the error and the UTC timestamp when it was recorded.
-Later sweeps skip recorded sharecodes before making any network call and
-report them in the run summary's known-bad bucket. A skip is informational and
-does not affect the exit code — the failure was already reported by the run
-that recorded it.
+mapping sharecode to the error, the UTC timestamp when it was recorded, and
+the Evxl metadata (benchmark id and rank ladder) the failure was recorded
+against. Later sweeps skip recorded sharecodes before making any network call
+and report them in the run summary's known-bad bucket. A skip is informational
+and does not affect the exit code — the failure was already reported by the
+run that recorded it.
 
-To retry a recorded sharecode, name it with `--only SHARECODE` (explicitly
-naming a code always attempts it) or run with `--force` (which attempts
-everything). A retry that succeeds clears the entry; one that fails
+A recorded verdict is a statement about specific upstream data, so it expires
+when that data changes: if Evxl's benchmark id or rank ladder for the
+sharecode no longer matches what was recorded, the item is retried
+automatically. That is what makes the ledger self-healing — when Evxl fixes
+one of these data bugs, the next snapshot refresh flows the correction in
+without anyone remembering to clear the entry.
+
+The one case this cannot detect is a fix on the KovaaK's side (say, its
+benchmark API starting to return the full rank ladder) while Evxl's metadata
+stays byte-identical. Use `--force` or `--only SHARECODE` to retry then.
+
+To retry a recorded sharecode explicitly, name it with `--only SHARECODE`
+(explicitly naming a code always attempts it) or run with `--force` (which
+attempts everything). A retry that succeeds clears the entry; one that fails
 deterministically again refreshes it. Transient failures are never recorded.
 
 Entries are only consulted for sharecodes still present in the Evxl snapshot,

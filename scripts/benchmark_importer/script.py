@@ -164,6 +164,21 @@ def _is_deterministic_failure(exc: BaseException) -> bool:
     return False
 
 
+def _ledger_entry_matches_evxl(entry: FailureEntry, item: EvxlDatabaseItem) -> bool:
+    """Report whether a recorded failure still describes the current Evxl metadata.
+
+    A deterministic failure is a statement about specific upstream data. Once that
+    data changes the verdict is stale, so the item is attempted again instead of
+    being skipped forever.
+    """
+    if entry.kovaaks_benchmark_id is None or entry.rank_colors is None:
+        return False
+    return (
+        entry.kovaaks_benchmark_id == item.kovaaksBenchmarkId
+        and entry.rank_colors == _ordered_rank_colors(item)
+    )
+
+
 def load_failure_ledger(path: Path = FAILURES_FILE) -> dict[str, FailureEntry]:
     """Load known-bad state, treating missing or malformed state as empty."""
     try:
@@ -689,6 +704,7 @@ def run_importer(
             ledger_entry is not None
             and not force
             and sharecode not in explicitly_requested
+            and _ledger_entry_matches_evxl(ledger_entry, database_item)
         ):
             logger.info(
                 "Skipping known-bad sharecode %s (recorded %s): %s",
@@ -698,6 +714,14 @@ def run_importer(
             )
             summary.known_bad[sharecode] = ledger_entry.error
             continue
+
+        if ledger_entry is not None and not _ledger_entry_matches_evxl(
+            ledger_entry, database_item
+        ):
+            logger.info(
+                "Evxl metadata changed since %s was recorded as known-bad; retrying",
+                sharecode,
+            )
 
         if made_network_request:
             time.sleep(POLITENESS_DELAY_SECONDS)
@@ -738,6 +762,8 @@ def run_importer(
                 ledger[sharecode] = FailureEntry(
                     error=str(exc),
                     recorded_at=datetime.now(UTC).isoformat(),
+                    kovaaks_benchmark_id=database_item.kovaaksBenchmarkId,
+                    rank_colors=_ordered_rank_colors(database_item),
                 )
                 write_failure_ledger(ledger, ledger_path)
                 continue

@@ -1320,3 +1320,97 @@ def test_ledger_survives_a_sweep_that_scans_the_generated_directory(
     second = script.run_importer(database, {}, generated_dir=tmp_path)
 
     assert second.known_bad == {"Bad": "bad ladder"}
+
+
+def _record_known_bad(tmp_path, item, monkeypatch, error="bad ladder"):
+    """Record a real deterministic failure so the ledger carries its signature."""
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError(error)
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    script.run_importer({"Bad": item}, {}, generated_dir=tmp_path)
+
+
+def test_ledger_records_the_evxl_signature_it_failed_against(tmp_path, monkeypatch):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+
+    entry = _read_ledger(tmp_path)["Bad"]
+
+    assert entry["kovaaks_benchmark_id"] == 2412
+    assert entry["rank_colors"] == [["Bronze", "#111"]]
+
+
+@pytest.mark.parametrize(
+    "repaired",
+    [
+        EvxlDatabaseItem(
+            kovaaksBenchmarkId=2412,
+            rankColors={"Bronze": "#111", "Silver": "#222"},
+        ),
+        EvxlDatabaseItem(kovaaksBenchmarkId=9999, rankColors={"Bronze": "#111"}),
+    ],
+    ids=["rank-ladder-changed", "benchmark-id-changed"],
+)
+def test_upstream_metadata_change_retries_a_known_bad_code(
+    repaired, tmp_path, monkeypatch
+):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer({"Bad": repaired}, {}, generated_dir=tmp_path)
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
+    assert summary.known_bad == {}
+    assert _read_ledger(tmp_path) == {}
+
+
+def test_unchanged_metadata_still_skips_a_known_bad_code(tmp_path, monkeypatch):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("unchanged metadata must be skipped"),
+    )
+
+    summary = script.run_importer({"Bad": item}, {}, generated_dir=tmp_path)
+
+    assert summary.known_bad == {"Bad": "bad ladder"}
+
+
+def test_ledger_entry_without_a_signature_is_retried(tmp_path, monkeypatch):
+    # Entries written before the signature existed must not skip forever.
+    (tmp_path / "failures.json").write_text(
+        json.dumps(
+            {"Bad": {"error": "bad ladder", "recorded_at": "2026-07-03T12:00:00+00:00"}}
+        ),
+        encoding="utf-8",
+    )
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})},
+        {},
+        generated_dir=tmp_path,
+    )
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
