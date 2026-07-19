@@ -289,8 +289,13 @@ jobs:
                   # newer push has already published. Older source must never
                   # displace newer source as Latest.
                   make_latest=true
-                  published=$(gh release list --exclude-drafts --limit 50 \
-                      --json tagName --jq '.[].tagName')
+                  # Every published release must be considered, not a page of
+                  # them: a draft resumed long after it was created can have
+                  # any number of descendants, and missing one lets this older
+                  # source reclaim Latest and downgrade every latest-tracking
+                  # install. `gh release list --limit` is a cap, not a scan.
+                  published=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases" \
+                      --jq '.[] | select(.draft == false) | .tag_name')
                   for other in $published; do
                       if [ "$other" = "$TAG" ]; then
                           continue
