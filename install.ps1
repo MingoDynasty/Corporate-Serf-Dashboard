@@ -140,14 +140,35 @@ function Install-ReleaseVersion($Release, [string]$UvExe) {
         Stop-Fatal "version.txt in the $releaseTag zip does not carry the release SHA $($Release.sha)"
     }
 
-    if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
-    Move-Item -LiteralPath $top[0].FullName -Destination $targetDir
-    Remove-Item -LiteralPath $extractDir -Recurse -Force
-    Remove-Item -LiteralPath $zipPath -Force
+    # A reinstall may target the tag the install currently runs -- deleting
+    # that directory before the replacement has synced would leave a bricked
+    # install if the sync fails (network outage, resolver error). Park the
+    # existing copy under tmp instead; a rename is same-volume and reversible,
+    # and the venv stays valid because restore returns it to its original
+    # path. On success the tmp cleanup at the end of the install removes it.
+    $backupDir = $null
+    if (Test-Path -LiteralPath $targetDir) {
+        $backupDir = Join-Path $tempDir "previous-$releaseTag"
+        if (Test-Path -LiteralPath $backupDir) { Remove-Item -LiteralPath $backupDir -Recurse -Force }
+        Move-Item -LiteralPath $targetDir -Destination $backupDir
+    }
+    try {
+        Move-Item -LiteralPath $top[0].FullName -Destination $targetDir
+        Remove-Item -LiteralPath $extractDir -Recurse -Force
+        Remove-Item -LiteralPath $zipPath -Force
 
-    Write-Host "Installing dependencies for $releaseTag ..."
-    & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
-    if ($LASTEXITCODE -ne 0) { Stop-Fatal "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
+        Write-Host "Installing dependencies for $releaseTag ..."
+        & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
+        if ($LASTEXITCODE -ne 0) { throw "uv sync failed for $releaseTag (exit $LASTEXITCODE)" }
+    } catch {
+        $message = $_.Exception.Message
+        if (Test-Path -LiteralPath $targetDir) { Remove-Item -LiteralPath $targetDir -Recurse -Force }
+        if ($backupDir -and (Test-Path -LiteralPath $backupDir)) {
+            Move-Item -LiteralPath $backupDir -Destination $targetDir
+            Stop-Fatal "install of $releaseTag failed ($message); the previously installed copy was restored."
+        }
+        Stop-Fatal "install of $releaseTag failed ($message)."
+    }
     return $targetDir
 }
 
