@@ -82,10 +82,26 @@ function Write-Manifest([string]$Tag, [string]$Sha, [string]$CommitDate, [string
 }
 
 function Get-ConfiguredPort {
+    # One parsing contract with the app: config.toml is user-owned, and TOML
+    # integer forms or pydantic coercions a regex would misread (8_051,
+    # 0x1F73, "8051") must resolve to the port the server actually binds --
+    # a divergence here polls the wrong port and kills a healthy app. Ask
+    # the installed app's own loader; fall back to the default when anything
+    # is unreadable, the same recovery as a missing config.
     try {
-        foreach ($line in [System.IO.File]::ReadAllLines((Join-Path $InstallRoot 'config.toml'))) {
-            if ($line -match '^\s*port\s*=\s*(\d+)') { return [int]$Matches[1] }
+        $manifest = [System.IO.File]::ReadAllText((Join-Path $InstallRoot 'install.json')) | ConvertFrom-Json
+        $tag = [string]$manifest.tag
+        if ([string]$manifest.update_policy -eq 'pinned' -and $manifest.pinned_tag) {
+            $tag = [string]$manifest.pinned_tag
         }
+        $python = Join-Path $InstallRoot "versions\$tag\.venv\Scripts\python.exe"
+        $env:CSD_STATE_DIR = $InstallRoot
+        try {
+            $portText = @(& $python -c 'from source.config.config_service import load_config; print(load_config().port)' 2>&1)
+        } finally {
+            Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
+        }
+        if ($LASTEXITCODE -eq 0) { return [int]$portText[-1] }
     } catch { }
     return $DefaultPort
 }
