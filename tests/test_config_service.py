@@ -43,7 +43,7 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
         'stats_dir = "missing required fields"',
         'stats_dir = "x"\n'
         "polling_interval = 1000\n"
-        "port = 8080\n"
+        "port = 8050\n"
         "sens_round_decimal_places = 1\n"
         "kovaaks_api_timeout_seconds = 0",
     ],
@@ -75,7 +75,7 @@ def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
     config_path.write_text(
         f'stats_dir = "{missing_stats_dir.as_posix()}"\n'
         "polling_interval = 1000\n"
-        "port = 8080\n"
+        "port = 8050\n"
         "sens_round_decimal_places = 1\n",
         encoding="utf-8",
     )

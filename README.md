@@ -38,7 +38,7 @@ The rationale behind each feature lives in [docs/product.md](docs/product.md); w
    makes player matching exact when usernames are ambiguous). Leave `kovaaks_username` empty to run
    fully offline.
 4. Feel free to change any other settings inside the TOML file, or leave them at their defaults. If
-   something on your machine already uses port 8080 (Steam, for example), change `port`.
+   something on your machine already uses port 8050, change `port`.
 
 ## Usage
 
@@ -49,7 +49,7 @@ uv sync
 uv run python source/app.py
 ```
 
-Step 2: Open a browser and navigate to: <http://localhost:8080/> (or your configured port).
+Step 2: Open a browser and navigate to: <http://localhost:8050/> (or your configured port).
 
 Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
 share one in-memory run-event queue and are not synchronized with each other.

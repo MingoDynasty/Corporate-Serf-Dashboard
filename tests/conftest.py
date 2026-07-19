@@ -18,7 +18,7 @@ def test_config(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     config = ConfigData(
         stats_dir=str(stats_dir),
         polling_interval=1000,
-        port=8080,
+        port=8050,
         sens_round_decimal_places=2,
         debug=False,
     )

@@ -10,7 +10,7 @@ stats_dir = "Change me!"
 polling_interval = 1000  # 1 second
 
 # Port to use for the backend server.
-port = 8080
+port = 8050
 
 # Whether to enable the Dash/Flask debug server. Keep this off unless developing locally.
 debug = false
