@@ -52,7 +52,12 @@ disturbed. Along the way the installer:
 - writes a starter `config.toml` beside the install;
 - creates a **Corporate Serf Dashboard** desktop shortcut.
 
-Launch it from that shortcut, which opens the dashboard in your browser.
+Launch it from that shortcut, which opens the dashboard in your browser. A
+console window stays open while the dashboard is running — **closing it stops
+the dashboard**, which is how you shut it down. Double-clicking the shortcut
+again while it is already running just opens another browser tab; it will not
+start a second copy.
+
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
 unreachable — it simply runs the version you already have. A new version only
