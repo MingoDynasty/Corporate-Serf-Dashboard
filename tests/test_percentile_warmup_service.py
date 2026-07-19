@@ -22,7 +22,7 @@ def _config(
     return ConfigData(
         stats_dir="stats",
         polling_interval=1000,
-        port=8080,
+        port=8050,
         sens_round_decimal_places=2,
         kovaaks_username=username,
         percentile_warmup_enabled=enabled,

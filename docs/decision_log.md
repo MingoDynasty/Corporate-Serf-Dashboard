@@ -13,6 +13,27 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-07-19: Default Port Is 8050, Not 8080
+
+Status: Accepted
+
+Decision: The example config (`example.toml`) ships with `port = 8050`. The
+app itself has no built-in default — `port` is a required config field served
+through waitress — so the example file is the only default we own.
+
+Why: 8080 is one of the most contended ports on end-user machines; Steam in
+particular holds it whenever it is running, and this app's audience is
+KovaaK's players, who all run Steam. 8050 is the Dash convention (`app.run()`
+default), so it signals "Dash app" to anyone inspecting the port, and its
+only common occupant is *other* Dash apps run with defaults — a rare
+collision for this audience. No port choice defends against Windows
+Hyper-V/WSL2 excluded-port-range reservations, which land semi-randomly;
+the `port` config setting remains the escape hatch for any collision.
+
+Migration: none in-app (single-user convention — no compat shims). Existing
+installs keep whatever their `config.toml` says; only fresh copies of
+`example.toml` pick up 8050.
+
 ## 2026-07-18: Accept Dash's First-Request Pages Race Instead of Warming the App
 
 Status: Accepted
