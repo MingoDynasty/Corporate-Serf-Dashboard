@@ -30,29 +30,115 @@ The rationale behind each feature lives in [docs/product.md](docs/product.md); w
     3. React
     4. Flask
 
-## First Time Setup
+## Install
 
-1. Make a copy of the `example.toml`. Name the new file `config.toml`.
-2. Inside `config.toml`, update the `stats_dir` variable to point to your KovaaK's stats file directory.
-3. To enable the leaderboard rank features, set `kovaaks_username` (and optionally `steam_id`, which
-   makes player matching exact when usernames are ambiguous). Leave `kovaaks_username` empty to run
-   fully offline.
-4. Feel free to change any other settings inside the TOML file, or leave them at their defaults. If
-   something on your machine already uses port 8050, change `port`.
+Windows only. You do not need Python, uv, or git — the installer brings its own
+copy of everything.
+
+### Easy install
+
+Paste this into PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main/get.ps1 | iex
+```
+
+Everything lands under `%LOCALAPPDATA%\CorporateSerfDashboard` — its own uv, its
+own Python, its own package cache — so nothing else on your machine is used or
+disturbed. Along the way the installer:
+
+- finds your KovaaK's stats folder (from Steam's install path and library
+  folders) and asks you to confirm it;
+- writes a starter `config.toml` beside the install;
+- creates a **Corporate Serf Dashboard** desktop shortcut.
+
+Launch it from that shortcut, which opens the dashboard in your browser.
+**Each launch checks for a new release and updates itself** before starting, so
+you stay current without doing anything. If that check fails — offline, GitHub
+unreachable — it simply runs the version you already have. A new version only
+becomes the recorded install after it has actually started successfully; one
+that fails to start is discarded and the previous version runs instead.
+
+### Manual install
+
+If you would rather not pipe a script from the internet, install from a release
+you have inspected yourself:
+
+1. Download the latest release zip from the
+   [Releases page](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/releases/latest).
+2. Extract it and read `install.ps1` — it is the same installer the one-liner
+   runs.
+3. Open PowerShell in the extracted folder and run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+That explicit command is required: double-clicking a `.ps1` file deliberately
+does not execute it on Windows. `-ExecutionPolicy Bypass` relaxes only the
+per-process default for this one script — it does not, and cannot, override
+enterprise Group Policy or AppLocker. Home machines are the audience here; on a
+machine someone else administers, ask them first.
+
+### Rollback
+
+Every release is kept and immutable, so going back is just naming a tag:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Tag v2026.07.19
+```
+
+`-Tag` also **pins** the install: it stays on that version and stops
+auto-updating. Without the pin the next launch would immediately reinstall the
+release you just rolled back from, making the rollback a no-op. To resume
+automatic updates, run the installer again without `-Tag`.
+
+### Uninstall
+
+Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
+shortcut. That is the entire footprint — no registry keys, no machine-wide
+Python, nothing left behind.
+
+## Configuration
+
+Settings live in `config.toml`:
+
+- **Installed:** `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`, written on
+  first install. Updates never touch it.
+- **From source:** copy `example.toml` to `config.toml` in your checkout.
+
+The installer fills in `stats_dir` for you. `example.toml` documents every
+setting; two are worth knowing about:
+
+- `kovaaks_username` — set this to enable the leaderboard rank and percentile
+  features (and optionally `steam_id`, which makes player matching exact when
+  usernames are ambiguous). Leave it empty to run fully offline.
+- `port` — change this if something else on your machine already uses 8050. The
+  dashboard says so at startup rather than failing mysteriously.
 
 ## Usage
 
-Step 1: Run the app in your terminal:
+Launch from the desktop shortcut, or run it yourself from a source checkout
+(below), then open <http://localhost:8050/> — or your configured port.
+
+Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
+share one in-memory run-event queue and are not synchronized with each other.
+
+## Run From Source
+
+For development, or if you would rather manage the toolchain yourself. Requires
+git and [uv](https://docs.astral.sh/uv/):
 
 ```shell
+git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
+cd Corporate-Serf-Dashboard
 uv sync
 uv run python source/app.py
 ```
 
-Step 2: Open a browser and navigate to: <http://localhost:8050/> (or your configured port).
-
-Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
-share one in-memory run-event queue and are not synchronized with each other.
+Copy `example.toml` to `config.toml` and set `stats_dir` before the first run
+(see [Configuration](#configuration)). A source checkout does not auto-update;
+`git pull` is the update path.
 
 ## Example
 
