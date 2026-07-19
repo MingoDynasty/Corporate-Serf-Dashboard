@@ -32,6 +32,7 @@ from source.kovaaks.api_models import (
 from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.dash_logging import get_dash_logger
+from source.utilities.paths import state_dir
 
 # KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
 # responses stay valid, so the default must clear that band (see the
@@ -57,7 +58,7 @@ _ACTIVITY_LOCK = threading.Lock()
 _last_interactive_activity = 0.0
 _last_network_success = 0.0
 
-CACHE_DIR = "data/cache"
+CACHE_DIR = state_dir() / "data" / "cache"
 
 # Evxl's exact-sharecode playlist lookup. Not a KovaaK's endpoint (so it is not
 # in the Endpoints enum); used as a fallback when KovaaK's own playlist search

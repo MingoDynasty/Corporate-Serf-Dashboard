@@ -12,17 +12,17 @@ import json
 import logging
 import os
 import threading
-from pathlib import Path
 
 from source.kovaaks.data_service import (
     get_playlist_selector_options,
     get_user_root_playlist_codes,
 )
 from source.utilities.atomic_write import replace_with_retry
+from source.utilities.paths import state_dir
 
 logger = logging.getLogger(__name__)
 
-PREFERENCES_FILE_PATH = Path("data/preferences.json").resolve()
+PREFERENCES_FILE_PATH = state_dir() / "data" / "preferences.json"
 _SHOWN_PLAYLISTS_KEY = "shown_playlists"
 
 # First-run visible set: the bundled Voltaic + Viscose benchmarks. A
