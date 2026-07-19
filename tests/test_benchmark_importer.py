@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 import requests
+from pydantic import ValidationError
 
 from scripts.benchmark_importer import script
 from scripts.benchmark_importer.models import (
@@ -1041,3 +1042,456 @@ def test_parse_args_supports_repeated_only_and_positive_limits():
 
     with pytest.raises(SystemExit):
         script.parse_args(["--limit", "0"])
+
+
+def _http_error(status_code: int) -> requests.HTTPError:
+    response = requests.Response()
+    response.status_code = status_code
+    return requests.HTTPError(f"{status_code} error", response=response)
+
+
+def _validation_error() -> ValidationError:
+    try:
+        ManifestEntry.model_validate({})
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("expected a ValidationError")
+
+
+def _read_ledger(tmp_path: Path) -> dict:
+    return json.loads((tmp_path / "failures.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        script.BenchmarkDataMismatchError("bad ladder"),
+        _validation_error(),
+        _http_error(400),
+        _http_error(404),
+    ],
+)
+def test_deterministic_failures_are_classified(exc):
+    assert script._is_deterministic_failure(exc)
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        _http_error(429),
+        _http_error(503),
+        requests.ConnectionError("no route"),
+        requests.ReadTimeout("too slow"),
+        requests.HTTPError("no response attached"),
+    ],
+)
+def test_transient_failures_are_classified(exc):
+    assert not script._is_deterministic_failure(exc)
+
+
+def test_consecutive_deterministic_failures_do_not_abort_the_sweep(
+    tmp_path, monkeypatch
+):
+    calls = []
+    database = {
+        code: EvxlDatabaseItem(kovaaksBenchmarkId=index, rankColors={})
+        for index, code in enumerate(["One", "Two", "Three", "Four"])
+    }
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        if sharecode == "Four":
+            return tmp_path / "Four.json"
+        raise script.BenchmarkDataMismatchError(f"bad ladder for {sharecode}")
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        database,
+        {},
+        max_consecutive_failures=3,
+        generated_dir=tmp_path,
+    )
+
+    assert calls == ["One", "Two", "Three", "Four"]
+    assert list(summary.failed) == ["One", "Two", "Three"]
+    assert summary.generated == ["Four"]
+    # Fresh failures report as failures, not as known-bad skips.
+    assert summary.known_bad == {}
+    assert sorted(_read_ledger(tmp_path)) == ["One", "Three", "Two"]
+    assert _read_ledger(tmp_path)["One"]["error"] == "bad ladder for One"
+
+
+def test_second_run_skips_ledger_codes_without_touching_the_network(
+    tmp_path, monkeypatch
+):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError("bad ladder")
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    first = script.run_importer(database, {}, generated_dir=tmp_path)
+
+    assert list(first.failed) == ["Bad"]
+
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("known-bad codes must not be fetched"),
+    )
+    second = script.run_importer(database, {}, generated_dir=tmp_path)
+
+    assert second.known_bad == {"Bad": "bad ladder"}
+    assert second.failed == {}
+    assert second.generated == []
+    # Known-bad skips stay informational.
+    assert second.exit_code == 0
+
+
+def test_only_retries_a_ledger_code_and_success_clears_the_entry(tmp_path, monkeypatch):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+    script.write_failure_ledger(
+        {
+            "Bad": script.FailureEntry(
+                error="bad ladder",
+                recorded_at="2026-07-03T12:00:00+00:00",
+            )
+        },
+        tmp_path / "failures.json",
+    )
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        database,
+        {},
+        only=["Bad"],
+        generated_dir=tmp_path,
+    )
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
+    assert summary.known_bad == {}
+    assert _read_ledger(tmp_path) == {}
+
+
+def test_repeat_deterministic_failure_refreshes_the_ledger_entry(tmp_path, monkeypatch):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+    script.write_failure_ledger(
+        {
+            "Bad": script.FailureEntry(
+                error="stale reason",
+                recorded_at="2026-07-03T12:00:00+00:00",
+            )
+        },
+        tmp_path / "failures.json",
+    )
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError("fresh reason")
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        database,
+        {},
+        only=["Bad"],
+        generated_dir=tmp_path,
+    )
+
+    assert summary.failed == {"Bad": "fresh reason"}
+    entry = _read_ledger(tmp_path)["Bad"]
+    assert entry["error"] == "fresh reason"
+    assert entry["recorded_at"] != "2026-07-03T12:00:00+00:00"
+
+
+def test_force_attempts_ledger_codes(tmp_path, monkeypatch):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+    script.write_failure_ledger(
+        {
+            "Bad": script.FailureEntry(
+                error="bad ladder",
+                recorded_at="2026-07-03T12:00:00+00:00",
+            )
+        },
+        tmp_path / "failures.json",
+    )
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(database, {}, generated_dir=tmp_path, force=True)
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
+    assert _read_ledger(tmp_path) == {}
+
+
+def test_transient_failures_are_not_recorded(tmp_path, monkeypatch):
+    database = {
+        code: EvxlDatabaseItem(kovaaksBenchmarkId=index, rankColors={})
+        for index, code in enumerate(["One", "Two"])
+    }
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise requests.ReadTimeout("offline")
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        database,
+        {},
+        max_consecutive_failures=3,
+        generated_dir=tmp_path,
+    )
+
+    assert list(summary.failed) == ["One", "Two"]
+    assert not (tmp_path / "failures.json").exists()
+
+
+def test_load_failure_ledger_treats_missing_and_malformed_as_empty(tmp_path, caplog):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    path = tmp_path / "failures.json"
+
+    assert script.load_failure_ledger(path) == {}
+    path.write_text("{broken", encoding="utf-8")
+    assert script.load_failure_ledger(path) == {}
+    path.write_text(json.dumps({"Bad": {"error": "no timestamp"}}), encoding="utf-8")
+    assert script.load_failure_ledger(path) == {}
+    assert sum("missing or malformed" in message for message in caplog.messages) == 3
+
+
+def test_importer_state_files_are_not_scanned_as_playlists(tmp_path, caplog):
+    caplog.set_level(logging.WARNING, logger=script.__name__)
+    script.write_manifest({"Code": _manifest_entry()}, tmp_path / "manifest.json")
+    script.write_failure_ledger(
+        {
+            "Code": script.FailureEntry(
+                error="bad ladder",
+                recorded_at="2026-07-03T12:00:00+00:00",
+            )
+        },
+        tmp_path / "failures.json",
+    )
+
+    ownership, unowned = script.scan_generated_ownership(tmp_path)
+
+    assert ownership == {}
+    assert unowned == set()
+    assert caplog.messages == []
+
+
+@pytest.mark.parametrize("reserved", ["manifest", "failures"])
+def test_playlist_named_after_importer_state_does_not_overwrite_it(reserved, tmp_path):
+    path = script.choose_generated_path(reserved, "KovaaKsCode", {}, set(), tmp_path)
+
+    assert path == tmp_path / f"{reserved}_KovaaKsCode.json"
+
+
+def test_ledger_survives_a_sweep_that_scans_the_generated_directory(
+    tmp_path, monkeypatch
+):
+    database = {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})}
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError("bad ladder")
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    script.run_importer(database, {}, generated_dir=tmp_path)
+
+    # A later sweep must still read the ledger it wrote.
+    second = script.run_importer(database, {}, generated_dir=tmp_path)
+
+    assert second.known_bad == {"Bad": "bad ladder"}
+
+
+def _record_known_bad(tmp_path, item, monkeypatch, error="bad ladder"):
+    """Record a real deterministic failure so the ledger carries its signature."""
+
+    def fail(_sharecode, *_args, **_kwargs):
+        raise script.BenchmarkDataMismatchError(error)
+
+    monkeypatch.setattr(script, "generate_playlist", fail)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+    script.run_importer({"Bad": item}, {}, generated_dir=tmp_path)
+
+
+def test_ledger_records_the_evxl_signature_it_failed_against(tmp_path, monkeypatch):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+
+    entry = _read_ledger(tmp_path)["Bad"]
+
+    assert entry["kovaaks_benchmark_id"] == 2412
+    assert entry["rank_colors"] == [["Bronze", "#111"]]
+
+
+@pytest.mark.parametrize(
+    "repaired",
+    [
+        EvxlDatabaseItem(
+            kovaaksBenchmarkId=2412,
+            rankColors={"Bronze": "#111", "Silver": "#222"},
+        ),
+        EvxlDatabaseItem(kovaaksBenchmarkId=9999, rankColors={"Bronze": "#111"}),
+    ],
+    ids=["rank-ladder-changed", "benchmark-id-changed"],
+)
+def test_upstream_metadata_change_retries_a_known_bad_code(
+    repaired, tmp_path, monkeypatch
+):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer({"Bad": repaired}, {}, generated_dir=tmp_path)
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
+    assert summary.known_bad == {}
+    assert _read_ledger(tmp_path) == {}
+
+
+def test_unchanged_metadata_still_skips_a_known_bad_code(tmp_path, monkeypatch):
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("unchanged metadata must be skipped"),
+    )
+
+    summary = script.run_importer({"Bad": item}, {}, generated_dir=tmp_path)
+
+    assert summary.known_bad == {"Bad": "bad ladder"}
+
+
+def test_ledger_entry_without_a_signature_is_retried(tmp_path, monkeypatch):
+    # Entries written before the signature existed must not skip forever.
+    (tmp_path / "failures.json").write_text(
+        json.dumps(
+            {"Bad": {"error": "bad ladder", "recorded_at": "2026-07-03T12:00:00+00:00"}}
+        ),
+        encoding="utf-8",
+    )
+    calls = []
+
+    def fake_generate(sharecode, *_args, **_kwargs):
+        calls.append(sharecode)
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+    monkeypatch.setattr(script.time, "sleep", lambda _seconds: None)
+
+    summary = script.run_importer(
+        {"Bad": EvxlDatabaseItem(kovaaksBenchmarkId=1, rankColors={})},
+        {},
+        generated_dir=tmp_path,
+    )
+
+    assert calls == ["Bad"]
+    assert summary.generated == ["Bad"]
+
+
+def _seed_intact_output(tmp_path, sharecode, item):
+    """Write a manifest entry and generated file that match the live Evxl item."""
+    entry = ManifestEntry(
+        file="Good.json",
+        playlist_name="Good",
+        kovaaks_benchmark_id=item.kovaaksBenchmarkId,
+        rank_colors=list(item.rankColors.items()),
+        generated_at="2026-07-03T12:00:00+00:00",
+    )
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+    script.write_manifest({sharecode: entry}, tmp_path / "manifest.json")
+
+
+def test_only_retries_a_ledger_code_despite_an_intact_manifest_entry(
+    tmp_path, monkeypatch
+):
+    # An intact older output must not pre-empt an explicit ledger retry.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    # Record first: seeding the intact output first would make the recording run
+    # itself hit the manifest skip, which is how this state stays hard to reach.
+    _record_known_bad(tmp_path, item, monkeypatch)
+    _seed_intact_output(tmp_path, "Bad", item)
+    calls = []
+
+    def fake_generate(sharecode, *_args, **kwargs):
+        calls.append((sharecode, kwargs["use_cache"]))
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer(
+        database={"Bad": item}, conflicts={}, only=["Bad"], generated_dir=tmp_path
+    )
+
+    assert calls == [("Bad", False)]
+    assert summary.skipped == []
+    assert summary.generated == ["Bad"]
+
+
+def test_only_retry_bypasses_the_benchmark_cache(tmp_path, monkeypatch):
+    # A cached rank-mismatch response is schema-valid, so reusing it would
+    # reproduce the same failure and hide a KovaaK's-side correction.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    captured = {}
+
+    def fake_generate(sharecode, *_args, **kwargs):
+        captured[sharecode] = kwargs["use_cache"]
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    script.run_importer(
+        database={"Bad": item}, conflicts={}, only=["Bad"], generated_dir=tmp_path
+    )
+
+    assert captured["Bad"] is False
+
+
+def test_only_on_a_healthy_code_still_honours_the_manifest_skip(tmp_path, monkeypatch):
+    # The retry override is scoped to ledger entries; --only otherwise keeps its
+    # ordinary meaning of restricting the sweep.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _seed_intact_output(tmp_path, "Healthy", item)
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("intact output must still be skipped"),
+    )
+
+    summary = script.run_importer(
+        database={"Healthy": item},
+        conflicts={},
+        only=["Healthy"],
+        generated_dir=tmp_path,
+    )
+
+    assert summary.skipped == ["Healthy"]
+    assert summary.generated == []

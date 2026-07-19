@@ -4,15 +4,23 @@ Manages the config file for the app, and shares that data to all other modules.
 
 import tomllib
 from functools import cache
+from pathlib import Path
 from typing import Annotated
 
 from pydantic import Field
 from pydantic.dataclasses import dataclass
 
+from source.utilities.paths import state_dir
+
 CONFIG_FILE = "config.toml"
 CONFIG_ERROR_MESSAGE = (
     "Configuration error: copy example.toml to config.toml and set stats_dir."
 )
+
+
+def config_file_path() -> Path:
+    """Return the path to the app's config file inside the state root."""
+    return state_dir() / CONFIG_FILE
 
 
 @dataclass()
@@ -37,7 +45,7 @@ class ConfigData:
 
 def load_config() -> ConfigData:
     """Loads the config file for this app."""
-    with open(CONFIG_FILE, "rb") as _file:
+    with open(config_file_path(), "rb") as _file:
         config_dict = tomllib.load(_file)
     return ConfigData(**config_dict)
 

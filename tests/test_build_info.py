@@ -7,6 +7,7 @@ import pytest
 
 from source.utilities import build_info
 from source.utilities.build_info import BuildInfo, get_build_info
+from source.utilities.paths import STATE_DIR_ENV_VAR
 
 MANIFEST_SHA = "1" * 40
 STAMP_SHA = "2" * 40
@@ -19,6 +20,8 @@ def isolated_build_info(
 ) -> Iterator[Path]:
     """Resolve every layer inside a tmp dir, with no cached result carried in."""
     monkeypatch.chdir(tmp_path)
+    # An inherited state root would send the manifest read somewhere else.
+    monkeypatch.delenv(STATE_DIR_ENV_VAR, raising=False)
     monkeypatch.setattr(build_info, "_CODE_ROOT", tmp_path)
     get_build_info.cache_clear()
     yield tmp_path
@@ -103,6 +106,23 @@ def test_stale_manifest_loses_to_the_stamp_beside_the_code(
     assert info == BuildInfo(
         sha=STAMP_SHA, commit_date="2026-07-17", tag=None, source="archive"
     )
+
+
+def test_manifest_is_read_from_the_state_root(
+    isolated_build_info: Path,
+    tmp_path_factory: pytest.TempPathFactory,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The manifest belongs to the install's state, not to the code tree."""
+    state_root = tmp_path_factory.mktemp("state")
+    _write_manifest(state_root, sha=STAMP_SHA)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+    monkeypatch.setenv(STATE_DIR_ENV_VAR, str(state_root))
+
+    info = get_build_info()
+
+    assert info.source == "manifest"
+    assert info.tag == "v2026.07.18"
 
 
 def test_manifest_without_a_stamp_is_ignored(

@@ -4,6 +4,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from source.utilities.paths import STATE_DIR_ENV_VAR
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -13,10 +15,15 @@ def _run_in_app(snippet: str, cwd: Path) -> str:
     Importing ``source.app`` configures process-wide logging and creates
     ``data/logs``, so it stays out of the test process.
     """
+    environment = {**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+    # These tests plant an install manifest in ``cwd``; an inherited state root
+    # would send the app looking for it somewhere else.
+    environment.pop(STATE_DIR_ENV_VAR, None)
+
     result = subprocess.run(
         [sys.executable, "-c", snippet],
         cwd=cwd,
-        env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
+        env=environment,
         capture_output=True,
         text=True,
         check=False,

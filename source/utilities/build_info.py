@@ -3,8 +3,8 @@ Resolve the identity of the running build: release tag, commit SHA, and date.
 
 Precedence, highest first:
 
-1. ``install.json`` — the install manifest written by the installer/launcher.
-   The only layer that can know the release tag. It is authoritative only
+1. ``install.json`` — the install manifest written by the installer/launcher
+   into the state root. The only layer that can know the release tag. It is authoritative only
    when it *corroborates* the running code: its ``sha`` must equal the SHA in
    the expanded stamp beside the code. The manifest lives with the install's
    state, which during an update still describes the previous version while
@@ -30,6 +30,8 @@ from dataclasses import dataclass
 from functools import cache
 from pathlib import Path
 
+from source.utilities.paths import package_root, state_dir
+
 logger = logging.getLogger(__name__)
 
 MANIFEST_FILENAME = "install.json"
@@ -41,11 +43,10 @@ _UNEXPANDED_PLACEHOLDER_MARKER = "$Format"
 _GIT_TIMEOUT_SECONDS = 5
 _SHORT_SHA_LENGTH = 7
 
-# The version stamp ships with the code, and in an installed layout the code
-# directory is not the working directory — so resolve it from this file rather
-# than the CWD. The manifest, by contrast, belongs to the install (state) root,
-# which is the CWD until the state-root work lands.
-_CODE_ROOT = Path(__file__).resolve().parents[2]
+# The stamp ships with the code, so it lives in the package root; the manifest
+# belongs to the install's state root, which survives version swaps. In a dev
+# checkout the two are the same directory.
+_CODE_ROOT = package_root()
 
 
 @dataclass(frozen=True)
@@ -108,7 +109,7 @@ def _from_manifest(stamped: BuildInfo | None) -> BuildInfo | None:
     ``stamped`` is the identity from the stamp beside the code, or ``None``
     when there is no expanded stamp to corroborate against.
     """
-    manifest_path = Path(MANIFEST_FILENAME)
+    manifest_path = state_dir() / MANIFEST_FILENAME
     manifest = _load_manifest(manifest_path)
     if manifest is None:
         return None

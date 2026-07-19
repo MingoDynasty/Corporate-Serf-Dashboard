@@ -98,6 +98,14 @@ that summary and never accesses the queue directly.
 
 ## State
 
+- **Two filesystem roots** (`utilities/paths.py`). Every mutable path below is
+  relative to the **state root**: `config.toml` and everything under `data/`.
+  It is `CSD_STATE_DIR` when set (the launcher owns that variable; the app only
+  reads it) and the current working directory otherwise, so a dev checkout
+  behaves exactly as it always has. Read-only assets that ship with the code —
+  `resources/benchmarks/` — resolve against the **package root** instead
+  (derived from `__file__`), because a deployed install runs code from a
+  per-version directory while state lives at the install root.
 - **In-memory only, no database.** `data_service.py` holds the live stores as
   module globals, rebuilt from CSVs on every startup:
   - `kovaaks_database` — scenario stats keyed by scenario name
@@ -317,7 +325,8 @@ flowchart LR
   notifications; records logged outside a callback context are queued and
   drained by a Home interval callback, so background threads can log too),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
-  `atomic_write` (Windows-lock-tolerant `os.replace` with retry).
+  `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
+  `paths` (`state_dir()` / `package_root()` — see State above).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
 
