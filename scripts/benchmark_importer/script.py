@@ -675,7 +675,9 @@ def run_importer(
     manifest = load_manifest(manifest_path)
     ledger_path = generated_dir / "failures.json"
     ledger = load_failure_ledger(ledger_path)
-    # Naming a sharecode explicitly is a retry intent, so it is always attempted.
+    # Naming a *recorded* sharecode is retry intent (see retry_intent below).
+    # Naming a healthy one keeps --only's ordinary meaning of restricting the
+    # sweep, so an intact current output is still skipped.
     explicitly_requested = set(only or ())
     for sharecode in sorted(manifest.keys() - known_sharecodes):
         logger.warning(
