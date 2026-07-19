@@ -55,7 +55,7 @@ jobs:
                           break
                       } catch {
                           Write-Host "Attempt ${attempt} failed: $($_.Exception.Message)"
-                          Start-Sleep -Seconds (5 * $attempt)
+                          if ($attempt -lt 3) { Start-Sleep -Seconds (5 * $attempt) }
                       }
                   }
                   if (-not $downloaded) { throw "Could not download $url" }
