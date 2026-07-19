@@ -82,16 +82,29 @@ machine someone else administers, ask them first.
 
 ### Rollback
 
-Every release is kept and immutable, so going back is just naming a tag:
+Every release is kept and immutable, so going back is a matter of naming a tag.
+Pick one from the
+[Releases page](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/releases),
+then paste this into PowerShell, editing the first line:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -Tag v2026.07.19
+$tag = 'v2026.07.19.4'
+$installer = "$env:TEMP\csd-install-$tag.ps1"
+Invoke-WebRequest -UseBasicParsing -OutFile $installer `
+  -Uri "https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/$tag/install.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Tag $tag
 ```
 
+Each release ships its own installer, so this deliberately fetches the one
+belonging to the release you are rolling back to.
+
 `-Tag` also **pins** the install: it stays on that version and stops
-auto-updating. Without the pin the next launch would immediately reinstall the
+auto-updating. Without the pin, the next launch would immediately reinstall the
 release you just rolled back from, making the rollback a no-op. To resume
-automatic updates, run the installer again without `-Tag`.
+automatic updates, run the [easy install](#easy-install) one-liner again.
+
+Releases published before the installer existed cannot be rolled back to;
+`v2026.07.19.4` is the earliest that can.
 
 ### Uninstall
 
