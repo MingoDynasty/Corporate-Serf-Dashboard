@@ -304,8 +304,8 @@ The versioned launcher then applies the manifest policy:
   endpoint (`/health`, added in PR 1) that reports the app's `BuildInfo`
   and echoes back a per-launch token passed via environment variable — a
   bare HTTP 200 is not proof of life, because an already-running instance
-  or an unrelated service (Steam famously squats on the default port 8080)
-  can answer while the pending process failed to bind. Promotion requires
+  or an unrelated service holding the configured port (Steam famously
+  squats on 8080) can answer while the pending process failed to bind. Promotion requires
   the child process still alive **and** the response carrying the expected
   full SHA and launch token; the same poll decides when to open the browser.
   The gate must **not** require a tag match (revision 5): a build on trial

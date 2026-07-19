@@ -9,7 +9,7 @@ a thin shim that imports this file; keep the content here.
 ## Commands
 
 - Run: `uv run python source/app.py` (settings in `config.toml`, copied from
-  `example.toml`; the default port 8080 may already be taken by Steam)
+  `example.toml`; default port 8050)
 - Tests: `uv run pytest`
 - Lint: `uv run ruff check`
 - Types: `uv run mypy`
