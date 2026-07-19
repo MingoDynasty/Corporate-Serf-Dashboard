@@ -1414,3 +1414,84 @@ def test_ledger_entry_without_a_signature_is_retried(tmp_path, monkeypatch):
 
     assert calls == ["Bad"]
     assert summary.generated == ["Bad"]
+
+
+def _seed_intact_output(tmp_path, sharecode, item):
+    """Write a manifest entry and generated file that match the live Evxl item."""
+    entry = ManifestEntry(
+        file="Good.json",
+        playlist_name="Good",
+        kovaaks_benchmark_id=item.kovaaksBenchmarkId,
+        rank_colors=list(item.rankColors.items()),
+        generated_at="2026-07-03T12:00:00+00:00",
+    )
+    _write_generated_file(tmp_path / entry.file, sharecode, entry)
+    script.write_manifest({sharecode: entry}, tmp_path / "manifest.json")
+
+
+def test_only_retries_a_ledger_code_despite_an_intact_manifest_entry(
+    tmp_path, monkeypatch
+):
+    # An intact older output must not pre-empt an explicit ledger retry.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    # Record first: seeding the intact output first would make the recording run
+    # itself hit the manifest skip, which is how this state stays hard to reach.
+    _record_known_bad(tmp_path, item, monkeypatch)
+    _seed_intact_output(tmp_path, "Bad", item)
+    calls = []
+
+    def fake_generate(sharecode, *_args, **kwargs):
+        calls.append((sharecode, kwargs["use_cache"]))
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    summary = script.run_importer(
+        database={"Bad": item}, conflicts={}, only=["Bad"], generated_dir=tmp_path
+    )
+
+    assert calls == [("Bad", False)]
+    assert summary.skipped == []
+    assert summary.generated == ["Bad"]
+
+
+def test_only_retry_bypasses_the_benchmark_cache(tmp_path, monkeypatch):
+    # A cached rank-mismatch response is schema-valid, so reusing it would
+    # reproduce the same failure and hide a KovaaK's-side correction.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _record_known_bad(tmp_path, item, monkeypatch)
+    captured = {}
+
+    def fake_generate(sharecode, *_args, **kwargs):
+        captured[sharecode] = kwargs["use_cache"]
+        return tmp_path / f"{sharecode}.json"
+
+    monkeypatch.setattr(script, "generate_playlist", fake_generate)
+
+    script.run_importer(
+        database={"Bad": item}, conflicts={}, only=["Bad"], generated_dir=tmp_path
+    )
+
+    assert captured["Bad"] is False
+
+
+def test_only_on_a_healthy_code_still_honours_the_manifest_skip(tmp_path, monkeypatch):
+    # The retry override is scoped to ledger entries; --only otherwise keeps its
+    # ordinary meaning of restricting the sweep.
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=2412, rankColors={"Bronze": "#111"})
+    _seed_intact_output(tmp_path, "Healthy", item)
+    monkeypatch.setattr(
+        script,
+        "generate_playlist",
+        lambda *_args, **_kwargs: pytest.fail("intact output must still be skipped"),
+    )
+
+    summary = script.run_importer(
+        database={"Healthy": item},
+        conflicts={},
+        only=["Healthy"],
+        generated_dir=tmp_path,
+    )
+
+    assert summary.skipped == ["Healthy"]
+    assert summary.generated == []

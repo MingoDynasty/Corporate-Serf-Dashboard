@@ -72,14 +72,22 @@ automatically. That is what makes the ledger self-healing — when Evxl fixes
 one of these data bugs, the next snapshot refresh flows the correction in
 without anyone remembering to clear the entry.
 
-The one case this cannot detect is a fix on the KovaaK's side (say, its
-benchmark API starting to return the full rank ladder) while Evxl's metadata
-stays byte-identical. Use `--force` or `--only SHARECODE` to retry then.
+Automatic expiry cannot detect a fix on the KovaaK's side (say, its benchmark
+API starting to return the full rank ladder) while Evxl's metadata stays
+byte-identical. Retry explicitly for that case.
 
-To retry a recorded sharecode explicitly, name it with `--only SHARECODE`
-(explicitly naming a code always attempts it) or run with `--force` (which
-attempts everything). A retry that succeeds clears the entry; one that fails
+To retry a recorded sharecode explicitly, name it with `--only SHARECODE` or
+run with `--force` (which attempts everything). Naming a recorded sharecode is
+treated as retry intent, so it overrides the two things that would otherwise
+replay the failure: the manifest skip (an intact older output no longer causes
+an early return) and the KovaaK's benchmark cache (the response is refetched,
+since a cached rank-mismatch response is schema-valid and would reproduce the
+same mismatch forever). A retry that succeeds clears the entry; one that fails
 deterministically again refreshes it. Transient failures are never recorded.
+
+This retry override applies only to sharecodes in the ledger. `--only` on a
+healthy sharecode keeps its ordinary meaning — restrict the sweep — and an
+intact, current output is still skipped; use `--force` to regenerate that.
 
 Entries are only consulted for sharecodes still present in the Evxl snapshot,
 so a code that later leaves the snapshot just becomes dead weight in the file;

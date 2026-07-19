@@ -688,7 +688,13 @@ def run_importer(
     for index, (sharecode, database_item) in enumerate(database.items(), start=1):
         if limit is not None and len(summary.generated) >= limit:
             break
-        if should_skip_generation(
+        ledger_entry = ledger.get(sharecode)
+        # Naming a recorded sharecode is retry intent, so it overrides both the
+        # manifest skip and the benchmark cache. Either one alone would replay
+        # the state that produced the failure and re-record the same verdict.
+        retry_intent = ledger_entry is not None and sharecode in explicitly_requested
+
+        if not retry_intent and should_skip_generation(
             sharecode,
             database_item,
             manifest.get(sharecode),
@@ -699,11 +705,10 @@ def run_importer(
             summary.skipped.append(sharecode)
             continue
 
-        ledger_entry = ledger.get(sharecode)
         if (
             ledger_entry is not None
             and not force
-            and sharecode not in explicitly_requested
+            and not retry_intent
             and _ledger_entry_matches_evxl(ledger_entry, database_item)
         ):
             logger.info(
@@ -715,7 +720,13 @@ def run_importer(
             summary.known_bad[sharecode] = ledger_entry.error
             continue
 
-        if ledger_entry is not None and not _ledger_entry_matches_evxl(
+        if retry_intent:
+            logger.info(
+                "Retrying known-bad sharecode %s: named explicitly, so the "
+                "manifest skip and benchmark cache are bypassed",
+                sharecode,
+            )
+        elif ledger_entry is not None and not _ledger_entry_matches_evxl(
             ledger_entry, database_item
         ):
             logger.info(
@@ -740,7 +751,7 @@ def run_importer(
                 ownership,
                 unowned,
                 generated_dir,
-                use_cache=not force,
+                use_cache=not force and not retry_intent,
                 manifest=manifest,
                 manifest_path=manifest_path,
             )
