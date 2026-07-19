@@ -4,6 +4,7 @@ Entrypoint to the Corporate Serf Dashboard app.
 
 import json
 import logging
+import socket
 import sys
 import tomllib
 from dataclasses import asdict
@@ -92,6 +93,39 @@ app.layout = layout()  # layout logic encapsulated in another file
 register_health_endpoint(app.server)
 
 
+def bind_server_socket(port: int) -> socket.socket:
+    """
+    Bind the app's listening socket, or exit with an actionable error.
+
+    Windows lets a second process bind a port another process is already
+    serving, which splits incoming connections nondeterministically between
+    the two instances -- a second copy of the dashboard then answers some
+    requests with its own state. ``SO_EXCLUSIVEADDRUSE`` (Windows only)
+    makes the second bind fail instead, so the duplicate exits immediately
+    rather than quietly stealing traffic. Elsewhere a plain bind already
+    refuses the second binder.
+
+    The socket is returned bound but not listening: waitress calls
+    ``listen()`` itself for sockets handed to it via ``sockets=``.
+    """
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        sock.bind(("127.0.0.1", port))
+    except OSError:
+        sock.close()
+        print(
+            f"Startup error: port {port} is already in use -- most likely "
+            "another copy of the dashboard is already running, or another "
+            "program has taken the port (Steam uses 8080). Close that "
+            f"program, or set a different port in {config_file_path()}.",
+            file=sys.stderr,
+        )
+        raise SystemExit(1) from None
+    return sock
+
+
 def main() -> None:
     """
     Main entry point.
@@ -166,7 +200,7 @@ def main() -> None:
             # Each Home poll tick bursts several callback POSTs at once;
             # Waitress's default 4 threads left no headroom (task queue depth
             # warnings with a single open tab).
-            serve(app.server, host="127.0.0.1", port=config.port, threads=8)
+            serve(app.server, sockets=[bind_server_socket(config.port)], threads=8)
     finally:
         observer.stop()
         observer.join()  # Wait until the observer thread terminates
