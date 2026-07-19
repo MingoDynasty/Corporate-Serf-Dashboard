@@ -13,6 +13,297 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-07-19: Releases Are Automated CalVer Tags Cut By CI
+
+Status: Accepted
+
+Decision: every push to `main` that changes anything an installed copy runs
+publishes a GitHub Release tagged `vYYYY.MM.DD` (`.N` suffix for same-day
+repeats). No human picks a version number or judges whether a commit "deserves"
+a release. The job lives in `.github/workflows/ci.yml` with `needs: test` — a
+commit that fails the gates never becomes a release — and the logic is in
+`scripts/release_job.py`.
+
+The skip rule is a **blocklist** (`docs/`, `tests/`, `.github/`, any `*.md`,
+`.gitignore`, `.pre-commit-config.yaml`), not an allowlist, because the failure
+directions are asymmetric: a redundant release is only noise, while a missed
+release strands distribution inputs — `install.ps1`, the launcher,
+`example.toml`, `.python-version`, `.gitattributes` — at an older tag. When in
+doubt, release.
+
+Two properties the job must keep:
+
+- **The Latest invariant.** Concurrent pushes serialize through a fixed
+  concurrency group (`cancel-in-progress: false`, `queue: max`), but that
+  serialization is FIFO by wait-start time, not by source order — a newer push
+  with faster tests can enter the critical section first. So inside it the job
+  checks ancestry (`git merge-base --is-ancestor`) against published releases
+  and passes `make_latest: false` when a published release descends from its
+  own SHA. `make_latest` defaults to true, so without this an older commit's
+  slow run would silently downgrade every `latest`-tracking install. After
+  claiming Latest, the job asserts `releases/latest` really resolves to its tag.
+- **Idempotency across every partial-failure state**, not just
+  tag-without-release: a rerun reuses a tag already pointing at `HEAD` and
+  *resumes an existing draft* (re-attaching assets) rather than creating a
+  second release.
+
+The zip asset is built by `git archive`, the only producer that expands the
+`export-subst` stamp — zipping a checkout would ship `version.txt` unexpanded.
+A second, tiny asset (`release.json`) carries the tag, full SHA, commit date,
+and that release's uv and Python pins, so the installer and launcher never parse
+TOML from PowerShell or spend an extra API call resolving the exact SHA
+(`releases/latest` reports `target_commitish`, which may be a branch name).
+
+Why: the maintainer explicitly does not want per-commit SemVer judgment, and the
+app has no API consumers to justify SemVer semantics. Market research across
+fast-shipping projects (yt-dlp, Path of Building Community, RuneLite, and
+FFmpeg's binary channels) found dated, immutable, retained artifacts to be the
+baseline even for daily-or-faster shippers, and found no comparable project
+shipping *unidentified* builds from a branch tip — tags are load-bearing for
+rollback and support.
+
+Provenance: this entry and the six below distill the release, versioning, and
+distribution proposal added in PR #150 and deleted once shipped (git history
+holds the full text). It went through four external design-review rounds plus
+the market-research run summarized above, and was implemented in PRs #154,
+#155, #158, #159, and the activation PR that removed it.
+
+## 2026-07-19: Releases And Their Assets Are Immutable
+
+Status: Accepted
+
+Decision: GitHub's immutable-releases setting is enabled on the repo, so tags
+and releases cannot be moved or deleted. The release job therefore creates a
+tag, then a **draft**, attaches assets, validates them, and only then publishes.
+
+Why: rollback is only trustworthy if `v2026.07.19` means the same bytes forever;
+a movable tag makes "go back to the version that worked" meaningless. The
+setting is not retroactive, which is why it was flipped *before* the release-job
+PR merged — that merge cut the first release, and a release published while the
+setting was off stays mutable forever.
+
+The consequence to remember: assets lock at publication, so validation must run
+pre-publish. After an immutable release is published it is too late to fix a bad
+asset — the only remedy is another release. This is what forces the draft-first
+flow above; do not "simplify" it into publish-then-attach.
+
+Launcher-side checksum verification is deliberately deferred: HTTPS to
+github.com is the trust anchor at this audience size.
+
+## 2026-07-19: Build Identity Comes From The Manifest, Corroborated By The Stamp
+
+Status: Accepted
+
+Decision: one reader (`source/utilities/build_info.py`) resolves the running
+build's identity, and every user-visible build string derives from it. The
+precedence is manifest → expanded stamp → git → `unknown`:
+
+1. **`install.json`** — the install manifest, written atomically by the
+   installer/launcher into the state root, never by the app. The only layer that
+   can know the release *tag*.
+2. **`version.txt`** — committed with git `export-subst` placeholders
+   (`sha: $Format:%H$`, `commit-date: $Format:%cs$`) plus a `.gitattributes`
+   entry. GitHub's archive endpoints run `git archive`, which expands them, so
+   any zip download carries its full SHA and commit date.
+3. **git** — if the placeholders are unexpanded, this is a checkout, so ask it.
+
+The manifest is authoritative **only when it corroborates the running code**:
+its `sha` must equal the SHA in the expanded stamp sitting beside that code. The
+manifest describes the install's *state*, not any one code directory, so during
+a staged update it still names the previous version while the new one is already
+running. Unconditional manifest-first precedence would make the new build report
+the old identity — and the launcher's own promotion check would then reject it
+forever. This was found by the Codex review of PR #154, during implementation,
+against a frozen design.
+
+Accepted consequence: a freshly promoted version reports `source: "archive"` and
+`tag: None` until the next launch. SHA and date still identify it exactly, and
+the tag↔SHA mapping is public in the releases.
+
+`version.txt` is deliberately plain `key: value` text rather than JSON: the
+committed file needs a comment header (a raw placeholder looks broken to anyone
+browsing the repo), and `export-subst` output is not JSON-escaped, so a JSON
+envelope would silently constrain future placeholders to escape-safe expansions.
+
+Identity surfaces in three places, chosen to cost no screen real estate: a
+startup line in `data/logs/debug.log` (bug reports arrive with the log), the
+existing GitHub icon tooltip in the header, and the browser title (which now
+derives from `BuildInfo` instead of advertising a static `v1.0.0`). A footer or
+an app-settings page was rejected as spending permanent space on a string read
+once per bug report.
+
+Why not have CI commit a version file on every push: the commit changes the SHA,
+so the file always describes its own parent; it doubles commit traffic; and it
+forces constant fetch friction for the maintainer and for parallel agent
+sessions. `export-subst` needs no commits and is never stale.
+
+## 2026-07-19: All Mutable State Lives Under An Explicit State Root
+
+Status: Accepted
+
+Decision: `CSD_STATE_DIR` names the directory holding every mutable file —
+`config.toml` and everything under `data/` (playlists, logs, preferences,
+caches). Unset means the current working directory, so dev checkouts behave
+exactly as before. Bundled read-only assets (`resources/benchmarks`) stop
+resolving from the working directory and resolve relative to the installed
+package instead, since they ship with the code. `source/utilities/paths.py`
+centralizes both rules.
+
+Why: without this split, versioned code directories cannot work at all. Running
+the app from a fresh version directory would lose `config.toml` and `data/`;
+running it from the state root would lose `resources/benchmarks`. An environment
+variable keeps the contract explicit and testable, and lets the launcher — not
+the app — own the choice of directories. (An early revision of the proposal
+claimed the installer needed zero code changes; that claim was wrong and the
+external review killed it.)
+
+## 2026-07-19: The Installer Brings Its Own Toolchain, App-Locally
+
+Status: Accepted
+
+Decision: installation is a PowerShell one-liner that fetches `get.ps1` from
+`main`. That shim is deliberately trivial and permanently backward compatible —
+resolve the latest release, fetch *that release's* `install.ps1`, run it,
+nothing else — so the installer is always exactly the same age as the payload it
+installs. Without the split, any installer change that merged ahead of its
+release would run against a payload whose layout it no longer matched, and would
+stay broken indefinitely if a release job failed.
+
+The installer puts the **entire toolchain** under the install root
+(`%LOCALAPPDATA%\CorporateSerfDashboard` by default): `UV_UNMANAGED_INSTALL`
+places uv in the tree and it is invoked by absolute path,
+`UV_PYTHON_INSTALL_DIR` plus `--managed-python` keep a managed CPython there
+instead of silently selecting whatever Python the machine has, and
+`UV_CACHE_DIR` keeps the cache inside too. No Python, uv, or registry state
+outside the root is used or disturbed, so uninstall is deleting the folder and
+the shortcut. Two files are written outside it by design: the desktop shortcut
+itself, and `get.ps1`'s copy of the installer at
+`%TEMP%\csd-install-<tag>.ps1`, which is inert once the install finishes and is
+deliberately not cleaned up (the shim stays trivial); the README documents
+deleting it.
+
+The uv version is **per release, not per install**: installer and launcher read
+the target release's `release.json` and provision that exact uv before syncing.
+An install-time-frozen uv would brick the first update that bumps the pin — the
+old binary rejects the new project, and `UV_UNMANAGED_INSTALL` disables uv
+self-update — so the toolchain upgrade must ride the same transaction as the
+code.
+
+First run does not merely copy `example.toml`, whose `stats_dir = "Change me!"`
+placeholder would crash the first launch. The installer locates the KovaaK's
+stats directory itself (Steam's registry `InstallPath` plus
+`libraryfolders.vdf`), confirms it with the user, validates that it exists, and
+writes it into `config.toml`. It then **round-trips the generated config through
+the installed app's own `load_config()`** and aborts loudly on failure, before
+writing the manifest or creating the shortcut. Validating with `tomllib` alone
+would only prove the file is syntactically TOML; the app's loader also proves
+the schema is one the app accepts. A config the app cannot load must fail the
+install loudly rather than surface later as a permanently broken first launch —
+permanent because existing `config.toml` and `data/` are never touched again.
+
+Why: the user's machine needs exactly one bootstrapped tool, acquired the way
+rustup and uv themselves are distributed. Python and git are never
+prerequisites. PyInstaller was rejected: unsigned executables trip SmartScreen
+and AV heuristics (fatal for a gaming audience's trust), signing is a recurring
+cost, every release would become a large re-download, and bundling
+dash/plotly/dash-ag-grid assets under PyInstaller is a known hook-debugging time
+sink. Revisit only if "run one command" ever becomes too much to ask.
+
+## 2026-07-19: PowerShell Writes UTF-8 Without BOM And Forward-Slash Paths
+
+Status: Accepted
+
+Decision: every machine-readable file written by the install/launch scripts
+(`config.toml`, `install.json`, the `launch.ps1` bootstrap) is written UTF-8
+**without** a byte-order mark, via `System.Text.UTF8Encoding($false)`, and every
+path inside them uses forward slashes. The scripts target Windows PowerShell
+5.1 — the shell the one-liner actually lands in on a stock Windows 11 machine.
+
+Why: 5.1's `-Encoding UTF8` emits a BOM, and this repo's Python 3.14 `tomllib`
+rejects both a BOM and raw `\` in TOML basic strings. Either alone yields a
+config the app can never parse, which the never-touch-an-existing-config rule
+would then make permanent. Both halves were verified empirically against this
+repo's interpreter rather than taken from documentation.
+
+This is a contract, not a style preference: do not "modernize" these writes to
+`Set-Content -Encoding UTF8`, and do not let Windows-native backslashes reach a
+generated TOML file.
+
+## 2026-07-19: Updates Are Staged, Reversible, And Speak A Frozen Wire Contract
+
+Status: Accepted
+
+Decision: the desktop shortcut targets a stable bootstrap at the install root
+(`launch.ps1`) that reads the manifest and delegates to the selected version's
+launcher — nothing else. Per-tag directories get pruned (keep last two), so the
+shortcut must never point into one. When the bootstrap itself must change, the
+versioned launcher replaces it on a higher embedded marker by writing a
+same-directory temp file, validating its marker and PowerShell syntax, then
+renaming over it. Never truncate the live file in place: PowerShell keeps
+executing the already-parsed body, so an interrupted in-place write leaves a
+working session now and a bricked entrypoint for every launch after it.
+
+The launcher is **single-instance** via a named mutex scoped to the install
+root, held for the launcher+app lifetime. A second launch opens the browser at
+the running instance and exits without updating, syncing, or touching the
+manifest — atomic manifest writes protect one file, not a whole transaction.
+
+Then it applies the manifest's policy:
+
+- **`latest`** (default): query `releases/latest` on a short timeout; a
+  different tag is downloaded and synced into a new per-tag directory but is
+  **not promoted yet**. It starts as a pending activation, and the launcher
+  polls `/health` until the child process is still alive *and* the response
+  carries the expected full SHA and a per-launch token passed in by environment
+  variable. A bare HTTP 200 is not proof of life: an already-running instance or
+  an unrelated service holding the port can answer while the pending process
+  never bound. Only then is the manifest atomically rewritten. On timeout or
+  early exit the launcher starts the previous version and leaves the manifest
+  untouched — a crashing release never becomes the recorded install. The gate
+  deliberately does **not** require a tag match, because a build on trial is
+  still described by the previous manifest and reports `tag: None` under the
+  corroboration rule above. Any network or API failure fails open: run what is
+  installed, offline-safe.
+- **`pinned`** + `pinned_tag`: skip the update check entirely. A rollback
+  install (`install.ps1 -Tag ...`) *writes this pin*; without it the next launch
+  would immediately reinstall the bad release, making rollback a no-op. Undoing
+  it is explicit: re-run the installer without `-Tag`.
+
+**Wire contract v1.** A pinned or long-offline install may jump from the first
+launcher straight to any future release, and the launcher performing that update
+is always the *old* one. So everything an old launcher parses is a frozen,
+versioned contract from day one: `release.json` and `install.json` both carry
+`schema_version: 1`, and the v1 field set froze when the installer shipped.
+Changes within v1 are additive-only. A breaking change bumps the version and
+dual-publishes the v1 envelope for as long as v1 launchers may exist. A launcher
+meeting an unknown `schema_version` — or any parse failure — runs the existing
+install and says so loudly ("re-run the install one-liner"), because fail-open
+alone would convert a contract break into *silent permanent stranding*: every
+launch retries, fails, runs the old version, and never tells the user.
+
+`install.json` deliberately carries **no uv field and no zip-prefix field**. The
+launcher takes uv from the new release's `release.json` at update time, and
+running the current version needs no uv at all — it starts the synced venv's
+`python.exe` directly, which is offline-safe and makes the health gate and the
+kill target the real server process rather than a wrapper. The zip's top-level
+directory name is **discovered after extraction, never derived**: the named
+asset keeps the "v" (`Corporate-Serf-Dashboard-v2026.07.19/`) while GitHub's
+source-archive fallback strips it. Both scripts assert exactly one top-level
+directory and verify the extracted stamp's SHA before syncing.
+
+Rollback protects *code*; durable state is governed by a rule rather than
+machinery. Releases must read older state (missing keys get defaults) and must
+not rewrite user-authored files. The durable state is a handful of tiny,
+schema-stable files, so a genuine format break is rare enough to be called out
+in its PR with a manual step — the house convention at this user-base size.
+State snapshot/restore was deferred on that basis.
+
+Accepted limitation: a release that fails its health gate is retried in full —
+download, sync, then the readiness timeout — on every launch until the next
+release lands. Bounded by the near-daily release cadence; the escape hatches are
+the rollback pin and waiting for the replacement release. Documented rather than
+solved with a failed-tag marker.
+
 ## 2026-07-19: The App Binds Its Port Exclusively And Exits If It Is Taken
 
 Status: Accepted

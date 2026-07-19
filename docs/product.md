@@ -142,6 +142,26 @@ list in the roadmap.)
   rank overlays need threshold data that no single public API provides; the
   importer builds it reproducibly, with provenance, instead of by hand.
 
+### Getting and updating the app
+
+- **One-line install with a self-updating shortcut** (PRs #155, #159, #163).
+  The whole install is one line pasted into PowerShell: it brings its own
+  Python and uv, finds the KovaaK's stats folder itself, and leaves a desktop
+  shortcut. Each launch updates to the newest release before starting, and
+  quietly runs the version already installed when there's no internet.
+  *Problem solved:* the audience is Windows gamers, not Python developers —
+  "clone the repo, install uv, run `uv sync`" excluded most of them. Everything
+  it installs stays in one folder, so uninstalling is deleting that folder and
+  the shortcut.
+- **Every build says what it is, and installer-era releases can be rolled back**
+  (PRs #154, #158, #159). Releases are dated, immutable, and kept forever; the
+  running build records its commit in the log and shows it in the header
+  tooltip. *Problem solved:* a bug report couldn't be tied to a version, and a
+  bad push had no "go back to yesterday" — installing an older tag now pins it
+  there until the user opts back into updates. Rollback targets must ship the
+  installer and launcher, so `v2026.07.19.4` is the earliest; older tags
+  predate that contract and their installs abort.
+
 ## Where it's going
 
 Sequencing and design state live in the [roadmap](./roadmap.md). The unsolved
