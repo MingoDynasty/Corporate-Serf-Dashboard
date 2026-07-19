@@ -302,6 +302,15 @@ flowchart LR
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
+- `health.py` — registers the `/health` Flask route on `app.server`: the
+  running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
+  variable, which is how an updater tells "my new process is up" apart from
+  "something else answers on this port".
+- `utilities/build_info.py` — `get_build_info()`: the single source of build
+  identity (tag, commit SHA, commit date), read once per process from
+  `install.json`, then the `git archive`-expanded `version.txt` stamp, then
+  `git`, then `unknown`. Feeds the startup log line, the header tooltip, the
+  browser title, and `/health`.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications; records logged outside a callback context are queued and
   drained by a Home interval callback, so background threads can log too),

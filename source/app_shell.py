@@ -7,6 +7,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
+from source.utilities.build_info import get_build_info
 from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
 
 logger = logging.getLogger(__name__)
@@ -87,7 +88,9 @@ github_component = dmc.Tooltip(
         local_icon("ion:logo-github", width=40),
         href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
     ),
-    label="View this app on GitHub",
+    # The build identity rides along on an existing tooltip: it costs no
+    # pixels, and a bug report only needs to read it once.
+    label=f"View this app on GitHub — build {get_build_info().short_description}",
 )
 
 theme_switch_component = dmc.Tooltip(

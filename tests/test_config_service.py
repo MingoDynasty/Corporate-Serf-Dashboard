@@ -47,6 +47,10 @@ def test_startup_with_missing_or_invalid_config_exits_cleanly(
     )
 
     assert result.returncode == 1
-    assert result.stdout == ""
+    # The startup build-identity line is the only stdout a failed start emits;
+    # a bug report about a broken config still says which build produced it.
+    stdout_lines = result.stdout.splitlines()
+    assert len(stdout_lines) == 1
+    assert "| Build " in stdout_lines[0]
     assert result.stderr.strip() == CONFIG_ERROR_MESSAGE
     assert "Traceback" not in result.stderr
