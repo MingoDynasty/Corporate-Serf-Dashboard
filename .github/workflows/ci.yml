@@ -98,25 +98,22 @@ jobs:
                   set -euo pipefail
                   # Diff the whole pushed range, not just the tip commit, so a
                   # multi-commit push cannot hide a runtime change behind a
-                  # docs-only tip. `before` is unusable after a force push or on
-                  # a brand new branch, so fall back to HEAD^ and finally to
-                  # releasing unconditionally.
-                  base=""
-                  if [ -n "${BEFORE:-}" ] &&
-                     [ "$BEFORE" != "0000000000000000000000000000000000000000" ] &&
-                     git cat-file -e "${BEFORE}^{commit}" 2>/dev/null &&
-                     git merge-base --is-ancestor "$BEFORE" HEAD; then
-                      base="$BEFORE"
-                  elif git rev-parse -q --verify 'HEAD~1^{commit}' >/dev/null; then
-                      base="HEAD~1"
-                  fi
-                  if [ -z "$base" ]; then
-                      echo "No usable base commit; releasing conservatively."
+                  # docs-only tip. When `before` is unusable -- a new ref, a
+                  # force push, or a pruned base -- the pushed range is
+                  # unknowable, so release rather than narrowing the diff to
+                  # HEAD~1: that would inspect one commit of a range we already
+                  # admitted we cannot see, and a missed release is the costly
+                  # direction.
+                  if [ -z "${BEFORE:-}" ] ||
+                     [ "$BEFORE" = "0000000000000000000000000000000000000000" ] ||
+                     ! git cat-file -e "${BEFORE}^{commit}" 2>/dev/null ||
+                     ! git merge-base --is-ancestor "$BEFORE" HEAD; then
+                      echo "Pushed range is unknowable; releasing conservatively."
                       echo "release=true" >> "$GITHUB_OUTPUT"
                       exit 0
                   fi
-                  git diff --name-only "$base" HEAD > changed-paths.txt
-                  echo "Changed paths since ${base}:"
+                  git diff --name-only "$BEFORE" HEAD > changed-paths.txt
+                  echo "Changed paths since ${BEFORE}:"
                   cat changed-paths.txt
                   decision=$(uv run --no-project --python "$(cat .python-version)" \
                       python scripts/release_job.py should-release \
