@@ -70,7 +70,13 @@ Codex <codex@local>
   error and a flood of "ID not found in layout" entries. This is a known
   upstream Dash race, not app code — it self-heals on reload. Reload before
   judging console cleanliness, and don't attribute it to whatever you just
-  changed. Details in `docs/decision_log.md` (2026-07-18 entry).
+  changed. Details in `docs/decision_log.md` (the 2026-07-18 pages-race
+  entry).
+- Both playlist grids log an AG Grid "invalid gridOptions property
+  'columnSizeOptions'" warning on every mount. This is benign dash-ag-grid
+  wrapper noise, still present on 35.3.0, not app code — don't drop the prop
+  and don't treat the warning as a regression. Details in
+  `docs/decision_log.md` (the 2026-07-18 `columnSizeOptions` entry).
 
 ## Documentation Habits
 
