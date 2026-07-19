@@ -43,16 +43,25 @@ split should decide whether they converge.
 tests and `compileall` — and that file picks release tags and is the last
 check before an immutable release publishes.
 
-Measured 2026-07-19 during the PR #158 review, so the cleanup is small and the
-blockers are known:
+Measured 2026-07-19 during the PR #158 review:
 
-- `ruff check --no-force-exclude scripts` passes on all five files, so the
-  lint exclusion hides nothing today. It could be narrowed to the two legacy
-  `scripts/<name>/script.py` trees or dropped outright.
+- Ruff, run over all five files with explicit paths, reports **40 findings** —
+  mostly `D100`/`D101`/`D103` docstring rules in the two legacy script trees,
+  plus `G004` and `PLR0915`. So the exclusion cannot simply be dropped.
+- `scripts/release_job.py` contributes exactly **one**: `PLR0913` on
+  `validate_release` (7 keyword-only arguments > 5). Narrowing the exclusion to
+  the two legacy trees therefore costs one decision — accept a targeted
+  per-file ignore, or reshape a signature that is deliberately explicit.
 - `mypy scripts/release_job.py` is clean, but `mypy scripts` fails on
   `Duplicate module named "models"` — `benchmark_importer/` and `Leaderboard
   Sensitivities/` each have one and neither has an `__init__.py`. That is a
   packaging fix, not type errors.
+
+Measure with explicit file paths. `ruff check --no-force-exclude scripts` is a
+**false pass**: `--no-force-exclude` only re-admits paths named explicitly, so
+directory traversal still prunes everything under the `scripts/**` exclusion
+and exits 0 having checked nothing. `--show-files` lists the five files anyway,
+which makes the false pass look convincing.
 
 Revisit when the tooling spec is next opened; changing it was out of scope for
 the release-job PR that surfaced it.
