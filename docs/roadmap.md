@@ -75,6 +75,15 @@ Design rationale for shipped work lives in
   without flooding dropdowns, and playlists are managed in the app instead of
   by copying files. (PRs #87, #90, #92, and #98) Design rationale distilled
   into [`decision_log.md`](./decision_log.md).
+- **Install, update, and rollback** — the app installs from one PowerShell
+  line that brings its own Python and uv, finds the KovaaK's stats folder, and
+  leaves a desktop shortcut that updates itself on launch. Every push to `main`
+  that changes runtime code publishes an immutable CalVer release, and every
+  build now identifies itself in the log, the header tooltip, and `/health`, so
+  a bug report names a version and any release can be rolled back to. Turns
+  "clone the repo and run uv" into something a non-technical player can do.
+  (PRs #154, #155, #158, #159; design in #150) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 
 ---
 
