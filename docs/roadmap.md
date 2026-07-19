@@ -82,7 +82,8 @@ Design rationale for shipped work lives in
   build now identifies itself in the log, the header tooltip, and `/health`, so
   a bug report names a version and any release can be rolled back to. Turns
   "clone the repo and run uv" into something a non-technical player can do.
-  (PRs #154, #155, #158, #159; design in #150) Design rationale distilled into
+  (PRs #154, #155, #158, #159, #163; design in #150) Design rationale distilled
+  into
   [`decision_log.md`](./decision_log.md).
 
 ---

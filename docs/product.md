@@ -144,14 +144,15 @@ list in the roadmap.)
 
 ### Getting and updating the app
 
-- **One-line install with a self-updating shortcut** (PRs #155, #159). The whole
-  install is one line pasted into PowerShell: it brings its own Python and uv,
-  finds the KovaaK's stats folder itself, and leaves a desktop shortcut. Each
-  launch updates to the newest release before starting, and quietly runs the
-  version already installed when there's no internet. *Problem solved:* the
-  audience is Windows gamers, not Python developers — "clone the repo, install
-  uv, run `uv sync`" excluded most of them. Everything it installs stays in one
-  folder, so uninstalling is deleting that folder and the shortcut.
+- **One-line install with a self-updating shortcut** (PRs #155, #159, #163).
+  The whole install is one line pasted into PowerShell: it brings its own
+  Python and uv, finds the KovaaK's stats folder itself, and leaves a desktop
+  shortcut. Each launch updates to the newest release before starting, and
+  quietly runs the version already installed when there's no internet.
+  *Problem solved:* the audience is Windows gamers, not Python developers —
+  "clone the repo, install uv, run `uv sync`" excluded most of them. Everything
+  it installs stays in one folder, so uninstalling is deleting that folder and
+  the shortcut.
 - **Every build says what it is, and any release can be rolled back** (PRs #154,
   #158). Releases are dated, immutable, and kept forever; the running build
   records its commit in the log and shows it in the header tooltip. *Problem
