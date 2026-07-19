@@ -34,3 +34,44 @@ jobs:
               run: uv run mypy
             - name: Run tests
               run: uv run pytest
+            # Kept out of pytest: it depends on the network and on GitHub having
+            # the commit, so a flake must block a merge without breaking local
+            # test runs. The PR head SHA is used because the merge ref may not
+            # be archivable.
+            - name: Verify version.txt export-subst expansion
+              shell: pwsh
+              env:
+                  ARCHIVE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+              run: |
+                  $ErrorActionPreference = 'Stop'
+                  $url = "https://github.com/${{ github.repository }}/archive/$env:ARCHIVE_SHA.zip"
+                  $zip = Join-Path $env:RUNNER_TEMP 'archive.zip'
+                  $extracted = Join-Path $env:RUNNER_TEMP 'archive'
+                  $downloaded = $false
+                  foreach ($attempt in 1..3) {
+                      try {
+                          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+                          $downloaded = $true
+                          break
+                      } catch {
+                          Write-Host "Attempt ${attempt} failed: $($_.Exception.Message)"
+                          Start-Sleep -Seconds (5 * $attempt)
+                      }
+                  }
+                  if (-not $downloaded) { throw "Could not download $url" }
+                  Expand-Archive -Path $zip -DestinationPath $extracted -Force
+                  $stamp = Get-ChildItem -Path $extracted -Filter 'version.txt' -Recurse |
+                      Select-Object -First 1
+                  if (-not $stamp) { throw 'version.txt is missing from the archive' }
+                  $content = Get-Content -Raw -Path $stamp.FullName
+                  Write-Host $content
+                  if ($content -match '\$Format') {
+                      throw 'export-subst placeholders were not expanded'
+                  }
+                  $sha = [regex]::Match($content, '(?m)^sha:\s*([0-9a-f]{40})\s*$').Groups[1].Value
+                  $date = [regex]::Match($content, '(?m)^commit-date:\s*(\d{4}-\d{2}-\d{2})\s*$').Groups[1].Value
+                  if (-not $sha) { throw 'version.txt has no usable sha' }
+                  if (-not $date) { throw 'version.txt has no usable commit-date' }
+                  if ($sha -ne $env:ARCHIVE_SHA) {
+                      throw "version.txt sha $sha does not match $env:ARCHIVE_SHA"
+                  }
