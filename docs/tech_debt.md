@@ -49,9 +49,12 @@ Measured 2026-07-19 during the PR #158 review:
   mostly `D100`/`D101`/`D103` docstring rules in the two legacy script trees,
   plus `G004` and `PLR0915`. So the exclusion cannot simply be dropped.
 - `scripts/release_job.py` contributes exactly **one**: `PLR0913` on
-  `validate_release` (7 keyword-only arguments > 5). Narrowing the exclusion to
-  the two legacy trees therefore costs one decision — accept a targeted
-  per-file ignore, or reshape a signature that is deliberately explicit.
+  `validate_release` (7 keyword-only arguments > 5). Settled during the PR #158
+  review: keep the signature and silence the rule with a targeted per-file
+  ignore. The arguments are all required and explicit, and bundling them into a
+  dataclass to satisfy a heuristic would cost call-site clarity for no
+  correctness gain. So narrowing the exclusion to the two legacy trees is
+  mechanical, not a design question.
 - `mypy scripts/release_job.py` is clean, but `mypy scripts` fails on
   `Duplicate module named "models"` — `benchmark_importer/` and `Leaderboard
   Sensitivities/` each have one and neither has an `__init__.py`. That is a
