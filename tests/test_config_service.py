@@ -59,7 +59,11 @@ def test_startup_with_missing_or_invalid_config_exits_cleanly(
     result = _run_app(tmp_path)
 
     assert result.returncode == 1
-    assert result.stdout == ""
+    # The startup build-identity line is the only stdout a failed start emits;
+    # a bug report about a broken config still says which build produced it.
+    stdout_lines = result.stdout.splitlines()
+    assert len(stdout_lines) == 1
+    assert "| Build " in stdout_lines[0]
     assert result.stderr.strip() == CONFIG_ERROR_MESSAGE
     assert "Traceback" not in result.stderr
 
@@ -79,7 +83,10 @@ def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
     result = _run_app(tmp_path)
 
     assert result.returncode == 1
-    assert result.stdout == ""
+    # Same as above: the build-identity line is the only expected stdout.
+    stdout_lines = result.stdout.splitlines()
+    assert len(stdout_lines) == 1
+    assert "| Build " in stdout_lines[0]
     assert "Traceback" not in result.stderr
     # One actionable line: what was configured, where to change it, what to set.
     assert "\n" not in result.stderr.strip()

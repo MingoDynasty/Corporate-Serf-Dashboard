@@ -7,7 +7,6 @@ import logging
 import sys
 import tomllib
 from dataclasses import asdict
-from importlib.metadata import version
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
@@ -22,12 +21,14 @@ from source.config.config_service import (
     config_file_path,
     get_config,
 )
+from source.health import register_health_endpoint
 from source.kovaaks.api_service import set_request_timeout
 from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
 from source.kovaaks.percentile_warmup_service import (
     start_percentile_warmup_worker,
 )
 from source.my_watchdog.file_watchdog import NewFileHandler
+from source.utilities.build_info import get_build_info
 from source.utilities.paths import state_dir
 
 # Logging setup
@@ -72,7 +73,14 @@ configure_logging()
 
 logger = logging.getLogger(__name__)
 
-APP_NAME = f"Corporate Serf Dashboard v{version('Corporate-Serf-Dashboard')}"
+
+def app_name() -> str:
+    """Name the app for the browser title, versioned only by a release tag."""
+    tag = get_build_info().tag
+    return f"Corporate Serf Dashboard {tag}" if tag else "Corporate Serf Dashboard"
+
+
+APP_NAME = app_name()
 app = DashProxy(
     title=APP_NAME,
     update_title=None,
@@ -81,6 +89,7 @@ app = DashProxy(
     use_pages=True,  # enable Dash pages
 )
 app.layout = layout()  # layout logic encapsulated in another file
+register_health_endpoint(app.server)
 
 
 def main() -> None:
@@ -88,6 +97,15 @@ def main() -> None:
     Main entry point.
     :return: None.
     """
+    build_info = get_build_info()
+    # Bug reports arrive with debug.log, so the log is where build identity
+    # matters most.
+    logger.info(
+        "Build %s, %s",
+        build_info.short_description,
+        build_info.release_label,
+    )
+
     try:
         config = get_config()
     except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:

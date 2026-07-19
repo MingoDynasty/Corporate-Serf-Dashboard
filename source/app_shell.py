@@ -7,6 +7,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
+from source.utilities.build_info import get_build_info
 from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
 
 logger = logging.getLogger(__name__)
@@ -82,13 +83,24 @@ discord_component = dmc.Tooltip(
     label="Contact me via Discord: MingoDynasty",
 )
 
-github_component = dmc.Tooltip(
-    dmc.Anchor(
-        local_icon("ion:logo-github", width=40),
-        href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
-    ),
-    label="View this app on GitHub",
-)
+
+def github_component() -> dmc.Tooltip:
+    """Build the GitHub link, whose tooltip carries the build identity.
+
+    Built on demand rather than at import: resolving the build identity can
+    log (an ignored install manifest, say), and this module is imported
+    before the app configures its log handlers.
+    """
+    return dmc.Tooltip(
+        dmc.Anchor(
+            local_icon("ion:logo-github", width=40),
+            href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
+        ),
+        # The build identity rides along on an existing tooltip: it costs no
+        # pixels, and a bug report only needs to read it once.
+        label=f"View this app on GitHub — build {get_build_info().short_description}",
+    )
+
 
 theme_switch_component = dmc.Tooltip(
     dmc.ColorSchemeToggle(
@@ -175,7 +187,7 @@ def layout(**kwargs):  # noqa: ARG001
                                     dmc.Group(
                                         children=[
                                             discord_component,
-                                            github_component,
+                                            github_component(),
                                             theme_switch_component,
                                         ],
                                         h="100%",
