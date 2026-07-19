@@ -98,6 +98,7 @@ $installer = "$env:TEMP\csd-install-$tag.ps1"
 Invoke-WebRequest -UseBasicParsing -OutFile $installer `
   -Uri "https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/$tag/install.ps1"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Tag $tag
+Remove-Item $installer
 ```
 
 Each release ships its own installer, so this deliberately fetches the one
@@ -114,8 +115,17 @@ Releases published before the installer existed cannot be rolled back to;
 ### Uninstall
 
 Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
-shortcut. That is the entire footprint — no registry keys, no machine-wide
-Python, nothing left behind.
+shortcut. Nothing else on the machine was modified — no registry keys, no
+machine-wide Python or uv, nothing on `PATH`.
+
+One loose end: the easy install downloads the installer to
+`%TEMP%\csd-install-<tag>.ps1` and leaves it there. It is inert once the
+install finishes — nothing reads it again — and Windows clears `%TEMP%`
+eventually, but you can delete it yourself:
+
+```powershell
+Remove-Item "$env:TEMP\csd-install-*.ps1"
+```
 
 ## Configuration
 

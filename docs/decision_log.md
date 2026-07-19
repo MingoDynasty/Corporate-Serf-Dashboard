@@ -174,8 +174,13 @@ The installer puts the **entire toolchain** under the install root
 places uv in the tree and it is invoked by absolute path,
 `UV_PYTHON_INSTALL_DIR` plus `--managed-python` keep a managed CPython there
 instead of silently selecting whatever Python the machine has, and
-`UV_CACHE_DIR` keeps the cache inside too. Nothing outside the root is used or
-disturbed, and uninstall is honest: delete the folder and the shortcut.
+`UV_CACHE_DIR` keeps the cache inside too. No Python, uv, or registry state
+outside the root is used or disturbed, so uninstall is deleting the folder and
+the shortcut. Two files are written outside it by design: the desktop shortcut
+itself, and `get.ps1`'s copy of the installer at
+`%TEMP%\csd-install-<tag>.ps1`, which is inert once the install finishes and is
+deliberately not cleaned up (the shim stays trivial); the README documents
+deleting it.
 
 The uv version is **per release, not per install**: installer and launcher read
 the target release's `release.json` and provision that exact uv before syncing.

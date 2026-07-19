@@ -153,12 +153,14 @@ list in the roadmap.)
   "clone the repo, install uv, run `uv sync`" excluded most of them. Everything
   it installs stays in one folder, so uninstalling is deleting that folder and
   the shortcut.
-- **Every build says what it is, and any release can be rolled back** (PRs #154,
-  #158, #159). Releases are dated, immutable, and kept forever; the running
-  build records its commit in the log and shows it in the header tooltip.
-  *Problem solved:* a bug report couldn't be tied to a version, and a bad push
-  had no "go back to yesterday" — installing an older tag now pins it there
-  until the user opts back into updates.
+- **Every build says what it is, and installer-era releases can be rolled back**
+  (PRs #154, #158, #159). Releases are dated, immutable, and kept forever; the
+  running build records its commit in the log and shows it in the header
+  tooltip. *Problem solved:* a bug report couldn't be tied to a version, and a
+  bad push had no "go back to yesterday" — installing an older tag now pins it
+  there until the user opts back into updates. Rollback targets must ship the
+  installer and launcher, so `v2026.07.19.4` is the earliest; older tags
+  predate that contract and their installs abort.
 
 ## Where it's going
 
