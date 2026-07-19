@@ -275,6 +275,18 @@ def test_archive_without_the_expected_prefix_blocks_publication(
     assert any("has no" in problem for problem in problems)
 
 
+def test_archive_renamed_in_yaml_blocks_publication(tmp_path: Path) -> None:
+    # The workflow mints the asset filename independently of this module. A
+    # rename there that leaves the archive prefix alone passes every other
+    # check, so release.json would name an asset the release does not carry.
+    archive = _write_archive(tmp_path / "Renamed-In-Yaml.zip", _stamp())
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(
+        "archive is named Renamed-In-Yaml.zip" in problem for problem in problems
+    )
+
+
 def test_unreadable_archive_blocks_publication(tmp_path: Path) -> None:
     archive = tmp_path / source_asset_name(TAG)
     archive.write_bytes(b"not a zip")

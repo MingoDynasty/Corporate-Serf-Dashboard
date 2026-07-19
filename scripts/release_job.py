@@ -233,7 +233,18 @@ def validate_release(
     be deleted, so everything checkable is checked while the release is still
     a draft.
     """
-    stamp, problems = _read_stamp(archive, tag)
+    problems: list[str] = []
+    # The uploaded asset's filename is minted in YAML, so it is the one input
+    # here that is not derived from `tag`. Renaming it there without also
+    # changing the archive prefix would otherwise pass every other check and
+    # publish a release.json naming an asset that does not exist -- which the
+    # launcher can only ever resolve through the source-archive fallback.
+    if archive.name != source_asset_name(tag):
+        problems.append(
+            f"archive is named {archive.name}, expected {source_asset_name(tag)}"
+        )
+    stamp, stamp_problems = _read_stamp(archive, tag)
+    problems.extend(stamp_problems)
     if stamp is not None:
         problems.extend(_stamp_problems(stamp, sha, commit_date))
     expected = build_release_metadata(
