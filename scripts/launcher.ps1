@@ -39,7 +39,7 @@ $InstallOneLiner = 'irm https://raw.githubusercontent.com/MingoDynasty/Corporate
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $UpdateCheckTimeoutSec = 5
 $HealthTimeoutSec = 120
-$DefaultPort = 8080
+$DefaultPort = 8050
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -453,16 +453,29 @@ try {
             Show-AppFailure "the dashboard failed to start ($state)."
             Stop-Fatal "version $runTag did not become ready on port $port. A readiness failure can be config-caused: check config.toml in $InstallRoot and the app error output above."
         }
-        Open-Dashboard $port
-        Remove-PrunedVersions -ActiveTag $runTag -PreviousTag ''
-        Update-Bootstrap $versionDir
         $appProcess = $current
+        try {
+            Open-Dashboard $port
+            Remove-PrunedVersions -ActiveTag $runTag -PreviousTag ''
+            Update-Bootstrap $versionDir
+        } catch {
+            # Cosmetic post-start steps (no browser handler, a locked
+            # launch.ps1) must never take down the running app -- the child
+            # shares this console and dies with the window.
+            Write-Host "WARNING: a post-start step failed ($($_.Exception.Message)); the dashboard is running." -ForegroundColor Yellow
+        }
     }
 
     # Hold the mutex for the launcher+app lifetime.
     Write-Host "Dashboard running at http://127.0.0.1:$port/ -- close this window (or press Ctrl+C) to stop it."
     $appProcess.WaitForExit()
     exit $appProcess.ExitCode
+} catch {
+    # Last resort: an unexpected terminating error would otherwise close the
+    # console window silently (taking the -NoNewWindow app child with it).
+    # Stop-Fatal shows the message and pauses; `exit` is flow control, so
+    # deliberate exits above never land here.
+    Stop-Fatal "unexpected launcher failure: $($_.Exception.Message)"
 } finally {
     if ($mutexAcquired) {
         try { $mutex.ReleaseMutex() } catch { }
