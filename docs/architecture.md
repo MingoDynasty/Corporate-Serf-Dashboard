@@ -309,8 +309,10 @@ flowchart LR
 - `utilities/build_info.py` — `get_build_info()`: the single source of build
   identity (tag, commit SHA, commit date), read once per process from
   `install.json`, then the `git archive`-expanded `version.txt` stamp, then
-  `git`, then `unknown`. Feeds the startup log line, the header tooltip, the
-  browser title, and `/health`.
+  `git`, then `unknown`. The manifest wins only when it corroborates the
+  running code (its `sha` equals the stamp's), because an install's manifest
+  still names the previous version while a new one is on trial. Feeds the
+  startup log line, the header tooltip, the browser title, and `/health`.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications; records logged outside a callback context are queued and
   drained by a Home interval callback, so background threads can log too),

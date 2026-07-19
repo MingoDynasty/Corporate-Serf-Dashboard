@@ -1,6 +1,13 @@
 # Proposal: release, versioning, and distribution model
 
-Status: Proposed — revision 4, 2026-07-18. Four external design-review
+Status: Proposed — revision 5, 2026-07-18. Revision 5 amends D2 and D6 only:
+implementing PR 1 surfaced a conflict *between* those two decisions (the
+manifest-first precedence made a pending update permanently unpromotable),
+found by the Codex review of PR #154 and confirmed there — a P1-class
+finding, which is the trigger the freeze rule requires. Everything below
+that is revision 4, unchanged.
+
+Revision 4, 2026-07-18. Four external design-review
 rounds (Codex): r0–r2 general, then a scoped round-4 P1 hunt against
 revision 3's freeze, which produced five confirmed release blockers —
 the freeze rule (design changes require a P1-class finding) working as
@@ -129,8 +136,21 @@ recovery remain real, small, costs.
 3. **Git fallback**: if the placeholder is unexpanded, we're in a checkout —
    `git rev-parse HEAD`; else `unknown`.
 
-Precedence: manifest → expanded `version.txt` → git → `unknown`. All
-user-visible identity (D3) derives from this one `BuildInfo`.
+Precedence: manifest → expanded `version.txt` → git → `unknown`, with one
+condition on the first step (revision 5): **the manifest is authoritative
+only when it corroborates the running code** — its `sha` must equal the SHA
+in the expanded stamp beside the code. The manifest belongs to the install's
+state, not to any one code directory, so during a pending activation (D6) it
+still names the *previous* version while the new one is already running.
+Unconditional manifest-first precedence would therefore make the new build
+report the old identity, and the launcher's own promotion check would reject
+it forever. Missing, unexpanded, or mismatched stamp ⇒ the manifest is
+ignored and the stamp (then git) answers. The accepted consequence is that a
+freshly promoted version keeps reporting `source: "archive"` and `tag: None`
+until the next launch; SHA and date still identify it exactly, and D1 makes
+the tag↔SHA mapping public.
+
+All user-visible identity (D3) derives from this one `BuildInfo`.
 Implementation must verify the export-subst expansion empirically before
 building on it: the mechanism is documented
 (`git-scm.com/docs/gitattributes`, GitHub source archives are `git archive`
@@ -286,9 +306,12 @@ The versioned launcher then applies the manifest policy:
   bare HTTP 200 is not proof of life, because an already-running instance
   or an unrelated service (Steam famously squats on the default port 8080)
   can answer while the pending process failed to bind. Promotion requires
-  the child process still alive **and** the response identity matching the
-  expected tag/SHA and token; the same poll decides when to open the
-  browser. Only then is the manifest atomically rewritten to make the new
+  the child process still alive **and** the response carrying the expected
+  full SHA and launch token; the same poll decides when to open the browser.
+  The gate must **not** require a tag match (revision 5): a build on trial
+  has not been promoted, so its manifest still names the previous version
+  and is ignored under D2's corroboration rule — it reports its own SHA with
+  `tag: None`. Requiring a tag here would reject every valid update. Only then is the manifest atomically rewritten to make the new
   version authoritative. On timeout or early exit, the
   launcher starts the previous version instead and leaves the manifest
   untouched — a crashing release never becomes the recorded install. (A

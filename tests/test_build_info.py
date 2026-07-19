@@ -64,30 +64,76 @@ def _fail_git(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(build_info.subprocess, "run", fake_run)
 
 
-def test_manifest_wins_over_every_other_layer(
+def test_manifest_wins_when_it_corroborates_the_stamp(
     isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    _write_manifest(isolated_build_info)
+    """A settled install: the manifest describes the code that is running."""
+    _write_manifest(isolated_build_info, sha=STAMP_SHA)
     _write_stamp(isolated_build_info, STAMP_SHA)
     _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
 
     info = get_build_info()
 
     assert info == BuildInfo(
-        sha=MANIFEST_SHA,
+        sha=STAMP_SHA,
         commit_date="2026-07-18",
         tag="v2026.07.18",
         source="manifest",
     )
-    assert info.short_sha == "1111111"
+    assert info.short_sha == "2222222"
     assert info.release_label == "v2026.07.18"
-    assert info.short_description == "1111111 (2026-07-18)"
+    assert info.short_description == "2222222 (2026-07-18)"
+
+
+def test_stale_manifest_loses_to_the_stamp_beside_the_code(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A pending activation: new code, but the install's manifest is older.
+
+    Regression test for the D2/D6 conflict found reviewing PR #154 — trusting
+    the manifest here would make the new build report the previous version,
+    and the launcher would never promote it.
+    """
+    _write_manifest(isolated_build_info, sha=MANIFEST_SHA)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    info = get_build_info()
+
+    assert info == BuildInfo(
+        sha=STAMP_SHA, commit_date="2026-07-17", tag=None, source="archive"
+    )
+
+
+def test_manifest_without_a_stamp_is_ignored(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Nothing corroborates the manifest, so it does not get to answer."""
+    _write_manifest(isolated_build_info)
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    assert get_build_info() == BuildInfo(
+        sha=GIT_SHA, commit_date="2026-07-16", tag=None, source="git"
+    )
+
+
+def test_manifest_with_an_unexpanded_stamp_is_ignored(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A checkout run against an install's state root still reports itself."""
+    _write_manifest(isolated_build_info)
+    _write_stamp(isolated_build_info, "$Format:%H$", commit_date="$Format:%cs$")
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    assert get_build_info().source == "git"
 
 
 @pytest.mark.parametrize(
     "overrides",
     [
-        {"schema_version": 2},
+        # Both would otherwise corroborate the stamp, so the fall-through is
+        # attributable to the field under test.
+        {"schema_version": 2, "sha": STAMP_SHA},
         {"schema_version": 1, "sha": ""},
     ],
 )

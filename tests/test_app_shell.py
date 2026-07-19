@@ -69,10 +69,10 @@ def test_theme_toggle_is_wrapped_in_tooltip():
 
 
 def test_github_tooltip_carries_the_build_identity():
-    label = app_shell.github_component.label
+    label = app_shell.github_component().label
 
     assert label.startswith("View this app on GitHub — build ")
-    assert label.endswith(f"{get_build_info().short_description}")
+    assert label.endswith(get_build_info().short_description)
 
 
 def test_color_scheme_is_restored_before_styles_load():

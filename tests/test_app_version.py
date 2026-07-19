@@ -35,20 +35,33 @@ def test_app_name_carries_no_version_without_a_release_tag() -> None:
 
 
 def test_app_name_carries_the_release_tag_when_installed(tmp_path: Path) -> None:
+    installed_sha = "a" * 40
     (tmp_path / "install.json").write_text(
         json.dumps(
             {
                 "schema_version": 1,
                 "tag": "v2026.07.18",
-                "sha": "a" * 40,
+                "sha": installed_sha,
                 "commit_date": "2026-07-18",
                 "update_policy": "latest",
             }
         ),
         encoding="utf-8",
     )
+    # The manifest only counts when the stamp beside the code corroborates it,
+    # and this repo's committed stamp is unexpanded — so the child process is
+    # pointed at a tmp code root holding an expanded one.
+    (tmp_path / "version.txt").write_text(
+        f"sha: {installed_sha}\ncommit-date: 2026-07-18\n", encoding="utf-8"
+    )
 
-    app_name = _run_in_app("from source.app import APP_NAME; print(APP_NAME)", tmp_path)
+    app_name = _run_in_app(
+        "from pathlib import Path;"
+        " from source.utilities import build_info;"
+        " build_info._CODE_ROOT = Path.cwd();"
+        " from source.app import app_name; print(app_name())",
+        tmp_path,
+    )
 
     assert app_name == "Corporate Serf Dashboard v2026.07.18"
 

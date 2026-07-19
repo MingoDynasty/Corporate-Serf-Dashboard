@@ -4,10 +4,17 @@ Resolve the identity of the running build: release tag, commit SHA, and date.
 Precedence, highest first:
 
 1. ``install.json`` — the install manifest written by the installer/launcher.
-   The only layer that can know the release tag. A missing manifest is the
-   normal development case, not an error.
+   The only layer that can know the release tag. It is authoritative only
+   when it *corroborates* the running code: its ``sha`` must equal the SHA in
+   the expanded stamp beside the code. The manifest lives with the install's
+   state, which during an update still describes the previous version while
+   the new version is already running — an uncorroborated manifest would make
+   the new build report the old identity, and the launcher would never
+   promote it. A missing manifest is the normal development case, not an
+   error.
 2. ``version.txt`` — a git ``export-subst`` stamp expanded by ``git archive``,
-   which is what GitHub's zip/release downloads run. Still holding the raw
+   which is what GitHub's zip/release downloads run. It ships with the code,
+   so it always describes the code actually running. Still holding the raw
    placeholders means this is a git checkout, so fall through.
 3. ``git`` — ask the checkout directly.
 4. ``unknown`` — nothing could identify the build.
@@ -79,9 +86,8 @@ def _optional_string(value: object) -> str | None:
     return None
 
 
-def _from_manifest() -> BuildInfo | None:
-    """Read build identity from the installer-written manifest."""
-    manifest_path = Path(MANIFEST_FILENAME)
+def _load_manifest(manifest_path: Path) -> dict[str, object] | None:
+    """Read the manifest file, or ``None`` if it is absent or not an object."""
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     except FileNotFoundError:
@@ -92,6 +98,19 @@ def _from_manifest() -> BuildInfo | None:
 
     if not isinstance(manifest, dict):
         logger.warning("Ignoring %s: expected a JSON object", manifest_path)
+        return None
+    return manifest
+
+
+def _from_manifest(stamped: BuildInfo | None) -> BuildInfo | None:
+    """Read build identity from the manifest, if it describes the running code.
+
+    ``stamped`` is the identity from the stamp beside the code, or ``None``
+    when there is no expanded stamp to corroborate against.
+    """
+    manifest_path = Path(MANIFEST_FILENAME)
+    manifest = _load_manifest(manifest_path)
+    if manifest is None:
         return None
 
     schema_version = manifest.get("schema_version")
@@ -106,6 +125,17 @@ def _from_manifest() -> BuildInfo | None:
     sha = _optional_string(manifest.get("sha"))
     if not sha:
         logger.warning("Ignoring %s: no sha", manifest_path)
+        return None
+
+    if stamped is None or stamped.sha != sha:
+        # Expected during an update: the manifest still names the previous
+        # version while this (new) code is on trial. The stamp is what
+        # describes the running build, so let it answer.
+        logger.info(
+            "Ignoring %s: it describes %s, which is not the running code",
+            manifest_path,
+            sha,
+        )
         return None
 
     return BuildInfo(
@@ -181,8 +211,10 @@ def _from_git() -> BuildInfo | None:
 @cache
 def get_build_info() -> BuildInfo:
     """Resolve the running build's identity, caching the result."""
-    for read_layer in (_from_manifest, _from_version_stamp, _from_git):
-        build_info = read_layer()
-        if build_info is not None:
-            return build_info
+    # The stamp is read first because the manifest is only trusted when the
+    # stamp corroborates it, not because it outranks the manifest.
+    stamped = _from_version_stamp()
+    resolved = _from_manifest(stamped) or stamped or _from_git()
+    if resolved is not None:
+        return resolved
     return BuildInfo(sha=None, commit_date=None, tag=None, source="unknown")

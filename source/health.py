@@ -15,10 +15,15 @@ def register_health_endpoint(server: Flask) -> None:
 
     The launcher starts a new version, then polls this endpoint before it
     promotes that version: it accepts the new build only when the reported
-    identity matches the expected tag/SHA *and* the echoed launch token
-    matches the one it passed in through the environment. A bare HTTP 200 is
-    not proof of life, because an already-running instance or an unrelated
+    full ``sha`` is the expected one *and* the echoed launch token matches
+    the one it passed in through the environment. A bare HTTP 200 is not
+    proof of life, because an already-running instance or an unrelated
     service on the port can answer it.
+
+    The gate is on the SHA, not the tag: a build on trial has not been
+    promoted yet, so its manifest still names the previous version and is
+    ignored (see ``build_info``) — it identifies itself from its stamp and
+    reports ``tag: None``.
 
     No authentication: the app serves localhost only.
     """
