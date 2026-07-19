@@ -223,7 +223,7 @@ open indefinitely if a release job fails. The installer:
   uninstall is honest: delete the folder and the shortcut. The uv version
   is **per release, not per install**: installer and launcher read the
   target release's `release.json` (D1) and ensure that exact uv
-  (`tool.uv.required-version`, currently `==0.11.26`) is present
+  (`tool.uv.required-version`, currently `==0.11.29`) is present
   app-locally *before* syncing that release. An install-time-frozen uv
   would brick the first update that bumps the pin — the old binary rejects
   the new project, and `UV_UNMANAGED_INSTALL` disables uv self-update — so
