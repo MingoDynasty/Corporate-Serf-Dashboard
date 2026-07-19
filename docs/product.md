@@ -154,11 +154,11 @@ list in the roadmap.)
   it installs stays in one folder, so uninstalling is deleting that folder and
   the shortcut.
 - **Every build says what it is, and any release can be rolled back** (PRs #154,
-  #158). Releases are dated, immutable, and kept forever; the running build
-  records its commit in the log and shows it in the header tooltip. *Problem
-  solved:* a bug report couldn't be tied to a version, and a bad push had no
-  "go back to yesterday" — installing an older tag now pins it there until the
-  user opts back into updates.
+  #158, #159). Releases are dated, immutable, and kept forever; the running
+  build records its commit in the log and shows it in the header tooltip.
+  *Problem solved:* a bug report couldn't be tied to a version, and a bad push
+  had no "go back to yesterday" — installing an older tag now pins it there
+  until the user opts back into updates.
 
 ## Where it's going
 
