@@ -5,6 +5,8 @@ from pathlib import Path
 
 import pytest
 
+from source.utilities.paths import STATE_DIR_ENV_VAR
+
 CONFIG_ERROR_MESSAGE = (
     "Configuration error: copy example.toml to config.toml and set stats_dir."
 )
@@ -17,6 +19,10 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
     environment["PYTHONPATH"] = os.pathsep.join(
         filter(None, [str(repo_root), environment.get("PYTHONPATH")])
     )
+    # These tests drive the app through the config file in ``cwd``. An
+    # inherited state root would point it at a different config.toml -- and a
+    # valid one would start the server and hang the suite.
+    environment.pop(STATE_DIR_ENV_VAR, None)
 
     return subprocess.run(
         [sys.executable, "-m", "source.app"],
@@ -25,6 +31,7 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         check=False,
+        timeout=60,
     )
 
 
