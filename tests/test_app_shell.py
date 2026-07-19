@@ -102,6 +102,19 @@ def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
     assert link.refresh is False
 
 
+def test_navbar_defaults_to_open_on_a_first_run():
+    shell = app_shell.layout()
+
+    burger = _find_component_by_id(shell, "burger")
+    appshell = _find_component_by_id(shell, "appshell")
+
+    assert burger.opened is True
+    # The shell's initial `collapsed` has to agree with the burger: the
+    # clientside callback recomputes it from `opened` on load, so a
+    # disagreement shows a collapsed navbar for a frame before it opens.
+    assert appshell.navbar["collapsed"] == {"mobile": False, "desktop": False}
+
+
 def test_navbar_burger_open_state_persists_across_refresh():
     shell = app_shell.layout()
 

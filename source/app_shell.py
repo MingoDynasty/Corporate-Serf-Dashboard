@@ -157,7 +157,7 @@ def layout(**kwargs):  # noqa: ARG001
                                             dmc.Burger(
                                                 id="burger",
                                                 size="sm",
-                                                opened=False,
+                                                opened=True,
                                                 persisted_props=["opened"],
                                                 persistence=True,
                                                 persistence_type="local",
@@ -220,9 +220,13 @@ def layout(**kwargs):  # noqa: ARG001
                 navbar={
                     "width": 250,
                     "breakpoint": "sm",
+                    # Mirrors the burger's `opened` default. The clientside
+                    # callback below derives this from the burger on every
+                    # load, so a mismatch here would paint the navbar
+                    # collapsed for a frame before the callback opens it.
                     "collapsed": {
-                        "mobile": True,
-                        "desktop": True,
+                        "mobile": False,
+                        "desktop": False,
                     },
                 },
                 id="appshell",
