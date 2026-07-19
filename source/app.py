@@ -109,9 +109,11 @@ def bind_server_socket(port: int) -> socket.socket:
     ``listen()`` itself for sockets handed to it via ``sockets=``.
     """
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+    # Only the bind is caught: a setsockopt failure is a bug, and reporting it
+    # as a busy port would send the reader chasing a conflict that isn't there.
     try:
-        if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
         sock.bind(("127.0.0.1", port))
     except OSError:
         sock.close()
