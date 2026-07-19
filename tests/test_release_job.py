@@ -1,5 +1,6 @@
 import io
 import json
+import re
 import zipfile
 from pathlib import Path
 
@@ -126,6 +127,26 @@ def test_one_runtime_path_outweighs_many_blocked_paths() -> None:
         )
         is True
     )
+
+
+def test_runtime_file_renamed_into_a_blocked_path_releases() -> None:
+    # The workflow passes `git diff --no-renames`, which reports a rename as a
+    # delete plus an add. The deleted runtime path is what makes this release;
+    # with rename detection on, only the blocked destination would be listed
+    # and the push would look docs-only while the installed tree lost a file.
+    assert should_release(["assets/example.png", "docs/example.png"]) is True
+
+
+def test_gate_diff_disables_rename_detection() -> None:
+    # Guards the flag above: `should_release` can only judge the paths it is
+    # handed, so dropping --no-renames from the workflow would silently
+    # reintroduce the missed release without failing any other test.
+    workflow = (
+        Path(__file__).resolve().parents[1] / ".github" / "workflows" / "ci.yml"
+    ).read_text(encoding="utf-8")
+    diff_command = re.search(r"git diff --name-only[^\n]*", workflow)
+    assert diff_command is not None, "the gate's git diff command moved or changed"
+    assert "--no-renames" in diff_command.group(0)
 
 
 def test_empty_and_blank_change_lists_release_conservatively() -> None:
