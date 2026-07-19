@@ -27,6 +27,7 @@ def _run_in_app(snippet: str, cwd: Path) -> str:
         capture_output=True,
         text=True,
         check=False,
+        timeout=60,
     )
 
     assert result.returncode == 0, result.stderr
