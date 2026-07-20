@@ -34,8 +34,11 @@ user-visible gaps:
   accepts the placeholder Steam ID `00000000000000000` — no real user
   identity needed. Verified against benchmark 598 (Sparky Voltaic S1):
   one call, 20 scenarios, each with `leaderboard_id`. The app already has
-  a client for it (`get_benchmark_json` in `source/kovaaks/api_service.py`,
-  currently without runtime callers) that sends exactly that placeholder.
+  a client for it (`get_benchmark_json` in `source/kovaaks/api_service.py`)
+  that sends exactly that placeholder. Its only caller today is the
+  benchmark importer script, which already fetches this payload for every
+  bundled benchmark to build rank thresholds — and discards the
+  `leaderboard_id` field.
 - The endpoint is keyed by **benchmark ID**, not by playlist sharecode.
   The Evxl catalog maps each of its difficulties' sharecodes to a
   `kovaaksBenchmarkId`, covering the whole bundled corpus (216 playlists,
@@ -50,18 +53,23 @@ user-visible gaps:
 
 ### PR-B: ship a seeded name→ID mapping, and use the benchmark endpoint
 
-**Offline seed generation.** A script under `scripts/` (importer-adjacent;
-it reads the same Evxl catalog) sweeps every catalog difficulty, calls
-`/benchmarks/player-progress-rank-benchmark` once per benchmark ID with
-the placeholder Steam ID, and collects `scenario name → leaderboard_id`
-pairs. Any bundled-corpus scenario the sweep misses gets an exact-search
-top-off. Output: `resources/leaderboard_ids.json`, a flat
-`{scenario_name: leaderboard_id}` object — machine-generated like
-`resources/benchmarks/`, never hand-edited. If two benchmarks disagree on
-an ID for the same name (should not happen; would be upstream weirdness),
-the script excludes that name and reports it, rather than shipping an
-ambiguous entry. The seed is regenerated the same way the benchmark
-corpus is: on demand, alongside importer runs.
+**Seed generation is an importer byproduct.** The benchmark importer
+(`scripts/benchmark_importer/` — the offline, on-demand maintainer tool
+that regenerates `resources/benchmarks/` from the Evxl catalog) already
+calls `get_benchmark_json` for every benchmark it processes to build
+rank thresholds (`generate_playlist`). Each bundled playlist's scenario
+list is itself built from that payload, so the payload the importer is
+already holding contains a `leaderboard_id` for every scenario that
+lands in the corpus — coverage is complete by construction, with zero
+additional API calls. The importer extension collects
+`scenario name → leaderboard_id` pairs from those payloads (using the
+same names the generated playlists carry) and writes
+`resources/leaderboard_ids.json`, a flat `{scenario_name:
+leaderboard_id}` object — machine-generated like `resources/benchmarks/`,
+never hand-edited. If two benchmarks disagree on an ID for the same name
+(should not happen; would be upstream weirdness), the importer excludes
+that name and reports it, rather than shipping an ambiguous entry. The
+seed refreshes whenever the corpus does, in the same run.
 
 **Runtime fallback layer.** `get_cached_leaderboard_id` consults the
 user's permanent mapping cache first, then the seed (loaded once per
@@ -85,9 +93,15 @@ exact-search calls with one benchmark call. Arbitrary community playlists
 (no benchmark ID anywhere) keep the existing path: cache → seed →
 total-play hydration (when a user is configured) → exact search.
 
-This runs lazily at playlist open, where resolution already lives and the
-progressive pending UI already exists — not eagerly at import time, so
-import stays fast and network-tolerant.
+This runs lazily at playlist open, not eagerly at import time. Import is
+itself a network fetch against the timeout-prone playlist endpoint, and
+its UI blocks on a spinner for the duration — chaining a second API call
+there lengthens the user-blocking window for a benefit invisible at
+import time. More decisively, the open-time path must exist anyway
+(playlists imported before this feature, or an import whose bulk resolve
+failed, still need resolution at open), so an import-time fetch would be
+a second code path for the same optimization. At open, the progressive
+pending UI already absorbs slow or failed resolution gracefully.
 
 **Effects.** With a username configured: unplayed playlist scenarios stop
 hitting the search endpoint (they resolve from the seed), so first opens
@@ -133,9 +147,13 @@ cached under the existing 168-hour totals TTL) behind the existing
 pending/progressive UI. Accepted cost: the first open of a playlist on a
 username-less install performs one cheap totals call per scenario.
 
-**Scope.** Playlist grids only. The Home rank line keeps its current
-no-username behavior; extending it is a possible follow-up, deliberately
-not part of this proposal.
+**Home rides along.** Home's Scenario Stats rank line consumes the same
+`get_scenario_rank_info` result through a pure formatter
+(`format_scenario_rank` in `source/pages/home.py`), so the service
+change reaches it for free. Its UNKNOWN branch — today a bare `"N/A"` —
+gains a totals-aware variant when `total_players` is present, e.g.
+`"N/A (18,342 players)"` (exact wording is the implementer's call). One
+branch plus a test.
 
 **Docs on ship.** The "Scenario Rank Feature" and "UI Boundaries"
 sections of `AGENTS.md` change (username no longer gates all rank
@@ -144,36 +162,29 @@ distilling both PRs — per the shipping checklist.
 
 ## Delivery plan
 
-- **PR-B** — seed generation script, `resources/leaderboard_ids.json`,
-  runtime seed fallback in `get_cached_leaderboard_id`, benchmark-bulk
-  tier at playlist open, `docs/kovaaks_api_notes.md` update for the
-  benchmark endpoint's placeholder-Steam-ID behavior. No dependencies.
-- **PR-C** — no-username totals: service change, row formatter change,
-  tests. Soft dependency on PR-B: it works without the seed, but then a
-  username-less playlist open fans out over the exact-search endpoint —
-  ship after PR-B.
+- **PR-B** — importer extension emitting `resources/leaderboard_ids.json`
+  (plus the regenerated seed itself), runtime seed fallback in
+  `get_cached_leaderboard_id`, benchmark-bulk tier at playlist open,
+  `docs/kovaaks_api_notes.md` update for the benchmark endpoint's
+  placeholder-Steam-ID behavior. No dependencies.
+- **PR-C** — no-username totals: service change, playlist row formatter
+  change, Home formatter branch, tests. Soft dependency on PR-B: it works
+  without the seed, but then a username-less playlist open fans out over
+  the exact-search endpoint — ship after PR-B.
 
 (The related build-tooltip/dual-bind work discussed alongside this
 proposal ships independently and is not part of it.)
 
 ## Testing
 
-- PR-B: unit tests for the generation script's merge/conflict/top-off
-  logic against fixture payloads; runtime precedence (learned cache beats
-  seed; seed hit on cache miss; both-miss falls through); the bulk tier
-  (unmapped scenarios + catalog match → one benchmark call → mappings
-  saved; no catalog match → no call).
+- PR-B: unit tests for the importer's seed emission (collection across
+  payloads, conflict exclusion) against fixture payloads; runtime
+  precedence (learned cache beats seed; seed hit on cache miss; both-miss
+  falls through); the bulk tier (unmapped scenarios + catalog match → one
+  benchmark call → mappings saved; no catalog match → no call).
 - PR-C: `get_scenario_rank_info` with no username returns UNKNOWN with
-  `total_players` set (network mocked); formatter renders totals on an
-  UNKNOWN row and still shows N/A for Position/Percentile; regression
-  test for the original report — username-less install, seeded mapping,
-  cached total → Total Players column populated.
-
-## Open questions
-
-1. Should the seed regeneration be folded into the benchmark importer
-   itself (one command refreshes corpus + seed together), or stay a
-   sibling script? Proposal assumes a sibling script invoked in the same
-   on-demand workflow.
-2. Should Home also surface totals without a username? Out of scope
-   here; cheap to add later if wanted.
+  `total_players` set (network mocked); playlist formatter renders totals
+  on an UNKNOWN row and still shows N/A for Position/Percentile; Home
+  `format_scenario_rank` UNKNOWN-with-total variant; regression test for
+  the original report — username-less install, seeded mapping, cached
+  total → Total Players column populated.
