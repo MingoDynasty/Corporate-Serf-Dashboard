@@ -100,8 +100,8 @@ def _bind_loopback_face(family: int, address: str, port: int) -> socket.socket:
     sock = socket.socket(family, socket.SOCK_STREAM)
     if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-    # Only the bind is caught: a setsockopt failure is a bug, and reporting it
-    # as a busy port would send the reader chasing a conflict that isn't there.
+    # Close before re-raising so a failed bind doesn't leak the socket; the
+    # caller classifies the OSError (see bind_server_socket for the buckets).
     try:
         sock.bind((address, port))
     except OSError:
@@ -151,6 +151,10 @@ def bind_server_socket(port: int) -> list[socket.socket]:
     Sockets are returned bound but not listening: waitress calls ``listen()``
     itself for each socket handed to it via ``sockets=``.
     """
+    # Every OSError the IPv4 bind can raise is treated as "port taken". Socket
+    # creation and the SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on
+    # a fresh socket, so folding them into this bucket rather than splitting
+    # hairs keeps the taxonomy to the two cases that actually happen.
     try:
         ipv4 = _bind_loopback_face(socket.AF_INET, "127.0.0.1", port)
     except OSError:
@@ -163,9 +167,10 @@ def bind_server_socket(port: int) -> list[socket.socket]:
     try:
         sockets.append(_bind_loopback_face(socket.AF_INET6, "::1", port))
     except OSError as error:
-        # Two buckets only: the port is taken, or this machine has no IPv6
-        # loopback to bind (the family is unsupported, or the address does
-        # not exist here).
+        # Two buckets, keyed on errno: an IPv6-absence error (the family is
+        # unsupported, or ::1 does not exist here) degrades to IPv4-only
+        # service; every other OSError -- including the near-impossible
+        # creation/setsockopt failure -- is treated as the port being taken.
         if error.errno not in (errno.EAFNOSUPPORT, errno.EADDRNOTAVAIL):
             _exit_port_taken(port, sockets)
         logger.info(
