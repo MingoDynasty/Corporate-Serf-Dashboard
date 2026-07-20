@@ -112,6 +112,14 @@ automatic updates, run the [easy install](#easy-install) one-liner again.
 Releases published before the installer existed cannot be rolled back to;
 `v2026.07.19.4` is the earliest that can.
 
+Rolling back has a config floor too. Because `config.toml` is written once at
+first install and never rewritten, an install first set up by a release that
+omits `polling_interval` and `sens_round_decimal_places` (they now default in
+code) cannot roll back to an older release that still requires them — the
+install stops with a "cannot load config.toml" error. Add those two keys from
+`example.toml`, or delete `config.toml` so the older installer regenerates its
+own, then re-run.
+
 ### Uninstall
 
 Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
