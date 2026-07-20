@@ -574,6 +574,78 @@ def save_leaderboard_id(
         _write_json(cache_file, mappings)
 
 
+def merge_seed_leaderboard_ids(
+    asserted: dict[str, int],
+    *,
+    allow_removals: bool,
+) -> None:
+    """Fold the bundled corpus's asserted mappings into the permanent cache.
+
+    ``asserted`` is the set of ``scenario name -> leaderboard id`` pairs the
+    bundled corpus currently stands behind (names two bundled files disagree on
+    are already excluded by the caller). The whole merge is one atomic
+    read-modify-write, per the cache conventions.
+
+    Rules (see docs/decision_log.md, the leaderboard-ID seeding entry):
+
+    - an asserted name missing from the cache is added, tagged ``source="seed"``;
+    - a ``source="seed"`` entry whose asserted value changed is refreshed, so
+      corrected IDs reach existing installs;
+    - a ``source="seed"`` entry whose name is not asserted is removed, so an
+      upgraded install never keeps resolving a mapping a fresh install would not;
+    - entries learned from the live API (any other source) are never touched, and
+      a name that already has a learned entry never gets a seed-owned row.
+
+    ``allow_removals`` is False when any bundled file failed to load: a partial
+    view of the corpus adds and refreshes but must not retract mappings the
+    corpus may still assert.
+    """
+    with _CACHE_IO_LOCK:
+        cache_file = _leaderboard_mapping_file()
+        cache_data = _read_json(cache_file)
+        mappings = cache_data if isinstance(cache_data, dict) else {}
+        now = datetime.now(UTC).isoformat()
+        changed = False
+
+        for scenario_name, leaderboard_id in asserted.items():
+            existing = mappings.get(scenario_name)
+            if isinstance(existing, dict) and existing.get("source") != "seed":
+                # Learned (or otherwise non-seed) data is never overwritten by
+                # the seed: a name with a live-learned value keeps it.
+                continue
+            if (
+                isinstance(existing, dict)
+                and existing.get("leaderboard_id") == leaderboard_id
+            ):
+                continue  # unchanged seed entry
+            mappings[scenario_name] = {
+                "leaderboard_id": int(leaderboard_id),
+                "source": "seed",
+                "fetched_at": now,
+            }
+            changed = True
+
+        if allow_removals:
+            for scenario_name in list(mappings):
+                entry = mappings.get(scenario_name)
+                if (
+                    isinstance(entry, dict)
+                    and entry.get("source") == "seed"
+                    and scenario_name not in asserted
+                ):
+                    del mappings[scenario_name]
+                    changed = True
+
+        if not changed:
+            return
+        _write_json(cache_file, mappings)
+        logger.info(
+            "Seeded leaderboard IDs from the bundled corpus: %d asserted; removals %s.",
+            len(asserted),
+            "applied" if allow_removals else "suppressed (partial corpus load)",
+        )
+
+
 def get_user_scenario_total_play(
     username: str,
     cache_ttl_hours: int = 24,

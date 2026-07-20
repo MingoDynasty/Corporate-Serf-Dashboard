@@ -26,7 +26,11 @@ from source.config.config_service import (
 )
 from source.health import register_health_endpoint
 from source.kovaaks.api_service import set_request_timeout
-from source.kovaaks.data_service import initialize_kovaaks_data, load_playlists
+from source.kovaaks.data_service import (
+    initialize_kovaaks_data,
+    load_playlists,
+    seed_leaderboard_ids_from_bundled_corpus,
+)
 from source.kovaaks.percentile_warmup_service import (
     start_percentile_warmup_worker,
 )
@@ -221,6 +225,10 @@ def main() -> None:
     set_request_timeout(config.kovaaks_api_timeout_seconds)
 
     load_playlists()
+
+    # Fold the bundled corpus's embedded leaderboard IDs into the permanent
+    # name->ID mapping cache before any rank lookup needs them.
+    seed_leaderboard_ids_from_bundled_corpus()
 
     # Initialize scenario data
     initialize_kovaaks_data(config.stats_dir)

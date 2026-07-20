@@ -16,7 +16,11 @@ from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from source.config.config_service import get_config
-from source.kovaaks.api_service import get_evxl_playlist, get_playlist_data
+from source.kovaaks.api_service import (
+    get_evxl_playlist,
+    get_playlist_data,
+    merge_seed_leaderboard_ids,
+)
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
@@ -77,6 +81,13 @@ _user_root_playlist_files: dict[str, list[Path]] = {}
 # their code (the pre-#90 copy-to-activate leftovers). Each entry is the dead
 # file plus the code it duplicated; the overview offers to clean them up.
 _superseded_user_playlist_files: list[tuple[Path, str]] = []
+# Embedded (scenario name, leaderboard id) pairs collected from the bundled
+# corpus during load_playlists, plus whether every bundled file loaded. The
+# startup seed merge folds these into the permanent name->ID mapping cache; a
+# partial bundled load suppresses removals. Both are reset on each
+# load_playlists() run.
+_bundled_seed_pairs: list[tuple[str, int]] = []
+_bundled_corpus_load_complete: bool = True
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -603,13 +614,23 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     )
 
 
-def load_playlists() -> None:
+def _collect_bundled_seed_pairs(playlist_data: PlaylistData) -> None:
+    """Record a bundled playlist's embedded (scenario name, leaderboard id) pairs."""
+    for scenario in playlist_data.scenarios:
+        if scenario.leaderboard_id is not None:
+            _bundled_seed_pairs.append((scenario.name, scenario.leaderboard_id))
+
+
+def load_playlists() -> None:  # noqa: PLR0912
     """Load valid playlist JSON files into the in-memory database."""
+    global _bundled_corpus_load_complete  # noqa: PLW0603
     playlist_database.clear()
     playlist_startup_warning_queue.clear()
     _user_root_playlist_codes.clear()
     _user_root_playlist_files.clear()
     _superseded_user_playlist_files.clear()
+    _bundled_seed_pairs.clear()
+    _bundled_corpus_load_complete = True
     playlist_sources: dict[str, Path] = {}
     for root, missing_ok in (
         (BUNDLED_PLAYLIST_DIRECTORY_PATH, False),
@@ -621,11 +642,15 @@ def load_playlists() -> None:
                     json_data = file.read()
                 playlist_data = PlaylistData.model_validate_json(json_data)
             except OSError:
+                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                    _bundled_corpus_load_complete = False
                 _record_startup_playlist_warning(
                     f"Failed to read playlist file: {playlist_file}"
                 )
                 continue
             except ValidationError as exc:
+                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                    _bundled_corpus_load_complete = False
                 if _is_code_validation_error(exc):
                     _record_startup_playlist_warning(
                         "Skipping playlist file "
@@ -637,6 +662,13 @@ def load_playlists() -> None:
                         f"Invalid JSON format in playlist file: {playlist_file}"
                     )
                 continue
+
+            if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                # Collect the corpus's embedded leaderboard IDs (asserted-set
+                # merge happens after the whole scan). Gather from every parsed
+                # bundled file, before code dedup, so a shadowed file that
+                # disagrees still surfaces as a conflict.
+                _collect_bundled_seed_pairs(playlist_data)
 
             if playlist_data.code in playlist_database:
                 winning_source = playlist_sources[playlist_data.code]
@@ -678,6 +710,43 @@ def load_playlists() -> None:
         len(playlist_startup_warning_queue),
         len(_superseded_user_playlist_files),
     )
+
+
+def get_bundled_leaderboard_seed() -> tuple[dict[str, int], bool]:
+    """Return the corpus-asserted name->ID map and whether the corpus fully loaded.
+
+    Names that two bundled files disagree on are excluded (with a warning): the
+    corpus does not stand behind a single value for them, so they are not part of
+    the asserted set. The boolean is False when any bundled file failed to load,
+    which the merge uses to suppress removals — a partial view of the corpus must
+    not retract mappings the corpus may still assert. Call after load_playlists().
+    """
+    ids_by_name: dict[str, set[int]] = {}
+    for scenario_name, leaderboard_id in _bundled_seed_pairs:
+        ids_by_name.setdefault(scenario_name, set()).add(leaderboard_id)
+
+    asserted: dict[str, int] = {}
+    for scenario_name, leaderboard_ids in ids_by_name.items():
+        if len(leaderboard_ids) > 1:
+            logger.warning(
+                "Bundled corpus disagrees on leaderboard id for scenario %r: %s; "
+                "excluding it from the seed.",
+                scenario_name,
+                sorted(leaderboard_ids),
+            )
+            continue
+        asserted[scenario_name] = next(iter(leaderboard_ids))
+    return asserted, _bundled_corpus_load_complete
+
+
+def seed_leaderboard_ids_from_bundled_corpus() -> None:
+    """Merge the bundled corpus's embedded leaderboard IDs into the mapping cache.
+
+    Runs once at startup after load_playlists() and before rank lookups matter
+    (see docs/decision_log.md, the leaderboard-ID seeding entry).
+    """
+    asserted, load_complete = get_bundled_leaderboard_seed()
+    merge_seed_leaderboard_ids(asserted, allow_removals=load_complete)
 
 
 def load_playlist_from_code(  # noqa: PLR0911
