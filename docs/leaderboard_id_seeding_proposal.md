@@ -2,7 +2,9 @@
 
 Status: Proposed
 Date: 2026-07-19 (narrowed 2026-07-20; the no-username work moved to
-`user_independent_totals_proposal.md`, proposed in its own PR)
+`user_independent_totals_proposal.md`, proposed in its own PR; pivoted
+2026-07-20 from an aggregate seed file to corpus-embedded IDs after
+review)
 
 ## Problem
 
@@ -41,80 +43,90 @@ gap the user-independent totals proposal builds on.
 
 ## Design
 
-**Seed generation is a full-corpus importer step.** The benchmark
-importer (`scripts/benchmark_importer/` — the offline, on-demand
-maintainer tool that regenerates `resources/benchmarks/` from the Evxl
-catalog) already calls `get_benchmark_json` for every benchmark it
-imports to build rank thresholds (`generate_playlist`), and each bundled
-playlist's scenario list is built from that same payload — so the payload
-family behind the corpus carries a `leaderboard_id` for every scenario in
-it. The seed step is deliberately *not* a per-benchmark side effect of
-generation: an incremental run skips benchmarks whose output is already
-current (`should_skip_generation`), so a normal run never holds fresh
-payloads for most of the corpus. Instead, at the end of every run, the
-step enumerates the full active benchmark set (the catalog minus
-ledger-blocked and deliberately excluded entries), obtains every payload
-from the importer's benchmark-JSON cache (`data/cache/benchmarks/`,
-fetch-on-miss through the same retrying client), and rebuilds the
-complete `scenario name → leaderboard_id` map from scratch — full
-coverage on every run, whether the run regenerated one benchmark or all
-of them, at zero or few API calls. If two benchmarks disagree on an ID
-for the same name (should not happen; would be upstream weirdness), the
-step excludes that name and reports it, rather than shipping an
-ambiguous entry.
+**Each generated playlist carries its own leaderboard IDs.** The
+benchmark importer (`scripts/benchmark_importer/` — the offline,
+on-demand maintainer tool that regenerates `resources/benchmarks/` from
+the Evxl catalog) builds every playlist's scenario list from the
+`get_benchmark_json` payload it fetches for that benchmark
+(`generate_playlist`) — and that payload carries a `leaderboard_id` for
+every scenario. Instead of discarding the ID, the importer embeds it:
+each scenario entry in a generated playlist JSON gains a
+`leaderboard_id` field, written from the payload the importer is
+already holding at that moment. There is no aggregate seed file, no
+end-of-run step, and no network call beyond what generation already
+makes — a scoped run (`--only`, `--limit`) or a run aborted by the
+transient-failure breaker embeds IDs for exactly the playlists it
+generated and touches nothing else.
 
-**The seed stages and activates with the corpus.** The importer writes
-its output to a staging area (`scripts/benchmark_importer/generated/`)
-for human review, and reviewed playlists are then copied into
-`resources/benchmarks/`. The seed follows the same lifecycle: the step
-writes the snapshot into the staging area — never directly to
-`resources/` — and the same activation step that copies reviewed
-playlists also copies `leaderboard_ids.json`, so the shipped seed and
-the shipped corpus always come from the same run. Every emitted seed is
-a full snapshot, so activation replaces the shipped file wholesale;
-an incremental run cannot leave a partial map behind. The shipped file
-is a flat `{scenario_name: leaderboard_id}` object — machine-generated
-like `resources/benchmarks/`, never hand-edited.
+**The corpus is the seed.** Because the IDs live in the same files as
+the scenario names, every corpus lifecycle rule applies to both
+automatically: staging in `generated/`, human review, activation into
+`resources/benchmarks/`, and the importer's retention policies — a
+sharecode that leaves the Evxl catalog, turns conflicting, or is
+recorded known-bad keeps its last-known-good file, and with it, its
+mappings. The shipped corpus and the shipped IDs cannot diverge,
+because they are the same artifact. One transitional gap, accepted: a
+retained last-known-good file generated before this change carries no
+IDs, so its scenarios stay unseeded (falling back to the existing
+resolution paths) until its benchmark next regenerates.
 
-**The seed merges into the permanent cache at startup.** The runtime
-lookup path does not change at all: `get_cached_leaderboard_id` keeps
-reading the one permanent mapping cache it reads today. Instead, at app
-startup the seed file is folded into that cache in one bulk
-read-modify-write (atomic, tolerant of a missing or malformed seed per
-cache conventions). The merge rule, per entry:
+**Schema.** The scenario `leaderboard_id` field is optional.
+User-imported playlists and pre-change files simply lack it; nothing
+outside the bundled corpus is expected to carry it. The bundled corpus
+and the app code ship together (the corpus is checked into the repo),
+so there is no version-skew concern. The shipping PR regenerates all
+216 bundled playlists once so the field is present corpus-wide.
 
-- a seed name **missing** from the cache is added, tagged
+**The bundled IDs merge into the permanent cache at startup.** The
+runtime lookup path does not change at all: `get_cached_leaderboard_id`
+keeps reading the one permanent mapping cache it reads today. The app
+already scans the full bundled corpus at startup; that scan now also
+collects the embedded `scenario name → leaderboard_id` pairs, and their
+union is folded into the cache in one bulk read-modify-write (atomic).
+The merge rule, per entry:
+
+- a bundled name **missing** from the cache is added, tagged
   `source: "seed"`;
-- an existing entry whose source is `"seed"` is **refreshed** if the
-  shipped value changed, so a corrected seed actually reaches existing
-  installs;
-- an existing entry whose source is `"seed"` but whose name is absent
-  from the shipped seed is **removed** — the seed has stopped asserting
-  it (conflict exclusion, or a benchmark leaving the corpus), and an
-  upgraded install must not keep resolving a mapping a fresh install
-  would not have;
-- entries learned from the live API are **never touched**.
+- an existing `source: "seed"` entry is **refreshed** if the bundled
+  value changed, so corrected IDs actually reach existing installs;
+- an existing `source: "seed"` entry whose name is absent from the
+  bundled corpus is **removed** — the corpus has stopped asserting it,
+  and an upgraded install must not keep resolving a mapping a fresh
+  install would not have;
+- entries learned from the live API are **never touched**, including
+  when the bundled corpus disagrees with them.
 
-A missing or malformed seed file skips the merge entirely — no
-additions, refreshes, or removals. After a successful merge the
-invariant is simple: the seed-owned entries of the cache are exactly
-the shipped seed; learned entries are unaffected either way.
+If two bundled playlists disagree on an ID for the same name (should
+not happen; would be upstream weirdness), the merge excludes that name
+and logs a warning rather than asserting an ambiguous mapping. If any
+bundled playlist fails to load, the merge still adds and refreshes but
+skips removals for that startup — a partial view of the corpus must not
+retract mappings the corpus may still assert.
+
+The post-merge invariant, stated carefully: the cache is the union of
+learned entries and the bundled IDs, with learned entries taking
+precedence on overlap; `source: "seed"` entries never contain a name
+the bundled corpus does not currently assert. (Not "the seed-owned
+entries are exactly the bundled IDs" — a name that already has a
+learned entry never gets a seed-owned row at all.)
 
 A copy-only-when-the-cache-is-absent rule would be simpler still, but it
 strands every existing install: they already have a cache file, so the
-seed entries for newly imported benchmarks would never arrive. Merging
-at every startup keeps one source of truth at runtime — which also
-matches the likely long-term shape of this cache (a table in a
-database, with the seed just rows upserted at startup).
+IDs for newly imported benchmarks would never arrive. Merging at every
+startup keeps one source of truth at runtime — which also matches the
+likely long-term shape of this cache (a table in a database, with the
+bundled IDs just rows upserted at startup).
 
-Accepted limitation, same one the cache already has: if KovaaK's ever
-re-uploads a scenario under the same name with a new leaderboard ID, the
-cached entry keeps winning — true today for every learned entry too. The
-escape hatch is deleting the mapping cache file (reads tolerate its
-absence; the next startup re-merges the seed).
+Accepted limitation, narrower than the cache's general one: if KovaaK's
+ever re-uploads a scenario under the same name with a new leaderboard
+ID, a **learned** cache entry keeps winning until it is deleted —
+seed-owned entries are refreshed by the merge, so only learned rows can
+pin a stale value. The escape hatch is deleting the mapping cache file
+(reads tolerate its absence; the next startup re-merges the bundled
+IDs).
 
 **Effects.** Unplayed scenarios of bundled playlists stop hitting the
-search endpoint (their IDs come from the seed), so first opens of
+search endpoint (their IDs ship with the corpus), so first opens of
 unfamiliar playlists get faster and less flaky. Imported playlists
 outside the bundled corpus are unchanged: their unmapped scenarios keep
 the existing fallbacks (total-play hydration for played scenarios when a
@@ -126,9 +138,17 @@ proposal builds on.
 
 - Evxl as the ID source — verified absent at both layers (catalog and
   playlist-by-code).
-- Embedding leaderboard IDs in the bundled playlist JSONs — couples the
-  playlist schema to the importer and duplicates the same fact across 216
-  files; a single seed file is one artifact with one regeneration story.
+- An aggregate `resources/leaderboard_ids.json` seed file — this
+  proposal's original shape. Rejected after two review passes kept
+  finding lifecycle machinery a cross-run artifact requires: full-corpus
+  rebuild rules (an incremental run holds payloads only for what it
+  regenerated), staging/activation coupling with the reviewed corpus,
+  retraction bookkeeping against the importer's retention policies
+  (last-known-good files whose codes left the catalog or went
+  known-bad), scoped-run and circuit-breaker containment for its
+  fetch-on-miss completion, and a reserved staging filename. Embedding
+  the IDs in the corpus files eliminates the artifact and the whole
+  class of consistency questions.
 - Sweeping the benchmark endpoint at app startup instead of shipping a
   seed — ~216 API calls per fresh install against a slow API, versus zero
   with a shipped file.
@@ -144,21 +164,21 @@ proposal builds on.
 
 ## Delivery plan
 
-One PR: the importer's full-corpus seed step (staged with the corpus),
-the activated `resources/leaderboard_ids.json` snapshot, the startup
-merge, and a `docs/kovaaks_api_notes.md` update recording the benchmark
-endpoint's placeholder-Steam-ID behavior. No dependencies. The user-independent
+One PR: the importer embedding change with its optional schema field,
+the once-regenerated bundled corpus, the startup merge, and a
+`docs/kovaaks_api_notes.md` update recording the benchmark endpoint's
+placeholder-Steam-ID behavior. No dependencies. The user-independent
 totals proposal depends on this PR.
 
 ## Testing
 
-- Importer seed emission: full-corpus rebuild against fixture payloads
-  and a fixture payload cache — an incremental run that regenerates a
-  single benchmark still emits a seed covering the whole active set
-  (cache hits for the rest, fetch on miss); conflict exclusion; the
-  snapshot lands in the staging area, not `resources/`.
+- Importer: a generated playlist embeds the payload's `leaderboard_id`
+  per scenario (fixture payloads); files without the field — imported
+  playlists and pre-change corpus files — still validate (schema
+  optionality).
 - Startup merge: a missing name is added; a learned entry is never
-  touched; a seed-owned entry is refreshed when the shipped value
-  changes; a seed-owned entry absent from the new seed is removed (the
-  upgrade case); a missing or malformed seed changes nothing — no
-  additions, refreshes, or removals.
+  touched; a seed-owned entry is refreshed when the bundled value
+  changes; a seed-owned entry absent from the bundled corpus is removed
+  (the upgrade case); two bundled playlists disagreeing on a name
+  excludes it with a warning; an unloadable bundled file still allows
+  adds and refreshes but suppresses removals.
