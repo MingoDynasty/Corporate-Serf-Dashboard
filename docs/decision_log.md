@@ -358,6 +358,44 @@ runs `windows-latest` only. If that ever changes, set `SO_REUSEADDR` before
 rebind without letting a second live server share the port, so it restores
 the old behavior without weakening the Windows guarantee.
 
+Addendum, 2026-07-20: both loopback faces are bound, not just IPv4.
+`bind_server_socket` now returns a list — `127.0.0.1` and `::1`, same port,
+each claimed with the same `SO_EXCLUSIVEADDRUSE` treatment — and both go to
+waitress as `sockets=`. The IPv4-only bind left the decision half-enforced:
+on Windows `localhost` may resolve to `::1` first, so an unrelated process
+holding the IPv6 face still captured every browser request to
+`http://localhost:<port>/` while the dashboard sat unreachable on IPv4.
+Observed live during the PR #153 session — another project's server held
+wildcard `::` while the dashboard held `127.0.0.1`, and the browser got the
+stranger's 404 page. (The squatter was *not* a `config.debug` run of this
+app: werkzeug picks the address family with a colon heuristic, so its
+`host="localhost"` always binds `AF_INET` `127.0.0.1` — verified against the
+pinned werkzeug.) Claiming `::1` ourselves collapses that to the two outcomes
+the original decision wanted: a specific bind takes routing precedence over
+someone else's wildcard `::`, and if the face is genuinely taken the app
+exits loudly instead of being silently shadowed.
+
+Do not "simplify" the two sockets into one dual-stack `AF_INET6` socket with
+`IPV6_V6ONLY=0`. That shape does not work here at all: v4-mapped addressing
+applies only to wildcard binds, so a dual-stack socket bound to `::1` accepts
+no `127.0.0.1` traffic whatsoever. Two explicit sockets are the only correct
+shape, and they keep the per-face exclusivity semantics verified above.
+
+Failure semantics stay deliberately two-bucket. Either face already taken
+(`EADDRINUSE`) closes whatever was bound and takes the existing exit-1 path,
+now with a message saying the port must be free on both addresses — a port
+free on only one face is refused outright rather than half-served. IPv6
+genuinely absent (`EAFNOSUPPORT` creating the socket, or `EADDRNOTAVAIL`
+binding `::1`) logs one info line and serves IPv4 alone; on such a machine
+`localhost` resolves to IPv4 anyway, so the ambiguity disappears with the
+interface. Re-verified against waitress 3.0.2 that the multi-socket path
+gives each socket the same treatment as the single-socket contract above:
+`create_server` loops over `adj.sockets` constructing every `AF_INET`/
+`AF_INET6` socket with `bind_socket=False`, calls the swallowed
+`set_reuse_addr()` per socket, and calls `listen()` per socket in
+`accept_connections()`; with two entries it returns a `MultiSocketServer`
+driving both from one loop.
+
 ## 2026-07-19: Default Port Is 8050, Not 8080
 
 Status: Accepted

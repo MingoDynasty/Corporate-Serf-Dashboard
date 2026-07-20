@@ -2,6 +2,7 @@
 Entrypoint to the Corporate Serf Dashboard app.
 """
 
+import errno
 import json
 import logging
 import socket
@@ -10,6 +11,7 @@ import tomllib
 from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
+from typing import NoReturn
 
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
@@ -93,11 +95,49 @@ app.layout = layout()  # layout logic encapsulated in another file
 register_health_endpoint(app.server)
 
 
-def bind_server_socket(port: int) -> socket.socket:
-    """
-    Bind the app's listening socket, or exit with an actionable error.
+def _bind_loopback_face(family: int, address: str, port: int) -> socket.socket:
+    """Bind one loopback address exclusively, returned bound but not listening."""
+    sock = socket.socket(family, socket.SOCK_STREAM)
+    if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+    # Close before re-raising so a failed bind doesn't leak the socket; the
+    # caller classifies the OSError (see bind_server_socket for the buckets).
+    try:
+        sock.bind((address, port))
+    except OSError:
+        sock.close()
+        raise
+    return sock
 
-    Windows lets a second process bind a port another process is already
+
+def _exit_port_taken(port: int, claimed: list[socket.socket]) -> NoReturn:
+    """Release any bound faces and exit with an actionable message."""
+    for sock in claimed:
+        sock.close()
+    print(
+        f"Startup error: port {port} is already in use -- most likely "
+        "another copy of the dashboard is already running, or another "
+        "program has taken the port (Steam uses 8080). The port must be free "
+        "on both loopback addresses, 127.0.0.1 and [::1]. Close that program, "
+        f"or set a different port in {config_file_path()}.",
+        file=sys.stderr,
+    )
+    raise SystemExit(1) from None
+
+
+def bind_server_socket(port: int) -> list[socket.socket]:
+    """
+    Bind the app's listening sockets, or exit with an actionable error.
+
+    Both loopback faces are bound -- ``127.0.0.1`` and ``::1`` -- because
+    Windows may resolve ``localhost`` to ``::1`` first. Binding IPv4 alone
+    leaves the IPv6 face free for an unrelated process to squat on, and the
+    browser then silently reaches that stranger instead of the dashboard.
+    Claiming ``::1`` ourselves means ``localhost`` either reaches us (a
+    specific bind wins over someone else's wildcard ``::`` listener) or the
+    app exits loudly, never the middle case where it is quietly shadowed.
+
+    Windows also lets a second process bind a port another process is already
     serving, which splits incoming connections nondeterministically between
     the two instances -- a second copy of the dashboard then answers some
     requests with its own state. ``SO_EXCLUSIVEADDRUSE`` (Windows only)
@@ -105,27 +145,39 @@ def bind_server_socket(port: int) -> socket.socket:
     rather than quietly stealing traffic. Elsewhere a plain bind already
     refuses the second binder.
 
-    The socket is returned bound but not listening: waitress calls
-    ``listen()`` itself for sockets handed to it via ``sockets=``.
+    A machine without IPv6 is served on IPv4 alone: there ``localhost``
+    resolves to IPv4 anyway, so the ambiguity disappears with the interface.
+
+    Sockets are returned bound but not listening: waitress calls ``listen()``
+    itself for each socket handed to it via ``sockets=``.
     """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-    # Only the bind is caught: a setsockopt failure is a bug, and reporting it
-    # as a busy port would send the reader chasing a conflict that isn't there.
+    # Every OSError the IPv4 bind can raise is treated as "port taken". Socket
+    # creation and the SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on
+    # a fresh socket, so folding them into this bucket rather than splitting
+    # hairs keeps the taxonomy to the two cases that actually happen.
     try:
-        sock.bind(("127.0.0.1", port))
+        ipv4 = _bind_loopback_face(socket.AF_INET, "127.0.0.1", port)
     except OSError:
-        sock.close()
-        print(
-            f"Startup error: port {port} is already in use -- most likely "
-            "another copy of the dashboard is already running, or another "
-            "program has taken the port (Steam uses 8080). Close that "
-            f"program, or set a different port in {config_file_path()}.",
-            file=sys.stderr,
+        _exit_port_taken(port, [])
+    sockets = [ipv4]
+    # Port 0 asks the OS to choose one. Both faces have to answer on the same
+    # port, so the second bind asks for the port the first one was given.
+    port = ipv4.getsockname()[1]
+
+    try:
+        sockets.append(_bind_loopback_face(socket.AF_INET6, "::1", port))
+    except OSError as error:
+        # Two buckets, keyed on errno: an IPv6-absence error (the family is
+        # unsupported, or ::1 does not exist here) degrades to IPv4-only
+        # service; every other OSError -- including the near-impossible
+        # creation/setsockopt failure -- is treated as the port being taken.
+        if error.errno not in (errno.EAFNOSUPPORT, errno.EADDRNOTAVAIL):
+            _exit_port_taken(port, sockets)
+        logger.info(
+            "No IPv6 loopback available (%s); serving on 127.0.0.1 only.",
+            error,
         )
-        raise SystemExit(1) from None
-    return sock
+    return sockets
 
 
 def main() -> None:
@@ -202,7 +254,7 @@ def main() -> None:
             # Each Home poll tick bursts several callback POSTs at once;
             # Waitress's default 4 threads left no headroom (task queue depth
             # warnings with a single open tab).
-            serve(app.server, sockets=[bind_server_socket(config.port)], threads=8)
+            serve(app.server, sockets=bind_server_socket(config.port), threads=8)
     finally:
         observer.stop()
         observer.join()  # Wait until the observer thread terminates
