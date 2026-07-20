@@ -526,7 +526,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     On failure the red notification carries the service's message and the grid
     is left untouched. On success the visibility membership is dropped too
     (in a show-list, forgetting a code IS removing its membership — this keeps
-    preferences.json from accumulating dead codes) and the refresh store bumps
+    playlist_visibility.json from accumulating dead codes) and the refresh store bumps
     so the deleted row disappears without a page reload.
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can

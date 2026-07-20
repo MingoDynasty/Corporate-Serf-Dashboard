@@ -447,7 +447,7 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
 
     assert deleted == ["UserCode"]
     # In a show-list, dropping membership IS forgetting the code, so
-    # preferences.json does not accumulate dead codes.
+    # playlist_visibility.json does not accumulate dead codes.
     assert hidden == ["UserCode"]
     assert notifications[0]["color"] == "green"
     assert notifications[0]["message"] == 'Deleted "User Label" (UserCode).'
@@ -660,7 +660,7 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
     _trigger(monkeypatch, "playlists-import-button")
     # KovaaK's canonicalizes pasted codes; the stored code is what visibility
     # must persist, or a non-canonical paste imports hidden once a
-    # preferences file exists.
+    # visibility file exists.
     monkeypatch.setattr(
         playlists,
         "load_playlist_from_code",

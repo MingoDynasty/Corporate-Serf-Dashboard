@@ -29,7 +29,7 @@ print(
             "cache": str(api_service.CACHE_DIR),
             "playlists": str(data_service.USER_PLAYLIST_DIRECTORY_PATH),
             "benchmarks": str(data_service.BUNDLED_PLAYLIST_DIRECTORY_PATH),
-            "preferences": str(playlist_visibility_service.PREFERENCES_FILE_PATH),
+            "visibility": str(playlist_visibility_service.VISIBILITY_FILE_PATH),
         }
     )
 )
@@ -98,7 +98,7 @@ def test_state_paths_follow_the_state_root(tmp_path: Path) -> None:
     assert paths["logs"] == state_root / "data" / "logs"
     assert paths["cache"] == state_root / "data" / "cache"
     assert paths["playlists"] == state_root / "data" / "playlists"
-    assert paths["preferences"] == state_root / "data" / "preferences.json"
+    assert paths["visibility"] == state_root / "data" / "playlist_visibility.json"
     # Bundled assets ship with the code, so they ignore the state root.
     assert paths["benchmarks"] == REPO_ROOT / "resources" / "benchmarks"
 
@@ -111,5 +111,5 @@ def test_unset_state_dir_keeps_cwd_relative_behavior(tmp_path: Path) -> None:
     assert paths["logs"] == tmp_path / "data" / "logs"
     assert paths["cache"] == tmp_path / "data" / "cache"
     assert paths["playlists"] == tmp_path / "data" / "playlists"
-    assert paths["preferences"] == tmp_path / "data" / "preferences.json"
+    assert paths["visibility"] == tmp_path / "data" / "playlist_visibility.json"
     assert paths["benchmarks"] == REPO_ROOT / "resources" / "benchmarks"
