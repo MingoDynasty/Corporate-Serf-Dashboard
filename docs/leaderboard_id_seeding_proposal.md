@@ -160,6 +160,39 @@ sections of `AGENTS.md` change (username no longer gates all rank
 lookups; UNKNOWN rows may carry totals), plus a decision-log entry
 distilling both PRs — per the shipping checklist.
 
+### PR-D (optional): warm imported playlists ahead of the first open
+
+The import-then-browse flow already has a background hook: a successful
+import calls `enqueue_playlist_percentile_warmup` (as does unhiding a
+playlist), which batch-prepends the playlist's scenarios to the warmup
+worker's queue with move-to-front dedup and wakes it. The gap is one
+filter: the enqueue keeps only *played* scenarios
+(`_ordered_played_scenarios`), which is the right mission for the
+overview but nearly empty for a freshly imported benchmark the user
+hasn't trained yet.
+
+The change is to relax that filter for the **import** call site only:
+enqueue the full scenario list (played first under the existing
+ordering heuristic, unplayed after in playlist order). The worker's
+per-item step needs no changes — an unplayed scenario resolves its
+leaderboard ID (free from the seed after PR-B), fetches rank (caching
+UNRANKED), and warms the total, which is exactly what the detail grid
+shows. The unhide call site stays played-only; the overview's needs
+have not changed.
+
+Interplay with opening the playlist is already designed for: the worker
+waits for interactive quiet between items, so during the import → click
+seconds it steps aside and the open's phase-2 fan-out does the
+interactive fetching; the worker fills the remainder in idle gaps, and
+the two coordinate through the same caches. Worst case is one
+duplicated in-flight fetch.
+
+Scoped to the configured-username case. A totals-only worker mode for
+username-less installs (the worker is gated off entirely without a
+username, including its validation step) is deliberately out: it is the
+one piece that would need real new worker branching, and PR-C's
+progressive open-time fetch already covers that audience.
+
 ## Delivery plan
 
 - **PR-B** — importer extension emitting `resources/leaderboard_ids.json`
@@ -171,6 +204,11 @@ distilling both PRs — per the shipping checklist.
   change, Home formatter branch, tests. Soft dependency on PR-B: it works
   without the seed, but then a username-less playlist open fans out over
   the exact-search endpoint — ship after PR-B.
+- **PR-D (optional)** — import-time warmup of unplayed scenarios: relax
+  the played-only filter at the import enqueue call site. Small (the
+  enqueue/worker machinery all exists); soft dependency on PR-B (without
+  the seed, each unplayed scenario costs the worker an exact-search
+  call). Independent of PR-C.
 
 (The related build-tooltip/dual-bind work discussed alongside this
 proposal ships independently and is not part of it.)
