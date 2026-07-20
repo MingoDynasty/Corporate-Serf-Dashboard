@@ -121,10 +121,10 @@ that summary and never accesses the queue directly.
   read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
-- **User preferences** — `data/preferences.json` (not committed) holds the
-  playlist show-list (`playlist_visibility_service.py`): written atomically on
-  each show/hide, read once and cached in-process, absent until the first
-  show/hide (reads fall back to the first-run seed).
+- **Playlist visibility** — `data/playlist_visibility.json` (not committed)
+  holds the playlist show-list (`playlist_visibility_service.py`): written
+  atomically on each show/hide, read once and cached in-process, absent until
+  the first show/hide (reads fall back to the first-run seed).
 
 ## Module map
 
@@ -287,9 +287,9 @@ flowchart LR
   hidden" mode asks for everything. Automated warmup-interval builds thread
   `record_activity=False` into those reads so polling does not postpone the
   worker.
-- `playlist_visibility_service.py` — per-code show/hide preferences (plain
-  show-list persisted at `data/preferences.json`, atomic writes under a module
-  lock). A missing file yields the first-run seed (bundled defaults plus
+- `playlist_visibility_service.py` — per-code show/hide visibility (plain
+  show-list persisted at `data/playlist_visibility.json`, atomic writes under a
+  module lock). A missing file yields the first-run seed (bundled defaults plus
   user-root codes) without writing. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Home
   filter, Journey picker, overview).

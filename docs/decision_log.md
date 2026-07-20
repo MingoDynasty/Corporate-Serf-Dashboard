@@ -704,13 +704,14 @@ import, and delete for user playlists — rather than spreading them across a
 Settings modal and the filesystem. Concretely:
 
 - **Visibility is a plain per-code show-list**, not file state. It is
-  persisted as the `shown_playlists` key in `data/preferences.json`, and a
-  playlist is visible iff its code is in the list — uniformly for bundled
-  benchmarks and user playlists. A missing (or unusable) preferences file
-  yields a first-run seed — the bundled `DEFAULT_VISIBLE_CODES` (Voltaic +
-  Viscose) plus every code loaded from the user root — **without writing**;
-  the file materializes on the first show/hide, and an existing file is
-  authoritative including an empty list (everything hidden on purpose).
+  persisted as the `shown_playlists` key in `data/preferences.json` (now
+  `data/playlist_visibility.json`), and a playlist is visible iff its code
+  is in the list — uniformly for bundled benchmarks and user playlists. A
+  missing (or unusable) preferences file yields a first-run seed — the
+  bundled `DEFAULT_VISIBLE_CODES` (Voltaic + Viscose) plus every code loaded
+  from the user root — **without writing**; the file materializes on the
+  first show/hide, and an existing file is authoritative including an empty
+  list (everything hidden on purpose).
   Importing a code appends it (importing is the intent to see); hide removes,
   unhide re-adds. `get_visible_playlist_selector_options()` is the single
   visibility filter every option list consumes (Home filter, Journey picker,
