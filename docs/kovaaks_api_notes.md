@@ -172,6 +172,20 @@ Important limitation:
 - Works for benchmark playlists, but not every playlist is a benchmark.
 - Scenario rank display should not depend on this endpoint.
 
+Leaderboard-ID facts (verified 2026-07-19; used by leaderboard-ID seeding —
+see the 2026-07-20 decision log entry):
+
+- The endpoint accepts the placeholder Steam ID `00000000000000000` — no real
+  user identity is needed. `get_benchmark_json` already sends exactly that
+  placeholder, so resolving a benchmark's scenario IDs works on a username-less
+  install.
+- Every scenario in the response carries its own `leaderboard_id` (a stable,
+  user-independent value), for the whole benchmark in one call. The benchmark
+  importer embeds these into the generated playlist JSONs, and the app folds
+  them into the permanent name->ID mapping cache at startup — so unplayed
+  bundled-playlist scenarios resolve their leaderboard ID without the slow,
+  timeout-prone exact-name search endpoint.
+
 Benchmark rank-data quirks (surfaced by `scripts/benchmark_importer`, which
 merges Evxl rank names/colors with this endpoint's per-scenario `rank_maxes`
 one-to-one):
