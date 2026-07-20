@@ -35,7 +35,8 @@
           "color": "#B5F5DF",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 95
     },
     {
       "name": "1w4t Pasu Raspberry Grandmaster",
@@ -70,7 +71,8 @@
           "color": "#B5F5DF",
           "threshold": 132.0
         }
-      ]
+      ],
+      "leaderboard_id": 14778
     },
     {
       "name": "cAt purrClick Hard",
@@ -105,7 +107,8 @@
           "color": "#B5F5DF",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 83380
     },
     {
       "name": "1wall5targets_pasu Reload",
@@ -140,7 +143,8 @@
           "color": "#B5F5DF",
           "threshold": 240.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "psalmTS angelic click",
@@ -175,7 +179,8 @@
           "color": "#B5F5DF",
           "threshold": 136.0
         }
-      ]
+      ],
+      "leaderboard_id": 578
     },
     {
       "name": "Leapcorn Pure",
@@ -210,7 +215,8 @@
           "color": "#B5F5DF",
           "threshold": 114.0
         }
-      ]
+      ],
+      "leaderboard_id": 13220
     },
     {
       "name": "beanClick 250% Speed",
@@ -245,7 +251,8 @@
           "color": "#B5F5DF",
           "threshold": 195.0
         }
-      ]
+      ],
+      "leaderboard_id": 10366
     },
     {
       "name": "Star Clicking - @wa11p1per",
@@ -280,7 +287,8 @@
           "color": "#B5F5DF",
           "threshold": 106.0
         }
-      ]
+      ],
+      "leaderboard_id": 29687
     },
     {
       "name": "Popcorn Goated rAim",
@@ -315,7 +323,8 @@
           "color": "#B5F5DF",
           "threshold": 640.0
         }
-      ]
+      ],
+      "leaderboard_id": 777
     },
     {
       "name": "Pasu Angelic",
@@ -350,7 +359,8 @@
           "color": "#B5F5DF",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 38540
     },
     {
       "name": "Aimerz+ hopClick Med S1",
@@ -385,7 +395,8 @@
           "color": "#B5F5DF",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 69291
     },
     {
       "name": "Controlsphere Click",
@@ -420,7 +431,8 @@
           "color": "#B5F5DF",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 24116
     }
   ],
   "generated_from": {
@@ -452,7 +464,8 @@
         "#B5F5DF"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:54.220870+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:07.018703+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

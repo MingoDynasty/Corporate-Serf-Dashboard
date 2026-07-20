@@ -35,7 +35,8 @@
           "color": "#FCFFA0",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 104675
     },
     {
       "name": "VT Popcorn Elite S5",
@@ -70,7 +71,8 @@
           "color": "#FCFFA0",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 104674
     },
     {
       "name": "VT 1w2ts Elite S5",
@@ -105,7 +107,8 @@
           "color": "#FCFFA0",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 104629
     },
     {
       "name": "VT ww5t Elite S5",
@@ -140,7 +143,8 @@
           "color": "#FCFFA0",
           "threshold": 1780.0
         }
-      ]
+      ],
+      "leaderboard_id": 104821
     },
     {
       "name": "VT Frogtagon Elite S5",
@@ -175,7 +179,8 @@
           "color": "#FCFFA0",
           "threshold": 1360.0
         }
-      ]
+      ],
+      "leaderboard_id": 107011
     },
     {
       "name": "VT Floating Heads Elite S5",
@@ -210,7 +215,8 @@
           "color": "#FCFFA0",
           "threshold": 1000.0
         }
-      ]
+      ],
+      "leaderboard_id": 106915
     },
     {
       "name": "VT PGT Elite S5",
@@ -245,7 +251,8 @@
           "color": "#FCFFA0",
           "threshold": 3425.0
         }
-      ]
+      ],
+      "leaderboard_id": 104670
     },
     {
       "name": "VT Snake Track Elite S5",
@@ -280,7 +287,8 @@
           "color": "#FCFFA0",
           "threshold": 3450.0
         }
-      ]
+      ],
+      "leaderboard_id": 104622
     },
     {
       "name": "VT Aether Elite S5",
@@ -315,7 +323,8 @@
           "color": "#FCFFA0",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 104623
     },
     {
       "name": "VT Ground Elite S5",
@@ -350,7 +359,8 @@
           "color": "#FCFFA0",
           "threshold": 3275.0
         }
-      ]
+      ],
+      "leaderboard_id": 104668
     },
     {
       "name": "VT Raw Control Elite S5",
@@ -385,7 +395,8 @@
           "color": "#FCFFA0",
           "threshold": 3325.0
         }
-      ]
+      ],
+      "leaderboard_id": 106738
     },
     {
       "name": "VT Controlsphere Elite S5",
@@ -420,7 +431,8 @@
           "color": "#FCFFA0",
           "threshold": 3275.0
         }
-      ]
+      ],
+      "leaderboard_id": 104661
     },
     {
       "name": "VT DotTS Elite S5",
@@ -455,7 +467,8 @@
           "color": "#FCFFA0",
           "threshold": 1410.0
         }
-      ]
+      ],
+      "leaderboard_id": 104962
     },
     {
       "name": "VT EddieTS Elite S5",
@@ -490,7 +503,8 @@
           "color": "#FCFFA0",
           "threshold": 1190.0
         }
-      ]
+      ],
+      "leaderboard_id": 104858
     },
     {
       "name": "VT DriftTS Elite S5",
@@ -525,7 +539,8 @@
           "color": "#FCFFA0",
           "threshold": 480.0
         }
-      ]
+      ],
+      "leaderboard_id": 104867
     },
     {
       "name": "VT FlyTS Elite S5",
@@ -560,7 +575,8 @@
           "color": "#FCFFA0",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 106747
     },
     {
       "name": "VT ControlTS Elite S5",
@@ -595,7 +611,8 @@
           "color": "#FCFFA0",
           "threshold": 480.0
         }
-      ]
+      ],
+      "leaderboard_id": 106693
     },
     {
       "name": "VT Penta Bounce Elite S5",
@@ -630,7 +647,41 @@
           "color": "#FCFFA0",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 104669
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingIndigoPatrol",
+    "kovaaks_benchmark_id": 475,
+    "rank_colors": [
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ],
+      [
+        "Stellaris",
+        "#979DDA"
+      ],
+      [
+        "Lunara",
+        "#54418E"
+      ],
+      [
+        "Solara",
+        "#FCFFA0"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:39.396211+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

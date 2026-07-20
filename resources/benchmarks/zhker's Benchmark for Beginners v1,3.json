@@ -30,7 +30,8 @@
           "color": "#62e4fe",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 34428
     },
     {
       "name": "Fireworks Flick Easy",
@@ -60,7 +61,8 @@
           "color": "#62e4fe",
           "threshold": 5200.0
         }
-      ]
+      ],
+      "leaderboard_id": 12389
     },
     {
       "name": "Reflex Flick - Fair",
@@ -90,7 +92,8 @@
           "color": "#62e4fe",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 10
     },
     {
       "name": "Ballsheet BB",
@@ -120,7 +123,8 @@
           "color": "#62e4fe",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 18678
     },
     {
       "name": "Pasu Angelic 20% Larger 80% Speed 30% larger",
@@ -150,7 +154,8 @@
           "color": "#62e4fe",
           "threshold": 124.0
         }
-      ]
+      ],
+      "leaderboard_id": 138857
     },
     {
       "name": "Star Clicking 30% Larger",
@@ -180,7 +185,8 @@
           "color": "#62e4fe",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 89545
     },
     {
       "name": "raspTS Click",
@@ -210,7 +216,8 @@
           "color": "#62e4fe",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 2067
     },
     {
       "name": "DomiSphere Micro Easy",
@@ -240,7 +247,8 @@
           "color": "#62e4fe",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 165810
     },
     {
       "name": "Avasphere Euphoric Novice",
@@ -270,7 +278,8 @@
           "color": "#62e4fe",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 161547
     },
     {
       "name": "WhisphereRawControl Larger + Slowed 80% speed",
@@ -300,7 +309,8 @@
           "color": "#62e4fe",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 131597
     },
     {
       "name": "VT Poptrack Novice S5",
@@ -330,7 +340,8 @@
           "color": "#62e4fe",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 108366
     },
     {
       "name": "Glider GOATED Easy",
@@ -360,7 +371,8 @@
           "color": "#62e4fe",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 323
     },
     {
       "name": "VT Suavetrack Novice",
@@ -390,7 +402,8 @@
           "color": "#62e4fe",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 40782
     },
     {
       "name": "VT Plaza Viscose Easy",
@@ -420,7 +433,8 @@
           "color": "#62e4fe",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 51224
     },
     {
       "name": "Air CELESTIAL No UFO Easy Slowed",
@@ -450,7 +464,8 @@
           "color": "#62e4fe",
           "threshold": 890.0
         }
-      ]
+      ],
+      "leaderboard_id": 131872
     },
     {
       "name": "Air NUNS AIO Easy",
@@ -480,7 +495,8 @@
           "color": "#62e4fe",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 822
     },
     {
       "name": "ww2t Voltaic Pokeball",
@@ -510,7 +526,8 @@
           "color": "#62e4fe",
           "threshold": 107.0
         }
-      ]
+      ],
+      "leaderboard_id": 16236
     },
     {
       "name": "voxTargetSwitch 2 Large",
@@ -540,7 +557,8 @@
           "color": "#62e4fe",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 84880
     },
     {
       "name": "Aimerz+ hopTS Easy S1",
@@ -570,7 +588,8 @@
           "color": "#62e4fe",
           "threshold": 77.0
         }
-      ]
+      ],
+      "leaderboard_id": 68429
     },
     {
       "name": "kinTargetSwitch 360 No Reload",
@@ -600,7 +619,8 @@
           "color": "#62e4fe",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1670
     }
   ],
   "generated_from": {
@@ -628,7 +648,8 @@
         "#62e4fe"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:37.451361+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:34.032295+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

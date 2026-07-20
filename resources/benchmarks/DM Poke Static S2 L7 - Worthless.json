@@ -25,7 +25,8 @@
           "color": "#24DDD8",
           "threshold": 1330.0
         }
-      ]
+      ],
+      "leaderboard_id": 34544
     },
     {
       "name": "DM ww2t Pokeball Even Smaller",
@@ -50,7 +51,8 @@
           "color": "#24DDD8",
           "threshold": 1470.0
         }
-      ]
+      ],
+      "leaderboard_id": 34436
     },
     {
       "name": "DM 1w3ts Pokeball Even Smaller",
@@ -75,7 +77,8 @@
           "color": "#24DDD8",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 34565
     },
     {
       "name": "DM ww3t Pokeball Even Smaller",
@@ -100,7 +103,8 @@
           "color": "#24DDD8",
           "threshold": 1560.0
         }
-      ]
+      ],
+      "leaderboard_id": 34454
     },
     {
       "name": "DM 1w4ts Pokeball Even Smaller",
@@ -125,7 +129,8 @@
           "color": "#24DDD8",
           "threshold": 1420.0
         }
-      ]
+      ],
+      "leaderboard_id": 34547
     },
     {
       "name": "DM ww4t Pokeball Even Smaller",
@@ -150,7 +155,8 @@
           "color": "#24DDD8",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 34536
     },
     {
       "name": "DM 1w5ts Pokeball Even Smaller",
@@ -175,7 +181,8 @@
           "color": "#24DDD8",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 34564
     },
     {
       "name": "DM ww5t Pokeball Even Smaller",
@@ -200,7 +207,8 @@
           "color": "#24DDD8",
           "threshold": 1630.0
         }
-      ]
+      ],
+      "leaderboard_id": 34538
     },
     {
       "name": "DM 1w6ts Pokeball Even Smaller",
@@ -225,7 +233,8 @@
           "color": "#24DDD8",
           "threshold": 1470.0
         }
-      ]
+      ],
+      "leaderboard_id": 34559
     },
     {
       "name": "DM ww6t Pokeball Even Smaller",
@@ -250,7 +259,33 @@
           "color": "#24DDD8",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 34541
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsScreamingViscousAntidive",
+    "kovaaks_benchmark_id": 864,
+    "rank_colors": [
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:32.317643+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

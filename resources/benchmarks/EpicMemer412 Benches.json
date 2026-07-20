@@ -25,7 +25,8 @@
           "color": "#FFD700",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 45482
     },
     {
       "name": "Frog House Revolving",
@@ -50,7 +51,8 @@
           "color": "#FFD700",
           "threshold": 6100.0
         }
-      ]
+      ],
+      "leaderboard_id": 67731
     },
     {
       "name": "SmoothBot Invincible Goated",
@@ -75,7 +77,8 @@
           "color": "#FFD700",
           "threshold": 5605.0
         }
-      ]
+      ],
+      "leaderboard_id": 348
     },
     {
       "name": "VT Aether Intermediate S5 Bot 3 Invincible",
@@ -100,7 +103,8 @@
           "color": "#FFD700",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 113585
     },
     {
       "name": "Glider GOATED Hard",
@@ -125,7 +129,8 @@
           "color": "#FFD700",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 1738
     },
     {
       "name": "Smoothbot Vertical P+",
@@ -150,7 +155,8 @@
           "color": "#FFD700",
           "threshold": 2300.0
         }
-      ]
+      ],
+      "leaderboard_id": 2770
     },
     {
       "name": "VT Raw Control Advanced S5 Hard",
@@ -175,7 +181,8 @@
           "color": "#FFD700",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 106726
     },
     {
       "name": "Controlsphere rAim",
@@ -200,7 +207,8 @@
           "color": "#FFD700",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5102
     },
     {
       "name": "Aethercontrol",
@@ -225,7 +233,8 @@
           "color": "#FFD700",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 177626
     },
     {
       "name": "cloverRawControl",
@@ -250,7 +259,8 @@
           "color": "#FFD700",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "Carmen Winstead Hype Moments",
@@ -275,7 +285,8 @@
           "color": "#FFD700",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 154005
     },
     {
       "name": "Aimerz+ VGS Med S1",
@@ -300,7 +311,8 @@
           "color": "#FFD700",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 69298
     },
     {
       "name": "VT Raw Control Advanced S5 Reactive Focus",
@@ -325,7 +337,8 @@
           "color": "#FFD700",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 104354
     },
     {
       "name": "VT Snake Track Advanced S5 Reactive Focus",
@@ -350,7 +363,8 @@
           "color": "#FFD700",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 104349
     },
     {
       "name": "Overhead Jumps Incline Hard",
@@ -375,7 +389,8 @@
           "color": "#FFD700",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 24304
     },
     {
       "name": "Jumppad Blink Gliders",
@@ -400,7 +415,8 @@
           "color": "#FFD700",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 43962
     },
     {
       "name": "fl2reTrack",
@@ -425,7 +441,8 @@
           "color": "#FFD700",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 175341
     },
     {
       "name": "Close Fast Strafes Invincible Precise+ OW",
@@ -450,7 +467,8 @@
           "color": "#FFD700",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 88563
     },
     {
       "name": "Jump Pad Small",
@@ -475,7 +493,8 @@
           "color": "#FFD700",
           "threshold": 46000.0
         }
-      ]
+      ],
+      "leaderboard_id": 49098
     },
     {
       "name": "PsalmTS Revolving Easy",
@@ -500,7 +519,8 @@
           "color": "#FFD700",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 12140
     },
     {
       "name": "revolving tracking strafes ow",
@@ -525,7 +545,8 @@
           "color": "#FFD700",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 693
     },
     {
       "name": "Jiggle Tracking",
@@ -550,7 +571,8 @@
           "color": "#FFD700",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 106435
     },
     {
       "name": "tamTargetSwitch Smooth Hard",
@@ -575,7 +597,8 @@
           "color": "#FFD700",
           "threshold": 47.0
         }
-      ]
+      ],
+      "leaderboard_id": 727
     },
     {
       "name": "Smoothbot TS Voltaic Regen Hasin 20% Smaller",
@@ -600,7 +623,8 @@
           "color": "#FFD700",
           "threshold": 42.0
         }
-      ]
+      ],
+      "leaderboard_id": 15082
     },
     {
       "name": "aimerz+ joeTS Normal",
@@ -625,7 +649,8 @@
           "color": "#FFD700",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 44377
     },
     {
       "name": "Aimerz+ pivoTS Easy S1",
@@ -650,7 +675,8 @@
           "color": "#FFD700",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 68432
     },
     {
       "name": "psev Star Clicking",
@@ -675,7 +701,8 @@
           "color": "#FFD700",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 120499
     },
     {
       "name": "cAt purrClick Hard",
@@ -700,7 +727,8 @@
           "color": "#FFD700",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83380
     },
     {
       "name": "Vertical hell click small",
@@ -725,7 +753,8 @@
           "color": "#FFD700",
           "threshold": 58.0
         }
-      ]
+      ],
+      "leaderboard_id": 1747
     },
     {
       "name": "Popcorn MV Advanced",
@@ -750,7 +779,8 @@
           "color": "#FFD700",
           "threshold": 450.0
         }
-      ]
+      ],
+      "leaderboard_id": 76966
     }
   ],
   "generated_from": {
@@ -774,7 +804,8 @@
         "#FFD700"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:18.640523+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:31.904277+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

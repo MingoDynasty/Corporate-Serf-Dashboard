@@ -25,7 +25,8 @@
           "color": "#F1C232",
           "threshold": 15600.0
         }
-      ]
+      ],
+      "leaderboard_id": 1743
     },
     {
       "name": "Spherical Centering Hard",
@@ -50,7 +51,8 @@
           "color": "#F1C232",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 19819
     },
     {
       "name": "Thin Gauntlet Easy",
@@ -75,7 +77,8 @@
           "color": "#F1C232",
           "threshold": 915.0
         }
-      ]
+      ],
+      "leaderboard_id": 914
     },
     {
       "name": "VT Suavetrack Intermediate",
@@ -100,7 +103,8 @@
           "color": "#F1C232",
           "threshold": 24800.0
         }
-      ]
+      ],
+      "leaderboard_id": 40783
     },
     {
       "name": "Pasu Track Extrasmooth TE",
@@ -125,7 +129,8 @@
           "color": "#F1C232",
           "threshold": 8040.0
         }
-      ]
+      ],
+      "leaderboard_id": 32539
     },
     {
       "name": "e1se Far Angle Smoothness EASY",
@@ -150,7 +155,8 @@
           "color": "#F1C232",
           "threshold": 435.0
         }
-      ]
+      ],
+      "leaderboard_id": 27713
     },
     {
       "name": "Controlsphere",
@@ -175,7 +181,8 @@
           "color": "#F1C232",
           "threshold": 12050.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "Smoothsphere",
@@ -200,7 +207,8 @@
           "color": "#F1C232",
           "threshold": 9250.0
         }
-      ]
+      ],
+      "leaderboard_id": 396
     },
     {
       "name": "e1se Glider 30s Normal",
@@ -225,7 +233,8 @@
           "color": "#F1C232",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 32130
     },
     {
       "name": "Smoothbot Invincible Goated Easy",
@@ -250,7 +259,8 @@
           "color": "#F1C232",
           "threshold": 4900.0
         }
-      ]
+      ],
+      "leaderboard_id": 955
     },
     {
       "name": "Smoothbot Voltaic Easy",
@@ -275,7 +285,8 @@
           "color": "#F1C232",
           "threshold": 3580.0
         }
-      ]
+      ],
+      "leaderboard_id": 370
     },
     {
       "name": "VT Smoothbot Intermediate",
@@ -300,7 +311,33 @@
           "color": "#F1C232",
           "threshold": 4420.0
         }
-      ]
+      ],
+      "leaderboard_id": 24952
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRaidingCaffeinatedFullbuy",
+    "kovaaks_benchmark_id": 696,
+    "rank_colors": [
+      [
+        "Milk",
+        "#B6D7A8"
+      ],
+      [
+        "Cream",
+        "#B4A7D6"
+      ],
+      [
+        "Cheese",
+        "#EA9999"
+      ],
+      [
+        "Butter",
+        "#F1C232"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:50.060578+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

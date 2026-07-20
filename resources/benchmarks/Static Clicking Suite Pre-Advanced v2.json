@@ -30,7 +30,8 @@
           "color": "#9662ca",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 188296
     },
     {
       "name": "SCS 4L Wide Easier",
@@ -60,7 +61,8 @@
           "color": "#9662ca",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 188548
     },
     {
       "name": "SCS 3m Dynamic",
@@ -90,7 +92,8 @@
           "color": "#9662ca",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 188305
     },
     {
       "name": "SCS 5m Dynamic",
@@ -120,7 +123,8 @@
           "color": "#9662ca",
           "threshold": 127.0
         }
-      ]
+      ],
+      "leaderboard_id": 188306
     },
     {
       "name": "SCS 6s",
@@ -150,7 +154,8 @@
           "color": "#9662ca",
           "threshold": 117.0
         }
-      ]
+      ],
+      "leaderboard_id": 188145
     },
     {
       "name": "SCS 4s",
@@ -180,7 +185,8 @@
           "color": "#9662ca",
           "threshold": 107.0
         }
-      ]
+      ],
+      "leaderboard_id": 188309
     },
     {
       "name": "SCS 3s Uniform",
@@ -210,7 +216,8 @@
           "color": "#9662ca",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 188411
     },
     {
       "name": "SCS 2s Uniform",
@@ -240,7 +247,8 @@
           "color": "#9662ca",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 188434
     },
     {
       "name": "SCS 6s Narrow",
@@ -270,7 +278,8 @@
           "color": "#9662ca",
           "threshold": 142.0
         }
-      ]
+      ],
+      "leaderboard_id": 188312
     },
     {
       "name": "SCS 15xs Narrow",
@@ -300,7 +309,8 @@
           "color": "#9662ca",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 188320
     },
     {
       "name": "SCS 8xs Uniform",
@@ -330,7 +340,8 @@
           "color": "#9662ca",
           "threshold": 97.0
         }
-      ]
+      ],
+      "leaderboard_id": 188314
     }
   ],
   "generated_from": {
@@ -358,7 +369,8 @@
         "#9662ca"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:48.948843+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:48.639888+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

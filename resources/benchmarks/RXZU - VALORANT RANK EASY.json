@@ -60,7 +60,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157082
     },
     {
       "name": "Rxzu - Mikruwka EZ",
@@ -120,7 +121,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157446
     },
     {
       "name": "Rxzu - Sinichka Ez",
@@ -180,7 +182,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157444
     },
     {
       "name": "Rxzu - KALibri EZ",
@@ -240,7 +243,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157426
     },
     {
       "name": "Rxzu - DoubleShotik Ez",
@@ -300,7 +304,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161821
     },
     {
       "name": "Rxzu - Doticlicko Ez",
@@ -360,7 +365,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157073
     },
     {
       "name": "Rxzu - 314Doors Ez",
@@ -420,7 +426,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157091
     },
     {
       "name": "Rxzu - 1WFP Ez",
@@ -480,7 +487,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161552
     },
     {
       "name": "Rxzu - Phantomflick Ez",
@@ -540,7 +548,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161825
     },
     {
       "name": "Rxzu - Astralis Ez",
@@ -600,7 +609,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161828
     },
     {
       "name": "Rxzu - Smoochiez Ez",
@@ -660,7 +670,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157166
     },
     {
       "name": "Rxzu - Wristie Ez",
@@ -720,7 +731,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157352
     },
     {
       "name": "Rxzu - SosiskaVAL Ez",
@@ -780,7 +792,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161832
     },
     {
       "name": "Rxzu - UGOL Ez",
@@ -840,7 +853,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161864
     },
     {
       "name": "Rxzu - Zazoola Ez",
@@ -900,7 +914,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161866
     },
     {
       "name": "Rxzu - Multiform I EZ",
@@ -960,7 +975,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 157236
     },
     {
       "name": "Rxzu - Multiform II Ez",
@@ -1020,7 +1036,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161867
     },
     {
       "name": "Rxzu - Multiform III Ez",
@@ -1080,7 +1097,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161868
     },
     {
       "name": "Rxzu - Multiform IV Ez",
@@ -1140,7 +1158,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161869
     },
     {
       "name": "Rxzu - Multiform V Ez",
@@ -1200,7 +1219,8 @@
           "color": "#08fdec",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 161816
     }
   ],
   "generated_from": {
@@ -1252,7 +1272,8 @@
         "#08fdec"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:06.044503+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:19.741031+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

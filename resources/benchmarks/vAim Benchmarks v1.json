@@ -45,7 +45,8 @@
           "color": "#fd0dc9",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 29483
     },
     {
       "name": "1w2ts reload",
@@ -90,7 +91,8 @@
           "color": "#fd0dc9",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 197
     },
     {
       "name": "widewall3targets",
@@ -135,7 +137,8 @@
           "color": "#fd0dc9",
           "threshold": 158.0
         }
-      ]
+      ],
+      "leaderboard_id": 59213
     },
     {
       "name": "CatClick Easier",
@@ -180,7 +183,8 @@
           "color": "#fd0dc9",
           "threshold": 96.0
         }
-      ]
+      ],
+      "leaderboard_id": 184866
     },
     {
       "name": "Popcorn MV Novice",
@@ -225,7 +229,8 @@
           "color": "#fd0dc9",
           "threshold": 480.0
         }
-      ]
+      ],
+      "leaderboard_id": 76965
     },
     {
       "name": "BlinkClick Valorant Precision Very Easy",
@@ -270,7 +275,8 @@
           "color": "#fd0dc9",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 112668
     },
     {
       "name": "Controlsphere",
@@ -315,7 +321,8 @@
           "color": "#fd0dc9",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "Air CELESTIAL No UFO Easy Slowed",
@@ -360,7 +367,8 @@
           "color": "#fd0dc9",
           "threshold": 918.0
         }
-      ]
+      ],
+      "leaderboard_id": 131872
     },
     {
       "name": "Aimerz+ Smoothbot Easy S1",
@@ -405,7 +413,8 @@
           "color": "#fd0dc9",
           "threshold": 5300.0
         }
-      ]
+      ],
+      "leaderboard_id": 68338
     },
     {
       "name": "patCircleSwitch NR",
@@ -450,7 +459,8 @@
           "color": "#fd0dc9",
           "threshold": 111.0
         }
-      ]
+      ],
+      "leaderboard_id": 535
     },
     {
       "name": "devTS Goated NR Static Small",
@@ -495,7 +505,8 @@
           "color": "#fd0dc9",
           "threshold": 690.0
         }
-      ]
+      ],
+      "leaderboard_id": 1633
     },
     {
       "name": "domiSwitch Easy",
@@ -540,7 +551,8 @@
           "color": "#fd0dc9",
           "threshold": 7300.0
         }
-      ]
+      ],
+      "leaderboard_id": 83043
     }
   ],
   "generated_from": {
@@ -580,7 +592,8 @@
         "#fd0dc9"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:11.650601+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:51.199899+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

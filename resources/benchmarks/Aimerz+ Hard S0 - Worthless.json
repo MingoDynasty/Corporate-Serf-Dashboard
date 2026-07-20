@@ -35,7 +35,8 @@
           "color": "#03071e",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 44342
     },
     {
       "name": "aimerz+ B180C Hard",
@@ -70,7 +71,8 @@
           "color": "#03071e",
           "threshold": 118.0
         }
-      ]
+      ],
+      "leaderboard_id": 44338
     },
     {
       "name": "aimerz+ WaveClick Hard",
@@ -105,7 +107,8 @@
           "color": "#03071e",
           "threshold": 91.0
         }
-      ]
+      ],
+      "leaderboard_id": 44336
     },
     {
       "name": "aimerz+ 1w3ts Hard",
@@ -140,7 +143,8 @@
           "color": "#03071e",
           "threshold": 163.0
         }
-      ]
+      ],
+      "leaderboard_id": 44330
     },
     {
       "name": "aimerz+ ww6t Hard",
@@ -175,7 +179,8 @@
           "color": "#03071e",
           "threshold": 178.0
         }
-      ]
+      ],
+      "leaderboard_id": 44334
     },
     {
       "name": "aimerz+ 1w4ts HF Hard",
@@ -210,7 +215,8 @@
           "color": "#03071e",
           "threshold": 222.0
         }
-      ]
+      ],
+      "leaderboard_id": 44331
     },
     {
       "name": "aimerz+ Smoothbot Hard",
@@ -245,7 +251,8 @@
           "color": "#03071e",
           "threshold": 5400.0
         }
-      ]
+      ],
+      "leaderboard_id": 44346
     },
     {
       "name": "aimerz+ PTI Hard",
@@ -280,7 +287,8 @@
           "color": "#03071e",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 44351
     },
     {
       "name": "aimerz+ PreciseTrack Hard",
@@ -315,7 +323,8 @@
           "color": "#03071e",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 44353
     },
     {
       "name": "aimerz+ PipeTrack Hard",
@@ -350,7 +359,8 @@
           "color": "#03071e",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 44356
     },
     {
       "name": "aimerz+ VariedStrafes Hard",
@@ -385,7 +395,8 @@
           "color": "#03071e",
           "threshold": 3550.0
         }
-      ]
+      ],
+      "leaderboard_id": 44360
     },
     {
       "name": "aimerz+ Air Hard",
@@ -420,7 +431,8 @@
           "color": "#03071e",
           "threshold": 6250.0
         }
-      ]
+      ],
+      "leaderboard_id": 53741
     },
     {
       "name": "aimerz+ pivoTS Hard",
@@ -455,7 +467,8 @@
           "color": "#03071e",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 44373
     },
     {
       "name": "aimerz+ waveTS Hard",
@@ -490,7 +503,8 @@
           "color": "#03071e",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 44375
     },
     {
       "name": "aimerz+ swingTS Hard",
@@ -525,7 +539,8 @@
           "color": "#03071e",
           "threshold": 1220.0
         }
-      ]
+      ],
+      "leaderboard_id": 53596
     },
     {
       "name": "aimerz+ joeTS Hard",
@@ -560,7 +575,8 @@
           "color": "#03071e",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 44378
     },
     {
       "name": "aimerz+ B180TC Hard",
@@ -595,7 +611,8 @@
           "color": "#03071e",
           "threshold": 92.0
         }
-      ]
+      ],
+      "leaderboard_id": 44379
     },
     {
       "name": "aimerz+ TomTS Hard",
@@ -630,7 +647,8 @@
           "color": "#03071e",
           "threshold": 73.0
         }
-      ]
+      ],
+      "leaderboard_id": 44395
     }
   ],
   "generated_from": {
@@ -662,7 +680,8 @@
         "#03071e"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:37.585489+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:13.731126+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

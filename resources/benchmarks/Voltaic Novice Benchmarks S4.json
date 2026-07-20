@@ -25,7 +25,8 @@
           "color": "#CAB148",
           "threshold": 850.0
         }
-      ]
+      ],
+      "leaderboard_id": 29489
     },
     {
       "name": "VT Bounceshot Novice",
@@ -50,7 +51,8 @@
           "color": "#CAB148",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 24975
     },
     {
       "name": "VT 1w6ts Rasp Novice",
@@ -75,7 +77,8 @@
           "color": "#CAB148",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 29483
     },
     {
       "name": "VT Multiclick 120 Novice",
@@ -100,7 +103,8 @@
           "color": "#CAB148",
           "threshold": 1460.0
         }
-      ]
+      ],
+      "leaderboard_id": 24969
     },
     {
       "name": "VT Smoothbot Novice",
@@ -125,7 +129,8 @@
           "color": "#CAB148",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 24967
     },
     {
       "name": "VT PreciseOrb Novice",
@@ -150,7 +155,8 @@
           "color": "#CAB148",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 24968
     },
     {
       "name": "VT Plaza Novice",
@@ -175,7 +181,8 @@
           "color": "#CAB148",
           "threshold": 3050.0
         }
-      ]
+      ],
+      "leaderboard_id": 43183
     },
     {
       "name": "VT Air Novice",
@@ -200,7 +207,8 @@
           "color": "#CAB148",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 43180
     },
     {
       "name": "VT psalmTS Novice",
@@ -225,7 +233,8 @@
           "color": "#CAB148",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 24979
     },
     {
       "name": "VT skyTS Novice",
@@ -250,7 +259,8 @@
           "color": "#CAB148",
           "threshold": 1040.0
         }
-      ]
+      ],
+      "leaderboard_id": 24971
     },
     {
       "name": "VT evaTS Novice",
@@ -275,7 +285,8 @@
           "color": "#CAB148",
           "threshold": 620.0
         }
-      ]
+      ],
+      "leaderboard_id": 24980
     },
     {
       "name": "VT bounceTS Novice",
@@ -300,7 +311,33 @@
           "color": "#CAB148",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 24973
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingPetulantScoutrifle",
+    "kovaaks_benchmark_id": 237,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:32.507860+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

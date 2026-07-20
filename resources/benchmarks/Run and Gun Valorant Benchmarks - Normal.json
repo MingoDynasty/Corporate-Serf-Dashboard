@@ -30,7 +30,8 @@
           "color": "#26559F",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 115016
     },
     {
       "name": "VAL pressureHorizontal EASY",
@@ -60,7 +61,8 @@
           "color": "#26559F",
           "threshold": 5850.0
         }
-      ]
+      ],
+      "leaderboard_id": 115118
     },
     {
       "name": "VAL smallflicks EASY",
@@ -90,7 +92,8 @@
           "color": "#26559F",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 115030
     },
     {
       "name": "VAL 6 Sphere Hipfire EASY",
@@ -120,7 +123,8 @@
           "color": "#26559F",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 115017
     },
     {
       "name": "VAL devTS staticClick EASY",
@@ -150,7 +154,8 @@
           "color": "#26559F",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 115022
     },
     {
       "name": "VAL 1w4ts Pasu Perfected EASY",
@@ -180,7 +185,8 @@
           "color": "#26559F",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 115018
     },
     {
       "name": "VAL beanClick Micro EASY",
@@ -210,7 +216,8 @@
           "color": "#26559F",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 115019
     },
     {
       "name": "VAL Floating Heads EASY",
@@ -240,7 +247,8 @@
           "color": "#26559F",
           "threshold": 700.0
         }
-      ]
+      ],
+      "leaderboard_id": 115023
     },
     {
       "name": "VAL FloatTS Click EASY",
@@ -270,7 +278,8 @@
           "color": "#26559F",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 115024
     },
     {
       "name": "VAL WavyClick EASY",
@@ -300,7 +309,8 @@
           "color": "#26559F",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 115028
     },
     {
       "name": "VAL XYClick EASY",
@@ -330,7 +340,8 @@
           "color": "#26559F",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 115035
     },
     {
       "name": "VAL psalmClick EASY",
@@ -360,7 +371,8 @@
           "color": "#26559F",
           "threshold": 95.0
         }
-      ]
+      ],
+      "leaderboard_id": 115027
     },
     {
       "name": "VAL Smooth EASY",
@@ -390,7 +402,8 @@
           "color": "#26559F",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 115031
     },
     {
       "name": "VAL Consecutive Tracking EASY",
@@ -420,7 +433,8 @@
           "color": "#26559F",
           "threshold": 50.0
         }
-      ]
+      ],
+      "leaderboard_id": 115021
     },
     {
       "name": "VAL MicroTrack EASY",
@@ -450,7 +464,8 @@
           "color": "#26559F",
           "threshold": 100000.0
         }
-      ]
+      ],
+      "leaderboard_id": 115026
     },
     {
       "name": "VAL staticSwitch EASY",
@@ -480,7 +495,8 @@
           "color": "#26559F",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 115033
     },
     {
       "name": "VAL beanTS EASY",
@@ -510,7 +526,8 @@
           "color": "#26559F",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 115020
     },
     {
       "name": "VAL RaspberryTS EASY",
@@ -540,7 +557,8 @@
           "color": "#26559F",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 115029
     },
     {
       "name": "VAL Garf MicroTS EASY",
@@ -570,7 +588,8 @@
           "color": "#26559F",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 115025
     },
     {
       "name": "VAL tamTS control EASY",
@@ -600,7 +619,8 @@
           "color": "#26559F",
           "threshold": 65.0
         }
-      ]
+      ],
+      "leaderboard_id": 115034
     },
     {
       "name": "VAL SmoothsphereTS EASY",
@@ -630,7 +650,37 @@
           "color": "#26559F",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 115032
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsLosingCharcoalgrayNuns",
+    "kovaaks_benchmark_id": 675,
+    "rank_colors": [
+      [
+        "Leaf",
+        "#FF4654"
+      ],
+      [
+        "Hype",
+        "#BA3A46"
+      ],
+      [
+        "Asuna",
+        "#111823"
+      ],
+      [
+        "Aspas",
+        "#D9D9D9"
+      ],
+      [
+        "Primmie",
+        "#26559F"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:45.267455+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

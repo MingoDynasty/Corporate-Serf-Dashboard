@@ -10,7 +10,8 @@
           "color": "#65F0D8",
           "threshold": 1528.0
         }
-      ]
+      ],
+      "leaderboard_id": 133797
     },
     {
       "name": "XYZ SwaySwitch",
@@ -20,7 +21,8 @@
           "color": "#65F0D8",
           "threshold": 1298.0
         }
-      ]
+      ],
+      "leaderboard_id": 131290
     },
     {
       "name": "XYZ BounceSwitch",
@@ -30,7 +32,8 @@
           "color": "#65F0D8",
           "threshold": 1130.0
         }
-      ]
+      ],
+      "leaderboard_id": 133806
     },
     {
       "name": "XYZ SnowSwitch",
@@ -40,7 +43,8 @@
           "color": "#65F0D8",
           "threshold": 697.0
         }
-      ]
+      ],
+      "leaderboard_id": 131300
     },
     {
       "name": "XYZ AscendSwitch",
@@ -50,7 +54,8 @@
           "color": "#65F0D8",
           "threshold": 718.0
         }
-      ]
+      ],
+      "leaderboard_id": 133807
     },
     {
       "name": "XYZ WarpSwitch",
@@ -60,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 136998
     },
     {
       "name": "XYZ SlopeSwitch",
@@ -70,7 +76,8 @@
           "color": "#65F0D8",
           "threshold": 791.0
         }
-      ]
+      ],
+      "leaderboard_id": 136986
     },
     {
       "name": "XYZ WideSwitch",
@@ -80,7 +87,21 @@
           "color": "#65F0D8",
           "threshold": 535.0
         }
-      ]
+      ],
+      "leaderboard_id": 133808
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsNamedroppingTurquoiseDeathball",
+    "kovaaks_benchmark_id": 724,
+    "rank_colors": [
+      [
+        "World Record",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:39.543496+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -35,7 +35,8 @@
           "color": "#8816d4",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 2648
     },
     {
       "name": "waldoTS",
@@ -70,7 +71,8 @@
           "color": "#8816d4",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 81042
     },
     {
       "name": "Pokeball Frenzy Auto 1w6ts",
@@ -105,7 +107,8 @@
           "color": "#8816d4",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 1176
     },
     {
       "name": "1w3ts reload",
@@ -140,7 +143,8 @@
           "color": "#8816d4",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 215
     },
     {
       "name": "1wall5targets_pasu Reload",
@@ -175,7 +179,8 @@
           "color": "#8816d4",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "Popcorn MV Intermediate",
@@ -210,7 +215,8 @@
           "color": "#8816d4",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 76960
     },
     {
       "name": "voxTargetClick 20% Small",
@@ -245,7 +251,8 @@
           "color": "#8816d4",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 857
     },
     {
       "name": "Flicker Plaza rAim Easy",
@@ -280,7 +287,8 @@
           "color": "#8816d4",
           "threshold": 925.0
         }
-      ]
+      ],
+      "leaderboard_id": 606
     },
     {
       "name": "Leaptrack Goated 75% Slightly Larger",
@@ -315,7 +323,8 @@
           "color": "#8816d4",
           "threshold": 3250.0
         }
-      ]
+      ],
+      "leaderboard_id": 124979
     },
     {
       "name": "Controlsphere rAim Easy",
@@ -350,7 +359,8 @@
           "color": "#8816d4",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5137
     },
     {
       "name": "VT Controlsphere Novice S5 Hard",
@@ -385,7 +395,8 @@
           "color": "#8816d4",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 104841
     },
     {
       "name": "cloverRawControl Easy",
@@ -420,7 +431,8 @@
           "color": "#8816d4",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 69150
     },
     {
       "name": "Whisphere Small & Slow 75%",
@@ -455,7 +467,8 @@
           "color": "#8816d4",
           "threshold": 19000.0
         }
-      ]
+      ],
+      "leaderboard_id": 77068
     },
     {
       "name": "Controlsphere OW",
@@ -490,7 +503,8 @@
           "color": "#8816d4",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 9638
     }
   ],
   "generated_from": {
@@ -522,7 +536,8 @@
         "#8816d4"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:24.777154+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:22.707665+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

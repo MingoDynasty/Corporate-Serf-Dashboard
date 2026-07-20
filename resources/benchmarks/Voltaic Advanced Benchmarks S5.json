@@ -25,7 +25,8 @@
           "color": "#24DDD8",
           "threshold": 1240.0
         }
-      ]
+      ],
+      "leaderboard_id": 98023
     },
     {
       "name": "VT Popcorn Advanced S5",
@@ -50,7 +51,8 @@
           "color": "#24DDD8",
           "threshold": 1020.0
         }
-      ]
+      ],
+      "leaderboard_id": 98024
     },
     {
       "name": "VT 1w2ts Advanced S5",
@@ -75,7 +77,8 @@
           "color": "#24DDD8",
           "threshold": 1620.0
         }
-      ]
+      ],
+      "leaderboard_id": 98025
     },
     {
       "name": "VT ww5t Advanced S5",
@@ -100,7 +103,8 @@
           "color": "#24DDD8",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 98026
     },
     {
       "name": "VT Frogtagon Advanced S5",
@@ -125,7 +129,8 @@
           "color": "#24DDD8",
           "threshold": 1490.0
         }
-      ]
+      ],
+      "leaderboard_id": 105776
     },
     {
       "name": "VT Floating Heads Advanced S5",
@@ -150,7 +155,8 @@
           "color": "#24DDD8",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 98012
     },
     {
       "name": "VT PGT Advanced S5",
@@ -175,7 +181,8 @@
           "color": "#24DDD8",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 98255
     },
     {
       "name": "VT Snake Track Advanced S5",
@@ -200,7 +207,8 @@
           "color": "#24DDD8",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 98297
     },
     {
       "name": "VT Aether Advanced S5",
@@ -225,7 +233,8 @@
           "color": "#24DDD8",
           "threshold": 3825.0
         }
-      ]
+      ],
+      "leaderboard_id": 100140
     },
     {
       "name": "VT Ground Advanced S5",
@@ -250,7 +259,8 @@
           "color": "#24DDD8",
           "threshold": 3725.0
         }
-      ]
+      ],
+      "leaderboard_id": 100768
     },
     {
       "name": "VT Raw Control Advanced S5",
@@ -275,7 +285,8 @@
           "color": "#24DDD8",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 98253
     },
     {
       "name": "VT Controlsphere Advanced S5",
@@ -300,7 +311,8 @@
           "color": "#24DDD8",
           "threshold": 4125.0
         }
-      ]
+      ],
+      "leaderboard_id": 103114
     },
     {
       "name": "VT DotTS Advanced S5",
@@ -325,7 +337,8 @@
           "color": "#24DDD8",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 104961
     },
     {
       "name": "VT EddieTS Advanced S5",
@@ -350,7 +363,8 @@
           "color": "#24DDD8",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 104864
     },
     {
       "name": "VT DriftTS Advanced S5",
@@ -375,7 +389,8 @@
           "color": "#24DDD8",
           "threshold": 540.0
         }
-      ]
+      ],
+      "leaderboard_id": 104866
     },
     {
       "name": "VT FlyTS Advanced S5",
@@ -400,7 +415,8 @@
           "color": "#24DDD8",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 105143
     },
     {
       "name": "VT ControlTS Advanced S5",
@@ -425,7 +441,8 @@
           "color": "#24DDD8",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 104833
     },
     {
       "name": "VT Penta Bounce Advanced S5",
@@ -450,7 +467,33 @@
           "color": "#24DDD8",
           "threshold": 670.0
         }
-      ]
+      ],
+      "leaderboard_id": 98619
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBobbingSepiaBuff",
+    "kovaaks_benchmark_id": 460,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:38.421827+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

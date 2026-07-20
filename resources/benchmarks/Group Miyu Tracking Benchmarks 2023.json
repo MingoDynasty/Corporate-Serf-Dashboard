@@ -40,7 +40,8 @@
           "color": "#FFFFFF",
           "threshold": 11760.0
         }
-      ]
+      ],
+      "leaderboard_id": 52965
     },
     {
       "name": "Jump Pad LS Humanoid Inv Miyu",
@@ -80,7 +81,8 @@
           "color": "#FFFFFF",
           "threshold": 18100.0
         }
-      ]
+      ],
+      "leaderboard_id": 53127
     },
     {
       "name": "Very Far Thin Long Strafes Miyu",
@@ -120,7 +122,8 @@
           "color": "#FFFFFF",
           "threshold": 18100.0
         }
-      ]
+      ],
+      "leaderboard_id": 53125
     },
     {
       "name": "Fast Strafes Humanoid Switch Miyu",
@@ -160,7 +163,8 @@
           "color": "#FFFFFF",
           "threshold": 8400.0
         }
-      ]
+      ],
+      "leaderboard_id": 53124
     },
     {
       "name": "Mid-range 3 Boxes Miyu",
@@ -200,7 +204,8 @@
           "color": "#FFFFFF",
           "threshold": 18400.0
         }
-      ]
+      ],
+      "leaderboard_id": 53129
     },
     {
       "name": "Box Sphere Unusual Miyu",
@@ -240,7 +245,8 @@
           "color": "#FFFFFF",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 53130
     },
     {
       "name": "S Humanoid Dodge Miyu",
@@ -280,7 +286,8 @@
           "color": "#FFFFFF",
           "threshold": 12700.0
         }
-      ]
+      ],
+      "leaderboard_id": 53131
     },
     {
       "name": "Tracking Heaven Miyu",
@@ -320,7 +327,45 @@
           "color": "#FFFFFF",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 53122
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSensingSkyblueReset",
+    "kovaaks_benchmark_id": 53,
+    "rank_colors": [
+      [
+        "Alpha",
+        "#F1C232"
+      ],
+      [
+        "Beta",
+        "#C27BA0"
+      ],
+      [
+        "Gamma",
+        "#6AA84F"
+      ],
+      [
+        "Delta",
+        "#9900FF"
+      ],
+      [
+        "Epsilon",
+        "#CC0000"
+      ],
+      [
+        "Zeta",
+        "#000000"
+      ],
+      [
+        "Eta",
+        "#FFFFFF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:07.655236+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

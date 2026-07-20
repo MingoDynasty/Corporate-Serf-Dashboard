@@ -35,7 +35,8 @@
           "color": "#FFD700",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 2
     },
     {
       "name": "Bounce 180",
@@ -70,7 +71,8 @@
           "color": "#FFD700",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 127
     },
     {
       "name": "1wall6targets TE",
@@ -105,7 +107,8 @@
           "color": "#FFD700",
           "threshold": 210.0
         }
-      ]
+      ],
+      "leaderboard_id": 10420
     },
     {
       "name": "1wall5targets_pasu Reload",
@@ -140,7 +143,8 @@
           "color": "#FFD700",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "Popcorn Sparky",
@@ -175,7 +179,8 @@
           "color": "#FFD700",
           "threshold": 300.0
         }
-      ]
+      ],
+      "leaderboard_id": 502
     },
     {
       "name": "Air no UFO no SKYBOTS",
@@ -210,7 +215,8 @@
           "color": "#FFD700",
           "threshold": 877.0
         }
-      ]
+      ],
+      "leaderboard_id": 234
     },
     {
       "name": "Ground Plaza NO UFO",
@@ -245,7 +251,8 @@
           "color": "#FFD700",
           "threshold": 99925.0
         }
-      ]
+      ],
+      "leaderboard_id": 534
     },
     {
       "name": "Popcorn Goated Tracking Invincible",
@@ -280,7 +287,8 @@
           "color": "#FFD700",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 380
     },
     {
       "name": "Close Fast Strafes Easy Invincible",
@@ -315,7 +323,8 @@
           "color": "#FFD700",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 128
     },
     {
       "name": "1wall5targets pasu track invincible",
@@ -350,7 +359,8 @@
           "color": "#FFD700",
           "threshold": 7300.0
         }
-      ]
+      ],
+      "leaderboard_id": 1068
     },
     {
       "name": "kinTargetSwitch",
@@ -385,7 +395,8 @@
           "color": "#FFD700",
           "threshold": 23500.0
         }
-      ]
+      ],
+      "leaderboard_id": 631
     },
     {
       "name": "devTargetSwitch Goated",
@@ -420,7 +431,8 @@
           "color": "#FFD700",
           "threshold": 630.0
         }
-      ]
+      ],
+      "leaderboard_id": 1263
     },
     {
       "name": "voxTargetSwitch",
@@ -455,7 +467,8 @@
           "color": "#FFD700",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 118
     },
     {
       "name": "Bounce 180 Tracking",
@@ -490,7 +503,8 @@
           "color": "#FFD700",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 122
     },
     {
       "name": "patTargetSwitch",
@@ -525,7 +539,8 @@
           "color": "#FFD700",
           "threshold": 7800.0
         }
-      ]
+      ],
+      "leaderboard_id": 116
     },
     {
       "name": "Air Dodge",
@@ -560,7 +575,8 @@
           "color": "#FFD700",
           "threshold": 143.0
         }
-      ]
+      ],
+      "leaderboard_id": 530
     },
     {
       "name": "Pasu Dodge Easy",
@@ -595,7 +611,8 @@
           "color": "#FFD700",
           "threshold": 440000.0
         }
-      ]
+      ],
+      "leaderboard_id": 873
     },
     {
       "name": "Pistol Strafe Gallery Sparky",
@@ -630,7 +647,8 @@
           "color": "#FFD700",
           "threshold": 280000.0
         }
-      ]
+      ],
+      "leaderboard_id": 545
     },
     {
       "name": "Close FS Easy Dodge",
@@ -665,7 +683,8 @@
           "color": "#FFD700",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 477
     },
     {
       "name": "LGC3 Reborn (old scoring)",
@@ -700,7 +719,8 @@
           "color": "#FFD700",
           "threshold": 31000.0
         }
-      ]
+      ],
+      "leaderboard_id": 15342
     }
   ],
   "generated_from": {
@@ -732,7 +752,8 @@
         "#FFD700"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:01.660010+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:17.547563+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

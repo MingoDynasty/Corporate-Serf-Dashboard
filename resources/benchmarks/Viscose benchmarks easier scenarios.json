@@ -45,7 +45,8 @@
           "color": "#F5BDE8",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128696
     },
     {
       "name": "Whisphere 80%",
@@ -90,7 +91,8 @@
           "color": "#F5BDE8",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 55382
     },
     {
       "name": "SmoothBot Invincible Goated 75%",
@@ -135,7 +137,8 @@
           "color": "#F5BDE8",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 75962
     },
     {
       "name": "Leaptrack Goated 60% Larger",
@@ -180,7 +183,8 @@
           "color": "#F5BDE8",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 128691
     },
     {
       "name": "Controlsphere rAim Easy 90%",
@@ -225,7 +229,8 @@
           "color": "#F5BDE8",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 83485
     },
     {
       "name": "VT Controlsphere Intermediate S5 80%",
@@ -270,7 +275,8 @@
           "color": "#F5BDE8",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 107281
     },
     {
       "name": "Air Angelic 4 Voltaic Easy 80% (Good Version)",
@@ -315,7 +321,8 @@
           "color": "#F5BDE8",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 13681
     },
     {
       "name": "cloverRawControl Easy 80% Speed",
@@ -360,7 +367,8 @@
           "color": "#F5BDE8",
           "threshold": 7700.0
         }
-      ]
+      ],
+      "leaderboard_id": 98867
     },
     {
       "name": "Controlsphere Far, Far Larger 90%",
@@ -405,7 +413,8 @@
           "color": "#F5BDE8",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128692
     },
     {
       "name": "PGTI Voltaic Easy 80%",
@@ -450,7 +459,8 @@
           "color": "#F5BDE8",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 2107
     },
     {
       "name": "Air CELESTIAL No UFO Easy Slowed",
@@ -495,7 +505,8 @@
           "color": "#F5BDE8",
           "threshold": 890.0
         }
-      ]
+      ],
+      "leaderboard_id": 131872
     },
     {
       "name": "Whisphere Small & Slow 55%",
@@ -540,7 +551,8 @@
           "color": "#F5BDE8",
           "threshold": 13500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128693
     },
     {
       "name": "Air Voltaic Invincible 7 Easy 80%",
@@ -585,7 +597,8 @@
           "color": "#F5BDE8",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 128694
     },
     {
       "name": "Controlsphere OW Long Strafes 90%",
@@ -630,7 +643,8 @@
           "color": "#F5BDE8",
           "threshold": 8700.0
         }
-      ]
+      ],
+      "leaderboard_id": 128697
     },
     {
       "name": "Flicker Plaza rAim Easy Less Blinks",
@@ -675,7 +689,8 @@
           "color": "#F5BDE8",
           "threshold": 909.0
         }
-      ]
+      ],
+      "leaderboard_id": 128774
     },
     {
       "name": "Polarized Hell Easy 40% Slower",
@@ -720,7 +735,8 @@
           "color": "#F5BDE8",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128775
     },
     {
       "name": "Air Pure Intermediate Slower No UFO",
@@ -765,7 +781,8 @@
           "color": "#F5BDE8",
           "threshold": 916.0
         }
-      ]
+      ],
+      "leaderboard_id": 128776
     },
     {
       "name": "Air Voltaic Easy Invincible 4 80%",
@@ -810,7 +827,8 @@
           "color": "#F5BDE8",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 128781
     },
     {
       "name": "Pokeball Frenzy Auto TE Wide",
@@ -855,7 +873,8 @@
           "color": "#F5BDE8",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 783
     },
     {
       "name": "1w3ts reload Larger",
@@ -900,7 +919,8 @@
           "color": "#F5BDE8",
           "threshold": 102.0
         }
-      ]
+      ],
+      "leaderboard_id": 128795
     },
     {
       "name": "voxTargetSwitch 2 Large",
@@ -945,7 +965,8 @@
           "color": "#F5BDE8",
           "threshold": 123.0
         }
-      ]
+      ],
+      "leaderboard_id": 84880
     },
     {
       "name": "beanTS Larger",
@@ -990,7 +1011,8 @@
           "color": "#F5BDE8",
           "threshold": 142.0
         }
-      ]
+      ],
+      "leaderboard_id": 129353
     },
     {
       "name": "FloatTS Angelic Easy Larger",
@@ -1035,7 +1057,8 @@
           "color": "#F5BDE8",
           "threshold": 111.0
         }
-      ]
+      ],
+      "leaderboard_id": 135509
     },
     {
       "name": "waldoTS Novice",
@@ -1080,7 +1103,8 @@
           "color": "#F5BDE8",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 113019
     },
     {
       "name": "devTS Goated NR Static 5Bot",
@@ -1125,7 +1149,8 @@
           "color": "#F5BDE8",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 125002
     },
     {
       "name": "domiSwitch Easy Slower",
@@ -1170,7 +1195,8 @@
           "color": "#F5BDE8",
           "threshold": 6300.0
         }
-      ]
+      ],
+      "leaderboard_id": 128818
     },
     {
       "name": "tamTargetSwitch Smooth Easy",
@@ -1215,7 +1241,8 @@
           "color": "#F5BDE8",
           "threshold": 28.0
         }
-      ]
+      ],
+      "leaderboard_id": 42505
     },
     {
       "name": "1wall5targets_pasu slow",
@@ -1260,7 +1287,8 @@
           "color": "#F5BDE8",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 544
     },
     {
       "name": "B180 Voltaic Easy 92%",
@@ -1305,7 +1333,8 @@
           "color": "#F5BDE8",
           "threshold": 87.0
         }
-      ]
+      ],
+      "leaderboard_id": 12018
     },
     {
       "name": "Controlsphere Click Easy",
@@ -1350,7 +1379,8 @@
           "color": "#F5BDE8",
           "threshold": 55.0
         }
-      ]
+      ],
+      "leaderboard_id": 89547
     },
     {
       "name": "Popcorn MV Novice",
@@ -1395,7 +1425,8 @@
           "color": "#F5BDE8",
           "threshold": 330.0
         }
-      ]
+      ],
+      "leaderboard_id": 76965
     },
     {
       "name": "Pasu Angelic 20% Larger 80% Speed",
@@ -1440,7 +1471,8 @@
           "color": "#F5BDE8",
           "threshold": 97.0
         }
-      ]
+      ],
+      "leaderboard_id": 129352
     },
     {
       "name": "1w2ts Pasu Perfected Easy",
@@ -1485,7 +1517,8 @@
           "color": "#F5BDE8",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 57757
     },
     {
       "name": "1w3ts Pasu Perfected Micro Goated Larger 80%",
@@ -1530,7 +1563,8 @@
           "color": "#F5BDE8",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 128920
     },
     {
       "name": "Floating Heads Timing 400% Larger",
@@ -1575,7 +1609,8 @@
           "color": "#F5BDE8",
           "threshold": 2750.0
         }
-      ]
+      ],
+      "leaderboard_id": 1607
     },
     {
       "name": "voxTargetSwitch Click",
@@ -1620,7 +1655,8 @@
           "color": "#F5BDE8",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 653
     }
   ],
   "generated_from": {
@@ -1660,7 +1696,8 @@
         "#F5BDE8"
       ]
     ],
-    "generated_at": "2026-07-10T20:17:06.247590+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:17.860956+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

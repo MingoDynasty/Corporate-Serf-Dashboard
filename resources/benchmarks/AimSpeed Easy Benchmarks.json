@@ -40,7 +40,8 @@
           "color": "#050000",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 413
     },
     {
       "name": "voxTargetSwitch Jumbo [Low TTK]",
@@ -80,7 +81,8 @@
           "color": "#050000",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 224
     },
     {
       "name": "StaticSwitchingVox Jumbo",
@@ -120,7 +122,8 @@
           "color": "#050000",
           "threshold": 190.0
         }
-      ]
+      ],
+      "leaderboard_id": 15654
     },
     {
       "name": "voxTS-Huge Jumbo static",
@@ -160,7 +163,8 @@
           "color": "#050000",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 24780
     },
     {
       "name": "patCircleSwitch easy NR",
@@ -200,7 +204,8 @@
           "color": "#050000",
           "threshold": 10400.0
         }
-      ]
+      ],
+      "leaderboard_id": 3719
     },
     {
       "name": "patTargetSwitch 90 easy",
@@ -240,7 +245,8 @@
           "color": "#050000",
           "threshold": 10960.0
         }
-      ]
+      ],
+      "leaderboard_id": 586
     },
     {
       "name": "StaticSwitchingPat 90 Jumbo",
@@ -280,7 +286,8 @@
           "color": "#050000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 15655
     },
     {
       "name": "xenTargetSwitch Jumbo",
@@ -320,7 +327,8 @@
           "color": "#050000",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 8837
     },
     {
       "name": "xenTargetSwitch speed static",
@@ -360,7 +368,8 @@
           "color": "#050000",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 1074
     },
     {
       "name": "kinTS NR Easy",
@@ -400,7 +409,8 @@
           "color": "#050000",
           "threshold": 27000.0
         }
-      ]
+      ],
+      "leaderboard_id": 7542
     },
     {
       "name": "kinTS NR Static",
@@ -440,7 +450,8 @@
           "color": "#050000",
           "threshold": 32100.0
         }
-      ]
+      ],
+      "leaderboard_id": 1061
     },
     {
       "name": "kinTS V2 Static",
@@ -480,7 +491,8 @@
           "color": "#050000",
           "threshold": 32100.0
         }
-      ]
+      ],
+      "leaderboard_id": 1062
     },
     {
       "name": "devTS Goated Easy",
@@ -520,7 +532,8 @@
           "color": "#050000",
           "threshold": 810.0
         }
-      ]
+      ],
+      "leaderboard_id": 1333
     },
     {
       "name": "devTS Goated NR Static Easy",
@@ -560,7 +573,8 @@
           "color": "#050000",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 11435
     },
     {
       "name": "Pokeball Frenzy Auto",
@@ -600,7 +614,8 @@
           "color": "#050000",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 1561
     },
     {
       "name": "Pokeball Frenzy Auto TE 60s",
@@ -640,7 +655,8 @@
           "color": "#050000",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 1944
     },
     {
       "name": "Pokeball Auto 1w2ts smallflicks",
@@ -680,7 +696,8 @@
           "color": "#050000",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 685
     },
     {
       "name": "canTS",
@@ -720,7 +737,8 @@
           "color": "#050000",
           "threshold": 530.0
         }
-      ]
+      ],
+      "leaderboard_id": 717
     },
     {
       "name": "beanTS",
@@ -760,7 +778,8 @@
           "color": "#050000",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 2648
     },
     {
       "name": "DotTS 30% Larger",
@@ -800,7 +819,8 @@
           "color": "#050000",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 75698
     },
     {
       "name": "Bounce 180 Tracking Jumbo",
@@ -840,7 +860,8 @@
           "color": "#050000",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 1759
     },
     {
       "name": "3D Switching",
@@ -880,7 +901,8 @@
           "color": "#050000",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 88
     },
     {
       "name": "Skeet Tracking Goated",
@@ -920,7 +942,8 @@
           "color": "#050000",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 977
     },
     {
       "name": "Target Switching 90 static",
@@ -960,7 +983,45 @@
           "color": "#050000",
           "threshold": 2050.0
         }
-      ]
+      ],
+      "leaderboard_id": 1183
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBobbingMaximumblueDeserteagle",
+    "kovaaks_benchmark_id": 581,
+    "rank_colors": [
+      [
+        "Stagnant",
+        "#F9CB9C"
+      ],
+      [
+        "Gradual",
+        "#FFE599"
+      ],
+      [
+        "Moderate",
+        "#B6D7A8"
+      ],
+      [
+        "Swift",
+        "#A4C2F4"
+      ],
+      [
+        "Exponential",
+        "#B47AD6"
+      ],
+      [
+        "Accelerated",
+        "#3C78D8"
+      ],
+      [
+        "Speed",
+        "#050000"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:05.073032+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

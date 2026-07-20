@@ -10,7 +10,8 @@
           "color": "#65F0D8",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 131269
     },
     {
       "name": "XYZ MixClick",
@@ -20,7 +21,8 @@
           "color": "#65F0D8",
           "threshold": 1870.0
         }
-      ]
+      ],
+      "leaderboard_id": 131272
     },
     {
       "name": "XYZ DepthClick",
@@ -30,7 +32,8 @@
           "color": "#65F0D8",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 131082
     },
     {
       "name": "XYZ XYZClick",
@@ -40,7 +43,8 @@
           "color": "#65F0D8",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 131889
     },
     {
       "name": "XYZ BounceClick",
@@ -50,7 +54,8 @@
           "color": "#65F0D8",
           "threshold": 990.0
         }
-      ]
+      ],
+      "leaderboard_id": 131284
     },
     {
       "name": "XYZ 3DClick",
@@ -60,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 1430.0
         }
-      ]
+      ],
+      "leaderboard_id": 131281
     },
     {
       "name": "XYZ StarClick",
@@ -70,7 +76,8 @@
           "color": "#65F0D8",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 131520
     },
     {
       "name": "XYZ AxisClick",
@@ -80,7 +87,21 @@
           "color": "#65F0D8",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 131289
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsStrikingRareSniper",
+    "kovaaks_benchmark_id": 632,
+    "rank_colors": [
+      [
+        "World Record",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:37.702511+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

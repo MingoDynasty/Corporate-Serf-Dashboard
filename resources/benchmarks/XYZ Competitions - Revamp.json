@@ -10,7 +10,8 @@
           "color": "#65F0D8",
           "threshold": 1880.0
         }
-      ]
+      ],
+      "leaderboard_id": 131272
     },
     {
       "name": "XYZ SmoothTrack",
@@ -20,7 +21,8 @@
           "color": "#65F0D8",
           "threshold": 4192.0
         }
-      ]
+      ],
+      "leaderboard_id": 138678
     },
     {
       "name": "XYZ BounceTrack",
@@ -30,7 +32,8 @@
           "color": "#65F0D8",
           "threshold": 4401.0
         }
-      ]
+      ],
+      "leaderboard_id": 131893
     },
     {
       "name": "XYZ AirTrack",
@@ -40,7 +43,8 @@
           "color": "#65F0D8",
           "threshold": 4056.0
         }
-      ]
+      ],
+      "leaderboard_id": 135207
     },
     {
       "name": "XYZ GroundTrack",
@@ -50,7 +54,8 @@
           "color": "#65F0D8",
           "threshold": 3712.0
         }
-      ]
+      ],
+      "leaderboard_id": 131989
     },
     {
       "name": "XYZ ReactiveTrack",
@@ -60,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 3478.0
         }
-      ]
+      ],
+      "leaderboard_id": 132067
     },
     {
       "name": "XYZ SwaySwitch",
@@ -70,7 +76,8 @@
           "color": "#65F0D8",
           "threshold": 1411.0
         }
-      ]
+      ],
+      "leaderboard_id": 131290
     },
     {
       "name": "XYZ SlopeSwitch",
@@ -80,7 +87,8 @@
           "color": "#65F0D8",
           "threshold": 758.0
         }
-      ]
+      ],
+      "leaderboard_id": 136986
     },
     {
       "name": "Aim Training Simulator - Tracking @thundah",
@@ -90,7 +98,8 @@
           "color": "#65F0D8",
           "threshold": 4098.0
         }
-      ]
+      ],
+      "leaderboard_id": 115721
     }
   ],
   "generated_from": {
@@ -102,7 +111,8 @@
         "#65F0D8"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:55.049987+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:40.436235+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

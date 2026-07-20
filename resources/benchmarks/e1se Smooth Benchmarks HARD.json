@@ -25,7 +25,8 @@
           "color": "#F1C232",
           "threshold": 17090.0
         }
-      ]
+      ],
+      "leaderboard_id": 19
     },
     {
       "name": "Spherical Centering",
@@ -50,7 +51,8 @@
           "color": "#F1C232",
           "threshold": 13980.0
         }
-      ]
+      ],
+      "leaderboard_id": 3071
     },
     {
       "name": "Thin Gauntlet",
@@ -75,7 +77,8 @@
           "color": "#F1C232",
           "threshold": 905.0
         }
-      ]
+      ],
+      "leaderboard_id": 13
     },
     {
       "name": "Aimerz+ Week #7 - Suavetrack",
@@ -100,7 +103,8 @@
           "color": "#F1C232",
           "threshold": 26500.0
         }
-      ]
+      ],
+      "leaderboard_id": 40784
     },
     {
       "name": "Pasu Track Smooth",
@@ -125,7 +129,8 @@
           "color": "#F1C232",
           "threshold": 6880.0
         }
-      ]
+      ],
+      "leaderboard_id": 1334
     },
     {
       "name": "Far Angle Smoothness",
@@ -150,7 +155,8 @@
           "color": "#F1C232",
           "threshold": 350.0
         }
-      ]
+      ],
+      "leaderboard_id": 6914
     },
     {
       "name": "Extra Controlsphere Pure",
@@ -175,7 +181,8 @@
           "color": "#F1C232",
           "threshold": 2680.0
         }
-      ]
+      ],
+      "leaderboard_id": 76
     },
     {
       "name": "Extra Smoothsphere Pure",
@@ -200,7 +207,8 @@
           "color": "#F1C232",
           "threshold": 960.0
         }
-      ]
+      ],
+      "leaderboard_id": 77
     },
     {
       "name": "Smoothsphere weaker UFO",
@@ -225,7 +233,8 @@
           "color": "#F1C232",
           "threshold": 7450.0
         }
-      ]
+      ],
+      "leaderboard_id": 1392
     },
     {
       "name": "SmoothBot Invincible Goated",
@@ -250,7 +259,8 @@
           "color": "#F1C232",
           "threshold": 4560.0
         }
-      ]
+      ],
+      "leaderboard_id": 348
     },
     {
       "name": "Smoothbot 180",
@@ -275,7 +285,8 @@
           "color": "#F1C232",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 24650
     },
     {
       "name": "VT Smoothbot Advanced",
@@ -300,7 +311,33 @@
           "color": "#F1C232",
           "threshold": 3620.0
         }
-      ]
+      ],
+      "leaderboard_id": 25151
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPoppingBurntorangeHeaven",
+    "kovaaks_benchmark_id": 697,
+    "rank_colors": [
+      [
+        "Milk",
+        "#B6D7A8"
+      ],
+      [
+        "Cream",
+        "#B4A7D6"
+      ],
+      [
+        "Cheese",
+        "#EA9999"
+      ],
+      [
+        "Butter",
+        "#F1C232"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:50.973655+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

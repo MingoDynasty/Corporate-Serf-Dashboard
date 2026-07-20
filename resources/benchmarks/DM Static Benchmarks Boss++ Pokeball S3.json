@@ -25,7 +25,8 @@
           "color": "#6B0000",
           "threshold": 1430.0
         }
-      ]
+      ],
+      "leaderboard_id": 177066
     },
     {
       "name": "DM ww2t Pokeball Even Smaller S3",
@@ -50,7 +51,8 @@
           "color": "#6B0000",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 177067
     },
     {
       "name": "DM 1w3ts Pokeball Even Smaller S3",
@@ -75,7 +77,8 @@
           "color": "#6B0000",
           "threshold": 1480.0
         }
-      ]
+      ],
+      "leaderboard_id": 177068
     },
     {
       "name": "DM ww3t Pokeball Even Smaller S3",
@@ -100,7 +103,8 @@
           "color": "#6B0000",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 177069
     },
     {
       "name": "DM 1w4ts Pokeball Even Smaller S3",
@@ -125,7 +129,8 @@
           "color": "#6B0000",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 177070
     },
     {
       "name": "DM ww4t Pokeball Even Smaller S3",
@@ -150,7 +155,8 @@
           "color": "#6B0000",
           "threshold": 1640.0
         }
-      ]
+      ],
+      "leaderboard_id": 177071
     },
     {
       "name": "DM 1w5ts Pokeball Even Smaller S3",
@@ -175,7 +181,8 @@
           "color": "#6B0000",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 177072
     },
     {
       "name": "DM ww5t Pokeball Even Smaller S3",
@@ -200,7 +207,8 @@
           "color": "#6B0000",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 177073
     },
     {
       "name": "DM 1w6ts Pokeball Even Smaller S3",
@@ -225,7 +233,8 @@
           "color": "#6B0000",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 177074
     },
     {
       "name": "DM ww6t Pokeball Even Smaller S3",
@@ -250,7 +259,8 @@
           "color": "#6B0000",
           "threshold": 1690.0
         }
-      ]
+      ],
+      "leaderboard_id": 177075
     }
   ],
   "generated_from": {
@@ -274,7 +284,8 @@
         "#6B0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:50.978099+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:53.495271+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

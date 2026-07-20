@@ -50,7 +50,8 @@
           "color": "#000000",
           "threshold": 2100.0
         }
-      ]
+      ],
+      "leaderboard_id": 124723
     },
     {
       "name": "Amare Smoothsphere",
@@ -100,7 +101,8 @@
           "color": "#000000",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 164356
     },
     {
       "name": "cloverRawControl Easy Far 30s",
@@ -150,7 +152,8 @@
           "color": "#000000",
           "threshold": 13200.0
         }
-      ]
+      ],
+      "leaderboard_id": 79549
     },
     {
       "name": "Domi SmoothinTrack 90%",
@@ -200,7 +203,8 @@
           "color": "#000000",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 143132
     },
     {
       "name": "tamTS Control Hard (Faster TTK - 30%)",
@@ -250,7 +254,8 @@
           "color": "#000000",
           "threshold": 57.0
         }
-      ]
+      ],
+      "leaderboard_id": 67834
     },
     {
       "name": "Pokeball Frenzy Auto Small Wide",
@@ -300,7 +305,8 @@
           "color": "#000000",
           "threshold": 3470.0
         }
-      ]
+      ],
+      "leaderboard_id": 106
     },
     {
       "name": "Pokeball 5 Sphere Hipfire Extra Small",
@@ -350,7 +356,8 @@
           "color": "#000000",
           "threshold": 163.0
         }
-      ]
+      ],
+      "leaderboard_id": 1172
     },
     {
       "name": "Amare Horizontal Switch",
@@ -400,7 +407,8 @@
           "color": "#000000",
           "threshold": 122.0
         }
-      ]
+      ],
+      "leaderboard_id": 42722
     },
     {
       "name": "Amare Dynamic TAF Micro v2",
@@ -450,7 +458,8 @@
           "color": "#000000",
           "threshold": 1198.0
         }
-      ]
+      ],
+      "leaderboard_id": 101028
     },
     {
       "name": "Amare Star Clicking",
@@ -500,7 +509,8 @@
           "color": "#000000",
           "threshold": 960.0
         }
-      ]
+      ],
+      "leaderboard_id": 94258
     },
     {
       "name": "eth PHM",
@@ -550,7 +560,8 @@
           "color": "#000000",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 81835
     },
     {
       "name": "eth FarSkeet Small",
@@ -600,7 +611,8 @@
           "color": "#000000",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 125049
     },
     {
       "name": "Amare VAL Micro Static 2T",
@@ -650,7 +662,8 @@
           "color": "#000000",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 158048
     },
     {
       "name": "Amare JaguarClick",
@@ -700,7 +713,8 @@
           "color": "#000000",
           "threshold": 840.0
         }
-      ]
+      ],
+      "leaderboard_id": 96186
     },
     {
       "name": "Amare Microcluster Horizontal",
@@ -750,7 +764,8 @@
           "color": "#000000",
           "threshold": 76.0
         }
-      ]
+      ],
+      "leaderboard_id": 79556
     },
     {
       "name": "uv VoxTargetClick Strafe",
@@ -800,7 +815,8 @@
           "color": "#000000",
           "threshold": 185.0
         }
-      ]
+      ],
+      "leaderboard_id": 59551
     }
   ],
   "generated_from": {
@@ -844,7 +860,8 @@
         "#000000"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:04.658831+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:21.630868+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -25,7 +25,8 @@
           "color": "#c493ff",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 153109
     },
     {
       "name": "773TS Always Left",
@@ -50,7 +51,8 @@
           "color": "#c493ff",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 153110
     },
     {
       "name": "773TS 45",
@@ -75,7 +77,8 @@
           "color": "#c493ff",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 152338
     },
     {
       "name": "773TS 90",
@@ -100,7 +103,8 @@
           "color": "#c493ff",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 152335
     },
     {
       "name": "773TS 135",
@@ -125,7 +129,8 @@
           "color": "#c493ff",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 153111
     },
     {
       "name": "773TS 180",
@@ -150,7 +155,8 @@
           "color": "#c493ff",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 152343
     },
     {
       "name": "773TS 45 2Steps",
@@ -175,7 +181,8 @@
           "color": "#c493ff",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 154592
     },
     {
       "name": "773TS 90 2Steps",
@@ -200,7 +207,8 @@
           "color": "#c493ff",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 164147
     },
     {
       "name": "773TS 135 2Steps",
@@ -225,7 +233,8 @@
           "color": "#c493ff",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 164153
     },
     {
       "name": "773TS 180 2Steps",
@@ -250,7 +259,8 @@
           "color": "#c493ff",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 154608
     },
     {
       "name": "773TS I",
@@ -275,7 +285,8 @@
           "color": "#c493ff",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 179328
     },
     {
       "name": "773TS M",
@@ -300,7 +311,8 @@
           "color": "#c493ff",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 179329
     },
     {
       "name": "773TS V",
@@ -325,7 +337,8 @@
           "color": "#c493ff",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 179333
     },
     {
       "name": "773TS W",
@@ -350,7 +363,8 @@
           "color": "#c493ff",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 179330
     },
     {
       "name": "773TS X",
@@ -375,7 +389,8 @@
           "color": "#c493ff",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 179331
     },
     {
       "name": "773TS Y",
@@ -400,7 +415,8 @@
           "color": "#c493ff",
           "threshold": 190.0
         }
-      ]
+      ],
+      "leaderboard_id": 179332
     },
     {
       "name": "773TS Run Locker",
@@ -425,7 +441,8 @@
           "color": "#c493ff",
           "threshold": 51.0
         }
-      ]
+      ],
+      "leaderboard_id": 190683
     },
     {
       "name": "773TS Run Underground",
@@ -450,7 +467,8 @@
           "color": "#c493ff",
           "threshold": 41.0
         }
-      ]
+      ],
+      "leaderboard_id": 191188
     },
     {
       "name": "773TS Run Metro",
@@ -475,7 +493,8 @@
           "color": "#c493ff",
           "threshold": 45.0
         }
-      ]
+      ],
+      "leaderboard_id": 191255
     }
   ],
   "generated_from": {
@@ -499,7 +518,8 @@
         "#c493ff"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:19.640387+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:27.278974+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

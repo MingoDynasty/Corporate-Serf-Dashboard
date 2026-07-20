@@ -35,7 +35,8 @@
           "color": "#00FFFF",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 85652
     },
     {
       "name": "Smoothundahsphere S1",
@@ -70,7 +71,8 @@
           "color": "#00FFFF",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 85641
     },
     {
       "name": "thunsphere",
@@ -105,7 +107,8 @@
           "color": "#00FFFF",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 83814
     },
     {
       "name": "dahTrack S1",
@@ -140,7 +143,8 @@
           "color": "#00FFFF",
           "threshold": 2300.0
         }
-      ]
+      ],
+      "leaderboard_id": 85663
     },
     {
       "name": "thundahRawControl S1",
@@ -175,7 +179,8 @@
           "color": "#00FFFF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 85664
     },
     {
       "name": "tunTrack S1",
@@ -210,7 +215,8 @@
           "color": "#00FFFF",
           "threshold": 2575.0
         }
-      ]
+      ],
+      "leaderboard_id": 85665
     },
     {
       "name": "thundah angelic S1",
@@ -245,7 +251,8 @@
           "color": "#00FFFF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 85659
     },
     {
       "name": "thundahsphere S1",
@@ -280,7 +287,8 @@
           "color": "#00FFFF",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 85666
     },
     {
       "name": "takiTrack S1",
@@ -315,7 +323,8 @@
           "color": "#00FFFF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 85667
     },
     {
       "name": "toonsTrack S1",
@@ -350,7 +359,41 @@
           "color": "#00FFFF",
           "threshold": 1725.0
         }
-      ]
+      ],
+      "leaderboard_id": 85668
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingDynamicClass",
+    "kovaaks_benchmark_id": 279,
+    "rank_colors": [
+      [
+        "Rat",
+        "#B45F06"
+      ],
+      [
+        "Monkey",
+        "#05696B"
+      ],
+      [
+        "Snake",
+        "#3C78D8"
+      ],
+      [
+        "Tiger",
+        "#FF0000"
+      ],
+      [
+        "Dragon",
+        "#F1C232"
+      ],
+      [
+        "Goat",
+        "#00FFFF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:59.366861+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

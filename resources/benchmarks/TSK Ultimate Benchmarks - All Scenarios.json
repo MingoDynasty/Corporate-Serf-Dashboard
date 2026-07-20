@@ -53,9 +53,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2852.0
+          "threshold": 2909.0
         }
-      ]
+      ],
+      "leaderboard_id": 120662
     },
     {
       "name": "TSK - ST60",
@@ -108,9 +109,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2524.0
+          "threshold": 2620.0
         }
-      ]
+      ],
+      "leaderboard_id": 120665
     },
     {
       "name": "TSK - SYW",
@@ -163,9 +165,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2208.0
+          "threshold": 2279.0
         }
-      ]
+      ],
+      "leaderboard_id": 120700
     },
     {
       "name": "TSK - SYW Thin",
@@ -218,9 +221,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 1802.0
+          "threshold": 1891.0
         }
-      ]
+      ],
+      "leaderboard_id": 121154
     },
     {
       "name": "TSK - Centering 45 Speed 2 Stop",
@@ -273,9 +277,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2428.0
+          "threshold": 2490.0
         }
-      ]
+      ],
+      "leaderboard_id": 120684
     },
     {
       "name": "TSK - Centering 90 Speed 2",
@@ -328,9 +333,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2532.0
+          "threshold": 2599.0
         }
-      ]
+      ],
+      "leaderboard_id": 120712
     },
     {
       "name": "TSK - Centering 180 Speed 2",
@@ -383,9 +389,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2554.0
+          "threshold": 2636.0
         }
-      ]
+      ],
+      "leaderboard_id": 120677
     },
     {
       "name": "TSK - Centering 180 Speed 3",
@@ -438,9 +445,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2161.0
+          "threshold": 2228.0
         }
-      ]
+      ],
+      "leaderboard_id": 120685
     },
     {
       "name": "TSK - Varied Centering 90 Trio",
@@ -493,9 +501,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2078.0
+          "threshold": 2338.0
         }
-      ]
+      ],
+      "leaderboard_id": 120731
     },
     {
       "name": "TSK - 360 Turn",
@@ -548,9 +557,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2822.0
+          "threshold": 2977.0
         }
-      ]
+      ],
+      "leaderboard_id": 120694
     },
     {
       "name": "TSK - DVD Tracking Big",
@@ -603,9 +613,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2808.0
+          "threshold": 2834.0
         }
-      ]
+      ],
+      "leaderboard_id": 123665
     },
     {
       "name": "TSK - DVD Tracking",
@@ -658,9 +669,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2669.0
+          "threshold": 2681.0
         }
-      ]
+      ],
+      "leaderboard_id": 123669
     },
     {
       "name": "TSK - DVD Tracking Small",
@@ -713,9 +725,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2300.0
+          "threshold": 2382.0
         }
-      ]
+      ],
+      "leaderboard_id": 123668
     },
     {
       "name": "TSK - DVD Tracking Close",
@@ -768,9 +781,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2723.0
+          "threshold": 2735.0
         }
-      ]
+      ],
+      "leaderboard_id": 123715
     },
     {
       "name": "TSK - Box Tracking",
@@ -823,9 +837,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2495.0
+          "threshold": 2562.0
         }
-      ]
+      ],
+      "leaderboard_id": 123458
     },
     {
       "name": "TSK - Box Tracking Small",
@@ -878,9 +893,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 1968.0
+          "threshold": 2028.0
         }
-      ]
+      ],
+      "leaderboard_id": 123460
     },
     {
       "name": "TSK - Box Tracking 3D",
@@ -933,9 +949,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2470.0
+          "threshold": 2585.0
         }
-      ]
+      ],
+      "leaderboard_id": 123492
     },
     {
       "name": "TSK - Box Tracking Close",
@@ -990,7 +1007,8 @@
           "color": "#24DDD8",
           "threshold": 2411.0
         }
-      ]
+      ],
+      "leaderboard_id": 123467
     },
     {
       "name": "TSK - Wavy Tracking",
@@ -1043,9 +1061,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2601.0
+          "threshold": 2726.0
         }
-      ]
+      ],
+      "leaderboard_id": 120839
     },
     {
       "name": "TSK - Wavy Tracking Small",
@@ -1098,9 +1117,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 1924.0
+          "threshold": 1933.0
         }
-      ]
+      ],
+      "leaderboard_id": 121359
     },
     {
       "name": "TSK - Hewchy's VAI 20",
@@ -1153,9 +1173,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2860.0
+          "threshold": 2899.0
         }
-      ]
+      ],
+      "leaderboard_id": 125975
     },
     {
       "name": "TSK - Hewchy's VAI 20 Small",
@@ -1210,7 +1231,8 @@
           "color": "#24DDD8",
           "threshold": 2691.0
         }
-      ]
+      ],
+      "leaderboard_id": 125976
     },
     {
       "name": "TSK - Hewchy's VAI 160",
@@ -1263,9 +1285,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2865.0
+          "threshold": 2898.0
         }
-      ]
+      ],
+      "leaderboard_id": 125978
     },
     {
       "name": "TSK - Hewchy's VAI 160 Small",
@@ -1318,9 +1341,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2586.0
+          "threshold": 2741.0
         }
-      ]
+      ],
+      "leaderboard_id": 125979
     },
     {
       "name": "TSK - Hewchy's VAI 70",
@@ -1373,9 +1397,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2753.0
+          "threshold": 2860.0
         }
-      ]
+      ],
+      "leaderboard_id": 125980
     },
     {
       "name": "TSK - Hewchy's VAI 70 Small",
@@ -1428,9 +1453,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2354.0
+          "threshold": 2414.0
         }
-      ]
+      ],
+      "leaderboard_id": 125981
     },
     {
       "name": "TSK - Hewchy's VAI 110",
@@ -1483,9 +1509,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2750.0
+          "threshold": 2822.0
         }
-      ]
+      ],
+      "leaderboard_id": 125974
     },
     {
       "name": "TSK - Hewchy's VAI 110 Small",
@@ -1538,9 +1565,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2477.0
+          "threshold": 2579.0
         }
-      ]
+      ],
+      "leaderboard_id": 125982
     },
     {
       "name": "TSK - Hewchy's VAI 45",
@@ -1593,9 +1621,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2776.0
+          "threshold": 2866.0
         }
-      ]
+      ],
+      "leaderboard_id": 125983
     },
     {
       "name": "TSK - Hewchy's VAI 135",
@@ -1648,9 +1677,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2819.0
+          "threshold": 2842.0
         }
-      ]
+      ],
+      "leaderboard_id": 125984
     },
     {
       "name": "TSK - SYV Big",
@@ -1703,9 +1733,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2864.0
+          "threshold": 2891.0
         }
-      ]
+      ],
+      "leaderboard_id": 128439
     },
     {
       "name": "TSK - SYV",
@@ -1758,9 +1789,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2722.0
+          "threshold": 2771.0
         }
-      ]
+      ],
+      "leaderboard_id": 126435
     },
     {
       "name": "TSK - SYV Small",
@@ -1815,7 +1847,8 @@
           "color": "#24DDD8",
           "threshold": 2404.0
         }
-      ]
+      ],
+      "leaderboard_id": 126707
     },
     {
       "name": "TSK - SYV Stop",
@@ -1868,9 +1901,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2512.0
+          "threshold": 2516.0
         }
-      ]
+      ],
+      "leaderboard_id": 126887
     },
     {
       "name": "TSK - SYV Down Close",
@@ -1923,9 +1957,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2750.0
+          "threshold": 2887.0
         }
-      ]
+      ],
+      "leaderboard_id": 126747
     },
     {
       "name": "TSK - VSTP Soft Big",
@@ -1978,9 +2013,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2746.0
+          "threshold": 2762.0
         }
-      ]
+      ],
+      "leaderboard_id": 128444
     },
     {
       "name": "TSK - VSTP Soft",
@@ -2035,7 +2071,8 @@
           "color": "#24DDD8",
           "threshold": 2628.0
         }
-      ]
+      ],
+      "leaderboard_id": 126425
     },
     {
       "name": "TSK - VSTP Soft Small",
@@ -2090,7 +2127,8 @@
           "color": "#24DDD8",
           "threshold": 2333.0
         }
-      ]
+      ],
+      "leaderboard_id": 128442
     },
     {
       "name": "TSK - VSTP High",
@@ -2143,9 +2181,10 @@
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2592.0
+          "threshold": 2652.0
         }
-      ]
+      ],
+      "leaderboard_id": 126705
     },
     {
       "name": "TSK - Vertical Frog Stationary",
@@ -2158,49 +2197,99 @@
         {
           "name": "Beginner",
           "color": "#FFE599",
-          "threshold": 1600.0
+          "threshold": 1500.0
         },
         {
           "name": "Intermediate",
           "color": "#FCC1C1",
-          "threshold": 2000.0
+          "threshold": 1900.0
         },
         {
           "name": "Pre-Adv.",
           "color": "#D2BFFE",
-          "threshold": 2300.0
+          "threshold": 2100.0
         },
         {
           "name": "Advanced",
           "color": "#B5D1FF",
-          "threshold": 2400.0
+          "threshold": 2300.0
         },
         {
           "name": "BLESSED",
           "color": "#E06666",
-          "threshold": 2500.0
+          "threshold": 2450.0
         },
         {
           "name": "EXALTED",
           "color": "#FBBC04",
-          "threshold": 2580.0
+          "threshold": 2500.0
         },
         {
           "name": "UBER",
           "color": "#351C75",
-          "threshold": 2650.0
+          "threshold": 2600.0
         },
         {
           "name": "ARCADIA",
           "color": "#274E13",
-          "threshold": 2750.0
+          "threshold": 2700.0
         },
         {
           "name": "HORIZON",
           "color": "#24DDD8",
-          "threshold": 2725.0
+          "threshold": 2743.0
         }
-      ]
+      ],
+      "leaderboard_id": 127261
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingGoodChoke",
+    "kovaaks_benchmark_id": 772,
+    "rank_colors": [
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Adv.",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ],
+      [
+        "BLESSED",
+        "#E06666"
+      ],
+      [
+        "EXALTED",
+        "#FBBC04"
+      ],
+      [
+        "UBER",
+        "#351C75"
+      ],
+      [
+        "ARCADIA",
+        "#274E13"
+      ],
+      [
+        "HORIZON",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:51.809071+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

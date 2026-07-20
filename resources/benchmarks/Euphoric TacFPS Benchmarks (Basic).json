@@ -35,7 +35,8 @@
           "color": "#00E7EB",
           "threshold": 124.0
         }
-      ]
+      ],
+      "leaderboard_id": 160550
     },
     {
       "name": "Driftshot Euphoric Basic",
@@ -70,7 +71,8 @@
           "color": "#00E7EB",
           "threshold": 96.0
         }
-      ]
+      ],
+      "leaderboard_id": 160551
     },
     {
       "name": "BlinkClick Euphoric Basic",
@@ -105,7 +107,8 @@
           "color": "#00E7EB",
           "threshold": 78.0
         }
-      ]
+      ],
+      "leaderboard_id": 160549
     },
     {
       "name": "YoxTS Euphoric Basic",
@@ -140,7 +143,8 @@
           "color": "#00E7EB",
           "threshold": 124.0
         }
-      ]
+      ],
+      "leaderboard_id": 160555
     },
     {
       "name": "Miniclick Euphoric Basic",
@@ -175,7 +179,8 @@
           "color": "#00E7EB",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 160552
     },
     {
       "name": "Animicro Euphoric Basic",
@@ -210,7 +215,8 @@
           "color": "#00E7EB",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 160548
     },
     {
       "name": "Smoothsphere Euphoric Basic",
@@ -245,7 +251,8 @@
           "color": "#00E7EB",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 160554
     },
     {
       "name": "Nomysphere Euphoric Basic",
@@ -280,7 +287,8 @@
           "color": "#00E7EB",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 160553
     },
     {
       "name": "Avasphere Euphoric Basic",
@@ -315,7 +323,8 @@
           "color": "#00E7EB",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 161234
     }
   ],
   "generated_from": {
@@ -347,7 +356,8 @@
         "#00E7EB"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:08.104789+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:17.911873+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

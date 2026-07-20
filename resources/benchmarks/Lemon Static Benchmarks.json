@@ -40,7 +40,8 @@
           "color": "#0000FF",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 456
     },
     {
       "name": "Pokeball 1w2ts Horizontalish small",
@@ -80,7 +81,8 @@
           "color": "#0000FF",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 5429
     },
     {
       "name": "Aimerz+ Week #5 - Static Switching 30% smaller",
@@ -120,7 +122,8 @@
           "color": "#0000FF",
           "threshold": 16500.0
         }
-      ]
+      ],
+      "leaderboard_id": 64673
     },
     {
       "name": "5 Sphere Hipfire Small",
@@ -160,7 +163,8 @@
           "color": "#0000FF",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 125
     },
     {
       "name": "devTS Static Click Angelic",
@@ -200,7 +204,8 @@
           "color": "#0000FF",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 38539
     },
     {
       "name": "1w2ts Pasu Perfected 30% Smaller",
@@ -240,7 +245,8 @@
           "color": "#0000FF",
           "threshold": 118.0
         }
-      ]
+      ],
+      "leaderboard_id": 28243
     },
     {
       "name": "Aimerz+ 1w4ts HF Hard S1",
@@ -280,7 +286,8 @@
           "color": "#0000FF",
           "threshold": 235.0
         }
-      ]
+      ],
+      "leaderboard_id": 68287
     },
     {
       "name": "Wide Wall 3 Targets",
@@ -320,7 +327,8 @@
           "color": "#0000FF",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 337
     },
     {
       "name": "Wide Wall 4 Targets",
@@ -360,7 +368,8 @@
           "color": "#0000FF",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 831
     },
     {
       "name": "Aimerz+ ww2t Hard S1",
@@ -400,7 +409,8 @@
           "color": "#0000FF",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 68389
     },
     {
       "name": "1w2ts Perfected",
@@ -440,7 +450,8 @@
           "color": "#0000FF",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 565
     },
     {
       "name": "1w2ts reload smallflicks",
@@ -480,7 +491,8 @@
           "color": "#0000FF",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 36
     },
     {
       "name": "1w2ts Vertical Flicks v2",
@@ -520,7 +532,8 @@
           "color": "#0000FF",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 12402
     },
     {
       "name": "1w2ts PulseShot",
@@ -560,7 +573,8 @@
           "color": "#0000FF",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 121642
     },
     {
       "name": "1w5t smallflicks - Pressure Aiming",
@@ -600,7 +614,8 @@
           "color": "#0000FF",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 18904
     },
     {
       "name": "1w4ts_truste Raspberry",
@@ -640,7 +655,8 @@
           "color": "#0000FF",
           "threshold": 205.0
         }
-      ]
+      ],
+      "leaderboard_id": 10631
     },
     {
       "name": "1w6ts_trustechain Raspberry",
@@ -680,7 +696,8 @@
           "color": "#0000FF",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 10625
     },
     {
       "name": "1w2ts reload",
@@ -720,7 +737,8 @@
           "color": "#0000FF",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 197
     },
     {
       "name": "1w3ts reload",
@@ -760,7 +778,8 @@
           "color": "#0000FF",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 215
     },
     {
       "name": "1w4ts reload",
@@ -800,7 +819,8 @@
           "color": "#0000FF",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 387
     },
     {
       "name": "1w6ts reload v2",
@@ -840,7 +860,8 @@
           "color": "#0000FF",
           "threshold": 185.0
         }
-      ]
+      ],
+      "leaderboard_id": 666
     }
   ],
   "generated_from": {
@@ -876,7 +897,8 @@
         "#0000FF"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:20.742645+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:14.984752+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

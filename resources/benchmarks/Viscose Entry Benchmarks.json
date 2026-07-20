@@ -35,7 +35,8 @@
           "color": "#5558AA",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 189903
     },
     {
       "name": "Air Voltaic Invincible 4 Entry",
@@ -70,7 +71,8 @@
           "color": "#5558AA",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 143160
     },
     {
       "name": "Controlsphere Viscose Entry",
@@ -105,7 +107,8 @@
           "color": "#5558AA",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 190002
     },
     {
       "name": "VT Controlsphere Viscose Entry",
@@ -140,7 +143,8 @@
           "color": "#5558AA",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 189866
     },
     {
       "name": "cloverRawControl Viscose Entry",
@@ -175,7 +179,8 @@
           "color": "#5558AA",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 190024
     },
     {
       "name": "Flower Entry",
@@ -210,7 +215,8 @@
           "color": "#5558AA",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 190139
     },
     {
       "name": "PGTI Vertical Iron",
@@ -245,7 +251,8 @@
           "color": "#5558AA",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 29252
     },
     {
       "name": "RawControlSphere Entry",
@@ -280,7 +287,8 @@
           "color": "#5558AA",
           "threshold": 13400.0
         }
-      ]
+      ],
+      "leaderboard_id": 190185
     },
     {
       "name": "wasuTS Entry",
@@ -315,7 +323,8 @@
           "color": "#5558AA",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 190123
     },
     {
       "name": "aimerz+ Static Switching 6 Bot Larger",
@@ -350,7 +359,8 @@
           "color": "#5558AA",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 190025
     },
     {
       "name": "1w2ts reload smallflicks Entry",
@@ -385,7 +395,8 @@
           "color": "#5558AA",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 190274
     },
     {
       "name": "StaticSwitchingVox Entry",
@@ -420,7 +431,8 @@
           "color": "#5558AA",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 190275
     },
     {
       "name": "eth Pasu Micro Entry",
@@ -455,7 +467,8 @@
           "color": "#5558AA",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 190273
     },
     {
       "name": "waldoTS Novice Static",
@@ -490,7 +503,8 @@
           "color": "#5558AA",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 189999
     },
     {
       "name": "Pasu Viscose Entry",
@@ -525,7 +539,8 @@
           "color": "#5558AA",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 192535
     },
     {
       "name": "VT Bounceshot Viscose Entry",
@@ -560,7 +575,8 @@
           "color": "#5558AA",
           "threshold": 850.0
         }
-      ]
+      ],
+      "leaderboard_id": 190272
     },
     {
       "name": "VT Floating Heads Viscose Entry",
@@ -595,7 +611,8 @@
           "color": "#5558AA",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 192531
     },
     {
       "name": "VoxTS Click Entry",
@@ -630,7 +647,8 @@
           "color": "#5558AA",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 192530
     }
   ],
   "generated_from": {
@@ -662,7 +680,8 @@
         "#5558AA"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:53.263998+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:52.285437+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

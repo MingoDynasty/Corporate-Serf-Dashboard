@@ -50,7 +50,8 @@
           "color": "#f8f4ff",
           "threshold": 1240.0
         }
-      ]
+      ],
+      "leaderboard_id": 98059
     },
     {
       "name": "VT Popcorn Novice S5",
@@ -100,7 +101,8 @@
           "color": "#f8f4ff",
           "threshold": 1020.0
         }
-      ]
+      ],
+      "leaderboard_id": 98285
     },
     {
       "name": "VT 1w4ts Novice S5",
@@ -150,7 +152,8 @@
           "color": "#f8f4ff",
           "threshold": 1620.0
         }
-      ]
+      ],
+      "leaderboard_id": 103210
     },
     {
       "name": "VT ww5t Novice S5",
@@ -200,7 +203,8 @@
           "color": "#f8f4ff",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 98030
     },
     {
       "name": "VT Frogtagon Novice S5",
@@ -250,7 +254,8 @@
           "color": "#f8f4ff",
           "threshold": 1490.0
         }
-      ]
+      ],
+      "leaderboard_id": 106186
     },
     {
       "name": "VT Floating Heads Novice S5",
@@ -300,7 +305,8 @@
           "color": "#f8f4ff",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 98054
     },
     {
       "name": "VT PGT Novice S5",
@@ -350,7 +356,8 @@
           "color": "#f8f4ff",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 98060
     },
     {
       "name": "VT Snake Track Novice S5",
@@ -400,7 +407,8 @@
           "color": "#f8f4ff",
           "threshold": 4700.0
         }
-      ]
+      ],
+      "leaderboard_id": 101560
     },
     {
       "name": "VT Aether Novice S5",
@@ -450,7 +458,8 @@
           "color": "#f8f4ff",
           "threshold": 3825.0
         }
-      ]
+      ],
+      "leaderboard_id": 101370
     },
     {
       "name": "VT Ground Novice S5",
@@ -500,7 +509,8 @@
           "color": "#f8f4ff",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 101744
     },
     {
       "name": "VT Raw Control Novice S5",
@@ -550,7 +560,8 @@
           "color": "#f8f4ff",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 98047
     },
     {
       "name": "VT Controlsphere Novice S5",
@@ -600,7 +611,8 @@
           "color": "#f8f4ff",
           "threshold": 4125.0
         }
-      ]
+      ],
+      "leaderboard_id": 103765
     },
     {
       "name": "VT DotTS Novice S5",
@@ -650,7 +662,8 @@
           "color": "#f8f4ff",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 104868
     },
     {
       "name": "VT EddieTS Novice S5",
@@ -700,7 +713,8 @@
           "color": "#f8f4ff",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 104835
     },
     {
       "name": "VT DriftTS Novice S5",
@@ -750,7 +764,8 @@
           "color": "#f8f4ff",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 104862
     },
     {
       "name": "VT FlyTS Novice S5",
@@ -800,7 +815,8 @@
           "color": "#f8f4ff",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 104830
     },
     {
       "name": "VT ControlTS Novice S5",
@@ -850,7 +866,8 @@
           "color": "#f8f4ff",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 105132
     },
     {
       "name": "VT Penta Bounce Novice S5",
@@ -900,7 +917,8 @@
           "color": "#f8f4ff",
           "threshold": 670.0
         }
-      ]
+      ],
+      "leaderboard_id": 103262
     }
   ],
   "generated_from": {
@@ -944,7 +962,8 @@
         "#f8f4ff"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:50.739000+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:39.739491+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

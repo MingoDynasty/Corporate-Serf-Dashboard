@@ -25,7 +25,8 @@
           "color": "#C27BA0",
           "threshold": 5200.0
         }
-      ]
+      ],
+      "leaderboard_id": 32546
     },
     {
       "name": "VAI 1 Easy TE",
@@ -50,7 +51,8 @@
           "color": "#C27BA0",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 42434
     },
     {
       "name": "VAI 15 Easy TE",
@@ -75,7 +77,8 @@
           "color": "#C27BA0",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 32983
     },
     {
       "name": "Pasu Track Extrasmooth Easy TE",
@@ -100,7 +103,8 @@
           "color": "#C27BA0",
           "threshold": 8200.0
         }
-      ]
+      ],
+      "leaderboard_id": 32982
     },
     {
       "name": "SYW (Smooth Your Wrist) Truly FIXED Easy",
@@ -125,7 +129,33 @@
           "color": "#C27BA0",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 32981
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSensingDiagonalMain",
+    "kovaaks_benchmark_id": 471,
+    "rank_colors": [
+      [
+        "Level 1",
+        "#CCCCCC"
+      ],
+      [
+        "Level 2",
+        "#EAD1DC"
+      ],
+      [
+        "Level 3",
+        "#D5A6BD"
+      ],
+      [
+        "Level 4",
+        "#C27BA0"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:56.426891+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

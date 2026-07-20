@@ -55,7 +55,8 @@
           "color": "#24DDD8",
           "threshold": 5447.0
         }
-      ]
+      ],
+      "leaderboard_id": 102055
     },
     {
       "name": "BounceSphere",
@@ -110,7 +111,8 @@
           "color": "#24DDD8",
           "threshold": 3840.0
         }
-      ]
+      ],
+      "leaderboard_id": 24133
     },
     {
       "name": "BounceSphere High & Wide",
@@ -165,7 +167,8 @@
           "color": "#24DDD8",
           "threshold": 3409.0
         }
-      ]
+      ],
+      "leaderboard_id": 102076
     },
     {
       "name": "Bouncesphere Smooth",
@@ -220,7 +223,8 @@
           "color": "#24DDD8",
           "threshold": 4957.0
         }
-      ]
+      ],
+      "leaderboard_id": 30847
     },
     {
       "name": "BounceSphere Always Left",
@@ -275,7 +279,8 @@
           "color": "#24DDD8",
           "threshold": 3654.0
         }
-      ]
+      ],
+      "leaderboard_id": 102078
     },
     {
       "name": "BounceSphere Always Right",
@@ -330,7 +335,57 @@
           "color": "#24DDD8",
           "threshold": 3777.0
         }
-      ]
+      ],
+      "leaderboard_id": 102086
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsReloadingBrownCallout",
+    "kovaaks_benchmark_id": 379,
+    "rank_colors": [
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Adv.",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ],
+      [
+        "BLESSED",
+        "#E06666"
+      ],
+      [
+        "EXALTED",
+        "#FBBC04"
+      ],
+      [
+        "UBER",
+        "#351C75"
+      ],
+      [
+        "SCOURGE",
+        "#274E13"
+      ],
+      [
+        "HORIZON",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:54.635728+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -45,7 +45,8 @@
           "color": "#24DDD8",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 42479
     },
     {
       "name": "DM ww2t Smaller",
@@ -90,7 +91,8 @@
           "color": "#24DDD8",
           "threshold": 1590.0
         }
-      ]
+      ],
+      "leaderboard_id": 34440
     },
     {
       "name": "DM 1w3ts Smaller",
@@ -135,7 +137,8 @@
           "color": "#24DDD8",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 42643
     },
     {
       "name": "DM ww3t Smaller",
@@ -180,7 +183,8 @@
           "color": "#24DDD8",
           "threshold": 1680.0
         }
-      ]
+      ],
+      "leaderboard_id": 34447
     },
     {
       "name": "DM 1w4ts Smaller",
@@ -225,7 +229,8 @@
           "color": "#24DDD8",
           "threshold": 1540.0
         }
-      ]
+      ],
+      "leaderboard_id": 31998
     },
     {
       "name": "DM ww4t Smaller",
@@ -270,7 +275,8 @@
           "color": "#24DDD8",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 34970
     },
     {
       "name": "DM 1w5ts Smaller",
@@ -315,7 +321,8 @@
           "color": "#24DDD8",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 32022
     },
     {
       "name": "DM ww5t Smaller",
@@ -360,7 +367,8 @@
           "color": "#24DDD8",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 34604
     },
     {
       "name": "DM 1w6ts Smaller",
@@ -405,7 +413,8 @@
           "color": "#24DDD8",
           "threshold": 1590.0
         }
-      ]
+      ],
+      "leaderboard_id": 32002
     },
     {
       "name": "DM ww6t Smaller",
@@ -450,7 +459,49 @@
           "color": "#24DDD8",
           "threshold": 1770.0
         }
-      ]
+      ],
+      "leaderboard_id": 34560
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsUlting90Speed",
+    "kovaaks_benchmark_id": 870,
+    "rank_colors": [
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:38.151679+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

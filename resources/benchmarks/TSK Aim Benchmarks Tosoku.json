@@ -30,7 +30,8 @@
           "color": "#B5D1FF",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 116640
     },
     {
       "name": "SYV Altered POV Easy Slow",
@@ -60,7 +61,8 @@
           "color": "#B5D1FF",
           "threshold": 6300.0
         }
-      ]
+      ],
+      "leaderboard_id": 47632
     },
     {
       "name": "SYV Altered POV Slow",
@@ -90,7 +92,8 @@
           "color": "#B5D1FF",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 47631
     },
     {
       "name": "VAI 1 Master TE",
@@ -120,7 +123,8 @@
           "color": "#B5D1FF",
           "threshold": 1850.0
         }
-      ]
+      ],
+      "leaderboard_id": 32542
     },
     {
       "name": "VAI 15 Master TE",
@@ -150,7 +154,8 @@
           "color": "#B5D1FF",
           "threshold": 1850.0
         }
-      ]
+      ],
+      "leaderboard_id": 32545
     },
     {
       "name": "VAI 1 Grandmaster TE",
@@ -180,7 +185,8 @@
           "color": "#B5D1FF",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 32543
     },
     {
       "name": "VAI 15 Grandmaster TE",
@@ -210,7 +216,8 @@
           "color": "#B5D1FF",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 32544
     },
     {
       "name": "Pasu Track Extrasmooth TE",
@@ -240,7 +247,8 @@
           "color": "#B5D1FF",
           "threshold": 8000.0
         }
-      ]
+      ],
+      "leaderboard_id": 32539
     },
     {
       "name": "Pasu Track Extrasmooth Small TE",
@@ -270,7 +278,8 @@
           "color": "#B5D1FF",
           "threshold": 5500.0
         }
-      ]
+      ],
+      "leaderboard_id": 32541
     },
     {
       "name": "Smooth Thin Strafe Always Right",
@@ -300,7 +309,8 @@
           "color": "#B5D1FF",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 32550
     },
     {
       "name": "Smooth Thin Strafe Always Left",
@@ -330,7 +340,8 @@
           "color": "#B5D1FF",
           "threshold": 4700.0
         }
-      ]
+      ],
+      "leaderboard_id": 32551
     },
     {
       "name": "SYW (Smooth Your Wrist) Truly FIXED",
@@ -360,7 +371,37 @@
           "color": "#B5D1FF",
           "threshold": 620.0
         }
-      ]
+      ],
+      "leaderboard_id": 13150
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHeadshottingKnockedBrain",
+    "kovaaks_benchmark_id": 227,
+    "rank_colors": [
+      [
+        "Fundamental",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Advanced",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:57.533805+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

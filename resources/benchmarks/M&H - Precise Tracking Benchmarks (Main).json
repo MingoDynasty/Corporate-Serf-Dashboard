@@ -35,7 +35,8 @@
           "color": "#47B7BE",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 192355
     },
     {
       "name": "Suavetrack Control wobin",
@@ -70,7 +71,8 @@
           "color": "#47B7BE",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 137565
     },
     {
       "name": "Smoothsphere Glider OW",
@@ -105,7 +107,8 @@
           "color": "#47B7BE",
           "threshold": 4750.0
         }
-      ]
+      ],
+      "leaderboard_id": 132504
     },
     {
       "name": "Smoothsphere Viscose Expert",
@@ -140,7 +143,8 @@
           "color": "#47B7BE",
           "threshold": 13500.0
         }
-      ]
+      ],
+      "leaderboard_id": 184830
     },
     {
       "name": "Smoothbot Voltaic Ava Hard",
@@ -175,7 +179,8 @@
           "color": "#47B7BE",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 192014
     },
     {
       "name": "SmoothBot Perfected Expert",
@@ -210,7 +215,8 @@
           "color": "#47B7BE",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 184832
     },
     {
       "name": "Leapcorn Pure Tracking Hard",
@@ -245,7 +251,8 @@
           "color": "#47B7BE",
           "threshold": 4450.0
         }
-      ]
+      ],
+      "leaderboard_id": 192369
     },
     {
       "name": "VTP Revosect",
@@ -280,7 +287,8 @@
           "color": "#47B7BE",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 141259
     },
     {
       "name": "PGTI Voltaic",
@@ -315,7 +323,8 @@
           "color": "#47B7BE",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 99
     },
     {
       "name": "cloverRawControl Euphoric",
@@ -350,7 +359,8 @@
           "color": "#47B7BE",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 160418
     },
     {
       "name": "Avasive bukeTrack Hard",
@@ -385,7 +395,8 @@
           "color": "#47B7BE",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 125228
     },
     {
       "name": "Deceptive Tracking XYZ",
@@ -420,7 +431,8 @@
           "color": "#47B7BE",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 82412
     },
     {
       "name": "Extra Controlsphere",
@@ -455,7 +467,8 @@
           "color": "#47B7BE",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 562
     },
     {
       "name": "Silo",
@@ -490,7 +503,8 @@
           "color": "#47B7BE",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 103000
     },
     {
       "name": "Whisphere Viscose Expert",
@@ -525,7 +539,8 @@
           "color": "#47B7BE",
           "threshold": 23500.0
         }
-      ]
+      ],
+      "leaderboard_id": 185239
     }
   ],
   "generated_from": {
@@ -557,7 +572,8 @@
         "#47B7BE"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:50.062254+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:36.642868+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

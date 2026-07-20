@@ -25,7 +25,8 @@
           "color": "#962a3f",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 132360
     },
     {
       "name": "Valorant EddieClick Medium",
@@ -50,7 +51,8 @@
           "color": "#962a3f",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 132361
     },
     {
       "name": "Valorant Adjustshot Wide Medium",
@@ -75,7 +77,8 @@
           "color": "#962a3f",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 132362
     },
     {
       "name": "Valorant DotTS Medium",
@@ -100,7 +103,8 @@
           "color": "#962a3f",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 132363
     },
     {
       "name": "Valorant MiniPhase Medium",
@@ -125,7 +129,8 @@
           "color": "#962a3f",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 132364
     },
     {
       "name": "Valorant Fourshot Adaptive Medium",
@@ -150,7 +155,8 @@
           "color": "#962a3f",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 132365
     },
     {
       "name": "Valorant 1w1t Medium",
@@ -175,7 +181,8 @@
           "color": "#962a3f",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 132366
     },
     {
       "name": "Valorant Wide Reflex Medium",
@@ -200,7 +207,8 @@
           "color": "#962a3f",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 132369
     },
     {
       "name": "Valorant DevClick Medium",
@@ -225,7 +233,8 @@
           "color": "#962a3f",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 132371
     },
     {
       "name": "Valorant AngleShot Micro Medium",
@@ -250,7 +259,8 @@
           "color": "#962a3f",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 132372
     },
     {
       "name": "Valorant Skyclick Multi Medium",
@@ -275,7 +285,8 @@
           "color": "#962a3f",
           "threshold": 45.0
         }
-      ]
+      ],
+      "leaderboard_id": 132373
     },
     {
       "name": "Valorant DevClick Static Medium",
@@ -300,7 +311,8 @@
           "color": "#962a3f",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 132374
     },
     {
       "name": "Valorant WaldoTS Medium",
@@ -325,7 +337,8 @@
           "color": "#962a3f",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 132375
     },
     {
       "name": "Valorant Micro 2 Sphere Medium",
@@ -350,7 +363,8 @@
           "color": "#962a3f",
           "threshold": 185.0
         }
-      ]
+      ],
+      "leaderboard_id": 132376
     },
     {
       "name": "Valorant PeekShot Medium",
@@ -375,7 +389,8 @@
           "color": "#962a3f",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 132377
     },
     {
       "name": "Valorant Micropace Medium",
@@ -400,7 +415,8 @@
           "color": "#962a3f",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 132378
     },
     {
       "name": "Valorant Microcluster Medium",
@@ -425,7 +441,8 @@
           "color": "#962a3f",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 132379
     },
     {
       "name": "Valorant ControlStrafes Medium",
@@ -450,7 +467,8 @@
           "color": "#962a3f",
           "threshold": 3550.0
         }
-      ]
+      ],
+      "leaderboard_id": 132380
     },
     {
       "name": "Valorant Peektrack Medium",
@@ -475,7 +493,8 @@
           "color": "#962a3f",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 132280
     },
     {
       "name": "Valorant Controlsphere Blink Medium",
@@ -500,7 +519,8 @@
           "color": "#962a3f",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 132382
     },
     {
       "name": "Valorant Angle Smoothing Medium",
@@ -525,7 +545,33 @@
           "color": "#962a3f",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 132383
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBotting90Heaven",
+    "kovaaks_benchmark_id": 653,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#439ba4"
+      ],
+      [
+        "Diamond",
+        "#9667b4"
+      ],
+      [
+        "Ascendant",
+        "#388760"
+      ],
+      [
+        "Immortal",
+        "#962a3f"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:43.286118+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

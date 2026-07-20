@@ -35,7 +35,8 @@
           "color": "#50C878",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 387
     },
     {
       "name": "Wide Wall 3 Targets",
@@ -70,7 +71,8 @@
           "color": "#50C878",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 337
     },
     {
       "name": "voxTS Static Click rAim",
@@ -105,7 +107,8 @@
           "color": "#50C878",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 573
     },
     {
       "name": "1w6t NQS Raspberry",
@@ -140,7 +143,8 @@
           "color": "#50C878",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 1581
     },
     {
       "name": "B180 rAim Easy",
@@ -175,7 +179,8 @@
           "color": "#50C878",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 781
     },
     {
       "name": "Pasu rAim Easy",
@@ -210,7 +215,8 @@
           "color": "#50C878",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 782
     },
     {
       "name": "Popcorn rAim Easy",
@@ -245,7 +251,8 @@
           "color": "#50C878",
           "threshold": 290.0
         }
-      ]
+      ],
+      "leaderboard_id": 607
     },
     {
       "name": "ToonsClick rAim Easy",
@@ -280,7 +287,8 @@
           "color": "#50C878",
           "threshold": 68.0
         }
-      ]
+      ],
+      "leaderboard_id": 5093
     },
     {
       "name": "PGTI rAim Easy",
@@ -315,7 +323,8 @@
           "color": "#50C878",
           "threshold": 1800.0
         }
-      ]
+      ],
+      "leaderboard_id": 655
     },
     {
       "name": "Smoothbot rAim Easy",
@@ -350,7 +359,8 @@
           "color": "#50C878",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 609
     },
     {
       "name": "Air Angelic rAim Easy",
@@ -385,7 +395,8 @@
           "color": "#50C878",
           "threshold": 915.0
         }
-      ]
+      ],
+      "leaderboard_id": 572
     },
     {
       "name": "Controlsphere rAim Easy",
@@ -420,7 +431,8 @@
           "color": "#50C878",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5137
     },
     {
       "name": "fuglaaXY Reactive rAim Easy",
@@ -455,7 +467,8 @@
           "color": "#50C878",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 571
     },
     {
       "name": "Air 3478 rAim Easy",
@@ -490,7 +503,8 @@
           "color": "#50C878",
           "threshold": 918.0
         }
-      ]
+      ],
+      "leaderboard_id": 355
     },
     {
       "name": "MFSI rAim Easy",
@@ -525,7 +539,8 @@
           "color": "#50C878",
           "threshold": 13700.0
         }
-      ]
+      ],
+      "leaderboard_id": 5191
     },
     {
       "name": "Smooth Thin Strafes Raspberry Easy",
@@ -560,7 +575,8 @@
           "color": "#50C878",
           "threshold": 9000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5536
     },
     {
       "name": "PatCircleSwitch rAim",
@@ -595,7 +611,8 @@
           "color": "#50C878",
           "threshold": 7000.0
         }
-      ]
+      ],
+      "leaderboard_id": 15485
     },
     {
       "name": "Pokeball Wide rAim Easy",
@@ -630,7 +647,8 @@
           "color": "#50C878",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 738
     },
     {
       "name": "voxTS rAim Easy",
@@ -665,7 +683,8 @@
           "color": "#50C878",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 739
     },
     {
       "name": "devTS Goated rAim Easy",
@@ -700,7 +719,8 @@
           "color": "#50C878",
           "threshold": 630.0
         }
-      ]
+      ],
+      "leaderboard_id": 5159
     },
     {
       "name": "B180T rAim Easy",
@@ -735,7 +755,8 @@
           "color": "#50C878",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 740
     },
     {
       "name": "kinTS rAim Easy",
@@ -770,7 +791,8 @@
           "color": "#50C878",
           "threshold": 21000.0
         }
-      ]
+      ],
+      "leaderboard_id": 611
     },
     {
       "name": "Pasu Track Smaller rAim Easy",
@@ -805,7 +827,8 @@
           "color": "#50C878",
           "threshold": 68.0
         }
-      ]
+      ],
+      "leaderboard_id": 610
     },
     {
       "name": "ToonsTS rAim Easy",
@@ -840,7 +863,41 @@
           "color": "#50C878",
           "threshold": 68.0
         }
-      ]
+      ],
+      "leaderboard_id": 5054
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDeathballingRandomBuy",
+    "kovaaks_benchmark_id": 533,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#B45F06"
+      ],
+      [
+        "Silver",
+        "#999999"
+      ],
+      [
+        "Gold",
+        "#FFD966"
+      ],
+      [
+        "Platinum",
+        "#A4C2F4"
+      ],
+      [
+        "Ruby",
+        "#E0115F"
+      ],
+      [
+        "Emerald",
+        "#50C878"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:40.322543+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

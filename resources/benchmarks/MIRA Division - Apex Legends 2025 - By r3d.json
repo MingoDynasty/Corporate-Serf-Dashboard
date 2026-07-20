@@ -55,7 +55,8 @@
           "color": "#8bcb07",
           "threshold": 6300.0
         }
-      ]
+      ],
+      "leaderboard_id": 150485
     },
     {
       "name": "r3d SmoothControl",
@@ -110,7 +111,8 @@
           "color": "#8bcb07",
           "threshold": 7000.0
         }
-      ]
+      ],
+      "leaderboard_id": 150481
     },
     {
       "name": "r3d GliderBOT",
@@ -165,7 +167,8 @@
           "color": "#8bcb07",
           "threshold": 8000.0
         }
-      ]
+      ],
+      "leaderboard_id": 150130
     },
     {
       "name": "r3d LiftTrack",
@@ -220,7 +223,8 @@
           "color": "#8bcb07",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 150090
     },
     {
       "name": "r3d GroundTracking",
@@ -275,7 +279,8 @@
           "color": "#8bcb07",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 150132
     },
     {
       "name": "r3d Horizontal Atmosphere",
@@ -330,7 +335,8 @@
           "color": "#8bcb07",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 150479
     },
     {
       "name": "r3d 1w4ts Pasu Perfected CR",
@@ -385,7 +391,8 @@
           "color": "#8bcb07",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 150492
     },
     {
       "name": "r3d Star Clicking Micro 2C",
@@ -440,7 +447,8 @@
           "color": "#8bcb07",
           "threshold": 700.0
         }
-      ]
+      ],
+      "leaderboard_id": 150493
     },
     {
       "name": "r3d GroundTracking [STRAFE]",
@@ -495,7 +503,8 @@
           "color": "#8bcb07",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 150491
     },
     {
       "name": "r3d High-LowGround Tracking [STRAFE]",
@@ -550,7 +559,8 @@
           "color": "#8bcb07",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 150497
     }
   ],
   "generated_from": {
@@ -598,7 +608,8 @@
         "#8bcb07"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:16.455640+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:01.080255+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

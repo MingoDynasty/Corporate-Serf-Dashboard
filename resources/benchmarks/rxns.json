@@ -35,7 +35,8 @@
           "color": "#000000",
           "threshold": 400.0
         }
-      ]
+      ],
+      "leaderboard_id": 42155
     },
     {
       "name": "4BK - RawMouseControlPokeball Adapt",
@@ -70,7 +71,8 @@
           "color": "#000000",
           "threshold": 360.0
         }
-      ]
+      ],
+      "leaderboard_id": 98516
     },
     {
       "name": "devTS Goated NR Static 5Bot",
@@ -105,7 +107,8 @@
           "color": "#000000",
           "threshold": 870.0
         }
-      ]
+      ],
+      "leaderboard_id": 125002
     },
     {
       "name": "RawMouseControl Reload LG56",
@@ -140,7 +143,8 @@
           "color": "#000000",
           "threshold": 250.0
         }
-      ]
+      ],
+      "leaderboard_id": 35486
     },
     {
       "name": "RawMouseControl Reload LG56 AIMGOD",
@@ -175,7 +179,8 @@
           "color": "#000000",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 42166
     },
     {
       "name": "RawMouseControl Pokeball Easy",
@@ -210,7 +215,8 @@
           "color": "#000000",
           "threshold": 250.0
         }
-      ]
+      ],
+      "leaderboard_id": 77620
     },
     {
       "name": "Cartoon's Micro RawMouseControlReact 30s",
@@ -245,7 +251,8 @@
           "color": "#000000",
           "threshold": 63.0
         }
-      ]
+      ],
+      "leaderboard_id": 80173
     },
     {
       "name": "Pokeball Frenzy Auto",
@@ -280,7 +287,8 @@
           "color": "#000000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 1561
     },
     {
       "name": "Pokevox LG56",
@@ -315,7 +323,8 @@
           "color": "#000000",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 39838
     },
     {
       "name": "Pokeball Auto ww6ts LG56",
@@ -350,7 +359,8 @@
           "color": "#000000",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 35495
     },
     {
       "name": "Reflex Flick - Very Easy",
@@ -385,7 +395,8 @@
           "color": "#000000",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 1749
     },
     {
       "name": "4BK - 1w1ts Pokeball",
@@ -420,7 +431,8 @@
           "color": "#000000",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 99007
     },
     {
       "name": "1w1t horizonalish extremely small",
@@ -455,7 +467,8 @@
           "color": "#000000",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 20703
     },
     {
       "name": "Pokeball Auto ww6t Larger Voltaic",
@@ -490,7 +503,8 @@
           "color": "#000000",
           "threshold": 230.0
         }
-      ]
+      ],
+      "leaderboard_id": 15152
     },
     {
       "name": "VT 1w3ts Intermediate S5 Clusters Pokeball",
@@ -525,7 +539,8 @@
           "color": "#000000",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 117215
     },
     {
       "name": "1wall 6targets extra small",
@@ -560,7 +575,8 @@
           "color": "#000000",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 169
     },
     {
       "name": "Pokeball Floating Heads 400%",
@@ -595,7 +611,8 @@
           "color": "#000000",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 15763
     },
     {
       "name": "beanTS 30% Smaller",
@@ -630,7 +647,8 @@
           "color": "#000000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 6779
     },
     {
       "name": "waldoTS",
@@ -665,7 +683,8 @@
           "color": "#000000",
           "threshold": 190.0
         }
-      ]
+      ],
+      "leaderboard_id": 81042
     },
     {
       "name": "voxTS Viscose Varied",
@@ -700,7 +719,8 @@
           "color": "#000000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 417
     },
     {
       "name": "Tamspeed 2bp",
@@ -735,7 +755,8 @@
           "color": "#000000",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 529
     },
     {
       "name": "1wall5targets_pasu - track",
@@ -770,7 +791,8 @@
           "color": "#000000",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 674
     },
     {
       "name": "Cloverrawcontrol Adaptive Very Easy",
@@ -805,7 +827,8 @@
           "color": "#000000",
           "threshold": 10400.0
         }
-      ]
+      ],
+      "leaderboard_id": 109682
     },
     {
       "name": "WhisphereRawControl 30% small",
@@ -840,7 +863,8 @@
           "color": "#000000",
           "threshold": 11800.0
         }
-      ]
+      ],
+      "leaderboard_id": 91398
     },
     {
       "name": "Leaptrack Goated 80%",
@@ -875,7 +899,8 @@
           "color": "#000000",
           "threshold": 3470.0
         }
-      ]
+      ],
+      "leaderboard_id": 59309
     },
     {
       "name": "tamTargetSwitch Smooth",
@@ -910,7 +935,8 @@
           "color": "#000000",
           "threshold": 50.0
         }
-      ]
+      ],
+      "leaderboard_id": 56
     },
     {
       "name": "Tamspeed 2bpes LG56 AIMGOD",
@@ -945,7 +971,8 @@
           "color": "#000000",
           "threshold": 45.0
         }
-      ]
+      ],
+      "leaderboard_id": 42077
     },
     {
       "name": "Controlsphere OW 150%",
@@ -980,7 +1007,8 @@
           "color": "#000000",
           "threshold": 9500.0
         }
-      ]
+      ],
+      "leaderboard_id": 83267
     },
     {
       "name": "Pasu Angelic",
@@ -1015,7 +1043,8 @@
           "color": "#000000",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 38540
     },
     {
       "name": "Air CELESTIAL",
@@ -1050,7 +1079,8 @@
           "color": "#000000",
           "threshold": 895.0
         }
-      ]
+      ],
+      "leaderboard_id": 1241
     },
     {
       "name": "voxtargetclick hard strafe fast",
@@ -1085,7 +1115,8 @@
           "color": "#000000",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 47938
     },
     {
       "name": "PGTI Voltaic",
@@ -1120,7 +1151,8 @@
           "color": "#000000",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 99
     }
   ],
   "generated_from": {
@@ -1152,7 +1184,8 @@
         "#000000"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:22.355137+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:05.010229+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -30,7 +30,8 @@
           "color": "#24DDD8",
           "threshold": 1060.0
         }
-      ]
+      ],
+      "leaderboard_id": 35936
     },
     {
       "name": "BounceClick SuperbAim",
@@ -60,7 +61,8 @@
           "color": "#24DDD8",
           "threshold": 108.0
         }
-      ]
+      ],
+      "leaderboard_id": 35900
     },
     {
       "name": "Pasu SuperbAim",
@@ -90,7 +92,8 @@
           "color": "#24DDD8",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 35929
     },
     {
       "name": "CombinedClick SuperbAim",
@@ -120,7 +123,8 @@
           "color": "#24DDD8",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 35956
     },
     {
       "name": "5 Dots SuperbAim",
@@ -150,7 +154,8 @@
           "color": "#24DDD8",
           "threshold": 1560.0
         }
-      ]
+      ],
+      "leaderboard_id": 35908
     },
     {
       "name": "3 Dots xyzAdjust SuperbAim",
@@ -180,7 +185,8 @@
           "color": "#24DDD8",
           "threshold": 176.0
         }
-      ]
+      ],
+      "leaderboard_id": 35907
     },
     {
       "name": "SmoothTrack SuperbAim",
@@ -210,7 +216,8 @@
           "color": "#24DDD8",
           "threshold": 5300.0
         }
-      ]
+      ],
+      "leaderboard_id": 36103
     },
     {
       "name": "LeapBot SuperbAim",
@@ -240,7 +247,8 @@
           "color": "#24DDD8",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 35905
     },
     {
       "name": "ReactiveStrafe SuperbAim",
@@ -270,7 +278,8 @@
           "color": "#24DDD8",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 48012
     },
     {
       "name": "AirReactive SuperbAim",
@@ -300,7 +309,8 @@
           "color": "#24DDD8",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 36012
     },
     {
       "name": "AirAngelic SuperbAim",
@@ -330,7 +340,8 @@
           "color": "#24DDD8",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 36097
     },
     {
       "name": "Controlsphere SuperbAim",
@@ -360,7 +371,8 @@
           "color": "#24DDD8",
           "threshold": 11200.0
         }
-      ]
+      ],
+      "leaderboard_id": 35293
     },
     {
       "name": "VoxTS SuperbAim",
@@ -390,7 +402,8 @@
           "color": "#24DDD8",
           "threshold": 1460.0
         }
-      ]
+      ],
+      "leaderboard_id": 35896
     },
     {
       "name": "PsalmTS SuperbAim",
@@ -420,7 +433,8 @@
           "color": "#24DDD8",
           "threshold": 118.0
         }
-      ]
+      ],
+      "leaderboard_id": 35949
     },
     {
       "name": "kinTS SuperbAim",
@@ -450,7 +464,8 @@
           "color": "#24DDD8",
           "threshold": 91.0
         }
-      ]
+      ],
+      "leaderboard_id": 35912
     },
     {
       "name": "BounceTS SuperbAim",
@@ -480,7 +495,37 @@
           "color": "#24DDD8",
           "threshold": 94.0
         }
-      ]
+      ],
+      "leaderboard_id": 35304
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsEnragingPeriwinkleAdventure",
+    "kovaaks_benchmark_id": 732,
+    "rank_colors": [
+      [
+        "Master",
+        "#C30D23"
+      ],
+      [
+        "GrandMaster",
+        "#FFD97B"
+      ],
+      [
+        "Cyan",
+        "#1F8784"
+      ],
+      [
+        "Blazar",
+        "#002549"
+      ],
+      [
+        "Superb",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:02.096943+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -901,3 +901,41 @@ def test_committed_bundled_playlists_all_carry_rank_data():
             missing_rank_data.append(playlist_path.relative_to(REPO_ROOT).as_posix())
 
     assert not missing_rank_data
+
+
+# Deliberately retained pre-change (ID-less) benchmark files, if the corpus ever
+# keeps a last-known-good file older than the leaderboard-ID embedding. Ships
+# empty: the corpus-wide regeneration gave every scenario an ID. A future
+# retention adds its path here, in the same PR, so the gap stays explicit.
+_LEADERBOARD_ID_COVERAGE_EXCEPTIONS: set[str] = set()
+
+
+def test_committed_bundled_playlists_all_carry_leaderboard_ids():
+    result = subprocess.run(
+        ["git", "ls-files", "resources/benchmarks"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    playlist_paths = [
+        REPO_ROOT / path
+        for path in result.stdout.splitlines()
+        if path.endswith(".json")
+    ]
+
+    assert playlist_paths
+    missing_leaderboard_ids = []
+    for playlist_path in playlist_paths:
+        relative = playlist_path.relative_to(REPO_ROOT).as_posix()
+        if relative in _LEADERBOARD_ID_COVERAGE_EXCEPTIONS:
+            continue
+        playlist = PlaylistData.model_validate_json(
+            playlist_path.read_text(encoding="utf-8")
+        )
+        if not playlist.scenarios or any(
+            scenario.leaderboard_id is None for scenario in playlist.scenarios
+        ):
+            missing_leaderboard_ids.append(relative)
+
+    assert not missing_leaderboard_ids

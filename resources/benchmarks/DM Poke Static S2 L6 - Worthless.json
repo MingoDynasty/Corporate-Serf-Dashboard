@@ -45,7 +45,8 @@
           "color": "#24DDD8",
           "threshold": 1400.0
         }
-      ]
+      ],
+      "leaderboard_id": 32406
     },
     {
       "name": "DM ww2t Pokeball Smaller",
@@ -90,7 +91,8 @@
           "color": "#24DDD8",
           "threshold": 1540.0
         }
-      ]
+      ],
+      "leaderboard_id": 34435
     },
     {
       "name": "DM 1w3ts Pokeball Smaller",
@@ -135,7 +137,8 @@
           "color": "#24DDD8",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 31997
     },
     {
       "name": "DM ww3t Pokeball Smaller",
@@ -180,7 +183,8 @@
           "color": "#24DDD8",
           "threshold": 1630.0
         }
-      ]
+      ],
+      "leaderboard_id": 34452
     },
     {
       "name": "DM 1w4ts Pokeball Smaller",
@@ -225,7 +229,8 @@
           "color": "#24DDD8",
           "threshold": 1490.0
         }
-      ]
+      ],
+      "leaderboard_id": 31999
     },
     {
       "name": "DM ww4t Pokeball Smaller",
@@ -270,7 +275,8 @@
           "color": "#24DDD8",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 34535
     },
     {
       "name": "DM 1w5ts Pokeball Smaller",
@@ -315,7 +321,8 @@
           "color": "#24DDD8",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 32001
     },
     {
       "name": "DM ww5t Pokeball Smaller",
@@ -360,7 +367,8 @@
           "color": "#24DDD8",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 34557
     },
     {
       "name": "DM 1w6ts Pokeball Smaller",
@@ -405,7 +413,8 @@
           "color": "#24DDD8",
           "threshold": 1540.0
         }
-      ]
+      ],
+      "leaderboard_id": 32004
     },
     {
       "name": "DM ww6t Pokeball Smaller",
@@ -450,7 +459,49 @@
           "color": "#24DDD8",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 34561
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRocketingVioletController",
+    "kovaaks_benchmark_id": 863,
+    "rank_colors": [
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:31.392673+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

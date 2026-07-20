@@ -55,7 +55,8 @@
           "color": "#24DDD8",
           "threshold": 8900.0
         }
-      ]
+      ],
+      "leaderboard_id": 3696
     },
     {
       "name": "odb MFSI",
@@ -110,7 +111,8 @@
           "color": "#24DDD8",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 4010
     },
     {
       "name": "LDDH Fixed",
@@ -165,7 +167,8 @@
           "color": "#24DDD8",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 80
     },
     {
       "name": "MSS Raspberry v2",
@@ -220,7 +223,8 @@
           "color": "#24DDD8",
           "threshold": 8400.0
         }
-      ]
+      ],
+      "leaderboard_id": 10183
     },
     {
       "name": "MSS Insanity Raspberry",
@@ -275,7 +279,8 @@
           "color": "#24DDD8",
           "threshold": 7000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1477
     },
     {
       "name": "MFSI v3 Raspberry",
@@ -330,7 +335,8 @@
           "color": "#24DDD8",
           "threshold": 8900.0
         }
-      ]
+      ],
+      "leaderboard_id": 8735
     },
     {
       "name": "Close Fast Strafes Invincible - Thin",
@@ -385,7 +391,8 @@
           "color": "#24DDD8",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 814
     },
     {
       "name": "Ground Plaza Sparky v3 OW",
@@ -440,7 +447,8 @@
           "color": "#24DDD8",
           "threshold": 903.0
         }
-      ]
+      ],
+      "leaderboard_id": 871
     },
     {
       "name": "Air invincible 8 small",
@@ -495,7 +503,8 @@
           "color": "#24DDD8",
           "threshold": 3150.0
         }
-      ]
+      ],
+      "leaderboard_id": 809
     },
     {
       "name": "Pasu Track Wide React",
@@ -550,7 +559,8 @@
           "color": "#24DDD8",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 81603
     },
     {
       "name": "ReactiveSphere",
@@ -605,7 +615,8 @@
           "color": "#24DDD8",
           "threshold": 8700.0
         }
-      ]
+      ],
+      "leaderboard_id": 24075
     },
     {
       "name": "Air Divine",
@@ -660,7 +671,57 @@
           "color": "#24DDD8",
           "threshold": 898.0
         }
-      ]
+      ],
+      "leaderboard_id": 645
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHipfiringWetWindow",
+    "kovaaks_benchmark_id": 610,
+    "rank_colors": [
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Advanced",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ],
+      [
+        "BLESSED",
+        "#E06666"
+      ],
+      [
+        "EXALTED",
+        "#FBBC04"
+      ],
+      [
+        "UBER",
+        "#351C75"
+      ],
+      [
+        "ARCADIA",
+        "#274E13"
+      ],
+      [
+        "HORIZON",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:55.535782+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

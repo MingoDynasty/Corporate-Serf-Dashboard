@@ -30,7 +30,8 @@
           "color": "#FF6961",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 63891
     },
     {
       "name": "Fiveshot Easy MIRA",
@@ -60,7 +61,8 @@
           "color": "#FF6961",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 63904
     },
     {
       "name": "Bounceshot Easy MIRA",
@@ -90,7 +92,8 @@
           "color": "#FF6961",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 63931
     },
     {
       "name": "Pasu Easy MIRA",
@@ -120,7 +123,8 @@
           "color": "#FF6961",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 63932
     },
     {
       "name": "Smoothbot Easy MIRA",
@@ -150,7 +154,8 @@
           "color": "#FF6961",
           "threshold": 13900.0
         }
-      ]
+      ],
+      "leaderboard_id": 63915
     },
     {
       "name": "PTI Easy MIRA",
@@ -180,7 +185,8 @@
           "color": "#FF6961",
           "threshold": 18000.0
         }
-      ]
+      ],
+      "leaderboard_id": 63933
     },
     {
       "name": "Plaza Easy MIRA",
@@ -210,7 +216,8 @@
           "color": "#FF6961",
           "threshold": 9500.0
         }
-      ]
+      ],
+      "leaderboard_id": 63936
     },
     {
       "name": "AA4 Easy MIRA",
@@ -240,7 +247,8 @@
           "color": "#FF6961",
           "threshold": 13900.0
         }
-      ]
+      ],
+      "leaderboard_id": 63937
     },
     {
       "name": "VelozSwitch Easy MIRA",
@@ -270,7 +278,8 @@
           "color": "#FF6961",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 63911
     },
     {
       "name": "kndTS Wide Easy MIRA",
@@ -300,7 +309,8 @@
           "color": "#FF6961",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 63893
     },
     {
       "name": "r3dSwitch Easy MIRA",
@@ -330,7 +340,8 @@
           "color": "#FF6961",
           "threshold": 470.0
         }
-      ]
+      ],
+      "leaderboard_id": 63956
     },
     {
       "name": "FugaSwitch Easy MIRA Fixed",
@@ -360,7 +371,8 @@
           "color": "#FF6961",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 63894
     }
   ],
   "generated_from": {
@@ -388,7 +400,8 @@
         "#FF6961"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:34.213806+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:23.860726+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

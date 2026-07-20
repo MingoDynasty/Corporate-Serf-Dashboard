@@ -35,7 +35,8 @@
           "color": "#F1076B",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 160398
     },
     {
       "name": "1w2ts Euphoric",
@@ -70,7 +71,8 @@
           "color": "#F1076B",
           "threshold": 166.0
         }
-      ]
+      ],
+      "leaderboard_id": 160399
     },
     {
       "name": "Driftshot Euphoric",
@@ -105,7 +107,8 @@
           "color": "#F1076B",
           "threshold": 126.0
         }
-      ]
+      ],
+      "leaderboard_id": 160401
     },
     {
       "name": "EvaClick Euphoric",
@@ -140,7 +143,8 @@
           "color": "#F1076B",
           "threshold": 134.0
         }
-      ]
+      ],
+      "leaderboard_id": 160400
     },
     {
       "name": "BlinkClick Euphoric",
@@ -175,7 +179,8 @@
           "color": "#F1076B",
           "threshold": 96.0
         }
-      ]
+      ],
+      "leaderboard_id": 160407
     },
     {
       "name": "Widereflex Euphoric",
@@ -210,7 +215,8 @@
           "color": "#F1076B",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 160404
     },
     {
       "name": "YoxTS Euphoric",
@@ -245,7 +251,8 @@
           "color": "#F1076B",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 160397
     },
     {
       "name": "Clustershot Euphoric",
@@ -280,7 +287,8 @@
           "color": "#F1076B",
           "threshold": 222.0
         }
-      ]
+      ],
+      "leaderboard_id": 160408
     },
     {
       "name": "Miniclick Euphoric",
@@ -315,7 +323,8 @@
           "color": "#F1076B",
           "threshold": 184.0
         }
-      ]
+      ],
+      "leaderboard_id": 160412
     },
     {
       "name": "ControlTS Euphoric",
@@ -350,7 +359,8 @@
           "color": "#F1076B",
           "threshold": 72.0
         }
-      ]
+      ],
+      "leaderboard_id": 160410
     },
     {
       "name": "Animicro Euphoric",
@@ -385,7 +395,8 @@
           "color": "#F1076B",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 160414
     },
     {
       "name": "MicroReflex Euphoric",
@@ -420,7 +431,8 @@
           "color": "#F1076B",
           "threshold": 94.0
         }
-      ]
+      ],
+      "leaderboard_id": 160413
     },
     {
       "name": "Smoothsphere Euphoric",
@@ -455,7 +467,8 @@
           "color": "#F1076B",
           "threshold": 4150.0
         }
-      ]
+      ],
+      "leaderboard_id": 160417
     },
     {
       "name": "cloverRawControl Euphoric",
@@ -490,7 +503,8 @@
           "color": "#F1076B",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 160418
     },
     {
       "name": "Nomysphere Euphoric",
@@ -525,7 +539,8 @@
           "color": "#F1076B",
           "threshold": 4750.0
         }
-      ]
+      ],
+      "leaderboard_id": 160416
     },
     {
       "name": "Controlsphere Euphoric",
@@ -560,7 +575,8 @@
           "color": "#F1076B",
           "threshold": 13500.0
         }
-      ]
+      ],
+      "leaderboard_id": 160415
     },
     {
       "name": "Avasphere Euphoric",
@@ -595,7 +611,8 @@
           "color": "#F1076B",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 160419
     },
     {
       "name": "Air Euphoric",
@@ -630,7 +647,8 @@
           "color": "#F1076B",
           "threshold": 3875.0
         }
-      ]
+      ],
+      "leaderboard_id": 160420
     }
   ],
   "generated_from": {
@@ -662,7 +680,8 @@
         "#F1076B"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:06.048769+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:18.828730+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

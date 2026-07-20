@@ -50,7 +50,8 @@
           "color": "#E5383B",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 146127
     },
     {
       "name": "WALLHACK - Silksphere",
@@ -100,7 +101,8 @@
           "color": "#E5383B",
           "threshold": 5100.0
         }
-      ]
+      ],
+      "leaderboard_id": 146125
     },
     {
       "name": "WALLHACK - Rinsphere",
@@ -150,7 +152,8 @@
           "color": "#E5383B",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 146124
     },
     {
       "name": "WALLHACK - AscendTrack",
@@ -200,7 +203,8 @@
           "color": "#E5383B",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 146120
     },
     {
       "name": "WALLHACK - PokeSwitch",
@@ -250,7 +254,8 @@
           "color": "#E5383B",
           "threshold": 1340.0
         }
-      ]
+      ],
+      "leaderboard_id": 145549
     },
     {
       "name": "WALLHACK - miaoSwitch",
@@ -300,7 +305,8 @@
           "color": "#E5383B",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 146118
     },
     {
       "name": "WALLHACK - MonarchTS",
@@ -350,7 +356,8 @@
           "color": "#E5383B",
           "threshold": 610.0
         }
-      ]
+      ],
+      "leaderboard_id": 146122
     },
     {
       "name": "WALLHACK - LeapTS",
@@ -400,7 +407,8 @@
           "color": "#E5383B",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 146128
     },
     {
       "name": "WALLHACK - VBRClick",
@@ -450,7 +458,8 @@
           "color": "#E5383B",
           "threshold": 1460.0
         }
-      ]
+      ],
+      "leaderboard_id": 146126
     },
     {
       "name": "WALLHACK - JennClick",
@@ -500,7 +509,8 @@
           "color": "#E5383B",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 146119
     },
     {
       "name": "WALLHACK - SkyClick",
@@ -550,7 +560,8 @@
           "color": "#E5383B",
           "threshold": 1350.0
         }
-      ]
+      ],
+      "leaderboard_id": 145852
     },
     {
       "name": "WALLHACK - ArcClick",
@@ -600,7 +611,8 @@
           "color": "#E5383B",
           "threshold": 1160.0
         }
-      ]
+      ],
+      "leaderboard_id": 145853
     }
   ],
   "generated_from": {
@@ -644,7 +656,8 @@
         "#E5383B"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:28.143726+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:19.651681+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

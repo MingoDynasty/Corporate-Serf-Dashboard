@@ -25,7 +25,8 @@
           "color": "#6f1d89",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 195440
     },
     {
       "name": "cA MFSI Easy S1",
@@ -50,7 +51,8 @@
           "color": "#6f1d89",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 195438
     },
     {
       "name": "cA FBS Easy S1",
@@ -75,7 +77,8 @@
           "color": "#6f1d89",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 195439
     },
     {
       "name": "cA SLIPPERY Easy S1",
@@ -100,7 +103,8 @@
           "color": "#6f1d89",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 195469
     },
     {
       "name": "cA VSS Easy S1",
@@ -125,7 +129,8 @@
           "color": "#6f1d89",
           "threshold": 14600.0
         }
-      ]
+      ],
+      "leaderboard_id": 195470
     },
     {
       "name": "cA FLUIDITY Easy S1",
@@ -150,7 +155,8 @@
           "color": "#6f1d89",
           "threshold": 3850.0
         }
-      ]
+      ],
+      "leaderboard_id": 195442
     },
     {
       "name": "cA XYZ Easy S1",
@@ -175,7 +181,8 @@
           "color": "#6f1d89",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 195421
     }
   ],
   "generated_from": {
@@ -199,7 +206,8 @@
         "#6f1d89"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:27.646759+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:02.285394+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -25,7 +25,8 @@
           "color": "#EC44CA",
           "threshold": 980.0
         }
-      ]
+      ],
+      "leaderboard_id": 98330
     },
     {
       "name": "VT Popcorn Intermediate S5",
@@ -50,7 +51,8 @@
           "color": "#EC44CA",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 98333
     },
     {
       "name": "VT 1w3ts Intermediate S5",
@@ -75,7 +77,8 @@
           "color": "#EC44CA",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 103209
     },
     {
       "name": "VT ww5t Intermediate S5",
@@ -100,7 +103,8 @@
           "color": "#EC44CA",
           "threshold": 1560.0
         }
-      ]
+      ],
+      "leaderboard_id": 98029
     },
     {
       "name": "VT Frogtagon Intermediate S5",
@@ -125,7 +129,8 @@
           "color": "#EC44CA",
           "threshold": 1230.0
         }
-      ]
+      ],
+      "leaderboard_id": 105828
     },
     {
       "name": "VT Floating Heads Intermediate S5",
@@ -150,7 +155,8 @@
           "color": "#EC44CA",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 98055
     },
     {
       "name": "VT PGT Intermediate S5",
@@ -175,7 +181,8 @@
           "color": "#EC44CA",
           "threshold": 3325.0
         }
-      ]
+      ],
+      "leaderboard_id": 98331
     },
     {
       "name": "VT Snake Track Intermediate S5",
@@ -200,7 +207,8 @@
           "color": "#EC44CA",
           "threshold": 3750.0
         }
-      ]
+      ],
+      "leaderboard_id": 98045
     },
     {
       "name": "VT Aether Intermediate S5",
@@ -225,7 +233,8 @@
           "color": "#EC44CA",
           "threshold": 3175.0
         }
-      ]
+      ],
+      "leaderboard_id": 101369
     },
     {
       "name": "VT Ground Intermediate S5",
@@ -250,7 +259,8 @@
           "color": "#EC44CA",
           "threshold": 3350.0
         }
-      ]
+      ],
+      "leaderboard_id": 101743
     },
     {
       "name": "VT Raw Control Intermediate S5",
@@ -275,7 +285,8 @@
           "color": "#EC44CA",
           "threshold": 3875.0
         }
-      ]
+      ],
+      "leaderboard_id": 98048
     },
     {
       "name": "VT Controlsphere Intermediate S5",
@@ -300,7 +311,8 @@
           "color": "#EC44CA",
           "threshold": 3825.0
         }
-      ]
+      ],
+      "leaderboard_id": 103353
     },
     {
       "name": "VT DotTS Intermediate S5",
@@ -325,7 +337,8 @@
           "color": "#EC44CA",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 104865
     },
     {
       "name": "VT EddieTS Intermediate S5",
@@ -350,7 +363,8 @@
           "color": "#EC44CA",
           "threshold": 1080.0
         }
-      ]
+      ],
+      "leaderboard_id": 105176
     },
     {
       "name": "VT DriftTS Intermediate S5",
@@ -375,7 +389,8 @@
           "color": "#EC44CA",
           "threshold": 490.0
         }
-      ]
+      ],
+      "leaderboard_id": 104863
     },
     {
       "name": "VT FlyTS Intermediate S5",
@@ -400,7 +415,8 @@
           "color": "#EC44CA",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 105142
     },
     {
       "name": "VT ControlTS Intermediate S5",
@@ -425,7 +441,8 @@
           "color": "#EC44CA",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 104890
     },
     {
       "name": "VT Penta Bounce Intermediate S5",
@@ -450,7 +467,33 @@
           "color": "#EC44CA",
           "threshold": 580.0
         }
-      ]
+      ],
+      "leaderboard_id": 103261
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBottingShinyDoor",
+    "kovaaks_benchmark_id": 458,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:37.508433+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

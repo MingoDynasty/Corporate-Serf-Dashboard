@@ -35,7 +35,8 @@
           "color": "#666666",
           "threshold": 147.0
         }
-      ]
+      ],
+      "leaderboard_id": 417
     },
     {
       "name": "voxTargetSwitch",
@@ -70,7 +71,8 @@
           "color": "#666666",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 118
     },
     {
       "name": "patTS NR",
@@ -105,7 +107,8 @@
           "color": "#666666",
           "threshold": 9700.0
         }
-      ]
+      ],
+      "leaderboard_id": 403
     },
     {
       "name": "voxTargetSwitch 30% Smaller",
@@ -140,7 +143,8 @@
           "color": "#666666",
           "threshold": 117.0
         }
-      ]
+      ],
+      "leaderboard_id": 812
     },
     {
       "name": "Target Switching 360 Static",
@@ -175,7 +179,8 @@
           "color": "#666666",
           "threshold": 20700.0
         }
-      ]
+      ],
+      "leaderboard_id": 243
     },
     {
       "name": "Tile Frenzy Flick 180",
@@ -210,7 +215,8 @@
           "color": "#666666",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 194
     },
     {
       "name": "xenTargetSwitch",
@@ -245,7 +251,8 @@
           "color": "#666666",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 1202
     },
     {
       "name": "voxTargetSwitch Jumbo",
@@ -280,7 +287,8 @@
           "color": "#666666",
           "threshold": 172.0
         }
-      ]
+      ],
+      "leaderboard_id": 413
     },
     {
       "name": "voxTS Voltaic LowTTK",
@@ -315,7 +323,8 @@
           "color": "#666666",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 19625
     },
     {
       "name": "patCircleSwitch NR Static",
@@ -350,7 +359,8 @@
           "color": "#666666",
           "threshold": 10500.0
         }
-      ]
+      ],
+      "leaderboard_id": 720
     },
     {
       "name": "patTargetSwitch easy",
@@ -385,7 +395,8 @@
           "color": "#666666",
           "threshold": 11200.0
         }
-      ]
+      ],
+      "leaderboard_id": 600
     },
     {
       "name": "devTS Goated NR Static",
@@ -420,7 +431,41 @@
           "color": "#666666",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 2109
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingFraggedBrush",
+    "kovaaks_benchmark_id": 802,
+    "rank_colors": [
+      [
+        "Ascendant",
+        "#990000"
+      ],
+      [
+        "Empyreal",
+        "#B45F06"
+      ],
+      [
+        "Reverent",
+        "#354698"
+      ],
+      [
+        "Angelic",
+        "#38761D"
+      ],
+      [
+        "Eternal",
+        "#351C75"
+      ],
+      [
+        "Unans",
+        "#666666"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:06.668212+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }
