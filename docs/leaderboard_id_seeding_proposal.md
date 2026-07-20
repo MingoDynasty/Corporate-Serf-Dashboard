@@ -2,7 +2,7 @@
 
 Status: Proposed
 Date: 2026-07-19 (narrowed 2026-07-20; the no-username work moved to
-[user_independent_totals_proposal.md](user_independent_totals_proposal.md))
+`user_independent_totals_proposal.md`, proposed in its own PR)
 
 ## Problem
 
