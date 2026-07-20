@@ -68,7 +68,9 @@ mappings. The shipped corpus and the shipped IDs cannot diverge,
 because they are the same artifact. One transitional gap, accepted: a
 retained last-known-good file generated before this change carries no
 IDs, so its scenarios stay unseeded (falling back to the existing
-resolution paths) until its benchmark next regenerates.
+resolution paths) until its benchmark next regenerates. The corpus
+coverage test in Testing makes every such retention an explicit,
+listed exception rather than a silent gap.
 
 **Schema.** The scenario `leaderboard_id` field is optional.
 User-imported playlists and pre-change files simply lack it; nothing
@@ -81,34 +83,36 @@ so there is no version-skew concern. The shipping PR regenerates all
 runtime lookup path does not change at all: `get_cached_leaderboard_id`
 keeps reading the one permanent mapping cache it reads today. The app
 already scans the full bundled corpus at startup; that scan now also
-collects the embedded `scenario name → leaderboard_id` pairs, and their
-union is folded into the cache in one bulk read-modify-write (atomic).
-The merge rule, per entry:
+collects the embedded `scenario name → leaderboard_id` pairs. Names on
+which two bundled files disagree (should not happen; would be upstream
+weirdness) are excluded up front with a logged warning, and the
+surviving pairs form the **asserted set** — the mappings the corpus
+currently stands behind. Every merge rule is defined against that set,
+folded into the cache in one bulk read-modify-write (atomic):
 
-- a bundled name **missing** from the cache is added, tagged
+- an asserted name **missing** from the cache is added, tagged
   `source: "seed"`;
-- an existing `source: "seed"` entry is **refreshed** if the bundled
+- an existing `source: "seed"` entry is **refreshed** if its asserted
   value changed, so corrected IDs actually reach existing installs;
-- an existing `source: "seed"` entry whose name is absent from the
-  bundled corpus is **removed** — the corpus has stopped asserting it,
-  and an upgraded install must not keep resolving a mapping a fresh
-  install would not have;
+- an existing `source: "seed"` entry whose name is **not in the
+  asserted set** is **removed** — whether the name left the corpus or
+  is still present in playlist files but conflicted, the corpus has
+  stopped asserting a value for it, and an upgraded install must not
+  keep resolving a mapping a fresh install would not have;
 - entries learned from the live API are **never touched**, including
-  when the bundled corpus disagrees with them.
+  when the asserted set disagrees with them.
 
-If two bundled playlists disagree on an ID for the same name (should
-not happen; would be upstream weirdness), the merge excludes that name
-and logs a warning rather than asserting an ambiguous mapping. If any
-bundled playlist fails to load, the merge still adds and refreshes but
-skips removals for that startup — a partial view of the corpus must not
-retract mappings the corpus may still assert.
+If any bundled playlist fails to load, the merge still adds and
+refreshes but skips removals for that startup — a partial view of the
+corpus must not retract mappings the corpus may still assert.
 
 The post-merge invariant, stated carefully: the cache is the union of
-learned entries and the bundled IDs, with learned entries taking
+learned entries and the asserted set, with learned entries taking
 precedence on overlap; `source: "seed"` entries never contain a name
-the bundled corpus does not currently assert. (Not "the seed-owned
-entries are exactly the bundled IDs" — a name that already has a
-learned entry never gets a seed-owned row at all.)
+outside the current asserted set (in particular, a name that turns
+conflicted loses its seed-owned row). Not "the seed-owned entries are
+exactly the asserted set" — a name that already has a learned entry
+never gets a seed-owned row at all.
 
 A copy-only-when-the-cache-is-absent rule would be simpler still, but it
 strands every existing install: they already have a cache file, so the
@@ -177,8 +181,18 @@ totals proposal depends on this PR.
   playlists and pre-change corpus files — still validate (schema
   optionality).
 - Startup merge: a missing name is added; a learned entry is never
-  touched; a seed-owned entry is refreshed when the bundled value
-  changes; a seed-owned entry absent from the bundled corpus is removed
-  (the upgrade case); two bundled playlists disagreeing on a name
-  excludes it with a warning; an unloadable bundled file still allows
+  touched; a seed-owned entry is refreshed when the asserted value
+  changes; a seed-owned entry absent from the asserted set is removed —
+  both the name-left-the-corpus case and the conflict transition (an
+  existing seed-owned row whose name two bundled files now disagree on
+  is removed with a warning); an unloadable bundled file still allows
   adds and refreshes but suppresses removals.
+- Corpus coverage (CI-enforced): every scenario of every tracked
+  `resources/benchmarks/*.json` carries a valid, non-null
+  `leaderboard_id`, with an explicit exception list — empty at ship —
+  for deliberately retained pre-change files, following the
+  committed-corpus invariant precedent in `tests/test_playlist_rekey.py`.
+  Schema optionality alone cannot detect a skipped or stale committed
+  file; this test is what proves the corpus-wide regeneration claim,
+  and a future retention of an ID-less last-known-good file then
+  requires an explicit exception entry in the same PR.
