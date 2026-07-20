@@ -245,15 +245,9 @@ function Write-FirstRunConfig([string]$StatsDir, [int]$Port) {
         "# Directory where the KovaaK's stats files are stored.",
         "stats_dir = ""$statsDirToml""",
         '',
-        '# How often to poll for updates (in milliseconds).',
-        'polling_interval = 1000',
-        '',
         '# Port for the local dashboard server. If another program already',
         '# uses it, the dashboard says so at startup -- pick a different port here.',
-        "port = $Port",
-        '',
-        '# How many decimal places to round the Sensitivity.',
-        'sens_round_decimal_places = 1'
+        "port = $Port"
     )
     Write-FileAtomic -Path (Join-Path $InstallRoot 'config.toml') -Content (($lines -join "`n") + "`n")
 }

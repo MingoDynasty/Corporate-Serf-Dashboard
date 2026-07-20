@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from source.config.config_service import ConfigData
 from source.utilities.paths import STATE_DIR_ENV_VAR
 
 CONFIG_ERROR_MESSAGE = (
@@ -40,7 +41,7 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
     [
         None,
         "not valid toml",
-        'stats_dir = "missing required fields"',
+        'stats_dir = "missing required port"',
         'stats_dir = "x"\n'
         "polling_interval = 1000\n"
         "port = 8050\n"
@@ -72,11 +73,10 @@ def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
     tmp_path = tmp_path.resolve()
     missing_stats_dir = tmp_path / "no-such-stats-dir"
     config_path = tmp_path / "config.toml"
+    # Only the two required fields; the tuning knobs fall back to their code
+    # defaults, exercising the defaulted path through a real startup.
     config_path.write_text(
-        f'stats_dir = "{missing_stats_dir.as_posix()}"\n'
-        "polling_interval = 1000\n"
-        "port = 8050\n"
-        "sens_round_decimal_places = 1\n",
+        f'stats_dir = "{missing_stats_dir.as_posix()}"\nport = 8050\n',
         encoding="utf-8",
     )
 
@@ -93,3 +93,11 @@ def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
     assert missing_stats_dir.as_posix() in result.stderr
     assert str(config_path) in result.stderr
     assert "FPSAimTrainer" in result.stderr
+
+
+def test_tuning_fields_default_when_omitted() -> None:
+    """stats_dir and port are the only required fields; tuning knobs default."""
+    config = ConfigData(stats_dir="x", port=8050)
+
+    assert config.polling_interval == 1000
+    assert config.sens_round_decimal_places == 1

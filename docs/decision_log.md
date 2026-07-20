@@ -209,6 +209,14 @@ cost, every release would become a large re-download, and bundling
 dash/plotly/dash-ag-grid assets under PyInstaller is a known hook-debugging time
 sink. Revisit only if "run one command" ever becomes too much to ask.
 
+Addendum (2026-07-20): the first-run `config.toml` now writes only the two true
+boot prerequisites, `stats_dir` and `port`. `polling_interval` (1000) and
+`sens_round_decimal_places` (1) gained code defaults on `ConfigData`, so they
+are no longer required fields and no longer seeded into the generated file —
+`example.toml` still documents them for anyone who wants to tune them. The
+round-trip through the installed app's `load_config()` still runs and must pass
+with the two-field file.
+
 ## 2026-07-19: PowerShell Writes UTF-8 Without BOM And Forward-Slash Paths
 
 Status: Accepted
