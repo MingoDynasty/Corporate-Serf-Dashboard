@@ -88,6 +88,18 @@ def test_scenario_strips_name_and_keeps_blank_names():
     assert imported.scenarios[0].name == "Padded"
 
 
+def test_scenario_leaderboard_id_is_optional():
+    # Imported playlists and pre-change corpus files carry no leaderboard_id;
+    # they must keep validating, defaulting the field to None.
+    without_id = PlaylistData.model_validate_json(
+        '{"name": "P", "code": "C", "scenarios": [{"name": "S"}]}'
+    )
+    assert without_id.scenarios[0].leaderboard_id is None
+
+    with_id = Scenario.model_validate({"name": "S", "leaderboard_id": 12345})
+    assert with_id.leaderboard_id == 12345
+
+
 def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
     monkeypatch,
     tmp_path,

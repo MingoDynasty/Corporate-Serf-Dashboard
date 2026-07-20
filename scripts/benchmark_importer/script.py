@@ -54,6 +54,13 @@ FAILURES_FILE = GENERATED_DIR / "failures.json"
 RESERVED_GENERATED_FILENAMES = frozenset({"manifest.json", "failures.json"})
 EVXL_BENCHMARKS_URL = "https://evxl.app/data/benchmarks"
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
+# Bumped whenever the generated playlist schema changes, so a plain run
+# regenerates pre-change outputs through the benchmark cache instead of needing
+# --force (which would refetch every payload live). It is folded into each
+# file's `generated_from` provenance, so `should_skip_generation` treats a file
+# written under an older schema as stale. Bumped to 2 for embedded
+# `leaderboard_id` fields.
+GENERATOR_SCHEMA_VERSION = 2
 RETRY_ATTEMPTS = 4
 RETRY_BACKOFF_SECONDS = (2, 4, 8)
 POLITENESS_DELAY_SECONDS = 0.5
@@ -227,6 +234,7 @@ def _expected_generated_from(
         "rank_colors": [list(pair) for pair in entry.rank_colors],
         "generated_at": entry.generated_at,
         "generator": "benchmark_importer",
+        "schema_version": GENERATOR_SCHEMA_VERSION,
     }
 
 
@@ -541,7 +549,15 @@ def build_scenarios(
             # Strip the KovaaK's scenario key: CSV run import strips the
             # `Scenario:` value, so padded names would never match run/PB/rank
             # lookups (all exact-match) once the benchmark is unhidden.
-            scenario_list.append(Scenario(name=scenario_name.strip(), ranks=ranks))
+            scenario_list.append(
+                Scenario(
+                    name=scenario_name.strip(),
+                    ranks=ranks,
+                    # Embed the leaderboard ID from the payload we already hold,
+                    # so the shipped corpus can seed the name->ID mapping cache.
+                    leaderboard_id=benchmark_scenario.leaderboard_id,
+                )
+            )
     return scenario_list
 
 
@@ -590,6 +606,7 @@ def generate_playlist(
         "rank_colors": [list(pair) for pair in rank_colors],
         "generated_at": generated_at,
         "generator": "benchmark_importer",
+        "schema_version": GENERATOR_SCHEMA_VERSION,
     }
     output_payload = playlist_data.model_dump(mode="json")
     output_payload["generated_from"] = generated_from

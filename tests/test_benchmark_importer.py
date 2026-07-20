@@ -118,6 +118,7 @@ def _write_generated_file(
                     "rank_colors": [list(pair) for pair in entry.rank_colors],
                     "generated_at": entry.generated_at,
                     "generator": "benchmark_importer",
+                    "schema_version": script.GENERATOR_SCHEMA_VERSION,
                 },
             }
         ),
@@ -358,6 +359,11 @@ def test_generate_playlist_passes_retry_policy_and_writes_playlist(
     generated = json.loads(output.read_text(encoding="utf-8"))
     assert generated["code"] == "KovaaKsGenerated"
     assert generated["scenarios"][0]["ranks"][0]["threshold"] == 100.0
+    # The leaderboard ID from the benchmark payload is embedded per scenario.
+    assert generated["scenarios"][0]["leaderboard_id"] == 1
+    assert generated["generated_from"]["schema_version"] == (
+        script.GENERATOR_SCHEMA_VERSION
+    )
 
 
 def test_rank_mismatch_is_typed():
@@ -399,6 +405,68 @@ def test_build_scenarios_strips_padded_scenario_names():
     )
 
     assert [scenario.name for scenario in scenarios] == ["6 Sphere Hipfire 150% Size"]
+
+
+def test_build_scenarios_embeds_leaderboard_id_per_scenario():
+    # The benchmark payload carries a leaderboard_id per scenario; the importer
+    # must embed it so the shipped corpus can seed the mapping cache.
+    payload = _benchmark_response([100])
+    payload["categories"]["Clicking"]["scenarios"] = {
+        "Alpha": {
+            "score": 0,
+            "leaderboard_rank": None,
+            "scenario_rank": 0,
+            "rank_maxes": [100],
+            "leaderboard_id": 111,
+        },
+        "Beta": {
+            "score": 0,
+            "leaderboard_rank": None,
+            "scenario_rank": 0,
+            "rank_maxes": [100],
+            "leaderboard_id": 222,
+        },
+    }
+    response = script.BenchmarksAPIResponse.model_validate(payload)
+
+    scenarios = script.build_scenarios(
+        response,
+        EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"}),
+    )
+
+    assert {scenario.name: scenario.leaderboard_id for scenario in scenarios} == {
+        "Alpha": 111,
+        "Beta": 222,
+    }
+
+
+def test_pre_change_generated_file_is_regenerated_by_schema_marker(tmp_path):
+    # A file written under the previous generator schema (no schema_version in
+    # its provenance) must no longer be treated as intact, so a plain run
+    # regenerates it through the benchmark cache instead of needing --force.
+    sharecode = "KovaaKsGenerated"
+    item = EvxlDatabaseItem(kovaaksBenchmarkId=42, rankColors={"Bronze": "#111"})
+    entry = _manifest_entry(rank_colors=[("Bronze", "#111")])
+    (tmp_path / entry.file).write_text(
+        json.dumps(
+            {
+                "name": entry.playlist_name,
+                "code": sharecode,
+                "scenarios": [],
+                "generated_from": {
+                    "sharecode": sharecode,
+                    "kovaaks_benchmark_id": entry.kovaaks_benchmark_id,
+                    "rank_colors": [list(pair) for pair in entry.rank_colors],
+                    "generated_at": entry.generated_at,
+                    "generator": "benchmark_importer",
+                    # No schema_version: this is a pre-change generated file.
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert not script.should_skip_generation(sharecode, item, entry, tmp_path)
 
 
 def test_run_importer_continues_after_item_failure(tmp_path, monkeypatch):
