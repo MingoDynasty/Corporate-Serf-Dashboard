@@ -28,9 +28,9 @@ class ConfigData:
     """Dataclass models configuration for this app."""
 
     stats_dir: str
-    polling_interval: int
     port: int
-    sens_round_decimal_places: int
+    polling_interval: int = 1000
+    sens_round_decimal_places: int = 1
     debug: bool = False
     kovaaks_username: str | None = None
     steam_id: str | None = None
