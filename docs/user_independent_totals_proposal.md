@@ -1,9 +1,10 @@
 # User-Independent Totals
 
 Status: Proposed
-Date: 2026-07-20 (split out of
-[leaderboard_id_seeding_proposal.md](leaderboard_id_seeding_proposal.md),
-which this proposal depends on)
+Date: 2026-07-20 (split out of the leaderboard ID seeding proposal,
+since shipped in PR #169 and distilled into the 2026-07-20 "Seed
+Leaderboard IDs From The Bundled Benchmark Corpus" entry of
+`docs/decision_log.md`)
 
 ## Problem
 
@@ -115,14 +116,13 @@ describes.
 
 - **Totals PR** — service change (including the error-to-warning message
   change), playlist row formatter change, Home formatter branch, tests.
-  Soft dependency on the seeding proposal's PR: it works without the
-  seed, but then a username-less playlist open fans out over the
-  exact-search endpoint — ship after it.
+  Its soft dependency — the seeding PR, without which a username-less
+  playlist open would fan out over the exact-search endpoint — shipped
+  as PR #169, so nothing blocks this.
 - **Import-warmup PR (optional)** — relax the played-only filter at the
   import enqueue call site. Small (the enqueue/worker machinery all
-  exists); soft dependency on the seeding PR (without the seed, each
-  unplayed scenario costs the worker an exact-search call). Independent
-  of the totals PR.
+  exists); its soft dependency on the seeding PR (shipped, PR #169) is
+  met. Independent of the totals PR.
 
 ## Testing
 
