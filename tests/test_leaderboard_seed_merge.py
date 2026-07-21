@@ -217,6 +217,57 @@ def test_bundled_load_failure_marks_corpus_incomplete(monkeypatch, tmp_path):
     assert load_complete is False
 
 
+def test_empty_bundled_dir_suppresses_removals(monkeypatch, tmp_path, cache_dir):
+    # A present-but-empty bundled root parses zero files and never trips the
+    # per-file failure handlers, yet it is the maximal partial view — the merge
+    # must suppress removals, not wipe every seed row.
+    _configure_bundled_root(monkeypatch, tmp_path)  # creates an empty bundled dir
+    _write_mapping(
+        cache_dir,
+        {"SeedRow": {"leaderboard_id": 5, "source": "seed", "fetched_at": "t"}},
+    )
+
+    data_service.load_playlists()
+    asserted, load_complete = data_service.get_bundled_leaderboard_seed()
+    assert asserted == {}
+    assert load_complete is False
+
+    data_service.seed_leaderboard_ids_from_bundled_corpus()
+    assert "SeedRow" in _read_mapping(cache_dir)
+
+
+def test_missing_bundled_dir_suppresses_removals(monkeypatch, tmp_path, cache_dir):
+    # A missing bundled root (broken install) must not compound the breakage by
+    # retracting every seeded mapping; learned rows stay untouched regardless.
+    missing = tmp_path / "does-not-exist" / "benchmarks"
+    monkeypatch.setattr(
+        data_service, "BUNDLED_PLAYLIST_DIRECTORY_PATH", missing.resolve()
+    )
+    monkeypatch.setattr(
+        data_service,
+        "USER_PLAYLIST_DIRECTORY_PATH",
+        (tmp_path / "data" / "playlists").resolve(),
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {})
+    _write_mapping(
+        cache_dir,
+        {
+            "SeedRow": {"leaderboard_id": 5, "source": "seed", "fetched_at": "t"},
+            "Learned": {"leaderboard_id": 2, "source": "total-play", "fetched_at": "t"},
+        },
+    )
+
+    data_service.load_playlists()
+    asserted, load_complete = data_service.get_bundled_leaderboard_seed()
+    assert asserted == {}
+    assert load_complete is False
+
+    data_service.seed_leaderboard_ids_from_bundled_corpus()
+    mappings = _read_mapping(cache_dir)
+    assert mappings["SeedRow"]["leaderboard_id"] == 5  # not retracted
+    assert mappings["Learned"]["source"] == "total-play"
+
+
 # --- end-to-end orchestrator ----------------------------------------------------
 
 

@@ -632,6 +632,7 @@ def load_playlists() -> None:  # noqa: PLR0912
     _bundled_seed_pairs.clear()
     _bundled_corpus_load_complete = True
     playlist_sources: dict[str, Path] = {}
+    bundled_parsed = 0
     for root, missing_ok in (
         (BUNDLED_PLAYLIST_DIRECTORY_PATH, False),
         (USER_PLAYLIST_DIRECTORY_PATH, True),
@@ -668,6 +669,7 @@ def load_playlists() -> None:  # noqa: PLR0912
                 # merge happens after the whole scan). Gather from every parsed
                 # bundled file, before code dedup, so a shadowed file that
                 # disagrees still surfaces as a conflict.
+                bundled_parsed += 1
                 _collect_bundled_seed_pairs(playlist_data)
 
             if playlist_data.code in playlist_database:
@@ -701,6 +703,13 @@ def load_playlists() -> None:  # noqa: PLR0912
                 _user_root_playlist_files.setdefault(playlist_data.code, []).append(
                     playlist_file
                 )
+    if bundled_parsed == 0:
+        # A missing or empty bundled root (or one whose every file failed to
+        # parse) never trips the per-file failure handlers above, yet it is the
+        # maximal partial view of the corpus. Force the seed merge to suppress
+        # removals so a broken install does not retract every seeded mapping
+        # (an empty asserted set with allow_removals would wipe them all).
+        _bundled_corpus_load_complete = False
     logger.debug(
         "Playlist startup load complete: loaded=%d bundled=%d user=%d "
         "warnings=%d superseded_files=%d.",
