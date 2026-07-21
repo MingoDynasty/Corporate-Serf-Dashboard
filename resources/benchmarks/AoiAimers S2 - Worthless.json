@@ -30,7 +30,8 @@
           "color": "#B479C3",
           "threshold": 19100.0
         }
-      ]
+      ],
+      "leaderboard_id": 1903
     },
     {
       "name": "Centering I 180",
@@ -60,7 +61,8 @@
           "color": "#B479C3",
           "threshold": 14400.0
         }
-      ]
+      ],
+      "leaderboard_id": 718
     },
     {
       "name": "Centering II 180",
@@ -90,7 +92,8 @@
           "color": "#B479C3",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 332
     },
     {
       "name": "VSS GP9",
@@ -120,7 +123,8 @@
           "color": "#B479C3",
           "threshold": 12200.0
         }
-      ]
+      ],
+      "leaderboard_id": 365
     },
     {
       "name": "VSS GPAIO",
@@ -150,7 +154,8 @@
           "color": "#B479C3",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 1203
     },
     {
       "name": "VSS GPAIO thin far bots",
@@ -180,7 +185,8 @@
           "color": "#B479C3",
           "threshold": 8700.0
         }
-      ]
+      ],
+      "leaderboard_id": 84
     },
     {
       "name": "Controlsphere",
@@ -210,7 +216,8 @@
           "color": "#B479C3",
           "threshold": 12750.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "LilithXYZ",
@@ -240,7 +247,8 @@
           "color": "#B479C3",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 16174
     },
     {
       "name": "Psalm Control Lilith medium",
@@ -270,7 +278,8 @@
           "color": "#B479C3",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 41473
     },
     {
       "name": "Ground Plaza",
@@ -300,7 +309,8 @@
           "color": "#B479C3",
           "threshold": 99883.0
         }
-      ]
+      ],
+      "leaderboard_id": 236
     },
     {
       "name": "Ground Plaza Easy",
@@ -330,7 +340,8 @@
           "color": "#B479C3",
           "threshold": 921.0
         }
-      ]
+      ],
+      "leaderboard_id": 226
     },
     {
       "name": "Ground Plaza NO UFO",
@@ -360,7 +371,8 @@
           "color": "#B479C3",
           "threshold": 99930.0
         }
-      ]
+      ],
+      "leaderboard_id": 534
     },
     {
       "name": "Close Long Strafes Invincible",
@@ -390,7 +402,8 @@
           "color": "#B479C3",
           "threshold": 18630.0
         }
-      ]
+      ],
+      "leaderboard_id": 117
     },
     {
       "name": "Midrange Long Strafes Invincible",
@@ -420,7 +433,8 @@
           "color": "#B479C3",
           "threshold": 20124.0
         }
-      ]
+      ],
+      "leaderboard_id": 147
     },
     {
       "name": "gp close long strafes",
@@ -450,7 +464,8 @@
           "color": "#B479C3",
           "threshold": 5933.0
         }
-      ]
+      ],
+      "leaderboard_id": 1103
     },
     {
       "name": "Kindaclose Long Strafes",
@@ -480,7 +495,37 @@
           "color": "#B479C3",
           "threshold": 19008.0
         }
-      ]
+      ],
+      "leaderboard_id": 751
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMountingSmallGoat",
+    "kovaaks_benchmark_id": 712,
+    "rank_colors": [
+      [
+        "Gold",
+        "#F3D63B"
+      ],
+      [
+        "Platinum",
+        "#2FE7C2"
+      ],
+      [
+        "Diamond",
+        "#C9DCF3"
+      ],
+      [
+        "Sapphire",
+        "#457FB8"
+      ],
+      [
+        "Aoi",
+        "#B479C3"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:56.916299+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

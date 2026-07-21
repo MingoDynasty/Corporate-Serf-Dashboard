@@ -55,7 +55,8 @@
           "color": "#B5D1FF",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 120662
     },
     {
       "name": "TSK - SYW",
@@ -110,7 +111,8 @@
           "color": "#B5D1FF",
           "threshold": 1800.0
         }
-      ]
+      ],
+      "leaderboard_id": 120700
     },
     {
       "name": "TSK - Centering 90 Speed 2",
@@ -165,7 +167,8 @@
           "color": "#B5D1FF",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 120712
     },
     {
       "name": "TSK - 360 Turn",
@@ -220,7 +223,8 @@
           "color": "#B5D1FF",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 120694
     },
     {
       "name": "TSK - DVD Tracking Big",
@@ -275,7 +279,8 @@
           "color": "#B5D1FF",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 123665
     },
     {
       "name": "TSK - DVD Tracking",
@@ -330,7 +335,8 @@
           "color": "#B5D1FF",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 123669
     },
     {
       "name": "TSK - Box Tracking",
@@ -385,7 +391,8 @@
           "color": "#B5D1FF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 123458
     },
     {
       "name": "TSK - Wavy Tracking",
@@ -440,7 +447,8 @@
           "color": "#B5D1FF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 120839
     },
     {
       "name": "TSK - Hewchy's VAI 20",
@@ -495,7 +503,8 @@
           "color": "#B5D1FF",
           "threshold": 2430.0
         }
-      ]
+      ],
+      "leaderboard_id": 125975
     },
     {
       "name": "TSK - Hewchy's VAI 160",
@@ -550,7 +559,8 @@
           "color": "#B5D1FF",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 125978
     },
     {
       "name": "TSK - Hewchy's VAI 70",
@@ -605,7 +615,8 @@
           "color": "#B5D1FF",
           "threshold": 2390.0
         }
-      ]
+      ],
+      "leaderboard_id": 125980
     },
     {
       "name": "TSK - Hewchy's VAI 110",
@@ -660,7 +671,8 @@
           "color": "#B5D1FF",
           "threshold": 2360.0
         }
-      ]
+      ],
+      "leaderboard_id": 125974
     },
     {
       "name": "TSK - SYV Big",
@@ -715,7 +727,8 @@
           "color": "#B5D1FF",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 128439
     },
     {
       "name": "TSK - SYV",
@@ -770,7 +783,8 @@
           "color": "#B5D1FF",
           "threshold": 2150.0
         }
-      ]
+      ],
+      "leaderboard_id": 126435
     },
     {
       "name": "TSK - VSTP Soft Big",
@@ -825,7 +839,8 @@
           "color": "#B5D1FF",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 128444
     },
     {
       "name": "TSK - VSTP Soft",
@@ -880,7 +895,57 @@
           "color": "#B5D1FF",
           "threshold": 2150.0
         }
-      ]
+      ],
+      "leaderboard_id": 126425
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrankingCeruleanDuelist",
+    "kovaaks_benchmark_id": 668,
+    "rank_colors": [
+      [
+        "Level 1",
+        "#CCCCCC"
+      ],
+      [
+        "Level 2",
+        "#EAD1DC"
+      ],
+      [
+        "Level 3",
+        "#D5A6BD"
+      ],
+      [
+        "Level 4",
+        "#C27BA0"
+      ],
+      [
+        "Level 5",
+        "#666666"
+      ],
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Advanced",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:50.845332+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

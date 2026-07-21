@@ -55,7 +55,8 @@
           "color": "#65F0D8",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 190503
     },
     {
       "name": "Spherical Centering II 90",
@@ -110,7 +111,8 @@
           "color": "#65F0D8",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 125285
     },
     {
       "name": "Spherical Centering II 180 V2",
@@ -165,7 +167,8 @@
           "color": "#65F0D8",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 190310
     },
     {
       "name": "Bipolar Centering 360 V2",
@@ -220,7 +223,8 @@
           "color": "#65F0D8",
           "threshold": 3750.0
         }
-      ]
+      ],
+      "leaderboard_id": 190337
     },
     {
       "name": "Anti-Centering V2",
@@ -275,7 +279,8 @@
           "color": "#65F0D8",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 190500
     },
     {
       "name": "VS60",
@@ -330,7 +335,8 @@
           "color": "#65F0D8",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 190291
     },
     {
       "name": "VS120",
@@ -385,7 +391,8 @@
           "color": "#65F0D8",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 190292
     },
     {
       "name": "VSTP Varied V2",
@@ -440,7 +447,8 @@
           "color": "#65F0D8",
           "threshold": 3375.0
         }
-      ]
+      ],
+      "leaderboard_id": 190302
     },
     {
       "name": "Curvesphere Vertical Altered",
@@ -495,7 +503,8 @@
           "color": "#65F0D8",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 190305
     },
     {
       "name": "Farmtrack Goated Fixed Altered",
@@ -550,7 +559,8 @@
           "color": "#65F0D8",
           "threshold": 3575.0
         }
-      ]
+      ],
+      "leaderboard_id": 190306
     },
     {
       "name": "PTXS 45s",
@@ -605,7 +615,8 @@
           "color": "#65F0D8",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 190594
     },
     {
       "name": "PTS FIXED",
@@ -660,7 +671,8 @@
           "color": "#65F0D8",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 190506
     },
     {
       "name": "ClockTrack 45s",
@@ -715,7 +727,8 @@
           "color": "#65F0D8",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 190415
     },
     {
       "name": "Multi Angle Smoothness V2",
@@ -770,7 +783,8 @@
           "color": "#65F0D8",
           "threshold": 3550.0
         }
-      ]
+      ],
+      "leaderboard_id": 190335
     },
     {
       "name": "Petal Tracking 45s",
@@ -825,7 +839,8 @@
           "color": "#65F0D8",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 190903
     }
   ],
   "generated_from": {
@@ -873,7 +888,8 @@
         "#65F0D8"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:50.606739+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:29.604914+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

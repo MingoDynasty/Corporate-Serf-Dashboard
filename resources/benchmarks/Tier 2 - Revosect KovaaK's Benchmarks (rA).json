@@ -35,7 +35,8 @@
           "color": "#050000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 387
     },
     {
       "name": "Wide Wall 3 Targets",
@@ -70,7 +71,8 @@
           "color": "#050000",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 337
     },
     {
       "name": "voxTS Static Click rAim",
@@ -105,7 +107,8 @@
           "color": "#050000",
           "threshold": 195.0
         }
-      ]
+      ],
+      "leaderboard_id": 573
     },
     {
       "name": "1w6t NQS Raspberry",
@@ -140,7 +143,8 @@
           "color": "#050000",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 1581
     },
     {
       "name": "Bounce 180 rAim",
@@ -175,7 +179,8 @@
           "color": "#050000",
           "threshold": 103.0
         }
-      ]
+      ],
+      "leaderboard_id": 526
     },
     {
       "name": "Pasu Reload Goated",
@@ -210,7 +215,8 @@
           "color": "#050000",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 583
     },
     {
       "name": "Popcorn Goated rAim",
@@ -245,7 +251,8 @@
           "color": "#050000",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 777
     },
     {
       "name": "ToonsClick rAim",
@@ -280,7 +287,8 @@
           "color": "#050000",
           "threshold": 91.0
         }
-      ]
+      ],
+      "leaderboard_id": 5053
     },
     {
       "name": "PGTI rAim",
@@ -315,7 +323,8 @@
           "color": "#050000",
           "threshold": 2300.0
         }
-      ]
+      ],
+      "leaderboard_id": 4686
     },
     {
       "name": "Smoothbot rAim",
@@ -350,7 +359,8 @@
           "color": "#050000",
           "threshold": 5200.0
         }
-      ]
+      ],
+      "leaderboard_id": 5151
     },
     {
       "name": "Air Angelic",
@@ -385,7 +395,8 @@
           "color": "#050000",
           "threshold": 927.0
         }
-      ]
+      ],
+      "leaderboard_id": 419
     },
     {
       "name": "Controlsphere rAim",
@@ -420,7 +431,8 @@
           "color": "#050000",
           "threshold": 10800.0
         }
-      ]
+      ],
+      "leaderboard_id": 5102
     },
     {
       "name": "fuglaaXY Reactive rAim",
@@ -455,7 +467,8 @@
           "color": "#050000",
           "threshold": 11700.0
         }
-      ]
+      ],
+      "leaderboard_id": 430
     },
     {
       "name": "Air Small 3478 rAim",
@@ -490,7 +503,8 @@
           "color": "#050000",
           "threshold": 922.0
         }
-      ]
+      ],
+      "leaderboard_id": 9824
     },
     {
       "name": "MFSI rAim",
@@ -525,7 +539,8 @@
           "color": "#050000",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5075
     },
     {
       "name": "Smooth Thin Strafes Raspberry",
@@ -560,7 +575,8 @@
           "color": "#050000",
           "threshold": 7900.0
         }
-      ]
+      ],
+      "leaderboard_id": 3696
     },
     {
       "name": "PatCircleSwitch rAim",
@@ -595,7 +611,8 @@
           "color": "#050000",
           "threshold": 9200.0
         }
-      ]
+      ],
+      "leaderboard_id": 15485
     },
     {
       "name": "Pokeball Wide rAim",
@@ -630,7 +647,8 @@
           "color": "#050000",
           "threshold": 158.0
         }
-      ]
+      ],
+      "leaderboard_id": 527
     },
     {
       "name": "voxTS rAim",
@@ -665,7 +683,8 @@
           "color": "#050000",
           "threshold": 117.0
         }
-      ]
+      ],
+      "leaderboard_id": 528
     },
     {
       "name": "devTS Goated rAim",
@@ -700,7 +719,8 @@
           "color": "#050000",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 5133
     },
     {
       "name": "Bounce 180 Tracking Small",
@@ -735,7 +755,8 @@
           "color": "#050000",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 105
     },
     {
       "name": "kinTS rAim",
@@ -770,7 +791,8 @@
           "color": "#050000",
           "threshold": 24600.0
         }
-      ]
+      ],
+      "leaderboard_id": 360
     },
     {
       "name": "Pasu Track Smaller rAim",
@@ -805,7 +827,8 @@
           "color": "#050000",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 552
     },
     {
       "name": "ToonsTS rAim",
@@ -840,7 +863,41 @@
           "color": "#050000",
           "threshold": 76.0
         }
-      ]
+      ],
+      "leaderboard_id": 5042
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDodgingRangedLostsector",
+    "kovaaks_benchmark_id": 534,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#4A86E8"
+      ],
+      [
+        "Master",
+        "#FF00FF"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Immortal",
+        "#C36EFF"
+      ],
+      [
+        "Archon",
+        "#FF0000"
+      ],
+      [
+        "Divine",
+        "#050000"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:41.284214+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

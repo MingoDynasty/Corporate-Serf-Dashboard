@@ -30,7 +30,8 @@
           "color": "#faa0fc",
           "threshold": 921.0
         }
-      ]
+      ],
+      "leaderboard_id": 154201
     },
     {
       "name": "Ground Plaza Voltaic Goated",
@@ -60,7 +61,8 @@
           "color": "#faa0fc",
           "threshold": 908.0
         }
-      ]
+      ],
+      "leaderboard_id": 152057
     },
     {
       "name": "hizkuRawGround",
@@ -90,7 +92,8 @@
           "color": "#faa0fc",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 128399
     },
     {
       "name": "Close Fast Strafes Invincible - Thin",
@@ -120,7 +123,8 @@
           "color": "#faa0fc",
           "threshold": 15400.0
         }
-      ]
+      ],
+      "leaderboard_id": 814
     },
     {
       "name": "Midrange Fast Strafes Invincible Thin",
@@ -150,7 +154,8 @@
           "color": "#faa0fc",
           "threshold": 13700.0
         }
-      ]
+      ],
+      "leaderboard_id": 1679
     },
     {
       "name": "Midrange Short Strafes Invincible Raspberry",
@@ -180,7 +185,8 @@
           "color": "#faa0fc",
           "threshold": 11400.0
         }
-      ]
+      ],
+      "leaderboard_id": 1484
     },
     {
       "name": "Plaza Pure Revosect",
@@ -210,7 +216,8 @@
           "color": "#faa0fc",
           "threshold": 921.0
         }
-      ]
+      ],
+      "leaderboard_id": 143331
     },
     {
       "name": "MFSI v3 Raspberry",
@@ -240,7 +247,8 @@
           "color": "#faa0fc",
           "threshold": 11300.0
         }
-      ]
+      ],
+      "leaderboard_id": 8735
     },
     {
       "name": "Ground Plaza Sparky v3 OW Thin",
@@ -270,7 +278,8 @@
           "color": "#faa0fc",
           "threshold": 901.0
         }
-      ]
+      ],
+      "leaderboard_id": 426
     },
     {
       "name": "Ground Plaza Sparky V3 Thin",
@@ -300,7 +309,8 @@
           "color": "#faa0fc",
           "threshold": 912.0
         }
-      ]
+      ],
+      "leaderboard_id": 1408
     },
     {
       "name": "VT Plaza Viscose Elite",
@@ -330,7 +340,8 @@
           "color": "#faa0fc",
           "threshold": 4750.0
         }
-      ]
+      ],
+      "leaderboard_id": 134548
     },
     {
       "name": "Plaza Pure Perfected",
@@ -360,7 +371,8 @@
           "color": "#faa0fc",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 154173
     },
     {
       "name": "Smooth Thin Strafes Raspberry",
@@ -390,7 +402,8 @@
           "color": "#faa0fc",
           "threshold": 10500.0
         }
-      ]
+      ],
+      "leaderboard_id": 3696
     },
     {
       "name": "Close Needle Thin Easy",
@@ -420,7 +433,8 @@
           "color": "#faa0fc",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 141929
     },
     {
       "name": "midrange long strafe invincible demotori edition",
@@ -450,7 +464,8 @@
           "color": "#faa0fc",
           "threshold": 13200.0
         }
-      ]
+      ],
+      "leaderboard_id": 90392
     },
     {
       "name": "midrange long strafes invincible demotori edit",
@@ -480,7 +495,8 @@
           "color": "#faa0fc",
           "threshold": 12600.0
         }
-      ]
+      ],
+      "leaderboard_id": 90952
     },
     {
       "name": "controlstrafes midrange",
@@ -510,7 +526,8 @@
           "color": "#faa0fc",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 154389
     },
     {
       "name": "Close Fast Strafes Invincible Precise+",
@@ -540,7 +557,8 @@
           "color": "#faa0fc",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 1343
     },
     {
       "name": "Plaza Smooth 2",
@@ -570,7 +588,8 @@
           "color": "#faa0fc",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 149607
     },
     {
       "name": "VT Ground Advanced S5 Bot 3",
@@ -600,7 +619,8 @@
           "color": "#faa0fc",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 106732
     }
   ],
   "generated_from": {
@@ -628,7 +648,8 @@
         "#faa0fc"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:33.938290+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:10.667893+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

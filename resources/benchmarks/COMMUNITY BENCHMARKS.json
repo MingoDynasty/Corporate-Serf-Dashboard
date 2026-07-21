@@ -35,7 +35,8 @@
           "color": "#1D1D1D",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 96086
     },
     {
       "name": "CB ThreeClick",
@@ -70,7 +71,8 @@
           "color": "#1D1D1D",
           "threshold": 1800.0
         }
-      ]
+      ],
+      "leaderboard_id": 92602
     },
     {
       "name": "CB FiveClick",
@@ -105,7 +107,8 @@
           "color": "#1D1D1D",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 92558
     },
     {
       "name": "CB XYClick",
@@ -140,7 +143,8 @@
           "color": "#1D1D1D",
           "threshold": 1350.0
         }
-      ]
+      ],
+      "leaderboard_id": 92604
     },
     {
       "name": "CB AerialClick",
@@ -175,7 +179,8 @@
           "color": "#1D1D1D",
           "threshold": 1070.0
         }
-      ]
+      ],
+      "leaderboard_id": 92562
     },
     {
       "name": "CB JumpClick",
@@ -210,7 +215,8 @@
           "color": "#1D1D1D",
           "threshold": 1170.0
         }
-      ]
+      ],
+      "leaderboard_id": 92555
     },
     {
       "name": "CB ControlTrack",
@@ -245,7 +251,8 @@
           "color": "#1D1D1D",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 92559
     },
     {
       "name": "CB SmoothTrack",
@@ -280,7 +287,8 @@
           "color": "#1D1D1D",
           "threshold": 3850.0
         }
-      ]
+      ],
+      "leaderboard_id": 92603
     },
     {
       "name": "CB JumpTrack",
@@ -315,7 +323,8 @@
           "color": "#1D1D1D",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 92553
     },
     {
       "name": "CB StrafeTrack",
@@ -350,7 +359,8 @@
           "color": "#1D1D1D",
           "threshold": 3250.0
         }
-      ]
+      ],
+      "leaderboard_id": 92600
     },
     {
       "name": "CB AerialTrack",
@@ -385,7 +395,8 @@
           "color": "#1D1D1D",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 92560
     },
     {
       "name": "CB SharpTrack",
@@ -420,7 +431,8 @@
           "color": "#1D1D1D",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 92552
     },
     {
       "name": "CB StaticSwitch",
@@ -455,7 +467,8 @@
           "color": "#1D1D1D",
           "threshold": 1400.0
         }
-      ]
+      ],
+      "leaderboard_id": 92601
     },
     {
       "name": "CB FlatSwitch",
@@ -490,7 +503,8 @@
           "color": "#1D1D1D",
           "threshold": 1370.0
         }
-      ]
+      ],
+      "leaderboard_id": 92557
     },
     {
       "name": "CB WaveSwitch",
@@ -525,7 +539,8 @@
           "color": "#1D1D1D",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 92594
     },
     {
       "name": "CB AerialSwitch",
@@ -560,7 +575,8 @@
           "color": "#1D1D1D",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 92561
     },
     {
       "name": "CB SmoothSwitch",
@@ -595,7 +611,8 @@
           "color": "#1D1D1D",
           "threshold": 640.0
         }
-      ]
+      ],
+      "leaderboard_id": 92551
     },
     {
       "name": "CB JumpSwitch",
@@ -630,7 +647,41 @@
           "color": "#1D1D1D",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 92554
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBoomstickingSmallXur",
+    "kovaaks_benchmark_id": 320,
+    "rank_colors": [
+      [
+        "VETERAN",
+        "#586289"
+      ],
+      [
+        "MASTER",
+        "#43004A"
+      ],
+      [
+        "ELITE",
+        "#B09B72"
+      ],
+      [
+        "TITAN",
+        "#004749"
+      ],
+      [
+        "LEGEND",
+        "#540000"
+      ],
+      [
+        "ETHEREAL",
+        "#1D1D1D"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:47.972328+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

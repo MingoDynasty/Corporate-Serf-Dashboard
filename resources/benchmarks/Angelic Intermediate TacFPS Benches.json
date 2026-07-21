@@ -35,7 +35,8 @@
           "color": "#FFDC60",
           "threshold": 196.0
         }
-      ]
+      ],
+      "leaderboard_id": 38534
     },
     {
       "name": "1w2ts Angelic",
@@ -70,7 +71,8 @@
           "color": "#FFDC60",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 38531
     },
     {
       "name": "Tamspeed 2bpes Angelic",
@@ -105,7 +107,8 @@
           "color": "#FFDC60",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 38536
     },
     {
       "name": "devTS Static Click Angelic",
@@ -140,7 +143,8 @@
           "color": "#FFDC60",
           "threshold": 172.0
         }
-      ]
+      ],
+      "leaderboard_id": 38539
     },
     {
       "name": "skyClick Angelic",
@@ -175,7 +179,8 @@
           "color": "#FFDC60",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 38543
     },
     {
       "name": "AmareTS Angelic",
@@ -210,7 +215,8 @@
           "color": "#FFDC60",
           "threshold": 138.0
         }
-      ]
+      ],
+      "leaderboard_id": 38552
     },
     {
       "name": "skyTS Angelic",
@@ -245,7 +251,8 @@
           "color": "#FFDC60",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 38547
     },
     {
       "name": "skyTS Static Angelic",
@@ -280,7 +287,8 @@
           "color": "#FFDC60",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 38549
     },
     {
       "name": "FloatTS Angelic",
@@ -315,7 +323,8 @@
           "color": "#FFDC60",
           "threshold": 123.0
         }
-      ]
+      ],
+      "leaderboard_id": 38548
     },
     {
       "name": "Pokeball 1w2ts Angelic",
@@ -350,7 +359,8 @@
           "color": "#FFDC60",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 38553
     },
     {
       "name": "1w4ts Angelic",
@@ -385,7 +395,8 @@
           "color": "#FFDC60",
           "threshold": 153.0
         }
-      ]
+      ],
+      "leaderboard_id": 38529
     },
     {
       "name": "1w3ts Angelic",
@@ -420,7 +431,8 @@
           "color": "#FFDC60",
           "threshold": 158.0
         }
-      ]
+      ],
+      "leaderboard_id": 38532
     },
     {
       "name": "FloatTS Click Angelic",
@@ -455,7 +467,8 @@
           "color": "#FFDC60",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 38557
     },
     {
       "name": "Pasu Angelic",
@@ -490,7 +503,41 @@
           "color": "#FFDC60",
           "threshold": 136.0
         }
-      ]
+      ],
+      "leaderboard_id": 38540
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClickingRandomEnrage",
+    "kovaaks_benchmark_id": 742,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#D3D3D3"
+      ],
+      [
+        "Emerald",
+        "#757575"
+      ],
+      [
+        "Diamond",
+        "#CE695D"
+      ],
+      [
+        "Ascendant",
+        "#B3633E"
+      ],
+      [
+        "Champion",
+        "#CFCFCF"
+      ],
+      [
+        "Angelic",
+        "#FFDC60"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:02.749157+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

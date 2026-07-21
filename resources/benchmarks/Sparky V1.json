@@ -45,7 +45,8 @@
           "color": "#FF2262",
           "threshold": 177.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "Popcorn Sparky",
@@ -90,7 +91,8 @@
           "color": "#FF2262",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 502
     },
     {
       "name": "ww6t reload",
@@ -135,7 +137,8 @@
           "color": "#FF2262",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 401
     },
     {
       "name": "1w6ts reload v2",
@@ -180,7 +183,8 @@
           "color": "#FF2262",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 666
     },
     {
       "name": "Bounce 180 Sparky",
@@ -225,7 +229,8 @@
           "color": "#FF2262",
           "threshold": 127.0
         }
-      ]
+      ],
+      "leaderboard_id": 762
     },
     {
       "name": "Air no UFO no SKYBOTS",
@@ -270,7 +275,8 @@
           "color": "#FF2262",
           "threshold": 891.4
         }
-      ]
+      ],
+      "leaderboard_id": 234
     },
     {
       "name": "Ground Plaza Sparky V3",
@@ -315,7 +321,8 @@
           "color": "#FF2262",
           "threshold": 908.3
         }
-      ]
+      ],
+      "leaderboard_id": 517
     },
     {
       "name": "Popcorn Goated Tracking Invincible",
@@ -360,7 +367,8 @@
           "color": "#FF2262",
           "threshold": 2270.0
         }
-      ]
+      ],
+      "leaderboard_id": 380
     },
     {
       "name": "Thin Gauntlet V2",
@@ -405,7 +413,8 @@
           "color": "#FF2262",
           "threshold": 909.2
         }
-      ]
+      ],
+      "leaderboard_id": 467
     },
     {
       "name": "Pasu Track Invincible v2",
@@ -450,7 +459,8 @@
           "color": "#FF2262",
           "threshold": 8118.0
         }
-      ]
+      ],
+      "leaderboard_id": 548
     },
     {
       "name": "patTS NR",
@@ -495,7 +505,8 @@
           "color": "#FF2262",
           "threshold": 8960.0
         }
-      ]
+      ],
+      "leaderboard_id": 403
     },
     {
       "name": "Bounce 180 Tracking",
@@ -540,7 +551,8 @@
           "color": "#FF2262",
           "threshold": 118.0
         }
-      ]
+      ],
+      "leaderboard_id": 122
     },
     {
       "name": "kinTS NR",
@@ -585,7 +597,8 @@
           "color": "#FF2262",
           "threshold": 25800.0
         }
-      ]
+      ],
+      "leaderboard_id": 941
     },
     {
       "name": "devTS Goated NR",
@@ -630,7 +643,8 @@
           "color": "#FF2262",
           "threshold": 701.0
         }
-      ]
+      ],
+      "leaderboard_id": 532
     },
     {
       "name": "voxTargetSwitch",
@@ -675,7 +689,8 @@
           "color": "#FF2262",
           "threshold": 126.0
         }
-      ]
+      ],
+      "leaderboard_id": 118
     },
     {
       "name": "Air Dodge",
@@ -720,7 +735,8 @@
           "color": "#FF2262",
           "threshold": 153.9
         }
-      ]
+      ],
+      "leaderboard_id": 530
     },
     {
       "name": "Pasu Dodge Easy",
@@ -765,7 +781,8 @@
           "color": "#FF2262",
           "threshold": 503463.0
         }
-      ]
+      ],
+      "leaderboard_id": 873
     },
     {
       "name": "Pistol Strafe Gallery Sparky",
@@ -810,7 +827,8 @@
           "color": "#FF2262",
           "threshold": 311916.8
         }
-      ]
+      ],
+      "leaderboard_id": 545
     },
     {
       "name": "LGC3 Reborn (old scoring)",
@@ -855,7 +873,8 @@
           "color": "#FF2262",
           "threshold": 34076.6
         }
-      ]
+      ],
+      "leaderboard_id": 15342
     },
     {
       "name": "patTargetSwitch Dodge 360 v2",
@@ -900,7 +919,49 @@
           "color": "#FF2262",
           "threshold": 9246.8
         }
-      ]
+      ],
+      "leaderboard_id": 984
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsQuestingSunsetorangeSmg",
+    "kovaaks_benchmark_id": 598,
+    "rank_colors": [
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Ascended",
+        "#FF2262"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:29.256240+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

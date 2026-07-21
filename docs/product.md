@@ -95,6 +95,13 @@ list in the roadmap.)
   rest wait behind "Show hidden" on the Playlists page. *Problem solved:* enabling a benchmark used to mean
   manually copying a JSON file and restarting — now it's one unhide click,
   and app updates refresh the whole library automatically.
+- **Bundled scenarios ship their leaderboard IDs** (PR #169). Every scenario
+  in the bundled benchmark library carries its KovaaK's leaderboard ID, folded
+  into the local name→ID mapping cache at startup. *Problem solved:* opening a
+  bundled playlist you have never played used to resolve each scenario's
+  leaderboard ID one slow, timeout-prone name-search call at a time — now those
+  IDs are already known, so first opens of unfamiliar playlists are faster and
+  less flaky, even before a username is configured.
 - **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
   PR #127). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,

@@ -35,7 +35,8 @@
           "color": "#B5F5DF",
           "threshold": 10400.0
         }
-      ]
+      ],
+      "leaderboard_id": 16344
     },
     {
       "name": "Wide Wall 4 Targets",
@@ -70,7 +71,8 @@
           "color": "#B5F5DF",
           "threshold": 186.0
         }
-      ]
+      ],
+      "leaderboard_id": 831
     },
     {
       "name": "fuglaaPressure 6 Sphere Hipfire no reload",
@@ -105,7 +107,8 @@
           "color": "#B5F5DF",
           "threshold": 12200.0
         }
-      ]
+      ],
+      "leaderboard_id": 30400
     },
     {
       "name": "1w5ts_trustechain Raspberry",
@@ -140,7 +143,8 @@
           "color": "#B5F5DF",
           "threshold": 205.0
         }
-      ]
+      ],
+      "leaderboard_id": 37197
     },
     {
       "name": "1w2ts Perfected",
@@ -175,7 +179,8 @@
           "color": "#B5F5DF",
           "threshold": 176.0
         }
-      ]
+      ],
+      "leaderboard_id": 565
     },
     {
       "name": "1w2t smallflicks small 60s",
@@ -210,7 +215,8 @@
           "color": "#B5F5DF",
           "threshold": 2040.0
         }
-      ]
+      ],
+      "leaderboard_id": 686
     },
     {
       "name": "1wall 6targets small",
@@ -245,7 +251,8 @@
           "color": "#B5F5DF",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 2
     },
     {
       "name": "Aimerz+ ww2t Hard S1 20% Smaller",
@@ -280,7 +287,8 @@
           "color": "#B5F5DF",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 83707
     },
     {
       "name": "Aimerz+ 1w3ts Med S1",
@@ -315,7 +323,8 @@
           "color": "#B5F5DF",
           "threshold": 190.0
         }
-      ]
+      ],
+      "leaderboard_id": 69295
     },
     {
       "name": "1w4t_vbr_pokeball Raspberry",
@@ -350,7 +359,8 @@
           "color": "#B5F5DF",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 4272
     },
     {
       "name": "Pokeball Frenzy Auto Small Wide",
@@ -385,7 +395,8 @@
           "color": "#B5F5DF",
           "threshold": 3810.0
         }
-      ]
+      ],
+      "leaderboard_id": 106
     },
     {
       "name": "10 Sphere Hipfire Extra Small",
@@ -420,7 +431,41 @@
           "color": "#B5F5DF",
           "threshold": 1960.0
         }
-      ]
+      ],
+      "leaderboard_id": 462
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsScreamingNastyRifle",
+    "kovaaks_benchmark_id": 819,
+    "rank_colors": [
+      [
+        "Prophet",
+        "#9E0059"
+      ],
+      [
+        "Saint",
+        "#5A189A"
+      ],
+      [
+        "Angelic",
+        "#0F4C5C"
+      ],
+      [
+        "Seraphic",
+        "#590D22"
+      ],
+      [
+        "Cherubim",
+        "#03071E"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:14.757859+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

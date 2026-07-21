@@ -40,7 +40,8 @@
           "color": "#AFF9BD",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 68391
     },
     {
       "name": "Aimerz+ hopClick Hard S1",
@@ -80,7 +81,8 @@
           "color": "#AFF9BD",
           "threshold": 1480.0
         }
-      ]
+      ],
+      "leaderboard_id": 68378
     },
     {
       "name": "Aimerz+ sunClick Hard S1",
@@ -120,7 +122,8 @@
           "color": "#AFF9BD",
           "threshold": 1080.0
         }
-      ]
+      ],
+      "leaderboard_id": 68298
     },
     {
       "name": "Aimerz+ ww2t Hard S1",
@@ -160,7 +163,8 @@
           "color": "#AFF9BD",
           "threshold": 195.0
         }
-      ]
+      ],
+      "leaderboard_id": 68389
     },
     {
       "name": "Aimerz+ 1w3ts Hard S1",
@@ -200,7 +204,8 @@
           "color": "#AFF9BD",
           "threshold": 186.0
         }
-      ]
+      ],
+      "leaderboard_id": 68293
     },
     {
       "name": "Aimerz+ 1w4ts HF Hard S1",
@@ -240,7 +245,8 @@
           "color": "#AFF9BD",
           "threshold": 250.0
         }
-      ]
+      ],
+      "leaderboard_id": 68287
     },
     {
       "name": "Aimerz+ Smoothbot Hard S1",
@@ -280,7 +286,8 @@
           "color": "#AFF9BD",
           "threshold": 5600.0
         }
-      ]
+      ],
+      "leaderboard_id": 68331
     },
     {
       "name": "Aimerz+ PTI Hard S1",
@@ -320,7 +327,8 @@
           "color": "#AFF9BD",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 68297
     },
     {
       "name": "Aimerz+ PreciseTrack Hard S1",
@@ -360,7 +368,8 @@
           "color": "#AFF9BD",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 68330
     },
     {
       "name": "Aimerz+ PipeTrack Hard S1",
@@ -400,7 +409,8 @@
           "color": "#AFF9BD",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 68328
     },
     {
       "name": "Aimerz+ VGS Hard S1",
@@ -440,7 +450,8 @@
           "color": "#AFF9BD",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 68332
     },
     {
       "name": "Aimerz+ VAS Hard S1",
@@ -480,7 +491,8 @@
           "color": "#AFF9BD",
           "threshold": 3725.0
         }
-      ]
+      ],
+      "leaderboard_id": 68304
     },
     {
       "name": "Aimerz+ pivoTS Hard S1",
@@ -520,7 +532,8 @@
           "color": "#AFF9BD",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 68313
     },
     {
       "name": "Aimerz+ nuTS Hard S1",
@@ -560,7 +573,8 @@
           "color": "#AFF9BD",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 68292
     },
     {
       "name": "Aimerz+ goaTS Hard S1",
@@ -600,7 +614,8 @@
           "color": "#AFF9BD",
           "threshold": 128.0
         }
-      ]
+      ],
+      "leaderboard_id": 68312
     },
     {
       "name": "Aimerz+ cheaTS Hard S1",
@@ -640,7 +655,8 @@
           "color": "#AFF9BD",
           "threshold": 82.0
         }
-      ]
+      ],
+      "leaderboard_id": 68294
     },
     {
       "name": "Aimerz+ hopTS Hard S1",
@@ -680,7 +696,8 @@
           "color": "#AFF9BD",
           "threshold": 97.0
         }
-      ]
+      ],
+      "leaderboard_id": 68311
     },
     {
       "name": "Aimerz+ caTS Hard S1",
@@ -720,7 +737,45 @@
           "color": "#AFF9BD",
           "threshold": 66.0
         }
-      ]
+      ],
+      "leaderboard_id": 68286
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGriefingGoldenrodQuest",
+    "kovaaks_benchmark_id": 636,
+    "rank_colors": [
+      [
+        "Acolyte",
+        "#FFA000"
+      ],
+      [
+        "Prophet",
+        "#9E0059"
+      ],
+      [
+        "Saint",
+        "#5A189A"
+      ],
+      [
+        "Angelic",
+        "#0F4C5C"
+      ],
+      [
+        "Seraphic",
+        "#590D22"
+      ],
+      [
+        "Cherubim",
+        "#03071E"
+      ],
+      [
+        "Transcendent",
+        "#AFF9BD"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:45.446583+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

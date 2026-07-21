@@ -35,7 +35,8 @@
           "color": "#62148f",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 184830
     },
     {
       "name": "Whisphere Viscose Expert",
@@ -70,7 +71,8 @@
           "color": "#62148f",
           "threshold": 22000.0
         }
-      ]
+      ],
+      "leaderboard_id": 185239
     },
     {
       "name": "SmoothBot Perfected Expert",
@@ -105,7 +107,8 @@
           "color": "#62148f",
           "threshold": 5400.0
         }
-      ]
+      ],
+      "leaderboard_id": 184832
     },
     {
       "name": "Leapstrafes Control wobin Expert",
@@ -140,7 +143,8 @@
           "color": "#62148f",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 185014
     },
     {
       "name": "Controlsphere SuperbAim Viscose Expert",
@@ -175,7 +179,8 @@
           "color": "#62148f",
           "threshold": 13500.0
         }
-      ]
+      ],
+      "leaderboard_id": 184836
     },
     {
       "name": "VT Controlsphere Viscose Expert",
@@ -210,7 +215,8 @@
           "color": "#62148f",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 184831
     },
     {
       "name": "Air Angelic 4 Voltaic Slightly Smaller",
@@ -245,7 +251,8 @@
           "color": "#62148f",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 184839
     },
     {
       "name": "cloverRawControl Viscose Expert 50cm",
@@ -280,7 +287,8 @@
           "color": "#62148f",
           "threshold": 10900.0
         }
-      ]
+      ],
+      "leaderboard_id": 184840
     },
     {
       "name": "Flower Expert 50cm",
@@ -315,7 +323,8 @@
           "color": "#62148f",
           "threshold": 4350.0
         }
-      ]
+      ],
+      "leaderboard_id": 184842
     },
     {
       "name": "PGTI Voltaic",
@@ -350,7 +359,8 @@
           "color": "#62148f",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 99
     },
     {
       "name": "Air CELESTIAL Expert",
@@ -385,7 +395,8 @@
           "color": "#62148f",
           "threshold": 899.0
         }
-      ]
+      ],
+      "leaderboard_id": 185401
     },
     {
       "name": "RawControlSphere Expert",
@@ -420,7 +431,8 @@
           "color": "#62148f",
           "threshold": 14100.0
         }
-      ]
+      ],
+      "leaderboard_id": 184846
     },
     {
       "name": "Ground Plaza Sparky V3 Thin",
@@ -455,7 +467,8 @@
           "color": "#62148f",
           "threshold": 906.0
         }
-      ]
+      ],
+      "leaderboard_id": 1408
     },
     {
       "name": "Air Spectral Harder",
@@ -490,7 +503,8 @@
           "color": "#62148f",
           "threshold": 929.0
         }
-      ]
+      ],
+      "leaderboard_id": 185018
     },
     {
       "name": "VT Aether Advanced S5 bot 1",
@@ -525,7 +539,8 @@
           "color": "#62148f",
           "threshold": 3550.0
         }
-      ]
+      ],
+      "leaderboard_id": 106773
     },
     {
       "name": "Plink Palace Hard",
@@ -560,7 +575,8 @@
           "color": "#62148f",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 184869
     },
     {
       "name": "Air Pure",
@@ -595,7 +611,8 @@
           "color": "#62148f",
           "threshold": 914.0
         }
-      ]
+      ],
+      "leaderboard_id": 13213
     },
     {
       "name": "Air Voltaic Invincible 4",
@@ -630,7 +647,8 @@
           "color": "#62148f",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 1092
     },
     {
       "name": "ww3t Voltaic 10% Smaller",
@@ -665,7 +683,8 @@
           "color": "#62148f",
           "threshold": 178.0
         }
-      ]
+      ],
+      "leaderboard_id": 92573
     },
     {
       "name": "voxTargetSwitch 2 20% Smaller",
@@ -700,7 +719,8 @@
           "color": "#62148f",
           "threshold": 139.0
         }
-      ]
+      ],
+      "leaderboard_id": 89093
     },
     {
       "name": "aimerz+ Static Switching",
@@ -735,7 +755,8 @@
           "color": "#62148f",
           "threshold": 163.0
         }
-      ]
+      ],
+      "leaderboard_id": 54520
     },
     {
       "name": "1w4ts Voltaic",
@@ -770,7 +791,8 @@
           "color": "#62148f",
           "threshold": 167.0
         }
-      ]
+      ],
+      "leaderboard_id": 319
     },
     {
       "name": "beanTS 200% Slightly Smaller",
@@ -805,7 +827,8 @@
           "color": "#62148f",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 185022
     },
     {
       "name": "StaticSwitchingVox xxSmall",
@@ -840,7 +863,8 @@
           "color": "#62148f",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 18203
     },
     {
       "name": "1w2ts reload smallflicks 25% smaller",
@@ -875,7 +899,8 @@
           "color": "#62148f",
           "threshold": 173.0
         }
-      ]
+      ],
+      "leaderboard_id": 32659
     },
     {
       "name": "eth Pasu Micro Expert",
@@ -910,7 +935,8 @@
           "color": "#62148f",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 185223
     },
     {
       "name": "waldoTS Elite",
@@ -945,7 +971,8 @@
           "color": "#62148f",
           "threshold": 172.0
         }
-      ]
+      ],
+      "leaderboard_id": 111257
     },
     {
       "name": "kinTS Voltaic Elite",
@@ -980,7 +1007,8 @@
           "color": "#62148f",
           "threshold": 93.0
         }
-      ]
+      ],
+      "leaderboard_id": 100251
     },
     {
       "name": "domiSwitch Harder",
@@ -1015,7 +1043,8 @@
           "color": "#62148f",
           "threshold": 7300.0
         }
-      ]
+      ],
+      "leaderboard_id": 185226
     },
     {
       "name": "B180T Voltaic 15% Smaller",
@@ -1050,7 +1079,8 @@
           "color": "#62148f",
           "threshold": 93.0
         }
-      ]
+      ],
+      "leaderboard_id": 16045
     },
     {
       "name": "Pasu Voltaic Reload 15% Smaller",
@@ -1085,7 +1115,8 @@
           "color": "#62148f",
           "threshold": 123.0
         }
-      ]
+      ],
+      "leaderboard_id": 185233
     },
     {
       "name": "VT Bounceshot Viscose Expert",
@@ -1120,7 +1151,8 @@
           "color": "#62148f",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 185236
     },
     {
       "name": "CatClick Harder",
@@ -1155,7 +1187,8 @@
           "color": "#62148f",
           "threshold": 104.0
         }
-      ]
+      ],
+      "leaderboard_id": 184865
     },
     {
       "name": "1w3ts Pasu Perfected Micro Goated 10% small",
@@ -1190,7 +1223,8 @@
           "color": "#62148f",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 172862
     },
     {
       "name": "Popcorn MV Advanced",
@@ -1225,7 +1259,8 @@
           "color": "#62148f",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 76966
     },
     {
       "name": "skyClick Goated Expert",
@@ -1260,7 +1295,8 @@
           "color": "#62148f",
           "threshold": 149.0
         }
-      ]
+      ],
+      "leaderboard_id": 185489
     },
     {
       "name": "VoxTS Click Hard",
@@ -1295,7 +1331,8 @@
           "color": "#62148f",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 136746
     },
     {
       "name": "VT Floating Heads Viscose Expert",
@@ -1330,7 +1367,8 @@
           "color": "#62148f",
           "threshold": 1180.0
         }
-      ]
+      ],
+      "leaderboard_id": 185221
     },
     {
       "name": "psalmTS Viscose Click Expert",
@@ -1365,7 +1403,8 @@
           "color": "#62148f",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 185607
     }
   ],
   "generated_from": {
@@ -1397,7 +1436,8 @@
         "#62148f"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:38.463972+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:44.553682+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

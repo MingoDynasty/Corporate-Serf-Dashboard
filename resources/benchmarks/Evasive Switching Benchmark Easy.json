@@ -40,7 +40,8 @@
           "color": "#B5F5DF",
           "threshold": 65.0
         }
-      ]
+      ],
+      "leaderboard_id": 92614
     },
     {
       "name": "tamTargetSwitch Smooth Hard 30% Larger",
@@ -80,7 +81,8 @@
           "color": "#B5F5DF",
           "threshold": 56.0
         }
-      ]
+      ],
+      "leaderboard_id": 96201
     },
     {
       "name": "Controlsphere TS 200% HP MORE BOTS",
@@ -120,7 +122,8 @@
           "color": "#B5F5DF",
           "threshold": 12450.0
         }
-      ]
+      ],
+      "leaderboard_id": 92674
     },
     {
       "name": "Smoothbot TS Voltaic Regen Hasin",
@@ -160,7 +163,8 @@
           "color": "#B5F5DF",
           "threshold": 63.0
         }
-      ]
+      ],
+      "leaderboard_id": 15084
     },
     {
       "name": "Pasu Switch Wide",
@@ -200,7 +204,8 @@
           "color": "#B5F5DF",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 48886
     },
     {
       "name": "domiSwitch Easy",
@@ -240,7 +245,8 @@
           "color": "#B5F5DF",
           "threshold": 9650.0
         }
-      ]
+      ],
+      "leaderboard_id": 83043
     },
     {
       "name": "Star Tracking Regen 40% Larger",
@@ -280,7 +286,8 @@
           "color": "#B5F5DF",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 92667
     },
     {
       "name": "Trippez Smooth Switching Regen Slow+",
@@ -320,7 +327,8 @@
           "color": "#B5F5DF",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 96204
     },
     {
       "name": "CircleTS Easy",
@@ -360,7 +368,8 @@
           "color": "#B5F5DF",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 96202
     },
     {
       "name": "darkSwitch Easy",
@@ -400,7 +409,8 @@
           "color": "#B5F5DF",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 92579
     },
     {
       "name": "Bounce 180 Tracking",
@@ -440,7 +450,8 @@
           "color": "#B5F5DF",
           "threshold": 136.0
         }
-      ]
+      ],
+      "leaderboard_id": 122
     },
     {
       "name": "Aimerz+ hopTS Med S1",
@@ -480,7 +491,8 @@
           "color": "#B5F5DF",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 69310
     }
   ],
   "generated_from": {
@@ -516,7 +528,8 @@
         "#B5F5DF"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:56.981096+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:11.712840+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

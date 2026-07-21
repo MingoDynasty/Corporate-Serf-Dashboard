@@ -15,7 +15,8 @@
           "color": "#FF8E86",
           "threshold": 23000.0
         }
-      ]
+      ],
+      "leaderboard_id": 2803
     },
     {
       "name": "Smooth Tracking a+ Easy",
@@ -30,7 +31,8 @@
           "color": "#FF8E86",
           "threshold": 10600.0
         }
-      ]
+      ],
+      "leaderboard_id": 26529
     },
     {
       "name": "e1se Smoothness EASY",
@@ -45,7 +47,8 @@
           "color": "#FF8E86",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 27196
     },
     {
       "name": "GP Far Long Strafes Easy",
@@ -60,7 +63,8 @@
           "color": "#FF8E86",
           "threshold": 5900.0
         }
-      ]
+      ],
+      "leaderboard_id": 11620
     },
     {
       "name": "GP Close Long Strafes Easy",
@@ -75,7 +79,8 @@
           "color": "#FF8E86",
           "threshold": 5900.0
         }
-      ]
+      ],
+      "leaderboard_id": 11637
     },
     {
       "name": "e1se Auto Balanced Long EASY",
@@ -90,7 +95,8 @@
           "color": "#FF8E86",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 27194
     },
     {
       "name": "Centering 90 Easy+ No Strafes",
@@ -105,7 +111,8 @@
           "color": "#FF8E86",
           "threshold": 19000.0
         }
-      ]
+      ],
+      "leaderboard_id": 7254
     },
     {
       "name": "Centering I Easy",
@@ -120,7 +127,25 @@
           "color": "#FF8E86",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1903
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsResettingScaredShotgun",
+    "kovaaks_benchmark_id": 693,
+    "rank_colors": [
+      [
+        "Proficient",
+        "#66FF94"
+      ],
+      [
+        "Master",
+        "#FF8E86"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:47.083542+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

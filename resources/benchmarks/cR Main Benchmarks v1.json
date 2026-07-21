@@ -45,7 +45,8 @@
           "color": "#990000",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128525
     },
     {
       "name": "vlav 1w2tes horizontal micro",
@@ -90,7 +91,8 @@
           "color": "#990000",
           "threshold": 210.0
         }
-      ]
+      ],
+      "leaderboard_id": 133255
     },
     {
       "name": "eth 1w4tes Micro",
@@ -135,7 +137,8 @@
           "color": "#990000",
           "threshold": 270.0
         }
-      ]
+      ],
+      "leaderboard_id": 66475
     },
     {
       "name": "headshot precision long distance 3 targets small",
@@ -180,7 +183,8 @@
           "color": "#990000",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 4249
     },
     {
       "name": "1W1T - VALORANT",
@@ -225,7 +229,8 @@
           "color": "#990000",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 72916
     },
     {
       "name": "Aimerz+ 1w4ts HF Hard S1",
@@ -270,7 +275,8 @@
           "color": "#990000",
           "threshold": 218.0
         }
-      ]
+      ],
+      "leaderboard_id": 68287
     },
     {
       "name": "5 Sphere Hipfire Extra Small",
@@ -315,7 +321,8 @@
           "color": "#990000",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 94
     },
     {
       "name": "cloverRawControl",
@@ -360,7 +367,8 @@
           "color": "#990000",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "Avasive bukeTrack Hard",
@@ -405,7 +413,8 @@
           "color": "#990000",
           "threshold": 8200.0
         }
-      ]
+      ],
+      "leaderboard_id": 125228
     },
     {
       "name": "Swing Tracking",
@@ -450,7 +459,8 @@
           "color": "#990000",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 92189
     },
     {
       "name": "VSTP Small TE",
@@ -495,7 +505,8 @@
           "color": "#990000",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 33081
     },
     {
       "name": "Centering II 90 No Strafes Fixed",
@@ -540,7 +551,8 @@
           "color": "#990000",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 33903
     },
     {
       "name": "Pasu Track Extrasmooth Small TE",
@@ -585,7 +597,8 @@
           "color": "#990000",
           "threshold": 7500.0
         }
-      ]
+      ],
+      "leaderboard_id": 32541
     },
     {
       "name": "GarfMicroTS",
@@ -630,7 +643,8 @@
           "color": "#990000",
           "threshold": 32.0
         }
-      ]
+      ],
+      "leaderboard_id": 40830
     },
     {
       "name": "domiSwitch",
@@ -675,7 +689,8 @@
           "color": "#990000",
           "threshold": 7000.0
         }
-      ]
+      ],
+      "leaderboard_id": 83035
     },
     {
       "name": "WhisphereRawControl",
@@ -720,7 +735,8 @@
           "color": "#990000",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 84199
     },
     {
       "name": "Controlsphere",
@@ -765,7 +781,8 @@
           "color": "#990000",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "Floating Heads Timing 400%",
@@ -810,7 +827,8 @@
           "color": "#990000",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 341
     },
     {
       "name": "Valorant Fireworks Flick Horizontal - Far",
@@ -855,7 +873,8 @@
           "color": "#990000",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 73729
     },
     {
       "name": "eth Didy - S",
@@ -900,7 +919,8 @@
           "color": "#990000",
           "threshold": 840.0
         }
-      ]
+      ],
+      "leaderboard_id": 79799
     },
     {
       "name": "VT SiniClick Valorant",
@@ -945,7 +965,8 @@
           "color": "#990000",
           "threshold": 122.0
         }
-      ]
+      ],
+      "leaderboard_id": 69597
     },
     {
       "name": "1w3ts Pasu Perfected Micro Goated",
@@ -990,7 +1011,8 @@
           "color": "#990000",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 65396
     },
     {
       "name": "Star Clicking Micro",
@@ -1035,7 +1057,8 @@
           "color": "#990000",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 129784
     }
   ],
   "generated_from": {
@@ -1075,7 +1098,8 @@
         "#990000"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:54.270167+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:55.428121+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

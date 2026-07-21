@@ -10,7 +10,8 @@
           "color": "#65F0D8",
           "threshold": 4405.0
         }
-      ]
+      ],
+      "leaderboard_id": 151114
     },
     {
       "name": "ElusiveStrafes",
@@ -20,7 +21,8 @@
           "color": "#65F0D8",
           "threshold": 4106.0
         }
-      ]
+      ],
+      "leaderboard_id": 151123
     },
     {
       "name": "IcyStrafes",
@@ -30,7 +32,8 @@
           "color": "#65F0D8",
           "threshold": 4159.0
         }
-      ]
+      ],
+      "leaderboard_id": 151116
     },
     {
       "name": "SnappyStrafes",
@@ -40,7 +43,8 @@
           "color": "#65F0D8",
           "threshold": 4056.0
         }
-      ]
+      ],
+      "leaderboard_id": 151362
     },
     {
       "name": "PlazaStrafes",
@@ -50,7 +54,8 @@
           "color": "#65F0D8",
           "threshold": 4301.0
         }
-      ]
+      ],
+      "leaderboard_id": 151138
     },
     {
       "name": "WiggleStrafes",
@@ -60,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 4480.0
         }
-      ]
+      ],
+      "leaderboard_id": 151337
     }
   ],
   "generated_from": {
@@ -72,7 +78,8 @@
         "#65F0D8"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:36.537998+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:41.340709+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

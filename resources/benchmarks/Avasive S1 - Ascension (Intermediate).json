@@ -30,7 +30,8 @@
           "color": "#5A189A",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 137076
     },
     {
       "name": "Smoothsphere Glider",
@@ -60,7 +61,8 @@
           "color": "#5A189A",
           "threshold": 3925.0
         }
-      ]
+      ],
+      "leaderboard_id": 136516
     },
     {
       "name": "Avasphere Intermediate",
@@ -90,7 +92,8 @@
           "color": "#5A189A",
           "threshold": 3425.0
         }
-      ]
+      ],
+      "leaderboard_id": 134660
     },
     {
       "name": "Airva Control",
@@ -120,7 +123,8 @@
           "color": "#5A189A",
           "threshold": 3375.0
         }
-      ]
+      ],
+      "leaderboard_id": 136867
     },
     {
       "name": "AvaTrack Ground Flicker",
@@ -150,7 +154,8 @@
           "color": "#5A189A",
           "threshold": 2525.0
         }
-      ]
+      ],
+      "leaderboard_id": 138188
     },
     {
       "name": "cuteTrack",
@@ -180,7 +185,8 @@
           "color": "#5A189A",
           "threshold": 2750.0
         }
-      ]
+      ],
+      "leaderboard_id": 137187
     },
     {
       "name": "SilkyTS",
@@ -210,7 +216,8 @@
           "color": "#5A189A",
           "threshold": 610.0
         }
-      ]
+      ],
+      "leaderboard_id": 137845
     },
     {
       "name": "TrixieSwitch",
@@ -240,7 +247,8 @@
           "color": "#5A189A",
           "threshold": 540.0
         }
-      ]
+      ],
+      "leaderboard_id": 137872
     },
     {
       "name": "AvomiTS",
@@ -270,7 +278,8 @@
           "color": "#5A189A",
           "threshold": 4550.0
         }
-      ]
+      ],
+      "leaderboard_id": 135319
     },
     {
       "name": "avaSwitch",
@@ -300,7 +309,8 @@
           "color": "#5A189A",
           "threshold": 570.0
         }
-      ]
+      ],
+      "leaderboard_id": 137528
     },
     {
       "name": "Avasive Speed Switch",
@@ -330,7 +340,8 @@
           "color": "#5A189A",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 122579
     },
     {
       "name": "AviaTS",
@@ -360,7 +371,8 @@
           "color": "#5A189A",
           "threshold": 980.0
         }
-      ]
+      ],
+      "leaderboard_id": 137071
     },
     {
       "name": "Avomi ww4t",
@@ -390,7 +402,8 @@
           "color": "#5A189A",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 136890
     },
     {
       "name": "Avasive 1w3ts",
@@ -420,7 +433,8 @@
           "color": "#5A189A",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 136896
     },
     {
       "name": "miaoClick",
@@ -450,7 +464,8 @@
           "color": "#5A189A",
           "threshold": 610.0
         }
-      ]
+      ],
+      "leaderboard_id": 136485
     },
     {
       "name": "B180 Avasive",
@@ -480,7 +495,8 @@
           "color": "#5A189A",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 137542
     },
     {
       "name": "domiClick",
@@ -510,7 +526,8 @@
           "color": "#5A189A",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 136911
     },
     {
       "name": "MadClick",
@@ -540,7 +557,37 @@
           "color": "#5A189A",
           "threshold": 820.0
         }
-      ]
+      ],
+      "leaderboard_id": 136903
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTimewarpingPeachMomentum",
+    "kovaaks_benchmark_id": 739,
+    "rank_colors": [
+      [
+        "Pigeon",
+        "#E0AAFF"
+      ],
+      [
+        "Heron",
+        "#C77DFF"
+      ],
+      [
+        "Owl",
+        "#9D4EDD"
+      ],
+      [
+        "Hawk",
+        "#7B2CBF"
+      ],
+      [
+        "Swan",
+        "#5A189A"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:59.786926+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

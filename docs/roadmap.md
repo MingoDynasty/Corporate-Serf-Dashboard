@@ -85,6 +85,13 @@ Design rationale for shipped work lives in
   something a non-technical player can do.
   (PRs #154, #155, #158, #159, #163; design in #150) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
+- **Leaderboard-ID seeding** — the bundled benchmark corpus now embeds each
+  scenario's KovaaK's leaderboard ID, and the app seeds them into the permanent
+  name→ID mapping cache at startup. First opens of unfamiliar bundled playlists
+  no longer fan out over the slow exact-name search endpoint, and ID resolution
+  no longer needs a configured username — the enabling work the user-independent
+  totals proposal builds on. (PR #169) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 
 ---
 

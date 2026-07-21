@@ -25,7 +25,8 @@
           "color": "#6B0000",
           "threshold": 1620.0
         }
-      ]
+      ],
+      "leaderboard_id": 176908
     },
     {
       "name": "DM ww2t S3",
@@ -50,7 +51,8 @@
           "color": "#6B0000",
           "threshold": 1740.0
         }
-      ]
+      ],
+      "leaderboard_id": 176937
     },
     {
       "name": "DM 1w3ts S3",
@@ -75,7 +77,8 @@
           "color": "#6B0000",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 177040
     },
     {
       "name": "DM ww3t S3",
@@ -100,7 +103,8 @@
           "color": "#6B0000",
           "threshold": 1790.0
         }
-      ]
+      ],
+      "leaderboard_id": 177041
     },
     {
       "name": "DM 1w4ts S3",
@@ -125,7 +129,8 @@
           "color": "#6B0000",
           "threshold": 1710.0
         }
-      ]
+      ],
+      "leaderboard_id": 177042
     },
     {
       "name": "DM ww4t S3",
@@ -150,7 +155,8 @@
           "color": "#6B0000",
           "threshold": 1830.0
         }
-      ]
+      ],
+      "leaderboard_id": 176999
     },
     {
       "name": "DM 1w5ts S3",
@@ -175,7 +181,8 @@
           "color": "#6B0000",
           "threshold": 1740.0
         }
-      ]
+      ],
+      "leaderboard_id": 177043
     },
     {
       "name": "DM ww5t S3",
@@ -200,7 +207,8 @@
           "color": "#6B0000",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 177044
     },
     {
       "name": "DM 1w6ts S3",
@@ -225,7 +233,8 @@
           "color": "#6B0000",
           "threshold": 1760.0
         }
-      ]
+      ],
+      "leaderboard_id": 177045
     },
     {
       "name": "DM ww6t S3",
@@ -250,7 +259,8 @@
           "color": "#6B0000",
           "threshold": 1880.0
         }
-      ]
+      ],
+      "leaderboard_id": 177046
     }
   ],
   "generated_from": {
@@ -274,7 +284,8 @@
         "#6B0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:38.540885+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:50.229597+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

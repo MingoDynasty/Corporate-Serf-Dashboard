@@ -55,7 +55,8 @@
           "color": "#ff0000",
           "threshold": 246.0
         }
-      ]
+      ],
+      "leaderboard_id": 1678
     },
     {
       "name": "Floating Heads Timing 400% Larger",
@@ -110,7 +111,8 @@
           "color": "#ff0000",
           "threshold": 5326.0
         }
-      ]
+      ],
+      "leaderboard_id": 1607
     },
     {
       "name": "Close Evasive Pure",
@@ -165,7 +167,8 @@
           "color": "#ff0000",
           "threshold": 5050.0
         }
-      ]
+      ],
+      "leaderboard_id": 85
     },
     {
       "name": "Cata IC Long Strafes Thin",
@@ -220,7 +223,8 @@
           "color": "#ff0000",
           "threshold": 10399.0
         }
-      ]
+      ],
+      "leaderboard_id": 1599
     },
     {
       "name": "patTargetSwitch Small No Reload",
@@ -275,7 +279,8 @@
           "color": "#ff0000",
           "threshold": 7458.0
         }
-      ]
+      ],
+      "leaderboard_id": 28
     },
     {
       "name": "kinTS NR",
@@ -330,7 +335,8 @@
           "color": "#ff0000",
           "threshold": 26938.0
         }
-      ]
+      ],
+      "leaderboard_id": 941
     }
   ],
   "generated_from": {
@@ -378,7 +384,8 @@
         "#ff0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:39.419534+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:47.723378+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

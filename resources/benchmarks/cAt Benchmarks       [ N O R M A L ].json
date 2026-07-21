@@ -25,7 +25,8 @@
           "color": "#EEB462",
           "threshold": 1320.0
         }
-      ]
+      ],
+      "leaderboard_id": 80982
     },
     {
       "name": "cAt 5 cats micro",
@@ -50,7 +51,8 @@
           "color": "#EEB462",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 80822
     },
     {
       "name": "cAt 4 cats",
@@ -75,7 +77,8 @@
           "color": "#EEB462",
           "threshold": 1180.0
         }
-      ]
+      ],
+      "leaderboard_id": 80980
     },
     {
       "name": "cAt purrClick Normal",
@@ -100,7 +103,8 @@
           "color": "#EEB462",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 83323
     },
     {
       "name": "cAt pawClick Normal",
@@ -125,7 +129,8 @@
           "color": "#EEB462",
           "threshold": 670.0
         }
-      ]
+      ],
+      "leaderboard_id": 83383
     },
     {
       "name": "cAt yarnClick Normal",
@@ -150,7 +155,8 @@
           "color": "#EEB462",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 83378
     },
     {
       "name": "cAt laserTrack Normal",
@@ -175,7 +181,8 @@
           "color": "#EEB462",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 83394
     },
     {
       "name": "cAt meowTrack Normal",
@@ -200,7 +207,8 @@
           "color": "#EEB462",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 83390
     },
     {
       "name": "cAt yarnTrack Normal",
@@ -225,7 +233,8 @@
           "color": "#EEB462",
           "threshold": 4650.0
         }
-      ]
+      ],
+      "leaderboard_id": 83319
     },
     {
       "name": "cAt sausageTrack Normal",
@@ -250,7 +259,8 @@
           "color": "#EEB462",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 83321
     },
     {
       "name": "cAt fluffyTrack Normal",
@@ -275,7 +285,8 @@
           "color": "#EEB462",
           "threshold": 2650.0
         }
-      ]
+      ],
+      "leaderboard_id": 83386
     },
     {
       "name": "cAt furTrack Normal",
@@ -300,7 +311,8 @@
           "color": "#EEB462",
           "threshold": 2100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83387
     },
     {
       "name": "cAt mealSwitch Normal",
@@ -325,7 +337,8 @@
           "color": "#EEB462",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 83329
     },
     {
       "name": "cAt tabbySwitch Normal",
@@ -350,7 +363,8 @@
           "color": "#EEB462",
           "threshold": 1230.0
         }
-      ]
+      ],
+      "leaderboard_id": 83333
     },
     {
       "name": "cAt wobbleSwitch Normal",
@@ -375,7 +389,8 @@
           "color": "#EEB462",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 83336
     },
     {
       "name": "cAt tailSwitch Normal",
@@ -400,7 +415,8 @@
           "color": "#EEB462",
           "threshold": 450.0
         }
-      ]
+      ],
+      "leaderboard_id": 83398
     },
     {
       "name": "cAt snortSwitch Normal",
@@ -425,7 +441,8 @@
           "color": "#EEB462",
           "threshold": 460.0
         }
-      ]
+      ],
+      "leaderboard_id": 83416
     },
     {
       "name": "cAt yarnSwitch Normal",
@@ -450,7 +467,33 @@
           "color": "#EEB462",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 83320
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBlinkingOrangeCrossfire",
+    "kovaaks_benchmark_id": 830,
+    "rank_colors": [
+      [
+        "Lynx",
+        "#DC8665"
+      ],
+      [
+        "Jaguar",
+        "#6C5E82"
+      ],
+      [
+        "Lion",
+        "#1E8F95"
+      ],
+      [
+        "Tiger",
+        "#EEB462"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:14.986378+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

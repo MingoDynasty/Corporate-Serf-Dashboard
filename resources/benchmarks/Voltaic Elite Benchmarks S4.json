@@ -35,7 +35,8 @@
           "color": "#351C75",
           "threshold": 1190.0
         }
-      ]
+      ],
+      "leaderboard_id": 86794
     },
     {
       "name": "VT Bounceshot Elite",
@@ -70,7 +71,8 @@
           "color": "#351C75",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 86805
     },
     {
       "name": "VT 1w2ts Rasp Elite",
@@ -105,7 +107,8 @@
           "color": "#351C75",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 86795
     },
     {
       "name": "VT Multiclick 180 Elite",
@@ -140,7 +143,8 @@
           "color": "#351C75",
           "threshold": 1970.0
         }
-      ]
+      ],
+      "leaderboard_id": 86801
     },
     {
       "name": "VT AngleStrafe Elite",
@@ -175,7 +179,8 @@
           "color": "#351C75",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 86796
     },
     {
       "name": "VT ArcStrafe Elite",
@@ -210,7 +215,8 @@
           "color": "#351C75",
           "threshold": 1290.0
         }
-      ]
+      ],
+      "leaderboard_id": 86806
     },
     {
       "name": "VT Smoothbot Elite",
@@ -245,7 +251,8 @@
           "color": "#351C75",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 86807
     },
     {
       "name": "VT PreciseOrb Elite",
@@ -280,7 +287,8 @@
           "color": "#351C75",
           "threshold": 3415.0
         }
-      ]
+      ],
+      "leaderboard_id": 86797
     },
     {
       "name": "VT Plaza Elite",
@@ -315,7 +323,8 @@
           "color": "#351C75",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 86815
     },
     {
       "name": "VT Air Elite",
@@ -350,7 +359,8 @@
           "color": "#351C75",
           "threshold": 3475.0
         }
-      ]
+      ],
+      "leaderboard_id": 86816
     },
     {
       "name": "VT PatStrafe Elite",
@@ -385,7 +395,8 @@
           "color": "#351C75",
           "threshold": 3580.0
         }
-      ]
+      ],
+      "leaderboard_id": 75837
     },
     {
       "name": "VT AirStrafe Elite",
@@ -420,7 +431,8 @@
           "color": "#351C75",
           "threshold": 3655.0
         }
-      ]
+      ],
+      "leaderboard_id": 86817
     },
     {
       "name": "VT psalmTS Elite",
@@ -455,7 +467,8 @@
           "color": "#351C75",
           "threshold": 1290.0
         }
-      ]
+      ],
+      "leaderboard_id": 86818
     },
     {
       "name": "VT skyTS Elite",
@@ -490,7 +503,8 @@
           "color": "#351C75",
           "threshold": 1640.0
         }
-      ]
+      ],
+      "leaderboard_id": 86810
     },
     {
       "name": "VT evaTS Elite",
@@ -525,7 +539,8 @@
           "color": "#351C75",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 86809
     },
     {
       "name": "VT bounceTS Elite",
@@ -560,7 +575,8 @@
           "color": "#351C75",
           "threshold": 1090.0
         }
-      ]
+      ],
+      "leaderboard_id": 86808
     }
   ],
   "generated_from": {
@@ -592,7 +608,8 @@
         "#351C75"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:24.264957+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:06:35.418640+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

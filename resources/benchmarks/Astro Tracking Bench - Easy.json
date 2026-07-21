@@ -25,7 +25,8 @@
           "color": "#e1f5ff",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 11939
     },
     {
       "name": "Smoothbot Pauer Glider Level 1",
@@ -50,7 +51,8 @@
           "color": "#e1f5ff",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 106199
     },
     {
       "name": "Avasive Horizontal Track Easy",
@@ -75,7 +77,8 @@
           "color": "#e1f5ff",
           "threshold": 8750.0
         }
-      ]
+      ],
+      "leaderboard_id": 131131
     },
     {
       "name": "CB SmoothTrack VERY EASY",
@@ -100,7 +103,8 @@
           "color": "#e1f5ff",
           "threshold": 2600.0
         }
-      ]
+      ],
+      "leaderboard_id": 97447
     },
     {
       "name": "VT Snake Track Novice S5 Hard",
@@ -125,7 +129,8 @@
           "color": "#e1f5ff",
           "threshold": 2775.0
         }
-      ]
+      ],
+      "leaderboard_id": 104620
     },
     {
       "name": "Controlsphere Diamond",
@@ -150,7 +155,8 @@
           "color": "#e1f5ff",
           "threshold": 9000.0
         }
-      ]
+      ],
+      "leaderboard_id": 11932
     },
     {
       "name": "Avasphere Novice",
@@ -175,7 +181,8 @@
           "color": "#e1f5ff",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 134667
     },
     {
       "name": "VT Raw Control Novice S5 Hard",
@@ -200,7 +207,8 @@
           "color": "#e1f5ff",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 106739
     },
     {
       "name": "Whisphere 80%",
@@ -225,7 +233,8 @@
           "color": "#e1f5ff",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 55382
     },
     {
       "name": "Avasive bukeTrack Easy",
@@ -250,7 +259,8 @@
           "color": "#e1f5ff",
           "threshold": 7250.0
         }
-      ]
+      ],
+      "leaderboard_id": 130665
     },
     {
       "name": "cloverRawControl - LVL 1",
@@ -275,7 +285,8 @@
           "color": "#e1f5ff",
           "threshold": 7600.0
         }
-      ]
+      ],
+      "leaderboard_id": 113777
     },
     {
       "name": "Controlsphere Far, Far Larger 90%",
@@ -300,7 +311,8 @@
           "color": "#e1f5ff",
           "threshold": 8500.0
         }
-      ]
+      ],
+      "leaderboard_id": 128692
     },
     {
       "name": "AmareRawControl Brent1",
@@ -325,7 +337,8 @@
           "color": "#e1f5ff",
           "threshold": 7250.0
         }
-      ]
+      ],
+      "leaderboard_id": 91388
     },
     {
       "name": "Air CELESTIAL No UFO Easy Slowed",
@@ -350,7 +363,8 @@
           "color": "#e1f5ff",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 131872
     },
     {
       "name": "VT Ground Novice S5 Hard",
@@ -375,7 +389,8 @@
           "color": "#e1f5ff",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 107511
     },
     {
       "name": "Air Angelic rAim Biggest",
@@ -400,7 +415,8 @@
           "color": "#e1f5ff",
           "threshold": 893.0
         }
-      ]
+      ],
+      "leaderboard_id": 12233
     },
     {
       "name": "Ground Plaza Sparky v3 Easy",
@@ -425,7 +441,33 @@
           "color": "#e1f5ff",
           "threshold": 875.0
         }
-      ]
+      ],
+      "leaderboard_id": 134502
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRevolvingDinkedLoadout",
+    "kovaaks_benchmark_id": 713,
+    "rank_colors": [
+      [
+        "Copper",
+        "#d99b5d"
+      ],
+      [
+        "Iron",
+        "#e2e7f1"
+      ],
+      [
+        "Brass",
+        "#d8c44f"
+      ],
+      [
+        "Silica",
+        "#e1f5ff"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:51.879063+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

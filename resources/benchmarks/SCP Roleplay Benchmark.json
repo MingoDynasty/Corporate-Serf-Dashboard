@@ -50,7 +50,8 @@
           "color": "#951379",
           "threshold": 13600.0
         }
-      ]
+      ],
+      "leaderboard_id": 198646
     },
     {
       "name": "SCP RP SmoothBot Perfected",
@@ -100,7 +101,8 @@
           "color": "#951379",
           "threshold": 5025.0
         }
-      ]
+      ],
+      "leaderboard_id": 198645
     },
     {
       "name": "SCP RP Whisphere",
@@ -150,7 +152,8 @@
           "color": "#951379",
           "threshold": 18500.0
         }
-      ]
+      ],
+      "leaderboard_id": 198647
     },
     {
       "name": "SCP RP Air Angelic",
@@ -200,7 +203,8 @@
           "color": "#951379",
           "threshold": 5100.0
         }
-      ]
+      ],
+      "leaderboard_id": 198636
     },
     {
       "name": "SCP RP RawControlSphere",
@@ -250,7 +254,8 @@
           "color": "#951379",
           "threshold": 13200.0
         }
-      ]
+      ],
+      "leaderboard_id": 198644
     },
     {
       "name": "SCP RP B180TI Sparki",
@@ -300,7 +305,8 @@
           "color": "#951379",
           "threshold": 5500.0
         }
-      ]
+      ],
+      "leaderboard_id": 199118
     },
     {
       "name": "SCP RP Close Tappy Strafes",
@@ -350,7 +356,8 @@
           "color": "#951379",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 198638
     },
     {
       "name": "SCP RP Narrow Strafe",
@@ -400,7 +407,8 @@
           "color": "#951379",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 198643
     },
     {
       "name": "SCP RP Kindafar Long Strafes",
@@ -450,7 +458,8 @@
           "color": "#951379",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 198642
     }
   ],
   "generated_from": {
@@ -494,7 +503,8 @@
         "#951379"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:29.362386+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:05.974508+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

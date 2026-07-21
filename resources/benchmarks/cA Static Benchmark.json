@@ -40,7 +40,8 @@
           "color": "#24DDD8",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 94345
     },
     {
       "name": "cA y-axis flick",
@@ -80,7 +81,8 @@
           "color": "#24DDD8",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 94344
     },
     {
       "name": "cA 2ts wideflick",
@@ -120,7 +122,8 @@
           "color": "#24DDD8",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 94275
     },
     {
       "name": "cA 4ts horizontal",
@@ -160,7 +163,8 @@
           "color": "#24DDD8",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 94287
     },
     {
       "name": "cA micropressure",
@@ -200,7 +204,8 @@
           "color": "#24DDD8",
           "threshold": 220.0
         }
-      ]
+      ],
+      "leaderboard_id": 94271
     },
     {
       "name": "cA 5ts vibrate",
@@ -240,7 +245,8 @@
           "color": "#24DDD8",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 98486
     },
     {
       "name": "cA 1ts ruohong",
@@ -280,7 +286,8 @@
           "color": "#24DDD8",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 94276
     },
     {
       "name": "cA fuglaapressure",
@@ -320,7 +327,8 @@
           "color": "#24DDD8",
           "threshold": 190.0
         }
-      ]
+      ],
+      "leaderboard_id": 94284
     },
     {
       "name": "cA 3ts precise",
@@ -360,7 +368,8 @@
           "color": "#24DDD8",
           "threshold": 172.0
         }
-      ]
+      ],
+      "leaderboard_id": 98210
     },
     {
       "name": "cA 4ts pokeball",
@@ -400,7 +409,8 @@
           "color": "#24DDD8",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 94714
     },
     {
       "name": "cA 900targets",
@@ -440,7 +450,8 @@
           "color": "#24DDD8",
           "threshold": 210.0
         }
-      ]
+      ],
+      "leaderboard_id": 96440
     },
     {
       "name": "cA sixshot",
@@ -480,7 +491,8 @@
           "color": "#24DDD8",
           "threshold": 194.0
         }
-      ]
+      ],
+      "leaderboard_id": 94716
     },
     {
       "name": "cA voxTSs smaller",
@@ -520,7 +532,8 @@
           "color": "#24DDD8",
           "threshold": 210.0
         }
-      ]
+      ],
+      "leaderboard_id": 94311
     },
     {
       "name": "cA 7ts pressure",
@@ -560,7 +573,8 @@
           "color": "#24DDD8",
           "threshold": 187.0
         }
-      ]
+      ],
+      "leaderboard_id": 96432
     }
   ],
   "generated_from": {
@@ -596,7 +610,8 @@
         "#24DDD8"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:48.290459+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:06:48.888856+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -25,7 +25,8 @@
           "color": "#00ffb3",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 815
     },
     {
       "name": "Frog House Revolving 50% smaller",
@@ -50,7 +51,8 @@
           "color": "#00ffb3",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 77778
     },
     {
       "name": "PGTI Voltaic",
@@ -75,7 +77,8 @@
           "color": "#00ffb3",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 99
     },
     {
       "name": "tamTargetSwitch Smooth Hard",
@@ -100,7 +103,8 @@
           "color": "#00ffb3",
           "threshold": 30.0
         }
-      ]
+      ],
+      "leaderboard_id": 727
     },
     {
       "name": "VT evaTS Advanced",
@@ -125,7 +129,8 @@
           "color": "#00ffb3",
           "threshold": 700.0
         }
-      ]
+      ],
+      "leaderboard_id": 25181
     },
     {
       "name": "Frog House Smoother 50% smaller",
@@ -150,7 +155,8 @@
           "color": "#00ffb3",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 77082
     },
     {
       "name": "MFSI v3 Raspberry",
@@ -175,7 +181,8 @@
           "color": "#00ffb3",
           "threshold": 7000.0
         }
-      ]
+      ],
+      "leaderboard_id": 8735
     },
     {
       "name": "VT Ground Advanced S5 Bot 3",
@@ -200,7 +207,8 @@
           "color": "#00ffb3",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 106732
     },
     {
       "name": "Close Fast Strafes Invincible Precise+",
@@ -225,7 +233,8 @@
           "color": "#00ffb3",
           "threshold": 9500.0
         }
-      ]
+      ],
+      "leaderboard_id": 1343
     }
   ],
   "generated_from": {
@@ -249,7 +258,8 @@
         "#00ffb3"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:23.849090+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:00.477178+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

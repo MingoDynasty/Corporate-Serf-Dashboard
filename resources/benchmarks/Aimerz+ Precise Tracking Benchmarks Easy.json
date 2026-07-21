@@ -40,7 +40,8 @@
           "color": "#B5F5DF",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 85148
     },
     {
       "name": "Deceptive Tracking XYZ Easy",
@@ -80,7 +81,8 @@
           "color": "#B5F5DF",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 84931
     },
     {
       "name": "Smoothbot Pauer Easy",
@@ -120,7 +122,8 @@
           "color": "#B5F5DF",
           "threshold": 7400.0
         }
-      ]
+      ],
+      "leaderboard_id": 4878
     },
     {
       "name": "cloverRawControl Big",
@@ -160,7 +163,8 @@
           "color": "#B5F5DF",
           "threshold": 17100.0
         }
-      ]
+      ],
+      "leaderboard_id": 69579
     },
     {
       "name": "Leapstrafes Control Medium",
@@ -200,7 +204,8 @@
           "color": "#B5F5DF",
           "threshold": 20500.0
         }
-      ]
+      ],
+      "leaderboard_id": 63065
     },
     {
       "name": "Aimerz+ PreciseTrack Med S1",
@@ -240,7 +245,8 @@
           "color": "#B5F5DF",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 69248
     },
     {
       "name": "Centering II 180 Fixed Larger",
@@ -280,7 +286,8 @@
           "color": "#B5F5DF",
           "threshold": 19000.0
         }
-      ]
+      ],
+      "leaderboard_id": 84930
     },
     {
       "name": "tamAngleSmoothness Easier",
@@ -320,7 +327,8 @@
           "color": "#B5F5DF",
           "threshold": 3250.0
         }
-      ]
+      ],
+      "leaderboard_id": 83451
     },
     {
       "name": "Controlsphere",
@@ -360,7 +368,8 @@
           "color": "#B5F5DF",
           "threshold": 16000.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "Whisphere Med 60s",
@@ -400,7 +409,8 @@
           "color": "#B5F5DF",
           "threshold": 28500.0
         }
-      ]
+      ],
+      "leaderboard_id": 84929
     },
     {
       "name": "Aimerz+ PTI Med S1",
@@ -440,7 +450,8 @@
           "color": "#B5F5DF",
           "threshold": 5050.0
         }
-      ]
+      ],
+      "leaderboard_id": 69247
     },
     {
       "name": "Bouncesphere Smoothness",
@@ -480,7 +491,45 @@
           "color": "#B5F5DF",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 28488
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDinkingForestgreenPrecision",
+    "kovaaks_benchmark_id": 593,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#A77138"
+      ],
+      [
+        "Silver",
+        "#C2D2D2"
+      ],
+      [
+        "Gold",
+        "#C4A12A"
+      ],
+      [
+        "Platinum",
+        "#00B3A5"
+      ],
+      [
+        "Diamond",
+        "#81D1FF"
+      ],
+      [
+        "Acolyte",
+        "#FFA000"
+      ],
+      [
+        "Transcendent",
+        "#B5F5DF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:09.898511+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -50,7 +50,8 @@
           "color": "#24252d",
           "threshold": 179.0
         }
-      ]
+      ],
+      "leaderboard_id": 188296
     },
     {
       "name": "SCS 3L Wide",
@@ -100,7 +101,8 @@
           "color": "#24252d",
           "threshold": 186.0
         }
-      ]
+      ],
+      "leaderboard_id": 188303
     },
     {
       "name": "SCS 4L Wide",
@@ -150,7 +152,8 @@
           "color": "#24252d",
           "threshold": 184.0
         }
-      ]
+      ],
+      "leaderboard_id": 188304
     },
     {
       "name": "SCS 3m Dynamic",
@@ -200,7 +203,8 @@
           "color": "#24252d",
           "threshold": 176.0
         }
-      ]
+      ],
+      "leaderboard_id": 188305
     },
     {
       "name": "SCS 5m Dynamic",
@@ -250,7 +254,8 @@
           "color": "#24252d",
           "threshold": 191.0
         }
-      ]
+      ],
+      "leaderboard_id": 188306
     },
     {
       "name": "SCS 3s Wide",
@@ -300,7 +305,8 @@
           "color": "#24252d",
           "threshold": 163.0
         }
-      ]
+      ],
+      "leaderboard_id": 188307
     },
     {
       "name": "SCS 6s Wide",
@@ -350,7 +356,8 @@
           "color": "#24252d",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 188308
     },
     {
       "name": "SCS 6s",
@@ -400,7 +407,8 @@
           "color": "#24252d",
           "threshold": 181.0
         }
-      ]
+      ],
+      "leaderboard_id": 188145
     },
     {
       "name": "SCS 4s",
@@ -450,7 +458,8 @@
           "color": "#24252d",
           "threshold": 171.0
         }
-      ]
+      ],
+      "leaderboard_id": 188309
     },
     {
       "name": "SCS 2s",
@@ -500,7 +509,8 @@
           "color": "#24252d",
           "threshold": 164.0
         }
-      ]
+      ],
+      "leaderboard_id": 188311
     },
     {
       "name": "SCS 6s Narrow",
@@ -550,7 +560,8 @@
           "color": "#24252d",
           "threshold": 209.0
         }
-      ]
+      ],
+      "leaderboard_id": 188312
     },
     {
       "name": "SCS 15xs Narrow",
@@ -600,7 +611,8 @@
           "color": "#24252d",
           "threshold": 184.0
         }
-      ]
+      ],
+      "leaderboard_id": 188320
     },
     {
       "name": "SCS 8xs Uniform",
@@ -650,7 +662,8 @@
           "color": "#24252d",
           "threshold": 161.0
         }
-      ]
+      ],
+      "leaderboard_id": 188314
     },
     {
       "name": "SCS 6xs",
@@ -700,7 +713,8 @@
           "color": "#24252d",
           "threshold": 164.0
         }
-      ]
+      ],
+      "leaderboard_id": 188315
     },
     {
       "name": "SCS 4xs Dynamic",
@@ -750,7 +764,8 @@
           "color": "#24252d",
           "threshold": 171.0
         }
-      ]
+      ],
+      "leaderboard_id": 188319
     },
     {
       "name": "SCS 2v",
@@ -800,7 +815,8 @@
           "color": "#24252d",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 188791
     },
     {
       "name": "SCS 5v Wide",
@@ -850,7 +866,8 @@
           "color": "#24252d",
           "threshold": 188.0
         }
-      ]
+      ],
+      "leaderboard_id": 188939
     },
     {
       "name": "SCS 8v Wide",
@@ -900,7 +917,8 @@
           "color": "#24252d",
           "threshold": 169.0
         }
-      ]
+      ],
+      "leaderboard_id": 188795
     }
   ],
   "generated_from": {
@@ -944,7 +962,8 @@
         "#24252d"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:41.444574+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:50.270226+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

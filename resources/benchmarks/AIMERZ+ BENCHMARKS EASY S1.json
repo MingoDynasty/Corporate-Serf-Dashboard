@@ -35,7 +35,8 @@
           "color": "#81D1FF",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 68431
     },
     {
       "name": "Aimerz+ hopClick Easy S1",
@@ -70,7 +71,8 @@
           "color": "#81D1FF",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 68428
     },
     {
       "name": "Aimerz+ sunClick Easy S1",
@@ -105,7 +107,8 @@
           "color": "#81D1FF",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 68434
     },
     {
       "name": "Aimerz+ ww2t Easy S1",
@@ -140,7 +143,8 @@
           "color": "#81D1FF",
           "threshold": 122.0
         }
-      ]
+      ],
+      "leaderboard_id": 68458
     },
     {
       "name": "Aimerz+ 1w3ts Easy S1",
@@ -175,7 +179,8 @@
           "color": "#81D1FF",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 68424
     },
     {
       "name": "Aimerz+ 1w4ts HF Easy S1",
@@ -210,7 +215,8 @@
           "color": "#81D1FF",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 68425
     },
     {
       "name": "Aimerz+ Smoothbot Easy S1",
@@ -245,7 +251,8 @@
           "color": "#81D1FF",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 68338
     },
     {
       "name": "Aimerz+ PTI Easy S1",
@@ -280,7 +287,8 @@
           "color": "#81D1FF",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 68336
     },
     {
       "name": "Aimerz+ PreciseTrack Easy S1",
@@ -315,7 +323,8 @@
           "color": "#81D1FF",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 68361
     },
     {
       "name": "Aimerz+ PipeTrack Easy S1",
@@ -350,7 +359,8 @@
           "color": "#81D1FF",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 68360
     },
     {
       "name": "Aimerz+ VGS Easy S1",
@@ -385,7 +395,8 @@
           "color": "#81D1FF",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 68358
     },
     {
       "name": "Aimerz+ VAS Easy S1",
@@ -420,7 +431,8 @@
           "color": "#81D1FF",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 68305
     },
     {
       "name": "Aimerz+ pivoTS Easy S1",
@@ -455,7 +467,8 @@
           "color": "#81D1FF",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 68432
     },
     {
       "name": "Aimerz+ nuTS Easy S1",
@@ -490,7 +503,8 @@
           "color": "#81D1FF",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 68430
     },
     {
       "name": "Aimerz+ goaTS Easy S1",
@@ -525,7 +539,8 @@
           "color": "#81D1FF",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 68427
     },
     {
       "name": "Aimerz+ cheaTS Easy S1",
@@ -560,7 +575,8 @@
           "color": "#81D1FF",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 68426
     },
     {
       "name": "Aimerz+ hopTS Easy S1",
@@ -595,7 +611,8 @@
           "color": "#81D1FF",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 68429
     },
     {
       "name": "Aimerz+ caTS Easy S1",
@@ -630,7 +647,41 @@
           "color": "#81D1FF",
           "threshold": 52.0
         }
-      ]
+      ],
+      "leaderboard_id": 68282
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGearingGodlikeHipfire",
+    "kovaaks_benchmark_id": 84,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#A77138"
+      ],
+      [
+        "Silver",
+        "#C2D2D2"
+      ],
+      [
+        "Gold",
+        "#C4A12A"
+      ],
+      [
+        "Platinum",
+        "#00B3A5"
+      ],
+      [
+        "Diamond",
+        "#81D1FF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:44.334651+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

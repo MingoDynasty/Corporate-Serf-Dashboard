@@ -40,7 +40,8 @@
           "color": "#741b47",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 1539
     },
     {
       "name": "rx 1w6ts No Clusters",
@@ -80,7 +81,8 @@
           "color": "#741b47",
           "threshold": 1170.0
         }
-      ]
+      ],
+      "leaderboard_id": 41629
     },
     {
       "name": "1w2ts Pasu Perfected",
@@ -120,7 +122,8 @@
           "color": "#741b47",
           "threshold": 103.0
         }
-      ]
+      ],
+      "leaderboard_id": 22601
     },
     {
       "name": "voxTS rAim Click",
@@ -160,7 +163,8 @@
           "color": "#741b47",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 2919
     },
     {
       "name": "SmoothBot Invincible Goated 15% bigger",
@@ -200,7 +204,8 @@
           "color": "#741b47",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 2429
     },
     {
       "name": "Leaptrack Goated 60% Larger",
@@ -240,7 +245,8 @@
           "color": "#741b47",
           "threshold": 2750.0
         }
-      ]
+      ],
+      "leaderboard_id": 128691
     },
     {
       "name": "VT Plaza Viscose",
@@ -280,7 +286,8 @@
           "color": "#741b47",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 49623
     },
     {
       "name": "VT Aether Novice S5 Hard",
@@ -320,7 +327,8 @@
           "color": "#741b47",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 106717
     },
     {
       "name": "Controlsphere rAim Easy",
@@ -360,7 +368,8 @@
           "color": "#741b47",
           "threshold": 13250.0
         }
-      ]
+      ],
+      "leaderboard_id": 5137
     },
     {
       "name": "cloverRawControl Easy",
@@ -400,7 +409,8 @@
           "color": "#741b47",
           "threshold": 9800.0
         }
-      ]
+      ],
+      "leaderboard_id": 69150
     },
     {
       "name": "voxTS Viscose Varied",
@@ -440,7 +450,8 @@
           "color": "#741b47",
           "threshold": 119.0
         }
-      ]
+      ],
+      "leaderboard_id": 417
     },
     {
       "name": "kinTS Voltaic Low TTK",
@@ -480,7 +491,8 @@
           "color": "#741b47",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 16678
     },
     {
       "name": "VT EvaTS Intermediate Regen",
@@ -520,7 +532,8 @@
           "color": "#741b47",
           "threshold": 760.0
         }
-      ]
+      ],
+      "leaderboard_id": 42422
     },
     {
       "name": "tamTargetSwitch Smooth Easy",
@@ -560,7 +573,8 @@
           "color": "#741b47",
           "threshold": 35.0
         }
-      ]
+      ],
+      "leaderboard_id": 42505
     }
   ],
   "generated_from": {
@@ -596,7 +610,8 @@
         "#741b47"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:35.581665+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:07.902490+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

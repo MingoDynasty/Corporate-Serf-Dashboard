@@ -30,7 +30,8 @@
           "color": "#B9F2FF",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 605
     },
     {
       "name": "B180 Voltaic Easy",
@@ -60,7 +61,8 @@
           "color": "#B9F2FF",
           "threshold": 86.0
         }
-      ]
+      ],
+      "leaderboard_id": 405
     },
     {
       "name": "Popcorn Voltaic Easy",
@@ -90,7 +92,8 @@
           "color": "#B9F2FF",
           "threshold": 310.0
         }
-      ]
+      ],
+      "leaderboard_id": 833
     },
     {
       "name": "ww3t Voltaic",
@@ -120,7 +123,8 @@
           "color": "#B9F2FF",
           "threshold": 123.0
         }
-      ]
+      ],
+      "leaderboard_id": 68
     },
     {
       "name": "1w4ts Voltaic",
@@ -150,7 +154,8 @@
           "color": "#B9F2FF",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 319
     },
     {
       "name": "6 Sphere Hipfire Voltaic",
@@ -180,7 +185,8 @@
           "color": "#B9F2FF",
           "threshold": 142.0
         }
-      ]
+      ],
+      "leaderboard_id": 108
     },
     {
       "name": "Smoothbot Voltaic Easy",
@@ -210,7 +216,8 @@
           "color": "#B9F2FF",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 370
     },
     {
       "name": "Air Angelic 4 Voltaic Easy",
@@ -240,7 +247,8 @@
           "color": "#B9F2FF",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 42
     },
     {
       "name": "PGTI Voltaic Easy",
@@ -270,7 +278,8 @@
           "color": "#B9F2FF",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 510
     },
     {
       "name": "FuglaaXYZ Voltaic Easy",
@@ -300,7 +309,8 @@
           "color": "#B9F2FF",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 603
     },
     {
       "name": "Ground Plaza Voltaic Easy",
@@ -330,7 +340,8 @@
           "color": "#B9F2FF",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 520
     },
     {
       "name": "Air Voltaic Easy",
@@ -360,7 +371,8 @@
           "color": "#B9F2FF",
           "threshold": 865.0
         }
-      ]
+      ],
+      "leaderboard_id": 568
     },
     {
       "name": "patTS Voltaic Easy",
@@ -390,7 +402,8 @@
           "color": "#B9F2FF",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 538
     },
     {
       "name": "psalmTS Voltaic Easy",
@@ -420,7 +433,8 @@
           "color": "#B9F2FF",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 960
     },
     {
       "name": "voxTS Voltaic Easy",
@@ -450,7 +464,8 @@
           "color": "#B9F2FF",
           "threshold": 109.0
         }
-      ]
+      ],
+      "leaderboard_id": 577
     },
     {
       "name": "kinTS Voltaic Easy",
@@ -480,7 +495,8 @@
           "color": "#B9F2FF",
           "threshold": 72.0
         }
-      ]
+      ],
+      "leaderboard_id": 542
     },
     {
       "name": "B180T Voltaic Easy",
@@ -510,7 +526,8 @@
           "color": "#B9F2FF",
           "threshold": 77.0
         }
-      ]
+      ],
+      "leaderboard_id": 543
     },
     {
       "name": "Smoothbot TS Voltaic Easy",
@@ -540,7 +557,37 @@
           "color": "#B9F2FF",
           "threshold": 54.0
         }
-      ]
+      ],
+      "leaderboard_id": 868
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsFlickingFastCashdrop",
+    "kovaaks_benchmark_id": 265,
+    "rank_colors": [
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:30.421209+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

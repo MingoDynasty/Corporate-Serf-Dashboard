@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1580.0
         }
-      ]
+      ],
+      "leaderboard_id": 26404
     },
     {
       "name": "DM 1w3ts",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1630.0
         }
-      ]
+      ],
+      "leaderboard_id": 26397
     },
     {
       "name": "DM Tripleclick Pokeball",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 1760.0
         }
-      ]
+      ],
+      "leaderboard_id": 26420
     },
     {
       "name": "DM Tripleclick",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 1810.0
         }
-      ]
+      ],
+      "leaderboard_id": 26410
     },
     {
       "name": "DM 1w4ts Pokeball",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1620.0
         }
-      ]
+      ],
+      "leaderboard_id": 26405
     },
     {
       "name": "DM 1w4ts",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 26398
     },
     {
       "name": "DM Quadclick Pokeball",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 1850.0
         }
-      ]
+      ],
+      "leaderboard_id": 26421
     },
     {
       "name": "DM Quadclick",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 26411
     },
     {
       "name": "DM 1w5ts Pokeball",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 26406
     },
     {
       "name": "DM 1w5ts",
@@ -650,7 +659,8 @@
           "color": "#24DDD8",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 26400
     },
     {
       "name": "DM Pentaclick Pokeball",
@@ -715,7 +725,8 @@
           "color": "#24DDD8",
           "threshold": 1920.0
         }
-      ]
+      ],
+      "leaderboard_id": 26422
     },
     {
       "name": "DM Pentaclick",
@@ -780,7 +791,8 @@
           "color": "#24DDD8",
           "threshold": 1970.0
         }
-      ]
+      ],
+      "leaderboard_id": 26414
     },
     {
       "name": "DM 1w6ts Pokeball",
@@ -845,7 +857,8 @@
           "color": "#24DDD8",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 26407
     },
     {
       "name": "DM 1w6ts",
@@ -910,7 +923,8 @@
           "color": "#24DDD8",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 26401
     },
     {
       "name": "DM Hexaclick Pokeball",
@@ -975,7 +989,8 @@
           "color": "#24DDD8",
           "threshold": 1970.0
         }
-      ]
+      ],
+      "leaderboard_id": 26423
     },
     {
       "name": "DM Hexaclick",
@@ -1040,7 +1055,65 @@
           "color": "#24DDD8",
           "threshold": 2020.0
         }
-      ]
+      ],
+      "leaderboard_id": 26416
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsStrafingWetOfftank",
+    "kovaaks_benchmark_id": 855,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:24.331549+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

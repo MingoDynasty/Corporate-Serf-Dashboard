@@ -45,7 +45,8 @@
           "color": "#cd30c1",
           "threshold": 18000.0
         }
-      ]
+      ],
+      "leaderboard_id": 117
     },
     {
       "name": "Ground Plaza Sparky v3 Invincible 5",
@@ -90,7 +91,8 @@
           "color": "#cd30c1",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 1090
     }
   ],
   "generated_from": {
@@ -130,7 +132,8 @@
         "#cd30c1"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:53.666015+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:11.560095+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }
