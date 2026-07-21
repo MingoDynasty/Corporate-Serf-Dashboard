@@ -90,9 +90,22 @@ Design rationale for shipped work lives in
 
 ## Upcoming milestones
 
-Nothing is actively in progress right now. The sequenced next candidate is
-**Run history and sessions** (see Future); it will be promoted here with a
-full entry when work on it starts.
+### Notification system redesign
+
+**What:** Collapse the two notification subsystems into one quiet-by-default
+toast layer: passive navigation never toasts errors, persistent conditions
+render in-place, and each run produces at most one verdict toast.
+
+**Why:** The default configuration currently produces a stacking wall of red
+error toasts plus a no-information "Graph updated!" toast during normal play —
+noise that drowns the in-session feedback the toasts exist to deliver.
+
+**Design:** [`notification_system_proposal.md`](./notification_system_proposal.md)
+(Proposed). Ships as three PRs (noise kill → consolidation → copy rework); the
+noise kill alone resolves the audit complaint.
+
+The sequenced next candidate after this is **Run history and sessions** (see
+Future); it will be promoted here with a full entry when work on it starts.
 
 ---
 
