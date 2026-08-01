@@ -33,18 +33,50 @@ REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTI
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
 
-# H2 headings outside fenced code blocks; fences are stripped first so a
-# template or example embedded in a proposal doesn't count as a section.
-# Fences are CommonMark-style: three or more backticks or tildes, closed by
-# at least as many of the same character (up to 3 leading spaces allowed).
-H2_HEADING_PATTERN = re.compile(r"^## (.+?)\s*$", re.MULTILINE)
-CODE_FENCE_PATTERN = re.compile(
-    r"^ {0,3}(?P<fence>(?P<char>[`~]){3,})[^\n]*\n"
-    r".*?"
-    r"^ {0,3}(?P=fence)(?P=char)*[^\S\n]*$",
-    re.MULTILINE | re.DOTALL,
-)
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
+
+
+def _visible_h2_headings(text: str) -> list[str]:
+    """Collect H2 headings as a Markdown reader would see them.
+
+    Line-oriented scan so a template or example embedded in a proposal
+    doesn't count as a section: skips CommonMark fenced code blocks
+    (backtick or tilde, three or more, closer at least as long as the
+    opener, up to 3 leading spaces; an unclosed fence consumes the rest
+    of the document) and multi-line HTML comment blocks.
+    """
+    headings: list[str] = []
+    fence_char = ""
+    fence_len = 0
+    in_comment = False
+    for line in text.splitlines():
+        stripped = line.strip()
+        if in_comment:
+            if "-->" in line:
+                in_comment = False
+            continue
+        if fence_char:
+            indent = len(line) - len(line.lstrip(" "))
+            closer = stripped.rstrip(fence_char)
+            if (
+                indent <= 3
+                and stripped.startswith(fence_char * fence_len)
+                and not closer
+            ):
+                fence_char = ""
+                fence_len = 0
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        if indent <= 3 and stripped[:3] in ("```", "~~~"):
+            fence_char = stripped[0]
+            fence_len = len(stripped) - len(stripped.lstrip(fence_char))
+            continue
+        if stripped.startswith("<!--") and "-->" not in stripped[4:]:
+            in_comment = True
+            continue
+        if line.startswith("## "):
+            headings.append(line[3:].strip())
+    return headings
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
@@ -87,9 +119,8 @@ def test_proposal_docs_lead_with_required_sections():
     """Placement, not just presence: the maintainer read-path comes first."""
     bad = []
     for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
-        text = CODE_FENCE_PATTERN.sub("", doc.read_text(encoding="utf-8"))
-        headings = tuple(m.group(1) for m in H2_HEADING_PATTERN.finditer(text))
-        leading = headings[: len(REQUIRED_LEADING_SECTIONS)]
+        headings = _visible_h2_headings(doc.read_text(encoding="utf-8"))
+        leading = tuple(headings[: len(REQUIRED_LEADING_SECTIONS)])
         if leading != REQUIRED_LEADING_SECTIONS:
             bad.append(f"{doc.relative_to(REPO_ROOT)}: first H2s are {list(leading)}")
     assert not bad, (
@@ -97,3 +128,37 @@ def test_proposal_docs_lead_with_required_sections():
         "'## Problem' in that order (see the AGENTS.md proposal template):\n"
         + "\n".join(bad)
     )
+
+
+def test_heading_scan_skips_fenced_and_commented_headings():
+    """Only rendered H2s count: embedded examples must not satisfy (or
+    break) the leading-section check, whatever hides them — paired
+    backtick/tilde/long fences, HTML comment blocks, or an unclosed
+    fence, which CommonMark extends through end of document."""
+    doc = "\n".join(
+        [
+            "# Title",
+            "",
+            "## Real A",
+            "",
+            "```markdown",
+            "## Hidden in backtick fence",
+            "```",
+            "~~~",
+            "## Hidden in tilde fence",
+            "~~~",
+            "````md",
+            "```",
+            "## Hidden in long fence with inner short fence",
+            "````",
+            "<!--",
+            "## Hidden in comment block",
+            "-->",
+            "<!-- ## Hidden in one-line comment -->",
+            "## Real B",
+            "",
+            "```",
+            "## Hidden in unclosed fence at EOF",
+        ]
+    )
+    assert _visible_h2_headings(doc) == ["Real A", "Real B"]
