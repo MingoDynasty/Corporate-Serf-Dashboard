@@ -6,7 +6,8 @@ identity auto-detection and the initial-setup flow moved to a
 deliberately unscheduled follow-on proposal, working notes in
 `ignore/design-notes/config-settings-arc.md`; amended 2026-08-01 to
 replace the installer's settings seed with an app-side `stats_dir`
-startup bootstrap)
+startup bootstrap, and again the same day to order that bootstrap last —
+PRs 1–3 are fully manual)
 
 ## Problem
 
@@ -135,32 +136,18 @@ in-process — the settings page is the live write path).
   stderr message are removed, and the startup-contract tests flip
   accordingly (missing `port` still exits; missing `stats_dir` no
   longer does).
-- **Startup bootstrap (app-side `stats_dir` detection).** When the
-  `stats_dir` key is absent (a missing file counts), startup runs a
-  local detection — Steam root from the registry (HKCU `SteamPath`,
-  HKLM fallbacks, the same candidate list the installer used), `"path"`
-  entries from `steamapps/libraryfolders.vdf`, probe
-  `<library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats` — and
-  writes the first existing directory through the settings service. No
-  hit: write nothing and retry next startup, so a dashboard installed
-  before KovaaK's self-configures once KovaaK's appears. Silent by
-  design — no confirmation step; on a machine with a stale copy in a
-  second Steam library the pick can be wrong, which is immediately
-  visible (wrong/empty data), fixable on the settings page, and
-  properly solved by the follow-on proposal's candidate dropdown. The
-  bootstrap runs only from the real server startup path (never at
-  import), and the detector is pure enough to unit-test with fixture
-  vdf content and temp directories. Because the page writes all three
-  keys on every save, a deliberately cleared `stats_dir` is `""` (key
-  present) and is never overridden.
 - **Installer simplification.** `Find-KovaaksStatsDir`, the `[Y/n]`
   confirm, the manual-entry retry loop, and the stats-dir `Stop-Fatal`
   are deleted; `Write-FirstRunConfig` writes the port-only `config.toml`
   (its `load_config()` round-trip validation stays). Installs become
   fully non-interactive, and the installer never touches
-  `settings.json`. This lands a proposal early versus the original
-  plan, because the app-side bootstrap makes the installer's detection
-  redundant rather than merely relocated.
+  `settings.json`. This is forced by the relocation itself, not by the
+  bootstrap: once `stats_dir` is no longer a config key, the installer's
+  detection has nowhere legitimate to write — `config.toml` now rejects
+  the key, and seeding `settings.json` was considered and rejected (one
+  home, one writer). The app-side bootstrap (PR 4, below) later replaces
+  what was deleted; until it lands, an absent `stats_dir` simply means
+  the app runs empty with the Home hint, and configuration is manual.
 - `docs/decision_log.md`: dated supersede notes on the 2026-07-19
   first-run-config entry (installer-written config is now `port` only;
   stats-directory detection moved into the app). History kept, per
@@ -193,15 +180,43 @@ manual entry and a single Save:
 - The page talks only to the settings service; no endpoint logic in UI
   code, per the UI-boundary convention.
 
+### `stats_dir` startup bootstrap (PR 4, last)
+
+The one detection this proposal ships, deliberately ordered after the
+settings page: the repair surface for a wrong silent pick must exist
+before the app ever writes a value on its own.
+
+- When the `stats_dir` key is absent (a missing file counts), startup
+  runs a local detection — Steam root from the registry (HKCU
+  `SteamPath`, HKLM fallbacks, the same candidate list the deleted
+  installer detection used), `"path"` entries from
+  `steamapps/libraryfolders.vdf`, probe
+  `<library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats` — and
+  writes the first existing directory through the settings service. No
+  hit: write nothing and retry next startup, so a dashboard installed
+  before KovaaK's self-configures once KovaaK's appears.
+- Silent by design — no confirmation step. On a machine with a stale
+  copy in a second Steam library the pick can be wrong, which is
+  immediately visible (wrong/empty data), fixable on the settings page
+  (already shipped, by construction), and properly solved by the
+  follow-on proposal's candidate dropdown.
+- The bootstrap runs only from the real server startup path (never at
+  import), and the detector is pure enough to unit-test with fixture
+  vdf content and temp directories. Because the page writes all three
+  keys on every save, a deliberately cleared `stats_dir` is `""` (key
+  present) and is never overridden.
+- The only hard dependency is PR 2 (the relocation); running after
+  PR 3 is the deliberate ordering above, not a technical constraint.
+
 ### Non-goals
 
 - No identity auto-detection (the KovaaK's-API-verified kind), no
   candidate dropdowns, and no initial-setup flow — follow-on proposal
   territory (working notes:
   `ignore/design-notes/config-settings-arc.md`). The silent `stats_dir`
-  bootstrap above is the one detection this proposal ships: it is
-  local-only, consent-free, and replaces the installer's detection
-  outright instead of relocating it.
+  bootstrap above is the one detection this proposal ships — last, as
+  PR 4: it is local-only, consent-free, and replaces the installer's
+  detection outright instead of relocating it.
 - No asked-vs-declined lifecycle state; nothing in this proposal prompts.
 - No About/version UX (separately earmarked; it will later join the page
   this proposal creates).
@@ -232,8 +247,10 @@ manual entry and a single Save:
   a silent local detection (registry → `libraryfolders.vdf` → path
   probe) writes the first hit through the service; no hit writes
   nothing and retries next startup. No confirmation step. The
-  installer's detection, prompts, and stats-dir fatal are deleted;
-  installs become fully non-interactive.
+  installer's detection, prompts, and stats-dir fatal are deleted in
+  PR 2 (forced by the relocation); the bootstrap ships last, as PR 4,
+  after the settings page — the repair surface precedes the first
+  silent write. In between, everything is manual.
 - R6 — Settings page with manual entry, single Save, and offline
   validation only: directory-exists for `stats_dir`, digits-only for
   `steam_id`, free-text username. No online verification.
@@ -252,17 +269,20 @@ manual entry and a single Save:
   `example.toml` drops the entries; `docs/architecture.md` module map
   gains the service; manual-migration note in the PR description. Hard
   dependencies: none.
-- **PR 2 — `stats_dir` relocation, nullable startup, bootstrap,
-  installer simplification.** `ConfigData` drops `stats_dir`; startup
-  tolerates unset/invalid (skip scan + watchdog, Home hint, tests
-  flip); app-side startup bootstrap detection (fixture-tested);
-  installer loses detection/prompts and writes the port-only
-  `config.toml`; decision-log supersede notes. Hard dependency: PR 1.
+- **PR 2 — `stats_dir` relocation, nullable startup, installer
+  simplification.** `ConfigData` drops `stats_dir`; startup tolerates
+  unset/invalid (skip scan + watchdog, Home hint, tests flip); installer
+  loses detection/prompts and writes the port-only `config.toml`;
+  decision-log supersede notes. No detection of any kind. Hard
+  dependency: PR 1.
 - **PR 3 — settings page.** `/settings` page, validation, apply
-  semantics, callback guards and tests. Ships the proposal: distills
-  R1–R8's durables into `docs/decision_log.md`, deletes this file,
-  updates `docs/roadmap.md` and `docs/product.md`, archives the consumed
-  kickoff prompts. Hard dependency: PR 2.
+  semantics, callback guards and tests. Hard dependency: PR 2.
+- **PR 4 — `stats_dir` startup bootstrap.** The detector
+  (fixture-tested) and its startup wiring, per the design section. Hard
+  dependency: PR 2 only; ordered after PR 3 deliberately (repair
+  surface first). Ships the proposal: distills R1–R8's durables into
+  `docs/decision_log.md`, deletes this file, updates `docs/roadmap.md`
+  and `docs/product.md`, archives the consumed kickoff prompts.
 
 All three PRs run the standard gates; none may call the live KovaaK's API
 or read the real registry in tests.
