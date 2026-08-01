@@ -36,6 +36,31 @@ STATUS_SEARCH_LINES = 15
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
 
 
+def _strip_html_comments(line: str, in_comment: bool) -> tuple[str, bool]:
+    """Return the line's visible text and the comment state after it.
+
+    Handles openers and closers anywhere in the line, including several
+    per line (`a <!-- x --> b <!-- y`); comment text itself is dropped.
+    """
+    visible: list[str] = []
+    rest = line
+    while True:
+        if in_comment:
+            end = rest.find("-->")
+            if end == -1:
+                return "".join(visible), True
+            rest = rest[end + 3 :]
+            in_comment = False
+        else:
+            start = rest.find("<!--")
+            if start == -1:
+                visible.append(rest)
+                return "".join(visible), False
+            visible.append(rest[:start])
+            rest = rest[start + 4 :]
+            in_comment = True
+
+
 def _visible_h2_headings(text: str) -> list[str]:
     """Collect H2 headings as a Markdown reader would see them.
 
@@ -43,20 +68,19 @@ def _visible_h2_headings(text: str) -> list[str]:
     doesn't count as a section: skips CommonMark fenced code blocks
     (backtick or tilde, three or more, closer at least as long as the
     opener, up to 3 leading spaces; an unclosed fence consumes the rest
-    of the document) and multi-line HTML comment blocks.
+    of the document) and HTML comments, wherever in a line they open.
+    Comments are not parsed inside fenced code; fence markers are not
+    parsed inside comments; the tail of a line that closes a multi-line
+    comment is HTML-block content, never a heading.
     """
     headings: list[str] = []
     fence_char = ""
     fence_len = 0
     in_comment = False
     for line in text.splitlines():
-        stripped = line.strip()
-        if in_comment:
-            if "-->" in line:
-                in_comment = False
-            continue
         if fence_char:
             indent = len(line) - len(line.lstrip(" "))
+            stripped = line.strip()
             closer = stripped.rstrip(fence_char)
             if (
                 indent <= 3
@@ -66,16 +90,18 @@ def _visible_h2_headings(text: str) -> list[str]:
                 fence_char = ""
                 fence_len = 0
             continue
-        indent = len(line) - len(line.lstrip(" "))
+        was_in_comment = in_comment
+        visible, in_comment = _strip_html_comments(line, in_comment)
+        if was_in_comment:
+            continue
+        stripped = visible.strip()
+        indent = len(visible) - len(visible.lstrip(" "))
         if indent <= 3 and stripped[:3] in ("```", "~~~"):
             fence_char = stripped[0]
             fence_len = len(stripped) - len(stripped.lstrip(fence_char))
             continue
-        if stripped.startswith("<!--") and "-->" not in stripped[4:]:
-            in_comment = True
-            continue
-        if line.startswith("## "):
-            headings.append(line[3:].strip())
+        if visible.startswith("## "):
+            headings.append(visible[3:].strip())
     return headings
 
 
@@ -133,8 +159,9 @@ def test_proposal_docs_lead_with_required_sections():
 def test_heading_scan_skips_fenced_and_commented_headings():
     """Only rendered H2s count: embedded examples must not satisfy (or
     break) the leading-section check, whatever hides them — paired
-    backtick/tilde/long fences, HTML comment blocks, or an unclosed
-    fence, which CommonMark extends through end of document."""
+    backtick/tilde/long fences, HTML comments (including ones opened
+    after visible text on the same line), or an unclosed fence, which
+    CommonMark extends through end of document."""
     doc = "\n".join(
         [
             "# Title",
@@ -155,10 +182,18 @@ def test_heading_scan_skips_fenced_and_commented_headings():
             "## Hidden in comment block",
             "-->",
             "<!-- ## Hidden in one-line comment -->",
-            "## Real B",
+            "Notes <!--",
+            "## Hidden in comment opened after text",
+            "-->## Not a heading: tail of the line closing a comment",
+            "## Real B <!-- trailing opener",
+            "## Hidden while that comment is still open",
+            "--> <!--",
+            "## Hidden after same-line close and reopen",
+            "-->",
+            "## Real C",
             "",
             "```",
             "## Hidden in unclosed fence at EOF",
         ]
     )
-    assert _visible_h2_headings(doc) == ["Real A", "Real B"]
+    assert _visible_h2_headings(doc) == ["Real A", "Real B", "Real C"]
