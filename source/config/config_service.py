@@ -13,9 +13,6 @@ from pydantic.dataclasses import dataclass
 from source.utilities.paths import state_dir
 
 CONFIG_FILE = "config.toml"
-CONFIG_ERROR_MESSAGE = (
-    "Configuration error: copy example.toml to config.toml and set stats_dir."
-)
 
 
 def config_file_path() -> Path:
