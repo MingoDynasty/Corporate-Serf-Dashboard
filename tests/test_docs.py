@@ -40,7 +40,9 @@ STATUS_SEARCH_LINES = 15
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
-    text = doc.read_text(encoding="utf-8")
+    # Fenced code is example text, not live links, so it is stripped here the
+    # same way heading collection strips it.
+    text = _strip_fenced_code(doc.read_text(encoding="utf-8"))
     targets = []
     for pattern in (INLINE_LINK_PATTERN, REFERENCE_DEF_PATTERN):
         for match in pattern.finditer(text):
@@ -52,7 +54,8 @@ def _relative_link_targets(doc: Path) -> list[str]:
 
 
 def _strip_fenced_code(text: str) -> str:
-    """Drop fenced code blocks so `# comment` lines are not read as headings."""
+    """Drop fenced code blocks so example links and `# comment` lines are
+    not read as live links or headings."""
     kept = []
     fence = None
     for line in text.splitlines():
@@ -74,14 +77,19 @@ def _github_anchor(heading: str) -> str:
 
 
 def _heading_anchors(doc: Path) -> set[str]:
+    # Duplicate handling mirrors github-slugger: every emitted anchor is
+    # reserved, and a duplicate base increments its suffix until the composed
+    # anchor is free (headings Foo, Foo-1, Foo yield foo, foo-1, foo-2).
     counts: dict[str, int] = {}
-    anchors = set()
+    anchors: set[str] = set()
     text = _strip_fenced_code(doc.read_text(encoding="utf-8"))
     for match in HEADING_PATTERN.finditer(text):
-        anchor = _github_anchor(match.group(1))
-        seen = counts.get(anchor, 0)
-        counts[anchor] = seen + 1
-        anchors.add(anchor if seen == 0 else f"{anchor}-{seen}")
+        base = _github_anchor(match.group(1))
+        anchor = base
+        while anchor in anchors:
+            counts[base] = counts.get(base, 0) + 1
+            anchor = f"{base}-{counts[base]}"
+        anchors.add(anchor)
     return anchors
 
 
@@ -117,6 +125,22 @@ def test_doc_anchor_links_resolve():
         "Anchor links pointing at headings that do not exist (renamed or "
         "deleted heading?):\n" + "\n".join(broken)
     )
+
+
+def test_link_targets_skip_fenced_code_examples(tmp_path):
+    doc = tmp_path / "fenced.md"
+    doc.write_text(
+        "# Title\n\n[real](other.md#anchor)\n\n"
+        "```markdown\n[example](#not-a-heading)\n```\n",
+        encoding="utf-8",
+    )
+    assert _relative_link_targets(doc) == ["other.md#anchor"]
+
+
+def test_heading_anchor_dedup_matches_github(tmp_path):
+    doc = tmp_path / "dup.md"
+    doc.write_text("# Foo\n\n# Foo-1\n\n# Foo\n", encoding="utf-8")
+    assert _heading_anchors(doc) == {"foo", "foo-1", "foo-2"}
 
 
 def test_proposal_docs_declare_status():
