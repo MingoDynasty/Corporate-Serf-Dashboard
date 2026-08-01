@@ -1,8 +1,10 @@
 """Documentation hygiene checks.
 
-Enforces the docs lifecycle from AGENTS.md "Shipping a proposal": proposal
-files declare a Status line, and no markdown doc links to a file that has
-been deleted (e.g. a proposal distilled into the decision log).
+Enforces the docs lifecycle from AGENTS.md "Shipping a proposal" and the
+proposal template: proposal files declare a Status line and lead with the
+TL;DR / Decision points / Problem sections in that order, and no markdown
+doc links to a file that has been deleted (e.g. a proposal distilled into
+the decision log).
 """
 
 import re
@@ -30,6 +32,12 @@ REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTI
 
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
+
+# H2 headings outside fenced code blocks; fences are stripped first so a
+# template or example embedded in a proposal doesn't count as a section.
+H2_HEADING_PATTERN = re.compile(r"^## (.+?)\s*$", re.MULTILINE)
+CODE_FENCE_PATTERN = re.compile(r"^```.*?^```[^\S\n]*$", re.MULTILINE | re.DOTALL)
+REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
@@ -65,4 +73,20 @@ def test_proposal_docs_declare_status():
     assert not missing, (
         f"Proposal docs missing a 'Status:' line in the first "
         f"{STATUS_SEARCH_LINES} lines: {missing}"
+    )
+
+
+def test_proposal_docs_lead_with_required_sections():
+    """Placement, not just presence: the maintainer read-path comes first."""
+    bad = []
+    for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
+        text = CODE_FENCE_PATTERN.sub("", doc.read_text(encoding="utf-8"))
+        headings = tuple(m.group(1) for m in H2_HEADING_PATTERN.finditer(text))
+        leading = headings[: len(REQUIRED_LEADING_SECTIONS)]
+        if leading != REQUIRED_LEADING_SECTIONS:
+            bad.append(f"{doc.relative_to(REPO_ROOT)}: first H2s are {list(leading)}")
+    assert not bad, (
+        "Proposal docs must open with '## TL;DR', '## Decision points', "
+        "'## Problem' in that order (see the AGENTS.md proposal template):\n"
+        + "\n".join(bad)
     )
