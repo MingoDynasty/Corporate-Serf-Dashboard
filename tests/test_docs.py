@@ -38,27 +38,25 @@ STATUS_SEARCH_LINES = 15
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
 
 
-# What a browser hides: comment markers that survived into the rendered
-# HTML (an unclosed comment hides everything to the end of the page).
-# Escaped markers from code spans and fenced code (&lt;!--) don't match.
-HTML_COMMENT_PATTERN = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
-H2_ELEMENT_PATTERN = re.compile(r"<h2>(.*?)</h2>", re.DOTALL)
-
-
 def _visible_h2_headings(text: str) -> list[str]:
     """Collect H2 headings as the reader of the rendered page sees them.
 
-    Renders with a CommonMark parser, then drops HTML comments from the
-    output the way a browser does. Earlier hand-rolled scans here kept
-    missing spec edges (tilde/long/unclosed fences, mid-line comments,
-    code spans); rendering makes them all fall out by construction —
-    code spans and fenced code render with their contents escaped, so
-    markers inside them never hide anything, while raw HTML comments
-    hide whatever falls inside them, headings included.
+    Reads the CommonMark parser's heading tokens rather than scanning
+    text or rendered HTML (earlier attempts at both kept missing spec
+    edges: fence forms, comment placement, code spans, raw-text
+    elements). Everything that hides a heading falls out of the token
+    stream by construction: fenced code parses as code tokens; comment
+    blocks, script/style raw text, and other block-level raw HTML parse
+    as html_block tokens, never headings; and an inline comment can't
+    swallow a heading, because a heading line interrupts the paragraph
+    that would have to contain it.
     """
-    html = MarkdownIt("commonmark").render(text)
-    visible = HTML_COMMENT_PATTERN.sub("", html)
-    return [m.group(1).strip() for m in H2_ELEMENT_PATTERN.finditer(visible)]
+    tokens = MarkdownIt("commonmark").parse(text)
+    return [
+        inline.content.strip()
+        for open_tok, inline in zip(tokens, tokens[1:])
+        if open_tok.type == "heading_open" and open_tok.tag == "h2"
+    ]
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
@@ -116,10 +114,11 @@ def test_heading_scan_matches_rendered_visibility():
     """Only rendered H2s count: embedded examples must not satisfy (or
     break) the leading-section check. Fenced code hides headings (all
     fence forms, including one left unclosed, which CommonMark extends
-    through end of document), and so do raw HTML comments. Markers
-    inside code spans or fenced code are escaped in the output and hide
-    nothing — and an unclosed marker after visible text is escaped too
-    (not a comment), so headings after it stay visible."""
+    through end of document); raw HTML comment blocks hide headings; so
+    does literal heading markup inside raw-text elements like script.
+    Markers inside code spans or fenced code are escaped in the output
+    and hide nothing — and an unclosed marker after visible text is
+    escaped too (not a comment), so headings after it stay visible."""
     doc = "\n".join(
         [
             "# Title",
@@ -150,6 +149,10 @@ def test_heading_scan_matches_rendered_visibility():
             "Notes <!--",
             "",
             "## Real C, after an unclosed marker that renders escaped",
+            "",
+            "<script>",
+            "<h2>Hidden in script raw text</h2>",
+            "</script>",
             "",
             "```",
             "## Hidden in unclosed fence at EOF",
