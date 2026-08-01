@@ -11,6 +11,8 @@ import re
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from markdown_it import MarkdownIt
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 DOC_FILES = sorted(
@@ -36,73 +38,27 @@ STATUS_SEARCH_LINES = 15
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
 
 
-def _strip_html_comments(line: str, in_comment: bool) -> tuple[str, bool]:
-    """Return the line's visible text and the comment state after it.
-
-    Handles openers and closers anywhere in the line, including several
-    per line (`a <!-- x --> b <!-- y`); comment text itself is dropped.
-    """
-    visible: list[str] = []
-    rest = line
-    while True:
-        if in_comment:
-            end = rest.find("-->")
-            if end == -1:
-                return "".join(visible), True
-            rest = rest[end + 3 :]
-            in_comment = False
-        else:
-            start = rest.find("<!--")
-            if start == -1:
-                visible.append(rest)
-                return "".join(visible), False
-            visible.append(rest[:start])
-            rest = rest[start + 4 :]
-            in_comment = True
+# What a browser hides: comment markers that survived into the rendered
+# HTML (an unclosed comment hides everything to the end of the page).
+# Escaped markers from code spans and fenced code (&lt;!--) don't match.
+HTML_COMMENT_PATTERN = re.compile(r"<!--.*?(?:-->|\Z)", re.DOTALL)
+H2_ELEMENT_PATTERN = re.compile(r"<h2>(.*?)</h2>", re.DOTALL)
 
 
 def _visible_h2_headings(text: str) -> list[str]:
-    """Collect H2 headings as a Markdown reader would see them.
+    """Collect H2 headings as the reader of the rendered page sees them.
 
-    Line-oriented scan so a template or example embedded in a proposal
-    doesn't count as a section: skips CommonMark fenced code blocks
-    (backtick or tilde, three or more, closer at least as long as the
-    opener, up to 3 leading spaces; an unclosed fence consumes the rest
-    of the document) and HTML comments, wherever in a line they open.
-    Comments are not parsed inside fenced code; fence markers are not
-    parsed inside comments; the tail of a line that closes a multi-line
-    comment is HTML-block content, never a heading.
+    Renders with a CommonMark parser, then drops HTML comments from the
+    output the way a browser does. Earlier hand-rolled scans here kept
+    missing spec edges (tilde/long/unclosed fences, mid-line comments,
+    code spans); rendering makes them all fall out by construction —
+    code spans and fenced code render with their contents escaped, so
+    markers inside them never hide anything, while raw HTML comments
+    hide whatever falls inside them, headings included.
     """
-    headings: list[str] = []
-    fence_char = ""
-    fence_len = 0
-    in_comment = False
-    for line in text.splitlines():
-        if fence_char:
-            indent = len(line) - len(line.lstrip(" "))
-            stripped = line.strip()
-            closer = stripped.rstrip(fence_char)
-            if (
-                indent <= 3
-                and stripped.startswith(fence_char * fence_len)
-                and not closer
-            ):
-                fence_char = ""
-                fence_len = 0
-            continue
-        was_in_comment = in_comment
-        visible, in_comment = _strip_html_comments(line, in_comment)
-        if was_in_comment:
-            continue
-        stripped = visible.strip()
-        indent = len(visible) - len(visible.lstrip(" "))
-        if indent <= 3 and stripped[:3] in ("```", "~~~"):
-            fence_char = stripped[0]
-            fence_len = len(stripped) - len(stripped.lstrip(fence_char))
-            continue
-        if visible.startswith("## "):
-            headings.append(visible[3:].strip())
-    return headings
+    html = MarkdownIt("commonmark").render(text)
+    visible = HTML_COMMENT_PATTERN.sub("", html)
+    return [m.group(1).strip() for m in H2_ELEMENT_PATTERN.finditer(visible)]
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
@@ -156,12 +112,14 @@ def test_proposal_docs_lead_with_required_sections():
     )
 
 
-def test_heading_scan_skips_fenced_and_commented_headings():
+def test_heading_scan_matches_rendered_visibility():
     """Only rendered H2s count: embedded examples must not satisfy (or
-    break) the leading-section check, whatever hides them — paired
-    backtick/tilde/long fences, HTML comments (including ones opened
-    after visible text on the same line), or an unclosed fence, which
-    CommonMark extends through end of document."""
+    break) the leading-section check. Fenced code hides headings (all
+    fence forms, including one left unclosed, which CommonMark extends
+    through end of document), and so do raw HTML comments. Markers
+    inside code spans or fenced code are escaped in the output and hide
+    nothing — and an unclosed marker after visible text is escaped too
+    (not a comment), so headings after it stay visible."""
     doc = "\n".join(
         [
             "# Title",
@@ -182,18 +140,23 @@ def test_heading_scan_skips_fenced_and_commented_headings():
             "## Hidden in comment block",
             "-->",
             "<!-- ## Hidden in one-line comment -->",
+            "",
+            "`<!--`",
+            "",
+            "## Real B, between code-span comment markers",
+            "",
+            "`-->`",
+            "",
             "Notes <!--",
-            "## Hidden in comment opened after text",
-            "-->## Not a heading: tail of the line closing a comment",
-            "## Real B <!-- trailing opener",
-            "## Hidden while that comment is still open",
-            "--> <!--",
-            "## Hidden after same-line close and reopen",
-            "-->",
-            "## Real C",
+            "",
+            "## Real C, after an unclosed marker that renders escaped",
             "",
             "```",
             "## Hidden in unclosed fence at EOF",
         ]
     )
-    assert _visible_h2_headings(doc) == ["Real A", "Real B", "Real C"]
+    assert _visible_h2_headings(doc) == [
+        "Real A",
+        "Real B, between code-span comment markers",
+        "Real C, after an unclosed marker that renders escaped",
+    ]
