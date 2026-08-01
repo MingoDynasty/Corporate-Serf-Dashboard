@@ -42,8 +42,9 @@ What survives: the leaderboard-ID seeding (PR #169, previous entry) stands on
 its own merits. The worthwhile kernel — treating "leaderboard features off"
 as a normal quiet state rather than a red error, skipping the futile
 progressive position fill, and pointing at how to enable the features — is
-deferred into the planned settings/config work, where a settings page gives
-that pointer a destination. The optional import-warmup companion (prefetching
+deferred until a settings page exists to give that pointer a destination
+(settings/config work proposed in PR #171, not yet agreed as of this
+writing). The optional import-warmup companion (prefetching
 unplayed scenarios of a freshly imported playlist) is dropped with the
 proposal; revisit only if the import-then-open flow proves slow in practice.
 
