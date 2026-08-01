@@ -16,7 +16,7 @@ the current training session across scenarios. It is deliberately
 high-level; only the data-model and sequencing decisions are meant to
 survive until it ships.
 
-## Decision points
+## Decisions needed
 
 None now — Status is Future, and the open questions (navigation surface,
 columns, roadmap placement) are deferred to build time.

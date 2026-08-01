@@ -83,9 +83,9 @@ Codex <codex@local>
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
 - Use proposal docs under `docs/` for feature design that is in flight or
   planned, following the template below. The maintainer reads `Status:`,
-  **TL;DR**, and **Decision points** by default and the dense body on
+  **TL;DR**, and **Decisions needed** by default and the dense body on
   demand — so a judgment call buried in the body is a process bug, and so
-  is a mechanical choice escalated into Decision points.
+  is a mechanical choice escalated into Decisions needed.
   `tests/test_docs.py` enforces the `Status:` line (`Proposed`,
   `In progress`, `Future`, ...) and the leading section order.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
@@ -125,6 +125,9 @@ both by layering:
   summary untouched should make the reviewer ask which layer is wrong.
 - No backfill: existing entries are converted only when a change touches
   them anyway.
+- The prose rules above are writing guidance, held by same-PR review;
+  `tests/test_docs.py` gates only the presence and order of the leading
+  proposal sections, never prose quality or full Markdown rendering.
 
 ### Proposal template
 
@@ -139,7 +142,7 @@ Date: YYYY-MM-DD
 <2–4 plain sentences: the problem and the shape of the fix. Layer-1 rules
 apply — no cross-references, no embedded lists.>
 
-## Decision points
+## Decisions needed
 
 <Only choices requiring maintainer product or workflow judgment, or
 acceptance of a costly-to-reverse trade-off, each with a recommended
@@ -181,8 +184,10 @@ in the same PR — do not leave it for later:
    each new entry opens with its layer-1 summary (see "Doc style — two
    readers, two layers").
 2. Delete the proposal file (git history preserves the full text).
-3. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers;
-   promote what's next.
+3. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers
+   and promote what's next. Shipped keeps only the ~5 most recent
+   milestones, newest first — push the oldest entry out entirely (steps 1
+   and 4 already preserve its durable record).
 4. Add the feature's user-facing rationale — the problem it solves — to the
    inventory in `docs/product.md` (the product counterpart to step 1's
    technical distillation).

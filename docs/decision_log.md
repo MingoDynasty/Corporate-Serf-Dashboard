@@ -13,6 +13,44 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-01: Doc-Style Follow-Up — Decisions Needed, Roadmap Trim, No Log Index
+
+Status: Accepted
+
+The proposal section listing what the maintainer must rule on is renamed
+from "Decision points" to "Decisions needed", so the heading itself tells
+you whether a document wants your attention. The roadmap now keeps only
+the few most recently shipped milestones instead of a full history. A
+topic index for this log was considered and rejected. The rest of the
+two-layer rules stand unchanged.
+
+Decision: `## Decisions needed` replaces `## Decision points` as the
+enforced second proposal section (`tests/test_docs.py`, the AGENTS.md
+template, and the in-flight proposal renamed together; renaming "TL;DR"
+to "Summary" was considered and deliberately not done). This amends the
+section naming in the two-layer entry below; everything else in that
+entry stands. The layer-1 prose rules are explicitly writing guidance
+held by same-PR review — the docs test gates only the presence and order
+of the leading sections, never prose quality or Markdown rendering
+fidelity (settled across the PR #174 review rounds).
+
+Roadmap policy: the Shipped section keeps only the ~5 most recent
+milestones, newest first, and older entries leave the file entirely —
+the shipping checklist already lands their user-facing rationale in
+`product.md` and their technical rationale here, and git history holds
+the full sequence.
+
+Rejected: a topic index at the top of this log (reviewer suggestion once
+the log passed ~1,500 lines). The planned `docs/specs/` capability layer
+links the relevant log entries per capability and is the intended
+findability fix; a hand-maintained index would duplicate it as a third
+structure, touched in every shipping PR and verified by nothing. Revisit
+only if findability still hurts after capability specs land.
+
+Provenance: post-merge review follow-up to PR #174 — refinements
+proposed by the external reviewer; scope ratified by the maintainer
+(rename yes, "TL;DR" kept, trim yes, index no).
+
 ## 2026-08-01: Durable Docs Open Plain And Proposals Lead With Decisions
 
 Status: Accepted
