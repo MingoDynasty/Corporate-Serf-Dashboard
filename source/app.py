@@ -35,6 +35,10 @@ from source.kovaaks.percentile_warmup_service import (
 )
 from source.my_watchdog.file_watchdog import NewFileHandler
 from source.utilities.build_info import get_build_info
+from source.utilities.crash_logging import (
+    SUPPRESS_CONSOLE_KEY,
+    install_crash_logging,
+)
 from source.utilities.paths import state_dir
 
 # Logging setup
@@ -57,11 +61,17 @@ def make_file_handler(filename: str, level: int) -> RotatingFileHandler:
     return handler
 
 
+def _console_should_emit(record: logging.LogRecord) -> bool:
+    """Drop records whose content the terminal already got via stderr."""
+    return not getattr(record, SUPPRESS_CONSOLE_KEY, False)
+
+
 def configure_logging() -> None:
     """Configure stdout and rotating file logging for the app process."""
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     console_handler = logging.StreamHandler(sys.stdout)
     console_handler.setLevel(logging.INFO)
+    console_handler.addFilter(_console_should_emit)
 
     logging.basicConfig(
         level=logging.DEBUG,
@@ -76,8 +86,21 @@ def configure_logging() -> None:
 
 
 configure_logging()
+install_crash_logging()
 
 logger = logging.getLogger(__name__)
+
+
+def _log_startup_error(message: str) -> None:
+    """Report a preflight failure on stderr and in the log files.
+
+    Bug reports arrive with debug.log; stderr alone would leave a
+    "won't start" report with a Build line and then nothing. The record
+    skips the console handler -- the stderr print already covers the
+    terminal, and a doubled message there would be noise.
+    """
+    logger.error(message, extra={SUPPRESS_CONSOLE_KEY: True})
+    print(message, file=sys.stderr)
 
 
 def app_name() -> str:
@@ -117,13 +140,12 @@ def _exit_port_taken(port: int, claimed: list[socket.socket]) -> NoReturn:
     """Release any bound faces and exit with an actionable message."""
     for sock in claimed:
         sock.close()
-    print(
+    _log_startup_error(
         f"Startup error: port {port} is already in use -- most likely "
         "another copy of the dashboard is already running, or another "
         "program has taken the port (Steam uses 8080). The port must be free "
         "on both loopback addresses, 127.0.0.1 and [::1]. Close that program, "
-        f"or set a different port in {config_file_path()}.",
-        file=sys.stderr,
+        f"or set a different port in {config_file_path()}."
     )
     raise SystemExit(1) from None
 
@@ -204,10 +226,9 @@ def main() -> None:
         # root, not the working directory, so "config.toml" alone leaves the
         # user guessing which one. Missing vs. unparseable is deliberately not
         # split out -- opening the named file answers that immediately.
-        print(
+        _log_startup_error(
             f"Configuration error: could not load {config_file_path()} -- "
-            "copy example.toml to config.toml and set stats_dir.",
-            file=sys.stderr,
+            "copy example.toml to config.toml and set stats_dir."
         )
         raise SystemExit(1) from None
 
@@ -215,12 +236,11 @@ def main() -> None:
     # consumer and throws a raw traceback at a missing directory, which is
     # what example.toml's "Change me!" placeholder produces on first run.
     if not Path(config.stats_dir).is_dir():
-        print(
+        _log_startup_error(
             f'Configuration error: stats_dir "{config.stats_dir}" is not an '
             f"existing directory -- edit {config_file_path()} and set "
             "stats_dir to your KovaaK's stats folder, usually "
-            "<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats",
-            file=sys.stderr,
+            "<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
         )
         raise SystemExit(1)
 
