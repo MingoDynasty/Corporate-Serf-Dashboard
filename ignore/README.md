@@ -12,6 +12,7 @@ a subdirectory — don't drop them at the top level.
 | Kickoff / implementation prompts for agent sessions | `prompts/` — the live queue: only prompts not yet consumed by a merged PR, so `ls ignore/prompts/*.md` answers "what's ready to start?" (consumed ones live in the `done/` subdir) |
 | Consumed kickoff prompts | `prompts/done/` — move a prompt here when the PR that consumes it merges. Kept as the house-style reference corpus for writing new prompts; everything here is untracked, so move, never delete |
 | Parked kickoff prompts (valid but deliberately not queued — e.g. a contingency that didn't fire) | `prompts/icebox/` — keeps the live queue meaning "ready to fire"; add a dated parking note at the top of the prompt; move back to `prompts/` to reactivate |
+| Design notes for future/deferred proposals: findings, probed facts, settled direction, open questions — the pickup point for drafting the eventual proposal | `design-notes/` (one file per arc; delete or archive into the proposal when it ships) |
 | One-off scripts, runners, experiments in code | `scripts/` |
 | Data samples: API responses, stats CSVs, tool test outputs | `data/` |
 | Downloaded playlist JSONs | `playlists/` |
