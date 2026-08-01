@@ -20,7 +20,6 @@ from watchdog.observers import Observer
 
 from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import (
-    CONFIG_ERROR_MESSAGE,
     config_file_path,
     get_config,
 )
@@ -201,7 +200,15 @@ def main() -> None:
     try:
         config = get_config()
     except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
-        print(CONFIG_ERROR_MESSAGE, file=sys.stderr)
+        # Name the file: a deployed install reads its config from the state
+        # root, not the working directory, so "config.toml" alone leaves the
+        # user guessing which one. Missing vs. unparseable is deliberately not
+        # split out -- opening the named file answers that immediately.
+        print(
+            f"Configuration error: could not load {config_file_path()} -- "
+            "copy example.toml to config.toml and set stats_dir.",
+            file=sys.stderr,
+        )
         raise SystemExit(1) from None
 
     # Checked before anything uses it: the watchdog observer is the first
