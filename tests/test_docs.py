@@ -35,8 +35,15 @@ STATUS_SEARCH_LINES = 15
 
 # H2 headings outside fenced code blocks; fences are stripped first so a
 # template or example embedded in a proposal doesn't count as a section.
+# Fences are CommonMark-style: three or more backticks or tildes, closed by
+# at least as many of the same character (up to 3 leading spaces allowed).
 H2_HEADING_PATTERN = re.compile(r"^## (.+?)\s*$", re.MULTILINE)
-CODE_FENCE_PATTERN = re.compile(r"^```.*?^```[^\S\n]*$", re.MULTILINE | re.DOTALL)
+CODE_FENCE_PATTERN = re.compile(
+    r"^ {0,3}(?P<fence>(?P<char>[`~]){3,})[^\n]*\n"
+    r".*?"
+    r"^ {0,3}(?P=fence)(?P=char)*[^\S\n]*$",
+    re.MULTILINE | re.DOTALL,
+)
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
 
 
