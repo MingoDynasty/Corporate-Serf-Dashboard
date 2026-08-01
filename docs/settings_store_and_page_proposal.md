@@ -1,10 +1,12 @@
 # Settings Store and Settings Page
 
 Status: Proposed
-Date: 2026-07-20 (reworked the same day from a detection-first draft;
-auto-detection and the initial-setup flow moved to a deliberately
-unscheduled follow-on proposal — working notes for it live in
-`ignore/design-notes/config-settings-arc.md`)
+Date: 2026-07-20 (reworked the same day from a detection-first draft —
+identity auto-detection and the initial-setup flow moved to a
+deliberately unscheduled follow-on proposal, working notes in
+`ignore/design-notes/config-settings-arc.md`; amended 2026-08-01 to
+replace the installer's settings seed with an app-side `stats_dir`
+startup bootstrap)
 
 ## Problem
 
@@ -74,9 +76,8 @@ every parameter lives in exactly one file, and every file has exactly one
 owner. `config.toml` stays human-owned and app-read-only. `data/
 settings.json` is app-owned, written through a new
 `source/config/settings_service.py` (mechanics mirroring the visibility
-store). The single exception is the installer's **first-install seed**
-(below) — the same role the installer already plays for `config.toml`:
-write once at first install, never touch again.
+store) — with no exceptions: the installer never touches it (the app
+bootstraps its own `stats_dir`, below).
 
 Flat JSON, three keys, no `schema_version`, no nesting:
 
@@ -93,7 +94,10 @@ value, and a missing/unreadable/malformed file all mean the same thing —
 *not configured*, feature off. No identity means rank lookups are
 disabled (exactly today's empty-string behavior); no usable `stats_dir`
 means the app runs empty (below). Malformed files are logged, never
-fatal, and rewritten whole on the next save. (A richer
+fatal, and rewritten whole on the next save. One structural nuance: the
+`stats_dir` bootstrap (below) fires only on a *missing key*, so a
+deliberately cleared `""` is never overridden — consumers still treat
+the two identically. (A richer
 asked-vs-declined lifecycle was part of the detection-first draft and is
 deferred with detection — nothing in this proposal prompts the user, so
 nothing needs to remember a refusal.)
@@ -131,21 +135,36 @@ in-process — the settings page is the live write path).
   stderr message are removed, and the startup-contract tests flip
   accordingly (missing `port` still exits; missing `stats_dir` no
   longer does).
-- **Installer seed.** `Find-KovaaksStatsDir` and its confirm prompt stay
-  exactly as shipped; only the write target changes. `Write-
-  FirstRunConfig` writes the port-only `config.toml`, and a new
-  ~10-line function writes `data/settings.json` with the confirmed
-  `stats_dir` (atomic, UTF-8 no BOM, same conventions; validated as
-  parseable JSON alongside the existing `load_config()` round-trip).
-  First install only — an existing `settings.json` is never touched,
-  the same rule `config.toml` already has. This role is explicitly
-  temporary: the follow-on proposal moves detection into the app and
-  deletes the installer's detection, prompts, and seed wholesale, so the
-  seed gets no extra UX investment.
+- **Startup bootstrap (app-side `stats_dir` detection).** When the
+  `stats_dir` key is absent (a missing file counts), startup runs a
+  local detection — Steam root from the registry (HKCU `SteamPath`,
+  HKLM fallbacks, the same candidate list the installer used), `"path"`
+  entries from `steamapps/libraryfolders.vdf`, probe
+  `<library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats` — and
+  writes the first existing directory through the settings service. No
+  hit: write nothing and retry next startup, so a dashboard installed
+  before KovaaK's self-configures once KovaaK's appears. Silent by
+  design — no confirmation step; on a machine with a stale copy in a
+  second Steam library the pick can be wrong, which is immediately
+  visible (wrong/empty data), fixable on the settings page, and
+  properly solved by the follow-on proposal's candidate dropdown. The
+  bootstrap runs only from the real server startup path (never at
+  import), and the detector is pure enough to unit-test with fixture
+  vdf content and temp directories. Because the page writes all three
+  keys on every save, a deliberately cleared `stats_dir` is `""` (key
+  present) and is never overridden.
+- **Installer simplification.** `Find-KovaaksStatsDir`, the `[Y/n]`
+  confirm, the manual-entry retry loop, and the stats-dir `Stop-Fatal`
+  are deleted; `Write-FirstRunConfig` writes the port-only `config.toml`
+  (its `load_config()` round-trip validation stays). Installs become
+  fully non-interactive, and the installer never touches
+  `settings.json`. This lands a proposal early versus the original
+  plan, because the app-side bootstrap makes the installer's detection
+  redundant rather than merely relocated.
 - `docs/decision_log.md`: dated supersede notes on the 2026-07-19
   first-run-config entry (installer-written config is now `port` only;
-  the detected stats directory seeds `settings.json` instead). History
-  kept, per convention.
+  stats-directory detection moved into the app). History kept, per
+  convention.
 
 ### Settings page (PR 3)
 
@@ -176,10 +195,13 @@ manual entry and a single Save:
 
 ### Non-goals
 
-- No auto-detection of any value, no candidate dropdowns, no
-  initial-setup flow, and no installer de-interactivation — all follow-on
-  proposal territory (working notes:
-  `ignore/design-notes/config-settings-arc.md`).
+- No identity auto-detection (the KovaaK's-API-verified kind), no
+  candidate dropdowns, and no initial-setup flow — follow-on proposal
+  territory (working notes:
+  `ignore/design-notes/config-settings-arc.md`). The silent `stats_dir`
+  bootstrap above is the one detection this proposal ships: it is
+  local-only, consent-free, and replaces the installer's detection
+  outright instead of relocating it.
 - No asked-vs-declined lifecycle state; nothing in this proposal prompts.
 - No About/version UX (separately earmarked; it will later join the page
   this proposal creates).
@@ -192,12 +214,13 @@ manual entry and a single Save:
 ## Register of decisions
 
 - R1 — `data/settings.json` is the app-owned user-settings store, written
-  only by `settings_service.py` — plus the installer's first-install-only
-  seed, mirroring its existing `config.toml` role. `config.toml` is
-  human-owned, app-read-only (one home, one writer).
+  only through `settings_service.py`; nothing else ever writes it — the
+  installer included. `config.toml` is human-owned, app-read-only (one
+  home, one writer).
 - R2 — Flat three-key schema, no `schema_version`. Missing key, empty
   value, and unusable file all mean "not configured"; malformed files are
-  logged, never fatal. No asked/declined tri-state.
+  logged, never fatal. No asked/declined tri-state. Consumers never
+  distinguish absent from empty; only the R5 bootstrap does.
 - R3 — Identity leaves `ConfigData`; consumers read the settings service
   per-operation (live apply). Manual two-line migration; pydantic's
   unknown-key rejection stays.
@@ -205,9 +228,12 @@ manual entry and a single Save:
   a usable stats directory (scan and watchdog skipped, empty pages, Home
   hint to Settings). Invalid behaves as unset; startup no longer exits
   for stats problems. Installed `config.toml` is `port` only.
-- R5 — The installer keeps its shipped detection/confirm but seeds the
-  result into `settings.json` (first install only, minimal by design —
-  the follow-on proposal deletes the whole installer detection path).
+- R5 — `stats_dir` bootstraps app-side: on startup with the key absent,
+  a silent local detection (registry → `libraryfolders.vdf` → path
+  probe) writes the first hit through the service; no hit writes
+  nothing and retries next startup. No confirmation step. The
+  installer's detection, prompts, and stats-dir fatal are deleted;
+  installs become fully non-interactive.
 - R6 — Settings page with manual entry, single Save, and offline
   validation only: directory-exists for `stats_dir`, digits-only for
   `steam_id`, free-text username. No online verification.
@@ -226,11 +252,12 @@ manual entry and a single Save:
   `example.toml` drops the entries; `docs/architecture.md` module map
   gains the service; manual-migration note in the PR description. Hard
   dependencies: none.
-- **PR 2 — `stats_dir` relocation, nullable startup, installer seed.**
-  `ConfigData` drops `stats_dir`; startup tolerates unset/invalid (skip
-  scan + watchdog, Home hint, tests flip); installer writes port-only
-  `config.toml` and seeds `settings.json`; decision-log supersede notes.
-  Hard dependency: PR 1.
+- **PR 2 — `stats_dir` relocation, nullable startup, bootstrap,
+  installer simplification.** `ConfigData` drops `stats_dir`; startup
+  tolerates unset/invalid (skip scan + watchdog, Home hint, tests
+  flip); app-side startup bootstrap detection (fixture-tested);
+  installer loses detection/prompts and writes the port-only
+  `config.toml`; decision-log supersede notes. Hard dependency: PR 1.
 - **PR 3 — settings page.** `/settings` page, validation, apply
   semantics, callback guards and tests. Ships the proposal: distills
   R1–R8's durables into `docs/decision_log.md`, deletes this file,
