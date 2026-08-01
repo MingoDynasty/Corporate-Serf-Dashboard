@@ -133,8 +133,16 @@ in-process — the settings page is the live write path).
   the edit at merge time avoids the stall entirely. This is the
   activation decision's sanctioned path for a rare format break — a
   manual step called out in the PR, not a compatibility window or
-  in-app migration (the PR #107 house convention). PR 2's `stats_dir`
-  removal rides the same mechanics and the same one-time edit.
+  in-app migration (the PR #107 house convention; adjudicated 2026-08-01
+  in review: easiest-manual wins at the single-user phase). PR 2's
+  `stats_dir` removal rides the same mechanics, and its instruction is
+  the simplest possible form: rewrite `config.toml` down to its minimal
+  remaining shape (`port`, plus `debug` in dev checkouts) as if freshly
+  installed, with `data/settings.json` becoming the source of truth for
+  everything else. Merging PRs 1 and 2 in quick succession collapses
+  both steps into that single rewrite; PR 1 alone still requires
+  `stats_dir` in `config.toml`, so the full reduction applies only from
+  PR 2 on.
 
 ### `stats_dir` relocation and nullable startup (PR 2)
 
