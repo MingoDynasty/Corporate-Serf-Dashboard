@@ -7,6 +7,20 @@
 > intentionally left open and should be revisited at build time. Only the
 > durable data-model and sequencing decisions are meant to survive that long.
 
+## TL;DR
+
+A finished run is only reported in a transient toast, so there is no way
+to look back at how earlier runs went. This proposal adds two views over
+the runs the app already stores: the full history of one scenario, and
+the current training session across scenarios. It is deliberately
+high-level; only the data-model and sequencing decisions are meant to
+survive until it ships.
+
+## Decision points
+
+None now — Status is Future, and the open questions (navigation surface,
+columns, roadmap placement) are deferred to build time.
+
 ## Problem
 
 When a run finishes, a transient toast reports whether it passed the

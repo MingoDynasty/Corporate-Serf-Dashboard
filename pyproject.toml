@@ -82,6 +82,7 @@ testpaths = ["tests"]
 [dependency-groups]
 dev = [
     "datamodel-code-generator>=0.68.1",
+    "markdown-it-py>=4.2.0",
     "mypy>=2.3.0",
     # Compatible-release pin rather than a floor: stubs describe a specific
     # pandas major/minor, so bump this in step with pandas itself.

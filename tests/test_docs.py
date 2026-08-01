@@ -1,13 +1,17 @@
 """Documentation hygiene checks.
 
-Enforces the docs lifecycle from AGENTS.md "Shipping a proposal": proposal
-files declare a Status line, and no markdown doc links to a file that has
-been deleted (e.g. a proposal distilled into the decision log).
+Enforces the docs lifecycle from AGENTS.md "Shipping a proposal" and the
+proposal template: proposal files declare a Status line and lead with the
+TL;DR / Decision points / Problem sections in that order, and no markdown
+doc links to a file that has been deleted (e.g. a proposal distilled into
+the decision log).
 """
 
 import re
 from pathlib import Path
 from urllib.parse import unquote, urlparse
+
+from markdown_it import MarkdownIt
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -30,6 +34,29 @@ REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTI
 
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
+
+REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
+
+
+def _visible_h2_headings(text: str) -> list[str]:
+    """Collect H2 headings as the reader of the rendered page sees them.
+
+    Reads the CommonMark parser's heading tokens rather than scanning
+    text or rendered HTML (earlier attempts at both kept missing spec
+    edges: fence forms, comment placement, code spans, raw-text
+    elements). Everything that hides a heading falls out of the token
+    stream by construction: fenced code parses as code tokens; comment
+    blocks, script/style raw text, and other block-level raw HTML parse
+    as html_block tokens, never headings; and an inline comment can't
+    swallow a heading, because a heading line interrupts the paragraph
+    that would have to contain it.
+    """
+    tokens = MarkdownIt("commonmark").parse(text)
+    return [
+        inline.content.strip()
+        for open_tok, inline in zip(tokens, tokens[1:])
+        if open_tok.type == "heading_open" and open_tok.tag == "h2"
+    ]
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
@@ -66,3 +93,73 @@ def test_proposal_docs_declare_status():
         f"Proposal docs missing a 'Status:' line in the first "
         f"{STATUS_SEARCH_LINES} lines: {missing}"
     )
+
+
+def test_proposal_docs_lead_with_required_sections():
+    """Placement, not just presence: the maintainer read-path comes first."""
+    bad = []
+    for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
+        headings = _visible_h2_headings(doc.read_text(encoding="utf-8"))
+        leading = tuple(headings[: len(REQUIRED_LEADING_SECTIONS)])
+        if leading != REQUIRED_LEADING_SECTIONS:
+            bad.append(f"{doc.relative_to(REPO_ROOT)}: first H2s are {list(leading)}")
+    assert not bad, (
+        "Proposal docs must open with '## TL;DR', '## Decision points', "
+        "'## Problem' in that order (see the AGENTS.md proposal template):\n"
+        + "\n".join(bad)
+    )
+
+
+def test_heading_scan_matches_rendered_visibility():
+    """Only rendered H2s count: embedded examples must not satisfy (or
+    break) the leading-section check. Fenced code hides headings (all
+    fence forms, including one left unclosed, which CommonMark extends
+    through end of document); raw HTML comment blocks hide headings; so
+    does literal heading markup inside raw-text elements like script.
+    Markers inside code spans or fenced code are escaped in the output
+    and hide nothing — and an unclosed marker after visible text is
+    escaped too (not a comment), so headings after it stay visible."""
+    doc = "\n".join(
+        [
+            "# Title",
+            "",
+            "## Real A",
+            "",
+            "```markdown",
+            "## Hidden in backtick fence",
+            "```",
+            "~~~",
+            "## Hidden in tilde fence",
+            "~~~",
+            "````md",
+            "```",
+            "## Hidden in long fence with inner short fence",
+            "````",
+            "<!--",
+            "## Hidden in comment block",
+            "-->",
+            "<!-- ## Hidden in one-line comment -->",
+            "",
+            "`<!--`",
+            "",
+            "## Real B, between code-span comment markers",
+            "",
+            "`-->`",
+            "",
+            "Notes <!--",
+            "",
+            "## Real C, after an unclosed marker that renders escaped",
+            "",
+            "<script>",
+            "<h2>Hidden in script raw text</h2>",
+            "</script>",
+            "",
+            "```",
+            "## Hidden in unclosed fence at EOF",
+        ]
+    )
+    assert _visible_h2_headings(doc) == [
+        "Real A",
+        "Real B, between code-span comment markers",
+        "Real C, after an unclosed marker that renders escaped",
+    ]
