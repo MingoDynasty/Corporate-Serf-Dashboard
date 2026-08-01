@@ -115,34 +115,42 @@ in-process — the settings page is the live write path).
   restart.
 - `example.toml` drops the two entries (it documents `config.toml` keys
   only).
-- Migration is manual, per the single-user no-compat-shims convention:
-  the PR description names the two lines to delete from `config.toml`
-  and gives the exact `settings.json` content. A forgotten edit fails
-  startup with the existing config error — pydantic's unknown-key
-  rejection stays, because it is what catches typos in a hand-edited
-  file.
-- **How that strictness meets auto-updates, stated plainly:** the
-  installed state root keeps its `config.toml` across updates, so until
-  the edit is applied there, the release carrying this PR fails its
-  config load and the launcher's health gate declines to promote it —
-  the previous version keeps running, and the full
-  download/sync/readiness-timeout retries on every launch (the
-  activation entry's documented accepted limitation for any
-  non-promoting release). Nothing is lost and nothing is stranded:
-  applying the documented edit lets the next launch promote, and doing
-  the edit at merge time avoids the stall entirely. This is the
-  activation decision's sanctioned path for a rare format break — a
-  manual step called out in the PR, not a compatibility window or
-  in-app migration (the PR #107 house convention; adjudicated 2026-08-01
-  in review: easiest-manual wins at the single-user phase). PR 2's
-  `stats_dir` removal rides the same mechanics, and its instruction is
-  the simplest possible form: rewrite `config.toml` down to its minimal
-  remaining shape (`port`, plus `debug` in dev checkouts) as if freshly
-  installed, with `data/settings.json` becoming the source of truth for
-  everything else. Merging PRs 1 and 2 in quick succession collapses
-  both steps into that single rewrite; PR 1 alone still requires
-  `stats_dir` in `config.toml`, so the full reduction applies only from
-  PR 2 on.
+- **Unknown `config.toml` keys are tolerated and warn-logged — a
+  correction from review.** Earlier revisions claimed pydantic's
+  unknown-key rejection would fail startup on unmigrated configs; that
+  behavior never existed (a bare pydantic `@dataclass()` silently
+  ignores extra keys — verified on this head). PR 1 makes the real
+  behavior explicit and useful: `load_config()` compares the parsed
+  TOML keys against the `ConfigData` fields and logs one warning naming
+  every unknown key (regression-tested), then proceeds. Tolerance is a
+  permanent design choice, not a transition shim: it is the
+  removed-field mirror of the activation entry's "releases must read
+  older state" rule, and it is what keeps every promotion boundary and
+  every rollback safe by construction — a config with retired keys runs
+  on both the old and the new version. The warn line replaces the
+  (never-real) typo protection with visible-but-non-fatal feedback.
+- **Migration is manual and never blocks an update** (single-user
+  no-compat-shims convention; adjudicated 2026-08-01: easiest-manual
+  wins). The governing rule: **through any promotion boundary,
+  `config.toml` stays in a shape both the outgoing and incoming
+  versions can read; cleanup happens only after promotion.** Concretely:
+  - PR 1: no `config.toml` edit is required for the update to promote —
+    leftover identity keys are warn-logged and ignored. Create
+    `data/settings.json` with the identity (exact content in the PR
+    description); until then rank features are simply off, the visible
+    and easily fixed symptom of a forgotten step. Delete the two retired
+    lines whenever convenient.
+  - PR 2: leave `stats_dir` in `config.toml` through the update — the
+    outgoing version requires it, the incoming one warns and ignores
+    it — and add `stats_dir` to `data/settings.json`. Once the release
+    is promoted and healthy, rewrite `config.toml` to its minimal shape
+    (`port`, plus `debug` in dev checkouts), with `data/settings.json`
+    as the source of truth for everything else. Rolling back past PR 2
+    later requires restoring the one `stats_dir` line — the manual
+    convention's price, stated openly. Never do the minimal-config
+    rewrite before promotion: the fallback path (launcher reverting to
+    the prior version on a failed activation) must always find a config
+    the prior version accepts.
 
 ### `stats_dir` relocation and nullable startup (PR 2)
 
@@ -168,9 +176,10 @@ in-process — the settings page is the live write path).
   fully non-interactive, and the installer never touches
   `settings.json`. This is forced by the relocation itself, not by the
   bootstrap: once `stats_dir` is no longer a config key, the installer's
-  detection has nowhere legitimate to write — `config.toml` now rejects
-  the key, and seeding `settings.json` was considered and rejected (one
-  home, one writer). The app-side bootstrap (PR 4, below) later replaces
+  detection has nowhere legitimate to write — a `stats_dir` line in
+  `config.toml` would just be warn-logged and ignored, and seeding
+  `settings.json` was considered and rejected (one home, one writer).
+  The app-side bootstrap (PR 4, below) later replaces
   what was deleted; until it lands, an absent `stats_dir` simply means
   the app runs empty with the Home hint, and configuration is manual.
 - `docs/decision_log.md`: dated supersede notes on the 2026-07-19
@@ -273,8 +282,12 @@ before the app ever writes a value on its own.
   logged, never fatal. No asked/declined tri-state. Consumers never
   distinguish absent from empty; only the R5 bootstrap does.
 - R3 — Identity leaves `ConfigData`; consumers read the settings service
-  per-operation (live apply). Manual two-line migration; pydantic's
-  unknown-key rejection stays.
+  per-operation (live apply). Migration is manual and never blocks an
+  update: unknown `config.toml` keys are warn-logged and ignored
+  (regression-tested; pydantic never rejected them — corrected in
+  review), and through any promotion boundary the config stays readable
+  by both the outgoing and incoming versions, with cleanup only after
+  promotion.
 - R4 — `stats_dir` leaves `ConfigData`; the app starts and serves without
   a usable stats directory (scan and watchdog skipped, empty pages, a
   plain-text Home hint that PR 3 upgrades into a `/settings` link).
@@ -305,6 +318,7 @@ before the app ever writes a value on its own.
 - **PR 1 — settings store and identity relocation.** New
   `settings_service.py` (store, accessors, tests); `ConfigData` drops the
   two identity fields; the five chokepoint files switch to service reads;
+  `load_config()` gains the unknown-key warning (regression-tested);
   `example.toml` drops the entries; `docs/architecture.md` module map
   gains the service; manual-migration note in the PR description. Hard
   dependencies: none.
