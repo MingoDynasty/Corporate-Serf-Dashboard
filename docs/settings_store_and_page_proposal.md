@@ -121,6 +121,20 @@ in-process — the settings page is the live write path).
   startup with the existing config error — pydantic's unknown-key
   rejection stays, because it is what catches typos in a hand-edited
   file.
+- **How that strictness meets auto-updates, stated plainly:** the
+  installed state root keeps its `config.toml` across updates, so until
+  the edit is applied there, the release carrying this PR fails its
+  config load and the launcher's health gate declines to promote it —
+  the previous version keeps running, and the full
+  download/sync/readiness-timeout retries on every launch (the
+  activation entry's documented accepted limitation for any
+  non-promoting release). Nothing is lost and nothing is stranded:
+  applying the documented edit lets the next launch promote, and doing
+  the edit at merge time avoids the stall entirely. This is the
+  activation decision's sanctioned path for a rare format break — a
+  manual step called out in the PR, not a compatibility window or
+  in-app migration (the PR #107 house convention). PR 2's `stats_dir`
+  removal rides the same mechanics and the same one-time edit.
 
 ### `stats_dir` relocation and nullable startup (PR 2)
 
@@ -130,8 +144,11 @@ in-process — the settings page is the live write path).
   unset — or set but not an existing directory (the moved-library case) —
   startup skips the initial stats scan and the file watchdog, logs one
   line naming the configured path, and serves normally: pages render
-  with empty data, and Home shows a persistent hint ("No stats directory
-  configured — set it in Settings") linking to the settings page. Unset
+  with empty data, and Home shows a persistent plain-text hint ("No
+  stats directory configured"). The hint neither mentions nor links to
+  the settings page yet — every merge to `main` releases independently,
+  and `/settings` only exists after PR 3, which upgrades this hint into
+  a link. Unset
   and invalid behave identically; today's `SystemExit` path and its
   stderr message are removed, and the startup-contract tests flip
   accordingly (missing `port` still exits; missing `stats_dir` no
@@ -164,21 +181,32 @@ manual entry and a single Save:
   free text. No online verification of any value — confirming a username
   against KovaaK's is detection territory and stays out of this
   proposal.
-- **Apply semantics:** identity saves apply live — the save handler also
-  calls `start_percentile_warmup_worker()` (idempotent) when a username
-  is present, so warmup starts without a restart. A `stats_dir` save
-  persists immediately but shows a "restart the dashboard to apply"
-  notice whenever the saved value differs from the value the server
-  booted with. The app never restarts itself, and there is no live
-  re-initialization of the watchdog or in-memory data — that machinery
-  is the riskiest code the arc could contain, and a restart costs the
-  user one console close and a shortcut click.
+- **Apply semantics:** setting identity for the *first time* applies
+  live — rank lookups read per-operation, and the save handler calls
+  `start_percentile_warmup_worker()` (idempotent) to cold-start the
+  worker that boot skipped, which works precisely because the singleton
+  was never created. *Changing or clearing* an already-set identity
+  instead gets the same "restart the dashboard to apply" notice as
+  `stats_dir`: the warmup singleton keeps the context it started with
+  (a second `start` call is a no-op), the caches it fills are scoped to
+  one identity per process, and hot-swap/reset semantics are not worth
+  building for an event this rare — a restart reproduces exactly
+  today's edit-config-and-restart behavior. A `stats_dir` save persists
+  immediately but shows the restart notice whenever the saved value
+  differs from the value the server booted with. The app never restarts
+  itself, and there is no live re-initialization of the watchdog,
+  warmup worker, or in-memory data — that machinery is the riskiest
+  code the arc could contain, and a restart costs the user one console
+  close and a shortcut click.
 - **Callback safety:** the save callback is `n_clicks`-guarded with a
   None-trigger regression test (the known
   initial-call-despite-`prevent_initial_call` hazard — this callback
   writes state).
 - The page talks only to the settings service; no endpoint logic in UI
   code, per the UI-boundary convention.
+- Upgrades PR 2's plain-text Home hint into a link to `/settings` with
+  "set it in Settings" wording — the route now exists (releases are
+  per-merge, so PR 2 could not link ahead of it).
 
 ### `stats_dir` startup bootstrap (PR 4, last)
 
@@ -240,8 +268,9 @@ before the app ever writes a value on its own.
   per-operation (live apply). Manual two-line migration; pydantic's
   unknown-key rejection stays.
 - R4 — `stats_dir` leaves `ConfigData`; the app starts and serves without
-  a usable stats directory (scan and watchdog skipped, empty pages, Home
-  hint to Settings). Invalid behaves as unset; startup no longer exits
+  a usable stats directory (scan and watchdog skipped, empty pages, a
+  plain-text Home hint that PR 3 upgrades into a `/settings` link).
+  Invalid behaves as unset; startup no longer exits
   for stats problems. Installed `config.toml` is `port` only.
 - R5 — `stats_dir` bootstraps app-side: on startup with the key absent,
   a silent local detection (registry → `libraryfolders.vdf` → path
@@ -254,9 +283,11 @@ before the app ever writes a value on its own.
 - R6 — Settings page with manual entry, single Save, and offline
   validation only: directory-exists for `stats_dir`, digits-only for
   `steam_id`, free-text username. No online verification.
-- R7 — Apply semantics: identity live (save also live-starts the warmup
-  worker, idempotently); `stats_dir` restart-required, signaled by a
-  notice comparing the saved value to the boot value. The app never
+- R7 — Apply semantics: the first-time identity set applies live
+  (lookups read per-operation; the save cold-starts the never-started
+  warmup worker). Changing or clearing an already-set identity, and any
+  `stats_dir` change, are restart-required, signaled by a notice. No
+  hot-swap or reset of the warmup singleton; the app never
   self-restarts.
 - R8 — State-writing page callbacks are `n_clicks`-guarded with a
   None-trigger regression test.
@@ -276,7 +307,8 @@ before the app ever writes a value on its own.
   decision-log supersede notes. No detection of any kind. Hard
   dependency: PR 1.
 - **PR 3 — settings page.** `/settings` page, validation, apply
-  semantics, callback guards and tests. Hard dependency: PR 2.
+  semantics, callback guards and tests; upgrades PR 2's plain-text Home
+  hint into a `/settings` link. Hard dependency: PR 2.
 - **PR 4 — `stats_dir` startup bootstrap.** The detector
   (fixture-tested) and its startup wiring, per the design section. Hard
   dependency: PR 2 only; ordered after PR 3 deliberately (repair
