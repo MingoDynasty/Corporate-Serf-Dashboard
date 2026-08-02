@@ -169,10 +169,11 @@ popular benchmarks (Voltaic, Viscose) are visible by default; to enable any
 other, toggle "Show hidden" on the Playlists page and unhide it — no file
 copying needed.
 
-You can also import any playlist by share code: open the `Settings` modal and
-enter the code, and the app fetches the playlist from the KovaaK's API and
-saves it under `data/playlists`. Playlists imported this way carry no rank
-data — the benchmark-rank overlays come only from the bundled library.
+You can also import any playlist by share code: on the Playlists page, click
+**Import** and enter the code, and the app fetches the playlist from the
+KovaaK's API and saves it under `data/playlists`. Playlists imported this way
+carry no rank data — the benchmark-rank overlays come only from the bundled
+library.
 
 ## Run From Source
 
