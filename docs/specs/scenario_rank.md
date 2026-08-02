@@ -1,12 +1,18 @@
 # Scenario Rank
 
-Current behavior of the scenario-rank capability: resolving the configured
-player's leaderboard position for a scenario from the KovaaK's API, caching
-it, and degrading when the API misbehaves. Statements here describe what the
-app does today and link the [decision log](../decision_log.md) entries that
-set them — rationale lives in those entries, not here. Runtime structure is
-mapped in [architecture.md](../architecture.md); endpoint behavior and quirks
-in [kovaaks_api_notes.md](../kovaaks_api_notes.md). In user-facing text,
+The dashboard looks up where the player currently places on a scenario's
+global KovaaK's leaderboard and how that placement compares with everyone
+else on the board. Placements are cached for a week and re-checked
+automatically after a new personal best, so the display stays current
+without hammering the API. When KovaaK's is slow or unavailable the app
+keeps showing the best data it already has rather than erroring, and with
+no username configured it makes no network calls at all.
+
+Statements below describe what the app does today and link the
+[decision log](../decision_log.md) entries that set them — rationale lives
+in those entries, not here. Runtime structure is mapped in
+[architecture.md](../architecture.md); endpoint behavior and quirks in
+[kovaaks_api_notes.md](../kovaaks_api_notes.md). In user-facing text,
 leaderboard placement is worded "Position", never "Rank" (which means
 benchmark tier) — see the
 [2026-07-06 verbiage entry](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage).
