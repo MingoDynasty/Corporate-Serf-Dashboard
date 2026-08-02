@@ -84,14 +84,19 @@ Codex <codex@local>
 
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
 - Use proposal docs under `docs/` for feature design that is in flight or
-  planned. Every proposal starts with a `Status:` line near the top
-  (`Proposed`, `In progress`, `Future`, ...) so a reader can tell live work
-  from stale files at a glance.
+  planned, following the template below. The maintainer reads `Status:`,
+  **TL;DR**, and **Decisions needed** by default and the dense body on
+  demand — so a judgment call buried in the body is a process bug, and so
+  is a mechanical choice escalated into Decisions needed.
+  `tests/test_docs.py` enforces the `Status:` line (`Proposed`,
+  `In progress`, `Future`, ...) and the leading section order.
 - Use `docs/specs/<capability>.md` for the current behavior of a shipped
   capability: plain statements of what the app does today, each linking the
-  decision-log entries that set it instead of restating their rationale.
-  `docs/decision_log.md` stays the chronological change history. Create a
-  spec when a capability needs one — do not backfill specs ahead of need.
+  decision-log entries that set it instead of restating their rationale,
+  and opening with a layer-1 summary (see "Doc style — two readers, two
+  layers"). `docs/decision_log.md` stays the chronological change history.
+  Create a spec when a capability needs one — do not backfill specs ahead
+  of need.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
@@ -109,17 +114,91 @@ Codex <codex@local>
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
 - When fixing a bug, add or update a regression test unless there is a clear reason not to; explain the exception in the handoff.
 
+### Doc style — two readers, two layers
+
+Durable docs have two readers with opposite needs: the maintainer, who
+skims to decide, and agents, who want maximum constraint per token. Serve
+both by layering:
+
+- **Layer 1 (maintainer).** Every new or materially-edited
+  `decision_log.md` entry — and every `docs/specs/` file, once that layer
+  exists — opens with a 2–4 sentence plain-language summary: what changed,
+  why, and what a user or contributor would notice. One idea per sentence.
+  No cross-references, file paths, or embedded enumerations — those belong
+  in the payload.
+- **Layer 2 (agents).** The dense payload follows: invariants, edge cases,
+  enumerations, cross-references. Write it as before — compression is a
+  feature here.
+- The summary is written and updated in the same PR as its payload, by the
+  same author, and reviewed with it. A payload change that leaves the
+  summary untouched should make the reviewer ask which layer is wrong.
+- No backfill: existing entries are converted only when a change touches
+  them anyway.
+- The prose rules above are writing guidance, held by same-PR review;
+  `tests/test_docs.py` gates only the presence and order of the leading
+  proposal sections, never prose quality or full Markdown rendering.
+
+### Proposal template
+
+```markdown
+# <Title>
+
+Status: Proposed
+Date: YYYY-MM-DD
+
+## TL;DR
+
+<2–4 plain sentences: the problem and the shape of the fix. Layer-1 rules
+apply — no cross-references, no embedded lists.>
+
+## Decisions needed
+
+<Only choices requiring maintainer product or workflow judgment, or
+acceptance of a costly-to-reverse trade-off, each with a recommended
+answer and the material consequence of choosing differently. The author
+owns mechanical, reversible, and evidence-resolvable choices — do not
+escalate them here. Write "None — mechanical." if there are none.>
+
+## Problem
+
+<Dense. Evidence, verified facts, current behavior, why now.>
+
+## Design
+
+<Dense. Behavior, invariants, edge cases, blast radius, alternatives
+rejected.>
+
+## Out of scope
+
+<What this deliberately does not do; where deferred work is tracked.>
+
+## Testing
+
+<How the change proves itself: new or updated tests, gates, manual
+checks.>
+```
+
+Optional sections (Verified facts, Open questions, Future / optional) slot
+in where the existing proposals put them. The first three H2 sections are
+fixed and mechanically enforced; the dense body after Problem is
+per-proposal — Design is the normal next section, but more specific
+sections may replace it.
+
 ### Shipping a proposal (docs definition of done)
 
 The PR that ships (or finishes shipping) a proposal must also tidy the docs,
 in the same PR — do not leave it for later:
 
-1. Distill the proposal's durable decisions into `docs/decision_log.md`.
+1. Distill the proposal's durable decisions into `docs/decision_log.md`;
+   each new entry opens with its layer-1 summary (see "Doc style — two
+   readers, two layers").
 2. Update the touched capability's spec under `docs/specs/` (if it has one)
    so it states the shipped behavior, linking the new decision-log entries.
 3. Delete the proposal file (git history preserves the full text).
-4. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers;
-   promote what's next.
+4. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers
+   and promote what's next. Shipped keeps only the ~5 most recent
+   milestones, newest first — push the oldest entry out entirely (steps 1
+   and 5 already preserve its durable record).
 5. Add the feature's user-facing rationale — the problem it solves — to the
    inventory in `docs/product.md` (the product counterpart to step 1's
    technical distillation).
