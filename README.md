@@ -6,6 +6,8 @@ This app watches your KovaaK's stats directory and turns your runs into training
 playing and generating new scores, the home page's plots, stats, and notifications update
 automatically in the background.
 
+![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
+
 ## Features
 
 - **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
@@ -20,15 +22,6 @@ automatically in the background.
 
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
 [docs/roadmap.md](docs/roadmap.md).
-
-## Tech Stack
-
-1. Python
-2. Dash
-    1. Plotly.js
-    2. Dash Mantine Components
-    3. React
-    4. Flask
 
 ## Install
 
@@ -50,13 +43,8 @@ disturbed. Along the way the installer:
 - finds your KovaaK's stats folder (from Steam's install path and library
   folders) and asks you to confirm it;
 - writes a starter `config.toml` beside the install;
-- creates a **Corporate Serf Dashboard** desktop shortcut.
-
-Launch it from that shortcut, which opens the dashboard in your browser. A
-console window stays open while the dashboard is running — **closing it stops
-the dashboard**, which is how you shut it down. Double-clicking the shortcut
-again while it is already running just opens another browser tab; it will not
-start a second copy.
+- creates a **Corporate Serf Dashboard** desktop shortcut — launching is covered
+  in [Usage](#usage).
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
@@ -85,7 +73,8 @@ per-process default for this one script — it does not, and cannot, override
 enterprise Group Policy or AppLocker. Home machines are the audience here; on a
 machine someone else administers, ask them first.
 
-### Rollback
+<details>
+<summary><strong>Rollback</strong> — go back to (and pin) an older release</summary>
 
 Every release is kept and immutable, so going back is a matter of naming a tag.
 Pick one from the
@@ -120,20 +109,26 @@ install stops with a "cannot load config.toml" error. Add those two keys from
 `example.toml`, or delete `config.toml` so the older installer regenerates its
 own, then re-run.
 
+</details>
+
 ### Uninstall
 
 Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
 shortcut. Nothing else on the machine was modified — no registry keys, no
 machine-wide Python or uv, nothing on `PATH`.
 
-One loose end: the easy install downloads the installer to
-`%TEMP%\csd-install-<tag>.ps1` and leaves it there. It is inert once the
-install finishes — nothing reads it again — and Windows clears `%TEMP%`
-eventually, but you can delete it yourself:
+<details>
+<summary>One loose end: the installer script left in <code>%TEMP%</code></summary>
+
+The easy install downloads the installer to `%TEMP%\csd-install-<tag>.ps1` and
+leaves it there. It is inert once the install finishes — nothing reads it again
+— and Windows clears `%TEMP%` eventually, but you can delete it yourself:
 
 ```powershell
 Remove-Item "$env:TEMP\csd-install-*.ps1"
 ```
+
+</details>
 
 ## Configuration
 
@@ -154,47 +149,50 @@ setting; two are worth knowing about:
 
 ## Usage
 
-Launch from the desktop shortcut, or run it yourself from a source checkout
-(below), then open <http://localhost:8050/> — or your configured port.
+Launch from the desktop shortcut, which opens the dashboard in your browser —
+or run it from a source checkout (below) and open <http://localhost:8050/>, or
+your configured port. When launched from the shortcut, a console window stays
+open while the dashboard is running — **closing it stops the dashboard**, which
+is how you shut it down. Double-clicking the shortcut again while it is already
+running just opens another browser tab; it will not start a second copy.
 
 Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
 share one in-memory run-event queue and are not synchronized with each other.
 
+## Playlists and Benchmarks
+
+Benchmarks are playlists with rank data attached. The app ships with a bundled
+benchmark library in `resources/benchmarks` — built with the help of
+[Evxl.app](https://evxl.app)'s author by combining his benchmark rank data with
+playlist data from the KovaaK's API — and loads all of it at startup. The most
+popular benchmarks (Voltaic, Viscose) are visible by default; to enable any
+other, toggle "Show hidden" on the Playlists page and unhide it — no file
+copying needed.
+
+You can also import any playlist by share code: on the Playlists page, click
+**Import** and enter the code, and the app fetches the playlist from the
+KovaaK's API and saves it under `data/playlists`. Playlists imported this way
+carry no rank data — the benchmark-rank overlays come only from the bundled
+library.
+
 ## Run From Source
 
-For development, or if you would rather manage the toolchain yourself. Requires
-git and [uv](https://docs.astral.sh/uv/):
+For development, or if you would rather manage the toolchain yourself. The app
+is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
+[docs/architecture.md](docs/architecture.md) has the module map. Requires git
+and [uv](https://docs.astral.sh/uv/):
 
 ```shell
 git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
 cd Corporate-Serf-Dashboard
 uv sync
+```
+
+Copy `example.toml` to `config.toml` and set `stats_dir` (see
+[Configuration](#configuration)), then start the app:
+
+```shell
 uv run python source/app.py
 ```
 
-Copy `example.toml` to `config.toml` and set `stats_dir` before the first run
-(see [Configuration](#configuration)). A source checkout does not auto-update;
-`git pull` is the update path.
-
-## Example
-
-![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
-
-## Rank Data
-
-In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
-the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
-common benchmarks. These files are in `resources/benchmarks` and the app loads all of them at startup. The most
-popular ones (Voltaic, Viscose) are visible by default; to enable any other benchmark, toggle "Show hidden" on the
-Playlists page and unhide it — no file copying needed.
-
-Playlist JSON must include a non-blank `code` field. The app uses that code as the playlist identity for routes,
-selectors, imports, and filenames; playlist names are only display labels.
-
-## Import Playlist
-
-In the `Settings` modal, there is an option to import a playlist via share code. The app queries the
-KovaaK's API with your input share code to retrieve the playlist data.
-
-Note that by importing playlists this way, the playlist will not include rank data. If you want to include rank data for
-the rank overlays, then see the **Rank Data** section. Imported playlists are saved under `data/playlists`.
+A source checkout does not auto-update; `git pull` is the update path.

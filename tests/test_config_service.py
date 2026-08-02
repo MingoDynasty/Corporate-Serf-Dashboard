@@ -8,10 +8,6 @@ import pytest
 from source.config.config_service import ConfigData
 from source.utilities.paths import STATE_DIR_ENV_VAR
 
-CONFIG_ERROR_MESSAGE = (
-    "Configuration error: copy example.toml to config.toml and set stats_dir."
-)
-
 
 def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
     """Start the app in ``cwd`` and return once it exits."""
@@ -54,8 +50,12 @@ def test_startup_with_missing_or_invalid_config_exits_cleanly(
     tmp_path: Path,
     config_contents: str | None,
 ) -> None:
+    # Resolved because the app names the config path it loaded, and
+    # ``state_dir`` resolves the working directory before joining it.
+    tmp_path = tmp_path.resolve()
+    config_path = tmp_path / "config.toml"
     if config_contents is not None:
-        (tmp_path / "config.toml").write_text(config_contents, encoding="utf-8")
+        config_path.write_text(config_contents, encoding="utf-8")
 
     result = _run_app(tmp_path)
 
@@ -65,8 +65,11 @@ def test_startup_with_missing_or_invalid_config_exits_cleanly(
     stdout_lines = result.stdout.splitlines()
     assert len(stdout_lines) == 1
     assert "| Build " in stdout_lines[0]
-    assert result.stderr.strip() == CONFIG_ERROR_MESSAGE
     assert "Traceback" not in result.stderr
+    # One actionable line: which file failed to load, and what to do about it.
+    assert "\n" not in result.stderr.strip()
+    assert str(config_path) in result.stderr
+    assert "copy example.toml to config.toml" in result.stderr
 
 
 def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:

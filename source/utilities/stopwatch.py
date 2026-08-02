@@ -1,9 +1,6 @@
 """Provide elapsed-time measurements for diagnostic logging."""
 
-import logging
 import time
-
-logger = logging.getLogger(__name__)
 
 
 class Stopwatch:

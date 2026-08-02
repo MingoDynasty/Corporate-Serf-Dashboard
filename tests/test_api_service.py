@@ -383,7 +383,7 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
-    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+    caplog.set_level(logging.INFO, logger=api_service.__name__)
 
     response = api_service._get_with_retry(
         "https://example.test",
@@ -399,6 +399,11 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
     assert caplog.messages == [
         "Rate limited at https://example.test (attempt 1/3); retrying after 0.50s",
         "Rate limited at https://example.test (attempt 2/3); retrying after 0.50s",
+    ]
+    # Retries that may recover are INFO; only exhausted attempts warn upstream.
+    assert [record.levelno for record in caplog.records] == [
+        logging.INFO,
+        logging.INFO,
     ]
 
 
@@ -416,7 +421,7 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
-    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+    caplog.set_level(logging.INFO, logger=api_service.__name__)
 
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
@@ -424,6 +429,8 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
         "Transient GET failure at https://evxl.gg/api after 1.00s "
         "(attempt 1/3); retrying: connection dropped"
     ]
+    # Retries that may recover are INFO; only exhausted attempts warn upstream.
+    assert [record.levelno for record in caplog.records] == [logging.INFO]
 
 
 def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog):

@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from source.utilities.paths import STATE_DIR_ENV_VAR
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 # Bind a free port, then try to bind that same port a second time -- the
@@ -65,16 +67,20 @@ print("bind unexpectedly succeeded")
 """
 
 
-def _run_in_app(snippet: str) -> subprocess.CompletedProcess[str]:
+def _run_in_app(snippet: str, cwd: Path) -> subprocess.CompletedProcess[str]:
     """Run a snippet against ``source.app`` in a child process.
 
     Importing ``source.app`` configures process-wide logging and creates
-    ``data/logs``, so it stays out of the test process.
+    ``data/logs``, so it stays out of the test process. ``cwd`` is the state
+    root: the port-taken exit writes a log record there, so each test points
+    it at its own temp directory instead of the repo's live logs.
     """
+    environment = {**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+    environment.pop(STATE_DIR_ENV_VAR, None)
     return subprocess.run(
         [sys.executable, "-c", snippet],
-        cwd=REPO_ROOT,
-        env={**os.environ, "PYTHONPATH": str(REPO_ROOT)},
+        cwd=cwd,
+        env=environment,
         capture_output=True,
         text=True,
         check=False,
@@ -82,7 +88,9 @@ def _run_in_app(snippet: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def test_bind_server_socket_returns_both_bound_loopback_faces() -> None:
+def test_bind_server_socket_returns_both_bound_loopback_faces(
+    tmp_path: Path,
+) -> None:
     result = _run_in_app(
         "import socket;"
         " from source.app import bind_server_socket;"
@@ -91,7 +99,8 @@ def test_bind_server_socket_returns_both_bound_loopback_faces() -> None:
         " sorted(s.family.name for s in socks),"
         " len({s.getsockname()[1] for s in socks}),"
         " socks[0].getsockname()[1] != 0,"
-        " [s.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN) for s in socks])"
+        " [s.getsockopt(socket.SOL_SOCKET, socket.SO_ACCEPTCONN) for s in socks])",
+        tmp_path,
     )
 
     assert result.returncode == 0, result.stderr
@@ -103,8 +112,10 @@ def test_bind_server_socket_returns_both_bound_loopback_faces() -> None:
     assert result.stdout.rstrip().endswith("[0, 0]"), result.stdout
 
 
-def test_second_bind_of_a_claimed_port_exits_with_an_actionable_error() -> None:
-    result = _run_in_app(SECOND_BIND_SNIPPET)
+def test_second_bind_of_a_claimed_port_exits_with_an_actionable_error(
+    tmp_path: Path,
+) -> None:
+    result = _run_in_app(SECOND_BIND_SNIPPET, tmp_path)
 
     assert "second bind unexpectedly succeeded" not in result.stdout
     assert result.returncode == 1, result.stderr
@@ -113,19 +124,14 @@ def test_second_bind_of_a_claimed_port_exits_with_an_actionable_error() -> None:
     assert f"port {port} is already in use" in result.stderr
     assert "127.0.0.1" in result.stderr and "::1" in result.stderr
     assert "config.toml" in result.stderr
+    # Startup errors also land in the log files: bug reports arrive with
+    # debug.log, and stderr is gone once the console window closes.
+    debug_log = (tmp_path / "data" / "logs" / "debug.log").read_text(encoding="utf-8")
+    assert f"port {port} is already in use" in debug_log
 
 
-def test_a_port_taken_on_only_the_ipv4_face_is_refused() -> None:
-    result = _run_in_app(_one_face_snippet("AF_INET", "127.0.0.1"))
-
-    assert "bind unexpectedly succeeded" not in result.stdout
-    assert result.returncode == 1, result.stderr
-    port = result.stdout.split("port=")[1].split()[0]
-    assert f"port {port} is already in use" in result.stderr
-
-
-def test_a_port_taken_on_only_the_ipv6_face_is_refused() -> None:
-    result = _run_in_app(_one_face_snippet("AF_INET6", "::1"))
+def test_a_port_taken_on_only_the_ipv4_face_is_refused(tmp_path: Path) -> None:
+    result = _run_in_app(_one_face_snippet("AF_INET", "127.0.0.1"), tmp_path)
 
     assert "bind unexpectedly succeeded" not in result.stdout
     assert result.returncode == 1, result.stderr
@@ -133,8 +139,17 @@ def test_a_port_taken_on_only_the_ipv6_face_is_refused() -> None:
     assert f"port {port} is already in use" in result.stderr
 
 
-def test_a_machine_without_ipv6_is_served_on_ipv4_alone() -> None:
-    result = _run_in_app(NO_IPV6_SNIPPET)
+def test_a_port_taken_on_only_the_ipv6_face_is_refused(tmp_path: Path) -> None:
+    result = _run_in_app(_one_face_snippet("AF_INET6", "::1"), tmp_path)
+
+    assert "bind unexpectedly succeeded" not in result.stdout
+    assert result.returncode == 1, result.stderr
+    port = result.stdout.split("port=")[1].split()[0]
+    assert f"port {port} is already in use" in result.stderr
+
+
+def test_a_machine_without_ipv6_is_served_on_ipv4_alone(tmp_path: Path) -> None:
+    result = _run_in_app(NO_IPV6_SNIPPET, tmp_path)
 
     assert result.returncode == 0, result.stderr
     assert "1 True" in result.stdout
