@@ -7,7 +7,27 @@ deliberately unscheduled follow-on proposal, working notes in
 `ignore/design-notes/config-settings-arc.md`; amended 2026-08-01 to
 replace the installer's settings seed with an app-side `stats_dir`
 startup bootstrap, and again the same day to order that bootstrap last —
-PRs 1–3 are fully manual)
+PRs 1–3 are fully manual; restructured 2026-08-02 to the new proposal
+template)
+
+## TL;DR
+
+Three user-level values — the stats folder location, the KovaaK's
+username, and the Steam ID — live in a hand-edited configuration file
+that the app reads once at startup. This proposal moves them into a
+small app-owned settings store, adds a settings page for viewing and
+changing them, and lets the app start usefully even when no stats folder
+is configured, so a moved Steam library is no longer fatal. The
+installer loses its only interactive step, and as the final piece the
+app learns to find the stats folder on its own. Automatic detection of
+the KovaaK's identity is deferred to a follow-on proposal.
+
+## Decisions needed
+
+None — the judgment calls were adjudicated during the 2026-07-20 design
+discussion and the 2026-08-01 review rounds (manual-first scope split,
+bootstrap ordered last, tolerate-and-warn unknown keys, easiest-manual
+migration); the Register of decisions records each outcome.
 
 ## Problem
 
@@ -253,7 +273,7 @@ before the app ever writes a value on its own.
 - The only hard dependency is PR 2 (the relocation); running after
   PR 3 is the deliberate ordering above, not a technical constraint.
 
-### Non-goals
+## Out of scope
 
 - No identity auto-detection (the KovaaK's-API-verified kind), no
   candidate dropdowns, and no initial-setup flow — follow-on proposal
@@ -334,9 +354,30 @@ before the app ever writes a value on its own.
 - **PR 4 — `stats_dir` startup bootstrap.** The detector
   (fixture-tested) and its startup wiring, per the design section. Hard
   dependency: PR 2 only; ordered after PR 3 deliberately (repair
-  surface first). Ships the proposal: distills R1–R8's durables into
-  `docs/decision_log.md`, deletes this file, updates `docs/roadmap.md`
-  and `docs/product.md`, archives the consumed kickoff prompts.
+  surface first). Ships the proposal per the AGENTS.md checklist:
+  distills R1–R8's durables into `docs/decision_log.md` with layer-1
+  summaries on the new entries, deletes this file, updates
+  `docs/roadmap.md` (Shipped keeps only the ~5 newest milestones) and
+  `docs/product.md`, archives the consumed kickoff prompts. No
+  `docs/specs/` work: the settings capability has no spec, and specs
+  are not backfilled ahead of need.
 
-All three PRs run the standard gates; none may call the live KovaaK's API
-or read the real registry in tests.
+## Testing
+
+- PR 1: unit tests for the settings service (unset/empty/corrupt/missing
+  files, atomic writes, cache behavior) and a regression test for the
+  `load_config()` unknown-key warning; existing rank-path tests adapt to
+  service reads.
+- PR 2: the startup-contract tests in `tests/test_config_service.py`
+  flip — missing `port` still exits, missing or invalid `stats_dir` now
+  serves — plus coverage that the scan and watchdog are skipped and the
+  Home hint renders.
+- PR 3: callback tests for the save flow, including the None-trigger
+  regression test on the `n_clicks` guard and the restart-notice
+  conditions; validation unit tests (directory-exists, digits-only).
+- PR 4: the detector is unit-tested against fixture `libraryfolders.vdf`
+  content and temp directories; the bootstrap trigger (absent key vs
+  `""`) is regression-tested.
+- No test may call the live KovaaK's API or read the real registry.
+  Every PR runs the standard five-command gate block; `tests/test_docs.py`
+  backstops the shipping PR's doc edits.
