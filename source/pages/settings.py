@@ -55,6 +55,12 @@ RESTART_NOTICE = (
     "settings it started with."
 )
 SAVED_STATUS = "Settings saved."
+SAVE_FAILED_STATUS = (
+    "Could not save settings — nothing was written. See data/logs/debug.log."
+)
+
+SAVE_STATUS_CLASS = "app-settings-save-status"
+SAVE_STATUS_FAILED_CLASS = f"{SAVE_STATUS_CLASS} app-settings-save-status-failed"
 
 RESTART_NOTICE_CLASS = "app-settings-restart-notice"
 # The notice ships hidden and is revealed by dropping this modifier, the same
@@ -95,6 +101,7 @@ def _restart_notice() -> tuple[str, str]:
     Output("app-settings-stats-dir", "error"),
     Output("app-settings-steam-id", "error"),
     Output("app-settings-save-status", "children"),
+    Output("app-settings-save-status", "className"),
     Output("app-settings-restart-notice", "children"),
     Output("app-settings-restart-notice", "className"),
     Input("app-settings-save-button", "n_clicks"),
@@ -117,7 +124,7 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
     disk.
     """
     if not n_clicks or ctx.triggered_id != "app-settings-save-button":
-        return no_update, no_update, no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update, no_update
 
     stats_dir = (stats_dir or "").strip()
     username = (username or "").strip()
@@ -125,15 +132,39 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
 
     stats_dir_error, steam_id_error = _validate(stats_dir, steam_id)
     if stats_dir_error or steam_id_error:
-        return stats_dir_error, steam_id_error, "", no_update, no_update
+        return (
+            stats_dir_error,
+            steam_id_error,
+            "",
+            SAVE_STATUS_CLASS,
+            no_update,
+            no_update,
+        )
 
-    save_settings(
-        {
-            STATS_DIR_KEY: stats_dir,
-            KOVAAKS_USERNAME_KEY: username,
-            STEAM_ID_KEY: steam_id,
-        }
-    )
+    try:
+        save_settings(
+            {
+                STATS_DIR_KEY: stats_dir,
+                KOVAAKS_USERNAME_KEY: username,
+                STEAM_ID_KEY: steam_id,
+            }
+        )
+    except OSError:
+        # A locked or unwritable file leaves the store exactly as it was (the
+        # write is a temp file plus an atomic replace), so the only thing left
+        # to do is say so. Letting it escape would fail the request silently:
+        # the form would keep whatever status it was already showing, up to and
+        # including a stale "Settings saved." from an earlier save.
+        logger.exception("Failed to save user settings from the settings page")
+        return (
+            None,
+            None,
+            SAVE_FAILED_STATUS,
+            SAVE_STATUS_FAILED_CLASS,
+            # The store is untouched, so what the notice says is still true.
+            no_update,
+            no_update,
+        )
     logger.info("Saved user settings from the settings page")
     if username:
         # Idempotent, and correct in every pin state: it starts the worker the
@@ -141,7 +172,7 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
         start_percentile_warmup_worker()
 
     notice, notice_class = _restart_notice()
-    return None, None, SAVED_STATUS, notice, notice_class
+    return None, None, SAVED_STATUS, SAVE_STATUS_CLASS, notice, notice_class
 
 
 def _settings_input(
@@ -197,7 +228,11 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.Group(
                 children=[
                     dmc.Button("Save", id="app-settings-save-button"),
-                    dmc.Text("", c="dimmed", id="app-settings-save-status"),
+                    dmc.Text(
+                        "",
+                        id="app-settings-save-status",
+                        className=SAVE_STATUS_CLASS,
+                    ),
                 ],
                 gap="md",
                 align="center",

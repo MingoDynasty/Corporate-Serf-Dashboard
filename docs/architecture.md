@@ -264,7 +264,9 @@ flowchart LR
   accessors) so it always shows what is on disk. Validation is offline only
   (directory exists, digits-only Steam ID); a save writes all three keys,
   cold-starts the warmup worker when a username was saved, and re-derives the
-  restart notice from `is_restart_pending()`.
+  restart notice from `is_restart_pending()`. A write that fails (a locked file
+  exhausting the atomic replace's retries) is caught and reported in the status
+  line rather than escaping into a failed request the user cannot see.
 
 ### Shared UI components
 - `components/local_icon.py` — local SVG icon registry/helper used by the shell

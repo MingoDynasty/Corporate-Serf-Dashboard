@@ -95,12 +95,8 @@ def test_an_untouched_page_saves_nothing(quiet_warmup, tmp_path):
     """The initial-call hazard is real, and this callback writes to disk."""
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
-    assert _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (
-        no_update,
-        no_update,
-        no_update,
-        no_update,
-        no_update,
+    assert (
+        _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (no_update,) * 6
     )
     assert settings_service.get_settings() == {"kovaaks_username": "MingoDynasty"}
     assert quiet_warmup == []
@@ -115,7 +111,7 @@ def test_a_save_triggered_by_anything_else_writes_nothing(monkeypatch, tmp_path)
 
 
 def test_a_valid_save_writes_all_three_keys(clicked, quiet_warmup, tmp_path):
-    stats_dir_error, steam_id_error, status, _notice, _class = _save(
+    stats_dir_error, steam_id_error, status, status_class, _notice, _class = _save(
         stats_dir=f"  {tmp_path}  ",
         username="  MingoDynasty  ",
         steam_id="76561197986713986",
@@ -123,6 +119,7 @@ def test_a_valid_save_writes_all_three_keys(clicked, quiet_warmup, tmp_path):
 
     assert (stats_dir_error, steam_id_error) == (None, None)
     assert status == settings_page.SAVED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_CLASS
     assert settings_service.get_settings() == {
         "stats_dir": str(tmp_path),
         "kovaaks_username": "MingoDynasty",
@@ -162,14 +159,16 @@ def test_steam_id_accepts_only_plain_digits(clicked, steam_id, expected_error):
 def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
     settings_service.save_settings({"kovaaks_username": "Stored"})
 
-    stats_dir_error, steam_id_error, status, notice, notice_class = _save(
+    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
         stats_dir=str(tmp_path / "no-such-directory"),
         username="MingoDynasty",
     )
 
     assert stats_dir_error == settings_page.STATS_DIR_ERROR
     assert steam_id_error is None
+    # A refusal clears any status a previous save left behind.
     assert status == ""
+    assert status_class == settings_page.SAVE_STATUS_CLASS
     assert (notice, notice_class) == (no_update, no_update)
     # All-or-nothing: the valid username in the same submit is not written.
     assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
@@ -179,7 +178,7 @@ def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
 def test_one_invalid_field_blocks_the_whole_save(clicked, quiet_warmup, tmp_path):
     settings_service.save_settings({})
 
-    stats_dir_error, steam_id_error, _status, _notice, _class = _save(
+    stats_dir_error, steam_id_error, *_ = _save(
         stats_dir=str(tmp_path / "no-such-directory"),
         username="MingoDynasty",
         steam_id="not-digits",
@@ -188,6 +187,38 @@ def test_one_invalid_field_blocks_the_whole_save(clicked, quiet_warmup, tmp_path
     assert stats_dir_error == settings_page.STATS_DIR_ERROR
     assert steam_id_error == settings_page.STEAM_ID_ERROR
     assert settings_service.get_settings() == {}
+    assert quiet_warmup == []
+
+
+def test_a_failed_write_says_so_instead_of_failing_the_request(
+    clicked,
+    quiet_warmup,
+    monkeypatch,
+    tmp_path,
+):
+    """An antivirus lock exhausts the atomic replace's retries and re-raises.
+
+    Letting that escape would fail the Dash request silently: the form would
+    keep whatever it was already showing, including a stale "Settings saved."
+    """
+
+    def refuse_to_write(_values):
+        raise PermissionError("locked by another process")
+
+    settings_service.save_settings({"kovaaks_username": "Stored"})
+    monkeypatch.setattr(settings_page, "save_settings", refuse_to_write)
+
+    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
+        stats_dir=str(tmp_path),
+        username="MingoDynasty",
+    )
+
+    assert (stats_dir_error, steam_id_error) == (None, None)
+    assert status == settings_page.SAVE_FAILED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
+    # The store is untouched, so the notice still describes the process.
+    assert (notice, notice_class) == (no_update, no_update)
+    assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
     assert quiet_warmup == []
 
 
