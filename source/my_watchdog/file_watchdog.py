@@ -89,6 +89,23 @@ class NewFileHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         """Import a newly created run CSV and notify interested UI callbacks."""
+        try:
+            self._import_created_file(event)
+        except Exception:  # noqa: BLE001 -- watchdog does not guard handlers.
+            # An escaped exception would kill the observer thread and silently
+            # end run tracking for the rest of the session (e.g. an OSError
+            # from a CSV still locked by KovaaK's); the next run must still
+            # find a live handler. Log it and tell the UI instead.
+            logger.exception(
+                "Failed to process new stats file: %s",
+                getattr(event, "src_path", "(unknown)"),
+            )
+            dash_logger.error(
+                "Could not process a new run file. See debug.log for details."
+            )
+
+    def _import_created_file(self, event):
+        """Parse, store, and announce one created file; may raise on surprises."""
         file = _get_created_csv_path(event)
         if file is None:
             return
