@@ -13,6 +13,7 @@ def settings_path(monkeypatch, tmp_path):
     monkeypatch.setattr(settings, "SETTINGS_FILE_PATH", path)
     settings.clear_settings_cache()
     settings.clear_stats_dir_pin()
+    settings.clear_identity_pin()
     return path
 
 
@@ -113,9 +114,11 @@ def test_unreadable_path_is_tolerated_and_warned(settings_path, caplog):
 def test_save_round_trips_across_a_cache_reset(settings_path):
     settings.save_settings({"kovaaks_username": "MingoDynasty", "steam_id": ""})
 
-    assert settings.get_kovaaks_username() == "MingoDynasty"
+    # The stored view, not the pinned accessors: this is about the file and the
+    # cache, and a pinned identity would answer without reading either.
+    assert settings.get_settings()["kovaaks_username"] == "MingoDynasty"
     settings.clear_settings_cache()
-    assert settings.get_kovaaks_username() == "MingoDynasty"
+    assert settings.get_settings()["kovaaks_username"] == "MingoDynasty"
     assert json.loads(settings_path.read_text(encoding="utf-8")) == {
         "kovaaks_username": "MingoDynasty",
         "steam_id": "",
@@ -149,12 +152,13 @@ def test_save_recovers_from_a_malformed_file(settings_path):
 def test_reads_are_cached_until_the_cache_is_cleared(settings_path):
     _write(settings_path, {"kovaaks_username": "First"})
 
-    assert settings.get_kovaaks_username() == "First"
+    # Through the stored view, so the identity pin cannot mask the cache.
+    assert settings.get_settings()["kovaaks_username"] == "First"
     _write(settings_path, {"kovaaks_username": "Second"})
-    assert settings.get_kovaaks_username() == "First"
+    assert settings.get_settings()["kovaaks_username"] == "First"
 
     settings.clear_settings_cache()
-    assert settings.get_kovaaks_username() == "Second"
+    assert settings.get_settings()["kovaaks_username"] == "Second"
 
 
 def test_get_identity_pairs_both_fields_from_one_read(settings_path):
@@ -261,3 +265,126 @@ def test_a_save_after_resolution_does_not_move_the_pin(settings_path, tmp_path):
     settings.save_settings({"stats_dir": str(moved)})
 
     assert settings.get_usable_stats_dir() == str(booted)
+
+
+def test_identity_reads_stay_live_while_no_username_is_configured(settings_path):
+    """Unset stays live: that is what makes the first-time set apply at once."""
+    _write(settings_path, {"steam_id": "111"})
+
+    assert settings.get_identity() == (None, "111")
+
+    settings.save_settings({"kovaaks_username": "MingoDynasty", "steam_id": "222"})
+
+    assert settings.get_identity() == ("MingoDynasty", "222")
+
+
+def test_the_first_configured_read_freezes_both_values_together(settings_path):
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+
+    assert settings.get_identity() == ("First", "111")
+
+    settings.save_settings({"kovaaks_username": "Second", "steam_id": "222"})
+
+    assert settings.get_identity() == ("First", "111")
+    assert settings.get_kovaaks_username() == "First"
+    assert settings.get_steam_id() == "111"
+
+
+def test_a_single_getter_freezes_the_pair_as_a_whole(settings_path):
+    """Any accessor is a read: the Steam ID cannot be pinned on its own."""
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+
+    assert settings.get_steam_id() == "111"
+
+    settings.save_settings({"kovaaks_username": "Second", "steam_id": "222"})
+
+    assert settings.get_kovaaks_username() == "First"
+
+
+def test_clearing_the_identity_pin_makes_reads_live_again(settings_path):
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+    assert settings.get_identity() == ("First", "111")
+    settings.save_settings({"kovaaks_username": "Second", "steam_id": "222"})
+
+    settings.clear_identity_pin()
+
+    assert settings.get_identity() == ("Second", "222")
+
+
+@pytest.mark.parametrize(
+    "stored",
+    [{}, {"kovaaks_username": "", "steam_id": ""}],
+    ids=["absent", "empty"],
+)
+def test_absent_and_empty_identity_both_read_as_unset(settings_path, stored):
+    _write(settings_path, stored)
+
+    assert settings.get_identity() == (None, None)
+    assert settings.get_kovaaks_username() is None
+    assert settings.get_steam_id() is None
+
+
+def test_nothing_is_pending_while_the_store_matches_both_pins(settings_path, tmp_path):
+    booted = tmp_path / "booted"
+    booted.mkdir()
+    settings.save_settings(
+        {"stats_dir": str(booted), "kovaaks_username": "First", "steam_id": "111"}
+    )
+    settings.resolve_stats_dir()
+    settings.get_identity()
+
+    assert settings.is_restart_pending() is False
+
+
+def test_a_stats_directory_change_is_pending(settings_path, tmp_path):
+    booted = tmp_path / "booted"
+    booted.mkdir()
+    settings.save_settings({"stats_dir": str(booted)})
+    settings.resolve_stats_dir()
+
+    moved = tmp_path / "moved"
+    moved.mkdir()
+    settings.save_settings({"stats_dir": str(moved)})
+
+    assert settings.is_restart_pending() is True
+
+
+def test_clearing_the_stats_directory_is_pending(settings_path, tmp_path):
+    """Cleared is a change like any other: the pin still points at the old one."""
+    booted = tmp_path / "booted"
+    booted.mkdir()
+    settings.save_settings({"stats_dir": str(booted)})
+    settings.resolve_stats_dir()
+
+    settings.save_settings({"stats_dir": ""})
+
+    assert settings.is_restart_pending() is True
+
+
+@pytest.mark.parametrize(
+    "saved",
+    [
+        {"kovaaks_username": "Second", "steam_id": "111"},
+        {"kovaaks_username": "First", "steam_id": "222"},
+        {"kovaaks_username": "", "steam_id": ""},
+    ],
+    ids=["username", "steam-id", "cleared"],
+)
+def test_changing_a_frozen_identity_is_pending(settings_path, saved):
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+    settings.get_identity()
+
+    settings.save_settings(saved)
+
+    assert settings.is_restart_pending() is True
+
+
+def test_a_first_time_identity_set_is_not_pending(settings_path):
+    """The live-apply path: nothing has consumed the old, unset identity."""
+    settings.save_settings({})
+    settings.resolve_stats_dir()
+    settings.get_identity()
+
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+
+    assert settings.is_restart_pending() is False
