@@ -373,6 +373,14 @@ external review killed it.)
 
 Status: Accepted
 
+Installing the dashboard is one PowerShell command, and it brings everything it
+needs with it: its own Python, its own package manager, the app, and a
+first-run configuration file. Nothing outside the install folder is used or
+disturbed, so uninstalling is deleting that folder and the desktop shortcut.
+Installs ask no questions — as of the 2026-08-02 addendum below, the generated
+configuration carries only the port the dashboard serves on, and where the
+KovaaK's stats live is the app's own business.
+
 Decision: installation is a PowerShell one-liner that fetches `get.ps1` from
 `main`. That shim is deliberately trivial and permanently backward compatible —
 resolve the latest release, fetch *that release's* `install.ps1`, run it,
@@ -428,6 +436,21 @@ are no longer required fields and no longer seeded into the generated file —
 `example.toml` still documents them for anyone who wants to tune them. The
 round-trip through the installed app's `load_config()` still runs and must pass
 with the two-field file.
+
+Addendum (2026-08-02): the stats-directory detection, the `[Y/n]` confirm, the
+manual-entry retry loop, and the stats-directory `Stop-Fatal` are all deleted,
+so **installs are fully non-interactive** and the generated `config.toml` is
+`port` only. `stats_dir` now lives in the app-owned `data/settings.json`, which
+the installer never touches — one home, one writer — so its detection had
+nowhere legitimate left to write: a `stats_dir` line in `config.toml` would only
+be warn-logged and ignored. The app absorbs the consequences instead of the
+installer: it starts and serves without a usable stats directory (initial scan
+and file watchdog skipped, one log line naming what was configured, a plain-text
+hint on Home), and an app-side startup bootstrap that re-detects the directory
+follows in the same proposal. Between the two, a fresh install runs empty until
+the directory is set by hand. The `load_config()` round-trip through the
+installed app is unchanged and still gates the install, now against the
+one-field file.
 
 ## 2026-07-19: PowerShell Writes UTF-8 Without BOM And Forward-Slash Paths
 

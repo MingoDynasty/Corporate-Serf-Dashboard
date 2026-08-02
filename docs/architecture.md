@@ -9,10 +9,13 @@ endpoint behavior see `docs/kovaaks_api_notes.md`; for workflow/conventions see
 
 ## Process & threads
 
-`source/app.py` (`main`) loads config, calls `initialize_kovaaks_data` to build
-the in-memory stores from existing CSVs, starts a watchdog `Observer` on
-`stats_dir`, and serves the Dash app with Waitress (Flask dev server when
-`config.debug`).
+`source/app.py` (`main`) loads config, pins the stats directory for the process
+(`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
+the in-memory stores from existing CSVs, starts a watchdog `Observer` on that
+directory, and serves the Dash app with Waitress (Flask dev server when
+`config.debug`). With no usable stats directory — unset, or set but missing —
+the scan and the observer are both skipped and the app serves empty pages; only
+`port` is needed to serve.
 
 Threads at runtime:
 
@@ -122,9 +125,11 @@ that summary and never accesses the queue directly.
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
 - **User settings** — `data/settings.json` (not committed) holds the app-owned
-  user settings (`config/settings_service.py`): the KovaaK's identity today.
-  Written atomically and whole, read once and cached in-process; a missing key,
-  an empty value, and an unusable file all mean "not configured".
+  user settings (`config/settings_service.py`): the stats directory and the
+  KovaaK's identity. Written atomically and whole, read once and cached
+  in-process; a missing key, an empty value, and an unusable file all mean "not
+  configured". `stats_dir` is additionally pinned at startup and read from the
+  pin by every consumer, so it can only change across a restart.
 - **Playlist visibility** — `data/playlist_visibility.json` (not committed)
   holds the playlist show-list (`playlist_visibility_service.py`): written
   atomically on each show/hide, read once and cached in-process, absent until
@@ -317,8 +322,11 @@ flowchart LR
   Unknown keys are named in one warning and ignored, so a config carrying keys
   a release has retired still loads.
 - `config/settings_service.py` — the app-owned user-settings store
-  (`data/settings.json`): the KovaaK's identity today, read per-operation.
-  Nothing else writes the file.
+  (`data/settings.json`): the KovaaK's identity, read per-operation, and the
+  stats directory, resolved once at startup (`resolve_stats_dir`) and read from
+  that pin afterwards (`get_usable_stats_dir`, which folds unset, unresolved,
+  and missing-directory into one "no stats directory"). Nothing else writes the
+  file.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
   running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
   variable, which is how an updater tells "my new process is up" apart from
@@ -363,4 +371,4 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings such as the KovaaK's identity |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity |

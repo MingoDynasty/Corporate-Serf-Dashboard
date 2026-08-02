@@ -132,34 +132,39 @@ Remove-Item "$env:TEMP\csd-install-*.ps1"
 
 ## Configuration
 
-Settings live in `config.toml`:
+Two files sit side by side. `config.toml` holds boot settings and is yours to
+edit:
 
 - **Installed:** `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`, written on
   first install. Updates never touch it.
 - **From source:** copy `example.toml` to `config.toml` in your checkout.
 
-The installer fills in `stats_dir` for you. `example.toml` documents every
-setting; one is worth knowing about:
+`example.toml` documents every setting; one is worth knowing about:
 
 - `port` — change this if something else on your machine already uses 8050. The
   dashboard says so at startup rather than failing mysteriously.
 
-Your KovaaK's identity lives in a separate, app-owned file, `data/settings.json`
-next to `config.toml` (installed:
-`%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). Create it to enable
-the leaderboard rank and percentile features; leave it absent to run fully
-offline:
+`data/settings.json` is the app-owned file next to it (installed:
+`%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). It holds where your
+KovaaK's stats live and who you are on the leaderboards:
 
 ```json
 {
+  "stats_dir": "S:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats",
   "kovaaks_username": "YourKovaaksName",
   "steam_id": ""
 }
 ```
 
-`steam_id` is optional and makes player matching exact when usernames are
-ambiguous. Edit this file only while the dashboard is stopped — it is read once
-per run.
+- `stats_dir` — the folder KovaaK's writes its run files into, usually
+  `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
+  it the dashboard still starts, but it has no runs to show and says so on the
+  Home page.
+- `kovaaks_username` — enables the leaderboard rank and percentile features;
+  leave it out to run fully offline. `steam_id` is optional and makes player
+  matching exact when usernames are ambiguous.
+
+Edit this file only while the dashboard is stopped — it is read once per run.
 
 ## Usage
 
@@ -202,8 +207,8 @@ cd Corporate-Serf-Dashboard
 uv sync
 ```
 
-Copy `example.toml` to `config.toml` and set `stats_dir` (see
-[Configuration](#configuration)), then start the app:
+Copy `example.toml` to `config.toml`, and create `data/settings.json` with your
+`stats_dir` (see [Configuration](#configuration)), then start the app:
 
 ```shell
 uv run python source/app.py
