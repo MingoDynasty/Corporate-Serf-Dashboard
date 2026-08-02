@@ -78,6 +78,16 @@ def test_non_string_value_is_tolerated(settings_path):
     assert settings.get_kovaaks_username() is None
 
 
+def test_hand_written_file_with_a_utf8_bom_is_read(settings_path):
+    """Windows editors write a BOM; json.loads rejects one outright."""
+    settings_path.parent.mkdir(parents=True, exist_ok=True)
+    settings_path.write_bytes(
+        b"\xef\xbb\xbf" + json.dumps({"kovaaks_username": "MingoDynasty"}).encode()
+    )
+
+    assert settings.get_kovaaks_username() == "MingoDynasty"
+
+
 def test_invalid_utf8_file_is_tolerated_and_warned(settings_path, caplog):
     settings_path.parent.mkdir(parents=True, exist_ok=True)
     settings_path.write_bytes(b"\xff\xfe\x00garbage")

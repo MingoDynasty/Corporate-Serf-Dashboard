@@ -46,7 +46,11 @@ def clear_settings_cache() -> None:
 def _read_settings_from_disk() -> dict[str, str]:
     """Read the persisted settings; anything unusable yields no keys."""
     try:
-        raw = SETTINGS_FILE_PATH.read_text(encoding="utf-8")
+        # utf-8-sig, not utf-8: this file is the documented hand-edit escape
+        # hatch, and Windows editors write a UTF-8 BOM that json.loads rejects
+        # outright — which would read as "every setting unset" instead of as
+        # the identity the user just typed. Transparent when no BOM is present.
+        raw = SETTINGS_FILE_PATH.read_text(encoding="utf-8-sig")
     except FileNotFoundError:
         return {}
     except OSError, UnicodeDecodeError:
