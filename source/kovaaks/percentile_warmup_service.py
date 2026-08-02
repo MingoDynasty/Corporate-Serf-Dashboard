@@ -729,7 +729,8 @@ class PercentileWarmupWorker:
             self._fatal_state = message
             self._in_flight = None
             self._queue.clear()
-        logger.info("Percentile warmup stopped: %s", message)
+        # WARNING: this terminally stops the warmup feature for the session.
+        logger.warning("Percentile warmup stopped: %s", message)
         if notify:
             dash_logger.error(
                 "Percentile update stopped: KovaaK's username may be misconfigured."

@@ -914,6 +914,15 @@ def load_playlist_from_code(  # noqa: PLR0911
     _user_root_playlist_files[playlist_data.code] = [
         get_playlist_file_path(playlist_data.name, playlist_data.code)
     ]
+    # The success record for the durable logs: the UI toast is ephemeral, and
+    # this is the one place both import paths (search and Evxl) converge after
+    # persistence actually succeeded.
+    logger.info(
+        "Imported playlist %s (%s): %d scenarios.",
+        playlist_data.name,
+        playlist_data.code,
+        len(playlist_data.scenarios),
+    )
     return None, playlist_data.code
 
 
@@ -972,6 +981,12 @@ def delete_user_playlist(playlist_code: str) -> str | None:
         playlist_database.pop(playlist_code, None)
         _user_root_playlist_codes.discard(playlist_code)
         _user_root_playlist_files.pop(playlist_code, None)
+    # Success record for the durable logs; failures logged above per file.
+    logger.info(
+        "Deleted user playlist %s (%d file(s)).",
+        playlist_code,
+        len(file_paths),
+    )
     return None
 
 
