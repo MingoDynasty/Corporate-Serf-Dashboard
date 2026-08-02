@@ -12,6 +12,10 @@ folder and the desktop shortcut.
 records update_policy "pinned", which the launcher honors by skipping the
 update check. Re-running the installer without -Tag restores "latest".
 
+Installs are fully non-interactive: the generated config.toml carries the
+dashboard port and nothing else. The KovaaK's stats directory is app-owned
+now -- it lives in data/settings.json, which only the app ever writes.
+
 Serialization contract: every machine-readable file written here
 (config.toml, install.json) is UTF-8 WITHOUT BOM with forward-slash paths --
 the app's Python 3.14 tomllib rejects both a BOM and raw backslashes.
@@ -179,71 +183,12 @@ function Install-ReleaseVersion($Release, [string]$UvExe) {
     return $targetDir
 }
 
-function Find-KovaaksStatsDir {
-    # Steam's registry install path plus every library in libraryfolders.vdf.
-    $steamRoots = @()
-    $candidates = @(
-        @{ Path = 'HKCU:\Software\Valve\Steam'; Name = 'SteamPath' },
-        @{ Path = 'HKLM:\SOFTWARE\WOW6432Node\Valve\Steam'; Name = 'InstallPath' },
-        @{ Path = 'HKLM:\SOFTWARE\Valve\Steam'; Name = 'InstallPath' }
-    )
-    foreach ($candidate in $candidates) {
-        try {
-            $value = (Get-ItemProperty -Path $candidate.Path -ErrorAction Stop).($candidate.Name)
-            if ($value) { $steamRoots += [string]$value }
-        } catch { }
-    }
-
-    $libraries = @($steamRoots)
-    foreach ($root in $steamRoots) {
-        $vdfPath = Join-Path $root 'steamapps\libraryfolders.vdf'
-        if (Test-Path -LiteralPath $vdfPath) {
-            $vdf = [System.IO.File]::ReadAllText($vdfPath)
-            foreach ($match in [regex]::Matches($vdf, '"path"\s*"([^"]*)"')) {
-                $libraries += $match.Groups[1].Value -replace '\\\\', '\'
-            }
-        }
-    }
-
-    foreach ($library in $libraries | Select-Object -Unique) {
-        $stats = Join-Path $library 'steamapps\common\FPSAimTrainer\FPSAimTrainer\stats'
-        if (Test-Path -LiteralPath $stats -PathType Container) {
-            return (Resolve-Path -LiteralPath $stats).Path
-        }
-    }
-    return $null
-}
-
-function Resolve-StatsDir {
-    $detected = Find-KovaaksStatsDir
-    if ($detected) {
-        Write-Host "Detected KovaaK's stats directory:"
-        Write-Host "  $detected"
-        $answer = Read-Host 'Use it? [Y/n]'
-        if ($answer -eq '' -or $answer -match '^[Yy]') { return $detected }
-    } else {
-        Write-Host "Could not find the KovaaK's stats directory automatically."
-    }
-    for ($attempt = 0; $attempt -lt 3; $attempt++) {
-        $manual = Read-Host "Enter the full path to your KovaaK's stats folder (usually <Steam library>\steamapps\common\FPSAimTrainer\FPSAimTrainer\stats)"
-        if ($manual -and (Test-Path -LiteralPath $manual -PathType Container)) {
-            return (Resolve-Path -LiteralPath $manual).Path
-        }
-        Write-Host 'That directory does not exist.'
-    }
-    Stop-Fatal 'no valid stats directory provided; run the installer again once you know the path.'
-}
-
-function Write-FirstRunConfig([string]$StatsDir, [int]$Port) {
-    $statsDirToml = $StatsDir.Replace('\', '/')
+function Write-FirstRunConfig([int]$Port) {
     $lines = @(
         '# Corporate Serf Dashboard configuration.',
         '# Written by the installer on first install; edit freely -- installs and',
         '# updates never touch an existing config.toml. See example.toml in the',
         '# installed version directory for all optional settings.',
-        '',
-        "# Directory where the KovaaK's stats files are stored.",
-        "stats_dir = ""$statsDirToml""",
         '',
         '# Port for the local dashboard server. If another program already',
         '# uses it, the dashboard says so at startup -- pick a different port here.',
@@ -308,8 +253,7 @@ $configPath = Join-Path $InstallRoot 'config.toml'
 if (Test-Path -LiteralPath $configPath) {
     Write-Host 'Keeping the existing config.toml.'
 } else {
-    $statsDir = Resolve-StatsDir
-    Write-FirstRunConfig -StatsDir $statsDir -Port $DefaultPort
+    Write-FirstRunConfig -Port $DefaultPort
     Write-Host "Wrote $configPath (dashboard port $DefaultPort)."
 }
 

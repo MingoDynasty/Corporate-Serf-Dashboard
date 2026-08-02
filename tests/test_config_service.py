@@ -13,7 +13,13 @@ from source.utilities.paths import STATE_DIR_ENV_VAR
 
 
 def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
-    """Start the app in ``cwd`` and return once it exits."""
+    """Start the app in ``cwd`` and return once it exits.
+
+    Only startup paths that still exit can be driven this way. A config the app
+    accepts makes it serve, and this call would then block until the timeout --
+    which is why the stats-directory paths are covered by unit tests instead
+    (``tests/test_app_startup_stats_dir.py``).
+    """
     repo_root = Path(__file__).resolve().parents[1]
     environment = os.environ.copy()
     environment["PYTHONPATH"] = os.pathsep.join(
@@ -40,14 +46,13 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
     [
         None,
         "not valid toml",
-        'stats_dir = "missing required port"',
-        'stats_dir = "x"\n'
+        "polling_interval = 1000  # missing the required port",
         "polling_interval = 1000\n"
         "port = 8050\n"
         "sens_round_decimal_places = 1\n"
         "kovaaks_api_timeout_seconds = 0",
     ],
-    ids=["missing", "invalid-toml", "invalid-schema", "non-positive-timeout"],
+    ids=["missing", "invalid-toml", "missing-port", "non-positive-timeout"],
 )
 def test_startup_with_missing_or_invalid_config_exits_cleanly(
     tmp_path: Path,
@@ -75,32 +80,6 @@ def test_startup_with_missing_or_invalid_config_exits_cleanly(
     assert "copy example.toml to config.toml" in result.stderr
 
 
-def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
-    tmp_path = tmp_path.resolve()
-    missing_stats_dir = tmp_path / "no-such-stats-dir"
-    config_path = tmp_path / "config.toml"
-    # Only the two required fields; the tuning knobs fall back to their code
-    # defaults, exercising the defaulted path through a real startup.
-    config_path.write_text(
-        f'stats_dir = "{missing_stats_dir.as_posix()}"\nport = 8050\n',
-        encoding="utf-8",
-    )
-
-    result = _run_app(tmp_path)
-
-    assert result.returncode == 1
-    # Same as above: the build-identity line is the only expected stdout.
-    stdout_lines = result.stdout.splitlines()
-    assert len(stdout_lines) == 1
-    assert "| Build " in stdout_lines[0]
-    assert "Traceback" not in result.stderr
-    # One actionable line: what was configured, where to change it, what to set.
-    assert "\n" not in result.stderr.strip()
-    assert missing_stats_dir.as_posix() in result.stderr
-    assert str(config_path) in result.stderr
-    assert "FPSAimTrainer" in result.stderr
-
-
 def test_unknown_config_keys_are_named_in_one_warning_and_ignored(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -113,8 +92,8 @@ def test_unknown_config_keys_are_named_in_one_warning_and_ignored(
     """
     config_path = tmp_path / "config.toml"
     config_path.write_text(
-        'stats_dir = "x"\n'
         "port = 8050\n"
+        'stats_dir = "S:/SteamLibrary/.../stats"\n'
         'kovaaks_username = "MingoDynasty"\n'
         'steam_id = "76561197986713986"\n'
         "polling_intervall = 1000\n",
@@ -128,19 +107,21 @@ def test_unknown_config_keys_are_named_in_one_warning_and_ignored(
     assert config.port == 8050
     # Silently dropped by pydantic, so the warning is the only feedback.
     assert not hasattr(config, "kovaaks_username")
+    assert not hasattr(config, "stats_dir")
     warnings = [
         record for record in caplog.records if record.levelno >= logging.WARNING
     ]
     assert len(warnings) == 1
     message = warnings[0].getMessage()
+    assert "stats_dir" in message
     assert "kovaaks_username" in message
     assert "steam_id" in message
     assert "polling_intervall" in message
 
 
 def test_tuning_fields_default_when_omitted() -> None:
-    """stats_dir and port are the only required fields; tuning knobs default."""
-    config = ConfigData(stats_dir="x", port=8050)
+    """port is the only required field; the tuning knobs default."""
+    config = ConfigData(port=8050)
 
     assert config.polling_interval == 1000
     assert config.sens_round_decimal_places == 1

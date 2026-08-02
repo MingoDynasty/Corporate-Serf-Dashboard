@@ -8,10 +8,11 @@ from source.config import settings_service as settings
 
 @pytest.fixture
 def settings_path(monkeypatch, tmp_path):
-    """Point the store at a temp file and start from a cold cache."""
+    """Point the store at a temp file and start from a cold cache and pin."""
     path = tmp_path / "data" / "settings.json"
     monkeypatch.setattr(settings, "SETTINGS_FILE_PATH", path)
     settings.clear_settings_cache()
+    settings.clear_stats_dir_pin()
     return path
 
 
@@ -197,3 +198,66 @@ def test_callers_cannot_mutate_the_cache_through_get_settings(settings_path):
     settings.get_settings()["kovaaks_username"] = "Tampered"
 
     assert settings.get_kovaaks_username() == "MingoDynasty"
+
+
+def test_unresolved_pin_reads_as_no_stats_directory(settings_path, tmp_path):
+    """A startup that never pinned one (tests, imports) reads as unconfigured."""
+    _write(settings_path, {"stats_dir": str(tmp_path)})
+
+    assert settings.get_usable_stats_dir() is None
+
+
+def test_resolved_pin_returns_the_stored_directory(settings_path, tmp_path):
+    _write(settings_path, {"stats_dir": str(tmp_path)})
+
+    assert settings.resolve_stats_dir() == str(tmp_path)
+    assert settings.get_usable_stats_dir() == str(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "stored",
+    [None, "", "no-such-directory"],
+    ids=["absent", "empty", "missing-directory"],
+)
+def test_unusable_values_all_read_as_no_stats_directory(settings_path, stored):
+    _write(settings_path, {} if stored is None else {"stats_dir": stored})
+
+    settings.resolve_stats_dir()
+
+    assert settings.get_usable_stats_dir() is None
+
+
+def test_a_missing_directory_is_still_pinned_for_the_startup_message(settings_path):
+    """The log line names what was configured, so the raw value must survive."""
+    _write(settings_path, {"stats_dir": "no-such-directory"})
+
+    assert settings.resolve_stats_dir() == "no-such-directory"
+    assert settings.get_usable_stats_dir() is None
+
+
+def test_a_directory_appearing_after_resolution_stays_unusable(
+    settings_path,
+    tmp_path,
+):
+    """Startup already skipped the scan and the watchdog for this directory."""
+    late = tmp_path / "late"
+    _write(settings_path, {"stats_dir": str(late)})
+    settings.resolve_stats_dir()
+
+    late.mkdir()
+
+    assert settings.get_usable_stats_dir() is None
+
+
+def test_a_save_after_resolution_does_not_move_the_pin(settings_path, tmp_path):
+    """Consumers read the boot pin, never the store: the value is restart-scoped."""
+    booted = tmp_path / "booted"
+    booted.mkdir()
+    _write(settings_path, {"stats_dir": str(booted)})
+    settings.resolve_stats_dir()
+
+    moved = tmp_path / "moved"
+    moved.mkdir()
+    settings.save_settings({"stats_dir": str(moved)})
+
+    assert settings.get_usable_stats_dir() == str(booted)

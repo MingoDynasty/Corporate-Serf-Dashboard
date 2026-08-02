@@ -2,10 +2,6 @@
 # This is an example configuration file.
 #
 
-# Directory where the Kovaak's stats files are stored.
-# stats_dir = "C:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
-stats_dir = "Change me!"
-
 # How often to poll for updates (in milliseconds)
 polling_interval = 1000  # 1 second
 

@@ -8,7 +8,9 @@ deliberately unscheduled follow-on proposal, working notes in
 replace the installer's settings seed with an app-side `stats_dir`
 startup bootstrap, and again the same day to order that bootstrap last —
 PRs 1–3 are fully manual; restructured 2026-08-02 to the new proposal
-template)
+template; amended 2026-08-02 with the maintainer's adjudication that
+restart-scoped values are process-pinned rather than read per-operation —
+R3, R4, R7 and the matching Design prose below)
 
 ## TL;DR
 
@@ -132,7 +134,11 @@ in-process — the settings page is the live write path).
 - `ConfigData` drops `kovaaks_username` and `steam_id`; the five
   chokepoints read through the settings service instead, per-operation —
   so a save on the settings page affects the next lookup without a
-  restart.
+  restart. Per the 2026-08-02 adjudication (R3), PR 3 narrows that to the
+  transition it exists for: the service snapshots the identity
+  process-wide at the first non-empty read, so only the unset→set case
+  applies live and a later change waits for the restart R7 already
+  required.
 - `example.toml` drops the two entries (it documents `config.toml` keys
   only).
 - **Unknown `config.toml` keys are tolerated and warn-logged — a
@@ -176,6 +182,14 @@ in-process — the settings page is the live write path).
 
 - `ConfigData` drops `stats_dir`. The installed `config.toml` becomes
   `port` only.
+- **The value is boot-pinned** (R4, adjudicated 2026-08-02). Server
+  startup resolves it from the store once and pins it for the process;
+  the initial scan, the watchdog, and Home's local scenario lists all
+  read the pin. Usability is decided once, as part of that resolution, so a
+  directory that appears mid-run cannot half-enable an app whose scan and
+  watchdog were already skipped. A pin that was never resolved — tests, or
+  any entry point that is not the real startup — reads as unconfigured,
+  exactly like an unset value.
 - **The app starts without a usable stats directory.** When the value is
   unset — or set but not an existing directory (the moved-library case) —
   startup skips the initial stats scan and the file watchdog, logs one
@@ -230,7 +244,7 @@ manual entry and a single Save:
   building for an event this rare — a restart reproduces exactly
   today's edit-config-and-restart behavior. A `stats_dir` save persists
   immediately but shows the restart notice whenever the saved value
-  differs from the value the server booted with. The app never restarts
+  differs from the boot pin (R4) the server is still running on. The app never restarts
   itself, and there is no live re-initialization of the watchdog,
   warmup worker, or in-memory data — that machinery is the riskiest
   code the arc could contain, and a restart costs the user one console
@@ -307,12 +321,22 @@ before the app ever writes a value on its own.
   (regression-tested; pydantic never rejected them — corrected in
   review), and through any promotion boundary the config stays readable
   by both the outgoing and incoming versions, with cleanup only after
-  promotion.
+  promotion. **Amended 2026-08-02 (maintainer adjudication):**
+  "per-operation" governs only the unset→set transition. PR 3 implements
+  identity as a process-wide snapshot taken at the first non-empty read;
+  an identity that is already set never changes under a running process,
+  which is what R7's restart notice already promised.
 - R4 — `stats_dir` leaves `ConfigData`; the app starts and serves without
   a usable stats directory (scan and watchdog skipped, empty pages, a
   plain-text Home hint that PR 3 upgrades into a `/settings` link).
   Invalid behaves as unset; startup no longer exits
   for stats problems. Installed `config.toml` is `port` only.
+  **Amended 2026-08-02 (maintainer adjudication):** `stats_dir` is
+  resolved once during startup and pinned for the life of the process;
+  every consumer reads that pin, never the store. A per-operation read
+  would let a mid-run save move half the app to a new directory while the
+  watchdog and the runs already in memory stayed on the old one, and the
+  restart notice has to describe reality for every consumer.
 - R5 — `stats_dir` bootstraps app-side: on startup with the key absent,
   a silent local detection (registry → `libraryfolders.vdf` → path
   probe) writes the first hit through the service; no hit writes
@@ -329,7 +353,11 @@ before the app ever writes a value on its own.
   warmup worker). Changing or clearing an already-set identity, and any
   `stats_dir` change, are restart-required, signaled by a notice. No
   hot-swap or reset of the warmup singleton; the app never
-  self-restarts.
+  self-restarts. **Amended 2026-08-02 (maintainer adjudication):** the
+  restart notice is what the pinning in R3 and R4 enforces, rather than a
+  convention the code hopes callers honor — the `stats_dir` notice
+  compares the saved value against the boot pin, and the identity notice
+  compares it against the process-wide snapshot.
 - R8 — State-writing page callbacks are `n_clicks`-guarded with a
   None-trigger regression test.
 

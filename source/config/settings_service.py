@@ -5,6 +5,10 @@ user-level settings the app itself writes live here and are read
 per-operation. The mechanics mirror the playlist visibility store — module
 ``RLock``, an in-process cache, atomic writes, tolerant reads.
 
+``stats_dir`` is the one exception to per-operation reads: server startup pins
+it for the life of the process and every consumer reads that pin (see
+``resolve_stats_dir``).
+
 Unset semantics are deliberately flat: a missing key, an empty value, and a
 missing/unreadable/malformed file all mean *not configured*. A malformed file
 is warned about once and treated as holding no keys; the next save rewrites it
@@ -20,6 +24,7 @@ import logging
 import os
 import threading
 from collections.abc import Mapping
+from pathlib import Path
 
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.paths import state_dir
@@ -29,18 +34,31 @@ logger = logging.getLogger(__name__)
 SETTINGS_FILE_PATH = state_dir() / "data" / "settings.json"
 
 KOVAAKS_USERNAME_KEY = "kovaaks_username"
+STATS_DIR_KEY = "stats_dir"
 STEAM_ID_KEY = "steam_id"
 
 _SETTINGS_LOCK = threading.RLock()
 # Cached settings mapping under a single key; None means not yet read from
 # disk. Mutated in place so no module-global rebinding is needed.
 _settings_cache: dict[str, dict[str, str] | None] = {"value": None}
+# The stats directory this process booted with: what was configured, and the
+# same value once it has been judged usable (None when it was not). Both are
+# None until startup resolves them, and stay None for a startup that never did
+# (tests, imports). Mutated in place for the same reason as the cache above.
+_stats_dir_pin: dict[str, str | None] = {"configured": None, "usable": None}
 
 
 def clear_settings_cache() -> None:
     """Forget the cached settings so the next read hits disk (test seam)."""
     with _SETTINGS_LOCK:
         _settings_cache["value"] = None
+
+
+def clear_stats_dir_pin() -> None:
+    """Forget the pinned stats directory (test seam)."""
+    with _SETTINGS_LOCK:
+        _stats_dir_pin["configured"] = None
+        _stats_dir_pin["usable"] = None
 
 
 def _read_settings_from_disk() -> dict[str, str]:
@@ -116,6 +134,43 @@ def get_identity() -> tuple[str | None, str | None]:
         settings.get(KOVAAKS_USERNAME_KEY) or None,
         settings.get(STEAM_ID_KEY) or None,
     )
+
+
+def resolve_stats_dir() -> str | None:
+    """Pin the stats directory for this process and return what was pinned.
+
+    Called once from server startup; every consumer reads the pin instead of
+    the store. A per-operation read would let a save made while the app runs
+    move half the app to a new directory while the watchdog and the runs
+    already in memory stayed on the old one — so the value is restart-scoped,
+    and the settings page's restart notice describes reality for every
+    consumer.
+    """
+    with _SETTINGS_LOCK:
+        configured = _get_setting(STATS_DIR_KEY)
+        _stats_dir_pin["configured"] = configured
+        _stats_dir_pin["usable"] = (
+            configured if configured and Path(configured).is_dir() else None
+        )
+        return configured
+
+
+def get_usable_stats_dir() -> str | None:
+    """Get the stats directory this process can actually scan and watch.
+
+    Unset, unresolved (a startup that never pinned one), and set-but-missing
+    all collapse to None: none of the three can be scanned or watched, and the
+    app serves without run data in all of them.
+
+    The existence check is part of the pin rather than repeated per call. A
+    directory that appears mid-run -- a network library coming online -- would
+    otherwise start reading as usable to whichever consumer asked next, even
+    though startup already skipped the scan and never began watching it: pages
+    would list scenarios whose runs are not loaded, with the hint that explains
+    the emptiness gone.
+    """
+    with _SETTINGS_LOCK:
+        return _stats_dir_pin["usable"]
 
 
 def save_settings(values: Mapping[str, str]) -> None:

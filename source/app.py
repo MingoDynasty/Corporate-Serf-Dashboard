@@ -10,18 +10,22 @@ import sys
 import tomllib
 from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
-from pathlib import Path
 from typing import NoReturn
 
 from dash_extensions.enrich import DashProxy
 from pydantic import ValidationError
 from waitress import serve
 from watchdog.observers import Observer
+from watchdog.observers.api import BaseObserver
 
 from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import (
     config_file_path,
     get_config,
+)
+from source.config.settings_service import (
+    get_usable_stats_dir,
+    resolve_stats_dir,
 )
 from source.health import register_health_endpoint
 from source.kovaaks.api_service import set_request_timeout
@@ -233,21 +237,9 @@ def main() -> None:
         # split out -- opening the named file answers that immediately.
         _log_startup_error(
             f"Configuration error: could not load {config_file_path()} -- "
-            "copy example.toml to config.toml and set stats_dir."
+            "copy example.toml to config.toml."
         )
         raise SystemExit(1) from None
-
-    # Checked before anything uses it: the watchdog observer is the first
-    # consumer and throws a raw traceback at a missing directory, which is
-    # what example.toml's "Change me!" placeholder produces on first run.
-    if not Path(config.stats_dir).is_dir():
-        _log_startup_error(
-            f'Configuration error: stats_dir "{config.stats_dir}" is not an '
-            f"existing directory -- edit {config_file_path()} and set "
-            "stats_dir to your KovaaK's stats folder, usually "
-            "<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats"
-        )
-        raise SystemExit(1)
 
     logger.debug(
         "Loaded config:\n%s",
@@ -262,23 +254,40 @@ def main() -> None:
     # name->ID mapping cache before any rank lookup needs them.
     seed_leaderboard_ids_from_bundled_corpus()
 
-    # Initialize scenario data
-    initialize_kovaaks_data(config.stats_dir)
+    # Resolve the stats directory once, here: it is restart-scoped, and every
+    # consumer reads the pin for the rest of the process (resolve_stats_dir).
+    configured_stats_dir = resolve_stats_dir()
+    stats_dir = get_usable_stats_dir()
+
+    if stats_dir is None:
+        # Not fatal: only `port` is needed to serve pages. Without a stats
+        # directory the app is merely empty, and Home says so.
+        logger.warning(
+            "No usable KovaaK's stats directory (%s): serving with no run "
+            "data, and skipping the initial scan and the file watchdog.",
+            f'"{configured_stats_dir}" is not an existing directory'
+            if configured_stats_dir
+            else "not configured",
+        )
+    else:
+        # Initialize scenario data
+        initialize_kovaaks_data(stats_dir)
 
     # The warmup queue is the played/visible intersection, so it can only be
     # assembled after both playlists and local CSV stats have loaded.
     start_percentile_warmup_worker(config)
 
     # Monitor for new files
-    event_handler = NewFileHandler()
-    observer = Observer()
-    observer.schedule(
-        event_handler,
-        config.stats_dir,
-        recursive=False,
-    )  # Set recursive=True to monitor subdirectories
-    observer.start()
-    logger.info("Monitoring directory: %s", config.stats_dir)
+    observer: BaseObserver | None = None
+    if stats_dir is not None:
+        observer = Observer()
+        observer.schedule(
+            NewFileHandler(),
+            stats_dir,
+            recursive=False,
+        )  # Set recursive=True to monitor subdirectories
+        observer.start()
+        logger.info("Monitoring directory: %s", stats_dir)
 
     try:
         # Run the Dash app. `app.run()` uses Flask's development server even when
@@ -296,8 +305,9 @@ def main() -> None:
             # warnings with a single open tab).
             serve(app.server, sockets=bind_server_socket(config.port), threads=8)
     finally:
-        observer.stop()
-        observer.join()  # Wait until the observer thread terminates
+        if observer is not None:
+            observer.stop()
+            observer.join()  # Wait until the observer thread terminates
 
 
 if __name__ == "__main__":

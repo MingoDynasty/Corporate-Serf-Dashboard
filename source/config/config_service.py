@@ -29,7 +29,6 @@ def config_file_path() -> Path:
 class ConfigData:
     """Dataclass models configuration for this app."""
 
-    stats_dir: str
     port: int
     polling_interval: int = 1000
     sens_round_decimal_places: int = 1
