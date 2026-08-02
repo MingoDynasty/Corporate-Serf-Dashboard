@@ -395,7 +395,7 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
         api_service._run_attempt,
     )
 
-    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+    with caplog.at_level(logging.INFO, logger=api_service.__name__):
         api_service._run_attempt(
             SCENARIO_NAME,
             USERNAME,
@@ -412,6 +412,9 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
     ]
     assert len(retry_records) == 1
     assert retry_records[0].exc_info is None
+    # A retry that may still recover is INFO; only exhausting the schedule
+    # warns (see _notify_exhaustion).
+    assert retry_records[0].levelno == logging.INFO
     assert notifications == []
     assert api_service._cached_rank(LEADERBOARD_ID, USERNAME).score == 100.0
 

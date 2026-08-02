@@ -1302,7 +1302,10 @@ def _run_attempt(  # noqa: PLR0913
             )
             return
         except requests.RequestException as exc:
-            logger.warning(
+            # INFO for the same reason as _get_with_retry's retry records: a
+            # scheduled attempt that may still recover is self-healed churn.
+            # Exhausting the schedule warns in _notify_exhaustion.
+            logger.info(
                 "Transient failure resolving leaderboard for %s; will retry: %s",
                 scenario_name,
                 request_exception_summary(exc),
