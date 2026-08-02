@@ -98,6 +98,15 @@
     min-height: 20rem;
 }
 
+/* Home's persistent notice when the app booted without a usable stats
+   directory. Every scenario control below it is empty, so the line has to
+   read as the explanation for that, not as decoration. */
+.stats-dir-hint {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-sm);
+    padding-bottom: 0.5rem;
+}
+
 /* Grid cells whose value carries hover-only detail (exact timestamps on Last
    Played, the weakest scenario on Lowest Percentile). The dotted underline
    plus help cursor signals "there is more on hover". */

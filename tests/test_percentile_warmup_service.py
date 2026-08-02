@@ -17,7 +17,6 @@ from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
 
 def _config(*, enabled: bool = True) -> ConfigData:
     return ConfigData(
-        stats_dir="stats",
         polling_interval=1000,
         port=8050,
         sens_round_decimal_places=2,

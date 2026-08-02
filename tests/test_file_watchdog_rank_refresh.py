@@ -135,11 +135,9 @@ def test_on_created_parses_absolute_source_path_outside_stats_dir(
 ):
     run_data = _run_data()
     messages, loads, _schedules = _patch_common(monkeypatch, run_data)
-    stats_dir = (tmp_path / "stats").resolve()
     source_path = (tmp_path / "outside-stats" / "run.csv").resolve()
     parsed_paths = []
 
-    monkeypatch.setattr(file_watchdog.get_config(), "stats_dir", str(stats_dir))
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",

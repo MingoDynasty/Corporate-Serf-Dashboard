@@ -79,20 +79,6 @@ def test_unreadable_config_reaches_the_log_files(tmp_path: Path) -> None:
     assert "Configuration error" in _debug_log(tmp_path)
 
 
-def test_missing_stats_dir_reaches_the_log_files(tmp_path: Path) -> None:
-    missing = tmp_path / "missing-stats"
-    (tmp_path / "config.toml").write_text(
-        f'stats_dir = "{missing.as_posix()}"\nport = 0\n',
-        encoding="utf-8",
-    )
-
-    result = _run_in_app("from source.app import main; main()", tmp_path)
-
-    assert result.returncode == 1
-    assert "is not an existing directory" in result.stderr
-    assert "is not an existing directory" in _debug_log(tmp_path)
-
-
 def test_urllib3_debug_is_silenced(tmp_path: Path) -> None:
     # The app's own per-attempt request records supersede urllib3's transport
     # chatter (~16% of a sampled debug.log); INFO keeps urllib3's warnings.

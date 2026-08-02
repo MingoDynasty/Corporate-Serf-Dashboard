@@ -22,7 +22,7 @@ from dash import (
 
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
-from source.config.settings_service import get_identity
+from source.config.settings_service import get_identity, get_usable_stats_dir
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
@@ -871,6 +871,12 @@ def modal_demo(_, opened):
     return not opened
 
 
+def _local_scenario_options() -> list:
+    """List the scenarios in the stats directory, or none without a usable one."""
+    stats_dir = get_usable_stats_dir()
+    return get_unique_scenarios(stats_dir) if stats_dir else []
+
+
 @callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
@@ -878,8 +884,25 @@ def modal_demo(_, opened):
 def select_playlist(selected_playlist):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return get_unique_scenarios(get_config().stats_dir)
+        return _local_scenario_options()
     return get_scenarios_from_playlist_code(selected_playlist)
+
+
+def _stats_dir_hint() -> list:
+    """Say so, persistently, when the app booted without a stats directory.
+
+    Deliberately plain text: unset and unusable read the same to the user, and
+    the settings page that will own the repair does not exist yet.
+    """
+    if get_usable_stats_dir() is not None:
+        return []
+    return [
+        dmc.Text(
+            "No stats directory configured",
+            className="stats-dir-hint",
+            id="stats-dir-hint",
+        )
+    ]
 
 
 def _home_initial_selection(
@@ -895,7 +918,7 @@ def _home_initial_selection(
     scenario_options = (
         get_scenarios_from_playlist_code(selected_playlist)
         if selected_playlist
-        else get_unique_scenarios(get_config().stats_dir)
+        else _local_scenario_options()
     )
     return selected_playlist, scenario_options, scenario or None
 
@@ -953,6 +976,7 @@ def layout(
                 interval=30_000,
                 n_intervals=0,
             ),
+            *_stats_dir_hint(),
             dmc.Grid(
                 children=[
                     dmc.GridCol(
