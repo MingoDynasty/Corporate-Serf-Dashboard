@@ -186,9 +186,13 @@ and [uv](https://docs.astral.sh/uv/):
 git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
 cd Corporate-Serf-Dashboard
 uv sync
+```
+
+Copy `example.toml` to `config.toml` and set `stats_dir` (see
+[Configuration](#configuration)), then start the app:
+
+```shell
 uv run python source/app.py
 ```
 
-Copy `example.toml` to `config.toml` and set `stats_dir` before the first run
-(see [Configuration](#configuration)). A source checkout does not auto-update;
-`git pull` is the update path.
+A source checkout does not auto-update; `git pull` is the update path.
