@@ -2,7 +2,7 @@
 
 Enforces the docs lifecycle from AGENTS.md "Shipping a proposal" and the
 proposal template: proposal files declare a Status line and lead with the
-TL;DR / Decision points / Problem sections in that order, and no markdown
+TL;DR / Decisions needed / Problem sections in that order, and no markdown
 doc links to a file that has been deleted (e.g. a proposal distilled into
 the decision log).
 """
@@ -35,7 +35,7 @@ REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTI
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
 
-REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decision points", "Problem")
+REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decisions needed", "Problem")
 
 
 def _visible_h2_headings(text: str) -> list[str]:
@@ -104,7 +104,7 @@ def test_proposal_docs_lead_with_required_sections():
         if leading != REQUIRED_LEADING_SECTIONS:
             bad.append(f"{doc.relative_to(REPO_ROOT)}: first H2s are {list(leading)}")
     assert not bad, (
-        "Proposal docs must open with '## TL;DR', '## Decision points', "
+        "Proposal docs must open with '## TL;DR', '## Decisions needed', "
         "'## Problem' in that order (see the AGENTS.md proposal template):\n"
         + "\n".join(bad)
     )
