@@ -48,7 +48,12 @@ STEAM_ID_DESCRIPTION = (
 )
 
 STATS_DIR_ERROR = "No such directory."
-STEAM_ID_ERROR = "Enter digits only."
+STEAM_ID_ERROR = "Enter a 17-digit SteamID64 — it starts with 7656119."
+
+# The first SteamID64 of Steam's public universe: every real account ID is at
+# or above it. Anything smaller with 17 digits is a typo, not an account.
+STEAM_ID64_BASE = 76561197960265728
+STEAM_ID64_DIGITS = 17
 
 RESTART_NOTICE = (
     "Saved. Restart the dashboard to apply — this app is still running on the "
@@ -70,6 +75,22 @@ RESTART_NOTICE_HIDDEN_CLASS = (
 )
 
 
+def _is_steam_id64(steam_id: str) -> bool:
+    """Say whether the text is shaped like a SteamID64.
+
+    Shape only -- whether the account exists is an online question, and this
+    page never asks one. The check is the range rather than digits alone
+    because the realistic paste mistakes are all well-formed numbers: an
+    account ID (``26448258``) or a SteamID3 fragment reads as digits and
+    resolves to nobody.
+    """
+    # ``isascii`` guards the digit check: ``str.isdigit`` also accepts
+    # superscripts and non-Latin digit forms, which no endpoint would take.
+    if not (steam_id.isascii() and steam_id.isdigit()):
+        return False
+    return len(steam_id) == STEAM_ID64_DIGITS and int(steam_id) >= STEAM_ID64_BASE
+
+
 def _validate(stats_dir: str, steam_id: str) -> tuple[str | None, str | None]:
     """Check the offline rules, returning one error per field (None when fine).
 
@@ -80,12 +101,8 @@ def _validate(stats_dir: str, steam_id: str) -> tuple[str | None, str | None]:
     stats_dir_error = (
         STATS_DIR_ERROR if stats_dir and not Path(stats_dir).is_dir() else None
     )
-    # ``isascii`` guards the digit check: ``str.isdigit`` also accepts
-    # superscripts and non-Latin digit forms, which no endpoint would take.
     steam_id_error = (
-        STEAM_ID_ERROR
-        if steam_id and not (steam_id.isascii() and steam_id.isdigit())
-        else None
+        STEAM_ID_ERROR if steam_id and not _is_steam_id64(steam_id) else None
     )
     return stats_dir_error, steam_id_error
 
