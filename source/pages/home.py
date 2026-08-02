@@ -891,14 +891,17 @@ def select_playlist(selected_playlist):
 def _stats_dir_hint() -> list:
     """Say so, persistently, when the app booted without a stats directory.
 
-    Deliberately plain text: unset and unusable read the same to the user, and
-    the settings page that will own the repair does not exist yet.
+    Unset and unusable read the same to the user, and both are repaired in the
+    same place, so the hint carries one link to the settings page.
     """
     if get_usable_stats_dir() is not None:
         return []
     return [
         dmc.Text(
-            "No stats directory configured",
+            [
+                "No stats directory configured — set it in ",
+                dmc.Anchor("Settings", href="/settings", refresh=False),
+            ],
             className="stats-dir-hint",
             id="stats-dir-hint",
         )

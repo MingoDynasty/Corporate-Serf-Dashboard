@@ -153,6 +153,7 @@ flowchart LR
         Playlists["playlists.py"]
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
+        SettingsPage["settings.py"]
     end
 
     subgraph SharedUI["Shared UI"]
@@ -194,6 +195,7 @@ flowchart LR
     PlaylistScenarios --> PlaylistService
     Journey --> DataService
     Journey --> PlotService
+    SettingsPage --> WarmupService
 
     Home --> Visibility
     Journey --> Visibility
@@ -256,6 +258,15 @@ flowchart LR
   transactions. The drain callback owns progress text, cancellation
   finalization, and the one-shot aggregate completion toast.
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
+- `settings.py` (`/settings`) — the settings store's only runtime writer: the
+  stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
+  Save. The form is built per visit from the stored view (never the pinned
+  accessors) so it always shows what is on disk. Validation is offline only
+  (directory exists, digits-only Steam ID); a save writes all three keys,
+  cold-starts the warmup worker when a username was saved, and re-derives the
+  restart notice from `is_restart_pending()`. A write that fails (a locked file
+  exhausting the atomic replace's retries) is caught and reported in the status
+  line rather than escaping into a failed request the user cannot see.
 
 ### Shared UI components
 - `components/local_icon.py` — local SVG icon registry/helper used by the shell
@@ -373,4 +384,5 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them |
+| Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

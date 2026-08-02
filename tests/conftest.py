@@ -43,6 +43,7 @@ def test_settings(
         tmp_path / "settings-store" / "settings.json",
     )
     settings_service.clear_settings_cache()
+    settings_service.clear_identity_pin()
     stats_dir = Path(__file__).resolve().parent / "fixtures" / "stats"
     stats_dir.mkdir(parents=True, exist_ok=True)
     settings_service.save_settings({settings_service.STATS_DIR_KEY: str(stats_dir)})
@@ -50,3 +51,4 @@ def test_settings(
     yield
     settings_service.clear_settings_cache()
     settings_service.clear_stats_dir_pin()
+    settings_service.clear_identity_pin()

@@ -102,6 +102,22 @@ def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
     assert link.refresh is False
 
 
+def test_navbar_links_to_every_navigable_page():
+    shell = app_shell.layout()
+
+    links = [
+        (component.label, component.href)
+        for component in _walk_components(shell)
+        if isinstance(component, dmc.NavLink)
+    ]
+
+    assert links == [
+        ("Home", "/"),
+        ("Playlists", "/playlists"),
+        ("Settings", "/settings"),
+    ]
+
+
 def test_navbar_defaults_to_open_on_a_first_run():
     shell = app_shell.layout()
 

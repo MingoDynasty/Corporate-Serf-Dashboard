@@ -206,6 +206,11 @@ def layout(**kwargs):  # noqa: ARG001
                                 "/playlists",
                                 "material-symbols:playlist-play",
                             ),
+                            nav_link(
+                                "Settings",
+                                "/settings",
+                                "clarity:settings-line",
+                            ),
                         ],
                         p="md",
                     ),

@@ -5,9 +5,11 @@ user-level settings the app itself writes live here and are read
 per-operation. The mechanics mirror the playlist visibility store — module
 ``RLock``, an in-process cache, atomic writes, tolerant reads.
 
-``stats_dir`` is the one exception to per-operation reads: server startup pins
-it for the life of the process and every consumer reads that pin (see
-``resolve_stats_dir``).
+Restart-scoped values are pinned rather than re-read: ``stats_dir`` is pinned
+by server startup (see ``resolve_stats_dir``), and the identity pair freezes at
+the first read that observes a configured username (see ``get_identity``).
+Everything the settings page can change while the app runs is therefore either
+applied live or covered by its restart notice (see ``is_restart_pending``).
 
 Unset semantics are deliberately flat: a missing key, an empty value, and a
 missing/unreadable/malformed file all mean *not configured*. A malformed file
@@ -46,6 +48,10 @@ _settings_cache: dict[str, dict[str, str] | None] = {"value": None}
 # None until startup resolves them, and stay None for a startup that never did
 # (tests, imports). Mutated in place for the same reason as the cache above.
 _stats_dir_pin: dict[str, str | None] = {"configured": None, "usable": None}
+# The identity this process serves, frozen as a (username, Steam ID) pair by
+# the first read that saw a configured username; None while reads are still
+# live. Mutated in place for the same reason as the two above.
+_identity_pin: dict[str, tuple[str | None, str | None] | None] = {"value": None}
 
 
 def clear_settings_cache() -> None:
@@ -59,6 +65,12 @@ def clear_stats_dir_pin() -> None:
     with _SETTINGS_LOCK:
         _stats_dir_pin["configured"] = None
         _stats_dir_pin["usable"] = None
+
+
+def clear_identity_pin() -> None:
+    """Forget the pinned identity so reads go live again (test seam)."""
+    with _SETTINGS_LOCK:
+        _identity_pin["value"] = None
 
 
 def _read_settings_from_disk() -> dict[str, str]:
@@ -112,28 +124,50 @@ def _get_setting(key: str) -> str | None:
 
 
 def get_kovaaks_username() -> str | None:
-    """Get the configured KovaaK's username, or None when unset."""
-    return _get_setting(KOVAAKS_USERNAME_KEY)
+    """Get the KovaaK's username this process serves, or None when unset."""
+    return get_identity()[0]
 
 
 def get_steam_id() -> str | None:
-    """Get the configured Steam ID, or None when unset."""
-    return _get_setting(STEAM_ID_KEY)
+    """Get the Steam ID this process serves, or None when unset."""
+    return get_identity()[1]
 
 
 def get_identity() -> tuple[str | None, str | None]:
-    """Get the username and Steam ID from a single consistent read.
+    """Get the username and Steam ID this process serves, as one pair.
 
-    Every caller that needs both must use this rather than the two getters
-    in sequence: separate reads can straddle a save and pair one settings
-    version's username with another's Steam ID, which rank lookups would
-    resolve to one player and then cache under the other's name.
+    The pair is always consistent: separate reads could straddle a save and
+    pair one settings version's username with another's Steam ID, which rank
+    lookups would resolve to one player and then cache under the other's name.
+
+    It is also process-pinned. The first read that observes a configured
+    username freezes both values for the life of the process; until then reads
+    stay live, which is what lets a first-time identity set apply without a
+    restart. A later change is restart-scoped instead -- the warmup worker
+    keeps the context it started with, and the caches it fills are scoped to
+    one identity per process -- and the settings page's restart notice says so.
+
+    Practical consequence, intended: when identity is already configured at
+    boot, the first consumer read -- normally the warmup starter during
+    startup, though its ``percentile_warmup_enabled`` guard short-circuits
+    ahead of the identity read, leaving the freeze to a Home render or a
+    watchdog event -- pins it there. Freeze-on-read only ever matters for the
+    unset-to-set flow.
     """
-    settings = get_settings()
-    return (
-        settings.get(KOVAAKS_USERNAME_KEY) or None,
-        settings.get(STEAM_ID_KEY) or None,
-    )
+    with _SETTINGS_LOCK:
+        pinned = _identity_pin["value"]
+        if pinned is not None:
+            return pinned
+        settings = get_settings()
+        identity = (
+            settings.get(KOVAAKS_USERNAME_KEY) or None,
+            settings.get(STEAM_ID_KEY) or None,
+        )
+        # Freeze on the username alone: it is what every consumer guards on,
+        # so a Steam ID without one has not been consumed by anything yet.
+        if identity[0] is not None:
+            _identity_pin["value"] = identity
+        return identity
 
 
 def resolve_stats_dir() -> str | None:
@@ -179,6 +213,30 @@ def save_settings(values: Mapping[str, str]) -> None:
     with _SETTINGS_LOCK:
         _write_settings_to_disk(settings)
         _settings_cache["value"] = settings
+
+
+def is_restart_pending() -> bool:
+    """Say whether stored settings differ from what this process is running on.
+
+    Derived, never stored: it compares the store against the two pins above, so
+    the settings page's notice describes reality for every consumer and
+    persists across page visits until the restart actually happens.
+
+    An unfrozen identity pin is not a difference. That is the first-time-set
+    path, which applies live -- nothing has consumed the old (unset) value.
+    """
+    with _SETTINGS_LOCK:
+        if _get_setting(STATS_DIR_KEY) != _stats_dir_pin["configured"]:
+            return True
+        pinned_identity = _identity_pin["value"]
+        if pinned_identity is None:
+            return False
+        settings = get_settings()
+        stored_identity = (
+            settings.get(KOVAAKS_USERNAME_KEY) or None,
+            settings.get(STEAM_ID_KEY) or None,
+        )
+        return stored_identity != pinned_identity
 
 
 def _write_settings_to_disk(settings: Mapping[str, str]) -> None:
