@@ -12,6 +12,7 @@ from sortedcontainers import SortedKeyList
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import get_config
+from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.api_service import schedule_rank_freshness_refresh
 from source.kovaaks.data_service import (
     extract_data_from_file,
@@ -64,17 +65,17 @@ def _refresh_rank_after_high_score(
     scenario_name: str,
     expected_score: float,
 ) -> None:
-    config = get_config()
-    if not config.kovaaks_username:
+    username = get_kovaaks_username()
+    if not username:
         return
 
     try:
         schedule_rank_freshness_refresh(
             scenario_name,
-            config.kovaaks_username,
-            config.steam_id,
+            username,
+            get_steam_id(),
             expected_score,
-            config.scenario_metadata_cache_ttl_hours,
+            get_config().scenario_metadata_cache_ttl_hours,
         )
     except Exception:
         logger.exception("Failed to schedule rank refresh for %s", scenario_name)

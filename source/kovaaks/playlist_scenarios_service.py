@@ -9,6 +9,7 @@ from typing import Literal, TypeAlias
 from urllib.parse import urlencode
 
 from source.config.config_service import get_config
+from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import (
     get_cached_leaderboard_id,
@@ -220,8 +221,8 @@ def _lookup_rank_info(
     # per-scenario path may start another total-play hydration.
     return get_scenario_rank_info(
         scenario_name,
-        config.kovaaks_username,
-        config.steam_id,
+        get_kovaaks_username(),
+        get_steam_id(),
         config.scenario_metadata_cache_ttl_hours,
         config.scenario_rank_cache_ttl_hours,
         config.leaderboard_total_cache_ttl_hours,
@@ -246,7 +247,7 @@ def _unknown_rank_info(scenario_name: str, exc: Exception) -> ScenarioRankInfo:
 def _hydrate_playlist_leaderboard_ids(scenario_names: list[str]) -> None:
     """Hydrate the leaderboard mapping once before the phase-2 fan-out."""
     config = get_config()
-    username = config.kovaaks_username
+    username = get_kovaaks_username()
     if not username:
         return
     try:

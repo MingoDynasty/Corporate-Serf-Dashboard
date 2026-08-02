@@ -5,6 +5,7 @@ import statistics
 from datetime import datetime
 
 from source.config.config_service import get_config
+from source.config.settings_service import get_kovaaks_username, get_steam_id
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_models import PlaylistData, ScenarioStats
@@ -54,8 +55,8 @@ def _cached_rank_resolution(
     try:
         rank_info = get_scenario_rank_info(
             scenario_name,
-            config.kovaaks_username,
-            config.steam_id,
+            get_kovaaks_username(),
+            get_steam_id(),
             config.scenario_metadata_cache_ttl_hours,
             config.scenario_rank_cache_ttl_hours,
             config.leaderboard_total_cache_ttl_hours,

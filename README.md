@@ -139,13 +139,27 @@ Settings live in `config.toml`:
 - **From source:** copy `example.toml` to `config.toml` in your checkout.
 
 The installer fills in `stats_dir` for you. `example.toml` documents every
-setting; two are worth knowing about:
+setting; one is worth knowing about:
 
-- `kovaaks_username` — set this to enable the leaderboard rank and percentile
-  features (and optionally `steam_id`, which makes player matching exact when
-  usernames are ambiguous). Leave it empty to run fully offline.
 - `port` — change this if something else on your machine already uses 8050. The
   dashboard says so at startup rather than failing mysteriously.
+
+Your KovaaK's identity lives in a separate, app-owned file, `data/settings.json`
+next to `config.toml` (installed:
+`%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). Create it to enable
+the leaderboard rank and percentile features; leave it absent to run fully
+offline:
+
+```json
+{
+  "kovaaks_username": "YourKovaaksName",
+  "steam_id": ""
+}
+```
+
+`steam_id` is optional and makes player matching exact when usernames are
+ambiguous. Edit this file only while the dashboard is stopped — it is read once
+per run.
 
 ## Usage
 

@@ -121,6 +121,10 @@ that summary and never accesses the queue directly.
   read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
+- **User settings** — `data/settings.json` (not committed) holds the app-owned
+  user settings (`config/settings_service.py`): the KovaaK's identity today.
+  Written atomically and whole, read once and cached in-process; a missing key,
+  an empty value, and an unusable file all mean "not configured".
 - **Playlist visibility** — `data/playlist_visibility.json` (not committed)
   holds the playlist show-list (`playlist_visibility_service.py`): written
   atomically on each show/hide, read once and cached in-process, absent until
@@ -310,6 +314,11 @@ flowchart LR
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
+  Unknown keys are named in one warning and ignored, so a config carrying keys
+  a release has retired still loads.
+- `config/settings_service.py` — the app-owned user-settings store
+  (`data/settings.json`): the KovaaK's identity today, read per-operation.
+  Nothing else writes the file.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
   running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
   variable, which is how an updater tells "my new process is up" apart from
@@ -354,4 +363,4 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings such as the KovaaK's identity |

@@ -1,6 +1,7 @@
 from datetime import datetime
 from types import SimpleNamespace
 
+from source.config import settings_service
 from source.kovaaks import data_service, playlist_overview_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario, ScenarioStats
@@ -13,12 +14,13 @@ RANKS = [Rank(name="Bronze", color="#a97142", threshold=100)]
 
 
 def _configure(monkeypatch):
+    settings_service.save_settings(
+        {"kovaaks_username": "MingoDynasty", "steam_id": "steam-id"}
+    )
     monkeypatch.setattr(
         playlist_overview_service,
         "get_config",
         lambda: SimpleNamespace(
-            kovaaks_username="MingoDynasty",
-            steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,
             scenario_rank_cache_ttl_hours=168,
             leaderboard_total_cache_ttl_hours=24,

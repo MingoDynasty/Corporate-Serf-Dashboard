@@ -1,6 +1,6 @@
 # Settings Store and Settings Page
 
-Status: Proposed
+Status: In progress
 Date: 2026-07-20 (reworked the same day from a detection-first draft —
 identity auto-detection and the initial-setup flow moved to a
 deliberately unscheduled follow-on proposal, working notes in

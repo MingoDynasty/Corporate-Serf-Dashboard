@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 import requests
 
+from source.config import settings_service
 from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, RunData, Scenario, ScenarioStats
@@ -209,12 +210,13 @@ def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures
         ],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings(
+        {"kovaaks_username": "MingoDynasty", "steam_id": "steam-id"}
+    )
     monkeypatch.setattr(
         playlist_scenarios_service,
         "get_config",
         lambda: SimpleNamespace(
-            kovaaks_username="MingoDynasty",
-            steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,
             scenario_rank_cache_ttl_hours=168,
             leaderboard_total_cache_ttl_hours=24,
@@ -346,12 +348,13 @@ def _setup_playlist_for_hydration(monkeypatch, *, mapped, username="MingoDynasty
         scenarios=[Scenario(name="First"), Scenario(name="Second")],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings(
+        {"kovaaks_username": username or "", "steam_id": "steam-id"}
+    )
     monkeypatch.setattr(
         playlist_scenarios_service,
         "get_config",
         lambda: SimpleNamespace(
-            kovaaks_username=username,
-            steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,
             scenario_rank_cache_ttl_hours=168,
             leaderboard_total_cache_ttl_hours=24,
@@ -696,12 +699,13 @@ def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
         ],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings(
+        {"kovaaks_username": "MingoDynasty", "steam_id": "steam-id"}
+    )
     monkeypatch.setattr(
         playlist_scenarios_service,
         "get_config",
         lambda: SimpleNamespace(
-            kovaaks_username="MingoDynasty",
-            steam_id="steam-id",
             scenario_metadata_cache_ttl_hours=24,
             scenario_rank_cache_ttl_hours=168,
             leaderboard_total_cache_ttl_hours=24,
