@@ -781,7 +781,8 @@ def load_playlist_from_code(  # noqa: PLR0911
         # KovaaK's returns HTTP 400 on some gibberish codes, and a slow spell
         # can time out or return schema-invalid JSON. Degrade any of these to a
         # refusal naming the pasted code rather than letting the exception
-        # escape as a raw Dash callback error (AGENTS.md "UI Boundaries").
+        # escape as a raw Dash callback error (docs/specs/scenario_rank.md,
+        # "Failure handling").
         # Deliberately no Evxl fallback here: widening the fallback to fire
         # when the search itself *raises* is a design change, not a bug fix.
         detail = (
