@@ -445,8 +445,9 @@ the installer never touches — one home, one writer — so its detection had
 nowhere legitimate left to write: a `stats_dir` line in `config.toml` would only
 be warn-logged and ignored. The app absorbs the consequences instead of the
 installer: it starts and serves without a usable stats directory (initial scan
-and file watchdog skipped, one log line naming what was configured, a plain-text
-hint on Home), and an app-side startup bootstrap that re-detects the directory
+and file watchdog skipped, one log line naming what was configured, a hint on
+Home — plain text until the settings page shipped, a link to it since), and an
+app-side startup bootstrap that re-detects the directory
 follows in the same proposal. Between the two, a fresh install runs empty until
 the directory is set by hand. The `load_config()` round-trip through the
 installed app is unchanged and still gates the install, now against the

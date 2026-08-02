@@ -1,6 +1,7 @@
 """Home says so, and lists no scenarios, when no stats directory is pinned."""
 
 import dash
+import dash_mantine_components as dmc
 import pytest
 
 from source.config import settings_service
@@ -9,7 +10,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
 
-HINT_TEXT = "No stats directory configured"
+HINT_TEXT = "No stats directory configured — set it in "
 
 
 def _walk_components(component):
@@ -69,7 +70,12 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
 
     hint = _component_by_id(page, "stats-dir-hint")
     assert hint is not None
-    assert hint.children == HINT_TEXT
+    text, link = hint.children
+    assert text == HINT_TEXT
+    # The repair surface exists now, so the hint points straight at it.
+    assert isinstance(link, dmc.Anchor)
+    assert link.children == "Settings"
+    assert link.href == "/settings"
     assert _component_by_id(page, "scenario-dropdown-selection").data == []
 
 

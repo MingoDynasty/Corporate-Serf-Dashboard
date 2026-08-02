@@ -140,6 +140,18 @@ a.playlist-scenario-link-cell:hover {
     display: none;
 }
 
+/* The settings page's restart notice: derived at render and after each save,
+   so it stays put until the restart actually happens. Ships hidden; the save
+   callback and the layout drop the modifier when a change is pending. */
+.app-settings-restart-notice {
+    color: var(--mantine-color-orange-filled);
+    font-size: var(--mantine-font-size-sm);
+}
+
+.app-settings-restart-notice-hidden {
+    display: none;
+}
+
 .settings-help-icon {
     cursor: help;
     flex-shrink: 0;
