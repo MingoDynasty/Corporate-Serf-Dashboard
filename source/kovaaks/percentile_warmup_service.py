@@ -14,6 +14,7 @@ import requests
 from pydantic import ValidationError
 
 from source.config.config_service import ConfigData, get_config
+from source.config.settings_service import get_identity, get_kovaaks_username
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import (
     UnknownKovaaksUserError,
@@ -169,7 +170,7 @@ def _username_validation_result(context: WarmupContext) -> WarmupStepResult:
             prior.reason or "username validation unavailable",
         )
 
-    username = context.config.kovaaks_username
+    username = get_kovaaks_username()
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
@@ -202,7 +203,7 @@ def process_warmup_hydration(context: WarmupContext) -> WarmupStepResult:
     if prior is not None and prior.terminal:
         return WarmupStepResult(StepDisposition.TERMINAL, prior.reason)
 
-    username = context.config.kovaaks_username
+    username = get_kovaaks_username()
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
@@ -247,7 +248,9 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
 ) -> WarmupStepResult:
     """Process one scenario without owning queue, pacing, or thread state."""
     config = context.config
-    username = config.kovaaks_username
+    # One read for the whole item: the fetch below pairs these two, and a
+    # mid-item re-read could pair them across different saves.
+    username, steam_id = get_identity()
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
@@ -295,7 +298,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
             candidate = fetch_scenario_rank(
                 leaderboard_id,
                 username,
-                config.steam_id,
+                steam_id,
             ).model_copy(update={"scenario_name": scenario_name})
         except (
             UnknownKovaaksUserError,
@@ -364,7 +367,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
 
 def _freshly_satisfied(scenario_name: str, config: ConfigData) -> bool:
     """Implement R4's dequeue-time fresh-rank/fresh-total predicate."""
-    username = config.kovaaks_username
+    username = get_kovaaks_username()
     if not username:
         return True
     leaderboard_id = get_cached_leaderboard_id(scenario_name)
@@ -389,9 +392,9 @@ def _freshly_satisfied(scenario_name: str, config: ConfigData) -> bool:
     )
 
 
-def _has_displayable_percentile(scenario_name: str, config: ConfigData) -> bool:
+def _has_displayable_percentile(scenario_name: str) -> bool:
     """Read presence-only caches for R3 ordering, without recording activity."""
-    username = config.kovaaks_username
+    username = get_kovaaks_username()
     if not username:
         return False
     leaderboard_id = get_cached_leaderboard_id(scenario_name)
@@ -411,7 +414,6 @@ def _has_displayable_percentile(scenario_name: str, config: ConfigData) -> bool:
 def _ordered_played_scenarios(
     playlist: PlaylistData,
     stats_by_scenario: dict[str, ScenarioStats],
-    config: ConfigData,
 ) -> list[str]:
     played = [
         (index, scenario.name, stats_by_scenario[scenario.name])
@@ -420,7 +422,7 @@ def _ordered_played_scenarios(
     ]
     played.sort(
         key=lambda item: (
-            _has_displayable_percentile(item[1], config),
+            _has_displayable_percentile(item[1]),
             -item[2].date_last_played.timestamp(),
             item[0],
         )
@@ -429,7 +431,7 @@ def _ordered_played_scenarios(
     return list(dict.fromkeys(scenario_name for _, scenario_name, _ in played))
 
 
-def _startup_queue(config: ConfigData) -> list[str]:
+def _startup_queue() -> list[str]:
     """Build R2/R3's played-visible queue in playlist-completion order."""
     stats_by_scenario = get_scenario_stats_snapshot()
     batches: list[tuple[datetime, str, str, list[str]]] = []
@@ -437,7 +439,7 @@ def _startup_queue(config: ConfigData) -> list[str]:
         playlist = get_playlist_by_code(playlist_code)
         if playlist is None:
             continue
-        scenarios = _ordered_played_scenarios(playlist, stats_by_scenario, config)
+        scenarios = _ordered_played_scenarios(playlist, stats_by_scenario)
         if not scenarios:
             continue
         most_recent = max(
@@ -543,11 +545,7 @@ class PercentileWarmupWorker:
         playlist = get_playlist_by_code(playlist_code)
         if playlist is None:
             return 0
-        scenarios = _ordered_played_scenarios(
-            playlist,
-            stats_by_scenario,
-            self.context.config,
-        )
+        scenarios = _ordered_played_scenarios(playlist, stats_by_scenario)
         if not scenarios:
             return 0
         with self._condition:
@@ -845,14 +843,14 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     global _worker  # noqa: PLW0603
     config = config or get_config()
     # Guard before playlist/stats enumeration: empty username is fully offline.
-    if not config.percentile_warmup_enabled or not config.kovaaks_username:
+    if not config.percentile_warmup_enabled or not get_kovaaks_username():
         logger.info("Percentile warmup disabled by configuration")
         return False
 
     with _worker_lock:
         if _worker is not None:
             return True
-        initial_queue = _startup_queue(config)
+        initial_queue = _startup_queue()
         _worker = PercentileWarmupWorker(config, initial_queue)
         _worker.start()
     return True
@@ -862,7 +860,7 @@ def enqueue_playlist_percentile_warmup(playlist_code: str) -> int:
     """Prepend one newly visible/imported playlist, or no-op while disabled."""
     config = get_config()
     # Same pre-enumeration guards as startup (R15).
-    if not config.percentile_warmup_enabled or not config.kovaaks_username:
+    if not config.percentile_warmup_enabled or not get_kovaaks_username():
         return 0
     with _worker_lock:
         worker = _worker

@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import requests
 
+from source.config import settings_service
 from source.config.config_service import ConfigData
 from source.kovaaks import api_service
 from source.kovaaks import percentile_warmup_service as warmup
@@ -14,19 +15,25 @@ from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
 
 
-def _config(
-    *,
-    username: str | None = "ValidUser",
-    enabled: bool = True,
-) -> ConfigData:
+def _config(*, enabled: bool = True) -> ConfigData:
     return ConfigData(
         stats_dir="stats",
         polling_interval=1000,
         port=8050,
         sens_round_decimal_places=2,
-        kovaaks_username=username,
         percentile_warmup_enabled=enabled,
     )
+
+
+def _store_identity(username: str | None) -> None:
+    """Set (or clear) the identity the worker now reads per-operation."""
+    settings_service.save_settings({"kovaaks_username": username or ""})
+
+
+@pytest.fixture(autouse=True)
+def stored_identity() -> None:
+    """Give every case a configured identity; offline cases clear it."""
+    _store_identity("ValidUser")
 
 
 def _stats(day: int) -> ScenarioStats:
@@ -60,10 +67,10 @@ def test_startup_queue_groups_recent_playlists_and_prioritizes_missing_percentil
     monkeypatch.setattr(
         warmup,
         "_has_displayable_percentile",
-        lambda scenario_name, _config: displayable[scenario_name],
+        lambda scenario_name: displayable[scenario_name],
     )
 
-    assert warmup._startup_queue(_config()) == ["B", "A", "C", "D"]
+    assert warmup._startup_queue() == ["B", "A", "C", "D"]
 
 
 def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
@@ -79,11 +86,11 @@ def test_startup_queue_enqueues_shared_scenarios_once(monkeypatch, caplog):
     monkeypatch.setattr(
         warmup,
         "_has_displayable_percentile",
-        lambda _scenario_name, _config: False,
+        lambda _scenario_name: False,
     )
 
     with caplog.at_level(logging.INFO, logger=warmup.__name__):
-        assert warmup._startup_queue(_config()) == ["A", "Shared", "C"]
+        assert warmup._startup_queue() == ["A", "Shared", "C"]
 
     messages = [record.getMessage() for record in caplog.records]
     assert (
@@ -133,7 +140,7 @@ def test_enqueue_batch_prepends_in_order_and_bumps_generation(monkeypatch):
     monkeypatch.setattr(
         warmup,
         "_has_displayable_percentile",
-        lambda scenario_name, _config: scenario_name == "A",
+        lambda scenario_name: scenario_name == "A",
     )
     worker = warmup.PercentileWarmupWorker(_config(), ["Tail"])
 
@@ -155,7 +162,7 @@ def test_enqueue_moves_already_queued_scenarios_to_front(monkeypatch):
     monkeypatch.setattr(
         warmup,
         "_has_displayable_percentile",
-        lambda scenario_name, _config: scenario_name == "A",
+        lambda scenario_name: scenario_name == "A",
     )
     worker = warmup.PercentileWarmupWorker(_config(), ["Tail", "A"])
 
@@ -424,19 +431,21 @@ def test_partial_rank_success_retries_only_the_total(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "config",
-    [
-        _config(username=None, enabled=True),
-        _config(username="ValidUser", enabled=False),
-    ],
+    ("username", "enabled"),
+    [(None, True), ("ValidUser", False)],
     ids=["offline", "kill-switch"],
 )
-def test_disabled_start_does_not_enumerate_or_create_worker(monkeypatch, config):
+def test_disabled_start_does_not_enumerate_or_create_worker(
+    monkeypatch,
+    username,
+    enabled,
+):
+    _store_identity(username)
     monkeypatch.setattr(warmup, "_worker", None)
     monkeypatch.setattr(
         warmup,
         "_startup_queue",
-        lambda _config: pytest.fail("disabled startup must not enumerate"),
+        lambda: pytest.fail("disabled startup must not enumerate"),
     )
     monkeypatch.setattr(
         warmup,
@@ -444,19 +453,17 @@ def test_disabled_start_does_not_enumerate_or_create_worker(monkeypatch, config)
         lambda *_a, **_k: pytest.fail("disabled startup must not create a worker"),
     )
 
-    assert warmup.start_percentile_warmup_worker(config) is False
+    assert warmup.start_percentile_warmup_worker(_config(enabled=enabled)) is False
 
 
 @pytest.mark.parametrize(
-    "config",
-    [
-        _config(username=None, enabled=True),
-        _config(username="ValidUser", enabled=False),
-    ],
+    ("username", "enabled"),
+    [(None, True), ("ValidUser", False)],
     ids=["offline", "kill-switch"],
 )
-def test_disabled_enqueue_does_not_enumerate(monkeypatch, config):
-    monkeypatch.setattr(warmup, "get_config", lambda: config)
+def test_disabled_enqueue_does_not_enumerate(monkeypatch, username, enabled):
+    _store_identity(username)
+    monkeypatch.setattr(warmup, "get_config", lambda: _config(enabled=enabled))
 
     class FailWorker:
         def enqueue_playlist(self, _code):

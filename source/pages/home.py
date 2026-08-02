@@ -22,6 +22,7 @@ from dash import (
 
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
+from source.config.settings_service import get_identity
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
@@ -359,9 +360,10 @@ def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
 def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
     """Return the shared rank-service arguments sourced from app configuration."""
     rank_config = get_config()
+    username, steam_id = get_identity()
     return (
-        rank_config.kovaaks_username,
-        rank_config.steam_id,
+        username,
+        steam_id,
         rank_config.scenario_metadata_cache_ttl_hours,
         rank_config.scenario_rank_cache_ttl_hours,
         rank_config.leaderboard_total_cache_ttl_hours,

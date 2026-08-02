@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import sys
@@ -5,7 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from source.config.config_service import ConfigData
+# Bound here, before the autouse config fixture replaces the module attribute
+# with a canned loader: these tests exercise the real file-reading loader.
+from source.config.config_service import ConfigData, load_config
 from source.utilities.paths import STATE_DIR_ENV_VAR
 
 
@@ -96,6 +99,43 @@ def test_startup_with_missing_stats_dir_exits_cleanly(tmp_path: Path) -> None:
     assert missing_stats_dir.as_posix() in result.stderr
     assert str(config_path) in result.stderr
     assert "FPSAimTrainer" in result.stderr
+
+
+def test_unknown_config_keys_are_named_in_one_warning_and_ignored(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Retired and misspelled keys warn but never block startup.
+
+    Tolerating them is what keeps update and rollback boundaries safe, so a
+    config still carrying the relocated identity keys has to load.
+    """
+    config_path = tmp_path / "config.toml"
+    config_path.write_text(
+        'stats_dir = "x"\n'
+        "port = 8050\n"
+        'kovaaks_username = "MingoDynasty"\n'
+        'steam_id = "76561197986713986"\n'
+        "polling_intervall = 1000\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
+
+    with caplog.at_level(logging.WARNING):
+        config = load_config()
+
+    assert config.port == 8050
+    # Silently dropped by pydantic, so the warning is the only feedback.
+    assert not hasattr(config, "kovaaks_username")
+    warnings = [
+        record for record in caplog.records if record.levelno >= logging.WARNING
+    ]
+    assert len(warnings) == 1
+    message = warnings[0].getMessage()
+    assert "kovaaks_username" in message
+    assert "steam_id" in message
+    assert "polling_intervall" in message
 
 
 def test_tuning_fields_default_when_omitted() -> None:
