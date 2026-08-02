@@ -10,7 +10,8 @@ no username configured it makes no network calls at all.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
-in those entries, not here. Runtime structure is mapped in
+in those entries, not here. A statement with no link is an implementation
+fact that no decision-log entry governs. Runtime structure is mapped in
 [architecture.md](../architecture.md); endpoint behavior and quirks in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md). In user-facing text,
 leaderboard placement is worded "Position", never "Rank" (which means
@@ -59,8 +60,8 @@ benchmark tier) — see the
   root relocated by
   [2026-07-11](../decision_log.md#2026-07-11-move-the-api-cache-under-datacache)),
   subject to the cache conventions in [AGENTS.md](../../AGENTS.md).
-- `scenario_rank_cache_ttl_hours` defaults to `168`.
-- `leaderboard_total_cache_ttl_hours` defaults to `168`
+- `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
+  both default to `168`
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
 - Every automatic rank-cache write routes through one process-locked
   monotonic writer, so a lower score or transient `UNRANKED` result never
@@ -91,7 +92,8 @@ benchmark tier) — see the
   of the local score; an exhausted chain leaves the previous cache untouched
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
 - The Home rank widget passively re-reads the rank and total caches on its
-  existing interval — TTL ignored, no network calls (same entry).
+  existing interval — TTL ignored, no network calls
+  ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
 - Background refresh failures notify the UI through `dash_logger.error(...)`.
   The handler is safe to call from plain threads: records logged outside a
   Dash callback context are queued in `dash_logging` and delivered to the
@@ -113,4 +115,6 @@ benchmark tier) — see the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).
 - Unexpected application bugs may still raise and are handled by
-  UI/background safety nets.
+  UI/background safety nets — the expected/unexpected boundary is set by
+  the same entry that reserves `UNKNOWN` for expected failures
+  ([2026-04-27](../decision_log.md#2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo)).

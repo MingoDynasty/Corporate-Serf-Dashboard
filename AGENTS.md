@@ -91,12 +91,13 @@ Codex <codex@local>
   `tests/test_docs.py` enforces the `Status:` line (`Proposed`,
   `In progress`, `Future`, ...) and the leading section order.
 - Use `docs/specs/<capability>.md` for the current behavior of a shipped
-  capability: plain statements of what the app does today, each linking the
-  decision-log entries that set it instead of restating their rationale,
-  and opening with a layer-1 summary (see "Doc style — two readers, two
-  layers"). `docs/decision_log.md` stays the chronological change history.
-  Create a spec when a capability needs one — do not backfill specs ahead
-  of need.
+  capability: plain statements of what the app does today, linking the
+  decision-log entries that set them instead of restating their rationale
+  (a statement with no governing entry stays unlinked — do not invent an
+  entry for it), and opening with a layer-1 summary (see "Doc style — two
+  readers, two layers"). `docs/decision_log.md` stays the chronological
+  change history. Create a spec when a capability needs one — do not
+  backfill specs ahead of need.
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
