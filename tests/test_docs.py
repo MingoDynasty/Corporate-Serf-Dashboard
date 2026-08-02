@@ -27,14 +27,6 @@ DOC_FILES = sorted(
     ]
 )
 
-# Inline markdown links/images: [text](target) — captures the target up to
-# whitespace or the closing paren, which also handles optional "title" parts.
-INLINE_LINK_PATTERN = re.compile(r"\]\(([^)\s]+)[^)]*\)")
-
-# Reference-style link definitions: `[id]: target` at the start of a line
-# (up to 3 leading spaces per CommonMark). Excludes footnotes (`[^1]: ...`).
-REFERENCE_DEF_PATTERN = re.compile(r"^ {0,3}\[[^\]^][^\]]*\]:\s+(\S+)", re.MULTILINE)
-
 STATUS_PATTERN = re.compile(r"status\s*:", re.IGNORECASE)
 STATUS_SEARCH_LINES = 15
 
@@ -68,32 +60,33 @@ def _visible_h2_headings(text: str) -> list[str]:
 
 
 def _relative_link_targets(doc: Path) -> list[str]:
-    # Fenced code is example text, not live links, so it is stripped before
-    # scanning.
-    text = _strip_fenced_code(doc.read_text(encoding="utf-8"))
+    """Collect relative link and image targets as the rendered page has
+    them, deduplicated in document order.
+
+    Reads the CommonMark parser's tokens for the same reason
+    _visible_headings does: targets inside fenced code, comments, or other
+    raw HTML are example text, never rendered links, and fall out of the
+    token stream by construction. Reference-style definitions come from
+    the parse environment, so an unused definition is still checked.
+    External targets (any scheme, mailto included) are filtered out.
+    """
+    env: dict = {}
+    tokens = MarkdownIt("commonmark").parse(doc.read_text(encoding="utf-8"), env)
     targets = []
-    for pattern in (INLINE_LINK_PATTERN, REFERENCE_DEF_PATTERN):
-        for match in pattern.finditer(text):
-            target = match.group(1)
-            if urlparse(target).scheme or target.startswith("mailto:"):
-                continue
-            targets.append(target)
-    return targets
-
-
-def _strip_fenced_code(text: str) -> str:
-    """Drop fenced code blocks so example links are not read as live links."""
-    kept = []
-    fence = None
-    for line in text.splitlines():
-        stripped = line.lstrip()
-        if fence is None and stripped[:3] in ("```", "~~~"):
-            fence = stripped[:3]
-        elif fence is not None and stripped.startswith(fence):
-            fence = None
-        elif fence is None:
-            kept.append(line)
-    return "\n".join(kept)
+    for token in tokens:
+        if token.type != "inline":
+            continue
+        for child in token.children or []:
+            if child.type == "link_open":
+                targets.append(child.attrGet("href"))
+            elif child.type == "image":
+                targets.append(child.attrGet("src"))
+    targets.extend(ref["href"] for ref in env.get("references", {}).values())
+    return [
+        target
+        for target in dict.fromkeys(targets)
+        if target and not urlparse(target).scheme
+    ]
 
 
 def _github_anchor(heading: str) -> str:
@@ -153,14 +146,27 @@ def test_doc_anchor_links_resolve():
     )
 
 
-def test_link_targets_skip_fenced_code_examples(tmp_path):
-    doc = tmp_path / "fenced.md"
+def test_link_targets_match_rendered_visibility(tmp_path):
+    """Only rendered links count: fenced examples and commented-out links
+    are invisible; inline links, images, and reference definitions (used
+    or not) are collected once each, external schemes filtered."""
+    doc = tmp_path / "links.md"
     doc.write_text(
-        "# Title\n\n[real](other.md#anchor)\n\n"
-        "```markdown\n[example](#not-a-heading)\n```\n",
+        "# Title\n\n"
+        "[real](other.md#anchor) and [used][r] and ![shot](img/pic.png)\n\n"
+        "[external](https://example.com/x.md) <https://example.com>\n\n"
+        "```markdown\n[example](#not-a-heading)\n[fenced](fenced.md)\n```\n\n"
+        "<!-- [commented](gone.md) -->\n\n"
+        "[r]: ref.md\n"
+        "[unused]: unused.md\n",
         encoding="utf-8",
     )
-    assert _relative_link_targets(doc) == ["other.md#anchor"]
+    assert _relative_link_targets(doc) == [
+        "other.md#anchor",
+        "ref.md",
+        "img/pic.png",
+        "unused.md",
+    ]
 
 
 def test_heading_anchor_dedup_matches_github(tmp_path):
