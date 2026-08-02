@@ -9,7 +9,9 @@ endpoint behavior see `docs/kovaaks_api_notes.md`; for workflow/conventions see
 
 ## Process & threads
 
-`source/app.py` (`main`) loads config, pins the stats directory for the process
+`source/app.py` (`main`) loads config, detects the stats directory when nothing
+ever configured one (`stats_dir_detection.bootstrap_stats_dir`, before the pin
+so a first detection serves this boot), pins the stats directory for the process
 (`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
 the in-memory stores from existing CSVs, starts a watchdog `Observer` on that
 directory, and serves the Dash app with Waitress (Flask dev server when
@@ -340,6 +342,13 @@ flowchart LR
   check is part of resolution, not of each read, so a directory that appears
   mid-run cannot half-enable an app that skipped its scan. Nothing else writes
   the file.
+- `config/stats_dir_detection.py` — finds the KovaaK's stats directory on this
+  machine (registry Steam roots → each root's `libraryfolders.vdf` → probe
+  `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`, first hit wins) and
+  seeds it (`bootstrap_stats_dir`, called from startup) when the `stats_dir`
+  key has never been set. An empty value is user intent and is never
+  overridden; a miss writes nothing and is retried next start. The registry
+  read is isolated in `_registry_value` so tests never touch the real registry.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
   running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
   variable, which is how an updater tells "my new process is up" apart from
@@ -384,5 +393,5 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the startup detection that seeds the stats directory |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

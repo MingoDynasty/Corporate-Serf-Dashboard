@@ -44,9 +44,11 @@ disturbed. It asks you nothing. Along the way the installer:
 - creates a **Corporate Serf Dashboard** desktop shortcut — launching is covered
   in [Usage](#usage).
 
-The dashboard starts either way, but it has no runs to show until you tell it
-where your KovaaK's stats folder is — see [Configuration](#configuration). It
-says so on the Home page until you do.
+On its first start the dashboard looks for your KovaaK's stats folder itself,
+through Steam, and remembers what it finds. If it comes up empty — KovaaK's
+installed somewhere unusual, or not installed yet — the dashboard still starts;
+it simply has no runs to show and says so on the Home page until you point it
+at the folder on the Settings page (see [Configuration](#configuration)).
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
@@ -146,9 +148,15 @@ edit:
 - `port` — change this if something else on your machine already uses 8050. The
   dashboard says so at startup rather than failing mysteriously.
 
-`data/settings.json` is the app-owned file next to it (installed:
-`%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). It holds where your
-KovaaK's stats live and who you are on the leaderboards:
+Everything else you might want to change lives on the dashboard's own
+**Settings** page: where your KovaaK's stats live, and who you are on the
+leaderboards. The stats folder is usually filled in for you on the first start
+— the dashboard finds it through Steam — so the page is mostly there for the
+cases it could not, and for turning the leaderboard features on.
+
+The page writes `data/settings.json`, the app-owned file beside `config.toml`
+(installed: `%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). You
+can write it by hand instead:
 
 ```json
 {
@@ -161,12 +169,15 @@ KovaaK's stats live and who you are on the leaderboards:
 - `stats_dir` — the folder KovaaK's writes its run files into, usually
   `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
   it the dashboard still starts, but it has no runs to show and says so on the
-  Home page.
+  Home page. Left empty on purpose, it stays empty: the startup detection only
+  fills the value in when it has never been set.
 - `kovaaks_username` — enables the leaderboard rank and percentile features;
   leave it out to run fully offline. `steam_id` is optional and makes player
   matching exact when usernames are ambiguous.
 
 Edit this file only while the dashboard is stopped — it is read once per run.
+Saving from the Settings page while it runs is fine; the page tells you when a
+change needs a restart before it takes effect.
 
 ## Usage
 
@@ -209,8 +220,9 @@ cd Corporate-Serf-Dashboard
 uv sync
 ```
 
-Copy `example.toml` to `config.toml`, and create `data/settings.json` with your
-`stats_dir` (see [Configuration](#configuration)), then start the app:
+Copy `example.toml` to `config.toml`, then start the app — the stats folder is
+detected on the first start, and the Settings page covers whatever it missed
+(see [Configuration](#configuration)):
 
 ```shell
 uv run python source/app.py
