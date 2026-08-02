@@ -83,6 +83,11 @@ def configure_logging() -> None:
         ],
         force=True,
     )
+    # The app's own per-attempt request records (api_service._get_with_retry)
+    # carry the params, status, duration, and attempt count, so urllib3's
+    # transport chatter duplicated them -- 2,641 lines, ~16% of a sampled
+    # debug.log. INFO keeps urllib3's warnings (its own retries, pool issues).
+    logging.getLogger("urllib3").setLevel(logging.INFO)
 
 
 configure_logging()

@@ -666,3 +666,15 @@ def test_interactive_activity_does_not_wake_backoff():
     worker._wait_for_backoff()
 
     assert sleeps == [10.0, 10.0, 10.0]
+
+
+def test_set_fatal_logs_a_warning(caplog):
+    # Fatal state terminally stops warmup for the session, so it must be
+    # WARNING-grade in the files, not an INFO line triage would skip.
+    worker = warmup.PercentileWarmupWorker(_config(), ["A"])
+
+    with caplog.at_level(logging.WARNING, logger=warmup.logger.name):
+        worker._set_fatal("boom", notify=False)
+
+    assert caplog.messages == ["Percentile warmup stopped: boom"]
+    assert [record.levelno for record in caplog.records] == [logging.WARNING]

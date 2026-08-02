@@ -46,7 +46,6 @@ def _get_created_csv_path(event) -> str | None:
         return None
 
     file = event.src_path
-    print()
     logger.debug("Detected new file: %s", Path(file).name)
     if not file.endswith(".csv"):
         return None

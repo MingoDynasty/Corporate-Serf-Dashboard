@@ -283,6 +283,39 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     assert imported.code == "NewCode"
 
 
+def test_import_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
+    # The UI toast is ephemeral; the durable success record is this INFO line,
+    # emitted after persistence on the happy KovaaK's-search path.
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    data_service.load_playlists()
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Fresh",
+                playlistCode="FreshCode",
+                scenarioList=[
+                    SimpleNamespace(scenarioName="One"),
+                    SimpleNamespace(scenarioName="Two"),
+                ],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    with caplog.at_level(logging.INFO, logger=data_service.logger.name):
+        assert data_service.load_playlist_from_code("FreshCode") == (
+            None,
+            "FreshCode",
+        )
+
+    info_messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.INFO
+    ]
+    assert info_messages == ["Imported playlist Fresh (FreshCode): 2 scenarios."]
+
+
 def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
     monkeypatch,
     tmp_path,
@@ -729,6 +762,17 @@ def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_p
     assert "UserCode" not in data_service.playlist_database
     assert data_service.get_user_root_playlist_codes() == set()
     assert "UserCode" not in data_service._user_root_playlist_files
+
+
+def test_delete_user_playlist_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+    data_service.load_playlists()
+
+    with caplog.at_level(logging.INFO, logger=data_service.logger.name):
+        assert data_service.delete_user_playlist("UserCode") is None
+
+    assert "Deleted user playlist UserCode (1 file(s))." in caplog.messages
 
 
 def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_path):

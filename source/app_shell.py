@@ -1,7 +1,5 @@
 """Build the shared Dash application shell and navigation."""
 
-import logging
-
 import dash
 import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
@@ -9,8 +7,6 @@ from dash import Input, Output, State, clientside_callback
 from source.components.local_icon import local_icon
 from source.utilities.build_info import get_build_info
 from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
-
-logger = logging.getLogger(__name__)
 
 APP_INDEX_STRING = """<!DOCTYPE html>
 <html lang="en">

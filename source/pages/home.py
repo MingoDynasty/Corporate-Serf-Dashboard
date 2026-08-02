@@ -345,12 +345,14 @@ def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
 
 
 def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
-    """Surface rank warnings and errors through the dashboard notification logger."""
+    """Surface rank warnings and errors through the dashboard notification logger.
+
+    No module-logger echo: the ``.dash`` records propagate to the root
+    handlers, so the files already keep the exact user-visible message.
+    """
     if rank_info.warning_message:
-        logger.warning("Scenario rank warning: %s", rank_info.warning_message)
         dash_logger.warning(rank_info.warning_message)
     if rank_info.error_message:
-        logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
         dash_logger.error(rank_info.error_message)
 
 

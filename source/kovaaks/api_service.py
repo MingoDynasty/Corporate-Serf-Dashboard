@@ -201,7 +201,7 @@ def _get_with_retry(
         except requests.RequestException as exc:
             elapsed_seconds = time.monotonic() - started
             # Outcome line for every failed attempt, retried or not: the
-            # WARNING below has no params, so during concurrent loads this is
+            # INFO below has no params, so during concurrent loads this is
             # what ties a failure to its leaderboard.
             logger.debug(
                 "GET %s %s failed after %.2fs (attempt %d/%d): %s",
@@ -213,7 +213,10 @@ def _get_with_retry(
                 request_exception_summary(exc),
             )
             if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
-                logger.warning(
+                # INFO, not WARNING: a retried attempt that recovers is
+                # self-healed churn. The exhausted-attempts failure still
+                # warns at the caller with scenario context.
+                logger.info(
                     "Transient GET failure at %s after %.2fs (attempt %d/%d); "
                     "retrying: %s",
                     url,
@@ -245,7 +248,8 @@ def _get_with_retry(
             return response
 
         delay_seconds = _retry_after_seconds(response)
-        logger.warning(
+        # INFO for the same reason as the transient-retry record above.
+        logger.info(
             "Rate limited at %s (attempt %d/%d); retrying after %.2fs",
             url,
             attempt + 1,

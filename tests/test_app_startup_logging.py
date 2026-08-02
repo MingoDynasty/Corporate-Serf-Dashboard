@@ -1,5 +1,6 @@
 """Startup failures and crashes must leave a record in the app log files."""
 
+import logging
 import os
 import subprocess
 import sys
@@ -90,3 +91,16 @@ def test_missing_stats_dir_reaches_the_log_files(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "is not an existing directory" in result.stderr
     assert "is not an existing directory" in _debug_log(tmp_path)
+
+
+def test_urllib3_debug_is_silenced(tmp_path: Path) -> None:
+    # The app's own per-attempt request records supersede urllib3's transport
+    # chatter (~16% of a sampled debug.log); INFO keeps urllib3's warnings.
+    result = _run_in_app(
+        "import logging; import source.app;"
+        " print(logging.getLogger('urllib3').getEffectiveLevel())",
+        tmp_path,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == str(logging.INFO)
