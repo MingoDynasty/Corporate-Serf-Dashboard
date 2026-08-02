@@ -146,6 +146,41 @@ def test_reads_are_cached_until_the_cache_is_cleared(settings_path):
     assert settings.get_kovaaks_username() == "Second"
 
 
+def test_get_identity_pairs_both_fields_from_one_read(settings_path):
+    _write(settings_path, {"kovaaks_username": "MingoDynasty", "steam_id": "765611"})
+
+    assert settings.get_identity() == ("MingoDynasty", "765611")
+
+
+def test_get_identity_collapses_empty_values_like_the_single_getters(settings_path):
+    _write(settings_path, {"kovaaks_username": "MingoDynasty", "steam_id": ""})
+
+    assert settings.get_identity() == ("MingoDynasty", None)
+    assert settings.get_identity() == (
+        settings.get_kovaaks_username(),
+        settings.get_steam_id(),
+    )
+
+
+def test_get_identity_cannot_straddle_a_concurrent_save(settings_path, monkeypatch):
+    """Both fields must come from one settings version, never a mix of two."""
+    settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
+    real_get_settings = settings.get_settings
+    reads = []
+
+    def get_settings_then_save():
+        """Stand in for a save landing between two separate getter calls."""
+        result = real_get_settings()
+        reads.append(result)
+        settings.save_settings({"kovaaks_username": "Second", "steam_id": "222"})
+        return result
+
+    monkeypatch.setattr(settings, "get_settings", get_settings_then_save)
+
+    assert settings.get_identity() == ("First", "111")
+    assert len(reads) == 1
+
+
 def test_callers_cannot_mutate_the_cache_through_get_settings(settings_path):
     _write(settings_path, {"kovaaks_username": "MingoDynasty"})
 

@@ -99,6 +99,21 @@ def get_steam_id() -> str | None:
     return _get_setting(STEAM_ID_KEY)
 
 
+def get_identity() -> tuple[str | None, str | None]:
+    """Get the username and Steam ID from a single consistent read.
+
+    Every caller that needs both must use this rather than the two getters
+    in sequence: separate reads can straddle a save and pair one settings
+    version's username with another's Steam ID, which rank lookups would
+    resolve to one player and then cache under the other's name.
+    """
+    settings = get_settings()
+    return (
+        settings.get(KOVAAKS_USERNAME_KEY) or None,
+        settings.get(STEAM_ID_KEY) or None,
+    )
+
+
 def save_settings(values: Mapping[str, str]) -> None:
     """Replace the stored settings with ``values`` and refresh the cache."""
     settings = dict(values)

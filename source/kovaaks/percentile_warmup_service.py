@@ -14,7 +14,7 @@ import requests
 from pydantic import ValidationError
 
 from source.config.config_service import ConfigData, get_config
-from source.config.settings_service import get_kovaaks_username, get_steam_id
+from source.config.settings_service import get_identity, get_kovaaks_username
 from source.kovaaks.api_models import ScenarioRankStatus
 from source.kovaaks.api_service import (
     UnknownKovaaksUserError,
@@ -248,7 +248,9 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
 ) -> WarmupStepResult:
     """Process one scenario without owning queue, pacing, or thread state."""
     config = context.config
-    username = get_kovaaks_username()
+    # One read for the whole item: the fetch below pairs these two, and a
+    # mid-item re-read could pair them across different saves.
+    username, steam_id = get_identity()
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
@@ -296,7 +298,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
             candidate = fetch_scenario_rank(
                 leaderboard_id,
                 username,
-                get_steam_id(),
+                steam_id,
             ).model_copy(update={"scenario_name": scenario_name})
         except (
             UnknownKovaaksUserError,
