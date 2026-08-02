@@ -38,13 +38,15 @@ irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main
 
 Everything lands under `%LOCALAPPDATA%\CorporateSerfDashboard` — its own uv, its
 own Python, its own package cache — so nothing else on your machine is used or
-disturbed. Along the way the installer:
+disturbed. It asks you nothing. Along the way the installer:
 
-- finds your KovaaK's stats folder (from Steam's install path and library
-  folders) and asks you to confirm it;
 - writes a starter `config.toml` beside the install;
 - creates a **Corporate Serf Dashboard** desktop shortcut — launching is covered
   in [Usage](#usage).
+
+The dashboard starts either way, but it has no runs to show until you tell it
+where your KovaaK's stats folder is — see [Configuration](#configuration). It
+says so on the Home page until you do.
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub

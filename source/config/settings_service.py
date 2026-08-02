@@ -41,10 +41,11 @@ _SETTINGS_LOCK = threading.RLock()
 # Cached settings mapping under a single key; None means not yet read from
 # disk. Mutated in place so no module-global rebinding is needed.
 _settings_cache: dict[str, dict[str, str] | None] = {"value": None}
-# The stats directory this process booted with; None until startup resolves it,
-# and None again for a startup that never did (tests, imports). Mutated in
-# place for the same reason as the cache above.
-_stats_dir_pin: dict[str, str | None] = {"value": None}
+# The stats directory this process booted with: what was configured, and the
+# same value once it has been judged usable (None when it was not). Both are
+# None until startup resolves them, and stay None for a startup that never did
+# (tests, imports). Mutated in place for the same reason as the cache above.
+_stats_dir_pin: dict[str, str | None] = {"configured": None, "usable": None}
 
 
 def clear_settings_cache() -> None:
@@ -56,7 +57,8 @@ def clear_settings_cache() -> None:
 def clear_stats_dir_pin() -> None:
     """Forget the pinned stats directory (test seam)."""
     with _SETTINGS_LOCK:
-        _stats_dir_pin["value"] = None
+        _stats_dir_pin["configured"] = None
+        _stats_dir_pin["usable"] = None
 
 
 def _read_settings_from_disk() -> dict[str, str]:
@@ -145,23 +147,30 @@ def resolve_stats_dir() -> str | None:
     consumer.
     """
     with _SETTINGS_LOCK:
-        pinned = _get_setting(STATS_DIR_KEY)
-        _stats_dir_pin["value"] = pinned
-        return pinned
+        configured = _get_setting(STATS_DIR_KEY)
+        _stats_dir_pin["configured"] = configured
+        _stats_dir_pin["usable"] = (
+            configured if configured and Path(configured).is_dir() else None
+        )
+        return configured
 
 
 def get_usable_stats_dir() -> str | None:
-    """Get the pinned stats directory when it is an existing directory.
+    """Get the stats directory this process can actually scan and watch.
 
     Unset, unresolved (a startup that never pinned one), and set-but-missing
     all collapse to None: none of the three can be scanned or watched, and the
     app serves without run data in all of them.
+
+    The existence check is part of the pin rather than repeated per call. A
+    directory that appears mid-run -- a network library coming online -- would
+    otherwise start reading as usable to whichever consumer asked next, even
+    though startup already skipped the scan and never began watching it: pages
+    would list scenarios whose runs are not loaded, with the hint that explains
+    the emptiness gone.
     """
     with _SETTINGS_LOCK:
-        pinned = _stats_dir_pin["value"]
-    if not pinned:
-        return None
-    return pinned if Path(pinned).is_dir() else None
+        return _stats_dir_pin["usable"]
 
 
 def save_settings(values: Mapping[str, str]) -> None:

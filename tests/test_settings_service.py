@@ -235,6 +235,20 @@ def test_a_missing_directory_is_still_pinned_for_the_startup_message(settings_pa
     assert settings.get_usable_stats_dir() is None
 
 
+def test_a_directory_appearing_after_resolution_stays_unusable(
+    settings_path,
+    tmp_path,
+):
+    """Startup already skipped the scan and the watchdog for this directory."""
+    late = tmp_path / "late"
+    _write(settings_path, {"stats_dir": str(late)})
+    settings.resolve_stats_dir()
+
+    late.mkdir()
+
+    assert settings.get_usable_stats_dir() is None
+
+
 def test_a_save_after_resolution_does_not_move_the_pin(settings_path, tmp_path):
     """Consumers read the boot pin, never the store: the value is restart-scoped."""
     booted = tmp_path / "booted"

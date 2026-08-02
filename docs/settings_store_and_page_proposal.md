@@ -185,9 +185,11 @@ in-process — the settings page is the live write path).
 - **The value is boot-pinned** (R4, adjudicated 2026-08-02). Server
   startup resolves it from the store once and pins it for the process;
   the initial scan, the watchdog, and Home's local scenario lists all
-  read the pin. A pin that was never resolved — tests, or any entry point
-  that is not the real startup — reads as unconfigured, exactly like an
-  unset value.
+  read the pin. Usability is decided once, as part of that resolution, so a
+  directory that appears mid-run cannot half-enable an app whose scan and
+  watchdog were already skipped. A pin that was never resolved — tests, or
+  any entry point that is not the real startup — reads as unconfigured,
+  exactly like an unset value.
 - **The app starts without a usable stats directory.** When the value is
   unset — or set but not an existing directory (the moved-library case) —
   startup skips the initial stats scan and the file watchdog, logs one

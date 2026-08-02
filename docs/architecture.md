@@ -325,8 +325,10 @@ flowchart LR
   (`data/settings.json`): the KovaaK's identity, read per-operation, and the
   stats directory, resolved once at startup (`resolve_stats_dir`) and read from
   that pin afterwards (`get_usable_stats_dir`, which folds unset, unresolved,
-  and missing-directory into one "no stats directory"). Nothing else writes the
-  file.
+  and missing-directory into one "no stats directory"). The directory-exists
+  check is part of resolution, not of each read, so a directory that appears
+  mid-run cannot half-enable an app that skipped its scan. Nothing else writes
+  the file.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
   running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
   variable, which is how an updater tells "my new process is up" apart from
