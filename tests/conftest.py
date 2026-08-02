@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from source.config import config_service
+from source.config import config_service, settings_service
 from source.config.config_service import ConfigData, get_config
 
 
@@ -26,3 +26,19 @@ def test_config(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
     get_config.cache_clear()
     yield
     get_config.cache_clear()
+
+
+@pytest.fixture(autouse=True)
+def test_settings(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> Iterator[None]:
+    """Keep the settings store empty and off the developer's real one."""
+    monkeypatch.setattr(
+        settings_service,
+        "SETTINGS_FILE_PATH",
+        tmp_path / "data" / "settings.json",
+    )
+    settings_service.clear_settings_cache()
+    yield
+    settings_service.clear_settings_cache()
