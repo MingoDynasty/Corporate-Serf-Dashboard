@@ -33,6 +33,25 @@ STATUS_SEARCH_LINES = 15
 REQUIRED_LEADING_SECTIONS = ("TL;DR", "Decisions needed", "Problem")
 
 
+def _inline_plain_text(token) -> str:
+    """The rendered text of an inline token — what the reader sees.
+
+    Link and emphasis markup contributes nothing itself (their text
+    children carry the content), code spans and entity-decoded text
+    contribute their content, line breaks read as spaces, and raw
+    inline HTML is dropped. This is the text GitHub slugs anchors from.
+    """
+    parts = []
+    for child in token.children or []:
+        if child.type in ("text", "code_inline"):
+            parts.append(child.content)
+        elif child.type in ("softbreak", "hardbreak"):
+            parts.append(" ")
+        elif child.children:
+            parts.append(_inline_plain_text(child))
+    return "".join(parts)
+
+
 def _visible_headings(text: str) -> list[tuple[str, str]]:
     """Collect (tag, text) heading pairs as the rendered page shows them.
 
@@ -44,11 +63,12 @@ def _visible_headings(text: str) -> list[tuple[str, str]]:
     blocks, script/style raw text, and other block-level raw HTML parse
     as html_block tokens, never headings; and an inline comment can't
     swallow a heading, because a heading line interrupts the paragraph
-    that would have to contain it.
+    that would have to contain it. Heading text is the rendered plain
+    text, not the inline Markdown source.
     """
     tokens = MarkdownIt("commonmark").parse(text)
     return [
-        (open_tok.tag, inline.content.strip())
+        (open_tok.tag, _inline_plain_text(inline).strip())
         for open_tok, inline in zip(tokens, tokens[1:])
         if open_tok.type == "heading_open"
     ]
@@ -173,6 +193,24 @@ def test_heading_anchor_dedup_matches_github(tmp_path):
     doc = tmp_path / "dup.md"
     doc.write_text("# Foo\n\n# Foo-1\n\n# Foo\n", encoding="utf-8")
     assert _heading_anchors(doc) == {"foo", "foo-1", "foo-2"}
+
+
+def test_heading_anchors_slug_rendered_text(tmp_path):
+    """GitHub slugs the visible heading text, not the Markdown source:
+    link destinations and markup must not leak into the anchor, and
+    entities decode before slugging."""
+    doc = tmp_path / "inline.md"
+    doc.write_text(
+        "# [Install](setup.md)\n\n"
+        "# Configure `config.toml` &amp; go\n\n"
+        "# *Emphasis* and **strong**\n",
+        encoding="utf-8",
+    )
+    assert _heading_anchors(doc) == {
+        "install",
+        "configure-configtoml--go",
+        "emphasis-and-strong",
+    }
 
 
 def test_proposal_docs_declare_status():
