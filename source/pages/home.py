@@ -24,7 +24,7 @@ from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import get_identity, get_usable_stats_dir
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
-from source.kovaaks.api_service import get_scenario_rank_info
+from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
 from source.kovaaks.data_service import (
     drain_startup_playlist_warnings,
     get_high_score,
@@ -55,6 +55,7 @@ from source.utilities.dash_logging import (
     drain_background_notifications,
     get_dash_logger,
 )
+from source.utilities.notifications import toast
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -112,6 +113,20 @@ _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score v
 _RANK_HINT_USERNAME_UNSET = "username_unset"
 _RANK_HINT_LOOKUP_FAILED = "lookup_failed"
 _RANK_HINT_SERVED_STALE = "served_stale"
+_STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
+_RANK_REFRESH_FAILED_NOTIFICATION_ID = "rank-refresh-failed"
+_RANK_REFRESH_STALE_NOTIFICATION_ID = "rank-refresh-stale"
+_RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
+# Both refresh-failure paths leave the displayed value alone, so one line
+# covers them: the hard failure keeps whatever was on screen, and the
+# served-stale path keeps the cached position it just re-served.
+_RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh — position unchanged."
+_RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh — showing the cached position."
+# Notices that fire once per app session rather than once per trigger, by id.
+# A set, so the check-and-set needs no ``global`` rebinding; sound under
+# Waitress's single-process thread pool, and a lost race is benign because the
+# stable id makes the loser's duplicate payload a no-op at the container.
+_session_notices_sent: set[str] = set()
 # What each scenario's last network-backed render concluded, as
 # (displayed value, hint), so the cache-only interval path can repeat the hint
 # instead of recomputing it from a read that cannot see the failure -- and can
@@ -353,19 +368,37 @@ def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
     return any(trigger["prop_id"] != _INTERVAL_PROP for trigger in triggered)
 
 
-def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
-    """Surface rank warnings and errors through the dashboard notification logger.
+def _steam_mismatch_notifications(
+    rank_info: ScenarioRankInfo,
+    username: str | None,
+    steam_id: str | None,
+) -> list[dict[str, object]]:
+    """Announce a Steam-ID mismatch once per app session, persistently.
 
-    Manual Refresh only: the user asked for the result, so they get one. Passive
-    renders say the same thing in place through ``_rank_hint`` instead.
-
-    No module-logger echo: the ``.dash`` records propagate to the root
-    handlers, so the files already keep the exact user-visible message.
+    The mismatch is a persistent condition with no in-place home, so it is the
+    one passive-path toast: one per session rather than one per scenario
+    switch, and it stays up until dismissed because it can fire while nobody
+    is looking at the page.
     """
-    if rank_info.warning_message:
-        dash_logger.warning(rank_info.warning_message)
-    if rank_info.error_message:
-        dash_logger.error(rank_info.error_message)
+    if not username or _STEAM_MISMATCH_NOTIFICATION_ID in _session_notices_sent:
+        return []
+
+    warning = steam_id_mismatch_warning(username, steam_id, rank_info.matched_steam_id)
+    if warning is None:
+        return []
+
+    _session_notices_sent.add(_STEAM_MISMATCH_NOTIFICATION_ID)
+    logger.warning(warning)
+    return [
+        toast(
+            _STEAM_MISMATCH_NOTIFICATION_ID,
+            "Steam ID mismatch",
+            warning,
+            color="yellow",
+            icon=local_icon("material-symbols:warning-outline"),
+            auto_close=False,
+        )
+    ]
 
 
 def _rank_hint_children(hint: str) -> list:
@@ -460,18 +493,24 @@ def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
 def _render_scenario_rank(
     selected_scenario: str | None,
     allow_network: bool,
-) -> str | list:
+    allow_notifications: bool = True,
+) -> tuple[str | list, list[dict[str, object]]]:
     """Render rank through either the normal lookup or the cache-only interval path.
 
-    Passive renders never toast: an unconfigured username, a failed lookup, and
-    a value served from a stale cache are persistent conditions, so the field
-    says so itself.
+    Returns the Position value and any toast the render earned. Passive renders
+    do not toast their own state: an unconfigured username, a failed lookup,
+    and a value served from a stale cache are persistent conditions, so the
+    field says so itself. The Steam-ID mismatch has no such in-place home and
+    is the single exception.
+
+    ``allow_notifications=False`` renders the value without spending the
+    session's one mismatch toast -- for the render nobody triggered.
     """
     if not selected_scenario:
-        return "N/A"
+        return "N/A", []
 
     lookup_config = _rank_lookup_config()
-    username = lookup_config[0]
+    username, steam_id = lookup_config[0], lookup_config[1]
     try:
         rank_info = get_scenario_rank_info(
             selected_scenario,
@@ -481,26 +520,70 @@ def _render_scenario_rank(
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
-        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED)
+        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED), []
 
     value = format_scenario_rank(rank_info)
-    return _rank_display(
+    display = _rank_display(
         value,
         _rank_hint(rank_info, username, selected_scenario, allow_network, value),
     )
+    if not allow_notifications:
+        return display, []
+    return display, _steam_mismatch_notifications(rank_info, username, steam_id)
 
 
 @callback(
     Output("scenario_rank", "children"),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
+    # Not ``True``: this callback renders the initial Position value, so the
+    # page load must still run it -- but Dash refuses an ``allow_duplicate``
+    # output without one of the ``prevent_initial_call`` forms.
+    prevent_initial_call="initial_duplicate",
 )
-def get_scenario_rank(_, selected_scenario, _n_intervals) -> str | list:
-    """Render scenario rank, keeping interval-only calls cache-only."""
-    return _render_scenario_rank(
+def get_scenario_rank(_, selected_scenario, _n_intervals):
+    """Render scenario rank, keeping interval-only calls cache-only.
+
+    Under DashProxy an ``allow_duplicate`` callback can still fire once on page
+    load with nothing triggering it. The value has to render either way, but a
+    fire nobody caused must not spend the session's one mismatch toast on a
+    moment the user may not be looking at.
+    """
+    triggered = ctx.triggered
+    display, notifications = _render_scenario_rank(
         selected_scenario,
-        _rank_allows_network(ctx.triggered),
+        _rank_allows_network(triggered),
+        allow_notifications=bool(triggered),
+    )
+    return display, notifications or no_update
+
+
+def _rank_refresh_failed_notification() -> dict[str, object]:
+    """Report a manual refresh that came back with nothing usable."""
+    return toast(
+        _RANK_REFRESH_FAILED_NOTIFICATION_ID,
+        _RANK_REFRESH_FAILED_TITLE,
+        _RANK_REFRESH_FAILED_MESSAGE,
+        color="red",
+        icon=local_icon("material-symbols:refresh-rounded"),
+    )
+
+
+def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, object]:
+    """Confirm a genuinely fresh manual refresh.
+
+    Fresh id per refresh: ``show`` silently ignores a duplicate id while the
+    previous toast is still visible, which would eat the "done" cue on
+    back-to-back refreshes.
+    """
+    return toast(
+        f"rank-refresh-notification-{uuid.uuid4()}",
+        "Notification",
+        f"Refreshed position for {selected_scenario}.",
+        color="green",
+        icon=local_icon("material-symbols:refresh-rounded"),
     )
 
 
@@ -518,11 +601,14 @@ def get_scenario_rank(_, selected_scenario, _n_intervals) -> str | list:
 def refresh_rank(n_clicks, selected_scenario: str | None):
     """Fetch and display authoritative board truth after an explicit user request.
 
-    A green toast confirms a genuinely fresh refresh. Degraded paths already
-    toast through ``dash_logger`` -- red when the fetch failed with nothing
-    cached, yellow when it failed but a stale cached rank was served (or on a
-    steam-mismatch warning) -- so any error or warning suppresses the green
-    confirmation.
+    The user asked, so every outcome answers on this callback's own
+    notification output: red when the refresh failed outright, yellow when it
+    failed but a cached position was served in its place, green only on a
+    genuinely fresh result.
+
+    A failed refresh returns ``no_update`` for the value rather than ``N/A``,
+    so whatever was on screen stays put -- usually the cached position -- and
+    the red toast's "position unchanged" is true either way.
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     fire once on initial page load despite ``prevent_initial_call``, and a
@@ -541,29 +627,39 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
         )
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
-        dash_logger.error("Position refresh for %s failed.", selected_scenario)
-        _last_rank_hints[selected_scenario] = ("N/A", _RANK_HINT_LOOKUP_FAILED)
-        return "N/A", no_update
+        return no_update, [_rank_refresh_failed_notification()]
+
+    if rank_info.error_message:
+        # The console/file record the log bridge used to keep, kept here now.
+        logger.error(
+            "Manual rank refresh for %s failed: %s",
+            selected_scenario,
+            rank_info.error_message,
+        )
+        return no_update, [_rank_refresh_failed_notification()]
 
     # A manual refresh is a network verdict too, so the interval path must not
     # go on repeating what the last passive render concluded.
     rank_text = format_scenario_rank(rank_info)
-    _last_rank_hints[selected_scenario] = (rank_text, _derive_rank_hint(rank_info))
-    _emit_rank_messages(rank_info)
-    if rank_info.error_message or rank_info.warning_message:
-        return rank_text, no_update
-    notification = {
-        "action": "show",
-        "title": "Notification",
-        "message": f"Refreshed position for {selected_scenario}.",
-        "color": "green",
-        # Fresh id per refresh: ``show`` silently ignores a duplicate id while
-        # the previous toast is still visible, which would eat the "done" cue
-        # on back-to-back refreshes.
-        "id": f"rank-refresh-notification-{uuid.uuid4()}",
-        "icon": local_icon("material-symbols:refresh-rounded"),
-    }
-    return rank_text, [notification]
+    hint = _derive_rank_hint(rank_info)
+    _last_rank_hints[selected_scenario] = (rank_text, hint)
+    display = _rank_display(rank_text, hint)
+    if rank_info.served_stale:
+        logger.warning(
+            "Manual rank refresh for %s served a cached position: %s",
+            selected_scenario,
+            rank_info.warning_message,
+        )
+        return display, [
+            toast(
+                _RANK_REFRESH_STALE_NOTIFICATION_ID,
+                _RANK_REFRESH_FAILED_TITLE,
+                _RANK_REFRESH_STALE_MESSAGE,
+                color="yellow",
+                icon=local_icon("material-symbols:refresh-rounded"),
+            )
+        ]
+    return display, [_rank_refresh_success_notification(selected_scenario)]
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
