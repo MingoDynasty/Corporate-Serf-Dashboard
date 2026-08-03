@@ -9,7 +9,9 @@ keeps showing the best data it already has rather than erroring, and with
 no username configured it makes no network calls at all. During normal
 play the field explains its own state beside the value rather than
 interrupting with a pop-up notification. A Refresh the player clicks
-still answers with one, because they asked for it.
+still answers with one, because they asked for it. So does a Steam ID
+that disagrees with the account KovaaK's found — once per app session,
+because the field has nowhere to say it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -40,8 +42,14 @@ benchmark tier) — see the
   matching; if Steam ID matching fails but exact username matching succeeds,
   the rank result is kept and a transient (never cached) warning is attached
   ([2026-04-27](../decision_log.md#2026-04-27-prefer-steam-id-matching-when-configured)).
-  Only a manual Refresh surfaces that warning to the user; passive renders
-  (scenario switch, new run, interval tick) carry it silently.
+  A mismatch is a persistent condition with no in-place home, so it gets one
+  toast per app session — fired by the first passive render that observes it
+  (scenario switch, new run, interval tick), titled "Steam ID mismatch", and
+  persistent until dismissed. Later renders carry it silently, and a manual
+  Refresh that merely re-observes the mismatch still reports a clean refresh:
+  the fetch succeeded. A render nothing triggered — the duplicate-output fire
+  Dash can make on page load — renders the value without spending the
+  session's one toast.
 - An empty `kovaaks_username` keeps the app fully offline: the rank service
   short-circuits before any network call
   ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)).
@@ -132,9 +140,16 @@ benchmark tier) — see the
   refresh Timer) moves the cache on, the interval reads a different value and
   the hint is retired rather than left contradicting a position that has
   since arrived.
-- Manual Refresh keeps toasting its own outcome — the user asked for it —
-  red when the fetch failed, yellow on a warning, green only on a clean
-  refresh.
+- Manual Refresh answers with a toast whatever happens — the user asked for
+  it — and all three outcomes come off the callback's own notification
+  output. A hard failure (an `error_message` result or a raised exception) is
+  red, titled "Position refresh failed", and leaves the displayed value
+  untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
+  position unchanged." is true whether a cached position was on screen or
+  not. A served-stale result is yellow, and its value carries the same
+  "from cache, Refresh to update" affordance a passive render would give it.
+  Only a genuinely fresh result gets the green confirmation, which keeps a
+  fresh id per click so back-to-back refreshes each answer.
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).
