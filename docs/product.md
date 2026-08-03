@@ -133,6 +133,18 @@ list in the roadmap.)
   empty pages and a hint pointing at Settings when there is nothing to show —
   and usually needs no configuration at all. Changes that cannot safely take
   effect under a running app say "restart to apply" instead of pretending.
+- **The Settings page suggests what the machine already knows** (`/settings`,
+  PRs #189, #191, #193). The stats-folder box lists every Steam library that
+  holds a KovaaK's stats folder, and a Detect button checks this machine's
+  Steam accounts against KovaaK's and fills in the account it can prove is
+  yours — offering the ones it found when it cannot prove exactly one. *Problem
+  solved:* the page used to accept only what the user could type from memory.
+  A username typo produced silently absent ranks, nobody knows their 17-digit
+  Steam ID offhand, and repairing a wrong-library stats folder meant digging a
+  deep path out of Explorer — all of it answerable from Steam's own files plus
+  one public KovaaK's lookup. Identity now arrives verified rather than
+  remembered, and a wrong pick is repaired by choosing a suggestion. Nothing is
+  written until Save, so a suggestion is never a decision made for the user.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the Home Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the
