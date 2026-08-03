@@ -24,6 +24,8 @@ from source.config.config_service import (
     get_config,
 )
 from source.config.settings_service import (
+    KOVAAKS_USERNAME_KEY,
+    get_settings,
     get_usable_stats_dir,
     resolve_stats_dir,
 )
@@ -111,6 +113,24 @@ def _log_startup_error(message: str) -> None:
     """
     logger.error(message, extra={SUPPRESS_CONSOLE_KEY: True})
     print(message, file=sys.stderr)
+
+
+def log_rank_lookup_availability() -> None:
+    """Note once, at startup, that leaderboard lookups are off for lack of a name.
+
+    An unset username is a supported state -- the app runs fully offline -- so
+    it is reported once here rather than per lookup. Home's Position field
+    carries the user-facing half, with a link to the settings page.
+
+    Reads the store rather than ``get_identity``: this is a report on what is
+    configured, not a consumer of the identity, and it must not be the read
+    that freezes the process pin.
+    """
+    if not get_settings().get(KOVAAKS_USERNAME_KEY):
+        logger.info(
+            "KovaaK's username not configured -- scenario position lookups "
+            "disabled (set it in Settings)."
+        )
 
 
 def app_name() -> str:
@@ -277,6 +297,8 @@ def main() -> None:
     else:
         # Initialize scenario data
         initialize_kovaaks_data(stats_dir)
+
+    log_rank_lookup_availability()
 
     # The warmup queue is the played/visible intersection, so it can only be
     # assembled after both playlists and local CSV stats have loaded.

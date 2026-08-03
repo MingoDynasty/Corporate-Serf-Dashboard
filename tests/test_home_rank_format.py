@@ -18,6 +18,26 @@ from source.pages import home  # noqa: E402
 format_scenario_rank = home.format_scenario_rank
 
 
+@pytest.fixture(autouse=True)
+def _forget_rank_hints():
+    """Keep the cross-tick hint memo from leaking between tests."""
+    home._last_rank_hints.clear()
+    yield
+    home._last_rank_hints.clear()
+
+
+def _rank_text(rendered) -> str:
+    """Flatten a rendered Position value into the text a reader would see."""
+    if isinstance(rendered, str):
+        return rendered
+    return "".join(
+        component
+        for child in rendered
+        for component in _walk_components(child)
+        if isinstance(component, str)
+    )
+
+
 def _walk_components(component):
     yield component
     children = getattr(component, "children", None)
@@ -336,6 +356,7 @@ def test_format_scenario_rank_unranked_and_unknown():
 
 def test_get_scenario_rank_queries_kovaaks_for_unplayed_local_scenario(monkeypatch):
     queried_scenarios = []
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
     def fail_is_scenario_in_database(*_args, **_kwargs):
         raise AssertionError("rank lookup should not require local scenario data")
@@ -471,7 +492,8 @@ def test_interval_rank_render_does_not_fetch_or_cache_unresolved_scenario(
 
     monkeypatch.setattr(api_service, "_session_get", fail_network)
 
-    assert home._render_scenario_rank(scenario_name, allow_network=False) == "N/A"
+    rendered = home._render_scenario_rank(scenario_name, allow_network=False)
+    assert _rank_text(rendered) == "N/A — lookup failed, Refresh to retry"
     assert api_service.get_cached_leaderboard_id(scenario_name) is None
 
 
@@ -503,10 +525,12 @@ def test_allow_network_false_short_circuits_resolution_and_rank_fetch(monkeypatc
     assert cached_lookups == ["Unresolved Scenario"]
 
 
-def test_interval_rank_render_does_not_retoast_derived_warning(
+def test_passive_rank_render_never_toasts_the_derived_mismatch_warning(
     monkeypatch,
     tmp_path,
 ):
+    # A Steam-ID mismatch is a persistent condition, so passive renders stay
+    # quiet on both paths; manual Refresh is what still reports it.
     scenario_name = "Cached Scenario"
     leaderboard_id = 98330
     username = "MingoDynasty"
@@ -531,19 +555,149 @@ def test_interval_rank_render_does_not_retoast_derived_warning(
     api_service.save_leaderboard_total(leaderboard_id, 100)
 
     warnings = []
+    errors = []
     monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
+    monkeypatch.setattr(home.dash_logger, "error", errors.append)
 
-    assert (
-        home._render_scenario_rank(scenario_name, allow_network=False)
-        == "10 of 100 (90.50% Percentile)"
+    for allow_network in (False, True):
+        assert (
+            home._render_scenario_rank(scenario_name, allow_network=allow_network)
+            == "10 of 100 (90.50% Percentile)"
+        )
+    assert warnings == []
+    assert errors == []
+
+
+def test_passive_rank_render_points_an_unset_username_at_settings(monkeypatch):
+    # The fixture store leaves identity unset -- the fresh-install default.
+    errors = []
+    monkeypatch.setattr(home.dash_logger, "error", errors.append)
+
+    rendered = home._render_scenario_rank("Scenario", allow_network=True)
+
+    assert _rank_text(rendered) == "N/A — set your KovaaK's username in Settings"
+    anchors = [
+        component
+        for child in rendered
+        for component in _walk_components(child)
+        if isinstance(component, dmc.Anchor)
+    ]
+    assert [anchor.href for anchor in anchors] == ["/settings"]
+    assert errors == []
+
+
+def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    errors = []
+    monkeypatch.setattr(home.dash_logger, "error", errors.append)
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="Failed to fetch leaderboard position for Scenario.",
+        ),
     )
+
+    rendered = home._render_scenario_rank("Scenario", allow_network=True)
+
+    assert _rank_text(rendered) == "N/A — lookup failed, Refresh to retry"
+    assert errors == []
+
+
+def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    warnings = []
+    monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=1240,
+            served_stale=True,
+            warning_message="Couldn't refresh from KovaaK's; showing the last "
+            "cached position for Scenario.",
+        ),
+    )
+
+    rendered = home._render_scenario_rank("Scenario", allow_network=True)
+
+    assert _rank_text(rendered) == "1,240 — from cache, Refresh to update"
     assert warnings == []
 
+
+def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
+    # The interval re-reads the same rank from cache, where the served-stale
+    # marker is gone; the hint must not blink off a tick after it appears.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+
+    def rank_for(*_args, **kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=1240,
+            served_stale=True if kwargs["allow_network"] else None,
+        )
+
+    monkeypatch.setattr(home, "get_scenario_rank_info", rank_for)
+
     assert (
-        home._render_scenario_rank(scenario_name, allow_network=True)
-        == "10 of 100 (90.50% Percentile)"
+        _rank_text(home._render_scenario_rank("Scenario", allow_network=True))
+        == "1,240 — from cache, Refresh to update"
     )
-    assert len(warnings) == 1
+    assert (
+        _rank_text(home._render_scenario_rank("Scenario", allow_network=False))
+        == "1,240 — from cache, Refresh to update"
+    )
+
+
+@pytest.mark.parametrize(
+    ("hint", "stale_value"),
+    [
+        (home._RANK_HINT_SERVED_STALE, "1,240"),
+        (home._RANK_HINT_LOOKUP_FAILED, "N/A"),
+    ],
+)
+def test_a_background_cache_write_retires_the_memoized_hint(
+    monkeypatch,
+    hint,
+    stale_value,
+):
+    # The warmup worker and the score-aware refresh Timer both write the rank
+    # cache off a background thread. Once the interval reads a value the last
+    # network verdict was never about, that verdict must not keep claiming the
+    # lookup failed over a position that has since arrived.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    home._last_rank_hints["Scenario"] = (stale_value, hint)
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=1180,
+        ),
+    )
+
+    assert home._render_scenario_rank("Scenario", allow_network=False) == "1,180"
+    assert "Scenario" not in home._last_rank_hints
+
+
+def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    home._last_rank_hints["Scenario"] = ("1,240", home._RANK_HINT_SERVED_STALE)
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=1240,
+        ),
+    )
+
+    home.refresh_rank(1, "Scenario")
+
+    assert home._last_rank_hints["Scenario"] == ("1,240", None)
+    assert home._render_scenario_rank("Scenario", allow_network=False) == "1,240"
 
 
 @pytest.mark.parametrize(

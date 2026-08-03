@@ -6,7 +6,10 @@ else on the board. Placements are cached for a week and re-checked
 automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
-no username configured it makes no network calls at all.
+no username configured it makes no network calls at all. During normal
+play the field explains its own state beside the value rather than
+interrupting with a pop-up notification. A Refresh the player clicks
+still answers with one, because they asked for it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -35,8 +38,10 @@ benchmark tier) — see the
   `total-play` hydration cannot resolve.
 - When `steam_id` is configured it is preferred for leaderboard identity
   matching; if Steam ID matching fails but exact username matching succeeds,
-  the rank result is kept and a transient (never cached) warning is surfaced
+  the rank result is kept and a transient (never cached) warning is attached
   ([2026-04-27](../decision_log.md#2026-04-27-prefer-steam-id-matching-when-configured)).
+  Only a manual Refresh surfaces that warning to the user; passive renders
+  (scenario switch, new run, interval tick) carry it silently.
 - An empty `kovaaks_username` keeps the app fully offline: the rank service
   short-circuits before any network call
   ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)).
@@ -110,11 +115,26 @@ benchmark tier) — see the
   ([2026-04-27](../decision_log.md#2026-04-27-keep-kovaaks-api-details-behind-scenariorankinfo)).
 - Exception: a rank-fetch failure with a resolved leaderboard — unreachable
   endpoint or schema-invalid response — falls back to the last cached rank
-  (TTL ignored, read-only) tagged with a `warning_message`, so the UI
-  degrades to a yellow warning instead of a red error; it becomes `UNKNOWN`
-  only when nothing is cached. `force_refresh=True` inherits the same
-  fallback
+  (TTL ignored, read-only) tagged with a `warning_message` and
+  `served_stale=True`, so the value survives the failure; it becomes
+  `UNKNOWN` only when nothing is cached. `force_refresh=True` inherits the
+  same fallback
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)).
+- Passive renders never toast. The Home Position field carries its own
+  explanation instead: `N/A` plus a link to the Settings page when no
+  username is configured, `N/A` plus "lookup failed, Refresh to retry" when
+  the lookup failed with nothing cached, and the cached value plus "from
+  cache, Refresh to update" when a failed fetch was served from cache. The
+  hint the last network-backed render concluded is reused by the cache-only
+  interval path, which cannot see a failure that already happened, so the
+  affordance does not blink off between ticks. That hint is tied to the value
+  it explained: when a background writer (the warmup worker, the score-aware
+  refresh Timer) moves the cache on, the interval reads a different value and
+  the hint is retired rather than left contradicting a position that has
+  since arrived.
+- Manual Refresh keeps toasting its own outcome — the user asked for it —
+  red when the fetch failed, yellow on a warning, green only on a clean
+  refresh.
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).

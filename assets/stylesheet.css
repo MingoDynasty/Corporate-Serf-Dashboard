@@ -107,6 +107,14 @@
     padding-bottom: 0.5rem;
 }
 
+/* Trailing explanation for the Home Position value: why it reads N/A, or why
+   it is a cached number rather than current truth. Dimmed and smaller so the
+   position itself stays the thing the eye lands on. */
+.scenario-rank-hint {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-xs);
+}
+
 /* Grid cells whose value carries hover-only detail (exact timestamps on Last
    Played, the weakest scenario on Lowest Percentile). The dotted underline
    plus help cursor signals "there is more on hover". */

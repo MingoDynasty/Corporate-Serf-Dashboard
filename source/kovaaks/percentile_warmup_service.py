@@ -37,11 +37,9 @@ from source.kovaaks.data_service import (
     get_scenario_stats_snapshot,
 )
 from source.kovaaks.playlist_visibility_service import get_shown_playlist_codes
-from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
-dash_logger = get_dash_logger(__name__)
 
 POLITENESS_GAP_SECONDS = 2.0
 INTERACTIVE_QUIET_SECONDS = 5.0
@@ -720,7 +718,12 @@ class PercentileWarmupWorker:
         else:
             logger.info("Percentile warmup backoff elapsed")
 
-    def _set_fatal(self, message: str, *, notify: bool) -> None:
+    def _set_fatal(self, message: str) -> None:
+        """Stop the warmup feature for the session, in the log only.
+
+        No notification: the fatal state is a persistent condition, and the
+        Playlists overview status strip already renders it in place.
+        """
         with self._condition:
             if self._fatal_state is not None:
                 return
@@ -729,17 +732,13 @@ class PercentileWarmupWorker:
             self._queue.clear()
         # WARNING: this terminally stops the warmup feature for the session.
         logger.warning("Percentile warmup stopped: %s", message)
-        if notify:
-            dash_logger.error(
-                "Percentile update stopped: KovaaK's username may be misconfigured."
-            )
 
     def _apply_hydration_result(self, result: WarmupStepResult) -> bool:
         self._hydration_pending = False
         if result.success:
             self._reset_backoff()
         if result.disposition == StepDisposition.FATAL:
-            self._set_fatal(result.reason or "unknown username", notify=True)
+            self._set_fatal(result.reason or "unknown username")
             return False
         if result.trip_backoff:
             self._wait_for_backoff()
@@ -776,7 +775,7 @@ class PercentileWarmupWorker:
         if result.success:
             self._reset_backoff()
         if result.disposition == StepDisposition.FATAL:
-            self._set_fatal(result.reason or "unknown username", notify=True)
+            self._set_fatal(result.reason or "unknown username")
             return False
         if result.trip_backoff:
             self._wait_for_backoff()
@@ -806,7 +805,7 @@ class PercentileWarmupWorker:
                     hydration_result = process_warmup_hydration(self.context)
                 except Exception as exc:  # noqa: BLE001 - daemon safety net
                     logger.exception("Unexpected percentile warmup hydration failure")
-                    self._set_fatal(str(exc), notify=False)
+                    self._set_fatal(str(exc))
                     return
                 if not self._apply_hydration_result(hydration_result):
                     return
@@ -824,7 +823,7 @@ class PercentileWarmupWorker:
                     "Unexpected percentile warmup failure for %s",
                     scenario_name,
                 )
-                self._set_fatal(str(exc), notify=False)
+                self._set_fatal(str(exc))
                 return
             if not self._apply_item_result(
                 scenario_name,
