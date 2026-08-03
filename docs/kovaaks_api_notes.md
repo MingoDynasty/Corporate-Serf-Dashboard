@@ -125,9 +125,13 @@ keeps a profile only when its `steamId` equals that account's SteamID64.
 
 Fields we rely on (verified live 2026-07-20, re-verified 2026-08-02):
 
-- `steamId` — a string, e.g. `"76561197986713986"`. The whole point of the
-  call: Steam persona and KovaaK's username are distinct namespaces that
-  merely often coincide, so this equality is what turns a guess into a fact.
+- `steamId` — a 17-digit string, e.g. `"76561197986713986"`. The whole point
+  of the call: Steam persona and KovaaK's username are distinct namespaces
+  that merely often coincide, so this equality is what turns a guess into a
+  fact. Detection requires exactly that shape, and treats anything else —
+  including the same digits sent as a JSON number, which cannot survive a
+  float round-trip intact — as unchecked drift rather than risking a
+  confident mismatch on a mangled value.
 - `webapp.username` — the canonical webapp spelling, which can differ in case
   from the persona that found it. Only this spelling is stored or sent to the
   rest of the API.
@@ -145,8 +149,9 @@ Important behavior:
   turns it into `None`, and detection records the account as confirmed absent.
   Every other status and every transport failure propagates, and detection
   counts that account unchecked.
-- A 2xx payload missing any of the three fields above is treated the same as
-  an outage — unchecked — never as "no match".
+- A 2xx payload missing any of the three fields above, or carrying one in an
+  unusable shape, is treated the same as an outage — unchecked — never as "no
+  match".
 - **No reverse lookup exists** (probed 2026-07-20; do not re-probe):
   `/user/profile/by-steam-id` returns 404 and `/user/profile?steamId=`
   returns 401. Going from a SteamID64 to a username is impossible, which is

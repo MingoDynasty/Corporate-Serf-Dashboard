@@ -46,14 +46,21 @@ logger = logging.getLogger(__name__)
 
 _LOGIN_USERS_SUBPATH = Path("config/loginusers.vdf")
 
+# A SteamID64 as both Steam's files and KovaaK's spell it: 17 digits. ASCII
+# only -- ``\d`` would otherwise accept digit forms no endpoint would take.
+_STEAM_ID64 = r"\d{17}"
+_STEAM_ID64_PATTERN = re.compile(_STEAM_ID64, re.ASCII)
 # One account block: a SteamID64 key followed by its brace-delimited body. The
 # bodies hold no nested braces, so excluding braces from the body keeps one
 # malformed block from swallowing the next. Regex rather than a real parser,
 # like the stats-directory detector: the upstream ``vdf`` package is
 # unmaintained, and this file is read once per Detect press.
-_ACCOUNT_KEY = r'"(\d{17})"'
-_ACCOUNT_KEY_PATTERN = re.compile(_ACCOUNT_KEY)
-_ACCOUNT_BLOCK_PATTERN = re.compile(rf"{_ACCOUNT_KEY}\s*\{{([^{{}}]*)\}}")
+#
+# The key pattern requires the opening brace as well, so it counts only what is
+# syntactically an account key: a 17-digit *value* (a numeric persona or
+# account name is legal) must not read as an account the block scan missed.
+_ACCOUNT_KEY_PATTERN = re.compile(rf'"{_STEAM_ID64}"\s*\{{', re.ASCII)
+_ACCOUNT_BLOCK_PATTERN = re.compile(rf'"({_STEAM_ID64})"\s*\{{([^{{}}]*)\}}', re.ASCII)
 # A file with no users section at all is a format we do not recognize, which
 # must not read as "nobody is signed in".
 _USERS_SECTION_PATTERN = re.compile(r'"users"\s*\{', re.IGNORECASE)
@@ -157,10 +164,10 @@ def _parse_accounts(text: str) -> tuple[list[SteamAccount], int]:
                 timestamp=int(raw_timestamp) if raw_timestamp.isdigit() else 0,
             )
         )
-    # Every account is keyed by exactly one SteamID64, so a key the block scan
-    # did not consume is an account this file failed to describe. Counting the
-    # difference is what keeps an unmatched block from vanishing into a file
-    # that then looks cleanly read.
+    # Every account opens with exactly one SteamID64 key, so a key the block
+    # scan did not consume is an account this file failed to describe. Counting
+    # the difference is what keeps an unmatched block from vanishing into a
+    # file that then looks cleanly read.
     unmatched = len(_ACCOUNT_KEY_PATTERN.findall(text)) - len(accounts) - unusable
     return accounts, unusable + max(unmatched, 0)
 
@@ -234,7 +241,14 @@ def _profile_candidate(
         raise ValueError("profile response was not an object")
 
     steam_id = profile.get("steamId")
-    if not isinstance(steam_id, str | int) or not str(steam_id).strip():
+    # The shape KovaaK's documents and returns live: a 17-digit string. Nothing
+    # else may reach the equality check below, because a value that cannot be
+    # a SteamID64 is schema drift, and drift must count as unchecked rather
+    # than clear an account as "belongs to somebody else". A JSON *number* is
+    # rejected for the same reason rather than coerced: 17 digits do not
+    # survive a float round-trip, so a numeric ID could arrive already wrong
+    # and would then read as a confident mismatch.
+    if not isinstance(steam_id, str) or not _STEAM_ID64_PATTERN.fullmatch(steam_id):
         raise ValueError("profile response has no usable steamId")
 
     webapp = profile.get("webapp")
@@ -252,7 +266,7 @@ def _profile_candidate(
     return (
         IdentityCandidate(
             username=username,
-            steam_id=str(steam_id).strip(),
+            steam_id=steam_id,
             persona_name=account.persona_name,
             last_access=last_access,
         ),

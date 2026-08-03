@@ -305,6 +305,32 @@ def test_a_brace_inside_a_value_costs_only_its_own_account(roots, tmp_path):
     assert not complete
 
 
+@pytest.mark.parametrize(
+    "overrides",
+    [{"persona_name": "12345678901234567"}, {"account_name": "12345678901234567"}],
+    ids=["numeric-persona", "numeric-account-name"],
+)
+def test_a_numeric_value_is_not_mistaken_for_an_account_key(
+    roots,
+    tmp_path,
+    overrides,
+):
+    """A 17-digit persona or account name is legal and changes nothing.
+
+    The unmatched-block count keys off account syntax, not off any 17-digit
+    token, or a file that parsed perfectly would report itself incomplete.
+    """
+    root = tmp_path / "Steam"
+    fields = {"steam_id": STEAM_ID, "persona_name": PERSONA, **overrides}
+    _write_login_users(root, [_account_block(**fields)])
+    roots(root)
+
+    accounts, complete = detection.discover_steam_accounts()
+
+    assert [account.steam_id for account in accounts] == [STEAM_ID]
+    assert complete
+
+
 def test_a_persona_with_quotes_and_unicode_is_parsed(roots, tmp_path):
     root = tmp_path / "Steam"
     _write_login_users(root, [_account_block(STEAM_ID, 'Ming\\"o ✿ 日本')])
@@ -446,6 +472,22 @@ def test_a_probe_that_fails_leaves_the_account_unchecked(
         pytest.param("not an object", id="not-an-object"),
         pytest.param(
             {"webapp": {"username": "x"}, "lastAccess": "2026-07-20"}, id="no-steam-id"
+        ),
+        pytest.param(
+            {
+                "steamId": "not-a-steamid64",
+                "webapp": {"username": "x"},
+                "lastAccess": "2026-07-20",
+            },
+            id="unusable-steam-id",
+        ),
+        pytest.param(
+            {
+                "steamId": int(STEAM_ID),
+                "webapp": {"username": "x"},
+                "lastAccess": "2026-07-20",
+            },
+            id="steam-id-as-a-number",
         ),
         pytest.param({"steamId": STEAM_ID, "lastAccess": "2026-07-20"}, id="no-webapp"),
         pytest.param(
