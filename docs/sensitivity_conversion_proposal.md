@@ -1,6 +1,12 @@
 # Cross-Scale Sensitivity Conversion
 
-Status: Proposed
+Status: Future — parked 2026-08-03 as low priority behind the notification
+redesign and run-history milestones. The design is complete and
+evidence-backed; nothing here is blocked on further investigation. All
+census numbers and corpus facts below were verified against the live stats
+directory on 2026-08-03 and only grow (new runs are all native cm/360, so
+the convertible share only improves). To resume: ratify D1, then follow the
+delivery plan — no other open threads exist outside this document.
 Date: 2026-08-03
 
 ## TL;DR
