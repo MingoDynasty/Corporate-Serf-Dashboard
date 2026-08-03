@@ -81,7 +81,19 @@ sequence.
   identity UI. Design in [`settings_detection_proposal.md`](./settings_detection_proposal.md)
   (PR #186). The guided first-run flow is deliberately a later proposal.
 
-The sequenced next candidate after this is **Run history and sessions** (see
+- **Notification system redesign** — collapse the two notification
+  subsystems into one quiet-by-default toast layer: persistent conditions
+  render in-place, passive navigation never toasts an error, and each run
+  produces at most one verdict toast. The default configuration currently
+  produces a stacking wall of red error toasts plus a no-information "Graph
+  updated!" toast during normal play — and since the background-delivery
+  fix, formerly invisible diagnostic errors render too. Ships as three PRs
+  (noise kill → consolidation → copy rework); the noise kill alone resolves
+  the audit complaint. Design in
+  [`notification_system_proposal.md`](./notification_system_proposal.md)
+  (Proposed).
+
+The sequenced next candidate after these is **Run history and sessions** (see
 Future).
 
 ---
