@@ -94,10 +94,9 @@ benchmark tier) — see the
 - The Home rank widget passively re-reads the rank and total caches on its
   existing interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
-- Background refresh failures notify the UI through `dash_logger.error(...)`.
-  The handler is safe to call from plain threads: records logged outside a
-  Dash callback context are queued in `dash_logging` and delivered to the
-  notification container by a Home interval callback.
+- Background refresh failures are recorded in the console/file logs only;
+  they produce no UI notification. The chain degrades silently — the widget
+  keeps serving the cached value it already shows.
 
 ## Failure handling
 

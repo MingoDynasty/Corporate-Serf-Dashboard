@@ -32,13 +32,6 @@ def _unranked() -> ScenarioRankInfo:
     )
 
 
-def _capture_log(messages):
-    def capture(message, *args):
-        messages.append(message % args if args else message)
-
-    return capture
-
-
 @pytest.fixture
 def rank_cache(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
@@ -340,27 +333,24 @@ def test_total_refresh_failure_does_not_undo_rank_save(
     assert "Total refresh failed after fresh rank" in caplog.text
 
 
-def test_unknown_user_stops_and_notifies(monkeypatch):
-    notifications = []
-
+def test_unknown_user_stops_with_warning_log(monkeypatch, caplog):
     def fail_resolution(*_args):
         raise api_service.UnknownKovaaksUserError("unknown user")
 
     monkeypatch.setattr(api_service, "resolve_leaderboard_id", fail_resolution)
-    monkeypatch.setattr(api_service.dash_logger, "error", _capture_log(notifications))
     monkeypatch.setattr(
         api_service,
         "_schedule_attempt",
         lambda *_args, **_kwargs: pytest.fail("must not retry"),
     )
 
-    api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
 
-    assert len(notifications) == 1
-    assert "username may be misconfigured" in notifications[0]
+    assert f"Rank refresh stopped for {SCENARIO_NAME}: unknown user" in caplog.text
 
 
-def test_transient_resolver_error_retries_without_notification_or_traceback(
+def test_transient_resolver_error_retries_without_traceback(
     rank_cache,
     monkeypatch,
     caplog,
@@ -369,7 +359,6 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
         api_service.requests.ConnectionError("temporary outage"),
         LEADERBOARD_ID,
     ]
-    notifications = []
 
     def resolve(*_args):
         result = resolution_results.pop(0)
@@ -383,7 +372,6 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
         "fetch_scenario_rank",
         lambda *_args: _ranked(100.0),
     )
-    monkeypatch.setattr(api_service.dash_logger, "error", _capture_log(notifications))
     monkeypatch.setattr(
         api_service,
         "_with_leaderboard_total",
@@ -415,7 +403,6 @@ def test_transient_resolver_error_retries_without_notification_or_traceback(
     # A retry that may still recover is INFO; only exhausting the schedule
     # warns (see _notify_exhaustion).
     assert retry_records[0].levelno == logging.INFO
-    assert notifications == []
     assert api_service._cached_rank(LEADERBOARD_ID, USERNAME).score == 100.0
 
 
@@ -454,13 +441,11 @@ def test_transient_fetch_error_retries(monkeypatch):
 
 
 def test_unresolved_leaderboard_is_warning_only(monkeypatch, caplog):
-    notifications = []
     monkeypatch.setattr(
         api_service,
         "resolve_leaderboard_id",
         lambda *_args: None,
     )
-    monkeypatch.setattr(api_service.dash_logger, "error", _capture_log(notifications))
     monkeypatch.setattr(
         api_service,
         "_schedule_attempt",
@@ -471,17 +456,13 @@ def test_unresolved_leaderboard_is_warning_only(monkeypatch, caplog):
         api_service._run_attempt(SCENARIO_NAME, USERNAME, None, 100.0, 24, 0)
 
     assert "Could not resolve leaderboard" in caplog.text
-    assert notifications == []
 
 
-def test_unexpected_attempt_error_is_caught_and_notified(monkeypatch, caplog):
-    notifications = []
-
+def test_unexpected_attempt_error_is_caught_and_logged(monkeypatch, caplog):
     def fail_resolution(*_args):
         raise ValueError("unexpected")
 
     monkeypatch.setattr(api_service, "resolve_leaderboard_id", fail_resolution)
-    monkeypatch.setattr(api_service.dash_logger, "error", _capture_log(notifications))
     monkeypatch.setattr(
         api_service,
         "_schedule_attempt",
@@ -498,9 +479,6 @@ def test_unexpected_attempt_error_is_caught_and_notified(monkeypatch, caplog):
     ]
     assert len(matching_records) == 1
     assert matching_records[0].exc_info is not None
-    assert notifications == [
-        f"Position update for {SCENARIO_NAME} failed unexpectedly."
-    ]
 
 
 def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
@@ -517,7 +495,6 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     pending: list[tuple[Callable, tuple]] = []
     scheduled_delays = []
     fetch_count = 0
-    notifications = []
 
     class FakeTimer:
         def __init__(self, delay, function, args):
@@ -542,7 +519,6 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
         lambda *_args: LEADERBOARD_ID,
     )
     monkeypatch.setattr(api_service, "fetch_scenario_rank", fetch_stale)
-    monkeypatch.setattr(api_service.dash_logger, "error", _capture_log(notifications))
 
     with caplog.at_level(logging.DEBUG, logger=api_service.__name__):
         api_service.schedule_rank_freshness_refresh(
@@ -559,10 +535,7 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     assert fetch_count == len(api_service.ATTEMPT_DELAYS_SECONDS)
     assert rank_file.read_bytes() == original_rank
     assert total_file.read_bytes() == original_total
-    assert notifications == [
-        f"Position update timed out for {SCENARIO_NAME}. "
-        "KovaaK's may still be catching up."
-    ]
+    assert f"Rank freshness refresh exhausted for {SCENARIO_NAME}" in caplog.text
     assert "Possible score-precision drift" in caplog.text
     assert (
         f"Scheduled rank freshness refresh for {SCENARIO_NAME} "
@@ -576,16 +549,7 @@ def test_smoke_stale_scores_retry_on_schedule_and_exhaust_without_cache_writes(
     )
 
 
-def test_exhaustion_without_stale_rank_has_no_precision_drift_warning(
-    monkeypatch,
-    caplog,
-):
-    monkeypatch.setattr(
-        api_service.dash_logger,
-        "error",
-        lambda _message, *_args: None,
-    )
-
+def test_exhaustion_without_stale_rank_has_no_precision_drift_warning(caplog):
     with caplog.at_level(logging.WARNING, logger=api_service.__name__):
         api_service._notify_exhaustion(SCENARIO_NAME, 100.0, _unranked())
 

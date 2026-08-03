@@ -31,7 +31,6 @@ from source.kovaaks.api_models import (
 )
 from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
-from source.utilities.dash_logging import get_dash_logger
 from source.utilities.paths import state_dir
 
 # KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
@@ -53,7 +52,6 @@ ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
 REDACTED_PARAMS = "<redacted>"
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
-dash_logger = get_dash_logger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
@@ -1298,7 +1296,7 @@ def _notify_exhaustion(
     expected_score: float,
     last_rank_info: ScenarioRankInfo | None,
 ) -> None:
-    """Log and notify after all scheduled freshness attempts are exhausted."""
+    """Log after all scheduled freshness attempts are exhausted."""
     logger.warning("Rank freshness refresh exhausted for %s", scenario_name)
     if (
         last_rank_info is not None
@@ -1313,10 +1311,6 @@ def _notify_exhaustion(
             last_rank_info.score,
             expected_score,
         )
-    dash_logger.error(
-        "Position update timed out for %s. KovaaK's may still be catching up.",
-        scenario_name,
-    )
 
 
 def _run_attempt(  # noqa: PLR0913
@@ -1339,10 +1333,6 @@ def _run_attempt(  # noqa: PLR0913
             )
         except UnknownKovaaksUserError as exc:
             logger.warning("Rank refresh stopped for %s: %s", scenario_name, exc)
-            dash_logger.error(
-                "Position update for %s failed: KovaaK's username may be misconfigured.",
-                scenario_name,
-            )
             return
         except requests.RequestException as exc:
             # INFO for the same reason as _get_with_retry's retry records: a
@@ -1431,10 +1421,6 @@ def _run_attempt(  # noqa: PLR0913
         )
     except Exception:
         logger.exception("Unexpected error during rank refresh for %s", scenario_name)
-        dash_logger.error(
-            "Position update for %s failed unexpectedly.",
-            scenario_name,
-        )
 
 
 def _schedule_attempt(  # noqa: PLR0913
