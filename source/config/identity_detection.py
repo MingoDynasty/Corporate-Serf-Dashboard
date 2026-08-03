@@ -51,7 +51,9 @@ _LOGIN_USERS_SUBPATH = Path("config/loginusers.vdf")
 # malformed block from swallowing the next. Regex rather than a real parser,
 # like the stats-directory detector: the upstream ``vdf`` package is
 # unmaintained, and this file is read once per Detect press.
-_ACCOUNT_BLOCK_PATTERN = re.compile(r'"(\d{17})"\s*\{([^{}]*)\}')
+_ACCOUNT_KEY = r'"(\d{17})"'
+_ACCOUNT_KEY_PATTERN = re.compile(_ACCOUNT_KEY)
+_ACCOUNT_BLOCK_PATTERN = re.compile(rf"{_ACCOUNT_KEY}\s*\{{([^{{}}]*)\}}")
 # A file with no users section at all is a format we do not recognize, which
 # must not read as "nobody is signed in".
 _USERS_SECTION_PATTERN = re.compile(r'"users"\s*\{', re.IGNORECASE)
@@ -129,9 +131,12 @@ def _block_value(block: str, key: str) -> str | None:
 def _parse_accounts(text: str) -> tuple[list[SteamAccount], int]:
     """List the accounts one ``loginusers.vdf`` describes, and the unusable ones.
 
-    An account without a persona name cannot be probed, so it is dropped and
-    counted: the count marks discovery incomplete rather than letting a garbled
-    block pass for an account that does not exist.
+    Two things make an account unusable: a block with no persona name, which
+    cannot be probed, and a SteamID64 whose block did not parse at all -- a
+    file caught half-written, or a value carrying a brace. Both are counted
+    rather than dropped, because the count is what marks discovery incomplete:
+    an account nobody could read must not pass for an account that is not
+    there.
     """
     accounts = []
     unusable = 0
@@ -152,7 +157,12 @@ def _parse_accounts(text: str) -> tuple[list[SteamAccount], int]:
                 timestamp=int(raw_timestamp) if raw_timestamp.isdigit() else 0,
             )
         )
-    return accounts, unusable
+    # Every account is keyed by exactly one SteamID64, so a key the block scan
+    # did not consume is an account this file failed to describe. Counting the
+    # difference is what keeps an unmatched block from vanishing into a file
+    # that then looks cleanly read.
+    unmatched = len(_ACCOUNT_KEY_PATTERN.findall(text)) - len(accounts) - unusable
+    return accounts, unusable + max(unmatched, 0)
 
 
 def _read_login_users(path: Path) -> tuple[list[SteamAccount], bool]:

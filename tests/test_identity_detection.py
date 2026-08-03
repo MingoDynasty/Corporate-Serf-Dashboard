@@ -259,6 +259,52 @@ def test_an_account_without_a_persona_cannot_be_probed_and_is_not_hidden(
     assert "Skipped 1 unreadable account entry" in caplog.text
 
 
+def test_an_account_block_that_does_not_parse_is_not_hidden_either(
+    roots,
+    tmp_path,
+    caplog,
+):
+    """A file caught half-written must not read as a complete account list."""
+    root = tmp_path / "Steam"
+    path = root / "config" / "loginusers.vdf"
+    path.parent.mkdir(parents=True)
+    path.write_text(
+        f'"users"\n{{\n{_account_block(STEAM_ID, PERSONA)}\n'
+        f'\t"{ALT_STEAM_ID}"\n\t{{\n\t\t"PersonaName"\t\t"Alt"\n',
+        encoding="utf-8",
+    )
+    roots(root)
+
+    with caplog.at_level(logging.WARNING):
+        accounts, complete = detection.discover_steam_accounts()
+
+    assert [account.steam_id for account in accounts] == [STEAM_ID]
+    assert not complete
+    assert "Skipped 1 unreadable account entry" in caplog.text
+
+
+def test_a_brace_inside_a_value_costs_only_its_own_account(roots, tmp_path):
+    """One unparseable block must not take the accounts around it down."""
+    root = tmp_path / "Steam"
+    _write_login_users(
+        root,
+        [
+            _account_block(STEAM_ID, PERSONA),
+            _account_block(ALT_STEAM_ID, "Al}t"),
+            _account_block("76561198000000003", "Third"),
+        ],
+    )
+    roots(root)
+
+    accounts, complete = detection.discover_steam_accounts()
+
+    assert [account.steam_id for account in accounts] == [
+        STEAM_ID,
+        "76561198000000003",
+    ]
+    assert not complete
+
+
 def test_a_persona_with_quotes_and_unicode_is_parsed(roots, tmp_path):
     root = tmp_path / "Steam"
     _write_login_users(root, [_account_block(STEAM_ID, 'Ming\\"o ✿ 日本')])
