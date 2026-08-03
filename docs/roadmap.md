@@ -35,8 +35,7 @@ sequence.
   no questions at all, and a start with nothing configured finds the KovaaK's
   stats folder itself. Configuring the dashboard no longer means opening a text
   editor. (PRs #181, #182, #183, #184; design in #171) Design rationale
-  distilled
-  into [`decision_log.md`](./decision_log.md).
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Leaderboard-ID seeding** — the bundled benchmark corpus now embeds each
   scenario's KovaaK's leaderboard ID, and the app seeds them into the permanent
   name→ID mapping cache at startup. First opens of unfamiliar bundled playlists
@@ -63,6 +62,7 @@ sequence.
   full local/cache-backed table immediately, then streams Position, Total
   Players, and Percentile updates into stable rows with visible progress and
   aggregate outage/interruption summaries. (PR #127)
+
 ---
 
 ## Upcoming milestones

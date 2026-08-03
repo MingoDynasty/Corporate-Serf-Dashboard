@@ -264,7 +264,8 @@ flowchart LR
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
   Save. The form is built per visit from the stored view (never the pinned
   accessors) so it always shows what is on disk. Validation is offline only
-  (directory exists, digits-only Steam ID); a save writes all three keys,
+  (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
+  above the universe-1 base); a save writes all three keys,
   cold-starts the warmup worker when a username was saved, and re-derives the
   restart notice from `is_restart_pending()`. A write that fails (a locked file
   exhausting the atomic replace's retries) is caught and reported in the status
