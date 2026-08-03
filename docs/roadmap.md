@@ -84,7 +84,7 @@ sequence.
   (noise kill → consolidation → copy rework); the noise kill alone resolves
   the audit complaint. Design in
   [`notification_system_proposal.md`](./notification_system_proposal.md)
-  (Proposed; sequencing ahead of run history is that proposal's second
+  (Proposed; sequencing ahead of run history is that proposal's third
   decision needed).
 
 - **Run history and sessions** — a reviewable, persistent record of past runs

@@ -133,7 +133,7 @@ the original audit; rows 18–21 are producers added since (marked *new*).
 | # | Notification | Fires when | System | Renders? | Verdict |
 |---|---|---|---|---|---|
 | 1 | 🔴 "KovaaK's username is not configured" | Every scenario switch / new run, username unset (default) | A | yes | **Remove toast**; inline hint on the Position field pointing at Settings + one startup console INFO |
-| 2 | 🔴 Rank fetch/resolve failed | Scenario switch / run, transient API failure | A | yes | **Remove toast**; inline field state, Refresh is the retry |
+| 2 | 🔴/🟡 Rank fetch/resolve failed (red when nothing cached, yellow when serving the stale cache) | Scenario switch / run, transient API failure | A | yes | **Remove toast**; inline field states (including the served-stale affordance, D3), Refresh is the retry |
 | 3 | 🟡 Steam-ID mismatch | Scenario switch when `steam_id` disagrees | A | yes | **Keep, once per app session**, persistent until dismissed |
 | 4 | 🟡 "No scenario data found" | Selecting an unplayed scenario | A | yes | **Remove** (on-canvas empty state already covers it) |
 | 5 | 🟡 "No scenario data for the given date range" | Date filter empties the plot (two call sites since the figure-builder split) | A | yes | **Remove** (same) |
@@ -151,7 +151,7 @@ the original audit; rows 18–21 are producers added since (marked *new*).
 | 17 | 🟢/🔴 Superseded-file cleanup result | Overview-page cleanup confirmation | B | yes | **Keep** |
 | 18 | 🔴 "Could not process a new run file" (*new*, PR #115) | A run CSV fails to import on the watchdog thread | A | yes, queued — next Home tick | **Keep → typed queue** (D4): the user's run silently vanished; they would act on it |
 | 19 | 🔴 "Percentile update stopped: username may be misconfigured" (*new*, warmup arc) | Warmup worker hits a fatal username error | A | yes, queued — next Home tick | **Remove toast**; the Playlists status strip already shows the fatal state in place |
-| 20 | 🟢 "Refreshed position for X." (*new*) | Manual Refresh succeeds with a fresh fetch | B | yes | **Keep**; D6 retitle (title is literally "Notification") |
+| 20 | 🟢 "Refreshed position for X." (*new*) | Manual Refresh succeeds with a fresh fetch | B | yes | **Keep**; D6 retitle (title is literally "Notification"); per-click id is a named D6 exception |
 | 21 | 🟡/🔴 Progressive-fill outage summary (*new*, PR #127) | A playlist-page position fill ends interrupted/failed | B | yes | **Keep** (settled 2026-07-15 design; one-shot aggregate, policy-conformant) |
 
 Net effect: during normal play with the default config, the only toasts are the
@@ -229,7 +229,14 @@ inline state or tooltip:
   PRs #181–#184, and the page's Detect button now offers a verified name.
   This row delivers the toast half of the quiet-state kernel the
   2026-08-01 totals-rejection entry deferred until a settings page existed.)
-- Lookup failed → `N/A` with hint "lookup failed — Refresh to retry".
+- Lookup failed, nothing cached → `N/A` with hint "lookup failed — Refresh to
+  retry".
+- Lookup failed, cached rank available → the service's third result shape
+  (`served_stale=True` with a `warning_message`, per the 2026-07-12
+  degrade-to-cache decision): show the cached value **with a visible stale
+  affordance** — e.g. a suffix or tooltip "from cache — Refresh to update" —
+  never as bare current truth. Today `_emit_rank_messages` toasts that
+  warning; on the passive path the inline stale state replaces the toast.
 
 Exact wording/affordance (trailing text vs. tooltip) is a build-time detail;
 the decision is that the field explains itself instead of toasting.
@@ -255,8 +262,9 @@ in PR 2: a module-level deque of import-failure messages in the watchdog,
 drained into one red toast by a Home interval callback, exactly the startup
 playlist-warning shape. Home-gated delivery is acceptable for it — the run's
 absence is a Home-visible fact, and today's delivery is already Home-gated.
-Rows 8–9 went console-only in PR #194; row 19 follows in PR 1 (delete the
-toast call, keep the `logger` sibling). Document the rule in
+Rows 8–9 go console-only in PR #194 (open at this writing — a hard
+prerequisite of PR 2, see Build sequencing); row 19 follows in PR 1 (delete
+the toast call, keep the `logger` sibling). Document the rule in
 `docs/architecture.md` so the level-driven-bridge mistake cannot recur. Surfacing background rank events as
 real toasts is deferred (Open questions) — if it happens, it reuses this
 typed-queue pattern.
@@ -306,7 +314,13 @@ duration dependency, which a future DMC/Mantine version could change.)
 
 ### D6. Presentation standards
 
-- Stable, semantic notification ids; dedupe/replace by id.
+- Stable, semantic notification ids; dedupe/replace by id. One named
+  exception: repeatable user-action results (#20, the manual-refresh
+  confirmation) use a **per-click id** — `show` with a reused id would
+  swallow the second of two deliberate back-to-back results, and each user
+  request deserves its visible answer. If per-click confirmations ever prove
+  noisy, the D5 upsert (paired `update`+`show` with the lifetime reset) is
+  the drop-in alternative.
 - **Title carries the verdict** — title + color must tell the whole story from
   across the room. Never the literal word "Notification" (today's offenders:
   the top-N toast and the row-20 refresh confirmation).
@@ -386,17 +400,23 @@ Grouped by file; each maps to inventory rows above.
     `prevent_initial_call="initial_duplicate"` — Dash (4.4.0 today) refuses to
     register an `allow_duplicate` output otherwise, and plain
     `prevent_initial_call=True` would lose the initial render.
-  - `refresh_rank` (#6, #20): emit the failure through the callback's existing
-    `sendNotifications` output (added for the row-20 success toast since the
-    audit) instead of `dash_logger`, on **both** failure paths: expected
-    failures come back as `ScenarioRankInfo.error_message` (no raise),
-    unexpected bugs raise — each must produce the toast. On failure the rank
-    output returns `no_update` so the displayed value stays put — usually the
-    cached position, but `N/A` when none was ever shown (default config, first
-    failure) — replacing today's behavior of flashing `N/A` until the next
-    ~1s cache-only tick restores it. The toast copy is therefore the
-    always-true "Couldn't refresh — position unchanged.", not "showing cached
-    position". Retitle the success toast per D6.
+  - `refresh_rank` (#6, #20): route **every** outcome through the callback's
+    existing `sendNotifications` output (added for the row-20 success toast
+    since the audit) instead of `dash_logger`, covering all three service
+    results. (a) Hard failure — expected failures come back as
+    `ScenarioRankInfo.error_message` (no raise), unexpected bugs raise; each
+    produces the red toast, and the rank output returns `no_update` so the
+    displayed value stays put — usually the cached position, but `N/A` when
+    none was ever shown (default config, first failure) — replacing today's
+    behavior of flashing `N/A` until the next ~1s cache-only tick restores
+    it. The copy is therefore the always-true "Couldn't refresh — position
+    unchanged." (b) Served-stale — the fetch failed but a cached rank exists
+    (`served_stale=True` with a `warning_message`, the 2026-07-12
+    degrade-to-cache path): a yellow "Couldn't refresh — showing the cached
+    position." toast, the displayed value carrying the D3 stale affordance,
+    and never the green confirmation. (c) Fresh success — the green toast,
+    retitled per D6, suppressed by any warning or error exactly as today.
+    The success toast keeps its **per-click id** (D6's named exception).
   - `generate_graph`: return `no_update` for the no-data branches (#4, #5 —
     note #5 now fires from two call sites in `_build_scenario_figure`);
     replace `_build_run_event_notifications`' two-toast output with the single
@@ -409,12 +429,12 @@ Grouped by file; each maps to inventory rows above.
   empty state where the chart renders, mirroring Home's on-canvas pattern.
   Drop the `get_dash_logger` import and module-global.
 - **`my_watchdog/file_watchdog.py`** — the schedule-failure toast (#8) is
-  already gone (PR #194). Replace the run-import failure toast (#18) with an
-  append to the new typed import-failure queue, then drop the
-  `get_dash_logger` import and module-global.
-- **`kovaaks/api_service.py`** — done in PR #194: the three toast calls in
-  `_notify_exhaustion` / `_run_attempt` (#9) and the `dash_logger`
-  import/global are already gone.
+  removed by PR #194 (a PR 2 prerequisite). Replace the run-import failure
+  toast (#18) with an append to the new typed import-failure queue, then
+  drop the `get_dash_logger` import and module-global.
+- **`kovaaks/api_service.py`** — covered by PR #194 (a PR 2 prerequisite):
+  the three toast calls in `_notify_exhaustion` / `_run_attempt` (#9) and
+  the `dash_logger` import/global.
 - **`kovaaks/percentile_warmup_service.py`** — delete the fatal-state toast
   (#19); keep the `logger.warning`. The Playlists overview status strip
   already renders the fatal state in place.
@@ -428,7 +448,7 @@ Grouped by file; each maps to inventory rows above.
   notifications; records logged outside a callback context are queued…"),
   which deleting `dash_logging.py` falsifies — `test_docs.py` gates dangling
   links, not stale prose, so nothing else catches it.
-- **`docs/specs/scenario_rank.md`** — PR #194 already rewrote the
+- **`docs/specs/scenario_rank.md`** — PR #194 rewrites the
   background-refresh-failure statement (console/file logs only); PRs 1–2
   update any remaining delivery-mechanism prose as System A shrinks.
 - **`pyproject.toml`** — **`dash-extensions` stays**: `app.py` imports
@@ -444,12 +464,15 @@ Grouped by file; each maps to inventory rows above.
    paragraph (the "Graph updated!" description becomes false here) and the
    `scenario_rank.md` spec lines PR 1 falsifies. Resolves the audit
    complaint by itself; smallest reviewable unit. (The #8/#9 dead-diagnostic
-   deletions already landed first as the independent PR #194.)
+   deletions are split out as the independent PR #194.)
 2. **System consolidation.** Delete System A (handler, queue, drain callback,
    `tests/test_dash_logging_background.py`), migrate #3 (once-per-session)
    and #6 to System B, add the row-18 typed import-failure queue, move #7
    in-page, add the `toast()` builder, document the D4 rule in
-   `architecture.md`, finish the spec update.
+   `architecture.md`, finish the spec update. **Hard prerequisite:
+   PR #194 merged** — deleting `dash_logging.py` while `file_watchdog.py`
+   and `api_service.py` still hold the #8/#9 call sites would strand
+   imports; if #194 has not merged by then, PR 2 subsumes its removals.
 3. **Copy rework.** The merged run-verdict toast (D5) and the D6 copy shapes;
    align the backlog summary (a full copy rewrite, not a no-op — see Migration
    notes); make #15 persistent; sweep surviving titles (#14–#17, #20, #21).
@@ -470,14 +493,15 @@ Grouped by file; each maps to inventory rows above.
     the "neither top-N nor threshold" case then asserts an empty list. In
     `tests/test_home_rank_format.py`, the cases that monkeypatch
     `home.dash_logger` to assert passive-path rank toasts — rewrite against
-    the inline Position-field states of D3. In
+    the inline Position-field states of D3, including the served-stale case
+    (cached value shown with the stale affordance, no toast). In
     `tests/test_home_build_scenario_figure.py`, the date-range warning
     assertions (#5, both call sites). No test asserts the #19 toast (only the
     in-page status string in `test_playlist_pages.py`), so its removal breaks
     nothing.
-  - **Shipped with PR #194** (the #8/#9 deletions):
+  - **Split out to PR #194** (the #8/#9 deletions):
     `tests/test_file_watchdog_rank_refresh.py` and
-    `tests/test_scenario_rank_freshness.py` were rewritten there against
+    `tests/test_scenario_rank_freshness.py` are rewritten there against
     the retained console `logger` calls.
   - **PR 2** (System A deletion, row-18 queue, Journey in-page state):
     `tests/test_dash_logging_background.py` is deleted with the module it
@@ -486,7 +510,11 @@ Grouped by file; each maps to inventory rows above.
     remaining `dash_logger` monkeypatches vanish with the module; the Journey
     page has no dedicated coverage today (only a tangential touch in
     `test_playlist_pages.py`), so the in-page empty state needs **net-new**
-    regression tests.
+    regression tests. The #6 migration adds regression coverage for all
+    three manual-refresh outcomes — red failure, yellow served-stale, green
+    fresh — including that served-stale never fires the green confirmation
+    and that back-to-back refreshes each render their result (the per-click
+    id exception).
   - **PR 3** (D5 merge + D6 copy): the `new-top-n-score-notification` /
     `score-threshold-notification` ids and two-toast-per-run shape in the
     remaining `test_single_run_*` cases, **and the four `test_backlog_*`
@@ -504,7 +532,7 @@ Grouped by file; each maps to inventory rows above.
   entry for this work, which the same sweep removes.
 - **Behavior parity.** Retiring System A loses nothing that currently renders
   except the toasts intentionally removed (#1/#2/#4/#5/#19 here, #8/#9
-  already via PR #194); row 18 is
+  via PR #194); row 18 is
   the only background toast that must keep rendering, and its typed queue
   preserves today's Home-gated delivery timing.
 
