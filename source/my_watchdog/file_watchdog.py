@@ -5,6 +5,7 @@ Business logic for monitoring a specified directory for newly created files.
 import datetime
 import logging
 import time
+from collections import deque
 from pathlib import Path
 from typing import cast
 
@@ -22,11 +23,31 @@ from source.kovaaks.data_service import (
     load_csv_file_into_database,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
-from source.utilities.dash_logging import get_dash_logger
 from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
-dash_logger = get_dash_logger(__name__)
+
+RUN_IMPORT_FAILURE_MESSAGE = (
+    "Could not process a new run file. See debug.log for details."
+)
+
+# Run files this thread failed to import. The watchdog runs outside any Dash
+# callback context, so it publishes here instead of driving a UI output, and a
+# Home interval callback drains it into one toast -- the same shape as the
+# startup playlist-warning queue. Typed and single-purpose on purpose: see the
+# background-thread rule in docs/architecture.md.
+run_import_failure_queue: deque[str] = deque()
+
+
+def drain_run_import_failures() -> list[str]:
+    """Drain run-import failures for UI delivery on the next Home tick."""
+    failures: list[str] = []
+    while True:
+        try:
+            failures.append(run_import_failure_queue.popleft())
+        except IndexError:
+            return failures
+
 
 # Percentage of the high score a run must beat to "pass" in the debug logs
 # below. This is an interim, developer-facing stand-in for reviewing runs
@@ -99,9 +120,7 @@ class NewFileHandler(FileSystemEventHandler):
                 "Failed to process new stats file: %s",
                 getattr(event, "src_path", "(unknown)"),
             )
-            dash_logger.error(
-                "Could not process a new run file. See debug.log for details."
-            )
+            run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
 
     def _import_created_file(self, event):
         """Parse, store, and announce one created file; may raise on surprises."""

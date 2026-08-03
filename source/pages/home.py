@@ -41,6 +41,7 @@ from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
+from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
@@ -116,6 +117,7 @@ _RANK_HINT_SERVED_STALE = "served_stale"
 _STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
 _RANK_REFRESH_FAILED_NOTIFICATION_ID = "rank-refresh-failed"
 _RANK_REFRESH_STALE_NOTIFICATION_ID = "rank-refresh-stale"
+_RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
 # Both refresh-failure paths leave the displayed value alone, so one line
 # covers them: the hard failure keeps whatever was on screen, and the
@@ -300,6 +302,48 @@ def flush_background_notifications(_n_intervals):
     if not notifications:
         return no_update
     return notifications
+
+
+def _build_run_import_failure_notification(
+    failures: list[str],
+) -> dict[str, object]:
+    """Fold a batch of failed run imports into one red toast.
+
+    Red is earned here: the user played those runs and nothing else tells them
+    the runs never landed.
+    """
+    message = (
+        failures[0]
+        if len(failures) == 1
+        else (
+            f"{len(failures)} new run files could not be processed. "
+            "See debug.log for details."
+        )
+    )
+    return toast(
+        _RUN_IMPORT_FAILURE_NOTIFICATION_ID,
+        "Run not recorded",
+        message,
+        color="red",
+        icon=local_icon("material-symbols:warning-outline"),
+    )
+
+
+@callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Input("interval-component", "n_intervals"),
+    prevent_initial_call=True,
+)
+def flush_run_import_failures(_n_intervals):
+    """Deliver run imports the watchdog thread could not complete.
+
+    Home-gated, like the delivery it replaces: a missing run is a Home-visible
+    fact, so the next poll tick is soon enough.
+    """
+    failures = drain_run_import_failures()
+    if not failures:
+        return no_update
+    return [_build_run_import_failure_notification(failures)]
 
 
 @callback(
