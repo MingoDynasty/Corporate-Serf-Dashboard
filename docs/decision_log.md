@@ -550,6 +550,18 @@ Accepted consequence: a freshly promoted version reports `source: "archive"` and
 `tag: None` until the next launch. SHA and date still identify it exactly, and
 the tag↔SHA mapping is public in the releases.
 
+**That accepted consequence is superseded (2026-08-02).** The installer and the
+launcher now copy the release's `release.json` verbatim into `versions/<tag>/`
+at stage time, and `build_info.py` reads that copy ahead of the manifest under
+the same corroboration rule, reporting `source: "release-file"`. The copy is
+written before the staged version ever runs, so it cannot lag the code it sits
+beside: a trial build names its own tag from its first session. The precedence
+above gains that file at the top and is otherwise unchanged — the manifest
+remains the fallback for version directories staged without a copy, which is
+how an install still on a pre-copy release degrades for exactly one update
+cycle (documented, not engineered around, under the single-user support
+boundary).
+
 `version.txt` is deliberately plain `key: value` text rather than JSON: the
 committed file needs a comment header (a raw placeholder looks broken to anyone
 browsing the repo), and `export-subst` output is not JSON-escaped, so a JSON
