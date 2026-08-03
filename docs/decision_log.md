@@ -523,14 +523,28 @@ github.com is the trust anchor at this audience size.
 ## 2026-07-19: Build Identity Comes From The Manifest, Corroborated By The Stamp
 
 Status: Accepted
+Superseded in part: 2026-08-02 (PR #188) added a release-file layer above the
+manifest and retired the accepted `tag: None` consequence recorded below.
+Every other decision in this entry stands.
+
+The app works out which release it is running by reading files left beside the
+code and in the install directory, never a version string committed in the
+source. Each of those files is trusted only when it agrees with the stamp that
+ships inside the downloaded code, so a half-finished update cannot make a new
+build report the old version. Since 2026-08-02 the installer and launcher also
+leave a copy of the release description next to each installed version, which
+is what lets a freshly updated app name its own release right away. Someone
+updating the app now sees the right version reported from the first session
+rather than a session later.
 
 Decision: one reader (`source/utilities/build_info.py`) resolves the running
 build's identity, and every user-visible build string derives from it. The
-precedence is manifest → expanded stamp → git → `unknown`:
+precedence is manifest → expanded stamp → git → `unknown` (a release-file
+layer was added above the manifest on 2026-08-02; see the end of this entry):
 
 1. **`install.json`** — the install manifest, written atomically by the
    installer/launcher into the state root, never by the app. The only layer that
-   can know the release *tag*.
+   can know the release *tag* — until the 2026-08-02 copy, which carries it too.
 2. **`version.txt`** — committed with git `export-subst` placeholders
    (`sha: $Format:%H$`, `commit-date: $Format:%cs$`) plus a `.gitattributes`
    entry. GitHub's archive endpoints run `git archive`, which expands them, so
@@ -554,14 +568,13 @@ the tag↔SHA mapping is public in the releases.
 installer and the launcher now copy the release's `release.json` verbatim into
 `versions/<tag>/` at stage time, and `build_info.py` reads that copy ahead of
 the manifest under the same corroboration rule, reporting
-`source: "release-file"`. The copy is
-written before the staged version ever runs, so it cannot lag the code it sits
-beside: a trial build names its own tag from its first session. The precedence
-above gains that file at the top and is otherwise unchanged — the manifest
-remains the fallback for version directories staged without a copy, which is
-how an install still on a pre-copy release degrades for exactly one update
-cycle (documented, not engineered around, under the single-user support
-boundary).
+`source: "release-file"`. The copy is written before the staged version ever
+runs, so it cannot lag the code it sits beside: a trial build names its own tag
+from its first session. The precedence above gains that file at the top and is
+otherwise unchanged — the manifest remains the fallback for version directories
+staged without a copy, which is how an install still on a pre-copy release
+degrades for exactly one update cycle (documented, not engineered around, under
+the single-user support boundary).
 
 `version.txt` is deliberately plain `key: value` text rather than JSON: the
 committed file needs a comment header (a raw placeholder looks broken to anyone
