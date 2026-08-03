@@ -471,6 +471,58 @@ def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog
     ]
 
 
+def test_get_with_retry_keeps_a_sensitive_requests_params_out_of_the_log(
+    monkeypatch,
+    caplog,
+):
+    # The identity probe sends Steam personas the app never persists, and
+    # debug.log is rotated, kept, and collected with bug reports. Both leaks
+    # are covered here: the attempt line's params, and the prepared URL that
+    # requests embeds in a transport failure's text.
+    responses = [
+        api_service.requests.ConnectionError(
+            "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+            "exceeded with url: /webapp-backend/user/profile/by-username"
+            "?username=SecretPersona (Caused by NewConnectionError())"
+        ),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://kovaaks.com/webapp-backend/user/profile/by-username",
+        params={"username": "SecretPersona"},
+        sensitive=True,
+    )
+
+    assert "SecretPersona" not in caplog.text
+    assert [record.getMessage() for record in caplog.records] == [
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> failed after 1.00s (attempt 1/2): "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "Transient GET failure at "
+        "https://kovaaks.com/webapp-backend/user/profile/by-username after "
+        "1.00s (attempt 1/2); retrying: "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> -> HTTP 200 in 1.00s (attempt 2/2)",
+    ]
+
+
 def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
     calls = []
 
@@ -484,6 +536,62 @@ def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
         api_service._get_with_retry("https://example.test")
 
     assert len(calls) == 1
+
+
+def test_get_user_profile_by_username_sends_the_name_as_a_sensitive_parameter(
+    monkeypatch,
+    caplog,
+):
+    profile = {"steamId": "76561198000000001", "webapp": {"username": "MingoDynasty"}}
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return FakeResponse(profile)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    assert api_service.get_user_profile_by_username("SecretPersona") == profile
+    # In params, never concatenated into the URL: that is what keeps the
+    # bare-URL log lines clean.
+    assert calls == [
+        (
+            "https://kovaaks.com/webapp-backend/user/profile/by-username",
+            {
+                "params": {"username": "SecretPersona"},
+                "timeout": api_service.DEFAULT_TIMEOUT_SECONDS,
+            },
+        )
+    ]
+    assert "SecretPersona" not in caplog.text
+
+
+def test_get_user_profile_by_username_maps_409_to_a_confirmed_absence(monkeypatch):
+    # 409 {"error":"Player does not exist"} is this endpoint's answer for "no
+    # such player", so identity detection must not have to read exceptions.
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(
+            {"error": "Player does not exist"},
+            status_code=409,
+        ),
+    )
+
+    assert api_service.get_user_profile_by_username("Nobody") is None
+
+
+def test_get_user_profile_by_username_propagates_other_http_errors(monkeypatch):
+    """A server failure is not evidence that the player does not exist."""
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(None, status_code=500),
+    )
+
+    with pytest.raises(api_service.requests.HTTPError):
+        api_service.get_user_profile_by_username("MingoDynasty")
 
 
 def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):

@@ -48,6 +48,9 @@ MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
 # through its ConnectionError base -- those requests never reached the server.
 TRANSIENT_GET_EXCEPTIONS = (requests.ConnectionError,)
 ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
+# Stands in for a sensitive request's parameters in the per-attempt log lines,
+# so the line still ties a failure to its call without recording the value.
+REDACTED_PARAMS = "<redacted>"
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
@@ -115,6 +118,7 @@ class Endpoints(StrEnum):
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
     SEARCH_SCENARIO = "/scenario/popular"
+    USER_PROFILE_BY_USERNAME = "/user/profile/by-username"
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
@@ -178,6 +182,7 @@ def _get_with_retry(
     *,
     attempts: int = 2,
     backoff_seconds: Sequence[float] = (0.0,),
+    sensitive: bool = False,
     **kwargs,
 ) -> requests.Response:
     """
@@ -190,9 +195,18 @@ def _get_with_retry(
     Every attempt's outcome is logged at DEBUG with its duration, so slow spells
     (e.g. successes landing just under the timeout) are visible without
     cross-referencing urllib3 connection lines by timestamp.
+
+    ``sensitive`` keeps one request's parameters out of the log entirely:
+    attempt lines record a placeholder instead of ``params``, and failure
+    summaries are scrubbed of the query string the exception text carries. Set
+    it for parameters that are user data the app never persists -- the identity
+    probe's Steam personas -- because ``data/logs/debug.log`` is rotated, kept,
+    and collected with bug reports. The ``url`` in every other line stays
+    loggable: parameters ride in ``params``, never in the URL.
     """
     kwargs.setdefault("timeout", _timeout_seconds)
     backoff_schedule = backoff_seconds or (0.0,)
+    logged_params = REDACTED_PARAMS if sensitive else kwargs.get("params")
 
     for attempt in range(attempts):
         started = time.monotonic()
@@ -206,11 +220,11 @@ def _get_with_retry(
             logger.debug(
                 "GET %s %s failed after %.2fs (attempt %d/%d): %s",
                 url,
-                kwargs.get("params"),
+                logged_params,
                 elapsed_seconds,
                 attempt + 1,
                 attempts,
-                request_exception_summary(exc),
+                request_exception_summary(exc, redact_query=sensitive),
             )
             if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
                 # INFO, not WARNING: a retried attempt that recovers is
@@ -223,7 +237,7 @@ def _get_with_retry(
                     elapsed_seconds,
                     attempt + 1,
                     attempts,
-                    request_exception_summary(exc),
+                    request_exception_summary(exc, redact_query=sensitive),
                 )
                 delay_seconds = backoff_schedule[
                     min(attempt, len(backoff_schedule) - 1)
@@ -236,7 +250,7 @@ def _get_with_retry(
         logger.debug(
             "GET %s %s -> HTTP %d in %.2fs (attempt %d/%d)",
             url,
-            kwargs.get("params"),
+            logged_params,
             response.status_code,
             time.monotonic() - started,
             attempt + 1,
@@ -283,6 +297,35 @@ def get_evxl_playlist(sharecode: str) -> EvxlPlaylist:
         params={"shareCode": sharecode.strip()},
     )
     return EvxlPlaylistByCodeResponse.model_validate(response.json()).playlist
+
+
+def get_user_profile_by_username(username: str) -> object | None:
+    """Look up one KovaaK's webapp profile by name, or None when there is none.
+
+    Unauthenticated. HTTP 409 (``{"error":"Player does not exist"}``) is this
+    endpoint's confirmed-absence answer rather than a failure, so it becomes
+    ``None``; ``_get_with_retry`` surfaces it as an ``HTTPError`` through
+    ``raise_for_status``, which is caught here. Every other status and every
+    transport failure propagates for the caller to classify.
+
+    The parsed body is returned unvalidated -- identity detection decides which
+    payloads it can use, so schema drift degrades there like an outage instead
+    of raising here.
+
+    The request is marked sensitive: the name is a Steam persona probed on the
+    user's behalf, including accounts they never save.
+    """
+    try:
+        response = _get_with_retry(
+            Endpoints.USER_PROFILE_BY_USERNAME,
+            params={"username": username},
+            sensitive=True,
+        )
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 409:
+            return None
+        raise
+    return response.json()
 
 
 def get_benchmark_json(
