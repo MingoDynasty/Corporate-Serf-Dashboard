@@ -660,12 +660,12 @@ def test_rank_render_without_notifications_reports_no_update(monkeypatch, tmp_pa
     assert notifications is no_update
 
 
-def test_passive_rank_render_points_an_unset_username_at_settings(monkeypatch):
+def test_passive_rank_render_points_an_unset_username_at_settings():
     # The fixture store leaves identity unset -- the fresh-install default.
-    errors = []
-    monkeypatch.setattr(home.dash_logger, "error", errors.append)
-
-    rendered = _rendered_rank("Scenario", allow_network=True)
+    rendered, notifications = home._render_scenario_rank(
+        "Scenario",
+        allow_network=True,
+    )
 
     assert _rank_text(rendered) == "N/A — set your KovaaK's username in Settings"
     anchors = [
@@ -675,13 +675,11 @@ def test_passive_rank_render_points_an_unset_username_at_settings(monkeypatch):
         if isinstance(component, dmc.Anchor)
     ]
     assert [anchor.href for anchor in anchors] == ["/settings"]
-    assert errors == []
+    assert notifications == []
 
 
 def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    errors = []
-    monkeypatch.setattr(home.dash_logger, "error", errors.append)
     monkeypatch.setattr(
         home,
         "get_scenario_rank_info",
@@ -691,16 +689,17 @@ def test_passive_rank_render_offers_refresh_when_the_lookup_failed(monkeypatch):
         ),
     )
 
-    rendered = _rendered_rank("Scenario", allow_network=True)
+    rendered, notifications = home._render_scenario_rank(
+        "Scenario",
+        allow_network=True,
+    )
 
     assert _rank_text(rendered) == "N/A — lookup failed, Refresh to retry"
-    assert errors == []
+    assert notifications == []
 
 
 def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    warnings = []
-    monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
     monkeypatch.setattr(
         home,
         "get_scenario_rank_info",
@@ -713,10 +712,13 @@ def test_passive_rank_render_marks_a_stale_cached_position(monkeypatch):
         ),
     )
 
-    rendered = _rendered_rank("Scenario", allow_network=True)
+    rendered, notifications = home._render_scenario_rank(
+        "Scenario",
+        allow_network=True,
+    )
 
     assert _rank_text(rendered) == "1,240 — from cache, Refresh to update"
-    assert warnings == []
+    assert notifications == []
 
 
 def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):

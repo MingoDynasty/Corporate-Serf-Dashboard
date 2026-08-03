@@ -13,7 +13,6 @@ from source.kovaaks import api_service
 from source.kovaaks import percentile_warmup_service as warmup
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.data_models import PlaylistData, Scenario, ScenarioStats
-from source.utilities import dash_logging
 
 
 def _config(*, enabled: bool = True) -> ConfigData:
@@ -685,16 +684,3 @@ def test_set_fatal_logs_a_warning(caplog):
 
     assert caplog.messages == ["Percentile warmup stopped: boom"]
     assert [record.levelno for record in caplog.records] == [logging.WARNING]
-
-
-def test_set_fatal_does_not_notify():
-    # The Playlists overview status strip already renders the fatal state in
-    # place, so the toast on top of it was a redundant second copy -- and,
-    # coming off the worker thread, it arrived batched onto the next Home
-    # visit rather than when the failure happened.
-    dash_logging.drain_background_notifications()
-    worker = warmup.PercentileWarmupWorker(_config(), ["A"])
-
-    worker._set_fatal("unknown username")
-
-    assert dash_logging.drain_background_notifications() == []

@@ -52,15 +52,10 @@ from source.plot.plot_service import (
     generate_sensitivity_plot,
     generate_time_plot,
 )
-from source.utilities.dash_logging import (
-    drain_background_notifications,
-    get_dash_logger,
-)
 from source.utilities.notifications import toast
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
-dash_logger = get_dash_logger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
@@ -283,25 +278,6 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
         target_scenario if target_scenario != selected_scenario else no_update
     )
     return run_events, scenario_update
-
-
-@callback(
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
-    Input("interval-component", "n_intervals"),
-    prevent_initial_call=True,
-)
-def flush_background_notifications(_n_intervals):
-    """Deliver notifications queued by threads without a callback context.
-
-    The file watchdog and the rank-freshness Timer chain log through
-    ``dash_logger`` from plain threads, where ``set_props`` is unavailable;
-    the handler queues those records and this callback hands them to the
-    notification container on the next poll tick.
-    """
-    notifications = drain_background_notifications()
-    if not notifications:
-        return no_update
-    return notifications
 
 
 def _build_run_import_failure_notification(

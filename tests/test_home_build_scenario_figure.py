@@ -97,37 +97,30 @@ def test_build_scenario_figure_sensitivity_mode_empty_range_suppresses_overlays(
     monkeypatch,
 ):
     monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: {})
-    # No dash_logger stub needed: the empty-range branch no longer toasts, so
-    # the helper runs outside a Dash callback context untouched. The on-canvas
-    # empty state below is the whole notice.
-    dash_logger = Mock()
-    monkeypatch.setattr(home, "dash_logger", dash_logger)
 
     figure, supports_overlays = home._build_scenario_figure(
         "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, None
     )
 
+    # The on-canvas empty state is the whole notice: the helper returns no
+    # notification channel at all, so there is nothing to suppress.
     assert supports_overlays is False
     assert len(figure.data) == 0
     assert home._NO_DATE_RANGE_DATA_PLOT_TITLE in figure.layout.annotations[0].text
-    dash_logger.warning.assert_not_called()
 
 
 def test_build_scenario_figure_time_mode_empty_range_suppresses_overlays(monkeypatch):
     monkeypatch.setattr(home, "get_time_vs_runs", lambda *_: {})
-    # Same as the sensitivity-mode case above: the second empty-range call site
-    # is silent too, so both stay covered against the toast creeping back.
-    dash_logger = Mock()
-    monkeypatch.setattr(home, "dash_logger", dash_logger)
 
     figure, supports_overlays = home._build_scenario_figure(
         "score_vs_time", "1w4ts", 5, _OLDEST, True, None
     )
 
+    # Same as the sensitivity-mode case above: the second empty-range call
+    # site draws the empty state and says nothing else.
     assert supports_overlays is False
     assert len(figure.data) == 0
     assert home._NO_DATE_RANGE_DATA_PLOT_TITLE in figure.layout.annotations[0].text
-    dash_logger.warning.assert_not_called()
 
 
 def test_build_scenario_figure_unsupported_mode_suppresses_overlays():

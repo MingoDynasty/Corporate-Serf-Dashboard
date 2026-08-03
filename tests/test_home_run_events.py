@@ -5,7 +5,6 @@ from types import SimpleNamespace
 
 import dash
 import plotly.graph_objects as go
-import pytest
 from dash import no_update
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -481,10 +480,6 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
     # Selecting a scenario with no local runs draws the on-canvas empty state
     # and nothing else; the parallel toast was a redundant second copy.
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
-    dash_logger = SimpleNamespace(
-        warning=lambda *_args: pytest.fail("the empty state must not toast"),
-    )
-    monkeypatch.setattr(home, "dash_logger", dash_logger)
 
     plot_json, notifications = home.generate_graph(
         None,
