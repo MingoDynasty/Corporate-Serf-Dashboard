@@ -109,6 +109,13 @@ _NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
 _NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
 _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
 _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score vs Time."
+_RANK_HINT_USERNAME_UNSET = "username_unset"
+_RANK_HINT_LOOKUP_FAILED = "lookup_failed"
+_RANK_HINT_SERVED_STALE = "served_stale"
+# Last hint each scenario's network-backed render concluded, so the cache-only
+# interval path can repeat it instead of recomputing from a read that cannot
+# see the failure. See _rank_hint.
+_last_rank_hints: dict[str, str | None] = {}
 dash.register_page(
     __name__,
     path="/",
@@ -348,6 +355,9 @@ def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
 def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
     """Surface rank warnings and errors through the dashboard notification logger.
 
+    Manual Refresh only: the user asked for the result, so they get one. Passive
+    renders say the same thing in place through ``_rank_hint`` instead.
+
     No module-logger echo: the ``.dash`` records propagate to the root
     handlers, so the files already keep the exact user-visible message.
     """
@@ -355,6 +365,67 @@ def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
         dash_logger.warning(rank_info.warning_message)
     if rank_info.error_message:
         dash_logger.error(rank_info.error_message)
+
+
+def _rank_hint_children(hint: str) -> list:
+    """Render one inline Position hint, including its repair affordance."""
+    if hint == _RANK_HINT_USERNAME_UNSET:
+        return [
+            " — set your KovaaK's username in ",
+            dmc.Anchor("Settings", href="/settings", refresh=False),
+        ]
+    if hint == _RANK_HINT_LOOKUP_FAILED:
+        return [" — lookup failed, Refresh to retry"]
+    return [" — from cache, Refresh to update"]
+
+
+def _rank_display(value: str, hint: str | None) -> str | list:
+    """Pair the formatted Position value with the hint that explains it."""
+    if hint is None:
+        return value
+    return [
+        value,
+        dmc.Text(
+            _rank_hint_children(hint),
+            className="scenario-rank-hint",
+            span=True,
+        ),
+    ]
+
+
+def _derive_rank_hint(rank_info: ScenarioRankInfo) -> str | None:
+    """Classify a rank result into the inline hint its value should carry."""
+    if rank_info.served_stale:
+        return _RANK_HINT_SERVED_STALE
+    if rank_info.error_message:
+        return _RANK_HINT_LOOKUP_FAILED
+    return None
+
+
+def _rank_hint(
+    rank_info: ScenarioRankInfo,
+    username: str | None,
+    selected_scenario: str,
+    allow_network: bool,
+) -> str | None:
+    """Resolve the hint for a render, keeping it stable across interval ticks.
+
+    Only the network path can tell a degraded read from a healthy one: a
+    served-stale result is an ordinary cache hit by the time the cache-only
+    interval re-reads it a second later. Remembering the last network verdict
+    per scenario keeps the affordance on screen instead of blinking off on the
+    next tick. An unset username is visible on both paths, so it is derived
+    rather than remembered and clears the moment Settings gains a name.
+    """
+    if not username:
+        return _RANK_HINT_USERNAME_UNSET
+    if allow_network:
+        hint = _derive_rank_hint(rank_info)
+        _last_rank_hints[selected_scenario] = hint
+        return hint
+    if selected_scenario in _last_rank_hints:
+        return _last_rank_hints[selected_scenario]
+    return _derive_rank_hint(rank_info)
 
 
 def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
@@ -370,25 +441,36 @@ def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
     )
 
 
-def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) -> str:
-    """Render rank through either the normal lookup or the cache-only interval path."""
+def _render_scenario_rank(
+    selected_scenario: str | None,
+    allow_network: bool,
+) -> str | list:
+    """Render rank through either the normal lookup or the cache-only interval path.
+
+    Passive renders never toast: an unconfigured username, a failed lookup, and
+    a value served from a stale cache are persistent conditions, so the field
+    says so itself.
+    """
     if not selected_scenario:
         return "N/A"
 
+    lookup_config = _rank_lookup_config()
+    username = lookup_config[0]
     try:
         rank_info = get_scenario_rank_info(
             selected_scenario,
-            *_rank_lookup_config(),
+            *lookup_config,
             allow_network=allow_network,
             record_activity=allow_network,
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
-        return "N/A"
+        return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED)
 
-    if allow_network:
-        _emit_rank_messages(rank_info)
-    return format_scenario_rank(rank_info)
+    return _rank_display(
+        format_scenario_rank(rank_info),
+        _rank_hint(rank_info, username, selected_scenario, allow_network),
+    )
 
 
 @callback(
@@ -397,7 +479,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
     Input("scenario-dropdown-selection", "value"),
     Input("interval-component", "n_intervals"),
 )
-def get_scenario_rank(_, selected_scenario, _n_intervals) -> str:
+def get_scenario_rank(_, selected_scenario, _n_intervals) -> str | list:
     """Render scenario rank, keeping interval-only calls cache-only."""
     return _render_scenario_rank(
         selected_scenario,
@@ -443,8 +525,12 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
         dash_logger.error("Position refresh for %s failed.", selected_scenario)
+        _last_rank_hints[selected_scenario] = _RANK_HINT_LOOKUP_FAILED
         return "N/A", no_update
 
+    # A manual refresh is a network verdict too, so the interval path must not
+    # go on repeating what the last passive render concluded.
+    _last_rank_hints[selected_scenario] = _derive_rank_hint(rank_info)
     _emit_rank_messages(rank_info)
     if rank_info.error_message or rank_info.warning_message:
         return format_scenario_rank(rank_info), no_update
