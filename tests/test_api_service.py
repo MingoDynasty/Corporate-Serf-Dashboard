@@ -471,6 +471,58 @@ def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog
     ]
 
 
+def test_get_with_retry_keeps_a_sensitive_requests_params_out_of_the_log(
+    monkeypatch,
+    caplog,
+):
+    # The identity probe sends Steam personas the app never persists, and
+    # debug.log is rotated, kept, and collected with bug reports. Both leaks
+    # are covered here: the attempt line's params, and the prepared URL that
+    # requests embeds in a transport failure's text.
+    responses = [
+        api_service.requests.ConnectionError(
+            "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+            "exceeded with url: /webapp-backend/user/profile/by-username"
+            "?username=SecretPersona (Caused by NewConnectionError())"
+        ),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://kovaaks.com/webapp-backend/user/profile/by-username",
+        params={"username": "SecretPersona"},
+        sensitive=True,
+    )
+
+    assert "SecretPersona" not in caplog.text
+    assert [record.getMessage() for record in caplog.records] == [
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> failed after 1.00s (attempt 1/2): "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "Transient GET failure at "
+        "https://kovaaks.com/webapp-backend/user/profile/by-username after "
+        "1.00s (attempt 1/2); retrying: "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> -> HTTP 200 in 1.00s (attempt 2/2)",
+    ]
+
+
 def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
     calls = []
 
