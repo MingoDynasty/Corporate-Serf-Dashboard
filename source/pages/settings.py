@@ -9,12 +9,18 @@ the bare ``settings-*`` namespace.
 """
 
 import logging
+from datetime import datetime
 from pathlib import Path
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, ctx, no_update
+from dash import Input, Output, State, callback, ctx, dcc, no_update
 
+from source.config.identity_detection import (
+    IdentityCandidate,
+    IdentityDetectionResult,
+    detect_identity_candidates,
+)
 from source.config.settings_service import (
     KOVAAKS_USERNAME_KEY,
     STATS_DIR_KEY,
@@ -26,6 +32,7 @@ from source.config.settings_service import (
 from source.config.stats_dir_detection import detect_stats_dir_candidates
 from source.kovaaks.percentile_warmup_service import start_percentile_warmup_worker
 from source.utilities.build_info import get_build_info
+from source.utilities.utilities import format_absolute_timestamp
 
 logger = logging.getLogger(__name__)
 
@@ -80,6 +87,31 @@ RESTART_NOTICE_CLASS = "app-settings-restart-notice"
 # way the playlists page reveals its cleanup alert.
 RESTART_NOTICE_HIDDEN_CLASS = (
     f"{RESTART_NOTICE_CLASS} app-settings-restart-notice-hidden"
+)
+
+DETECT_STATUS_CLASS = "app-settings-detect-status"
+
+PICKER_CLASS = "app-settings-identity-picker"
+# The picker ships hidden and stays hidden unless a detection produces
+# something to choose between, the same modifier trick as the notice above.
+PICKER_HIDDEN_CLASS = f"{PICKER_CLASS} app-settings-identity-picker-hidden"
+
+# The only conclusive miss: every account on this machine was checked, and none
+# of them owns a KovaaK's profile. There is no reverse lookup from a Steam ID,
+# so manual entry really is the only path left — which is why this message is
+# reserved for the one result that has ruled everything else out.
+NO_MATCH_STATUS = (
+    "No Steam account on this machine has a KovaaK's profile. Type your "
+    "username in yourself — KovaaK's cannot look one up from a Steam ID."
+)
+# The same empty-handed result from a run that did not finish. Deliberately not
+# the message above: an account that went unchecked may be the answer.
+NOTHING_VERIFIED_STATUS = (
+    "No KovaaK's profile matched the Steam accounts that could be checked."
+)
+DISCOVERY_FAILED_STATUS = (
+    "Steam's account list could not be read, so accounts on this machine may "
+    "have been missed. See data/logs/debug.log."
 )
 
 
@@ -200,6 +232,185 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
     return None, None, SAVED_STATUS, SAVE_STATUS_CLASS, notice, notice_class
 
 
+def _format_last_seen(last_access: str) -> str:
+    """Render a profile's last-access stamp for a candidate's secondary line.
+
+    KovaaK's sends UTC ISO-8601 (``2026-08-02T14:56:42.919Z``) and the app shows
+    local time in the house format. A stamp that does not parse is shown exactly
+    as it arrived: the date is decoration, and an unreadable one must not cost
+    the user a candidate they could otherwise pick.
+    """
+    try:
+        parsed = datetime.fromisoformat(last_access)
+    except ValueError:
+        return last_access
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone()
+    return format_absolute_timestamp(parsed)
+
+
+def _candidate_radio(candidate: IdentityCandidate) -> dmc.Radio:
+    """Build one picker row: the verified name, then where it came from.
+
+    The label is the canonical ``webapp.username`` — the value that gets saved —
+    and the persona that found it is secondary, because two accounts are told
+    apart by which Steam login they belong to, not by the KovaaK's name.
+    """
+    return dmc.Radio(
+        value=candidate.steam_id,
+        label=candidate.username,
+        description=(
+            f"Steam account {candidate.persona_name} · last seen "
+            f"{_format_last_seen(candidate.last_access)}"
+        ),
+    )
+
+
+def _picker_rows(candidates: tuple[IdentityCandidate, ...]) -> dmc.Stack:
+    """Build the picker's rows in the engine's order (newest last seen first)."""
+    return dmc.Stack(
+        children=[_candidate_radio(candidate) for candidate in candidates],
+        gap="xs",
+    )
+
+
+def _can_auto_fill(result: IdentityDetectionResult) -> bool:
+    """Say whether one candidate is the whole answer rather than the only one seen.
+
+    Filling needs certainty, not a majority: a run that left an account
+    unchecked, or that could not read the account list, may be hiding a second
+    verified account, and a wrong identity fills caches with someone else's
+    ranks. Anything short of this goes to the picker.
+    """
+    return (
+        len(result.candidates) == 1
+        and result.unchecked_count == 0
+        and result.discovery_complete
+    )
+
+
+def _unchecked_status(count: int) -> str:
+    """Say how much of the machine detection could not answer for."""
+    return (
+        f"{count} Steam account{'' if count == 1 else 's'} could not be checked; "
+        "press Detect again to retry."
+    )
+
+
+def _detect_status(result: IdentityDetectionResult) -> str:
+    """Say what a detection found, never dressing an unfinished run as final.
+
+    The lead says what came back and the caveats say what did not, so an
+    incomplete run always reads as incomplete — the conclusive no-match message
+    is only reachable when nothing was left unresolved.
+    """
+    parts = []
+    count = len(result.candidates)
+    if count:
+        parts.append(
+            f"Found {count} KovaaK's account{'' if count == 1 else 's'}. "
+            "Choose the one to use, then Save."
+        )
+    elif result.unchecked_count or not result.discovery_complete:
+        parts.append(NOTHING_VERIFIED_STATUS)
+    else:
+        parts.append(NO_MATCH_STATUS)
+
+    if not result.discovery_complete:
+        parts.append(DISCOVERY_FAILED_STATUS)
+    if result.unchecked_count:
+        parts.append(_unchecked_status(result.unchecked_count))
+    return " ".join(parts)
+
+
+@callback(
+    Output("app-settings-username", "value"),
+    Output("app-settings-steam-id", "value"),
+    Output("app-settings-detect-status", "children"),
+    Output("app-settings-identity-picker", "children"),
+    Output("app-settings-identity-picker", "className"),
+    Output("app-settings-identity-picker", "value"),
+    Output("app-settings-identity-candidates", "data"),
+    Input("app-settings-detect-button", "n_clicks"),
+    # One slow-spell account can hold the probe for ~30 seconds, so the button
+    # spins for the duration; Mantine's loading state also swallows clicks,
+    # which keeps an impatient user from queueing more KovaaK's calls.
+    running=[(Output("app-settings-detect-button", "loading"), True, False)],
+    prevent_initial_call=True,
+)
+def detect_identity(n_clicks):
+    """Check this machine's Steam accounts against KovaaK's and offer the result.
+
+    Suggestion only: this fills inputs and never touches the store — Save stays
+    the single writer. A lone certain candidate is filled in directly; anything
+    less certain is offered in the picker instead, and an empty-handed run says
+    which kind of empty it was.
+
+    Guard on ``n_clicks``: under DashProxy a callback can still fire once on
+    initial page load despite ``prevent_initial_call``, and this one calls
+    KovaaK's.
+    """
+    if not n_clicks or ctx.triggered_id != "app-settings-detect-button":
+        return (no_update,) * 7
+
+    result = detect_identity_candidates()
+    # Only what the picker needs to fill the form. The personas and stamps stay
+    # in the rendered rows: nothing about an account the user never picks is
+    # worth shipping to the browser twice.
+    stored = [
+        {"username": candidate.username, "steam_id": candidate.steam_id}
+        for candidate in result.candidates
+    ]
+
+    if _can_auto_fill(result):
+        candidate = result.candidates[0]
+        return (
+            candidate.username,
+            candidate.steam_id,
+            f"Found {candidate.username}. Save to apply it.",
+            _picker_rows(()),
+            PICKER_HIDDEN_CLASS,
+            None,
+            stored,
+        )
+
+    return (
+        no_update,
+        no_update,
+        _detect_status(result),
+        _picker_rows(result.candidates),
+        PICKER_CLASS if result.candidates else PICKER_HIDDEN_CLASS,
+        # A fresh detection clears the old selection, so picking the same
+        # account again is still a change the pick callback sees.
+        None,
+        stored,
+    )
+
+
+@callback(
+    Output("app-settings-username", "value", allow_duplicate=True),
+    Output("app-settings-steam-id", "value", allow_duplicate=True),
+    Input("app-settings-identity-picker", "value"),
+    State("app-settings-identity-candidates", "data"),
+    prevent_initial_call=True,
+)
+def use_detected_identity(steam_id, candidates):
+    """Fill the identity fields from the picked candidate. Save applies it.
+
+    The candidates come from the store rather than from a second detection, so
+    a pick costs no KovaaK's calls and always fills what the user was shown.
+    Guarded like every other state-changing callback here, because clearing the
+    picker also arrives as a value change.
+    """
+    if not steam_id or ctx.triggered_id != "app-settings-identity-picker":
+        return no_update, no_update
+
+    for candidate in candidates or []:
+        if candidate.get("steam_id") == steam_id:
+            return candidate.get("username", ""), steam_id
+    return no_update, no_update
+
+
 # Wide enough that a deep Steam path stays readable.
 _FIELD_WIDTH = "min(40rem, 100%)"
 
@@ -266,6 +477,47 @@ def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
     )
 
 
+def _identity_detection() -> dmc.Stack:
+    """Build the Detect control, its status line, and the picker it may fill.
+
+    All three ship empty: identity detection costs KovaaK's calls, so it runs
+    behind the button and never on a render path. The picker stays hidden until
+    a detection produces something to choose between.
+    """
+    return dmc.Stack(
+        children=[
+            dmc.Group(
+                children=[
+                    dmc.Button(
+                        "Detect",
+                        id="app-settings-detect-button",
+                        # Secondary to Save, which is the only button here that
+                        # changes anything.
+                        variant="default",
+                    ),
+                    dmc.Text(
+                        "",
+                        id="app-settings-detect-status",
+                        className=DETECT_STATUS_CLASS,
+                    ),
+                ],
+                gap="md",
+                align="center",
+            ),
+            dmc.RadioGroup(
+                id="app-settings-identity-picker",
+                children=[],
+                label="Detected KovaaK's accounts",
+                description="Choosing one fills the fields above; Save applies it.",
+                className=PICKER_HIDDEN_CLASS,
+            ),
+            # What the picker's rows mean, so a pick needs no second detection.
+            dcc.Store(id="app-settings-identity-candidates"),
+        ],
+        gap="sm",
+    )
+
+
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
     """Build the settings form from the stored values.
@@ -275,6 +527,8 @@ def layout(**kwargs):  # noqa: ARG001
     that is waiting on a restart. Stats-directory detection runs per visit too:
     it is a registry read, a couple of file reads, and a handful of directory
     probes, so the suggestions always describe the machine as it is now.
+    Identity detection does not: it calls KovaaK's, so opening the page never
+    costs a request and the Detect button is the only thing that spends one.
     """
     stored = get_settings()
     notice, notice_class = _restart_notice()
@@ -297,6 +551,7 @@ def layout(**kwargs):  # noqa: ARG001
                 STEAM_ID_DESCRIPTION,
                 stored.get(STEAM_ID_KEY, ""),
             ),
+            _identity_detection(),
             dmc.Group(
                 children=[
                     dmc.Button("Save", id="app-settings-save-button"),

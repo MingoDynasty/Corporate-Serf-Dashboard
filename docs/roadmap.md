@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Settings detection** — the Settings page now offers what the machine
+  already knows. The stats-folder box suggests every Steam library holding a
+  KovaaK's stats folder, so a wrong first-start pick is a click to repair
+  instead of a path dug out of Explorer by hand; a Detect button checks this
+  machine's Steam accounts against KovaaK's and fills in the one it can prove
+  is yours, offering a choice when it cannot prove exactly one. Detection only
+  ever fills the form — Save is still what writes. (PRs #189, #191, #193;
+  design in #186) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Version display** — the Settings page now names the running build: the
   release tag, with the commit it came from underneath. A freshly updated app
   knows its own tag from its first session, because the installer and launcher
@@ -60,26 +69,10 @@ sequence.
   something a non-technical player can do.
   (PRs #154, #155, #158, #159, #163; design in #150) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Background playlist percentile warmup** — the Playlists overview now
-  fills cold percentile caches in one polite background queue, keeps partial
-  aggregates behind honest coverage placeholders, and shows remaining/ETA or
-  paused/fatal status while rows update live. Unhiding or importing a playlist
-  moves its played scenarios to the front without blocking the page. (PRs
-  #129, #130, #132, #133; design in #128)
 
 ---
 
 ## Upcoming milestones
-
-- **Settings detection** — the Settings page stops asking users to type what
-  the machine already knows. The stats-directory field suggests every Steam
-  library holding a KovaaK's stats folder, so a wrong first-start pick is a
-  click to repair instead of a path dug out of Explorer by hand; a Detect
-  button then finds the local Steam accounts that have a real KovaaK's
-  profile and fills in the verified username and Steam ID. Three PRs:
-  stats-directory candidates, the identity detection engine, then the
-  identity UI. Design in [`settings_detection_proposal.md`](./settings_detection_proposal.md)
-  (PR #186). The guided first-run flow is deliberately a later proposal.
 
 - **Notification system redesign** — collapse the two notification
   subsystems into one quiet-by-default toast layer: persistent conditions
@@ -91,10 +84,20 @@ sequence.
   (noise kill → consolidation → copy rework); the noise kill alone resolves
   the audit complaint. Design in
   [`notification_system_proposal.md`](./notification_system_proposal.md)
-  (Proposed).
+  (Proposed; sequencing ahead of run history is that proposal's second
+  decision needed).
 
-The sequenced next candidate after these is **Run history and sessions** (see
-Future).
+- **Run history and sessions** — a reviewable, persistent record of past runs
+  that the ephemeral per-run toast can't provide: the current cross-scenario
+  training session, and a scenario's full history over time (e.g. cold-start
+  vs warmed-up comparisons). Gap-based *sessions* are a later
+  quality-of-life layer on top; this supersedes the interim console-log
+  stopgap in `file_watchdog.py`. Design in
+  [`run_history_proposal.md`](./run_history_proposal.md).
+
+The settings arc's guided first-run flow — a setup card for a fresh install,
+and what "skip" should mean — was deliberately left out of settings detection
+and still needs a proposal of its own before it can be sequenced.
 
 ---
 
@@ -116,13 +119,6 @@ expanded into its own roadmap entry when it becomes the next thing up.
   training-hour checkpoints across playlists, which is a different question
   from the shipped playlist-level overview — so it remains a separate
   concern to revisit later, not a replacement for it.
-- **Run history and sessions** — a reviewable, persistent record of past runs
-  that the ephemeral per-run toast can't provide: the current cross-scenario
-  training session, and a scenario's full history over time (e.g. cold-start
-  vs warmed-up comparisons). Gap-based *sessions* are a later quality-of-life
-  layer on top. Sequenced after the playlist-level overview milestone;
-  supersedes the interim console-log stopgap in `file_watchdog.py`. See
-  [`run_history_proposal.md`](./run_history_proposal.md).
 - **Scenarios page** — scenario-first navigation for scenarios that live in
   several playlists or in none, parked from the playlist-overview design. The
   overview → scenario table → Home drill chain covers playlist-first
