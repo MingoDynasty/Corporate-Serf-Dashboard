@@ -23,6 +23,7 @@ from source.config.settings_service import (
     is_restart_pending,
     save_settings,
 )
+from source.config.stats_dir_detection import detect_stats_dir_candidates
 from source.kovaaks.percentile_warmup_service import start_percentile_warmup_worker
 
 logger = logging.getLogger(__name__)
@@ -192,13 +193,17 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
     return None, None, SAVED_STATUS, SAVE_STATUS_CLASS, notice, notice_class
 
 
+# Wide enough that a deep Steam path stays readable.
+_FIELD_WIDTH = "min(40rem, 100%)"
+
+
 def _settings_input(
     component_id: str,
     label: str,
     description: str,
     value: str,
 ) -> dmc.TextInput:
-    """Build one settings field, sized so a long path stays readable."""
+    """Build one free-text settings field."""
     return dmc.TextInput(
         id=component_id,
         label=label,
@@ -207,7 +212,25 @@ def _settings_input(
         # Never a NumberInput, not even for the Steam ID: a SteamID64 exceeds
         # JavaScript's exact-integer range, and a cleared NumberInput reports
         # an empty string rather than a missing value.
-        w="min(40rem, 100%)",
+        w=_FIELD_WIDTH,
+    )
+
+
+def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
+    """Build the stats-directory field: free text plus detected suggestions.
+
+    An Autocomplete rather than a Select because the candidates are hints, not
+    the allowed set: a path this machine's Steam does not know about is still a
+    valid answer, and with no candidates the field is exactly the text input it
+    replaced.
+    """
+    return dmc.Autocomplete(
+        id="app-settings-stats-dir",
+        label="Stats directory",
+        description=STATS_DIR_DESCRIPTION,
+        value=value,
+        data=candidates,
+        w=_FIELD_WIDTH,
     )
 
 
@@ -217,18 +240,18 @@ def layout(**kwargs):  # noqa: ARG001
 
     Built per visit, and from the stored view rather than the pinned
     accessors, so the form always shows what is on disk — including a change
-    that is waiting on a restart.
+    that is waiting on a restart. Stats-directory detection runs per visit too:
+    it is a registry read, a couple of file reads, and a handful of directory
+    probes, so the suggestions always describe the machine as it is now.
     """
     stored = get_settings()
     notice, notice_class = _restart_notice()
     return dmc.Stack(
         children=[
             dmc.Title("Settings", order=2),
-            _settings_input(
-                "app-settings-stats-dir",
-                "Stats directory",
-                STATS_DIR_DESCRIPTION,
+            _stats_dir_input(
                 stored.get(STATS_DIR_KEY, ""),
+                detect_stats_dir_candidates(),
             ),
             _settings_input(
                 "app-settings-username",

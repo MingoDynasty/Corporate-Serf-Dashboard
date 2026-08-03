@@ -1,9 +1,14 @@
-"""Find the KovaaK's stats directory on this machine, once, at startup.
+"""Find the KovaaK's stats directory on this machine.
 
 A Python port of the installer's ``Find-KovaaksStatsDir``, deleted when installs
 became non-interactive: Steam's roots come from the registry, each root's
-``libraryfolders.vdf`` names the other libraries, and the first library holding
-``steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`` wins.
+``libraryfolders.vdf`` names the other libraries, and every library holding
+``steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`` is a hit.
+
+The walk has two readers with different needs. Startup wants one answer and
+takes the first hit; the settings page wants all of them, because a machine
+carrying a stale second copy is exactly the case where the first hit is the
+wrong one and the user has to pick.
 
 The vdf is read with a flat ``"path"`` regex rather than a real parser -- the
 same expression the installer used, and no new dependency for a file this app
@@ -102,8 +107,13 @@ def _steam_libraries() -> list[str]:
     return libraries
 
 
-def detect_stats_dir() -> str | None:
-    """Find the KovaaK's stats directory, or None when there is nothing to find."""
+def detect_stats_dir_candidates() -> list[str]:
+    """List every KovaaK's stats directory on this machine, likeliest first.
+
+    Registry order, then each root's vdf order -- the same order the first-hit
+    detector walks, so the head of this list is what startup would have chosen.
+    """
+    candidates = []
     seen = set()
     for library in _steam_libraries():
         # A root reached through the registry and again through its own vdf is
@@ -115,8 +125,14 @@ def detect_stats_dir() -> str | None:
         seen.add(key)
         stats_dir = Path(library) / _STATS_SUBPATH
         if stats_dir.is_dir():
-            return str(stats_dir)
-    return None
+            candidates.append(str(stats_dir))
+    return candidates
+
+
+def detect_stats_dir() -> str | None:
+    """Find the KovaaK's stats directory, or None when there is nothing to find."""
+    candidates = detect_stats_dir_candidates()
+    return candidates[0] if candidates else None
 
 
 def bootstrap_stats_dir() -> None:
