@@ -74,6 +74,19 @@ sequence.
 
 ## Upcoming milestones
 
+- **Notification system redesign** — collapse the two notification
+  subsystems into one quiet-by-default toast layer: persistent conditions
+  render in-place, passive navigation never toasts an error, and each run
+  produces at most one verdict toast. The default configuration currently
+  produces a stacking wall of red error toasts plus a no-information "Graph
+  updated!" toast during normal play — and since the background-delivery
+  fix, formerly invisible diagnostic errors render too. Ships as three PRs
+  (noise kill → consolidation → copy rework); the noise kill alone resolves
+  the audit complaint. Design in
+  [`notification_system_proposal.md`](./notification_system_proposal.md)
+  (Proposed; sequencing ahead of run history is that proposal's third
+  decision needed).
+
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
   training session, and a scenario's full history over time (e.g. cold-start
