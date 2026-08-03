@@ -473,6 +473,62 @@ def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch)
     assert opened is False
 
 
+def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monkeypatch):
+    """The file is already unlinked, so the delete's own outcome is the report.
+
+    The dropped shown-set entry is bookkeeping with no observable consequence,
+    so there is deliberately no split-outcome message here. What matters is
+    that the request no longer fails: failing it would show nothing, and the
+    natural retry renders a red "Playlist Delete Failed" toast for a delete
+    that actually succeeded.
+    """
+    deleted = []
+    monkeypatch.setattr(
+        playlists,
+        "delete_user_playlist",
+        lambda code: deleted.append(code) or None,
+    )
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "User Label"
+    )
+
+    def refuse_to_write(_code):
+        raise PermissionError("locked by another process")
+
+    monkeypatch.setattr(playlists, "hide_playlist", refuse_to_write)
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert deleted == ["UserCode"]
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["title"] == "Playlist Deleted"
+    assert notifications[0]["message"] == 'Deleted "User Label" (UserCode).'
+    assert rows_refresh == 5
+    assert opened is False
+
+
+def test_playlists_overview_visibility_toggle_propagates_a_failed_write(monkeypatch):
+    """The toggle prints no claim, so it may keep propagating (PR #183 rule).
+
+    Nothing was committed and nothing false is displayed: the row is simply
+    never rebuilt, and the next click retries. Pinned so a future catch-all
+    "fix" cannot quietly turn this into a notification.
+    """
+    _trigger(monkeypatch, "playlists-overview-grid")
+
+    def refuse_to_write(_code):
+        raise PermissionError("locked by another process")
+
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", refuse_to_write)
+
+    with pytest.raises(PermissionError):
+        playlists.update_playlist_visibility(
+            {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4
+        )
+
+
 def test_confirm_delete_playlist_without_target_noops(monkeypatch):
     monkeypatch.setattr(
         playlists,
@@ -828,6 +884,54 @@ def test_import_playlist_success_message_uses_display_label(monkeypatch):
 
     assert notifications[0]["title"] == "Playlist Imported"
     assert notifications[0]["message"] == 'Imported "My Playlist" (CanonicalCode).'
+
+
+def test_import_playlist_reports_a_failed_visibility_write(monkeypatch):
+    """The playlist file is already written, so the import must still report.
+
+    An antivirus lock exhausts the atomic replace's retries and re-raises.
+    Letting that escape would fail the Dash request: no output applied, so the
+    user gets no confirmation at all for a playlist that did land on disk.
+    """
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(
+        playlists,
+        "load_playlist_from_code",
+        lambda _code: (None, "CanonicalCode"),
+    )
+    monkeypatch.setattr(
+        playlists, "get_playlist_display_label", lambda _code: "My Playlist"
+    )
+
+    def refuse_to_write(_code):
+        raise PermissionError("locked by another process")
+
+    enqueued = []
+    monkeypatch.setattr(playlists, "show_playlist", refuse_to_write)
+    monkeypatch.setattr(
+        playlists,
+        "enqueue_playlist_percentile_warmup",
+        enqueued.append,
+    )
+
+    notifications, import_refresh, opened, value, error = playlists.import_playlist(
+        1, "canonicalcode", 0
+    )
+
+    notification = notifications[0]
+    assert notification["color"] == "orange"
+    assert notification["id"] == "imported-playlist-visibility-failed-notification"
+    # Never generic "import failed" wording: the import succeeded, and the
+    # message names what landed plus the eye-toggle recovery.
+    assert notification["message"].startswith('Imported "My Playlist" (CanonicalCode).')
+    assert notification["message"].endswith(playlists.IMPORT_VISIBILITY_FAILED_HINT)
+    # Every other output matches the success path.
+    assert import_refresh == 1
+    assert opened is False
+    assert value == ""
+    assert error is None
+    # The playlist file exists, so the warmup enqueue must not be skipped.
+    assert enqueued == ["CanonicalCode"]
 
 
 def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):

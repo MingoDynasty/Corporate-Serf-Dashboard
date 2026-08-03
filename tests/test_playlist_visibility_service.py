@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from source.kovaaks import playlist_visibility_service as visibility
 
 
@@ -113,6 +115,32 @@ def test_non_list_shown_value_falls_back_to_seed(monkeypatch, tmp_path):
     assert visibility.get_shown_playlist_codes() == set(
         visibility.DEFAULT_VISIBLE_CODES
     )
+
+
+def test_a_failed_write_propagates_and_leaves_the_cached_set_intact(
+    monkeypatch,
+    tmp_path,
+):
+    """The write-before-cache ordering is what makes a later retry correct.
+
+    An antivirus lock exhausts the atomic replace's retries and re-raises. The
+    service deliberately propagates that (its callers decide what to report),
+    but it must not have already moved the in-memory set — otherwise the retry
+    would see the new value, early-return, and never write.
+    """
+    _use_tmp_visibility(monkeypatch, tmp_path, user_root_codes={"UserCode"})
+    before = visibility.get_shown_playlist_codes()
+
+    def refuse_to_write(_shown):
+        raise PermissionError("locked by another process")
+
+    monkeypatch.setattr(visibility, "_write_shown_to_disk", refuse_to_write)
+
+    with pytest.raises(PermissionError):
+        visibility.show_playlist("NewCode")
+
+    assert visibility.get_shown_playlist_codes() == before
+    assert not visibility.is_playlist_shown("NewCode")
 
 
 def test_visible_selector_options_filter_hidden_codes(monkeypatch):

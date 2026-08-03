@@ -62,6 +62,17 @@ HIDDEN_DUPLICATE_HINT = (
     ' It is currently hidden — toggle "Show hidden" on this page to unhide it.'
 )
 
+# Appended to the import toast when the playlist file landed but the visibility
+# write failed. The import itself succeeded, so the message must say so and then
+# name the one thing that did not happen, plus its recovery: the new code is
+# absent from the shown set, so its row renders as hidden and "Show hidden" is
+# what surfaces it before the eye toggle can be clicked.
+IMPORT_VISIBILITY_FAILED_HINT = (
+    " It could not be marked visible, so it may be missing from playlist"
+    ' selectors — toggle "Show hidden" on this page, then click its row\'s eye'
+    " icon to show it."
+)
+
 dash.register_page(
     __name__,
     path="/playlists",
@@ -421,6 +432,11 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     event, so it sets an inline field error rather than sending a notification;
     any non-empty submit clears that error. The phantom initial fire (guarded
     on ``ctx.triggered_id``/``n_clicks``) must leave the error untouched.
+
+    A failed visibility write does not fail the import: the playlist file is
+    already on disk, so the toast turns orange and reports the split outcome
+    rather than vanishing (see the 2026-08-02 committed-side-effect entry in
+    ``docs/decision_log.md``).
     """
     if ctx.triggered_id != "playlists-import-button" or not n_clicks:
         return no_update, no_update, no_update, no_update, no_update
@@ -451,8 +467,21 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     # canonical stored code, which can differ from the pasted input. The
     # is-not-None guard is defensive; the service contract guarantees a code
     # here, but never persist a None into the shown-set if that ever changes.
+    visibility_write_failed = False
     if canonical_code is not None:
-        show_playlist(canonical_code)
+        try:
+            show_playlist(canonical_code)
+        except OSError:
+            # The playlist file is already written — an irreversible step that
+            # succeeded — so failing the request here would leave the user with
+            # no report at all for something that happened. Report the split
+            # outcome instead. The store is untouched (temp file plus atomic
+            # replace), so the code is simply absent from the shown set.
+            logger.exception(
+                "Failed to mark imported playlist '%s' as shown", canonical_code
+            )
+            visibility_write_failed = True
+        # Outside the try: the playlist file exists either way, so warm it.
         enqueue_playlist_percentile_warmup(canonical_code)
     # Name the imported playlist using the canonical stored code (never the
     # pasted input, which can differ in case) so the toast confirms exactly
@@ -461,14 +490,27 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     # pass one to the str-typed label lookup — if that ever changes.
     imported_code = canonical_code if canonical_code is not None else playlist_to_import
     label = get_playlist_display_label(imported_code)
-    notification = {
-        "action": "show",
-        "title": "Playlist Imported",
-        "message": f'Imported "{label}" ({imported_code}).',
-        "color": "green",
-        "id": "imported-playlist-successful-notification",
-        "icon": local_icon("material-symbols:upload"),
-    }
+    imported_message = f'Imported "{label}" ({imported_code}).'
+    if visibility_write_failed:
+        notification = {
+            "action": "show",
+            "title": "Playlist Imported — Not Shown",
+            "message": imported_message + IMPORT_VISIBILITY_FAILED_HINT,
+            "color": "orange",
+            "id": "imported-playlist-visibility-failed-notification",
+            "icon": local_icon("material-symbols:upload"),
+        }
+    else:
+        notification = {
+            "action": "show",
+            "title": "Playlist Imported",
+            "message": imported_message,
+            "color": "green",
+            "id": "imported-playlist-successful-notification",
+            "icon": local_icon("material-symbols:upload"),
+        }
+    # Every other output matches the success path: the import happened, so the
+    # grid rebuilds and the modal closes with a cleared field either way.
     return [notification], (rows_refresh or 0) + 1, False, "", None
 
 
@@ -527,7 +569,9 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     is left untouched. On success the visibility membership is dropped too
     (in a show-list, forgetting a code IS removing its membership — this keeps
     playlist_visibility.json from accumulating dead codes) and the refresh store bumps
-    so the deleted row disappears without a page reload.
+    so the deleted row disappears without a page reload. A failed visibility
+    write is logged and otherwise ignored: the delete is what the toast reports
+    (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log.md``).
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     still fire once on initial page load despite ``prevent_initial_call``, so a
@@ -549,7 +593,19 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
             "id": "deleted-playlist-failed-notification",
         }
         return [notification], no_update, False
-    hide_playlist(target_code)
+    try:
+        hide_playlist(target_code)
+    except OSError:
+        # Membership bookkeeping only, and it has no observable consequence: the
+        # row is gone either way, a dead code renders nowhere, and a later
+        # re-import early-returns on the still-shown code. So log it and still
+        # report the delete — the outcome the user actually asked about, and
+        # which has already committed. Failing the request instead would show
+        # nothing, and the natural retry deletes an absent file and renders a
+        # red "delete failed" toast for a delete that succeeded.
+        logger.exception(
+            "Failed to drop deleted playlist '%s' from the shown set", target_code
+        )
     notification = {
         "action": "show",
         "title": "Playlist Deleted",
