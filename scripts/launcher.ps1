@@ -119,18 +119,27 @@ function Get-LatestTag {
 }
 
 function Get-ReleaseInfo([string]$Tag) {
+    # Returns the parsed release plus the bytes it was parsed from:
+    # Install-ReleaseVersion copies those bytes verbatim into the version
+    # directory, and re-serializing the parsed object would not be verbatim.
     # GitHub serves release assets as octet-stream, so .Content may be bytes.
     $raw = (Invoke-WebRequest -UseBasicParsing -TimeoutSec 30 `
             -Uri "$DownloadBase/$Repo/releases/download/$Tag/release.json").Content
-    if ($raw -is [byte[]]) { $raw = [System.Text.Encoding]::UTF8.GetString($raw) }
-    $release = $raw | ConvertFrom-Json
+    if ($raw -is [byte[]]) {
+        $bytes = $raw
+        $text = [System.Text.Encoding]::UTF8.GetString($raw)
+    } else {
+        $text = [string]$raw
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
+    }
+    $release = $text | ConvertFrom-Json
     if ([int]$release.schema_version -ne 1) {
         throw "unsupported release schema_version '$($release.schema_version)'"
     }
     foreach ($field in 'tag', 'sha', 'commit_date', 'uv_version', 'source_asset') {
         if (-not $release.$field) { throw "release.json is missing '$field'" }
     }
-    return $release
+    return [pscustomobject]@{ Release = $release; RawBytes = $bytes }
 }
 
 function Install-UvVersion([string]$UvVersion) {
@@ -158,7 +167,7 @@ function Install-UvVersion([string]$UvVersion) {
     return $uvExe
 }
 
-function Install-ReleaseVersion($Release, [string]$UvExe) {
+function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe) {
     # Download + extract the release into versions\<tag> and sync its venv.
     $tag = [string]$Release.tag
     $versionsDir = Join-Path $InstallRoot 'versions'
@@ -198,6 +207,13 @@ function Install-ReleaseVersion($Release, [string]$UvExe) {
     Move-Item -LiteralPath $top[0].FullName -Destination $targetDir
     Remove-Item -LiteralPath $extractDir -Recurse -Force
     Remove-Item -LiteralPath $zipPath -Force
+
+    # Leave the release description beside the code it describes, so the trial
+    # run can name its own tag -- the manifest still names the previous version
+    # until this one is promoted. Byte-verbatim (never re-serialized): the app
+    # reads it as the release published it, and the stamp check above
+    # corroborates it right here.
+    [System.IO.File]::WriteAllBytes((Join-Path $targetDir 'release.json'), $ReleaseBytes)
 
     Write-Host "Installing dependencies for $tag ..."
     & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
@@ -394,9 +410,9 @@ try {
 
         if ($latestTag -and $latestTag -ne $runTag) {
             Write-Host "Update available: $runTag -> $latestTag"
-            $release = $null
+            $releaseInfo = $null
             try {
-                $release = Get-ReleaseInfo $latestTag
+                $releaseInfo = Get-ReleaseInfo $latestTag
             } catch {
                 # Wire-contract failure (unknown schema_version, parse error,
                 # missing fields): fail open, but LOUDLY -- silent permanent
@@ -410,11 +426,12 @@ try {
                 Write-Host ('=' * 74) -ForegroundColor Yellow
             }
 
-            if ($release) {
+            if ($releaseInfo) {
+                $release = $releaseInfo.Release
                 $pending = $null
                 try {
                     $uvExe = Install-UvVersion ([string]$release.uv_version)
-                    $newDir = Install-ReleaseVersion $release $uvExe
+                    $newDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
 
                     # Pending activation: the new version starts unpromoted;
                     # the manifest still names the previous version until the

@@ -355,11 +355,14 @@ flowchart LR
   variable, which is how an updater tells "my new process is up" apart from
   "something else answers on this port".
 - `utilities/build_info.py` — `get_build_info()`: the single source of build
-  identity (tag, commit SHA, commit date), read once per process from
-  `install.json`, then the `git archive`-expanded `version.txt` stamp, then
-  `git`, then `unknown`. The manifest wins only when it corroborates the
-  running code (its `sha` equals the stamp's), because an install's manifest
-  still names the previous version while a new one is on trial. Feeds the
+  identity (tag, commit SHA, commit date), read once per process from the
+  `release.json` copy the installer/launcher stage into the version directory,
+  then `install.json`, then the `git archive`-expanded `version.txt` stamp,
+  then `git`, then `unknown`. Both JSON layers answer only when they
+  corroborate the running code (their `sha` equals the stamp's); the staged
+  copy is read first because it is written beside the code before that version
+  ever runs, whereas an install's manifest still names the previous version
+  while a new one is on trial. Feeds the
   startup log line, the header tooltip, the browser title, and `/health`.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications; records logged outside a callback context are queued and
