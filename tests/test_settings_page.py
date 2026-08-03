@@ -8,6 +8,7 @@ import pytest
 from dash import no_update
 
 from source.config import settings_service
+from source.utilities.build_info import BuildInfo
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -338,6 +339,33 @@ def test_the_notice_survives_a_page_revisit(clicked, tmp_path):
 
     assert notice.children == settings_page.RESTART_NOTICE
     assert notice.className == settings_page.RESTART_NOTICE_CLASS
+
+
+def test_the_page_names_the_running_build(monkeypatch):
+    """Straight off ``BuildInfo``: the page re-derives no part of the identity.
+
+    Patched on this module rather than on ``build_info``: the resolver is
+    ``@cache``d, so the source module's copy may already have answered.
+    """
+    monkeypatch.setattr(
+        settings_page,
+        "get_build_info",
+        lambda: BuildInfo(
+            sha="0123456789abcdef",
+            commit_date="2026-08-02",
+            tag="v2026.08.02.1",
+            source="release-file",
+        ),
+    )
+
+    page = settings_page.layout()
+
+    assert _component_by_id(page, "app-settings-version").children == (
+        "Version v2026.08.02.1"
+    )
+    assert _component_by_id(page, "app-settings-build").children == (
+        "0123456 (2026-08-02)"
+    )
 
 
 def test_a_settled_process_renders_no_notice(tmp_path):

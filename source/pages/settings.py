@@ -25,6 +25,7 @@ from source.config.settings_service import (
 )
 from source.config.stats_dir_detection import detect_stats_dir_candidates
 from source.kovaaks.percentile_warmup_service import start_percentile_warmup_worker
+from source.utilities.build_info import get_build_info
 
 logger = logging.getLogger(__name__)
 
@@ -222,6 +223,29 @@ def _settings_input(
     )
 
 
+def _version_section() -> dmc.Stack:
+    """Name the running build: the release label, then the commit detail.
+
+    Static text read straight off ``BuildInfo`` — the identity is resolved once
+    per process by one reader, and nothing here re-derives any part of it. It
+    answers "which version am I running?" after an update, and gives a bug
+    report something to quote.
+    """
+    build = get_build_info()
+    return dmc.Stack(
+        children=[
+            dmc.Text(f"Version {build.release_label}", id="app-settings-version"),
+            dmc.Text(
+                build.short_description,
+                id="app-settings-build",
+                c="dimmed",
+                size="sm",
+            ),
+        ],
+        gap="xs",
+    )
+
+
 def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
     """Build the stats-directory field: free text plus detected suggestions.
 
@@ -290,6 +314,8 @@ def layout(**kwargs):  # noqa: ARG001
                 id="app-settings-restart-notice",
                 className=notice_class,
             ),
+            dmc.Divider(),
+            _version_section(),
         ],
         gap="md",
     )
