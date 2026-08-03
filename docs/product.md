@@ -123,6 +123,16 @@ list in the roadmap.)
 
 ### Getting data in
 
+- **Settings page, and a stats folder the app finds itself** (`/settings`, PRs
+  #181–#184). The stats folder, KovaaK's username, and Steam ID are edited in
+  the app and stored in a file the app owns; a start with nothing configured
+  looks the stats folder up on this machine and stores what it finds. *Problem
+  solved:* configuring the dashboard used to mean finding a TOML file and
+  typing a Steam library path into it, and a moved Steam library turned that
+  chore into a dashboard that refused to start. It now starts regardless —
+  empty pages and a hint pointing at Settings when there is nothing to show —
+  and usually needs no configuration at all. Changes that cannot safely take
+  effect under a running app say "restart to apply" instead of pretending.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the Home Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the
@@ -153,8 +163,9 @@ list in the roadmap.)
 
 - **One-line install with a self-updating shortcut** (PRs #155, #159, #163).
   The whole install is one line pasted into PowerShell: it brings its own
-  Python and uv, finds the KovaaK's stats folder itself, and leaves a desktop
-  shortcut. Each launch updates to the newest release before starting, and
+  Python and uv, asks nothing at all, and leaves a desktop shortcut (finding
+  the KovaaK's stats folder moved into the app itself, above). Each launch
+  updates to the newest release before starting, and
   quietly runs the version already installed when there's no internet.
   *Problem solved:* the audience is Windows gamers, not Python developers —
   "clone the repo, install uv, run `uv sync`" excluded most of them. Everything

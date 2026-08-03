@@ -27,6 +27,7 @@ from source.config.settings_service import (
     get_usable_stats_dir,
     resolve_stats_dir,
 )
+from source.config.stats_dir_detection import bootstrap_stats_dir
 from source.health import register_health_endpoint
 from source.kovaaks.api_service import set_request_timeout
 from source.kovaaks.data_service import (
@@ -253,6 +254,10 @@ def main() -> None:
     # Fold the bundled corpus's embedded leaderboard IDs into the permanent
     # name->ID mapping cache before any rank lookup needs them.
     seed_leaderboard_ids_from_bundled_corpus()
+
+    # Detect the stats directory when nothing ever configured one -- before the
+    # pin below, so a first detection serves this boot instead of the next one.
+    bootstrap_stats_dir()
 
     # Resolve the stats directory once, here: it is restart-scoped, and every
     # consumer reads the pin for the rest of the process (resolve_stats_dir).
