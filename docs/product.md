@@ -173,12 +173,20 @@ list in the roadmap.)
   the shortcut.
 - **Every build says what it is, and installer-era releases can be rolled back**
   (PRs #154, #158, #159). Releases are dated, immutable, and kept forever; the
-  running build records its commit in the log and shows it in the header
-  tooltip. *Problem solved:* a bug report couldn't be tied to a version, and a
-  bad push had no "go back to yesterday" — installing an older tag now pins it
-  there until the user opts back into updates. Rollback targets must ship the
-  installer and launcher, so `v2026.07.19.4` is the earliest; older tags
-  predate that contract and their installs abort.
+  running build records its commit in the log. *Problem solved:* a bug report
+  couldn't be tied to a version, and a bad push had no "go back to yesterday" —
+  installing an older tag now pins it there until the user opts back into
+  updates. Rollback targets must ship the installer and launcher, so
+  `v2026.07.19.4` is the earliest; older tags predate that contract and their
+  installs abort.
+- **The version is on the Settings page** (PRs #188, #190). The page names the
+  release tag, with the commit it was built from underneath, and a freshly
+  updated app knows its own tag from its first session. *Problem solved:* the
+  two moments anyone wants a version are right after an update ("the console
+  said it updated — did it?") and while writing a bug report, and until now the
+  answer sat in a tooltip on the header's GitHub icon, where nobody looks. It
+  used to read "unknown" for the whole session after an update — exactly when
+  it was most likely to be checked, and exactly the look of a failed update.
 
 ## Where it's going
 

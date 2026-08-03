@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Version display** — the Settings page now names the running build: the
+  release tag, with the commit it came from underneath. A freshly updated app
+  knows its own tag from its first session, because the installer and launcher
+  leave a copy of the release description beside each installed version at
+  download time. Checking whether an update landed, or quoting a version in a
+  bug report, no longer means hovering the header's GitHub icon. (PRs #188,
+  #190; design in #187) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **In-app settings** — the stats folder, KovaaK's username, and Steam ID moved
   out of the hand-edited `config.toml` into an app-owned store with a Settings
   page that edits all three. The app now starts and serves whatever its stats
@@ -46,9 +54,9 @@ sequence.
   line that brings its own Python and uv, finds the KovaaK's stats folder, and
   leaves a desktop shortcut that updates itself on launch. Every push to `main`
   that changes runtime code publishes an immutable CalVer release, and every
-  build now identifies itself in the log, the header tooltip, and `/health`, so
-  a bug report names a version and any installer-era release (`v2026.07.19.4`
-  and later) can be rolled back to. Turns "clone the repo and run uv" into
+  build identifies itself in the log and `/health`, so a bug report names a
+  version and any installer-era release (`v2026.07.19.4` and later) can be
+  rolled back to. Turns "clone the repo and run uv" into
   something a non-technical player can do.
   (PRs #154, #155, #158, #159, #163; design in #150) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
@@ -58,10 +66,6 @@ sequence.
   paused/fatal status while rows update live. Unhiding or importing a playlist
   moves its played scenarios to the front without blocking the page. (PRs
   #129, #130, #132, #133; design in #128)
-- **Progressive playlist position fill** — opening a playlist now paints the
-  full local/cache-backed table immediately, then streams Position, Total
-  Players, and Percentile updates into stable rows with visible progress and
-  aggregate outage/interruption summaries. (PR #127)
 
 ---
 

@@ -13,6 +13,73 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-02: The Settings Page Owns Version Display
+
+Status: Accepted
+
+The app's version now appears on the settings page — the release tag on one
+line, the commit it was built from on the next — instead of hiding in a
+tooltip on the header's GitHub icon. Anyone checking which version they are
+running, or quoting one in a bug report, can look somewhere they would think
+to look. The section is plain text: it shows what the app already knew about
+itself and asks the network nothing.
+
+Decision (PR #190): the settings page is the venue for build identity, and
+`github_component`'s tooltip reverts to a plain "View this app on GitHub".
+The build suffix was an explicit stopgap — identity shipped (PR #154) before
+any page existed that could own the display, and information behind a hover
+on a repo link is found by accident rather than on purpose. A separate About
+page was considered and rejected in the same call: a nav destination for three
+lines of static text is not worth the space, and the settings page
+([entry](#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page))
+is already the "about this install" home.
+
+The section is static text built with the page layout from
+`BuildInfo.release_label` (the CalVer tag, `dev` in a source checkout, or
+`unknown`) and `BuildInfo.short_description` (short SHA and commit date). It
+re-derives no part of the identity, owns no callback, and makes no request.
+Identity resolution is unchanged: the stage-time `release.json` copy and the
+full precedence live in
+[Build Identity Comes From The Manifest](#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp),
+whose surfaces list this entry rewrites.
+
+Sequencing behind that mechanism (PR #188) was a hard dependency, not a
+preference. Post-update verification — "the console said it updated to vX; did
+it work?" — is the display's peak-usage moment, and a version line reading
+`unknown` exactly then looks like a failed update and manufactures the
+confused bug reports the display exists to prevent.
+
+Support boundary for that guarantee (maintainer, adjudicating the PR #187
+review): the app has a single-user install base, so update paths originating
+from releases that predate PR #188 are out of support. The guarantee holds
+whenever the launcher staging the update is PR #188's or newer. An install
+still on an older release stages its next update without the copy, so that
+one trial session shows `unknown`; it self-heals at the next launch, and
+permanently once a newer launcher stages the following update. Both escape
+hatches already exist — launch again, or re-run the install one-liner. With a
+single-user install base this is documented rather than engineered around.
+
+Rejected alternatives:
+
+- **Delivering `release.json` inside the release archive**, so launchers
+  predating the copy step still receive the metadata. The zip is pure
+  `git archive` output — the only producer that expands the `version.txt`
+  stamp — so injecting a generated file means the release job post-processes
+  the archive and a second identity artifact must be validated before
+  publish. Its only beneficiary is the out-of-support path above. Rejected
+  with that boundary, not forever: if the boundary widens, this is the
+  mechanism to revisit.
+- **An update-availability check on the page** ("newest release is vX"). It
+  needs a network call from a page that makes none, plus policy decisions
+  (when to check, what to cache) that nothing here requires. Out of scope,
+  not rejected forever.
+- **A multi-entry `install.json`** with per-version records and an `is_active`
+  flag — already recorded, and still rejected, in the entry linked above.
+
+Deliberately not shown: the update policy (automatic, or pinned to a tag). It
+is a cheap manifest read, but it only repeats a fact the user set themselves
+via the installer; skipped until asked for.
+
 ## 2026-08-02: A Committed Side Effect Reports Its Outcome Even When A Later Write Fails
 
 Status: Accepted
@@ -535,7 +602,9 @@ build report the old version. Since 2026-08-02 the installer and launcher also
 leave a copy of the release description next to each installed version, which
 is what lets a freshly updated app name its own release right away. Someone
 updating the app now sees the right version reported from the first session
-rather than a session later.
+rather than a session later. Where they see it is the settings page, which
+since 2026-08-02 shows the running version; the header GitHub link's tooltip
+used to carry it and no longer does.
 
 Decision: one reader (`source/utilities/build_info.py`) resolves the running
 build's identity, and every user-visible build string derives from it. The
@@ -581,12 +650,25 @@ committed file needs a comment header (a raw placeholder looks broken to anyone
 browsing the repo), and `export-subst` output is not JSON-escaped, so a JSON
 envelope would silently constrain future placeholders to escape-safe expansions.
 
-Identity surfaces in three places, chosen to cost no screen real estate: a
-startup line in `data/logs/debug.log` (bug reports arrive with the log), the
-existing GitHub icon tooltip in the header, and the browser title (which now
-derives from `BuildInfo` instead of advertising a static `v1.0.0`). A footer or
-an app-settings page was rejected as spending permanent space on a string read
-once per bug report.
+Identity surfaces in three places: a startup line in `data/logs/debug.log`
+(bug reports arrive with the log), the `/health` endpoint, and — since
+2026-08-02 (PR #190) — a version section on the settings page.
+
+**That surfaces list is corrected and superseded (2026-08-02, PR #190).** It
+originally named the header GitHub icon's tooltip and the browser title, and
+rejected an app-settings page as spending permanent space on a string read
+once per bug report. Two changes:
+
+- The tooltip suffix is gone; the label is a plain "View this app on GitHub"
+  again. Hanging version information off a hover on a repo link is an
+  affordance failure — it was a stopgap chosen only because no page existed to
+  own the display, and the settings page (PRs #181–#184) now does. The
+  space objection died with it: the section costs nothing on a page the user
+  opened deliberately.
+- The browser-title claim was factually wrong. Dash Pages sets a per-page
+  title on every navigation, so `document.title` never carried build identity
+  in practice. The tab title stays deliberately unversioned — the correction
+  is to this claim, not to the title.
 
 Why not have CI commit a version file on every push: the commit changes the SHA,
 so the file always describes its own parent; it doubles commit traffic; and it

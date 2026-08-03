@@ -269,6 +269,9 @@ flowchart LR
   filter is overridden (`allOptions` in `assets/dashMantineFunctions.js`)
   because Mantine's default matches options against the input text, which would
   leave the normally-prefilled field offering only the path it already holds.
+  Below the form, a static version section names the running build from
+  `utilities/build_info.py` — release label, then short SHA and commit date —
+  with no callback and no network.
   Validation is offline only
   (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
   above the universe-1 base); a save writes all three keys,
@@ -372,7 +375,7 @@ flowchart LR
   copy is read first because it is written beside the code before that version
   ever runs, whereas an install's manifest still names the previous version
   while a new one is on trial. Feeds the
-  startup log line, the header tooltip, the browser title, and `/health`.
+  startup log line, `/health`, and the settings page's version section.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
   notifications; records logged outside a callback context are queued and
   drained by a Home interval callback, so background threads can log too),
