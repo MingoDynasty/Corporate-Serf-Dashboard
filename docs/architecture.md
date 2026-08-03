@@ -269,6 +269,19 @@ flowchart LR
   filter is overridden (`allOptions` in `assets/dashMantineFunctions.js`)
   because Mantine's default matches options against the input text, which would
   leave the normally-prefilled field offering only the path it already holds.
+  A Detect button beside the identity fields runs
+  `config/identity_detection.py` behind a `running=` spinner — the page's only
+  network action, deliberately off the render path — and presents what comes
+  back: exactly one candidate from a run with nothing unresolved (no unchecked
+  probes, complete account discovery) fills both identity inputs, and anything
+  less certain populates a hidden-by-default `dmc.RadioGroup` picker whose rows
+  carry the canonical username plus the persona and last-seen stamp, in engine
+  order. Picking one fills the same two inputs from a `dcc.Store` copy of the
+  result, so no second detection is spent. Both callbacks are
+  `n_clicks`/`triggered_id`-guarded (DashProxy initial-call hazard), neither
+  writes the store, and neither logs a persona. The status line keeps the
+  conclusive no-match message for the one outcome that ruled everything out;
+  unchecked probes and unreadable account lists each say so in their own words.
   Below the form, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
   with no callback and no network.
@@ -431,5 +444,5 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles, which the page runs behind its Detect button |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |
