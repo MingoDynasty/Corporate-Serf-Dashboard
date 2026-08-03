@@ -6,10 +6,10 @@ else on the board. Placements are cached for a week and re-checked
 automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
-no username configured it makes no network calls at all. Anything the
-player needs to know about the displayed position — that it came from a
-cache, that the lookup failed, that no username is set — is written beside
-the value itself, never announced in a pop-up notification.
+no username configured it makes no network calls at all. During normal
+play the field explains its own state beside the value rather than
+interrupting with a pop-up notification. A Refresh the player clicks
+still answers with one, because they asked for it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives

@@ -32,7 +32,7 @@ list in the roadmap.)
   runs grouped by sensitivity. *Problem solved:* "is my current sensitivity
   actually better?" and "am I trending up on this scenario?" are answered
   visually instead of by gut feel.
-- **Run notifications.** When a new run lands, a toast reports it. Two
+- **Run notifications.** A new run gets a toast when it earns one of two
   conditional classifications: a top-N placement within the run's sensitivity
   ("40.2 cm/360 has a new 2nd place score"), shown when the run makes the
   configured top N for the on-screen scenario; and a score-threshold
