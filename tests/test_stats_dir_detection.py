@@ -169,6 +169,61 @@ def test_a_vdf_holding_no_paths_contributes_no_libraries(roots, tmp_path):
     assert detection.detect_stats_dir() is None
 
 
+def test_every_library_holding_the_game_becomes_a_candidate(roots, tmp_path):
+    """The settings page offers all of them; the order is the detector's."""
+    root = _library(tmp_path / "Steam")
+    stale = _library(tmp_path / "D" / "SteamLibrary")
+    empty = _library(tmp_path / "E" / "SteamLibrary", with_game=False)
+    _write_structured_vdf(root, [empty, stale])
+    roots(root)
+
+    assert detection.detect_stats_dir_candidates() == [
+        str(root / STATS_SUBPATH),
+        str(stale / STATS_SUBPATH),
+    ]
+
+
+def test_the_first_candidate_is_what_startup_detects(roots, tmp_path):
+    """The contract the bootstrap and the pin depend on, pinned against drift."""
+    root = _library(tmp_path / "Steam")
+    _library(tmp_path / "D" / "SteamLibrary")
+    _write_structured_vdf(root, [tmp_path / "D" / "SteamLibrary"])
+    roots(root)
+
+    assert detection.detect_stats_dir() == str(root / STATS_SUBPATH)
+    assert detection.detect_stats_dir() == detection.detect_stats_dir_candidates()[0]
+
+
+def test_one_library_reached_several_ways_is_one_candidate(roots, tmp_path):
+    """Two registry spellings plus its own vdf must not triple the suggestions."""
+    root = _library(tmp_path / "Steam")
+    _write_structured_vdf(root, [root, Path(f"{root}\\")])
+    roots(root, Path(str(root).replace("\\", "/")))
+
+    assert detection.detect_stats_dir_candidates() == [str(root / STATS_SUBPATH)]
+
+
+def test_a_single_library_yields_a_single_candidate(roots, tmp_path):
+    root = _library(tmp_path / "Steam")
+    roots(root)
+
+    assert detection.detect_stats_dir_candidates() == [str(root / STATS_SUBPATH)]
+
+
+def test_no_steam_at_all_yields_no_candidates(roots):
+    roots()
+
+    assert detection.detect_stats_dir_candidates() == []
+
+
+def test_steam_without_the_game_yields_no_candidates(roots, tmp_path):
+    root = _library(tmp_path / "Steam", with_game=False)
+    _write_structured_vdf(root, [_library(tmp_path / "Other", with_game=False)])
+    roots(root)
+
+    assert detection.detect_stats_dir_candidates() == []
+
+
 def test_every_registry_hit_becomes_a_root(monkeypatch):
     """Both HKLM views can name different installs; all of them are candidates."""
     found = {

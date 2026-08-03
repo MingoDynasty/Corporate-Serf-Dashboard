@@ -152,7 +152,10 @@ Everything else you might want to change lives on the dashboard's own
 **Settings** page: where your KovaaK's stats live, and who you are on the
 leaderboards. The stats folder is usually filled in for you on the first start
 — the dashboard finds it through Steam — so the page is mostly there for the
-cases it could not, and for turning the leaderboard features on.
+cases it could not, and for turning the leaderboard features on. If you have
+KovaaK's in more than one Steam library, the stats folder box suggests each one
+it found, so picking the right copy is a click rather than a hunt through
+Explorer.
 
 The page writes `data/settings.json`, the app-owned file beside `config.toml`
 (installed: `%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). You

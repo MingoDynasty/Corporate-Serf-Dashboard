@@ -67,9 +67,18 @@ sequence.
 
 ## Upcoming milestones
 
-Nothing is actively in progress right now. The sequenced next candidate is
-**Run history and sessions** (see Future); it will be promoted here with a
-full entry when work on it starts.
+- **Settings detection** — the Settings page stops asking users to type what
+  the machine already knows. The stats-directory field suggests every Steam
+  library holding a KovaaK's stats folder, so a wrong first-start pick is a
+  click to repair instead of a path dug out of Explorer by hand; a Detect
+  button then finds the local Steam accounts that have a real KovaaK's
+  profile and fills in the verified username and Steam ID. Three PRs:
+  stats-directory candidates, the identity detection engine, then the
+  identity UI. Design in [`settings_detection_proposal.md`](./settings_detection_proposal.md)
+  (PR #186). The guided first-run flow is deliberately a later proposal.
+
+The sequenced next candidate after this is **Run history and sessions** (see
+Future).
 
 ---
 

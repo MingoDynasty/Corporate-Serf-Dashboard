@@ -28,6 +28,23 @@ def quiet_warmup(monkeypatch):
     return calls
 
 
+@pytest.fixture(autouse=True)
+def candidates(monkeypatch):
+    """Declare what the machine's Steam holds; no test reads the real registry.
+
+    Autouse because ``layout`` detects on every visit, and a dev machine with
+    KovaaK's installed would otherwise leak its own paths into every render
+    assertion. Mutate the returned list to change what detection reports.
+    """
+    found = [r"S:\SteamLibrary\steamapps\common\FPSAimTrainer\FPSAimTrainer\stats"]
+    monkeypatch.setattr(
+        settings_page,
+        "detect_stats_dir_candidates",
+        lambda: list(found),
+    )
+    return found
+
+
 @pytest.fixture
 def clicked(monkeypatch):
     """Report the save button as the trigger, the way a real click does."""
@@ -79,6 +96,42 @@ def test_the_steam_id_field_is_never_a_number_input():
     field = _component_by_id(settings_page.layout(), "app-settings-steam-id")
 
     assert type(field).__name__ == "TextInput"
+
+
+def test_detected_directories_are_offered_as_suggestions(candidates, tmp_path):
+    """Suggestions never disturb the stored value: they sit under the field."""
+    candidates[:] = [str(tmp_path / "primary"), str(tmp_path / "second")]
+    settings_service.save_settings({"stats_dir": str(tmp_path / "typed")})
+
+    field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
+
+    assert type(field).__name__ == "Autocomplete"
+    assert field.data == candidates
+    assert field.value == str(tmp_path / "typed")
+
+
+def test_a_prefilled_field_still_offers_the_other_libraries(candidates, tmp_path):
+    """The wrong-library repair is the whole point, and it starts prefilled.
+
+    Mantine's default filter matches options against the input text, so the
+    seeded path would hide every alternative — the one case the suggestions
+    exist for. Pinned at the prop because the behavior lives in Mantine.
+    """
+    candidates[:] = [str(tmp_path / "primary"), str(tmp_path / "second")]
+    settings_service.save_settings({"stats_dir": str(tmp_path / "primary")})
+
+    field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
+
+    assert field.filter == settings_page.SHOW_EVERY_CANDIDATE
+
+
+def test_detecting_nothing_leaves_a_plain_text_field(candidates):
+    """A machine without Steam gets exactly the field that shipped."""
+    candidates.clear()
+
+    field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
+
+    assert field.data == []
 
 
 def test_unset_settings_render_empty_fields():
