@@ -82,6 +82,155 @@ writes when the playlist was visible.
 Provenance: the PR #183 review and commit `bae99a5` (rule 1), and PR #185
 (rule 2 and the playlist call sites).
 
+## 2026-08-02: User Settings Live In An App-Owned Store With A Settings Page
+
+Status: Accepted
+
+Where the KovaaK's stats live, the KovaaK's username, and the Steam ID have
+moved out of the hand-edited configuration file into a small file the app
+owns and writes. A Settings page inside the app shows and changes all three,
+so ordinary use no longer needs a text editor. The configuration file keeps
+only what a person genuinely sets by hand, such as the port. An update never
+blocks on editing that file: keys a release no longer knows about are named
+in one warning and ignored.
+
+Decision — **one home, one writer**: every parameter lives in exactly one
+file, and every file has exactly one owner. `config.toml` is human-owned and
+app-read-only. `data/settings.json` is app-owned and written only through
+`source/config/settings_service.py`, whose mechanics mirror the playlist
+visibility store (module `RLock`, in-process cache, temp file + `fsync` +
+`replace_with_retry`, tolerant reads). Nothing else ever writes it — the
+installer included.
+
+The schema is flat, three string keys, no `schema_version`, no nesting.
+Unset semantics are deliberately flat too: a missing key, an empty value, and
+a missing, unreadable, or malformed file all mean *not configured* — no
+identity disables rank lookups, no usable `stats_dir` runs the app empty. A
+malformed file is warned about once, treated as holding no keys, and rewritten
+whole by the next save; it is never fatal. Hand-editing while the app is
+stopped stays a legitimate escape hatch, but edits made while it runs are not
+picked up, because reads are cached in-process. Only the bootstrap in the next
+entry distinguishes an absent key from an empty one.
+
+`ConfigData` therefore drops all three fields and `example.toml` drops their
+entries; the installed `config.toml` is `port` only. **Unknown `config.toml`
+keys are warn-logged and ignored** — a permanent design choice, not a
+transition shim. It is the removed-field mirror of the update contract's
+"releases must read older state" rule, and it is what makes every promotion
+boundary and every rollback safe by construction: a config carrying retired
+keys runs on both the outgoing and the incoming version. The governing rule
+follows from it — **through any promotion boundary, `config.toml` stays in a
+shape both versions can read, and cleanup happens only after promotion**. (An
+earlier revision claimed pydantic rejected unknown keys and would fail startup
+on an unmigrated config; that behavior never existed, and the warning replaces
+the imagined typo protection with visible, non-fatal feedback.) Migration is
+manual and never blocks an update, per the single-user no-compat-shims
+convention: there are no in-app migrations.
+
+The page at `/settings` edits the three values with one Save. The write is
+all-or-nothing — any field error writes nothing, so the store never holds half
+a form — and a successful save writes every key, empty string included, which
+is what keeps "cleared" distinguishable from "never set". Validation is
+offline only: `stats_dir` must be an existing directory or empty, and
+`steam_id` must be shaped like a SteamID64 (17 ASCII digits at or above the
+universe-1 base `76561197960265728`, tightened from digits-only as the arc
+shipped, because an account ID or a SteamID3 fragment is digits too). The
+username is free text; confirming it against KovaaK's is detection territory
+and belongs to a later proposal. The form is built per visit from the stored
+view rather than the pinned accessors, so it always shows what is on disk. A
+write that fails is caught and reported in the status line rather than
+escaping into a request the user cannot see. State-writing page callbacks are
+`n_clicks`-guarded with a None-trigger regression test, because under
+DashProxy a callback can still fire once on page load despite
+`prevent_initial_call`.
+
+Provenance: distilled from `docs/settings_store_and_page_proposal.md`
+(proposed in PR #171, register R1–R8, amended twice during review), shipped in
+PRs #181, #182, #183, and #184; the proposal file is deleted in the shipping
+PR and git history holds its full text.
+
+## 2026-08-02: Restart-Scoped Settings Are Pinned At Boot, And The Stats Folder Finds Itself
+
+Status: Accepted
+
+The app no longer has to be told where the KovaaK's stats folder is. On a
+start with nothing ever configured it looks the folder up the way the
+installer used to, stores what it finds, and uses it immediately. Settings
+that cannot safely change under a running app are frozen when it starts, so a
+saved change either applies at once or the Settings page says a restart is
+needed. The app also starts and serves with no stats folder at all, showing
+empty pages and a hint instead of refusing to run.
+
+Decision — **restart-scoped values are pinned, not re-read.** `stats_dir` is
+resolved once by server startup (`resolve_stats_dir`) and every consumer reads
+that pin (`get_usable_stats_dir`); a per-operation read would let a mid-run
+save move half the app to a new directory while the watchdog and the runs
+already in memory stayed on the old one. Whether the directory is usable is
+decided as part of that resolution, not per call, so a directory that appears
+mid-run — a network library coming online — cannot half-enable an app whose
+scan and watchdog were already skipped. A pin that was never resolved (tests,
+imports, any entry point that is not the real startup) reads exactly like an
+unset value.
+
+Identity is pinned as a **pair**, frozen by the first read that observes a
+configured username. Reading both fields together is what stops a lookup from
+straddling a save and resolving one player's rank into another's cache entry.
+Staying live until that first non-empty read is what lets a first-time
+identity set apply without a restart; a later change is restart-scoped
+instead, because the warmup worker keeps the context it started with and the
+caches it fills are scoped to one identity per process. `is_restart_pending()`
+derives the Settings page's notice by comparing the store against both pins,
+so the notice describes reality for every consumer and stands until the
+restart actually happens. It is derived, never stored. The app never restarts
+itself, and there is no live re-initialization of the watchdog, the warmup
+singleton, or the in-memory data — that machinery is the riskiest code this
+arc could have contained, and a restart costs one console close and a shortcut
+click.
+
+**The app starts without a usable stats directory.** Unset, and set but not an
+existing directory (the moved-library case), behave identically: startup skips
+the initial scan and the file watchdog, logs one line naming what was
+configured, and serves — only `port` is needed to serve pages. Home shows a
+hint linking to the settings page. The `SystemExit` that used to guard this is
+gone.
+
+**`stats_dir` bootstraps app-side**, replacing the detection deleted from the
+installer (see the 2026-08-02 addendum on the 2026-07-19 installer entry
+below, which this supersedes for stats-directory detection). On startup with
+the key **absent** — a missing file counts — the app collects Steam's install
+roots from the registry (`HKCU` `SteamPath`, then both `HKLM` `InstallPath`
+views, every hit kept), treats those roots as libraries, adds every `"path"`
+value from each root's `steamapps/libraryfolders.vdf`, and probes
+`<library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats` per unique
+library. The first existing directory is written through the settings service,
+merged with whatever is already stored. The bootstrap runs before the pin
+above, so a first detection serves the boot that made it. A miss writes
+nothing and is retried on the next start, so a dashboard installed before
+KovaaK's self-configures once KovaaK's appears. A present-but-empty value is
+never overridden: that is the user saying "run without run data" on the page,
+and the page writes every key on every save precisely so this distinction
+survives.
+
+The pick is silent — no confirmation step. On a machine with a stale copy in a
+second Steam library it can be wrong, which is immediately visible (empty or
+wrong data), fixable on the settings page, and properly solved by the
+follow-on proposal's candidate dropdown. The page shipping first is why the
+silent write is acceptable at all: the repair surface precedes it.
+
+The vdf is read with the installer's flat `"path"\s*"([^"]*)"` regex,
+unescaping `\\`, rather than with the `vdf` PyPI package: no new dependency
+for a file read once per start, the upstream package is unmaintained, and the
+regex ignores the file's structure by design. It harvests the per-library
+object format Steam writes today; a pre-structured file (numeric key to path)
+contributes no extra libraries, exactly as the installer behaved, and the
+Steam roots themselves are still probed. An unreadable or malformed vdf is
+logged and skipped, never fatal. The bootstrap runs only from the real server
+startup path, never at import, and the registry read is isolated in one
+function so no test ever touches the real registry.
+
+Provenance: same proposal and delivery arc as the entry above (PR #171;
+PRs #181, #182, #183, #184).
+
 ## 2026-08-01: Doc-Style Follow-Up — Decisions Needed, Roadmap Trim, No Log Index
 
 Status: Accepted
@@ -518,7 +667,9 @@ and file watchdog skipped, one log line naming what was configured, a hint on
 Home — plain text until the settings page shipped, a link to it since), and an
 app-side startup bootstrap that re-detects the directory
 follows in the same proposal. Between the two, a fresh install runs empty until
-the directory is set by hand. The `load_config()` round-trip through the
+the directory is set by hand. That bootstrap has since shipped — see the
+2026-08-02 pinning-and-bootstrap entry, which supersedes this addendum on
+stats-directory detection. The `load_config()` round-trip through the
 installed app is unchanged and still gates the install, now against the
 one-field file.
 

@@ -150,9 +150,19 @@ def test_cleared_fields_are_stored_as_empty_strings(clicked, quiet_warmup):
         # ``str.isdigit`` alone accepts these; no endpoint would.
         ("٧٦٥٦١", settings_page.STEAM_ID_ERROR),
         ("7656²", settings_page.STEAM_ID_ERROR),
+        # The realistic paste mistakes: an account ID and a SteamID3 fragment.
+        ("26448258", settings_page.STEAM_ID_ERROR),
+        ("[U:1:26448258]", settings_page.STEAM_ID_ERROR),
+        # Right length, below the universe-1 base -- not an account.
+        ("10000000000000000", settings_page.STEAM_ID_ERROR),
+        # The base itself is the first real SteamID64.
+        ("76561197960265728", None),
+        # One digit short and one digit long.
+        ("7656119798671398", settings_page.STEAM_ID_ERROR),
+        ("765611979867139866", settings_page.STEAM_ID_ERROR),
     ],
 )
-def test_steam_id_accepts_only_plain_digits(clicked, steam_id, expected_error):
+def test_steam_id_accepts_only_a_steam_id64(clicked, steam_id, expected_error):
     assert _save(steam_id=steam_id)[1] == expected_error
 
 

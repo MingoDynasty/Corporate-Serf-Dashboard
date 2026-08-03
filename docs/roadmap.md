@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **In-app settings** — the stats folder, KovaaK's username, and Steam ID moved
+  out of the hand-edited `config.toml` into an app-owned store with a Settings
+  page that edits all three. The app now starts and serves whatever its stats
+  folder is doing — unset, moved, or missing — instead of exiting, installs ask
+  no questions at all, and a start with nothing configured finds the KovaaK's
+  stats folder itself. Configuring the dashboard no longer means opening a text
+  editor. (PRs #181, #182, #183, #184; design in #171) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Leaderboard-ID seeding** — the bundled benchmark corpus now embeds each
   scenario's KovaaK's leaderboard ID, and the app seeds them into the permanent
   name→ID mapping cache at startup. First opens of unfamiliar bundled playlists
@@ -54,15 +62,6 @@ sequence.
   full local/cache-backed table immediately, then streams Position, Total
   Players, and Percentile updates into stable rows with visible progress and
   aggregate outage/interruption summaries. (PR #127)
-- **Playlist management & benchmark library** — the overview became the single
-  playlist-management surface: per-code show/hide filtering every dropdown, the
-  full importer-generated benchmark library shipped flat under
-  `resources/benchmarks/` with Voltaic + Viscose visible by default, and
-  overview-hosted import, delete (user playlists only), and cleanup of user
-  files superseded by bundled benchmarks. The whole library ships with the app
-  without flooding dropdowns, and playlists are managed in the app instead of
-  by copying files. (PRs #87, #90, #92, and #98) Design rationale distilled
-  into [`decision_log.md`](./decision_log.md).
 
 ---
 
