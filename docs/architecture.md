@@ -263,7 +263,10 @@ flowchart LR
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
   Save. The form is built per visit from the stored view (never the pinned
-  accessors) so it always shows what is on disk. Validation is offline only
+  accessors) so it always shows what is on disk. The stats-directory field is a
+  free-text `dmc.Autocomplete` whose suggestions are the detector's candidate
+  list, re-run on each visit; suggestions never bypass validation or Save.
+  Validation is offline only
   (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
   above the universe-1 base); a save writes all three keys,
   cold-starts the warmup worker when a username was saved, and re-derives the
@@ -345,9 +348,12 @@ flowchart LR
   the file.
 - `config/stats_dir_detection.py` — finds the KovaaK's stats directory on this
   machine (registry Steam roots → each root's `libraryfolders.vdf` → probe
-  `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`, first hit wins) and
-  seeds it (`bootstrap_stats_dir`, called from startup) when the `stats_dir`
-  key has never been set. An empty value is user intent and is never
+  `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`). One walk, two readers:
+  `detect_stats_dir_candidates` returns every library that hits, deduplicated
+  by normalized path and in roots-first order, which the settings page offers
+  as suggestions; `detect_stats_dir` is its first element, and seeds the value
+  (`bootstrap_stats_dir`, called from startup) when the `stats_dir` key has
+  never been set. An empty value is user intent and is never
   overridden; a miss writes nothing and is retried next start. The registry
   read is isolated in `_registry_value` so tests never touch the real registry.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
@@ -394,5 +400,5 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the startup detection that seeds the stats directory |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

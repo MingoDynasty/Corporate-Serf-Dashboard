@@ -1,6 +1,6 @@
 # Settings detection: verified identity and stats-directory candidates
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-02
 
 ## TL;DR
