@@ -1205,11 +1205,17 @@ def _find_matching_player(
     return None
 
 
-def _steam_id_mismatch_warning(
+def steam_id_mismatch_warning(
     username: str,
     configured_steam_id: str | None,
     matched_steam_id: str | None,
 ) -> str | None:
+    """Describe a Steam-ID mismatch, or return None when the identity agrees.
+
+    Public because the UI routes on the condition itself: the mismatch earns a
+    toast of its own, and re-deriving "is this a mismatch" from the warning
+    text would fork the identity rule this function owns.
+    """
     if (
         not configured_steam_id
         or not matched_steam_id
@@ -1231,7 +1237,7 @@ def _with_derived_rank_warning(
     """Attach transient UI warnings derived from current config and cached facts."""
     return rank_info.model_copy(
         update={
-            "warning_message": _steam_id_mismatch_warning(
+            "warning_message": steam_id_mismatch_warning(
                 username,
                 steam_id,
                 rank_info.matched_steam_id,

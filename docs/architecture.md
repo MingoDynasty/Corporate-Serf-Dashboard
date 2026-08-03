@@ -101,6 +101,30 @@ The UI is pull-based: a `dcc.Interval` on the home page drains the entire queue
 each tick and publishes one scenario-specific summary. `generate_graph` reads
 that summary and never accesses the queue directly.
 
+### Background threads never drive UI outputs
+
+Dash outputs — including the notification container's `sendNotifications` —
+belong to callbacks. A background thread that has something to say **publishes
+it to typed shared state that an interval callback polls**; it never reaches
+into the UI. There is deliberately no general event bus and no level-driven
+bridge: a channel carries one kind of event, and its consumer decides what, if
+anything, the user sees. Anything else lets a call site's log level stand in
+for the judgment of whether an event is worth interrupting someone for.
+
+The sanctioned channels, each typed and single-purpose:
+
+- `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only; its
+  consumer assumes run-specific fields.
+- `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
+  drained by a dedicated Home interval callback.
+- `file_watchdog.run_import_failure_queue` — run files the watchdog thread
+  could not import, drained by a Home interval callback into one red toast.
+- The JSON caches under `data/cache/` — the rank pipeline: refresh Timers
+  write, cache-only interval reads pick the value up on the next tick.
+
+A background event that fits none of these gets its own typed queue or polled
+state, not a field grafted onto someone else's schema.
+
 ## State
 
 - **Two filesystem roots** (`utilities/paths.py`). Every mutable path below is
@@ -406,9 +430,10 @@ flowchart LR
   ever runs, whereas an install's manifest still names the previous version
   while a new one is on trial. Feeds the
   startup log line, `/health`, and the settings page's version section.
-- `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
-  notifications; records logged outside a callback context are queued and
-  drained by a Home interval callback, so background threads can log too),
+- `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
+  the one builder for `sendNotifications` payloads: stable semantic id, title,
+  message, color, optional icon, and the shared auto-close duration —
+  `auto_close=False` for the conditions that must survive until dismissed),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
   `paths` (`state_dir()` / `package_root()` — see State above).

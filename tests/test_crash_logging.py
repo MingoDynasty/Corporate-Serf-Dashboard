@@ -72,17 +72,12 @@ def test_thread_hook_ignores_system_exit(monkeypatch, caplog):
 
 
 def test_on_created_survives_unexpected_error(monkeypatch, caplog):
-    notifications = []
-
-    def capture(message, *args):
-        notifications.append(message % args if args else message)
-
     def explode(_path):
         raise OSError("file still locked")
 
     monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
     monkeypatch.setattr(file_watchdog, "extract_data_from_file", explode)
-    monkeypatch.setattr(file_watchdog.dash_logger, "error", capture)
+    file_watchdog.run_import_failure_queue.clear()
 
     with caplog.at_level(logging.ERROR, logger=file_watchdog.logger.name):
         file_watchdog.NewFileHandler().on_created(
@@ -92,6 +87,9 @@ def test_on_created_survives_unexpected_error(monkeypatch, caplog):
     assert "Failed to process new stats file: run.csv" in caplog.text
     # exc_info rides along, so the traceback reaches debug.log.
     assert "file still locked" in caplog.text
-    assert notifications == [
+    # The watchdog thread has no callback context, so it publishes the failure
+    # for Home's interval callback to drain rather than driving a UI output.
+    assert file_watchdog.drain_run_import_failures() == [
         "Could not process a new run file. See debug.log for details."
     ]
+    assert file_watchdog.drain_run_import_failures() == []
