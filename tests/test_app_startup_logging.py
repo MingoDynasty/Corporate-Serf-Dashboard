@@ -10,6 +10,11 @@ from source.utilities.paths import STATE_DIR_ENV_VAR
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
+UNSET_USERNAME_NOTICE = (
+    "KovaaK's username not configured -- scenario position lookups "
+    "disabled (set it in Settings)."
+)
+
 # Crash both a worker thread and the main thread in one process: the two
 # hooks are independent, and debug.log must show both tracebacks.
 CRASH_SNIPPET = """
@@ -54,6 +59,16 @@ def _debug_log(state_root: Path) -> str:
     return (state_root / "data" / "logs" / "debug.log").read_text(encoding="utf-8")
 
 
+def _debug_log_if_written(state_root: Path) -> str:
+    """Read debug.log, or "" when nothing was logged.
+
+    The rotating handlers open lazily, so a run that logs nothing at all
+    leaves no file behind -- which is itself a pass for absence assertions.
+    """
+    log_file = state_root / "data" / "logs" / "debug.log"
+    return log_file.read_text(encoding="utf-8") if log_file.exists() else ""
+
+
 def test_uncaught_crashes_reach_the_log_files(tmp_path: Path) -> None:
     result = _run_in_app(CRASH_SNIPPET, tmp_path)
 
@@ -77,6 +92,33 @@ def test_unreadable_config_reaches_the_log_files(tmp_path: Path) -> None:
     assert result.returncode == 1
     assert "Configuration error" in result.stderr
     assert "Configuration error" in _debug_log(tmp_path)
+
+
+def test_unset_username_is_reported_once_at_startup(tmp_path: Path) -> None:
+    # Row 1's console half: an unset username is a supported state, so it is
+    # said once at boot instead of on every scenario switch.
+    result = _run_in_app(
+        "from source.app import log_rank_lookup_availability;"
+        " log_rank_lookup_availability()",
+        tmp_path,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert _debug_log(tmp_path).count(UNSET_USERNAME_NOTICE) == 1
+
+
+def test_configured_username_is_not_reported_at_startup(tmp_path: Path) -> None:
+    result = _run_in_app(
+        "from source.app import log_rank_lookup_availability;"
+        " from source.config.settings_service import"
+        " KOVAAKS_USERNAME_KEY, save_settings;"
+        " save_settings({KOVAAKS_USERNAME_KEY: 'MingoDynasty'});"
+        " log_rank_lookup_availability()",
+        tmp_path,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert UNSET_USERNAME_NOTICE not in _debug_log_if_written(tmp_path)
 
 
 def test_urllib3_debug_is_silenced(tmp_path: Path) -> None:
