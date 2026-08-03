@@ -48,6 +48,14 @@ for the review record:
    transitions (giving the failed-update path cleanup obligations where
    today it touches nothing), and conflates install-level policy with
    per-version facts.
+6. **Support boundary for the tag guarantee** (maintainer, 2026-08-02,
+   adjudicating the PR #187 review): the app currently has a
+   single-user install base, so update paths that originate from
+   releases predating Part 1 are out of support. The guarantee in (4)
+   holds whenever the staging launcher is Part 1's or newer; an update
+   staged by an older launcher gets one session of `unknown` and
+   self-heals (mechanics under Design), and no delivery mechanism is
+   added for its benefit (see Rejected alternatives).
 
 ## Problem
 
@@ -114,7 +122,24 @@ release file goes first because it is the one that is never stale.
 Wire-contract impact: none. This is additive within
 [contract v1](decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)
 — no field changes to either schema, and an old launcher that does not
-write the copy leaves behavior exactly as today. The filename stays
+write the copy leaves behavior exactly as today.
+
+Accepted transition limitation (decision 6): the launcher that stages an
+update is always the *installed* release's launcher, and the wire
+contract deliberately supports jumping from any old release straight to
+latest — so an install still on a pre-Part-1 release stages its next
+update without the copy, and that trial session resolves from the stamp
+(`tag: None`; the page, once it exists, shows `unknown`). This is
+today's accepted limitation surviving for exactly one more update cycle
+on that install: it self-heals at the next launch, where the promoted
+manifest corroborates and names the tag, and permanently once a
+Part-1-or-later launcher stages the following update. Both escape
+hatches already exist — launch again, or re-run the install one-liner,
+which fetches the latest release's installer and does write the copy.
+With a single-user install base this is documented rather than
+engineered around.
+
+The filename stays
 `release.json` (not renamed on copy): one name for one schema, greppable
 across the CI release job, both scripts, and the app; sitting inside a
 version directory rather than the state root, it does not read as
@@ -156,6 +181,16 @@ described under Problem; the `build_info.py` bullet in
   — needs a network call from a page that today makes none, plus policy
   decisions (when to check, what to cache); nothing settled here needs
   it. Out of scope, not rejected forever.
+- **Delivering `release.json` inside the release archive** (the PR #187
+  review's suggested mechanism, so that launchers predating the copy
+  step still receive the metadata) — the zip is pure `git archive`
+  output today, the only producer that expands the `version.txt` stamp;
+  injecting a generated file means the release job post-processes the
+  archive and a second identity artifact must be validated before
+  publish. Its only beneficiary is an update staged by a pre-Part-1
+  launcher, which decision 6 places out of support. Rejected with that
+  decision, not forever — if the support boundary ever widens, this is
+  the mechanism to revisit.
 
 ## Delivery plan
 
@@ -196,11 +231,16 @@ Kickoff prompts derive from this plan, one per PR.
   file falls through to the stamp; malformed JSON, a non-object, a bad
   `schema_version`, and a missing `sha` each warn and fall through; with
   the file absent, the corroborated-manifest path still answers
-  (fallback preserved). The PowerShell side has no pytest harness — the
-  copy step is verified by a manual staged-update E2E on the dev
-  machine: install the previous release, launch to trigger the update,
-  and confirm `versions/<tag>/release.json` exists and the first
-  session's startup log and `/health` report the new tag.
+  (fallback preserved). The PowerShell side has no pytest harness — two
+  manual checks on the dev machine cover the supported path: a fresh
+  install of Part 1's release (its installer stages with the copy;
+  confirm `versions/<tag>/release.json` exists and the startup log and
+  `/health` report the tag), and, once the next release lands, a launch
+  that stages it (Part 1's launcher performs the copy; confirm the
+  *trial* session's startup log already reports the new tag — the
+  moment decision 4 is about). A direct jump from a pre-Part-1 release
+  is deliberately not covered: decision 6 places it out of support, and
+  its expected behavior (one `unknown` session) is stated under Design.
 - **PR 2**: `tests/test_app_shell.py`'s
   `test_github_tooltip_carries_the_build_identity` flips to pin the
   plain label; a settings-page layout test asserts the section renders
