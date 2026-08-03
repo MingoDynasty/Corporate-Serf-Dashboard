@@ -292,7 +292,9 @@ flowchart LR
   `delete_superseded_user_playlist_files` are the write paths that unlink those
   files under the playlist I/O lock, keeping startup itself read-only.
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
-  helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
+  helpers (including `_get_with_retry`'s `sensitive` option, which keeps one
+  request's parameters and query string out of every log line), JSON cache
+  helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
   bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
   its returned `ScenarioRankInfo` structurally without persisting the marker;
@@ -359,6 +361,21 @@ flowchart LR
   never been set. An empty value is user intent and is never
   overridden; a miss writes nothing and is retried next start. The registry
   read is isolated in `_registry_value` so tests never touch the real registry.
+- `config/identity_detection.py` — verifies this machine's Steam accounts
+  against KovaaK's profiles (`detect_identity_candidates`), for the settings
+  page's Detect action. Reads every registry Steam root's
+  `config/loginusers.vdf` (roots come from `stats_dir_detection._steam_roots`),
+  merges accounts by SteamID64 keeping the newest `Timestamp`, and probes each
+  distinct persona once through `api_service.get_user_profile_by_username`. A
+  profile counts only when its `steamId` equals that account's ID64 — there is
+  no reverse lookup from a Steam ID, so detection guesses with personas and
+  verifies, and a persona that coincides with someone else's KovaaK's name is
+  discarded rather than believed. Failures are recorded, not raised: probe
+  failures and unusable payloads raise `unchecked_count`, and an account list
+  that existed but could not be read or understood clears
+  `discovery_complete`, both so the UI cannot present a partial answer as a
+  conclusive one. Pure functions: nothing here writes settings or runs at
+  startup, and the probed personas never reach the log.
 - `health.py` — registers the `/health` Flask route on `app.server`: the
   running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
   variable, which is how an updater tells "my new process is up" apart from
@@ -411,5 +428,5 @@ flowchart LR
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |
