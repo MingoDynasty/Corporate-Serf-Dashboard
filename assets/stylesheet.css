@@ -164,6 +164,19 @@ a.playlist-scenario-link-cell:hover {
     display: none;
 }
 
+/* What the Detect button found, in the same quiet register as the save status
+   beside it — a detection reports, it never changes anything. */
+.app-settings-detect-status {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-sm);
+}
+
+/* The detected-account picker ships hidden and the detect callback drops the
+   modifier for the results it refuses to apply on its own. */
+.app-settings-identity-picker-hidden {
+    display: none;
+}
+
 .settings-help-icon {
     cursor: help;
     flex-shrink: 0;

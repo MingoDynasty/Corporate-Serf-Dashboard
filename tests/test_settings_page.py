@@ -1,6 +1,7 @@
 """The settings page: form rendering, the save flow, and the restart notice."""
 
 from collections import deque
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import dash
@@ -8,13 +9,20 @@ import pytest
 from dash import no_update
 
 from source.config import settings_service
+from source.config.identity_detection import (
+    IdentityCandidate,
+    IdentityDetectionResult,
+)
 from source.utilities.build_info import BuildInfo
+from source.utilities.utilities import format_absolute_timestamp
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import settings as settings_page  # noqa: E402
 
 SAVE_BUTTON_ID = "app-settings-save-button"
+DETECT_BUTTON_ID = "app-settings-detect-button"
+PICKER_ID = "app-settings-identity-picker"
 
 
 @pytest.fixture(autouse=True)
@@ -56,6 +64,42 @@ def clicked(monkeypatch):
     )
 
 
+@pytest.fixture
+def detect_clicked(monkeypatch):
+    """Report the Detect button as the trigger, the way a real click does."""
+    monkeypatch.setattr(
+        settings_page,
+        "ctx",
+        SimpleNamespace(triggered_id=DETECT_BUTTON_ID),
+    )
+
+
+@pytest.fixture
+def picked(monkeypatch):
+    """Report the picker as the trigger, the way choosing a row does."""
+    monkeypatch.setattr(settings_page, "ctx", SimpleNamespace(triggered_id=PICKER_ID))
+
+
+@pytest.fixture
+def detects(monkeypatch):
+    """Declare what one Detect press finds; the real engine never runs.
+
+    Every outcome past "exactly one verified account" is unreachable on this
+    machine — its three Steam accounts collapse to a single verified pair — so
+    the several-candidate, unchecked, and failed-discovery paths exist here or
+    nowhere.
+    """
+
+    def declare(*candidates, unchecked=0, complete=True):
+        monkeypatch.setattr(
+            settings_page,
+            "detect_identity_candidates",
+            lambda: IdentityDetectionResult(tuple(candidates), unchecked, complete),
+        )
+
+    return declare
+
+
 def _component_by_id(root, component_id):
     components = deque([root])
     while components:
@@ -74,6 +118,48 @@ def _component_by_id(root, component_id):
 
 def _save(stats_dir="", username="", steam_id="", n_clicks=1):
     return settings_page.save_user_settings(n_clicks, stats_dir, username, steam_id)
+
+
+MAIN_ACCOUNT_ID = "76561197986713986"
+OTHER_ACCOUNT_ID = "76561198000000001"
+
+
+def _candidate(
+    username="MingoDynasty",
+    steam_id=MAIN_ACCOUNT_ID,
+    persona_name=None,
+    last_access="2026-08-02T14:56:42.919Z",
+):
+    """One verified pair, as the engine hands it over."""
+    return IdentityCandidate(
+        username=username,
+        steam_id=steam_id,
+        # Usually the same string; the two are distinct namespaces that merely
+        # often coincide, so tests that care say so.
+        persona_name=username if persona_name is None else persona_name,
+        last_access=last_access,
+    )
+
+
+def _detect(n_clicks=1):
+    """Press Detect, naming the seven outputs the callback answers with."""
+    username, steam_id, status, picker, picker_class, picker_value, stored = (
+        settings_page.detect_identity(n_clicks)
+    )
+    return SimpleNamespace(
+        username=username,
+        steam_id=steam_id,
+        status=status,
+        rows=picker.children,
+        picker_class=picker_class,
+        picker_value=picker_value,
+        stored=stored,
+    )
+
+
+def _offered(outcome):
+    """The picker rows a detection produced, as (label, value) pairs."""
+    return [(row.label, row.value) for row in outcome.rows]
 
 
 def test_the_form_shows_what_is_stored(tmp_path):
@@ -376,3 +462,206 @@ def test_a_settled_process_renders_no_notice(tmp_path):
 
     assert notice.children == ""
     assert notice.className == settings_page.RESTART_NOTICE_HIDDEN_CLASS
+
+
+def test_opening_the_page_never_calls_kovaaks(monkeypatch):
+    """Detection is split by cost: local candidates render, probes wait.
+
+    The picker ships empty and hidden, which is also what says the page did not
+    detect anything on its way in.
+    """
+
+    def never():
+        raise AssertionError("identity detection ran while rendering the page")
+
+    monkeypatch.setattr(settings_page, "detect_identity_candidates", never)
+
+    picker = _component_by_id(settings_page.layout(), PICKER_ID)
+
+    assert picker.children == []
+    assert picker.className == settings_page.PICKER_HIDDEN_CLASS
+
+
+def test_one_certain_account_fills_the_identity_fields(detect_clicked, detects):
+    """The only outcome allowed to fill by itself: nothing was left unresolved."""
+    detects(_candidate(username="MingoDynasty", persona_name="mingo"))
+
+    outcome = _detect()
+
+    # The canonical webapp username, never the persona that found it.
+    assert outcome.username == "MingoDynasty"
+    assert outcome.steam_id == MAIN_ACCOUNT_ID
+    assert "MingoDynasty" in outcome.status
+    assert "Save" in outcome.status
+    # Nothing to choose between, so nothing is offered.
+    assert _offered(outcome) == []
+    assert outcome.picker_class == settings_page.PICKER_HIDDEN_CLASS
+
+
+def test_several_accounts_are_offered_instead_of_filled(detect_clicked, detects):
+    """A wrong identity fills caches with someone else's ranks; the user picks."""
+    detects(
+        _candidate(username="Newest"),
+        _candidate(username="Older", steam_id=OTHER_ACCOUNT_ID),
+    )
+
+    outcome = _detect()
+
+    assert (outcome.username, outcome.steam_id) == (no_update, no_update)
+    # Engine order is display order: newest last-access first, never re-sorted.
+    assert _offered(outcome) == [
+        ("Newest", MAIN_ACCOUNT_ID),
+        ("Older", OTHER_ACCOUNT_ID),
+    ]
+    assert outcome.picker_class == settings_page.PICKER_CLASS
+    assert outcome.stored == [
+        {"username": "Newest", "steam_id": MAIN_ACCOUNT_ID},
+        {"username": "Older", "steam_id": OTHER_ACCOUNT_ID},
+    ]
+    assert "2" in outcome.status
+
+
+@pytest.mark.parametrize(
+    ("unchecked", "complete"),
+    [
+        # An account nobody could check may be the second verified account.
+        (1, True),
+        # So may an account the unreadable account list never yielded.
+        (0, False),
+    ],
+)
+def test_a_sole_account_from_an_unfinished_run_is_never_filled(
+    detect_clicked,
+    detects,
+    unchecked,
+    complete,
+):
+    detects(_candidate(), unchecked=unchecked, complete=complete)
+
+    outcome = _detect()
+
+    assert (outcome.username, outcome.steam_id) == (no_update, no_update)
+    assert _offered(outcome) == [("MingoDynasty", MAIN_ACCOUNT_ID)]
+    assert outcome.picker_class == settings_page.PICKER_CLASS
+
+
+def test_a_picker_row_names_the_steam_account_behind_the_name(
+    detect_clicked,
+    detects,
+):
+    """Two accounts are told apart by their Steam login, not their KovaaK's name."""
+    detects(
+        _candidate(persona_name="mingo", last_access="2026-08-02T14:56:42"),
+        unchecked=1,
+    )
+
+    (row,) = _detect().rows
+
+    assert row.label == "MingoDynasty"
+    assert "mingo" in row.description
+    assert "Aug 2, 2026, 2:56 PM" in row.description
+
+
+def test_finding_nothing_with_nothing_unresolved_is_conclusive(
+    detect_clicked,
+    detects,
+):
+    """Everything was checked and nobody matched: manual entry is all that is left."""
+    detects()
+
+    outcome = _detect()
+
+    assert outcome.status == settings_page.NO_MATCH_STATUS
+    assert _offered(outcome) == []
+    assert outcome.picker_class == settings_page.PICKER_HIDDEN_CLASS
+
+
+def test_an_unreadable_account_list_never_reads_as_no_match(detect_clicked, detects):
+    """A detection that could not enumerate accounts has ruled out nothing."""
+    detects(complete=False)
+
+    outcome = _detect()
+
+    assert settings_page.DISCOVERY_FAILED_STATUS in outcome.status
+    assert settings_page.NO_MATCH_STATUS not in outcome.status
+
+
+def test_the_status_names_how_many_accounts_went_unchecked(detect_clicked, detects):
+    detects(unchecked=2)
+
+    outcome = _detect()
+
+    assert "2 Steam accounts could not be checked" in outcome.status
+    assert settings_page.NO_MATCH_STATUS not in outcome.status
+
+
+def test_choosing_a_detected_account_fills_both_fields(picked):
+    stored = [
+        {"username": "Newest", "steam_id": MAIN_ACCOUNT_ID},
+        {"username": "Older", "steam_id": OTHER_ACCOUNT_ID},
+    ]
+
+    assert settings_page.use_detected_identity(OTHER_ACCOUNT_ID, stored) == (
+        "Older",
+        OTHER_ACCOUNT_ID,
+    )
+
+
+@pytest.mark.parametrize(
+    ("n_clicks", "triggered_id"),
+    [(None, DETECT_BUTTON_ID), (1, None)],
+)
+def test_a_detection_nobody_asked_for_never_calls_kovaaks(
+    monkeypatch,
+    n_clicks,
+    triggered_id,
+):
+    """The initial-call hazard, on the one callback here that hits the network."""
+
+    def never():
+        raise AssertionError("identity detection ran without a Detect press")
+
+    monkeypatch.setattr(
+        settings_page, "ctx", SimpleNamespace(triggered_id=triggered_id)
+    )
+    monkeypatch.setattr(settings_page, "detect_identity_candidates", never)
+
+    assert settings_page.detect_identity(n_clicks) == (no_update,) * 7
+
+
+@pytest.mark.parametrize(
+    ("value", "triggered_id"),
+    [(None, PICKER_ID), (MAIN_ACCOUNT_ID, None)],
+)
+def test_a_pick_nobody_made_fills_nothing(monkeypatch, value, triggered_id):
+    """Clearing the picker after a fresh detection arrives as a value change too."""
+    monkeypatch.setattr(
+        settings_page, "ctx", SimpleNamespace(triggered_id=triggered_id)
+    )
+    stored = [{"username": "MingoDynasty", "steam_id": MAIN_ACCOUNT_ID}]
+
+    assert settings_page.use_detected_identity(value, stored) == (
+        no_update,
+        no_update,
+    )
+
+
+def test_a_last_seen_stamp_is_shown_in_the_house_format():
+    assert settings_page._format_last_seen("2026-08-02T14:56:42") == (
+        "Aug 2, 2026, 2:56 PM"
+    )
+
+
+def test_a_utc_stamp_is_shown_in_local_time():
+    """Whatever this machine's timezone is, one instant has one rendering."""
+    shown = settings_page._format_last_seen("2026-08-02T14:56:42.919Z")
+
+    assert shown == settings_page._format_last_seen("2026-08-02T16:56:42+02:00")
+    assert shown == format_absolute_timestamp(
+        datetime(2026, 8, 2, 14, 56, 42, tzinfo=UTC).astimezone()
+    )
+
+
+def test_an_unreadable_last_seen_stamp_is_shown_as_it_arrived():
+    """A decorative field must not cost the user a candidate they could pick."""
+    assert settings_page._format_last_seen("last tuesday") == "last tuesday"
