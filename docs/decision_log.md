@@ -13,6 +13,54 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-03: Background Rank Diagnostics Are Console-Only
+
+Status: Accepted
+
+Supersedes: the "asks the user to click Refresh" consequence of the
+[2026-07-01 score-aware refresh entry](#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes).
+The rest of that decision — the timer schedule, the two-decimal catch-up floor,
+the monotonic writer, the cache-only interval poll, and the board-authoritative
+manual Refresh — is unchanged.
+
+When a position lookup fails in the background, the app no longer shows the user
+an error message. The failure is written to the console and the log file, and
+the position on screen keeps showing the value it already had. These failures
+fix themselves: a failed attempt never overwrites the cached position, and the
+next personal best starts a fresh lookup. The message was asking the user to
+react to something they could not act on, often minutes after the fact.
+
+Decision: four background diagnostic error toasts are deleted and their
+`logger` siblings retained. Three are in the rank-freshness timer chain in
+`kovaaks/api_service.py` — retry exhaustion, the unknown-user stop, and the
+unexpected-error safety net — and one is in `my_watchdog/file_watchdog.py`,
+where scheduling the refresh itself fails. `api_service.py` loses its
+`dash_logger` import and module-global with them; `file_watchdog.py` keeps both
+for its run-import failure toast, which this entry does not touch.
+
+Why: these calls were dead code when written — `dash_logger` records emitted
+from a plain thread never reached a callback context — and PR #115's queueing
+handler made them live without anyone re-deciding whether they should be. What
+they actually deliver is a generic red "Error" toast, batched onto the next
+Home visit, describing an event that is already handled. Manual Refresh remains
+the escape hatch the superseded entry reserved for a permanently divergent
+score; what changes is that the app stops prompting for it, because the prompt
+arrived detached from the event and named no action the failure had not already
+taken care of.
+
+Consequences: a background refresh failure has no user-visible surface —
+noticing one means reading `data/logs/debug.log` or the console. That is the
+accepted trade for silence on a self-healing path, and it is why the manual
+Refresh button, which reports its own failures, stays. The regression tests for
+these paths assert the retained log records rather than toast delivery.
+
+Scope: this entry decides these four call sites only. The broader notification
+redesign — which subsystem owns toasts, the routing policy that produced this
+verdict, and the fate of every other toast in the app — is still under debate in
+PR #82 and is not settled here. The deletion was split out (PR #194) because it
+stands alone: nothing else reads the removed calls, and the retained logging is
+untouched.
+
 ## 2026-08-03: Settings Detection Suggests, And Identity Is Offered Only Once Verified
 
 Status: Accepted
@@ -1944,7 +1992,10 @@ Consequences: The home callback owns the empty-state value and tooltip affordanc
 
 ## 2026-07-01: Keep Scenario Rank Consistent With Score-Aware Refreshes
 
-Status: Accepted
+Status: Superseded in part, for the exhausted-loop notification ("asks the user
+to click Refresh" in Consequences below), by the
+[2026-08-03 console-only background diagnostics decision](#2026-08-03-background-rank-diagnostics-are-console-only).
+Every other part of this entry remains Accepted.
 
 Supersedes: The `ThreadPoolExecutor(max_workers=2)` high-score refresh and the
 decision not to provide manual rank refresh in the original scenario rank

@@ -96,7 +96,8 @@ benchmark tier) — see the
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
 - Background refresh failures are recorded in the console/file logs only;
   they produce no UI notification. The chain degrades silently — the widget
-  keeps serving the cached value it already shows.
+  keeps serving the cached value it already shows
+  ([2026-08-03](../decision_log.md#2026-08-03-background-rank-diagnostics-are-console-only)).
 
 ## Failure handling
 
