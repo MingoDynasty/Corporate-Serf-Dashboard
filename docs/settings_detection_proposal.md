@@ -38,8 +38,9 @@ the review record:
    KovaaK's profile endpoint. Persona names are already public on Steam,
    the probe is equivalent to typing the name into kovaaks.com's search,
    it fires only on an explicit button press, and nothing is persisted for
-   candidates the user does not save. This is a deliberate choice, not a
-   side effect.
+   candidates the user does not save — including in request logs: probe
+   log lines redact the queried name, because `debug.log` ships with bug
+   reports. This is a deliberate choice, not a side effect.
 
 ## Problem
 
@@ -101,17 +102,24 @@ if ever needed).
 **Identity candidates.** A new module (indicatively
 `source/config/identity_detection.py`, beside the stats-dir detector):
 
-- Locate `loginusers.vdf` as `<root>/config/loginusers.vdf` for the first
-  Steam root (reusing the detector's registry walk) where the file
-  exists. Accounts are per-client, not per-library, so one file is the
-  answer.
+- Read `<root>/config/loginusers.vdf` for every Steam root the
+  detector's registry walk yields, not just the first hit — the walk
+  deliberately keeps every root because the 32-bit and 64-bit registry
+  views can point at different installs, and the first root is not
+  guaranteed to be the active client. Accounts merge across files and
+  deduplicate by SteamID64, keeping the entry with the newest
+  `Timestamp`: the most recently used client's view of an account
+  carries the freshest persona.
 - Enumerate every account: a tolerant scan for SteamID64-keyed blocks
   capturing `PersonaName` (the probe key) plus `AccountName` and
-  `Timestamp` (display/tie-break material). Malformed or unreadable vdf →
-  warn once and treat as empty, per the store's malformed-is-never-fatal
-  convention. Parsing is regex-based like the shipped detector — the
-  upstream `vdf` package is unmaintained, and a dependency for two small
-  files read on demand is not warranted.
+  `Timestamp` (display/tie-break material). A malformed or unreadable
+  file warns once and contributes no accounts — never fatal — but the
+  failure is not erased: the result records that discovery was
+  incomplete (an account list existed and could not be read), which is
+  a different fact from reading cleanly and finding no accounts.
+  Parsing is regex-based like the shipped detector — the upstream `vdf`
+  package is unmaintained, and a dependency for two small files read on
+  demand is not warranted.
 - For each account, probe `by-username` with its persona (duplicate
   persona strings probed once) and classify:
   - profile exists and `steamId` == the account's ID64 → **verified
@@ -120,12 +128,17 @@ if ever needed).
     metadata;
   - HTTP 409 → confirmed absent, discarded;
   - profile exists but `steamId` differs → coincidental name, discarded;
-  - transport failure or unexpected status → **unchecked**, counted so
-    the UI can say detection was incomplete.
-- Return verified pairs ranked by profile `lastAccess` (newest first)
-  plus the unchecked count. The engine never writes settings and never
-  raises for ordinary misses (no Steam, no file, no accounts → zero
-  candidates).
+  - transport failure, an unexpected status, or a 2xx payload the
+    pipeline cannot use (malformed JSON; a profile missing or invalid
+    `steamId`, `webapp.username`, or `lastAccess`) → **unchecked**,
+    counted so the UI can say detection was incomplete. Schema drift
+    degrades to an incomplete result exactly like an outage — it never
+    escapes as an exception that fails the Detect callback.
+- Return verified pairs ranked by profile `lastAccess` (newest first),
+  the unchecked count, and whether account discovery was complete. The
+  engine never writes settings and never raises for ordinary misses (no
+  Steam, no file, no accounts → zero candidates with complete
+  discovery).
 
 The API call lands in `source/kovaaks/api_service.py` as a small function
 over the existing `_get_with_retry` stack, inheriting the project retry
@@ -135,6 +148,20 @@ spells). The same PR documents the endpoint in
 [kovaaks_api_notes.md](kovaaks_api_notes.md): 409 semantics, the fields
 relied on, and the negative results (no reverse lookup) so nobody
 re-probes them.
+
+One consequence of the accepted privacy decision is designed in rather
+than left for review to discover: `_get_with_retry` logs every
+attempt's `params` at DEBUG, its transport-failure summaries embed the
+prepared URL with its query string, and `data/logs/debug.log` is
+persisted, rotated, and collected with bug reports — an unmodified call
+would therefore retain every probed persona on disk, including 409s and
+candidates never selected. The probe call marks its request sensitive:
+attempt lines log a placeholder in place of the username parameter,
+failure summaries for this call are scrubbed of the query string, and
+identity-detection's own log lines name counts and positions ("account
+2 of 3"), never the personas or IDs of accounts the user did not save.
+A regression test drives success, 409, and transport-failure probes
+under `caplog` and asserts no persona reaches any log record.
 
 Probes are sequential — typically one to three accounts — and run only
 inside the Detect callback, never on a render path and never at startup.
@@ -161,11 +188,15 @@ the pipeline synchronously with a loading state:
   one fills the two inputs. Never auto-picked: two verified accounts is
   precisely the case where silent selection would fill caches with
   someone else's ranks;
-- zero verified, all probes answered → status: no local Steam account
-  matches a KovaaK's profile; enter the username manually (with no
-  reverse lookup, manual entry is the only remaining path);
-- some probes unchecked → the status adds that N account(s) could not be
-  checked and Detect can be pressed again.
+- zero verified, discovery complete, all probes answered → status: no
+  local Steam account matches a KovaaK's profile; enter the username
+  manually (with no reverse lookup, manual entry is the only remaining
+  path);
+- incomplete results are never dressed up as conclusive: if some probes
+  went unchecked, the status says N account(s) could not be checked and
+  Detect can be pressed again; if account discovery itself failed (an
+  account list existed but could not be read), the status says Steam's
+  account list could not be read — never the no-match message above.
 
 Filling inputs is transient UI state. The store is written only by Save,
 with its shipped semantics: all-or-nothing validation, every key written,
@@ -179,9 +210,10 @@ per the DashProxy initial-call hazard.
 
 No store schema change, no new writers, no startup changes. The bootstrap,
 both pins, and `detect_stats_dir()` keep their contracts.
-`api_service.py` gains one endpoint function; `pages/settings.py` gains
-the candidates, the button, and the picker; `docs/architecture.md`'s
-module map rows are updated in the PRs whose behavior they describe.
+`api_service.py` gains one endpoint function and a sensitive-request
+logging option on `_get_with_retry`; `pages/settings.py` gains the
+candidates, the button, and the picker; `docs/architecture.md`'s module
+map rows are updated in the PRs whose behavior they describe.
 
 ### Alternatives rejected
 
@@ -225,17 +257,23 @@ module map rows are updated in the PRs whose behavior they describe.
   outside `tmp_path`, or API in any test, matching
   `tests/test_stats_dir_detection.py`): all-candidates ordering and
   dedup; `loginusers.vdf` enumeration (multi-account, zero accounts,
-  missing file, malformed vdf warns and yields nothing); the verify
-  pipeline against mocked responses — the live-probed
-  three-accounts-to-one collapse, 409, `steamId` mismatch, transport
-  failure producing an unchecked count, `lastAccess` ranking, duplicate
-  personas probed once.
+  missing file, accounts merged across several roots' files with
+  SteamID64 dedup preferring the newest `Timestamp`, malformed vdf
+  warning and flagging discovery incomplete rather than reading as a
+  clean empty); the verify pipeline against mocked responses — the
+  live-probed three-accounts-to-one collapse, 409, `steamId` mismatch,
+  transport failures and unusable 2xx payloads (malformed JSON, missing
+  or invalid profile fields) each producing an unchecked count,
+  `lastAccess` ranking, duplicate personas probed once.
 - **API layer**: `by-username` maps 409 to a domain result rather than an
   exception escaping the pipeline; retry behavior rides the existing
-  `_get_with_retry` coverage.
+  `_get_with_retry` coverage. The log-privacy regression drives success,
+  409, and transport-failure probes under `caplog` and asserts no
+  persona string reaches any log record.
 - **Page callbacks**: render-time candidates land in the field's
   suggestion data; Detect outcomes (fill on one pair, picker on several,
-  the zero and incomplete statuses); None-trigger regressions for both
+  the conclusive no-match, unchecked, and discovery-failure statuses);
+  None-trigger regressions for both
   new callbacks. Picker interaction is verified at the callback layer —
   the automated browser pane cannot open Mantine dropdowns, the
   established practice from the settings-page tests.
