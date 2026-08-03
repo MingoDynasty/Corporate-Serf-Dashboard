@@ -12,6 +12,8 @@ from source.utilities.paths import STATE_DIR_ENV_VAR
 MANIFEST_SHA = "1" * 40
 STAMP_SHA = "2" * 40
 GIT_SHA = "3" * 40
+RELEASE_FILE_SHA = "4" * 40
+RELEASE_FILE_TAG = "v2026.07.19"
 
 
 @pytest.fixture(autouse=True)
@@ -42,6 +44,23 @@ def _write_manifest(root: Path, **overrides: object) -> None:
     )
 
 
+def _write_release_file(root: Path, **overrides: object) -> None:
+    release = {
+        "schema_version": 1,
+        "tag": RELEASE_FILE_TAG,
+        "sha": RELEASE_FILE_SHA,
+        "commit_date": "2026-07-19",
+        # Irrelevant to identity; here to pin that they are simply unread.
+        "uv_version": "0.9.7",
+        "python_version": "3.14",
+        "source_asset": f"Corporate-Serf-Dashboard-{RELEASE_FILE_TAG}.zip",
+    }
+    release.update(overrides)
+    (root / build_info.RELEASE_FILENAME).write_text(
+        json.dumps(release), encoding="utf-8"
+    )
+
+
 def _write_stamp(root: Path, sha: str, commit_date: str = "2026-07-17") -> None:
     (root / build_info.VERSION_STAMP_FILENAME).write_text(
         f"# comment header\nsha: {sha}\ncommit-date: {commit_date}\n",
@@ -67,10 +86,98 @@ def _fail_git(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(build_info.subprocess, "run", fake_run)
 
 
+def test_release_file_wins_when_it_corroborates_the_stamp(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The first session after an update: the copy names the staged release.
+
+    The manifest corroborates here too and still loses, which is the point of
+    the precedence: only the release file is guaranteed not to lag the code.
+    """
+    _write_release_file(isolated_build_info, sha=STAMP_SHA)
+    _write_manifest(isolated_build_info, sha=STAMP_SHA)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    info = get_build_info()
+
+    assert info == BuildInfo(
+        sha=STAMP_SHA,
+        commit_date="2026-07-19",
+        tag=RELEASE_FILE_TAG,
+        source="release-file",
+    )
+    assert info.release_label == RELEASE_FILE_TAG
+
+
+def test_release_file_for_other_code_loses_to_the_stamp(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A stray copy describing some other build must not get to answer."""
+    _write_release_file(isolated_build_info)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    assert get_build_info() == BuildInfo(
+        sha=STAMP_SHA, commit_date="2026-07-17", tag=None, source="archive"
+    )
+
+
+def test_release_file_without_a_stamp_is_ignored(
+    isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Nothing corroborates the copy, so the checkout answers for itself."""
+    _write_release_file(isolated_build_info)
+    _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")
+
+    assert get_build_info() == BuildInfo(
+        sha=GIT_SHA, commit_date="2026-07-16", tag=None, source="git"
+    )
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        # Both would otherwise corroborate the stamp, so the fall-through is
+        # attributable to the field under test.
+        {"schema_version": 2, "sha": STAMP_SHA},
+        {"schema_version": 1, "sha": ""},
+    ],
+)
+def test_unusable_release_file_falls_through_to_the_manifest(
+    isolated_build_info: Path, overrides: dict[str, object]
+) -> None:
+    _write_release_file(isolated_build_info, **overrides)
+    _write_manifest(isolated_build_info, sha=STAMP_SHA)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+
+    info = get_build_info()
+
+    assert info.source == "manifest"
+    assert info.tag == "v2026.07.18"
+
+
+@pytest.mark.parametrize("content", ["not json", "[]"])
+def test_malformed_release_file_falls_through_to_the_manifest(
+    isolated_build_info: Path, content: str
+) -> None:
+    (isolated_build_info / build_info.RELEASE_FILENAME).write_text(
+        content, encoding="utf-8"
+    )
+    _write_manifest(isolated_build_info, sha=STAMP_SHA)
+    _write_stamp(isolated_build_info, STAMP_SHA)
+
+    assert get_build_info().source == "manifest"
+
+
 def test_manifest_wins_when_it_corroborates_the_stamp(
     isolated_build_info: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A settled install: the manifest describes the code that is running."""
+    """A settled install: the manifest describes the code that is running.
+
+    No release file is staged beside the code — the version directory predates
+    the copy, or the install has since been promoted — so the manifest answers.
+    """
     _write_manifest(isolated_build_info, sha=STAMP_SHA)
     _write_stamp(isolated_build_info, STAMP_SHA)
     _fake_git(monkeypatch, f"{GIT_SHA}\n2026-07-16\n")

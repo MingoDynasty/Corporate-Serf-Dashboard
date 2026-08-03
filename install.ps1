@@ -16,9 +16,11 @@ Installs are fully non-interactive: the generated config.toml carries the
 dashboard port and nothing else. The KovaaK's stats directory is app-owned
 now -- it lives in data/settings.json, which only the app ever writes.
 
-Serialization contract: every machine-readable file written here
+Serialization contract: every machine-readable file GENERATED here
 (config.toml, install.json) is UTF-8 WITHOUT BOM with forward-slash paths --
-the app's Python 3.14 tomllib rejects both a BOM and raw backslashes.
+the app's Python 3.14 tomllib rejects both a BOM and raw backslashes. The
+release.json copy staged into versions\<tag> is exempt: it is preserved
+byte-for-byte as the release published it, never re-serialized.
 
 The release zip's top-level directory name is DISCOVERED after extraction,
 never derived: the named asset and GitHub's source-archive fallback use
@@ -76,11 +78,20 @@ function Write-FileAtomic([string]$Path, [string]$Content) {
 }
 
 function Get-ReleaseInfo([string]$ReleaseTag) {
+    # Returns the parsed release plus the bytes it was parsed from:
+    # Install-ReleaseVersion copies those bytes verbatim into the version
+    # directory, and re-serializing the parsed object would not be verbatim.
     # GitHub serves release assets as octet-stream, so .Content may be bytes.
     $raw = (Invoke-WebRequest -UseBasicParsing -TimeoutSec 30 `
             -Uri "$DownloadBase/$Repo/releases/download/$ReleaseTag/release.json").Content
-    if ($raw -is [byte[]]) { $raw = [System.Text.Encoding]::UTF8.GetString($raw) }
-    return $raw | ConvertFrom-Json
+    if ($raw -is [byte[]]) {
+        $bytes = $raw
+        $text = [System.Text.Encoding]::UTF8.GetString($raw)
+    } else {
+        $text = [string]$raw
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
+    }
+    return [pscustomobject]@{ Release = ($text | ConvertFrom-Json); RawBytes = $bytes }
 }
 
 function Install-UvVersion([string]$UvVersion) {
@@ -108,7 +119,7 @@ function Install-UvVersion([string]$UvVersion) {
     return $uvExe
 }
 
-function Install-ReleaseVersion($Release, [string]$UvExe) {
+function Install-ReleaseVersion($Release, [byte[]]$ReleaseBytes, [string]$UvExe) {
     # Download + extract the release into versions\<tag> and sync its venv.
     $releaseTag = [string]$Release.tag
     $versionsDir = Join-Path $InstallRoot 'versions'
@@ -160,6 +171,13 @@ function Install-ReleaseVersion($Release, [string]$UvExe) {
         Move-Item -LiteralPath $top[0].FullName -Destination $targetDir
         Remove-Item -LiteralPath $extractDir -Recurse -Force
         Remove-Item -LiteralPath $zipPath -Force
+
+        # Leave the release description beside the code it describes, so this
+        # version can name its own tag from its very first run -- the manifest
+        # still names the previous version while a staged update is on trial.
+        # Byte-verbatim (never re-serialized): the app reads it as the release
+        # published it, and the stamp check above corroborates it right here.
+        [System.IO.File]::WriteAllBytes((Join-Path $targetDir 'release.json'), $ReleaseBytes)
 
         Write-Host "Installing dependencies for $releaseTag ..."
         & $UvExe sync --directory $targetDir --locked --no-dev --managed-python
@@ -222,12 +240,13 @@ if ($Tag) {
 
 Write-Host "Installing Corporate Serf Dashboard $targetTag to $InstallRoot"
 
-$release = $null
+$releaseInfo = $null
 try {
-    $release = Get-ReleaseInfo $targetTag
+    $releaseInfo = Get-ReleaseInfo $targetTag
 } catch {
     Stop-Fatal "cannot read release.json for $targetTag ($($_.Exception.Message))."
 }
+$release = $releaseInfo.Release
 # Unknown schema: this installer is too old for the release it was pointed
 # at. Loud abort -- get.ps1 always pairs a fresh installer with a fresh
 # payload, so re-running the one-liner recovers.
@@ -246,7 +265,7 @@ $env:UV_PYTHON_INSTALL_DIR = Join-Path $InstallRoot 'python'
 $env:UV_CACHE_DIR = Join-Path $InstallRoot 'uv-cache'
 
 $uvExe = Install-UvVersion ([string]$release.uv_version)
-$versionDir = Install-ReleaseVersion $release $uvExe
+$versionDir = Install-ReleaseVersion $release $releaseInfo.RawBytes $uvExe
 
 # First-run config. An existing config.toml (and data/) is never touched.
 $configPath = Join-Path $InstallRoot 'config.toml'
