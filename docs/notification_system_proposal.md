@@ -21,13 +21,13 @@ first one alone resolves the original audit complaint.
    quiet, one run one toast, user-initiated actions always get their
    result) is the product call everything below executes. Choosing
    differently means re-judging the inventory verdicts row by row.
-2. **Sequencing: queue this as the next milestone after the in-flight
-   settings-detection work** (the `roadmap.md` edit in this PR does so),
-   ahead of run history and score trend. Recommended: yes — three small
-   PRs, kills a daily-use noise complaint, and the background-delivery fix
-   (PR #115) made the formerly dead timeout errors *start rendering*, so
-   the noise is worse than when the audit ran. Deferring keeps that noise
-   through the next milestone.
+2. **Sequencing: make this the next milestone, ahead of run history**
+   (the `roadmap.md` edit in this PR proposes that order). Recommended:
+   yes — three small PRs against run history's larger build, it kills a
+   daily-use noise complaint, and the background-delivery fix (PR #115)
+   made the formerly dead timeout errors *start rendering*, so the noise
+   is worse than when the audit ran. Choosing run history first keeps
+   that noise through a long milestone.
 
 ## Problem
 
@@ -74,10 +74,10 @@ network-allowed rank render (scenario switch, new run) reports that state as a
 red **Error** toast. It auto-closes after 8s, but re-fires constantly and
 stacks (unique ids), so it reads as a persistent wall of red. Since the audit,
 the username moved from `config.toml` into the app-owned settings store with a
-Settings page (PRs #181–#184), and identity *detection* is in flight
-([settings_detection_proposal.md](./settings_detection_proposal.md)) — the
-unset state will get rarer and easier to fix, but it remains supported and
-must stop being an error. That same 2026-08-01 entry explicitly deferred
+Settings page (PRs #181–#184), and identity *detection* shipped on top
+(PRs #189, #191, #193): the Settings page can now find and verify the
+username itself. The unset state gets rarer and easier to fix, but it remains
+the fresh-install default, stays supported, and must stop being an error. That same 2026-08-01 entry explicitly deferred
 "treat leaderboard-features-off as a normal quiet state rather than a red
 error, pointing at how to enable it" until a settings page existed to point
 at; the settings page now exists, and this proposal's inventory row 1 is that
@@ -207,8 +207,8 @@ inline state or tooltip:
   enable rank lookups" — pointing at the `/settings` page, the same pattern as
   Home's existing no-stats-directory hint. (The audit-era copy pointed at
   `config.toml`; the username has since moved to the app-owned settings store,
-  PRs #181–#184, and the in-flight detection work will offer a verified name
-  there. This row delivers the toast half of the quiet-state kernel the
+  PRs #181–#184, and the page's Detect button now offers a verified name.
+  This row delivers the toast half of the quiet-state kernel the
   2026-08-01 totals-rejection entry deferred until a settings page existed.)
 - Lookup failed → `N/A` with hint "lookup failed — Refresh to retry".
 
@@ -532,7 +532,8 @@ The 2026-08-03 refresh re-verified the inventory row by row against main
 after PRs #83–#193. Material deltas folded in: background-thread delivery now
 works via a queueing handler (PR #115), so the formerly dead rows 8–9 render;
 the username moved to the app-owned settings store with a Settings page
-(PRs #181–#184) and identity detection is in flight; four producers added
+(PRs #181–#184) with identity detection on top (PRs #189–#193); four
+producers added
 since the audit became rows 18–21; the delivery-mechanism prose, per-file
 change list, PR sequencing, and test migration map were updated to match.
 The routing policy, inventory verdicts 1–17, and the D5/D6 mechanics were
