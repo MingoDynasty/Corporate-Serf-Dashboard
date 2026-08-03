@@ -3,7 +3,6 @@ from collections import deque
 import dash_mantine_components as dmc
 
 from source import app_shell
-from source.utilities.build_info import get_build_info
 
 
 def _find_component_by_id(root, component_id):
@@ -68,11 +67,9 @@ def test_theme_toggle_is_wrapped_in_tooltip():
     assert toggle.to_plotly_json()["props"]["aria-label"] == "Toggle color scheme"
 
 
-def test_github_tooltip_carries_the_build_identity():
-    label = app_shell.github_component().label
-
-    assert label.startswith("View this app on GitHub — build ")
-    assert label.endswith(get_build_info().short_description)
+def test_github_tooltip_is_a_plain_link_label():
+    """The build identity lives on the settings page, not behind this hover."""
+    assert app_shell.github_component.label == "View this app on GitHub"
 
 
 def test_color_scheme_is_restored_before_styles_load():
