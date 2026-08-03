@@ -437,7 +437,10 @@ def _rank_hint(
     if remembered is not None:
         if remembered[0] == value:
             return remembered[1]
-        del _last_rank_hints[selected_scenario]
+        # pop, not del: concurrent interval ticks for the same scenario (two
+        # Home tabs on Waitress's thread pool) can pass the same read, and the
+        # loser's KeyError would land outside the caller's try/except.
+        _last_rank_hints.pop(selected_scenario, None)
     return _derive_rank_hint(rank_info)
 
 
