@@ -56,10 +56,16 @@ _STEAM_ID64_PATTERN = re.compile(_STEAM_ID64, re.ASCII)
 # like the stats-directory detector: the upstream ``vdf`` package is
 # unmaintained, and this file is read once per Detect press.
 #
-# The key pattern requires the opening brace as well, so it counts only what is
-# syntactically an account key: a 17-digit *value* (a numeric persona or
-# account name is legal) must not read as an account the block scan missed.
-_ACCOUNT_KEY_PATTERN = re.compile(rf'"{_STEAM_ID64}"\s*\{{', re.ASCII)
+# The key pattern recognizes an account key on its own, so a block that never
+# parsed can still be counted. Steam opens a line with the bare ID64 and puts
+# the brace on the next one, while a 17-digit *value* -- a numeric persona or
+# account name, both legal -- always has its field key earlier on the same
+# line. Anchoring to the start of the line is what tells those two apart, and
+# accepting a same-line brace keeps this in step with the block pattern.
+_ACCOUNT_KEY_PATTERN = re.compile(
+    rf'^[ \t]*"{_STEAM_ID64}"[ \t]*(?:\{{|$)',
+    re.ASCII | re.MULTILINE,
+)
 _ACCOUNT_BLOCK_PATTERN = re.compile(rf'"({_STEAM_ID64})"\s*\{{([^{{}}]*)\}}', re.ASCII)
 # A file with no users section at all is a format we do not recognize, which
 # must not read as "nobody is signed in".

@@ -259,10 +259,21 @@ def test_an_account_without_a_persona_cannot_be_probed_and_is_not_hidden(
     assert "Skipped 1 unreadable account entry" in caplog.text
 
 
+@pytest.mark.parametrize(
+    "half_written",
+    [
+        # Cut after the block opened, and cut between the account key and its
+        # brace: Steam writes the key on its own line, so both are visible.
+        '\t"{alt}"\n\t{{\n\t\t"PersonaName"\t\t"Alt"\n',
+        '\t"{alt}"\n',
+    ],
+    ids=["cut-inside-the-block", "cut-before-the-brace"],
+)
 def test_an_account_block_that_does_not_parse_is_not_hidden_either(
     roots,
     tmp_path,
     caplog,
+    half_written,
 ):
     """A file caught half-written must not read as a complete account list."""
     root = tmp_path / "Steam"
@@ -270,7 +281,7 @@ def test_an_account_block_that_does_not_parse_is_not_hidden_either(
     path.parent.mkdir(parents=True)
     path.write_text(
         f'"users"\n{{\n{_account_block(STEAM_ID, PERSONA)}\n'
-        f'\t"{ALT_STEAM_ID}"\n\t{{\n\t\t"PersonaName"\t\t"Alt"\n',
+        + half_written.format(alt=ALT_STEAM_ID),
         encoding="utf-8",
     )
     roots(root)
