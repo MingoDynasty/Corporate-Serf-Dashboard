@@ -180,14 +180,18 @@ untouched.
 **Identity detection.** A Detect button beside the identity fields runs
 the pipeline synchronously with a loading state:
 
-- exactly one verified pair → the username and Steam ID inputs are filled
-  with it, and the status line says what was found and that Save applies
-  it;
-- two or more → a picker appears listing each pair (canonical username,
-  with persona and last-seen as secondary text, newest first); choosing
-  one fills the two inputs. Never auto-picked: two verified accounts is
-  precisely the case where silent selection would fill caches with
-  someone else's ranks;
+- exactly one verified pair, from a detection with nothing unresolved
+  (discovery complete, zero unchecked probes) → the username and Steam
+  ID inputs are filled with it, and the status line says what was found
+  and that Save applies it;
+- two or more verified pairs — or a sole verified pair from an
+  incomplete detection, whose unresolved portion could be hiding
+  another valid account → a picker appears listing each pair (canonical
+  username, with persona and last-seen as secondary text, newest
+  first); choosing one fills the two inputs. Never auto-picked:
+  auto-fill is reserved for the one result that cannot be hiding a
+  second answer, because a wrong identity fills caches with someone
+  else's ranks;
 - zero verified, discovery complete, all probes answered → status: no
   local Steam account matches a KovaaK's profile; enter the username
   manually (with no reverse lookup, manual entry is the only remaining
@@ -271,9 +275,11 @@ map rows are updated in the PRs whose behavior they describe.
   409, and transport-failure probes under `caplog` and asserts no
   persona string reaches any log record.
 - **Page callbacks**: render-time candidates land in the field's
-  suggestion data; Detect outcomes (fill on one pair, picker on several,
-  the conclusive no-match, unchecked, and discovery-failure statuses);
-  None-trigger regressions for both
+  suggestion data; Detect outcomes (fill only on one pair with a
+  complete detection; picker on several pairs and on a sole pair with
+  an unchecked probe or failed discovery; the conclusive no-match,
+  unchecked, and discovery-failure statuses); None-trigger regressions
+  for both
   new callbacks. Picker interaction is verified at the callback layer —
   the automated browser pane cannot open Mantine dropdowns, the
   established practice from the settings-page tests.
