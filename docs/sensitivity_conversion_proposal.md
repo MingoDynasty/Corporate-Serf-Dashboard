@@ -33,16 +33,22 @@ empirically the sensitivity re-expressed in KovaaK's internal base scale
 `cm/360 = 360 × 2.54 / (0.07 × increment × DPI)` universal: every sens scale
 KovaaK's supports, including ones added in future game updates, converts with
 zero per-game knowledge, and the result is exactly what KovaaK's itself would
-display. The alternative — porting the per-game yaw table from KovaaK's
-SensitivityMatcher project — supports only the scales we hardcode, makes us
-the owner of each constant's provenance, and provably disagrees with KovaaK's
-in-game numbers in the fourth significant digit (KovaaK's internal Valorant
-yaw is 0.06996, not the community's 0.07). Choosing the table instead means
-new-scale support requires a code change each time and the converted values
-differ from what the KovaaK's UI shows the user; the risk of the recommended
-path is reliance on an undocumented field, mitigated by its perfect
-consistency across 7,413 real files and by regression fixtures taken from
-those files.
+display. The alternative is a per-scale yaw table — and the repository
+already carries a KovaaK-generated one: `resources/sensitivity converter/
+response.json`, captured from kovaaks.com's `game-settings` endpoint, whose
+formulas match KovaaK's UI exactly (its Valorant entry records yaw 0.06996,
+corroborating the corpus measurement below). A table sourced from that
+capture produces the same numbers as the recommended path; only a
+community-sourced table (Valorant 0.07) would disagree in the fourth
+significant digit. The real trade-off is therefore upkeep and matching: a
+table covers only the scales in the capture, needs regenerating when
+KovaaK's adds scales, and requires mapping the stats file's `Sens Scale`
+string onto the capture's `ScaleName`, whereas the increment travels inside
+every stats file. The risk of the recommended path is reliance on an
+undocumented stats-file field — mitigated by its perfect consistency across
+7,413 real files, by the capture's `IncrementFormula` entries (for game
+scales the recorded increment equals that formula's value divided by 0.07
+exactly), and by regression fixtures taken from those files.
 
 ## Problem
 
@@ -74,7 +80,8 @@ A second, incidental defect: the parser rounds the raw sensitivity to
 `sens_round_decimal_places` (configured 1) before keying, so `0.16 Valorant`
 and `0.25 Valorant` currently collapse into the `0.2 Valorant` group.
 Conversion moves the rounding to the cm/360 result, where one decimal place
-is appropriate, and those runs separate correctly (51.1 vs 40.8 cm/360).
+is appropriate, and those runs separate correctly: 0.16 → 51.1 and
+0.25 → 32.7 cm/360, splitting off from the true 0.2 runs at 40.8.
 
 ## Verified facts
 
@@ -96,16 +103,23 @@ All verified against the live stats directory on 2026-08-03:
   community-standard 0.07. The difference is 0.06% — invisible at one
   decimal place — but it means the increment path reproduces KovaaK's own
   numbers while a community yaw table would not.
-- The yaw model and per-game constants originate from KovaaK's own
-  SensitivityMatcher project (github.com/KovaaK/SensitivityMatcher);
-  community references list Valorant 0.07 and Overwatch 0.0066.
+- The yaw model originates from KovaaK's own tooling
+  (github.com/KovaaK/SensitivityMatcher); community references list
+  Valorant 0.07 and Overwatch 0.0066. The repository's
+  `resources/sensitivity converter/response.json` — a capture of
+  kovaaks.com's `game-settings` endpoint — records the exact in-game
+  formulas, Valorant `360 / (Inches × 0.06996 × DPI)` and Overwatch
+  `360 / (Inches × 0.0066 × DPI)`, independently corroborating the 0.06996
+  corpus measurement; for game scales its `IncrementFormula` entries match
+  the observed `Sens Increment` field as the formula's value divided
+  by 0.07.
 - The 368 runs recorded at DPI 400 (2025-08-12 → 08-16) are a KovaaK's
   settings mistake — the mouse was physically at 1600 DPI. See Settled
   decisions.
 
 ## Design
 
-Normalization happens in one place: `_get_data_from_csv_file` in
+Normalization happens in one place: `extract_data_from_file` in
 `source/kovaaks/data_service.py`, which already parses `Sens Scale:` and
 `Horiz Sens:`. It additionally reads `DPI:` and `Sens Increment:` and then:
 
@@ -160,12 +174,21 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
 
 - Unit tests for the conversion, with fixtures taken from real corpus files:
   cm/360 identity; `0.2 Valorant` @ 1600 → 40.8; the same increment @ 400 →
-  163.4; missing DPI, missing increment, and zero values each fall back to
-  the original label; legacy files still parse (fields stay optional).
-- A cross-check test asserting the increment-derived result for the corpus's
-  Valorant fixtures agrees with the community-yaw computation
-  (`360/(0.07 × sens)/DPI × 2.54`) within 0.1%, documenting the field's
-  semantics as an executable invariant.
+  163.4. Rounded expectations alone cannot pin the mechanism — a
+  community-yaw (0.07) computation from the raw sensitivity differs from the
+  increment-derived value by only 0.06%, which one-decimal rounding hides —
+  so fixtures also assert the unrounded value (increment 0.199886 @ 1600 →
+  ≈40.8447) at a relative tolerance of 1e-5, an order of magnitude below
+  that delta, making a regression that silently recomputes from raw
+  sensitivity with community constants fail.
+- Fallback coverage: missing DPI, missing increment, and zero values each
+  keep the original label; legacy files still parse (the new fields stay
+  optional, never joining the required-field check).
+- A cross-check test asserting the increment-derived result matches the
+  exact formula recorded in `resources/sensitivity converter/response.json`
+  (`360 / (Inches × 0.06996 × DPI)` for Valorant) within the precision of
+  the six-decimal increment field, documenting the field's semantics as an
+  executable invariant with KovaaK-sourced provenance.
 - Existing parser/grouping tests updated where labels change.
 - Standard gates (ruff format, ruff check, mypy, pytest, compileall).
 
@@ -174,9 +197,10 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
 1. **PR 1 — this proposal.** No code.
 2. **PR 2 — implementation.** Gated on D1 flipping to Accepted. Parser
    change + tests, `docs/kovaaks_api_notes.md` gains the `Sens Increment` /
-   `DPI` field semantics and the empirical invariant (they become
-   relied-upon fields), plus the full shipping checklist: decision-log
-   distillation, proposal deletion, roadmap and product inventory updates.
+   `DPI` field semantics, the empirical invariant (they become relied-upon
+   fields), and the `game-settings` endpoint capture that corroborates
+   them, plus the full shipping checklist: decision-log distillation,
+   proposal deletion, roadmap and product inventory updates.
 
 Single implementation PR; the blast radius is one parser function plus
 tests and docs.
