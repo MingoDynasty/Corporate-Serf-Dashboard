@@ -24,7 +24,8 @@ decision only with new evidence, not re-argument. Approving decision 1
 alone starts PR 1; decisions 2 and 3 can trail without blocking it.
 
 1. **Noise kill (gates PR 1) — approve the quiet-by-default routing rule
-   and its removal verdicts.** Status: open. Persistent conditions render
+   and its removal verdicts.** Status: Accepted (2026-08-03). Persistent
+   conditions render
    in-place instead of re-toasting and passive navigation never toasts an
    error: concretely, inventory rows 1/2/4/5/12/19 are removed in favor
    of existing in-place surfaces plus the D3 Position-field hints.
@@ -33,14 +34,17 @@ alone starts PR 1; decisions 2 and 3 can trail without blocking it.
    complaint. Needs nothing from decision 2.
 2. **Architecture (gates PRs 2–3) — approve retiring System A onto the
    callback path, the one-run-one-toast merge, and the typed queue for
-   the run-import failure.** Status: open. The D1/D4/D5 design.
+   the run-import failure.** Status: Accepted (2026-08-03) — with D5
+   reframed so the replace behaviors are normative and the verified timer
+   mechanism is a fallback, per the approval round. The D1/D4/D5 design.
    Recommended: yes — one delivery path with per-event routing replaces a
    log-level bridge that stacks uuid toasts under generic titles.
    Choosing differently keeps two delivery systems and the
    double-toast-per-run behavior; the noise kill above still stands on
    its own.
 3. **Sequencing — make this the next milestone, ahead of run history**
-   (the `roadmap.md` edit in this PR proposes that order). Status: open.
+   (the `roadmap.md` entry records that order). Status: Accepted
+   (2026-08-03).
    Recommended: yes — three small PRs against run history's larger build,
    it kills a daily-use noise complaint, and the background-delivery fix
    (PR #115) made the formerly dead timeout errors *start rendering*, so
@@ -77,8 +81,9 @@ The audit found four System A error toasts that could never render (the
 watchdog's "Could not start position update" and the three rank-timer
 messages); PR #115 fixed delivery — so **those red generic "Error" toasts now
 actually appear**, batched onto the next Home visit. The delivery bug is gone
-and the noise is correspondingly worse. Their deletion — inventory rows 8–9 —
-is this proposal's lowest-risk slice and was split out as PR #194.
+and the noise was correspondingly worse. Their deletion — inventory rows
+8–9 — was this proposal's lowest-risk slice, split out as PR #194 and merged
+(`449ea92`); those toasts are gone from main.
 
 System B has stacking sources of its own: the top-N toast and the
 score-threshold toast use *different* stable ids, so a single run that
@@ -139,8 +144,8 @@ the original audit; rows 18–21 are producers added since (marked *new*).
 | 5 | 🟡 "No scenario data for the given date range" | Date filter empties the plot (two call sites since the figure-builder split) | A | yes | **Remove** (same) |
 | 6 | 🔴 "Position refresh for X failed" | Manual Refresh errors | A | yes | **Keep → move to B** |
 | 7 | 🟡 "Insufficient data for playlist X" | Journey page, selected playlist has no data | A | yes | **Modify → in-page empty state**, no toast |
-| 8 | 🔴 "Could not start position update for X" | Watchdog fails to schedule refresh | A | yes, queued — next Home tick | **Delete** (console log stays) — split out as PR #194 |
-| 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | yes, queued — next Home tick | **Delete** (console log stays) — split out as PR #194 |
+| 8 | 🔴 "Could not start position update for X" | Watchdog fails to schedule refresh | A | no — removed | **Delete** (console log stays) — shipped in PR #194 |
+| 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | no — removed | **Delete** (console log stays) — shipped in PR #194 |
 | 10 | 🟢 New top-N score | Run makes top-N for its sensitivity | B | yes | **Merge into one run-verdict toast** (D5) + rewrite copy |
 | 11 | 🟢/🟡 Score threshold pass/fail | Threshold switch on + prior PB exists | B | yes | **Merge into one run-verdict toast** (D5) |
 | 12 | 🔵 "Graph updated!" | Any run not threshold-judged (co-fires with the top-N toast, which does not suppress it) | B | yes | **Remove** |
@@ -262,9 +267,8 @@ in PR 2: a module-level deque of import-failure messages in the watchdog,
 drained into one red toast by a Home interval callback, exactly the startup
 playlist-warning shape. Home-gated delivery is acceptable for it — the run's
 absence is a Home-visible fact, and today's delivery is already Home-gated.
-Rows 8–9 go console-only in PR #194 (open at this writing — a hard
-prerequisite of PR 2, see Build sequencing); row 19 follows in PR 1 (delete
-the toast call, keep the `logger` sibling). Document the rule in
+Rows 8–9 went console-only in PR #194 (merged); row 19 follows in PR 1
+(delete the toast call, keep the `logger` sibling). Document the rule in
 `docs/architecture.md` so the level-driven-bridge mistake cannot recur. Surfacing background rank events as
 real toasts is deferred (Open questions) — if it happens, it reuses this
 typed-queue pattern.
@@ -281,36 +285,43 @@ removed). The backlog summary (#13) already follows this one-toast shape and
 **shares the `run-verdict` id**: a new live run replaces the catch-up digest,
 which is strictly staler information.
 
-**Replace mechanics (DMC 2.8.0, the locked version — re-verified 2026-08-03):**
-a bare `show` cannot replace — the Mantine store ignores `show` for an id
-already on screen, and `update` is a no-op for an id that is not. Neither
-alone is an upsert, so each run-verdict emission sends **both actions with the
-same id and payload** (`update` then `show`): whichever matches the toast's
-current state applies and the other is a no-op.
+**Normative behavior** — this, not any mechanism, is the durable decision:
 
-The upsert must also grant a **fresh full lifetime**: Mantine's auto-close
-timer effect is keyed on the resolved `autoClose` duration only, so an
-`update` carrying the same duration leaves the original timer running — a run
-landing near the old toast's expiry would flash for milliseconds. Each
-emission therefore alternates `autoClose` between two indistinguishable
-durations (e.g. 8000/8001 ms), forcing the duration-keyed effect to cancel and
-re-arm the timer. The alternation state is **per browser client**: a
-`dcc.Store` sequence flipped on each emission (`generate_graph` gains a
-`State`/`Output` pair on it, and the pure builders take the sequence as an
-argument). A module-global toggle would be wrong — each tab runs its own
-callback stream and `NotificationContainer`, so one tab's flip could hand
-another tab the duration it is already displaying, leaving the old timer
-running. The Store's **lifecycle must match the host's**: it lives in
-`app_shell.py` beside the `NotificationContainer`, not in Home's page layout —
-toasts survive page navigation (the container is shell-hosted) while a
-page-layout memory Store resets on remount, which could reissue the visible
-toast's duration after a navigate-away-and-back. PR 3 must carry a regression
-test for the replace cases — a second run's toast replacing a visible one, a
-live run replacing the backlog digest, and an emission after navigating away
-and back while a toast is active — asserting with **elapsed time** that the
-replacement gets a full lifetime, not merely that the payload changed. (The
-test doubles as an upgrade guard: the mechanism depends on the timer effect's
-duration dependency, which a future DMC/Mantine version could change.)
+- at most one run-verdict toast is visible at a time;
+- a later verdict replaces the visible one, including the backlog digest;
+- the replacement receives a full toast lifetime, never the remainder of the
+  old timer;
+- all of the above holds per browser client and survives page navigation.
+
+PR 3 must carry a regression test for the replace cases — a second run's
+toast replacing a visible one, a live run replacing the backlog digest, and
+an emission after navigating away and back while a toast is active —
+asserting with **elapsed time** that the replacement gets a full lifetime,
+not merely that the payload changed. Those tests are the contract the
+implementation must satisfy, and they double as an upgrade guard for future
+DMC/Mantine versions.
+
+**Verified fallback mechanism (DMC 2.8.0, the locked version — re-verified
+2026-08-03).** The implementation PR should use the simplest mechanism that
+passes those tests — if a simpler approach (or a future DMC native replace)
+works, prefer it. The following is the one mechanism verified to work today,
+recorded so PR 3 does not rediscover it: a bare `show` cannot replace — the
+Mantine store ignores `show` for an id already on screen, and `update` is a
+no-op for an id that is not — so each emission sends **both actions with the
+same id and payload** (`update` then `show`); whichever matches the toast's
+current state applies and the other is a no-op. Mantine's auto-close timer
+effect is keyed on the resolved `autoClose` duration only, so an `update`
+carrying the same duration leaves the original timer running — a run landing
+near the old toast's expiry would flash for milliseconds; alternating
+`autoClose` between two indistinguishable durations (e.g. 8000/8001 ms)
+forces the duration-keyed effect to cancel and re-arm. The alternation state
+must be **per browser client** (a `dcc.Store` sequence flipped on each
+emission — a module-global toggle could hand another tab the duration it is
+already displaying), and the Store's **lifecycle must match the host's**: in
+`app_shell.py` beside the `NotificationContainer`, not in Home's page
+layout — toasts survive page navigation while a page-layout memory Store
+resets on remount, which could reissue the visible toast's duration after a
+navigate-away-and-back.
 
 ### D6. Presentation standards
 
@@ -326,11 +337,10 @@ duration dependency, which a future DMC/Mantine version could change.)
   the top-N toast and the row-20 refresh confirmation).
 - **Message leads with the scenario**; sensitivity is a trailing qualifier
   (top-N is per-sensitivity, so it matters, but it is never the subject).
-- Consistent `autoClose`: one nominal duration — expressed at runtime as two
-  indistinguishable values by the D5 timer-reset alternation — with two
-  deliberate exceptions that persist until dismissed: the Steam-ID mismatch
-  (#3) and startup playlist warnings (#15), both of which fire when the user
-  may not be looking.
+- Consistent `autoClose`: one nominal duration (however the D5 replace
+  mechanism expresses it at runtime) with two deliberate exceptions that
+  persist until dismissed: the Steam-ID mismatch (#3) and startup playlist
+  warnings (#15), both of which fire when the user may not be looking.
 - Copy shapes (final wording is a build-time detail; the shape is the
   decision):
   - Top-N only: title `New 2nd-best score` (1st: `New best score`), message
@@ -383,8 +393,9 @@ Grouped by file; each maps to inventory rows above.
   `home.py` (`_build_run_event_notifications`) stays and calls it.
 - **`app_shell.py`** — the single `dmc.NotificationContainer` remains the only
   host (the audit-era `log_handler.embed()` is already gone since PR #115).
-  Add the per-client toast-lifetime `dcc.Store` beside it (D5) — shell-hosted
-  so its lifecycle matches the container's across page navigation.
+  If PR 3 uses the verified D5 fallback mechanism, add the per-client
+  toast-lifetime `dcc.Store` beside it — shell-hosted so its lifecycle
+  matches the container's across page navigation.
 - **`pages/home.py`**
   - Delete `flush_background_notifications` (dies with System A's queue); add
     the small drain callback for the row-18 typed queue (D4) in its place.
@@ -421,20 +432,21 @@ Grouped by file; each maps to inventory rows above.
     note #5 now fires from two call sites in `_build_scenario_figure`);
     replace `_build_run_event_notifications`' two-toast output with the single
     merged run-verdict toast (D5); drop the "Graph updated!" fallback (#12).
-    This callback gains the `State`/`Output` pair on the shell-hosted
-    toast-lifetime `dcc.Store` (see the `app_shell.py` item) for the D5
-    autoClose alternation.
+    Under the verified D5 fallback mechanism, this callback gains the
+    `State`/`Output` pair on the shell-hosted toast-lifetime `dcc.Store`
+    (see the `app_shell.py` item) for the autoClose alternation, and the
+    pure builders take the sequence as an argument.
   - Drop the `get_dash_logger` import and the `dash_logger` module-global.
 - **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
   empty state where the chart renders, mirroring Home's on-canvas pattern.
   Drop the `get_dash_logger` import and module-global.
 - **`my_watchdog/file_watchdog.py`** — the schedule-failure toast (#8) is
-  removed by PR #194 (a PR 2 prerequisite). Replace the run-import failure
-  toast (#18) with an append to the new typed import-failure queue, then
-  drop the `get_dash_logger` import and module-global.
-- **`kovaaks/api_service.py`** — covered by PR #194 (a PR 2 prerequisite):
-  the three toast calls in `_notify_exhaustion` / `_run_attempt` (#9) and
-  the `dash_logger` import/global.
+  already gone (PR #194, merged). Replace the run-import failure toast (#18)
+  with an append to the new typed import-failure queue, then drop the
+  `get_dash_logger` import and module-global.
+- **`kovaaks/api_service.py`** — already done (PR #194, merged): the three
+  toast calls in `_notify_exhaustion` / `_run_attempt` (#9) and the
+  `dash_logger` import/global are gone.
 - **`kovaaks/percentile_warmup_service.py`** — delete the fatal-state toast
   (#19); keep the `logger.warning`. The Playlists overview status strip
   already renders the fatal state in place.
@@ -448,9 +460,10 @@ Grouped by file; each maps to inventory rows above.
   notifications; records logged outside a callback context are queued…"),
   which deleting `dash_logging.py` falsifies — `test_docs.py` gates dangling
   links, not stale prose, so nothing else catches it.
-- **`docs/specs/scenario_rank.md`** — PR #194 rewrites the
-  background-refresh-failure statement (console/file logs only); PRs 1–2
-  update any remaining delivery-mechanism prose as System A shrinks.
+- **`docs/specs/scenario_rank.md`** — PR #194 already rewrote the
+  background-refresh-failure statement (console/file logs only, with its own
+  2026-08-03 decision-log entry); PRs 1–2 update any remaining
+  delivery-mechanism prose as System A shrinks.
 - **`pyproject.toml`** — **`dash-extensions` stays**: `app.py` imports
   `DashProxy` from `dash_extensions.enrich` (the app framework itself), and
   only `dash_logging.py`'s `context_value` import goes away with the module.
@@ -464,15 +477,14 @@ Grouped by file; each maps to inventory rows above.
    paragraph (the "Graph updated!" description becomes false here) and the
    `scenario_rank.md` spec lines PR 1 falsifies. Resolves the audit
    complaint by itself; smallest reviewable unit. (The #8/#9 dead-diagnostic
-   deletions are split out as the independent PR #194.)
+   deletions landed first as the independent PR #194, merged.)
 2. **System consolidation.** Delete System A (handler, queue, drain callback,
    `tests/test_dash_logging_background.py`), migrate #3 (once-per-session)
    and #6 to System B, add the row-18 typed import-failure queue, move #7
    in-page, add the `toast()` builder, document the D4 rule in
-   `architecture.md`, finish the spec update. **Hard prerequisite:
-   PR #194 merged** — deleting `dash_logging.py` while `file_watchdog.py`
-   and `api_service.py` still hold the #8/#9 call sites would strand
-   imports; if #194 has not merged by then, PR 2 subsumes its removals.
+   `architecture.md`, finish the spec update. Its former hard prerequisite —
+   PR #194 merged, so no `dash_logger` call sites remain outside the
+   modules PR 2 itself touches — is already satisfied.
 3. **Copy rework.** The merged run-verdict toast (D5) and the D6 copy shapes;
    align the backlog summary (a full copy rewrite, not a no-op — see Migration
    notes); make #15 persistent; sweep surviving titles (#14–#17, #20, #21).
@@ -499,9 +511,9 @@ Grouped by file; each maps to inventory rows above.
     assertions (#5, both call sites). No test asserts the #19 toast (only the
     in-page status string in `test_playlist_pages.py`), so its removal breaks
     nothing.
-  - **Split out to PR #194** (the #8/#9 deletions):
+  - **Shipped with PR #194** (the #8/#9 deletions):
     `tests/test_file_watchdog_rank_refresh.py` and
-    `tests/test_scenario_rank_freshness.py` are rewritten there against
+    `tests/test_scenario_rank_freshness.py` were rewritten there against
     the retained console `logger` calls.
   - **PR 2** (System A deletion, row-18 queue, Journey in-page state):
     `tests/test_dash_logging_background.py` is deleted with the module it
@@ -588,3 +600,10 @@ Later the same day, Decisions needed was restructured into three
 independently approvable decisions, each carrying a recorded status so
 review rounds can scope themselves to what is still open, and the rows 8–9
 deletions were split out and opened as PR #194.
+
+On 2026-08-03, after the proposal and PR #194 merged, an approving external
+review round (two independent passes, both endorsing all three decisions)
+led the maintainer to accept them; this amendment records the Accepted
+statuses, reflects PR #194's merge, and reframes D5 so the replace behaviors
+are normative with the verified DMC 2.8.0 timer mechanism recorded as a
+fallback rather than a mandate.
