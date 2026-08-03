@@ -80,9 +80,13 @@ paths assert the retained log records rather than toast delivery.
 
 Scope: this entry decides these four call sites only. The broader notification
 redesign — which subsystem owns toasts, the routing policy that produced this
-verdict, and the fate of every other toast in the app — is still under debate in
-PR #82 and is not settled here. The deletion was split out (PR #194) because it
-stands alone: nothing else reads the removed calls, and the retained logging is
+verdict, and the fate of every other toast in the app — was still under debate
+in PR #82 when this shipped; later the same day the maintainer accepted all
+three of that proposal's decisions (2026-08-03, recorded in
+`notification_system_proposal.md`), so the redesign's implementation PRs are
+now authorized and its durable decisions will be distilled here when the final
+redesign PR ships. The deletion was split out (PR #194) because it stands
+alone: nothing else reads the removed calls, and the retained logging is
 untouched.
 
 ## 2026-08-03: Settings Detection Suggests, And Identity Is Offered Only Once Verified
