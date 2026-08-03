@@ -25,10 +25,10 @@ manual Refresh — is unchanged.
 
 When a position lookup fails in the background, the app no longer shows the user
 an error message. The failure is written to the console and the log file, and
-the position on screen keeps showing the value it already had. These failures
-fix themselves: a failed attempt never overwrites the cached position, and the
-next personal best starts a fresh lookup. The message was asking the user to
-react to something they could not act on, often minutes after the fact.
+the position on screen keeps showing the last value the app confirmed. Nothing
+is lost or overwritten by the failure, but the app no longer announces it
+either: a background failure is now something the user finds in the log, or
+infers from a position that did not move after a personal best.
 
 Decision: four background diagnostic error toasts are deleted and their
 `logger` siblings retained. Three are in the rank-freshness timer chain in
@@ -42,17 +42,41 @@ Why: these calls were dead code when written — `dash_logger` records emitted
 from a plain thread never reached a callback context — and PR #115's queueing
 handler made them live without anyone re-deciding whether they should be. What
 they actually deliver is a generic red "Error" toast, batched onto the next
-Home visit, describing an event that is already handled. Manual Refresh remains
-the escape hatch the superseded entry reserved for a permanently divergent
-score; what changes is that the app stops prompting for it, because the prompt
-arrived detached from the event and named no action the failure had not already
-taken care of.
+Home visit. One channel was reporting two failures of different kinds, and the
+reasons for dropping it differ per kind — neither of them is "the chain retries
+until it works", which is true of no path here:
 
-Consequences: a background refresh failure has no user-visible surface —
-noticing one means reading `data/logs/debug.log` or the console. That is the
-accepted trade for silence on a self-healing path, and it is why the manual
-Refresh button, which reports its own failures, stays. The regression tests for
-these paths assert the retained log records rather than toast delivery.
+- **An exhausted chain has a recoverable outcome, not a self-healing one.**
+  The chain stops; nothing reschedules it. What makes the outcome benign is the
+  monotonic writer: a failed attempt never replaces the cached position, so the
+  widget keeps serving the last confirmed value and the *next successful
+  lookup* corrects it — a later PB, a manual Refresh, or a foreground fetch
+  once the week-long rank-cache TTL expires (the interval poll is cache-only
+  and never triggers one). With no later PB, the displayed position can sit at
+  its pre-PB value for that full TTL. That is bounded staleness on a value that
+  was correct when written, and it is the honest ceiling on this decision.
+- **The unknown-user stop never recovers, and is not claimed to.**
+  `_run_attempt` returns without scheduling, and every later PB repeats the
+  same failure until the username is fixed on the settings page. It is dropped
+  for a different reason: it is a persistent misconfiguration that the
+  foreground already reports. Home's rank callback takes `run-events` as an
+  input, so the same new run that schedules the chain also triggers a
+  network-allowed foreground lookup, which returns `UNKNOWN` carrying
+  `KovaaK's username '<name>' was not found.` and toasts it through
+  `_emit_rank_messages`. The deleted background toast was a second, later, less
+  specific copy of a message the user already receives.
+
+Consequences — the accepted loss is on the exhaustion path: it now has no
+user-visible surface at all, so noticing one means reading `data/logs/debug.log`
+or the console, or noticing the position did not move. This entry accepts that
+rather than solving it. The remedy on the table — a persistent in-place state on
+the Position field that explains why the value is what it is — is a UI addition
+belonging to the notification redesign, not to a deletion-only change, and is
+tracked there (PR #82, the routing-policy and in-place-state decisions). Manual
+Refresh, which reports its own failures in the foreground, remains the escape
+hatch the superseded entry reserved for a permanently divergent score; what
+changes is that the app no longer prompts for it. The regression tests for these
+paths assert the retained log records rather than toast delivery.
 
 Scope: this entry decides these four call sites only. The broader notification
 redesign — which subsystem owns toasts, the routing policy that produced this

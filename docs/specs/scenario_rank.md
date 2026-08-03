@@ -96,7 +96,11 @@ benchmark tier) — see the
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
 - Background refresh failures are recorded in the console/file logs only;
   they produce no UI notification. The chain degrades silently — the widget
-  keeps serving the cached value it already shows
+  keeps serving the cached value it already shows, and an exhausted chain is
+  corrected only by the next successful lookup (a later PB, a manual Refresh,
+  or a foreground fetch after the rank-cache TTL expires). An invalid username
+  stops the chain outright, but is still reported by the foreground lookup the
+  same run event triggers, not by the chain
   ([2026-08-03](../decision_log.md#2026-08-03-background-rank-diagnostics-are-console-only)).
 
 ## Failure handling
