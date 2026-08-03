@@ -118,6 +118,7 @@ class Endpoints(StrEnum):
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
     SEARCH_SCENARIO = "/scenario/popular"
+    USER_PROFILE_BY_USERNAME = "/user/profile/by-username"
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
@@ -296,6 +297,35 @@ def get_evxl_playlist(sharecode: str) -> EvxlPlaylist:
         params={"shareCode": sharecode.strip()},
     )
     return EvxlPlaylistByCodeResponse.model_validate(response.json()).playlist
+
+
+def get_user_profile_by_username(username: str) -> object | None:
+    """Look up one KovaaK's webapp profile by name, or None when there is none.
+
+    Unauthenticated. HTTP 409 (``{"error":"Player does not exist"}``) is this
+    endpoint's confirmed-absence answer rather than a failure, so it becomes
+    ``None``; ``_get_with_retry`` surfaces it as an ``HTTPError`` through
+    ``raise_for_status``, which is caught here. Every other status and every
+    transport failure propagates for the caller to classify.
+
+    The parsed body is returned unvalidated -- identity detection decides which
+    payloads it can use, so schema drift degrades there like an outage instead
+    of raising here.
+
+    The request is marked sensitive: the name is a Steam persona probed on the
+    user's behalf, including accounts they never save.
+    """
+    try:
+        response = _get_with_retry(
+            Endpoints.USER_PROFILE_BY_USERNAME,
+            params={"username": username},
+            sensitive=True,
+        )
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 409:
+            return None
+        raise
+    return response.json()
 
 
 def get_benchmark_json(

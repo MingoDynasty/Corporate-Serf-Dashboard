@@ -538,6 +538,62 @@ def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
     assert len(calls) == 1
 
 
+def test_get_user_profile_by_username_sends_the_name_as_a_sensitive_parameter(
+    monkeypatch,
+    caplog,
+):
+    profile = {"steamId": "76561198000000001", "webapp": {"username": "MingoDynasty"}}
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return FakeResponse(profile)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    assert api_service.get_user_profile_by_username("SecretPersona") == profile
+    # In params, never concatenated into the URL: that is what keeps the
+    # bare-URL log lines clean.
+    assert calls == [
+        (
+            "https://kovaaks.com/webapp-backend/user/profile/by-username",
+            {
+                "params": {"username": "SecretPersona"},
+                "timeout": api_service.DEFAULT_TIMEOUT_SECONDS,
+            },
+        )
+    ]
+    assert "SecretPersona" not in caplog.text
+
+
+def test_get_user_profile_by_username_maps_409_to_a_confirmed_absence(monkeypatch):
+    # 409 {"error":"Player does not exist"} is this endpoint's answer for "no
+    # such player", so identity detection must not have to read exceptions.
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(
+            {"error": "Player does not exist"},
+            status_code=409,
+        ),
+    )
+
+    assert api_service.get_user_profile_by_username("Nobody") is None
+
+
+def test_get_user_profile_by_username_propagates_other_http_errors(monkeypatch):
+    """A server failure is not evidence that the player does not exist."""
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(None, status_code=500),
+    )
+
+    with pytest.raises(api_service.requests.HTTPError):
+        api_service.get_user_profile_by_username("MingoDynasty")
+
+
 def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
     response_json = {"benchmark_progress": 42}
 
