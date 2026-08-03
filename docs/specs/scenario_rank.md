@@ -7,11 +7,10 @@ automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
 no username configured it makes no network calls at all. During normal
-play the field explains its own state beside the value rather than
-interrupting with a pop-up notification. A Refresh the player clicks
-still answers with one, because they asked for it. So does a Steam ID
-that disagrees with the account KovaaK's found — once per app session,
-because the field has nowhere to say it.
+play the field explains its own state beside the value instead of popping
+up a notification, and only two things still interrupt: a Refresh the
+player clicked, and a Steam ID that disagrees with the account KovaaK's
+found, said once per app session because the field has nowhere to put it.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
