@@ -16,18 +16,36 @@ first one alone resolves the original audit complaint.
 
 ## Decisions needed
 
-1. **Adopt the routing policy and one-toast-per-run design.** Recommended:
-   yes — the policy (persistent conditions in-place, passive activity
-   quiet, one run one toast, user-initiated actions always get their
-   result) is the product call everything below executes. Choosing
-   differently means re-judging the inventory verdicts row by row.
-2. **Sequencing: make this the next milestone, ahead of run history**
-   (the `roadmap.md` edit in this PR proposes that order). Recommended:
-   yes — three small PRs against run history's larger build, it kills a
-   daily-use noise complaint, and the background-delivery fix (PR #115)
-   made the formerly dead timeout errors *start rendering*, so the noise
-   is worse than when the audit ran. Choosing run history first keeps
-   that noise through a long milestone.
+Each decision below is independently approvable and carries its own
+status, so review stays scoped: a decision marked **Accepted** is settled
+with the maintainer and is not a review target — reviewers argue the open
+decisions and the correctness of the body, and re-open an accepted
+decision only with new evidence, not re-argument. Approving decision 1
+alone starts PR 1; decisions 2 and 3 can trail without blocking it.
+
+1. **Noise kill (gates PR 1) — approve the quiet-by-default routing rule
+   and its removal verdicts.** Status: open. Persistent conditions render
+   in-place instead of re-toasting and passive navigation never toasts an
+   error: concretely, inventory rows 1/2/4/5/12/19 are removed in favor
+   of existing in-place surfaces plus the D3 Position-field hints.
+   Recommended: yes — every removed toast has an in-place surface already
+   or conveys nothing actionable, and PR 1 alone resolves the audit
+   complaint. Needs nothing from decision 2.
+2. **Architecture (gates PRs 2–3) — approve retiring System A onto the
+   callback path, the one-run-one-toast merge, and the typed queue for
+   the run-import failure.** Status: open. The D1/D4/D5 design.
+   Recommended: yes — one delivery path with per-event routing replaces a
+   log-level bridge that stacks uuid toasts under generic titles.
+   Choosing differently keeps two delivery systems and the
+   double-toast-per-run behavior; the noise kill above still stands on
+   its own.
+3. **Sequencing — make this the next milestone, ahead of run history**
+   (the `roadmap.md` edit in this PR proposes that order). Status: open.
+   Recommended: yes — three small PRs against run history's larger build,
+   it kills a daily-use noise complaint, and the background-delivery fix
+   (PR #115) made the formerly dead timeout errors *start rendering*, so
+   the noise is worse than when the audit ran. Choosing run history first
+   keeps that noise through a long milestone.
 
 ## Problem
 
@@ -59,7 +77,8 @@ The audit found four System A error toasts that could never render (the
 watchdog's "Could not start position update" and the three rank-timer
 messages); PR #115 fixed delivery — so **those red generic "Error" toasts now
 actually appear**, batched onto the next Home visit. The delivery bug is gone
-and the noise is correspondingly worse.
+and the noise is correspondingly worse. Their deletion — inventory rows 8–9 —
+is this proposal's lowest-risk slice and was split out as PR #194.
 
 System B has stacking sources of its own: the top-N toast and the
 score-threshold toast use *different* stable ids, so a single run that
@@ -120,8 +139,8 @@ the original audit; rows 18–21 are producers added since (marked *new*).
 | 5 | 🟡 "No scenario data for the given date range" | Date filter empties the plot (two call sites since the figure-builder split) | A | yes | **Remove** (same) |
 | 6 | 🔴 "Position refresh for X failed" | Manual Refresh errors | A | yes | **Keep → move to B** |
 | 7 | 🟡 "Insufficient data for playlist X" | Journey page, selected playlist has no data | A | yes | **Modify → in-page empty state**, no toast |
-| 8 | 🔴 "Could not start position update for X" | Watchdog fails to schedule refresh | A | yes, queued — next Home tick | **Delete** (console log stays) |
-| 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | yes, queued — next Home tick | **Delete** (console log stays) |
+| 8 | 🔴 "Could not start position update for X" | Watchdog fails to schedule refresh | A | yes, queued — next Home tick | **Delete** (console log stays) — split out as PR #194 |
+| 9 | 🔴 "Position update timed out / misconfigured / failed" | Rank-freshness timer chain | A | yes, queued — next Home tick | **Delete** (console log stays) — split out as PR #194 |
 | 10 | 🟢 New top-N score | Run makes top-N for its sensitivity | B | yes | **Merge into one run-verdict toast** (D5) + rewrite copy |
 | 11 | 🟢/🟡 Score threshold pass/fail | Threshold switch on + prior PB exists | B | yes | **Merge into one run-verdict toast** (D5) |
 | 12 | 🔵 "Graph updated!" | Any run not threshold-judged (co-fires with the top-N toast, which does not suppress it) | B | yes | **Remove** |
@@ -236,9 +255,9 @@ in PR 2: a module-level deque of import-failure messages in the watchdog,
 drained into one red toast by a Home interval callback, exactly the startup
 playlist-warning shape. Home-gated delivery is acceptable for it — the run's
 absence is a Home-visible fact, and today's delivery is already Home-gated.
-Rows 8–9 and 19 become console-only (delete the toast calls, keep the
-`logger` siblings). Document the rule in `docs/architecture.md` so the
-level-driven-bridge mistake cannot recur. Surfacing background rank events as
+Rows 8–9 went console-only in PR #194; row 19 follows in PR 1 (delete the
+toast call, keep the `logger` sibling). Document the rule in
+`docs/architecture.md` so the level-driven-bridge mistake cannot recur. Surfacing background rank events as
 real toasts is deferred (Open questions) — if it happens, it reuses this
 typed-queue pattern.
 
@@ -389,13 +408,13 @@ Grouped by file; each maps to inventory rows above.
 - **`pages/aim_training_journey.py`** — replace the toast (#7) with an in-page
   empty state where the chart renders, mirroring Home's on-canvas pattern.
   Drop the `get_dash_logger` import and module-global.
-- **`my_watchdog/file_watchdog.py`** — delete the `dash_logger.error` for the
-  schedule failure (#8); keep `logger.exception`. Replace the run-import
-  failure toast (#18) with an append to the new typed import-failure queue.
-  Drop the `get_dash_logger` import and module-global.
-- **`kovaaks/api_service.py`** — delete the three `dash_logger.error` calls in
-  `_notify_exhaustion` / `_run_attempt` (#9); keep the `logger` siblings. Drop
-  the now-unused `dash_logger` import.
+- **`my_watchdog/file_watchdog.py`** — the schedule-failure toast (#8) is
+  already gone (PR #194). Replace the run-import failure toast (#18) with an
+  append to the new typed import-failure queue, then drop the
+  `get_dash_logger` import and module-global.
+- **`kovaaks/api_service.py`** — done in PR #194: the three toast calls in
+  `_notify_exhaustion` / `_run_attempt` (#9) and the `dash_logger`
+  import/global are already gone.
 - **`kovaaks/percentile_warmup_service.py`** — delete the fatal-state toast
   (#19); keep the `logger.warning`. The Playlists overview status strip
   already renders the fatal state in place.
@@ -409,10 +428,9 @@ Grouped by file; each maps to inventory rows above.
   notifications; records logged outside a callback context are queued…"),
   which deleting `dash_logging.py` falsifies — `test_docs.py` gates dangling
   links, not stale prose, so nothing else catches it.
-- **`docs/specs/scenario_rank.md`** — the spec (created since the audit)
-  states that background refresh failures notify the UI through
-  `dash_logger.error(...)` and describes the queue path; update those
-  statements when the toasts become console-only in PRs 1–2.
+- **`docs/specs/scenario_rank.md`** — PR #194 already rewrote the
+  background-refresh-failure statement (console/file logs only); PRs 1–2
+  update any remaining delivery-mechanism prose as System A shrinks.
 - **`pyproject.toml`** — **`dash-extensions` stays**: `app.py` imports
   `DashProxy` from `dash_extensions.enrich` (the app framework itself), and
   only `dash_logging.py`'s `context_value` import goes away with the module.
@@ -426,8 +444,7 @@ Grouped by file; each maps to inventory rows above.
    paragraph (the "Graph updated!" description becomes false here) and the
    `scenario_rank.md` spec lines PR 1 falsifies. Resolves the audit
    complaint by itself; smallest reviewable unit. (The #8/#9 dead-diagnostic
-   deletions are low-risk and can ride along or land first as an independent
-   commit.)
+   deletions already landed first as the independent PR #194.)
 2. **System consolidation.** Delete System A (handler, queue, drain callback,
    `tests/test_dash_logging_background.py`), migrate #3 (once-per-session)
    and #6 to System B, add the row-18 typed import-failure queue, move #7
@@ -458,11 +475,10 @@ Grouped by file; each maps to inventory rows above.
     assertions (#5, both call sites). No test asserts the #19 toast (only the
     in-page status string in `test_playlist_pages.py`), so its removal breaks
     nothing.
-  - **PR 1 or 2** (whichever deletes the #8/#9 calls):
+  - **Shipped with PR #194** (the #8/#9 deletions):
     `tests/test_file_watchdog_rank_refresh.py` and
-    `tests/test_scenario_rank_freshness.py` monkeypatch `dash_logger` and
-    assert those messages. Rewrite against the retained console `logger`
-    calls.
+    `tests/test_scenario_rank_freshness.py` were rewritten there against
+    the retained console `logger` calls.
   - **PR 2** (System A deletion, row-18 queue, Journey in-page state):
     `tests/test_dash_logging_background.py` is deleted with the module it
     covers; `tests/test_crash_logging.py` asserts the row-18 message through
@@ -487,7 +503,8 @@ Grouped by file; each maps to inventory rows above.
   links if any doc still references it then — including the `roadmap.md`
   entry for this work, which the same sweep removes.
 - **Behavior parity.** Retiring System A loses nothing that currently renders
-  except the toasts intentionally removed (#1/#2/#4/#5/#8/#9/#19); row 18 is
+  except the toasts intentionally removed (#1/#2/#4/#5/#19 here, #8/#9
+  already via PR #194); row 18 is
   the only background toast that must keep rendering, and its typed queue
   preserves today's Home-gated delivery timing.
 
@@ -538,3 +555,8 @@ since the audit became rows 18–21; the delivery-mechanism prose, per-file
 change list, PR sequencing, and test migration map were updated to match.
 The routing policy, inventory verdicts 1–17, and the D5/D6 mechanics were
 re-confirmed unchanged (DMC still locked at 2.8.0).
+
+Later the same day, Decisions needed was restructured into three
+independently approvable decisions, each carrying a recorded status so
+review rounds can scope themselves to what is still open, and the rows 8–9
+deletions were split out and opened as PR #194.
