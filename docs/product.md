@@ -39,9 +39,9 @@ list in the roadmap.)
   pass/fail against the run's previous high score ("ready to move on" vs
   "keep grinding"), shown when the threshold notification switch is on and a
   previous high score exists. The overlay line for that same percentage tracks
-  the current personal best. A run that qualifies for neither still gets a
-  generic "Graph updated!" toast. A new personal best has no toast of its
-  own; it triggers the background rank refresh. If runs accumulate while Home
+  the current personal best. A run that qualifies for neither is reported by
+  its new point on the plot and nothing else. A new personal best has no toast
+  of its own; it triggers the background rank refresh. If runs accumulate while Home
   is not open, the next visit rebuilds once from final state and gives one
   scenario-named summary instead of replaying stale toasts and selections.
   *Problem solved:* immediate in-session feedback on whether the run you just

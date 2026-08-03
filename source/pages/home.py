@@ -683,17 +683,9 @@ def _build_run_event_notifications(
                     "autoClose": 8000,
                 }
             )
-    else:
-        notifications.append(
-            {
-                "action": "show",
-                "title": "Notification",
-                "message": "Graph updated!",
-                "color": "blue",
-                "id": "graph-updated-notification",
-                "icon": local_icon("material-symbols:refresh-rounded"),
-            }
-        )
+    # A run that places in neither the top N nor a threshold verdict says
+    # nothing worth interrupting for; the new point on the plot is the
+    # confirmation that it landed.
     return notifications
 
 
@@ -728,7 +720,6 @@ def _build_scenario_figure(  # noqa: PLR0913
                 selected_scenario,
                 oldest_datetime,
             )
-            dash_logger.warning("No scenario data for the given date range.")
             return (
                 generate_empty_plot(
                     _NO_DATE_RANGE_DATA_PLOT_TITLE,
@@ -765,7 +756,6 @@ def _build_scenario_figure(  # noqa: PLR0913
                 selected_scenario,
                 oldest_datetime,
             )
-            dash_logger.warning("No scenario data for the given date range.")
             return (
                 generate_empty_plot(
                     _NO_DATE_RANGE_DATA_PLOT_TITLE,
@@ -854,7 +844,6 @@ def generate_graph(  # noqa: PLR0913
 
     if not is_scenario_in_database(selected_scenario):
         logger.warning("No scenario data found for: %s", selected_scenario)
-        dash_logger.warning("No scenario data found.")
         return _empty_state_graph_response(
             _NO_SCENARIO_DATA_PLOT_TITLE,
             _NO_SCENARIO_DATA_PLOT_MESSAGE,

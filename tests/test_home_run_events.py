@@ -5,6 +5,7 @@ from types import SimpleNamespace
 
 import dash
 import plotly.graph_objects as go
+import pytest
 from dash import no_update
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -195,7 +196,9 @@ def test_drain_run_events_tolerates_popleft_race(monkeypatch):
     assert payload == _payload()
 
 
-def test_single_run_notifications_preserve_top_n_and_fallback_toasts():
+def test_single_run_notifications_preserve_the_top_n_toast_alone():
+    # No previous high score means no threshold verdict; the top-N placement
+    # is the whole story, with no content-free companion toast beside it.
     notifications = home._build_run_event_notifications(
         _payload(previous_high_score=None),
         "Scenario A",
@@ -206,12 +209,10 @@ def test_single_run_notifications_preserve_top_n_and_fallback_toasts():
 
     assert [notification["id"] for notification in notifications] == [
         "new-top-n-score-notification",
-        "graph-updated-notification",
     ]
     assert notifications[0]["message"] == (
         "34.64 cm/360 has a new 2nd place score: 812.40"
     )
-    assert notifications[1]["message"] == "Graph updated!"
 
 
 def test_single_run_threshold_notification_uses_previous_high_score():
@@ -312,8 +313,19 @@ def test_single_run_threshold_notification_ignores_empty_percentage():
 
         assert [notification["id"] for notification in notifications] == [
             "new-top-n-score-notification",
-            "graph-updated-notification",
         ]
+
+
+def test_a_run_qualifying_for_neither_verdict_says_nothing():
+    notifications = home._build_run_event_notifications(
+        _payload(nth_score=9, previous_high_score=None),
+        "Scenario A",
+        top_n_scores=5,
+        score_threshold_percentage=100.0,
+        score_threshold_notification_switch=True,
+    )
+
+    assert notifications == []
 
 
 def test_backlog_notification_is_one_scenario_named_summary():
@@ -465,6 +477,35 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
     assert plot["layout"]["yaxis"]["visible"] is False
 
 
+def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkeypatch):
+    # Selecting a scenario with no local runs draws the on-canvas empty state
+    # and nothing else; the parallel toast was a redundant second copy.
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
+    dash_logger = SimpleNamespace(
+        warning=lambda *_args: pytest.fail("the empty state must not toast"),
+    )
+    monkeypatch.setattr(home, "dash_logger", dash_logger)
+
+    plot_json, notifications = home.generate_graph(
+        None,
+        "Unplayed Scenario",
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        True,
+        True,
+        95,
+        True,
+        None,
+    )
+
+    plot = json.loads(plot_json)
+
+    assert notifications is no_update
+    assert home._NO_SCENARIO_DATA_PLOT_TITLE in plot["layout"]["annotations"][0]["text"]
+
+
 def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatch):
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(
@@ -544,5 +585,4 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
 
         assert [notification["id"] for notification in notifications] == [
             "new-top-n-score-notification",
-            "graph-updated-notification",
         ]
