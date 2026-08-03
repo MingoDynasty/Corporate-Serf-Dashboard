@@ -651,9 +651,40 @@ def test_stale_affordance_survives_the_cache_only_interval_tick(monkeypatch):
     )
 
 
+@pytest.mark.parametrize(
+    ("hint", "stale_value"),
+    [
+        (home._RANK_HINT_SERVED_STALE, "1,240"),
+        (home._RANK_HINT_LOOKUP_FAILED, "N/A"),
+    ],
+)
+def test_a_background_cache_write_retires_the_memoized_hint(
+    monkeypatch,
+    hint,
+    stale_value,
+):
+    # The warmup worker and the score-aware refresh Timer both write the rank
+    # cache off a background thread. Once the interval reads a value the last
+    # network verdict was never about, that verdict must not keep claiming the
+    # lookup failed over a position that has since arrived.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    home._last_rank_hints["Scenario"] = (stale_value, hint)
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=1180,
+        ),
+    )
+
+    assert home._render_scenario_rank("Scenario", allow_network=False) == "1,180"
+    assert "Scenario" not in home._last_rank_hints
+
+
 def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
-    home._last_rank_hints["Scenario"] = home._RANK_HINT_SERVED_STALE
+    home._last_rank_hints["Scenario"] = ("1,240", home._RANK_HINT_SERVED_STALE)
     monkeypatch.setattr(
         home,
         "get_scenario_rank_info",
@@ -665,7 +696,7 @@ def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
 
     home.refresh_rank(1, "Scenario")
 
-    assert home._last_rank_hints["Scenario"] is None
+    assert home._last_rank_hints["Scenario"] == ("1,240", None)
     assert home._render_scenario_rank("Scenario", allow_network=False) == "1,240"
 
 

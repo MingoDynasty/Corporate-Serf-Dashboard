@@ -127,7 +127,11 @@ benchmark tier) — see the
   cache, Refresh to update" when a failed fetch was served from cache. The
   hint the last network-backed render concluded is reused by the cache-only
   interval path, which cannot see a failure that already happened, so the
-  affordance does not blink off between ticks.
+  affordance does not blink off between ticks. That hint is tied to the value
+  it explained: when a background writer (the warmup worker, the score-aware
+  refresh Timer) moves the cache on, the interval reads a different value and
+  the hint is retired rather than left contradicting a position that has
+  since arrived.
 - Manual Refresh keeps toasting its own outcome — the user asked for it —
   red when the fetch failed, yellow on a warning, green only on a clean
   refresh.

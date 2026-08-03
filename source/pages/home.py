@@ -112,10 +112,11 @@ _UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score v
 _RANK_HINT_USERNAME_UNSET = "username_unset"
 _RANK_HINT_LOOKUP_FAILED = "lookup_failed"
 _RANK_HINT_SERVED_STALE = "served_stale"
-# Last hint each scenario's network-backed render concluded, so the cache-only
-# interval path can repeat it instead of recomputing from a read that cannot
-# see the failure. See _rank_hint.
-_last_rank_hints: dict[str, str | None] = {}
+# What each scenario's last network-backed render concluded, as
+# (displayed value, hint), so the cache-only interval path can repeat the hint
+# instead of recomputing it from a read that cannot see the failure -- and can
+# tell when a background writer has moved the cache on. See _rank_hint.
+_last_rank_hints: dict[str, tuple[str, str | None]] = {}
 dash.register_page(
     __name__,
     path="/",
@@ -407,6 +408,7 @@ def _rank_hint(
     username: str | None,
     selected_scenario: str,
     allow_network: bool,
+    value: str,
 ) -> str | None:
     """Resolve the hint for a render, keeping it stable across interval ticks.
 
@@ -414,17 +416,28 @@ def _rank_hint(
     served-stale result is an ordinary cache hit by the time the cache-only
     interval re-reads it a second later. Remembering the last network verdict
     per scenario keeps the affordance on screen instead of blinking off on the
-    next tick. An unset username is visible on both paths, so it is derived
-    rather than remembered and clears the moment Settings gains a name.
+    next tick.
+
+    The memo is tied to the value it explained, because the warmup worker and
+    the score-aware refresh Timer both write the rank cache from background
+    threads. When the interval reads a value the verdict was never about, the
+    cache has moved on: the memo is retired rather than left claiming the
+    lookup failed over a position that has since arrived.
+
+    An unset username is visible on both paths, so it is derived rather than
+    remembered and clears the moment Settings gains a name.
     """
     if not username:
         return _RANK_HINT_USERNAME_UNSET
     if allow_network:
         hint = _derive_rank_hint(rank_info)
-        _last_rank_hints[selected_scenario] = hint
+        _last_rank_hints[selected_scenario] = (value, hint)
         return hint
-    if selected_scenario in _last_rank_hints:
-        return _last_rank_hints[selected_scenario]
+    remembered = _last_rank_hints.get(selected_scenario)
+    if remembered is not None:
+        if remembered[0] == value:
+            return remembered[1]
+        del _last_rank_hints[selected_scenario]
     return _derive_rank_hint(rank_info)
 
 
@@ -467,9 +480,10 @@ def _render_scenario_rank(
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
         return _rank_display("N/A", _RANK_HINT_LOOKUP_FAILED)
 
+    value = format_scenario_rank(rank_info)
     return _rank_display(
-        format_scenario_rank(rank_info),
-        _rank_hint(rank_info, username, selected_scenario, allow_network),
+        value,
+        _rank_hint(rank_info, username, selected_scenario, allow_network, value),
     )
 
 
@@ -525,15 +539,16 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
         dash_logger.error("Position refresh for %s failed.", selected_scenario)
-        _last_rank_hints[selected_scenario] = _RANK_HINT_LOOKUP_FAILED
+        _last_rank_hints[selected_scenario] = ("N/A", _RANK_HINT_LOOKUP_FAILED)
         return "N/A", no_update
 
     # A manual refresh is a network verdict too, so the interval path must not
     # go on repeating what the last passive render concluded.
-    _last_rank_hints[selected_scenario] = _derive_rank_hint(rank_info)
+    rank_text = format_scenario_rank(rank_info)
+    _last_rank_hints[selected_scenario] = (rank_text, _derive_rank_hint(rank_info))
     _emit_rank_messages(rank_info)
     if rank_info.error_message or rank_info.warning_message:
-        return format_scenario_rank(rank_info), no_update
+        return rank_text, no_update
     notification = {
         "action": "show",
         "title": "Notification",
@@ -545,7 +560,7 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
         "id": f"rank-refresh-notification-{uuid.uuid4()}",
         "icon": local_icon("material-symbols:refresh-rounded"),
     }
-    return format_scenario_rank(rank_info), [notification]
+    return rank_text, [notification]
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
