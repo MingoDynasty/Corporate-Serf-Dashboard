@@ -94,10 +94,14 @@ benchmark tier) — see the
 - The Home rank widget passively re-reads the rank and total caches on its
   existing interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
-- Background refresh failures notify the UI through `dash_logger.error(...)`.
-  The handler is safe to call from plain threads: records logged outside a
-  Dash callback context are queued in `dash_logging` and delivered to the
-  notification container by a Home interval callback.
+- Background refresh failures are recorded in the console/file logs only;
+  they produce no UI notification. The chain degrades silently — the widget
+  keeps serving the cached value it already shows, and an exhausted chain is
+  corrected only by the next successful lookup (a later PB, a manual Refresh,
+  or a foreground fetch after the rank-cache TTL expires). An invalid username
+  stops the chain outright, but is still reported by the foreground lookup the
+  same run event triggers, not by the chain
+  ([2026-08-03](../decision_log.md#2026-08-03-background-rank-diagnostics-are-console-only)).
 
 ## Failure handling
 

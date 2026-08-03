@@ -21,13 +21,6 @@ def _sorted_runs(*scores: float) -> SortedList:
     )
 
 
-def _capture_log(messages):
-    def capture(message, *args):
-        messages.append(message % args if args else message)
-
-    return capture
-
-
 def _run_data(score: float = 100.0) -> RunData:
     return RunData(
         datetime_object=datetime.datetime.now(),
@@ -230,10 +223,9 @@ def test_on_created_preserves_detection_log_for_non_csv(caplog):
     assert "Detected new file: notes.txt" in caplog.messages
 
 
-def test_scheduling_failure_does_not_block_ingestion(monkeypatch):
+def test_scheduling_failure_does_not_block_ingestion(monkeypatch, caplog):
     run_data = _run_data()
     messages, loads, _schedules = _patch_common(monkeypatch, run_data)
-    notifications = []
     monkeypatch.setattr(
         file_watchdog,
         "is_scenario_in_database",
@@ -248,19 +240,21 @@ def test_scheduling_failure_does_not_block_ingestion(monkeypatch):
         "schedule_rank_freshness_refresh",
         fail_schedule,
     )
-    monkeypatch.setattr(
-        file_watchdog.dash_logger,
-        "error",
-        _capture_log(notifications),
-    )
 
-    file_watchdog.NewFileHandler().on_created(
-        SimpleNamespace(is_directory=False, src_path="run.csv")
-    )
+    with caplog.at_level(logging.ERROR, logger=file_watchdog.logger.name):
+        file_watchdog.NewFileHandler().on_created(
+            SimpleNamespace(is_directory=False, src_path="run.csv")
+        )
 
     assert len(messages) == 1
     assert loads == ["run.csv"]
-    assert notifications == [f"Could not start position update for {SCENARIO_NAME}."]
+    matching_records = [
+        record
+        for record in caplog.records
+        if "Failed to schedule rank refresh" in record.getMessage()
+    ]
+    assert len(matching_records) == 1
+    assert matching_records[0].exc_info is not None
 
 
 def test_on_created_loads_before_enqueuing(monkeypatch):
