@@ -2,6 +2,7 @@
 Utility functions for the Corporate Serf app.
 """
 
+import math
 from datetime import datetime
 from decimal import Decimal
 
@@ -48,6 +49,24 @@ def format_decimal(number) -> Decimal | int:
     if decimal == decimal.to_integral():
         return int(decimal)
     return decimal.normalize()
+
+
+def format_approximate_duration(seconds: float) -> str:
+    """Format a duration estimate without false precision.
+
+    Examples: 45 -> "<1 min", 254 -> "5 min", 5940 -> "1 hr 39 min".
+    Meant for estimates (ETAs), not measurements — precision below one
+    minute is deliberately discarded.
+    """
+    if seconds < 60:
+        return "<1 min"
+    minutes = math.ceil(seconds / 60)
+    if minutes < 60:
+        return f"{minutes} min"
+    hours, remainder = divmod(minutes, 60)
+    if not remainder:
+        return f"{hours} hr"
+    return f"{hours} hr {remainder} min"
 
 
 def format_absolute_timestamp(dt: datetime, *, include_seconds: bool = False) -> str:

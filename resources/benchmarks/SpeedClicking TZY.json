@@ -30,7 +30,8 @@
           "color": "#a61c00",
           "threshold": 195.0
         }
-      ]
+      ],
+      "leaderboard_id": 902
     },
     {
       "name": "Gridshot Large",
@@ -60,7 +61,8 @@
           "color": "#a61c00",
           "threshold": 215.0
         }
-      ]
+      ],
+      "leaderboard_id": 2839
     },
     {
       "name": "GridShot 3x3",
@@ -90,7 +92,8 @@
           "color": "#a61c00",
           "threshold": 168000.0
         }
-      ]
+      ],
+      "leaderboard_id": 30879
     },
     {
       "name": "Gridshot 3x3 50% Smaller",
@@ -120,7 +123,8 @@
           "color": "#a61c00",
           "threshold": 125000.0
         }
-      ]
+      ],
+      "leaderboard_id": 40235
     },
     {
       "name": "Tile Frenzy",
@@ -150,7 +154,8 @@
           "color": "#a61c00",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 11
     },
     {
       "name": "Tile Frenzy Mini",
@@ -180,7 +185,8 @@
           "color": "#a61c00",
           "threshold": 215.0
         }
-      ]
+      ],
+      "leaderboard_id": 67
     },
     {
       "name": "1wall9000targets",
@@ -210,7 +216,8 @@
           "color": "#a61c00",
           "threshold": 360.0
         }
-      ]
+      ],
+      "leaderboard_id": 470
     },
     {
       "name": "Jumbo1wall9000targets",
@@ -240,7 +247,8 @@
           "color": "#a61c00",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 1912
     }
   ],
   "generated_from": {
@@ -268,7 +276,8 @@
         "#a61c00"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:26.590173+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:00.174254+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

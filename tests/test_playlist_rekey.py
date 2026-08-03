@@ -1,8 +1,11 @@
+import logging
 import subprocess
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+import requests
+from pydantic import ValidationError
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
@@ -85,6 +88,18 @@ def test_scenario_strips_name_and_keeps_blank_names():
     assert imported.scenarios[0].name == "Padded"
 
 
+def test_scenario_leaderboard_id_is_optional():
+    # Imported playlists and pre-change corpus files carry no leaderboard_id;
+    # they must keep validating, defaulting the field to None.
+    without_id = PlaylistData.model_validate_json(
+        '{"name": "P", "code": "C", "scenarios": [{"name": "S"}]}'
+    )
+    assert without_id.scenarios[0].leaderboard_id is None
+
+    with_id = Scenario.model_validate({"name": "S", "leaderboard_id": 12345})
+    assert with_id.leaderboard_id == 12345
+
+
 def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
     monkeypatch,
     tmp_path,
@@ -111,6 +126,7 @@ def test_load_playlists_keys_by_code_and_disambiguates_duplicate_names(
 def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
@@ -119,9 +135,14 @@ def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
     # count as a user-root code either.
     _write_playlist(user_root / "shadowed.json", _playlist("Shadow", "BundledCode"))
 
-    data_service.load_playlists()
+    with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
+        data_service.load_playlists()
 
     assert data_service.get_user_root_playlist_codes() == {"UserCode"}
+    assert (
+        "Playlist startup load complete: loaded=2 bundled=1 user=1 warnings=1 "
+        "superseded_files=1." in caplog.messages
+    )
 
 
 def test_load_playlists_treats_missing_user_root_as_empty(monkeypatch, tmp_path):
@@ -262,6 +283,39 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     assert imported.code == "NewCode"
 
 
+def test_import_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
+    # The UI toast is ephemeral; the durable success record is this INFO line,
+    # emitted after persistence on the happy KovaaK's-search path.
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    data_service.load_playlists()
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Fresh",
+                playlistCode="FreshCode",
+                scenarioList=[
+                    SimpleNamespace(scenarioName="One"),
+                    SimpleNamespace(scenarioName="Two"),
+                ],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    with caplog.at_level(logging.INFO, logger=data_service.logger.name):
+        assert data_service.load_playlist_from_code("FreshCode") == (
+            None,
+            "FreshCode",
+        )
+
+    info_messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.INFO
+    ]
+    assert info_messages == ["Imported playlist Fresh (FreshCode): 2 scenarios."]
+
+
 def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
     monkeypatch,
     tmp_path,
@@ -327,6 +381,285 @@ def test_import_reports_write_failures_without_updating_database(
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
+
+
+def _validation_error() -> ValidationError:
+    """Build a genuine pydantic ``ValidationError`` for the API-garbage case."""
+    try:
+        PlaylistData.model_validate({})
+    except ValidationError as exc:
+        return exc
+    raise AssertionError("expected PlaylistData.model_validate({}) to raise")
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        requests.HTTPError("400 Client Error: Bad Request"),
+        _validation_error(),
+    ],
+    ids=["http-error", "validation-error"],
+)
+def test_import_degrades_api_failure_to_refusal(monkeypatch, exc):
+    # A gibberish code makes KovaaK's return HTTP 400 (and a slow spell can
+    # time out or return schema-invalid JSON). The import flow must degrade any
+    # of these to a refusal naming the pasted code, never let it escape as a
+    # raw callback error.
+    def raise_exc(_code):
+        raise exc
+
+    monkeypatch.setattr(data_service, "get_playlist_data", raise_exc)
+
+    message, imported_code = data_service.load_playlist_from_code("zzzznotacode!!")
+
+    assert imported_code is None
+    assert message is not None
+    assert "zzzznotacode!!" in message
+
+
+def test_import_refuses_blank_code_from_search_without_raising(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # PlaylistAPIResponse accepts a whitespace-only playlistCode as a plain
+    # string, but PlaylistData.strip_and_require_code rejects it. A
+    # structurally valid search response can therefore still fail domain
+    # validation, and that must degrade to a refusal rather than escape into
+    # the Dash callback.
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: SimpleNamespace(
+            data=[
+                SimpleNamespace(
+                    playlistName="Blank Code Playlist",
+                    playlistCode="   ",
+                    scenarioList=[SimpleNamespace(scenarioName="Scenario")],
+                )
+            ]
+        ),
+    )
+    monkeypatch.setattr(
+        data_service,
+        "get_evxl_playlist",
+        lambda _code: pytest.fail(
+            "a single-record build failure must refuse, not widen to the fallback"
+        ),
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("BlankCode")
+
+    assert imported_code is None
+    assert message == (
+        "Invalid playlist data returned by API for playlist code: BlankCode"
+    )
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def _evxl_playlist(name, code, scenario_names):
+    """Build an Evxl playlist-by-code stand-in with snake_case attributes."""
+    return SimpleNamespace(
+        playlist_name=name,
+        playlist_code=code,
+        scenario_list=[SimpleNamespace(scenario_name=n) for n in scenario_names],
+    )
+
+
+def test_import_falls_back_to_evxl_when_search_returns_null_records(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    # KovaaK's null-hydration quirk: the match is counted but the record is
+    # null, so ignore_null_playlist_items drops it and data is empty.
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    evxl = _evxl_playlist(
+        "VDIM Adept S5 - Clicking I",
+        "KovaaKsCarryingGodlikeTile",
+        ["Scenario A", "Scenario B"],
+    )
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    # Paste a mis-cased code to pin that the stored code is Evxl's canonical one,
+    # never the pasted input.
+    message, imported_code = data_service.load_playlist_from_code(
+        "kovaakscarryinggodliketile"
+    )
+
+    assert message is None
+    assert imported_code == "KovaaKsCarryingGodlikeTile"
+    stored = data_service.playlist_database["KovaaKsCarryingGodlikeTile"]
+    assert stored.name == "VDIM Adept S5 - Clicking I"
+    assert [scenario.name for scenario in stored.scenarios] == [
+        "Scenario A",
+        "Scenario B",
+    ]
+    imported_file = (
+        user_root / "VDIM Adept S5 - Clicking I [KovaaKsCarryingGodlikeTile].json"
+    )
+    assert imported_file.exists()
+
+
+def test_import_refuses_when_search_empty_and_evxl_returns_http_400(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+
+    def evxl_not_found(_code):
+        # Evxl returns HTTP 400 for unknown/mis-cased codes; _get_with_retry
+        # surfaces it as an immediate HTTPError.
+        raise requests.HTTPError("400 Client Error")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_not_found)
+
+    message, imported_code = data_service.load_playlist_from_code("GarbageCode")
+
+    assert message == "Failed to load playlist data for playlist code: GarbageCode"
+    assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def test_import_refuses_when_search_empty_and_evxl_connection_error(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+
+    def evxl_down(_code):
+        raise requests.ConnectionError("evxl unreachable")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_down)
+
+    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+
+    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert imported_code is None
+
+
+def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    # EvxlPlaylist accepts any str code, but PlaylistData rejects a blank one.
+    # That ValidationError must degrade to the refusal, not escape into the
+    # Dash import callback (which has no safety net around this service call).
+    evxl = _evxl_playlist("Nameless", "   ", ["Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    message, imported_code = data_service.load_playlist_from_code("SomeCode")
+
+    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert imported_code is None
+    assert data_service.playlist_database == {}
+    assert not user_root.exists()
+
+
+def test_import_falls_back_to_evxl_when_search_is_ambiguous(monkeypatch, tmp_path):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    two_records = SimpleNamespace(
+        data=[
+            SimpleNamespace(playlistName="One", playlistCode="One", scenarioList=[]),
+            SimpleNamespace(playlistName="Two", playlistCode="Two", scenarioList=[]),
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: two_records)
+    evxl = _evxl_playlist("Resolved Name", "ResolvedCode", ["Only Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    message, imported_code = data_service.load_playlist_from_code("AmbiguousCode")
+
+    assert message is None
+    assert imported_code == "ResolvedCode"
+    stored = data_service.playlist_database["ResolvedCode"]
+    assert stored.name == "Resolved Name"
+    assert [scenario.name for scenario in stored.scenarios] == ["Only Scenario"]
+
+
+def test_import_preserves_ambiguity_refusal_when_evxl_also_fails(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    two_records = SimpleNamespace(
+        data=[
+            SimpleNamespace(playlistName="One", playlistCode="One", scenarioList=[]),
+            SimpleNamespace(playlistName="Two", playlistCode="Two", scenarioList=[]),
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: two_records)
+
+    def evxl_not_found(_code):
+        raise requests.HTTPError("400 Client Error")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", evxl_not_found)
+
+    message, imported_code = data_service.load_playlist_from_code("AmbiguousCode")
+
+    assert message == "Found more than one playlist from code: AmbiguousCode"
+    assert imported_code is None
+
+
+def test_import_does_not_call_evxl_when_search_is_unambiguous(monkeypatch, tmp_path):
+    _bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    api_response = SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName="Solo Playlist",
+                playlistCode="SoloCode",
+                scenarioList=[SimpleNamespace(scenarioName="Imported Scenario")],
+            )
+        ]
+    )
+    monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+
+    def fail_if_called(_code):
+        raise AssertionError("Evxl fallback must not run for a single search match")
+
+    monkeypatch.setattr(data_service, "get_evxl_playlist", fail_if_called)
+
+    message, imported_code = data_service.load_playlist_from_code("SoloCode")
+
+    assert message is None
+    assert imported_code == "SoloCode"
+
+
+def test_evxl_fallback_duplicate_code_refusal_carries_canonical_code(
+    monkeypatch,
+    tmp_path,
+):
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    existing = _playlist("Existing Name", "SharedCode")
+    _write_playlist(bundled_root / "existing.json", existing)
+    data_service.load_playlists()
+
+    monkeypatch.setattr(
+        data_service, "get_playlist_data", lambda _code: SimpleNamespace(data=[])
+    )
+    evxl = _evxl_playlist("Existing Name", "SharedCode", ["Scenario"])
+    monkeypatch.setattr(data_service, "get_evxl_playlist", lambda _code: evxl)
+
+    # Paste a mis-cased code; the fallback resolves to the canonical already-
+    # imported code and the duplicate refusal must carry that canonical code.
+    message, imported_code = data_service.load_playlist_from_code("sharedcode")
+
+    assert message == (
+        "Playlist code already exists: SharedCode is already imported as "
+        "Existing Name (SharedCode)."
+    )
+    assert imported_code == "SharedCode"
 
 
 def test_write_playlist_data_to_file_retries_transient_replace_errors(
@@ -429,6 +762,17 @@ def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_p
     assert "UserCode" not in data_service.playlist_database
     assert data_service.get_user_root_playlist_codes() == set()
     assert "UserCode" not in data_service._user_root_playlist_files
+
+
+def test_delete_user_playlist_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+    data_service.load_playlists()
+
+    with caplog.at_level(logging.INFO, logger=data_service.logger.name):
+        assert data_service.delete_user_playlist("UserCode") is None
+
+    assert "Deleted user playlist UserCode (1 file(s))." in caplog.messages
 
 
 def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_path):
@@ -601,3 +945,41 @@ def test_committed_bundled_playlists_all_carry_rank_data():
             missing_rank_data.append(playlist_path.relative_to(REPO_ROOT).as_posix())
 
     assert not missing_rank_data
+
+
+# Deliberately retained pre-change (ID-less) benchmark files, if the corpus ever
+# keeps a last-known-good file older than the leaderboard-ID embedding. Ships
+# empty: the corpus-wide regeneration gave every scenario an ID. A future
+# retention adds its path here, in the same PR, so the gap stays explicit.
+_LEADERBOARD_ID_COVERAGE_EXCEPTIONS: set[str] = set()
+
+
+def test_committed_bundled_playlists_all_carry_leaderboard_ids():
+    result = subprocess.run(
+        ["git", "ls-files", "resources/benchmarks"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    playlist_paths = [
+        REPO_ROOT / path
+        for path in result.stdout.splitlines()
+        if path.endswith(".json")
+    ]
+
+    assert playlist_paths
+    missing_leaderboard_ids = []
+    for playlist_path in playlist_paths:
+        relative = playlist_path.relative_to(REPO_ROOT).as_posix()
+        if relative in _LEADERBOARD_ID_COVERAGE_EXCEPTIONS:
+            continue
+        playlist = PlaylistData.model_validate_json(
+            playlist_path.read_text(encoding="utf-8")
+        )
+        if not playlist.scenarios or any(
+            scenario.leaderboard_id is None for scenario in playlist.scenarios
+        ):
+            missing_leaderboard_ids.append(relative)
+
+    assert not missing_leaderboard_ids

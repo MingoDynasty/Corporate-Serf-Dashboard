@@ -40,7 +40,8 @@
           "color": "#932324",
           "threshold": 185.0
         }
-      ]
+      ],
+      "leaderboard_id": 113754
     },
     {
       "name": "VAL pressureWide",
@@ -80,7 +81,8 @@
           "color": "#932324",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 113790
     },
     {
       "name": "VAL smallflicks",
@@ -120,7 +122,8 @@
           "color": "#932324",
           "threshold": 215.0
         }
-      ]
+      ],
+      "leaderboard_id": 113756
     },
     {
       "name": "VAL 6 Sphere Hipfire",
@@ -160,7 +163,8 @@
           "color": "#932324",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 113755
     },
     {
       "name": "VAL devTS staticClick",
@@ -200,7 +204,8 @@
           "color": "#932324",
           "threshold": 220.0
         }
-      ]
+      ],
+      "leaderboard_id": 113804
     },
     {
       "name": "VAL 1w4ts Pasu Perfected",
@@ -240,7 +245,8 @@
           "color": "#932324",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 113748
     },
     {
       "name": "VAL beanClick Micro",
@@ -280,7 +286,8 @@
           "color": "#932324",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 113815
     },
     {
       "name": "VAL Floating Heads",
@@ -320,7 +327,8 @@
           "color": "#932324",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 113791
     },
     {
       "name": "VAL FloatTS Click",
@@ -360,7 +368,8 @@
           "color": "#932324",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 114397
     },
     {
       "name": "VAL WavyClick",
@@ -400,7 +409,8 @@
           "color": "#932324",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 114475
     },
     {
       "name": "VAL XYClick",
@@ -440,7 +450,8 @@
           "color": "#932324",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 114476
     },
     {
       "name": "VAL psalmClick",
@@ -480,7 +491,8 @@
           "color": "#932324",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 113809
     },
     {
       "name": "VAL Smooth",
@@ -520,7 +532,8 @@
           "color": "#932324",
           "threshold": 770.0
         }
-      ]
+      ],
+      "leaderboard_id": 113808
     },
     {
       "name": "VAL Consecutive Tracking",
@@ -560,7 +573,8 @@
           "color": "#932324",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 113803
     },
     {
       "name": "VAL MicroTrack",
@@ -600,7 +614,8 @@
           "color": "#932324",
           "threshold": 115000.0
         }
-      ]
+      ],
+      "leaderboard_id": 114398
     },
     {
       "name": "VAL staticSwitch",
@@ -640,7 +655,8 @@
           "color": "#932324",
           "threshold": 2150.0
         }
-      ]
+      ],
+      "leaderboard_id": 113816
     },
     {
       "name": "VAL beanTS",
@@ -680,7 +696,8 @@
           "color": "#932324",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 113757
     },
     {
       "name": "VAL RaspberryTS",
@@ -720,7 +737,8 @@
           "color": "#932324",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 113807
     },
     {
       "name": "VAL Garf MicroTS",
@@ -760,7 +778,8 @@
           "color": "#932324",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 113805
     },
     {
       "name": "VAL tamTS control",
@@ -800,7 +819,8 @@
           "color": "#932324",
           "threshold": 65.0
         }
-      ]
+      ],
+      "leaderboard_id": 113810
     },
     {
       "name": "VAL SmoothsphereTS",
@@ -840,7 +860,45 @@
           "color": "#932324",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 114408
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsJumpingCeruleanChat",
+    "kovaaks_benchmark_id": 676,
+    "rank_colors": [
+      [
+        "Derke",
+        "#00BCBC"
+      ],
+      [
+        "Meteor",
+        "#00CC6A"
+      ],
+      [
+        "Patmen",
+        "#393B8F"
+      ],
+      [
+        "KangKang",
+        "#4C3769"
+      ],
+      [
+        "Zellsis",
+        "#1FC67C"
+      ],
+      [
+        "f0rsaken",
+        "#563B4D"
+      ],
+      [
+        "Zekken",
+        "#932324"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:46.182699+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

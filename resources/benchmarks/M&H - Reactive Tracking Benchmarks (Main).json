@@ -35,7 +35,8 @@
           "color": "#47B7BE",
           "threshold": 912.0
         }
-      ]
+      ],
+      "leaderboard_id": 1408
     },
     {
       "name": "VT Plaza Viscose Elite",
@@ -70,7 +71,8 @@
           "color": "#47B7BE",
           "threshold": 4750.0
         }
-      ]
+      ],
+      "leaderboard_id": 134548
     },
     {
       "name": "hizkuSmoothGround Thin",
@@ -105,7 +107,8 @@
           "color": "#47B7BE",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 166928
     },
     {
       "name": "Ground Plaza Sparky Quake Thin",
@@ -140,7 +143,8 @@
           "color": "#47B7BE",
           "threshold": 907.0
         }
-      ]
+      ],
+      "leaderboard_id": 82727
     },
     {
       "name": "Ground Plaza Voltaic",
@@ -175,7 +179,8 @@
           "color": "#47B7BE",
           "threshold": 909.0
         }
-      ]
+      ],
+      "leaderboard_id": 316
     },
     {
       "name": "hizkuGround",
@@ -210,7 +215,8 @@
           "color": "#47B7BE",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 166926
     },
     {
       "name": "Ground Plaza Sparky v3 OW Thin",
@@ -245,7 +251,8 @@
           "color": "#47B7BE",
           "threshold": 901.0
         }
-      ]
+      ],
+      "leaderboard_id": 426
     },
     {
       "name": "Plaza Pure Revosect",
@@ -280,7 +287,8 @@
           "color": "#47B7BE",
           "threshold": 920.0
         }
-      ]
+      ],
+      "leaderboard_id": 143331
     },
     {
       "name": "hizkuRawGround",
@@ -315,7 +323,8 @@
           "color": "#47B7BE",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 128399
     },
     {
       "name": "Air Angelic 4 Voltaic",
@@ -350,7 +359,8 @@
           "color": "#47B7BE",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 30
     },
     {
       "name": "Air Spectral",
@@ -385,7 +395,8 @@
           "color": "#47B7BE",
           "threshold": 938.0
         }
-      ]
+      ],
+      "leaderboard_id": 142893
     },
     {
       "name": "Air CELESTIAL No UFO",
@@ -420,7 +431,8 @@
           "color": "#47B7BE",
           "threshold": 916.0
         }
-      ]
+      ],
+      "leaderboard_id": 70970
     },
     {
       "name": "Air no UFO no SKYBOTS",
@@ -455,7 +467,8 @@
           "color": "#47B7BE",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 234
     },
     {
       "name": "Air Voltaic",
@@ -490,7 +503,8 @@
           "color": "#47B7BE",
           "threshold": 903.0
         }
-      ]
+      ],
+      "leaderboard_id": 29
     },
     {
       "name": "Air Angelic",
@@ -525,7 +539,8 @@
           "color": "#47B7BE",
           "threshold": 938.0
         }
-      ]
+      ],
+      "leaderboard_id": 419
     },
     {
       "name": "hizkuRawAir",
@@ -560,7 +575,8 @@
           "color": "#47B7BE",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 128400
     },
     {
       "name": "Pasu Track Wide React Goated",
@@ -595,7 +611,8 @@
           "color": "#47B7BE",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 166106
     },
     {
       "name": "Air Pure Revosect",
@@ -630,7 +647,8 @@
           "color": "#47B7BE",
           "threshold": 910.0
         }
-      ]
+      ],
+      "leaderboard_id": 142823
     }
   ],
   "generated_from": {
@@ -662,7 +680,8 @@
         "#47B7BE"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:46.936731+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:34.550333+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

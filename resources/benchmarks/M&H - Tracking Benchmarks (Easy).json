@@ -25,7 +25,8 @@
           "color": "#C0D1D4",
           "threshold": 8025.0
         }
-      ]
+      ],
+      "leaderboard_id": 16440
     },
     {
       "name": "VT PreciseOrb Novice",
@@ -50,7 +51,8 @@
           "color": "#C0D1D4",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 24968
     },
     {
       "name": "Glidertrack Avasive Easy",
@@ -75,7 +77,8 @@
           "color": "#C0D1D4",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 130529
     },
     {
       "name": "Smoothbot Voltaic Easy",
@@ -100,7 +103,8 @@
           "color": "#C0D1D4",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 370
     },
     {
       "name": "Avasive bukeTrack Easy",
@@ -125,7 +129,8 @@
           "color": "#C0D1D4",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 130665
     },
     {
       "name": "WhisphereRawControl Larger + Slowed",
@@ -150,7 +155,8 @@
           "color": "#C0D1D4",
           "threshold": 10750.0
         }
-      ]
+      ],
+      "leaderboard_id": 128696
     },
     {
       "name": "Whisphere 80%",
@@ -175,7 +181,8 @@
           "color": "#C0D1D4",
           "threshold": 12250.0
         }
-      ]
+      ],
+      "leaderboard_id": 55382
     },
     {
       "name": "Controlsphere",
@@ -200,7 +207,8 @@
           "color": "#C0D1D4",
           "threshold": 8500.0
         }
-      ]
+      ],
+      "leaderboard_id": 392
     },
     {
       "name": "VT Plaza Viscose",
@@ -225,7 +233,8 @@
           "color": "#C0D1D4",
           "threshold": 3250.0
         }
-      ]
+      ],
+      "leaderboard_id": 49623
     },
     {
       "name": "Avasive Air Angelic Easy",
@@ -250,7 +259,8 @@
           "color": "#C0D1D4",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 130557
     },
     {
       "name": "Ground Plaza Sparky v3 Invincible 5",
@@ -275,7 +285,8 @@
           "color": "#C0D1D4",
           "threshold": 3350.0
         }
-      ]
+      ],
+      "leaderboard_id": 1090
     },
     {
       "name": "Air Voltaic Easy Invincible 4 80%",
@@ -300,7 +311,8 @@
           "color": "#C0D1D4",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 128781
     }
   ],
   "generated_from": {
@@ -324,7 +336,8 @@
         "#C0D1D4"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:59.865508+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:30.670200+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

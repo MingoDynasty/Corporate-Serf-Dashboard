@@ -20,7 +20,8 @@
           "color": "#007bff",
           "threshold": 3625.0
         }
-      ]
+      ],
+      "leaderboard_id": 75962
     },
     {
       "name": "Frog House Revolving",
@@ -40,7 +41,8 @@
           "color": "#007bff",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 67731
     },
     {
       "name": "PGTI Voltaic Easy 80%",
@@ -60,7 +62,8 @@
           "color": "#007bff",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 2107
     },
     {
       "name": "tamTargetSwitch Control Novice",
@@ -80,7 +83,8 @@
           "color": "#007bff",
           "threshold": 40.0
         }
-      ]
+      ],
+      "leaderboard_id": 110825
     },
     {
       "name": "VT evaTS Novice",
@@ -100,7 +104,8 @@
           "color": "#007bff",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 24980
     },
     {
       "name": "Frog House Smooth Entry",
@@ -120,7 +125,8 @@
           "color": "#007bff",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 145277
     },
     {
       "name": "MSSI Raspberry Easy",
@@ -140,7 +146,8 @@
           "color": "#007bff",
           "threshold": 6450.0
         }
-      ]
+      ],
+      "leaderboard_id": 154184
     },
     {
       "name": "VT Ground Intermediate S5 Bot 3 Invincible",
@@ -160,7 +167,8 @@
           "color": "#007bff",
           "threshold": 2600.0
         }
-      ]
+      ],
+      "leaderboard_id": 107319
     },
     {
       "name": "Smooth Thin Strafes Raspberry Easy",
@@ -180,7 +188,8 @@
           "color": "#007bff",
           "threshold": 7200.0
         }
-      ]
+      ],
+      "leaderboard_id": 5536
     }
   ],
   "generated_from": {
@@ -200,7 +209,8 @@
         "#007bff"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:33.536682+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:59.570053+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

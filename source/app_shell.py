@@ -1,15 +1,11 @@
 """Build the shared Dash application shell and navigation."""
 
-import logging
-
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback
+from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
-from source.utilities.dash_logging import log_handler
-
-logger = logging.getLogger(__name__)
+from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
 
 APP_INDEX_STRING = """<!DOCTYPE html>
 <html lang="en">
@@ -82,13 +78,17 @@ discord_component = dmc.Tooltip(
     label="Contact me via Discord: MingoDynasty",
 )
 
+
 github_component = dmc.Tooltip(
     dmc.Anchor(
         local_icon("ion:logo-github", width=40),
         href="https://github.com/MingoDynasty/Corporate-Serf-Dashboard",
     ),
+    # Plain again: the build identity is the settings page's to show, not a
+    # thing to be found by hovering a repo link.
     label="View this app on GitHub",
 )
+
 
 theme_switch_component = dmc.Tooltip(
     dmc.ColorSchemeToggle(
@@ -108,7 +108,7 @@ theme_switch_component = dmc.Tooltip(
         mr="xl",
         **{"aria-label": "Toggle color scheme"},
     ),
-    label="Switch between light and dark theme.",
+    label="Toggle light and dark theme",
 )
 
 
@@ -135,7 +135,7 @@ def layout(**kwargs):  # noqa: ARG001
         children=[
             dmc.AppShell(
                 children=[
-                    dmc.NotificationContainer(id="notification-container"),
+                    dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
                     dmc.AppShellHeader(
                         dmc.Grid(
                             children=[
@@ -145,7 +145,7 @@ def layout(**kwargs):  # noqa: ARG001
                                             dmc.Burger(
                                                 id="burger",
                                                 size="sm",
-                                                opened=False,
+                                                opened=True,
                                                 persisted_props=["opened"],
                                                 persistence=True,
                                                 persistence_type="local",
@@ -155,20 +155,21 @@ def layout(**kwargs):  # noqa: ARG001
                                                 children=[
                                                     dmc.Title(
                                                         "Corporate Serf Dashboard",
+                                                        className="app-header-title",
                                                     ),
                                                 ],
                                                 href="/",
                                                 target="_self",
                                                 underline="never",
-                                                style={
-                                                    "color": "var(--mantine-color-text)",
-                                                },
+                                                className="app-header-title-anchor",
                                             ),
                                         ],
                                         h="100%",
                                         px="md",
+                                        wrap="nowrap",
                                     ),
-                                    span=6,
+                                    className="app-header-title-col",
+                                    span="auto",
                                 ),
                                 dmc.GridCol(
                                     dmc.Group(
@@ -180,8 +181,9 @@ def layout(**kwargs):  # noqa: ARG001
                                         h="100%",
                                         px="md",
                                         justify="flex-end",
+                                        wrap="nowrap",
                                     ),
-                                    span=6,
+                                    span="content",
                                 ),
                             ],
                         ),
@@ -196,6 +198,11 @@ def layout(**kwargs):  # noqa: ARG001
                                 "/playlists",
                                 "material-symbols:playlist-play",
                             ),
+                            nav_link(
+                                "Settings",
+                                "/settings",
+                                "clarity:settings-line",
+                            ),
                         ],
                         p="md",
                     ),
@@ -206,27 +213,32 @@ def layout(**kwargs):  # noqa: ARG001
                 navbar={
                     "width": 250,
                     "breakpoint": "sm",
+                    # Mirrors the burger's `opened` default. The clientside
+                    # callback below derives this from the burger on every
+                    # load, so a mismatch here would paint the navbar
+                    # collapsed for a frame before the callback opens it.
                     "collapsed": {
-                        "mobile": True,
-                        "desktop": True,
+                        "mobile": False,
+                        "desktop": False,
                     },
                 },
                 id="appshell",
             ),
-        ]
-        + log_handler.embed(),
+        ],
     )
 
 
-@callback(
+clientside_callback(
+    """
+    (opened, navbar) => ({
+        ...navbar,
+        collapsed: {
+            mobile: !opened,
+            desktop: !opened,
+        },
+    })
+    """,
     Output("appshell", "navbar"),
     Input("burger", "opened"),
     State("appshell", "navbar"),
 )
-def toggle_navbar(opened, navbar):
-    """Synchronize the navbar's collapsed state with the burger control."""
-    navbar["collapsed"] = {
-        "mobile": not opened,
-        "desktop": not opened,
-    }
-    return navbar

@@ -30,7 +30,8 @@
           "color": "#8B0B1E",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 137087
     },
     {
       "name": "Smoothsphere Glider Hard",
@@ -60,7 +61,8 @@
           "color": "#8B0B1E",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 136517
     },
     {
       "name": "Avasphere Advanced",
@@ -90,7 +92,8 @@
           "color": "#8B0B1E",
           "threshold": 3750.0
         }
-      ]
+      ],
+      "leaderboard_id": 134669
     },
     {
       "name": "Airva Control Hard",
@@ -120,7 +123,8 @@
           "color": "#8B0B1E",
           "threshold": 3825.0
         }
-      ]
+      ],
+      "leaderboard_id": 136869
     },
     {
       "name": "AvaTrack Ground Flicker Hard",
@@ -150,7 +154,8 @@
           "color": "#8B0B1E",
           "threshold": 3125.0
         }
-      ]
+      ],
+      "leaderboard_id": 138194
     },
     {
       "name": "cuteTrack Hard",
@@ -180,7 +185,8 @@
           "color": "#8B0B1E",
           "threshold": 3525.0
         }
-      ]
+      ],
+      "leaderboard_id": 137194
     },
     {
       "name": "SilkyTS Hard",
@@ -210,7 +216,8 @@
           "color": "#8B0B1E",
           "threshold": 720.0
         }
-      ]
+      ],
+      "leaderboard_id": 137861
     },
     {
       "name": "TrixieSwitch Hard",
@@ -240,7 +247,8 @@
           "color": "#8B0B1E",
           "threshold": 610.0
         }
-      ]
+      ],
+      "leaderboard_id": 137886
     },
     {
       "name": "AvomiTS Hard",
@@ -270,7 +278,8 @@
           "color": "#8B0B1E",
           "threshold": 5100.0
         }
-      ]
+      ],
+      "leaderboard_id": 135724
     },
     {
       "name": "avaSwitch Hard",
@@ -300,7 +309,8 @@
           "color": "#8B0B1E",
           "threshold": 660.0
         }
-      ]
+      ],
+      "leaderboard_id": 137537
     },
     {
       "name": "Avasive Speed Switch Hard",
@@ -330,7 +340,8 @@
           "color": "#8B0B1E",
           "threshold": 1360.0
         }
-      ]
+      ],
+      "leaderboard_id": 122582
     },
     {
       "name": "AviaTS Hard",
@@ -360,7 +371,8 @@
           "color": "#8B0B1E",
           "threshold": 1020.0
         }
-      ]
+      ],
+      "leaderboard_id": 137112
     },
     {
       "name": "Avomi ww4t Hard",
@@ -390,7 +402,8 @@
           "color": "#8B0B1E",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 136892
     },
     {
       "name": "Avasive 1w3ts Hard",
@@ -420,7 +433,8 @@
           "color": "#8B0B1E",
           "threshold": 1920.0
         }
-      ]
+      ],
+      "leaderboard_id": 136897
     },
     {
       "name": "miaoClick Hard",
@@ -450,7 +464,8 @@
           "color": "#8B0B1E",
           "threshold": 820.0
         }
-      ]
+      ],
+      "leaderboard_id": 136490
     },
     {
       "name": "B180 Avasive Hard",
@@ -480,7 +495,8 @@
           "color": "#8B0B1E",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 137543
     },
     {
       "name": "domiClick Hard",
@@ -510,7 +526,8 @@
           "color": "#8B0B1E",
           "threshold": 1000.0
         }
-      ]
+      ],
+      "leaderboard_id": 136914
     },
     {
       "name": "MadClick Hard",
@@ -540,7 +557,37 @@
           "color": "#8B0B1E",
           "threshold": 960.0
         }
-      ]
+      ],
+      "leaderboard_id": 136906
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrackingPeriwinkleEntryfrag",
+    "kovaaks_benchmark_id": 740,
+    "rank_colors": [
+      [
+        "Jezebel",
+        "#FCC1D6"
+      ],
+      [
+        "Morpho",
+        "#EE86A6"
+      ],
+      [
+        "Admiral",
+        "#D65072"
+      ],
+      [
+        "Pixie",
+        "#B42743"
+      ],
+      [
+        "Monarch",
+        "#8B0B1E"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:00.805020+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -25,7 +25,8 @@
           "color": "#b800eb",
           "threshold": 116.0
         }
-      ]
+      ],
+      "leaderboard_id": 192116
     },
     {
       "name": "IRIS Popcorn",
@@ -50,7 +51,8 @@
           "color": "#b800eb",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 192117
     },
     {
       "name": "IRIS 1w6ts",
@@ -75,7 +77,8 @@
           "color": "#b800eb",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 192118
     },
     {
       "name": "IRIS Wide Wall",
@@ -100,7 +103,8 @@
           "color": "#b800eb",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 192119
     },
     {
       "name": "IRIS voxTS Click",
@@ -125,7 +129,8 @@
           "color": "#b800eb",
           "threshold": 163.0
         }
-      ]
+      ],
+      "leaderboard_id": 192121
     },
     {
       "name": "IRIS Controlsphere Click",
@@ -150,7 +155,8 @@
           "color": "#b800eb",
           "threshold": 96.0
         }
-      ]
+      ],
+      "leaderboard_id": 192120
     },
     {
       "name": "IRIS Smoothbot",
@@ -175,7 +181,8 @@
           "color": "#b800eb",
           "threshold": 3950.0
         }
-      ]
+      ],
+      "leaderboard_id": 192122
     },
     {
       "name": "IRIS Leaptrack Goated",
@@ -200,7 +207,8 @@
           "color": "#b800eb",
           "threshold": 4450.0
         }
-      ]
+      ],
+      "leaderboard_id": 192123
     },
     {
       "name": "IRIS Air Nuns",
@@ -225,7 +233,8 @@
           "color": "#b800eb",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 192104
     },
     {
       "name": "IRIS Ground Plaza",
@@ -250,7 +259,8 @@
           "color": "#b800eb",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 192124
     },
     {
       "name": "IRIS Controlsphere",
@@ -275,7 +285,8 @@
           "color": "#b800eb",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 192125
     },
     {
       "name": "IRIS WhisphereRawControl",
@@ -300,7 +311,8 @@
           "color": "#b800eb",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 192126
     },
     {
       "name": "IRIS SlideTS",
@@ -325,7 +337,8 @@
           "color": "#b800eb",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 192127
     },
     {
       "name": "IRIS SpeedSwitch",
@@ -350,7 +363,8 @@
           "color": "#b800eb",
           "threshold": 1400.0
         }
-      ]
+      ],
+      "leaderboard_id": 192128
     },
     {
       "name": "IRIS PasuTS",
@@ -375,7 +389,8 @@
           "color": "#b800eb",
           "threshold": 620.0
         }
-      ]
+      ],
+      "leaderboard_id": 192129
     },
     {
       "name": "IRIS SmoothbotTS",
@@ -400,7 +415,8 @@
           "color": "#b800eb",
           "threshold": 67.0
         }
-      ]
+      ],
+      "leaderboard_id": 192130
     },
     {
       "name": "IRIS Popswitch",
@@ -425,7 +441,8 @@
           "color": "#b800eb",
           "threshold": 58.0
         }
-      ]
+      ],
+      "leaderboard_id": 192132
     },
     {
       "name": "IRIS 3D Switching",
@@ -450,7 +467,8 @@
           "color": "#b800eb",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 192134
     }
   ],
   "generated_from": {
@@ -474,7 +492,8 @@
         "#b800eb"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:07.797382+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:55.533522+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

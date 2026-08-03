@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pytest
 from sortedcontainers import SortedList
 
+from source.config import settings_service
 from source.kovaaks.data_models import RunData
 from source.my_watchdog import file_watchdog
 
@@ -66,12 +67,9 @@ def _patch_common(monkeypatch, run_data):
         "schedule_rank_freshness_refresh",
         lambda *args: schedules.append(args),
     )
-    monkeypatch.setattr(
-        file_watchdog.get_config(),
-        "kovaaks_username",
-        "MingoDynasty",
+    settings_service.save_settings(
+        {"kovaaks_username": "MingoDynasty", "steam_id": "steam-id"}
     )
-    monkeypatch.setattr(file_watchdog.get_config(), "steam_id", "steam-id")
     monkeypatch.setattr(
         file_watchdog.get_config(),
         "scenario_metadata_cache_ttl_hours",
@@ -137,11 +135,9 @@ def test_on_created_parses_absolute_source_path_outside_stats_dir(
 ):
     run_data = _run_data()
     messages, loads, _schedules = _patch_common(monkeypatch, run_data)
-    stats_dir = (tmp_path / "stats").resolve()
     source_path = (tmp_path / "outside-stats" / "run.csv").resolve()
     parsed_paths = []
 
-    monkeypatch.setattr(file_watchdog.get_config(), "stats_dir", str(stats_dir))
     monkeypatch.setattr(
         file_watchdog,
         "extract_data_from_file",
@@ -291,7 +287,8 @@ def test_on_created_loads_before_enqueuing(monkeypatch):
         "message_queue",
         SimpleNamespace(append=lambda _message: events.append("enqueue")),
     )
-    monkeypatch.setattr(file_watchdog.get_config(), "kovaaks_username", None)
+    # No stored identity, so ingestion must still complete without a refresh.
+    settings_service.save_settings({})
 
     file_watchdog.NewFileHandler().on_created(
         SimpleNamespace(is_directory=False, src_path="run.csv")

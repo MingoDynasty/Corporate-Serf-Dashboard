@@ -1,4 +1,4 @@
-"""Per-code show/hide visibility preferences for playlists.
+"""Per-code show/hide visibility state for playlists.
 
 Visibility is a display preference, not file state: hidden playlists stay
 loaded, their routes keep resolving, and rank overlays keep drawing — hiding
@@ -12,17 +12,17 @@ import json
 import logging
 import os
 import threading
-from pathlib import Path
 
 from source.kovaaks.data_service import (
     get_playlist_selector_options,
     get_user_root_playlist_codes,
 )
 from source.utilities.atomic_write import replace_with_retry
+from source.utilities.paths import state_dir
 
 logger = logging.getLogger(__name__)
 
-PREFERENCES_FILE_PATH = Path("data/preferences.json").resolve()
+VISIBILITY_FILE_PATH = state_dir() / "data" / "playlist_visibility.json"
 _SHOWN_PLAYLISTS_KEY = "shown_playlists"
 
 # First-run visible set: the bundled Voltaic + Viscose benchmarks. A
@@ -37,18 +37,23 @@ DEFAULT_VISIBLE_CODES = frozenset(
         "KovaaKsQuestingMaximumblueNightfall",  # Viscose benchmarks hard
         "KovaaKsPushingMauveWeaponlevel",  # Viscose benchmarks medium
         "KovaaKsRaidingMediumFaction",  # Viscose benchmarks easier
+        "KovaaKsDinkingVibrantInfiltration",  # Viscose Entry Benchmarks
+        "KovaaKsScreamingPulledEgg",  # Viscose Benchmark S2 - Easier
+        "KovaaKsPeakingNarrowImpact",  # Viscose Benchmark S2 - Medium
+        "KovaaKsPlunderingOlivegreenClutch",  # Viscose Benchmark S2 - Hard
+        "KovaaKsRaidingPeriwinkleWindow",  # Viscose Benchmark S2 - Expert
     }
 )
 
-_PREFERENCES_LOCK = threading.RLock()
+_VISIBILITY_LOCK = threading.RLock()
 # Cached shown set under a single key; None means not yet read from disk.
 # Mutated in place so no module-global rebinding is needed.
 _shown_cache: dict[str, set[str] | None] = {"value": None}
 
 
-def clear_preferences_cache() -> None:
+def clear_visibility_cache() -> None:
     """Forget the cached shown set so the next read hits disk (test seam)."""
-    with _PREFERENCES_LOCK:
+    with _VISIBILITY_LOCK:
         _shown_cache["value"] = None
 
 
@@ -62,13 +67,13 @@ def _seed_shown_codes() -> set[str]:
 def _read_shown_from_disk() -> set[str] | None:
     """Read the persisted shown set; None means absent or unusable."""
     try:
-        raw = PREFERENCES_FILE_PATH.read_text(encoding="utf-8")
+        raw = VISIBILITY_FILE_PATH.read_text(encoding="utf-8")
     except FileNotFoundError:
         return None
     except OSError, UnicodeDecodeError:
         logger.warning(
             "Failed to read %s; falling back to the first-run visibility seed.",
-            PREFERENCES_FILE_PATH,
+            VISIBILITY_FILE_PATH,
             exc_info=True,
         )
         return None
@@ -81,9 +86,9 @@ def _read_shown_from_disk() -> set[str] | None:
             raise TypeError(f"{_SHOWN_PLAYLISTS_KEY} must be a list of strings")
     except json.JSONDecodeError, KeyError, TypeError:
         logger.warning(
-            "Invalid preferences file %s; falling back to the first-run "
+            "Invalid visibility file %s; falling back to the first-run "
             "visibility seed. The file is rewritten on the next show/hide.",
-            PREFERENCES_FILE_PATH,
+            VISIBILITY_FILE_PATH,
             exc_info=True,
         )
         return None
@@ -92,9 +97,9 @@ def _read_shown_from_disk() -> set[str] | None:
 
 def _write_shown_to_disk(shown: set[str]) -> None:
     payload = json.dumps({_SHOWN_PLAYLISTS_KEY: sorted(shown)}, indent=2)
-    PREFERENCES_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    temp_file = PREFERENCES_FILE_PATH.with_name(
-        f".{PREFERENCES_FILE_PATH.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+    VISIBILITY_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    temp_file = VISIBILITY_FILE_PATH.with_name(
+        f".{VISIBILITY_FILE_PATH.name}.{os.getpid()}.{threading.get_ident()}.tmp"
     )
     try:
         with open(temp_file, "w", encoding="utf-8") as file:
@@ -102,7 +107,7 @@ def _write_shown_to_disk(shown: set[str]) -> None:
             file.write("\n")
             file.flush()
             os.fsync(file.fileno())
-        replace_with_retry(temp_file, PREFERENCES_FILE_PATH, logger=logger)
+        replace_with_retry(temp_file, VISIBILITY_FILE_PATH, logger=logger)
     finally:
         temp_file.unlink(missing_ok=True)
 
@@ -110,12 +115,12 @@ def _write_shown_to_disk(shown: set[str]) -> None:
 def get_shown_playlist_codes() -> set[str]:
     """Get the codes of playlists the user has chosen to see.
 
-    A missing (or unusable) preferences file yields the first-run seed
+    A missing (or unusable) visibility file yields the first-run seed
     without writing anything — the file materializes on the first show/hide.
     An existing file is authoritative, including an empty list (everything
     hidden on purpose).
     """
-    with _PREFERENCES_LOCK:
+    with _VISIBILITY_LOCK:
         if _shown_cache["value"] is None:
             _shown_cache["value"] = _read_shown_from_disk()
         shown = _shown_cache["value"]
@@ -129,7 +134,7 @@ def is_playlist_shown(playlist_code: str) -> bool:
 
 def show_playlist(playlist_code: str) -> None:
     """Make a playlist visible and persist the preference."""
-    with _PREFERENCES_LOCK:
+    with _VISIBILITY_LOCK:
         shown = get_shown_playlist_codes()
         if playlist_code in shown:
             return
@@ -140,7 +145,7 @@ def show_playlist(playlist_code: str) -> None:
 
 def hide_playlist(playlist_code: str) -> None:
     """Hide a playlist from option lists and persist the preference."""
-    with _PREFERENCES_LOCK:
+    with _VISIBILITY_LOCK:
         shown = get_shown_playlist_codes()
         if playlist_code not in shown:
             return
@@ -151,7 +156,7 @@ def hide_playlist(playlist_code: str) -> None:
 
 def toggle_playlist_visibility(playlist_code: str) -> bool:
     """Flip a playlist's visibility; return True when it is now shown."""
-    with _PREFERENCES_LOCK:
+    with _VISIBILITY_LOCK:
         if is_playlist_shown(playlist_code):
             hide_playlist(playlist_code)
             return False

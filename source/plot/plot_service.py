@@ -21,6 +21,19 @@ logger = logging.getLogger(__name__)
 _K = TypeVar("_K")
 
 
+def generate_placeholder_plot() -> go.Figure:
+    """Build a neutral transparent figure for graph panels awaiting data."""
+    figure = go.Figure()
+    figure.update_layout(
+        dragmode=False,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        xaxis={"visible": False},
+        yaxis={"visible": False},
+    )
+    return figure
+
+
 def generate_empty_plot(title: str, message: str) -> go.Figure:
     """Build an intentional empty-state figure for graph panels without data."""
     figure = go.Figure()

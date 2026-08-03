@@ -25,7 +25,8 @@
           "color": "#24DDD8",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 42480
     },
     {
       "name": "DM ww2t Even Smaller",
@@ -50,7 +51,8 @@
           "color": "#24DDD8",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 34441
     },
     {
       "name": "DM 1w3ts Even Smaller",
@@ -75,7 +77,8 @@
           "color": "#24DDD8",
           "threshold": 1430.0
         }
-      ]
+      ],
+      "leaderboard_id": 43071
     },
     {
       "name": "DM ww3t Even Smaller",
@@ -100,7 +103,8 @@
           "color": "#24DDD8",
           "threshold": 1610.0
         }
-      ]
+      ],
+      "leaderboard_id": 34448
     },
     {
       "name": "DM 1w4ts Even Smaller",
@@ -125,7 +129,8 @@
           "color": "#24DDD8",
           "threshold": 1470.0
         }
-      ]
+      ],
+      "leaderboard_id": 34625
     },
     {
       "name": "DM ww4t Even Smaller",
@@ -150,7 +155,8 @@
           "color": "#24DDD8",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 34534
     },
     {
       "name": "DM 1w5ts Even Smaller",
@@ -175,7 +181,8 @@
           "color": "#24DDD8",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 34626
     },
     {
       "name": "DM ww5t Even Smaller",
@@ -200,7 +207,8 @@
           "color": "#24DDD8",
           "threshold": 1680.0
         }
-      ]
+      ],
+      "leaderboard_id": 34537
     },
     {
       "name": "DM 1w6ts Even Smaller",
@@ -225,7 +233,8 @@
           "color": "#24DDD8",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 34578
     },
     {
       "name": "DM ww6t Even Smaller",
@@ -250,7 +259,33 @@
           "color": "#24DDD8",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 34568
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsVibrating180Jump",
+    "kovaaks_benchmark_id": 871,
+    "rank_colors": [
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:39.203658+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

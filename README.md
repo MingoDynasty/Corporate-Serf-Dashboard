@@ -6,6 +6,8 @@ This app watches your KovaaK's stats directory and turns your runs into training
 playing and generating new scores, the home page's plots, stats, and notifications update
 automatically in the background.
 
+![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
+
 ## Features
 
 - **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
@@ -21,58 +23,212 @@ automatically in the background.
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
 [docs/roadmap.md](docs/roadmap.md).
 
-## Tech Stack
+## Install
 
-1. Python
-2. Dash
-    1. Plotly.js
-    2. Dash Mantine Components
-    3. React
-    4. Flask
+Windows only. You do not need Python, uv, or git — the installer brings its own
+copy of everything.
 
-## First Time Setup
+### Easy install
 
-1. Make a copy of the `example.toml`. Name the new file `config.toml`.
-2. Inside `config.toml`, update the `stats_dir` variable to point to your KovaaK's stats file directory.
-3. To enable the leaderboard rank features, set `kovaaks_username` (and optionally `steam_id`, which
-   makes player matching exact when usernames are ambiguous). Leave `kovaaks_username` empty to run
-   fully offline.
-4. Feel free to change any other settings inside the TOML file, or leave them at their defaults. If
-   something on your machine already uses port 8080 (Steam, for example), change `port`.
+Paste this into PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/main/get.ps1 | iex
+```
+
+Everything lands under `%LOCALAPPDATA%\CorporateSerfDashboard` — its own uv, its
+own Python, its own package cache — so nothing else on your machine is used or
+disturbed. It asks you nothing. Along the way the installer:
+
+- writes a starter `config.toml` beside the install;
+- creates a **Corporate Serf Dashboard** desktop shortcut — launching is covered
+  in [Usage](#usage).
+
+On its first start the dashboard looks for your KovaaK's stats folder itself,
+through Steam, and remembers what it finds. If it comes up empty — KovaaK's
+installed somewhere unusual, or not installed yet — the dashboard still starts;
+it simply has no runs to show and says so on the Home page until you point it
+at the folder on the Settings page (see [Configuration](#configuration)).
+
+**Each launch checks for a new release and updates itself** before starting, so
+you stay current without doing anything. If that check fails — offline, GitHub
+unreachable — it simply runs the version you already have. A new version only
+becomes the recorded install after it has actually started successfully; one
+that fails to start is discarded and the previous version runs instead.
+
+### Manual install
+
+If you would rather not pipe a script from the internet, install from a release
+you have inspected yourself:
+
+1. Download the latest release zip from the
+   [Releases page](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/releases/latest).
+2. Extract it and read `install.ps1` — it is the same installer the one-liner
+   runs.
+3. Open PowerShell in the extracted folder and run:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+That explicit command is required: double-clicking a `.ps1` file deliberately
+does not execute it on Windows. `-ExecutionPolicy Bypass` relaxes only the
+per-process default for this one script — it does not, and cannot, override
+enterprise Group Policy or AppLocker. Home machines are the audience here; on a
+machine someone else administers, ask them first.
+
+<details>
+<summary><strong>Rollback</strong> — go back to (and pin) an older release</summary>
+
+Every release is kept and immutable, so going back is a matter of naming a tag.
+Pick one from the
+[Releases page](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/releases),
+then paste this into PowerShell, editing the first line:
+
+```powershell
+$tag = 'v2026.07.19.4'
+$installer = "$env:TEMP\csd-install-$tag.ps1"
+Invoke-WebRequest -UseBasicParsing -OutFile $installer `
+  -Uri "https://raw.githubusercontent.com/MingoDynasty/Corporate-Serf-Dashboard/$tag/install.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Tag $tag
+Remove-Item $installer
+```
+
+Each release ships its own installer, so this deliberately fetches the one
+belonging to the release you are rolling back to.
+
+`-Tag` also **pins** the install: it stays on that version and stops
+auto-updating. Without the pin, the next launch would immediately reinstall the
+release you just rolled back from, making the rollback a no-op. To resume
+automatic updates, run the [easy install](#easy-install) one-liner again.
+
+Releases published before the installer existed cannot be rolled back to;
+`v2026.07.19.4` is the earliest that can.
+
+Rolling back has a config floor too. Because `config.toml` is written once at
+first install and never rewritten, an install first set up by a release that
+omits `polling_interval` and `sens_round_decimal_places` (they now default in
+code) cannot roll back to an older release that still requires them — the
+install stops with a "cannot load config.toml" error. Add those two keys from
+`example.toml`, or delete `config.toml` so the older installer regenerates its
+own, then re-run.
+
+</details>
+
+### Uninstall
+
+Delete the `%LOCALAPPDATA%\CorporateSerfDashboard` folder and the desktop
+shortcut. Nothing else on the machine was modified — no registry keys, no
+machine-wide Python or uv, nothing on `PATH`.
+
+<details>
+<summary>One loose end: the installer script left in <code>%TEMP%</code></summary>
+
+The easy install downloads the installer to `%TEMP%\csd-install-<tag>.ps1` and
+leaves it there. It is inert once the install finishes — nothing reads it again
+— and Windows clears `%TEMP%` eventually, but you can delete it yourself:
+
+```powershell
+Remove-Item "$env:TEMP\csd-install-*.ps1"
+```
+
+</details>
+
+## Configuration
+
+Two files sit side by side. `config.toml` holds boot settings and is yours to
+edit:
+
+- **Installed:** `%LOCALAPPDATA%\CorporateSerfDashboard\config.toml`, written on
+  first install. Updates never touch it.
+- **From source:** copy `example.toml` to `config.toml` in your checkout.
+
+`example.toml` documents every setting; one is worth knowing about:
+
+- `port` — change this if something else on your machine already uses 8050. The
+  dashboard says so at startup rather than failing mysteriously.
+
+Everything else you might want to change lives on the dashboard's own
+**Settings** page: where your KovaaK's stats live, and who you are on the
+leaderboards. The stats folder is usually filled in for you on the first start
+— the dashboard finds it through Steam — so the page is mostly there for the
+cases it could not, and for turning the leaderboard features on. If you have
+KovaaK's in more than one Steam library, the stats folder box suggests each one
+it found, so picking the right copy is a click rather than a hunt through
+Explorer.
+
+The page writes `data/settings.json`, the app-owned file beside `config.toml`
+(installed: `%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). You
+can write it by hand instead:
+
+```json
+{
+  "stats_dir": "S:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats",
+  "kovaaks_username": "YourKovaaksName",
+  "steam_id": ""
+}
+```
+
+- `stats_dir` — the folder KovaaK's writes its run files into, usually
+  `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
+  it the dashboard still starts, but it has no runs to show and says so on the
+  Home page. Left empty on purpose, it stays empty: the startup detection only
+  fills the value in when it has never been set.
+- `kovaaks_username` — enables the leaderboard rank and percentile features;
+  leave it out to run fully offline. `steam_id` is optional and makes player
+  matching exact when usernames are ambiguous.
+
+Edit this file only while the dashboard is stopped — it is read once per run.
+Saving from the Settings page while it runs is fine; the page tells you when a
+change needs a restart before it takes effect.
 
 ## Usage
 
-Step 1: Run the app in your terminal:
-
-```shell
-uv sync
-uv run python source/app.py
-```
-
-Step 2: Open a browser and navigate to: <http://localhost:8080/> (or your configured port).
+Launch from the desktop shortcut, which opens the dashboard in your browser —
+or run it from a source checkout (below) and open <http://localhost:8050/>, or
+your configured port. When launched from the shortcut, a console window stays
+open while the dashboard is running — **closing it stops the dashboard**, which
+is how you shut it down. Double-clicking the shortcut again while it is already
+running just opens another browser tab; it will not start a second copy.
 
 Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
 share one in-memory run-event queue and are not synchronized with each other.
 
-## Example
+## Playlists and Benchmarks
 
-![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
+Benchmarks are playlists with rank data attached. The app ships with a bundled
+benchmark library in `resources/benchmarks` — built with the help of
+[Evxl.app](https://evxl.app)'s author by combining his benchmark rank data with
+playlist data from the KovaaK's API — and loads all of it at startup. The most
+popular benchmarks (Voltaic, Viscose) are visible by default; to enable any
+other, toggle "Show hidden" on the Playlists page and unhide it — no file
+copying needed.
 
-## Rank Data
+You can also import any playlist by share code: on the Playlists page, click
+**Import** and enter the code, and the app fetches the playlist from the
+KovaaK's API and saves it under `data/playlists`. Playlists imported this way
+carry no rank data — the benchmark-rank overlays come only from the bundled
+library.
 
-In essence, "benchmarks" are basically just "playlists" but with rank data attached. With the help of
-the <http://Evxl.app>'s author, I combined his benchmarks data with playlist data from KovaaK's API, for most of the
-common benchmarks. These files are in `resources/benchmarks` and the app loads all of them at startup. The most
-popular ones (Voltaic, Viscose) are visible by default; to enable any other benchmark, toggle "Show hidden" on the
-Playlists page and unhide it — no file copying needed.
+## Run From Source
 
-Playlist JSON must include a non-blank `code` field. The app uses that code as the playlist identity for routes,
-selectors, imports, and filenames; playlist names are only display labels.
+For development, or if you would rather manage the toolchain yourself. The app
+is Python + [Dash](https://dash.plotly.com/) (Plotly, Dash Mantine Components);
+[docs/architecture.md](docs/architecture.md) has the module map. Requires git
+and [uv](https://docs.astral.sh/uv/):
 
-## Import Playlist
+```shell
+git clone https://github.com/MingoDynasty/Corporate-Serf-Dashboard.git
+cd Corporate-Serf-Dashboard
+uv sync
+```
 
-In the `Settings` modal, there is an option to import a playlist via share code. The app queries the
-KovaaK's API with your input share code to retrieve the playlist data.
+Copy `example.toml` to `config.toml`, then start the app — the stats folder is
+detected on the first start, and the Settings page covers whatever it missed
+(see [Configuration](#configuration)):
 
-Note that by importing playlists this way, the playlist will not include rank data. If you want to include rank data for
-the rank overlays, then see the **Rank Data** section. Imported playlists are saved under `data/playlists`.
+```shell
+uv run python source/app.py
+```
+
+A source checkout does not auto-update; `git pull` is the update path.

@@ -45,7 +45,8 @@
           "color": "#cd30c1",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 73836
     },
     {
       "name": "Air Voltaic Easy Invincible 4 80%",
@@ -90,7 +91,8 @@
           "color": "#cd30c1",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 128781
     },
     {
       "name": "VT Aether Novice S5 Bot 2",
@@ -135,7 +137,8 @@
           "color": "#cd30c1",
           "threshold": 4450.0
         }
-      ]
+      ],
+      "leaderboard_id": 108143
     }
   ],
   "generated_from": {
@@ -175,7 +178,8 @@
         "#cd30c1"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:02.146618+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:38.819664+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

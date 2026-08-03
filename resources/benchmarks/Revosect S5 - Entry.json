@@ -25,7 +25,8 @@
           "color": "#6FA8DC",
           "threshold": 760.0
         }
-      ]
+      ],
+      "leaderboard_id": 142851
     },
     {
       "name": "StrawberryClick Revosect Entry",
@@ -50,7 +51,8 @@
           "color": "#6FA8DC",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 142853
     },
     {
       "name": "1w5ts vbr Revosect Entry",
@@ -75,7 +77,8 @@
           "color": "#6FA8DC",
           "threshold": 1070.0
         }
-      ]
+      ],
+      "leaderboard_id": 142873
     },
     {
       "name": "1w4t Pressure Revosect Entry",
@@ -100,7 +103,8 @@
           "color": "#6FA8DC",
           "threshold": 1260.0
         }
-      ]
+      ],
+      "leaderboard_id": 142878
     },
     {
       "name": "Pasu Revosect Entry",
@@ -125,7 +129,8 @@
           "color": "#6FA8DC",
           "threshold": 590.0
         }
-      ]
+      ],
+      "leaderboard_id": 142881
     },
     {
       "name": "SpringClick Revosect Entry",
@@ -150,7 +155,8 @@
           "color": "#6FA8DC",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 142898
     },
     {
       "name": "SnowClick Revosect Entry",
@@ -175,7 +181,8 @@
           "color": "#6FA8DC",
           "threshold": 630.0
         }
-      ]
+      ],
+      "leaderboard_id": 142900
     },
     {
       "name": "Floating Heads Revosect Entry",
@@ -200,7 +207,8 @@
           "color": "#6FA8DC",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 142902
     },
     {
       "name": "FloodTrack Revosect Entry",
@@ -225,7 +233,8 @@
           "color": "#6FA8DC",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 142826
     },
     {
       "name": "VTP Revosect Entry",
@@ -250,7 +259,8 @@
           "color": "#6FA8DC",
           "threshold": 2300.0
         }
-      ]
+      ],
+      "leaderboard_id": 142831
     },
     {
       "name": "Tornadosphere Revosect Entry",
@@ -275,7 +285,8 @@
           "color": "#6FA8DC",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 142822
     },
     {
       "name": "Leapstrafes Revosect Entry",
@@ -300,7 +311,8 @@
           "color": "#6FA8DC",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 142829
     },
     {
       "name": "Plaza Pure Revosect Entry",
@@ -325,7 +337,8 @@
           "color": "#6FA8DC",
           "threshold": 887.0
         }
-      ]
+      ],
+      "leaderboard_id": 142843
     },
     {
       "name": "Plaza Smooth Revosect Entry",
@@ -350,7 +363,8 @@
           "color": "#6FA8DC",
           "threshold": 882.0
         }
-      ]
+      ],
+      "leaderboard_id": 142847
     },
     {
       "name": "Air Pure Revosect Entry",
@@ -375,7 +389,8 @@
           "color": "#6FA8DC",
           "threshold": 883.0
         }
-      ]
+      ],
+      "leaderboard_id": 142837
     },
     {
       "name": "Air Smooth Revosect Entry",
@@ -400,7 +415,8 @@
           "color": "#6FA8DC",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 142839
     },
     {
       "name": "AngleSwitch Revosect Entry",
@@ -425,7 +441,8 @@
           "color": "#6FA8DC",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 143238
     },
     {
       "name": "DotSwitch Revosect Entry",
@@ -450,7 +467,8 @@
           "color": "#6FA8DC",
           "threshold": 980.0
         }
-      ]
+      ],
+      "leaderboard_id": 143241
     },
     {
       "name": "NovaSwitch Revosect Entry",
@@ -475,7 +493,8 @@
           "color": "#6FA8DC",
           "threshold": 760.0
         }
-      ]
+      ],
+      "leaderboard_id": 143231
     },
     {
       "name": "WaveSwitch Revosect Entry",
@@ -500,7 +519,8 @@
           "color": "#6FA8DC",
           "threshold": 840.0
         }
-      ]
+      ],
+      "leaderboard_id": 142903
     },
     {
       "name": "SpringTS Revosect Entry",
@@ -525,7 +545,8 @@
           "color": "#6FA8DC",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 143242
     },
     {
       "name": "WhisphereTS Revosect Entry",
@@ -550,7 +571,8 @@
           "color": "#6FA8DC",
           "threshold": 410.0
         }
-      ]
+      ],
+      "leaderboard_id": 142906
     },
     {
       "name": "PasuTS Revosect Entry",
@@ -575,7 +597,8 @@
           "color": "#6FA8DC",
           "threshold": 320.0
         }
-      ]
+      ],
+      "leaderboard_id": 143244
     },
     {
       "name": "SmoothTS Revosect Entry",
@@ -600,7 +623,8 @@
           "color": "#6FA8DC",
           "threshold": 410.0
         }
-      ]
+      ],
+      "leaderboard_id": 142911
     }
   ],
   "generated_from": {
@@ -624,7 +648,8 @@
         "#6FA8DC"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:35.207610+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:10.606076+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

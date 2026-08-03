@@ -55,7 +55,8 @@
           "color": "#24DDD8",
           "threshold": 102.0
         }
-      ]
+      ],
+      "leaderboard_id": 102616
     },
     {
       "name": "ClickTrack 5t",
@@ -110,7 +111,8 @@
           "color": "#24DDD8",
           "threshold": 102.0
         }
-      ]
+      ],
+      "leaderboard_id": 102615
     },
     {
       "name": "ClickTrack Horizontal 2t",
@@ -165,7 +167,8 @@
           "color": "#24DDD8",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 102619
     },
     {
       "name": "ClickTrack Horizontal 3t",
@@ -220,7 +223,8 @@
           "color": "#24DDD8",
           "threshold": 95.0
         }
-      ]
+      ],
+      "leaderboard_id": 102627
     },
     {
       "name": "ClickTrack Diagonal 2t",
@@ -275,7 +279,8 @@
           "color": "#24DDD8",
           "threshold": 78.0
         }
-      ]
+      ],
+      "leaderboard_id": 102618
     },
     {
       "name": "ClickTrack Diagonal 3t",
@@ -330,7 +335,8 @@
           "color": "#24DDD8",
           "threshold": 89.0
         }
-      ]
+      ],
+      "leaderboard_id": 102635
     },
     {
       "name": "ClickTrack AntiDiagonal 2t",
@@ -385,7 +391,8 @@
           "color": "#24DDD8",
           "threshold": 74.0
         }
-      ]
+      ],
+      "leaderboard_id": 102626
     },
     {
       "name": "ClickTrack AntiDiagonal 3t",
@@ -440,7 +447,8 @@
           "color": "#24DDD8",
           "threshold": 87.0
         }
-      ]
+      ],
+      "leaderboard_id": 102622
     },
     {
       "name": "ClickTrack Vertical 2t",
@@ -495,7 +503,8 @@
           "color": "#24DDD8",
           "threshold": 76.0
         }
-      ]
+      ],
+      "leaderboard_id": 116393
     },
     {
       "name": "ClickTrack Vertical 3t",
@@ -550,7 +559,8 @@
           "color": "#24DDD8",
           "threshold": 87.0
         }
-      ]
+      ],
+      "leaderboard_id": 116394
     },
     {
       "name": "ClickTrack 3t Short",
@@ -605,7 +615,8 @@
           "color": "#24DDD8",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 115370
     },
     {
       "name": "ClickTrack 5t Short",
@@ -660,7 +671,8 @@
           "color": "#24DDD8",
           "threshold": 132.0
         }
-      ]
+      ],
+      "leaderboard_id": 115371
     },
     {
       "name": "ClickTrack Horizontal 2t Short",
@@ -715,7 +727,8 @@
           "color": "#24DDD8",
           "threshold": 142.0
         }
-      ]
+      ],
+      "leaderboard_id": 115374
     },
     {
       "name": "ClickTrack Horizontal 3t Short",
@@ -770,7 +783,8 @@
           "color": "#24DDD8",
           "threshold": 147.0
         }
-      ]
+      ],
+      "leaderboard_id": 115480
     },
     {
       "name": "ClickTrack Diagonal 2t Short",
@@ -825,7 +839,8 @@
           "color": "#24DDD8",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 115390
     },
     {
       "name": "ClickTrack Diagonal 3t Short",
@@ -880,7 +895,8 @@
           "color": "#24DDD8",
           "threshold": 157.0
         }
-      ]
+      ],
+      "leaderboard_id": 115375
     },
     {
       "name": "ClickTrack AntiDiagonal 2t Short",
@@ -935,7 +951,8 @@
           "color": "#24DDD8",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 115368
     },
     {
       "name": "ClickTrack AntiDiagonal 3t Short",
@@ -990,7 +1007,8 @@
           "color": "#24DDD8",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 115372
     },
     {
       "name": "ClickTrack Vertical 2t Short",
@@ -1045,7 +1063,8 @@
           "color": "#24DDD8",
           "threshold": 142.0
         }
-      ]
+      ],
+      "leaderboard_id": 115725
     },
     {
       "name": "ClickTrack Vertical 3t Short",
@@ -1100,7 +1119,8 @@
           "color": "#24DDD8",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 116396
     },
     {
       "name": "ClickTrack 3t Long",
@@ -1155,7 +1175,8 @@
           "color": "#24DDD8",
           "threshold": 64.0
         }
-      ]
+      ],
+      "leaderboard_id": 115474
     },
     {
       "name": "ClickTrack 5t Long",
@@ -1210,7 +1231,8 @@
           "color": "#24DDD8",
           "threshold": 66.0
         }
-      ]
+      ],
+      "leaderboard_id": 115513
     },
     {
       "name": "ClickTrack Horizontal 2t Long",
@@ -1265,7 +1287,8 @@
           "color": "#24DDD8",
           "threshold": 62.0
         }
-      ]
+      ],
+      "leaderboard_id": 115475
     },
     {
       "name": "ClickTrack Horizontal 3t Long",
@@ -1320,7 +1343,8 @@
           "color": "#24DDD8",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 115517
     },
     {
       "name": "ClickTrack Diagonal 2t Long",
@@ -1375,7 +1399,8 @@
           "color": "#24DDD8",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 115477
     },
     {
       "name": "ClickTrack Diagonal 3t Long",
@@ -1430,7 +1455,8 @@
           "color": "#24DDD8",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 115516
     },
     {
       "name": "ClickTrack AntiDiagonal 2t Long",
@@ -1485,7 +1511,8 @@
           "color": "#24DDD8",
           "threshold": 61.0
         }
-      ]
+      ],
+      "leaderboard_id": 115476
     },
     {
       "name": "ClickTrack AntiDiagonal 3t Long",
@@ -1540,7 +1567,8 @@
           "color": "#24DDD8",
           "threshold": 67.0
         }
-      ]
+      ],
+      "leaderboard_id": 115515
     },
     {
       "name": "ClickTrack Vertical 2t Long",
@@ -1595,7 +1623,8 @@
           "color": "#24DDD8",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 116392
     },
     {
       "name": "ClickTrack Vertical 3t Long",
@@ -1650,7 +1679,57 @@
           "color": "#24DDD8",
           "threshold": 71.0
         }
-      ]
+      ],
+      "leaderboard_id": 116398
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSnipingSaltyMomentum",
+    "kovaaks_benchmark_id": 670,
+    "rank_colors": [
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Advanced",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ],
+      [
+        "BLESSED",
+        "#E06666"
+      ],
+      [
+        "EXALTED",
+        "#FBBC04"
+      ],
+      [
+        "UBER",
+        "#351C75"
+      ],
+      [
+        "ARCADIA",
+        "#274E13"
+      ],
+      [
+        "HORIZON",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:52.748511+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -55,7 +55,8 @@
           "color": "#E51C3E",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 13210
     },
     {
       "name": "Bounce Tracking Pure",
@@ -110,7 +111,8 @@
           "color": "#E51C3E",
           "threshold": 221.0
         }
-      ]
+      ],
+      "leaderboard_id": 13212
     },
     {
       "name": "Air Pure",
@@ -165,7 +167,8 @@
           "color": "#E51C3E",
           "threshold": 903.0
         }
-      ]
+      ],
+      "leaderboard_id": 13213
     },
     {
       "name": "Ground Plaza Pure",
@@ -220,7 +223,8 @@
           "color": "#E51C3E",
           "threshold": 892.0
         }
-      ]
+      ],
+      "leaderboard_id": 13214
     },
     {
       "name": "Horizontal Clicking Pure",
@@ -275,7 +279,8 @@
           "color": "#E51C3E",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 13218
     },
     {
       "name": "Leapcorn Pure",
@@ -330,7 +335,8 @@
           "color": "#E51C3E",
           "threshold": 78.0
         }
-      ]
+      ],
+      "leaderboard_id": 13220
     },
     {
       "name": "Static Clicking Pure",
@@ -385,7 +391,8 @@
           "color": "#E51C3E",
           "threshold": 253.0
         }
-      ]
+      ],
+      "leaderboard_id": 13226
     },
     {
       "name": "Pokeball Pure",
@@ -440,7 +447,8 @@
           "color": "#E51C3E",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 13219
     },
     {
       "name": "Pasu Switch Pure",
@@ -495,7 +503,8 @@
           "color": "#E51C3E",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 13227
     },
     {
       "name": "kinTS Pure",
@@ -550,7 +559,8 @@
           "color": "#E51C3E",
           "threshold": 94.0
         }
-      ]
+      ],
+      "leaderboard_id": 13228
     },
     {
       "name": "Static Switching Pure",
@@ -605,7 +615,8 @@
           "color": "#E51C3E",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 13221
     },
     {
       "name": "voxTS Pure",
@@ -660,7 +671,8 @@
           "color": "#E51C3E",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 13229
     },
     {
       "name": "Pistol Strafe Gallery Pure",
@@ -715,7 +727,8 @@
           "color": "#E51C3E",
           "threshold": 315000.0
         }
-      ]
+      ],
+      "leaderboard_id": 13225
     },
     {
       "name": "Strafe Tracking Pure",
@@ -770,7 +783,57 @@
           "color": "#E51C3E",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 13216
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCounterstrafingButteryExitfrag",
+    "kovaaks_benchmark_id": 599,
+    "rank_colors": [
+      [
+        "Division I",
+        "#885157"
+      ],
+      [
+        "Division II",
+        "#B89381"
+      ],
+      [
+        "Division III",
+        "#6A6A6A"
+      ],
+      [
+        "Division IV",
+        "#AEAEAE"
+      ],
+      [
+        "Division V",
+        "#B09335"
+      ],
+      [
+        "Division VI",
+        "#DDB845"
+      ],
+      [
+        "Division VII",
+        "#B6D9FF"
+      ],
+      [
+        "Division VIII",
+        "#5BC16B"
+      ],
+      [
+        "Division IX",
+        "#A078F9"
+      ],
+      [
+        "Division X",
+        "#E51C3E"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:22.952153+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

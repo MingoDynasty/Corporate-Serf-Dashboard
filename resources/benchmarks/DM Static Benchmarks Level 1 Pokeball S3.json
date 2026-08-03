@@ -25,7 +25,8 @@
           "color": "#6B0000",
           "threshold": 1850.0
         }
-      ]
+      ],
+      "leaderboard_id": 176939
     },
     {
       "name": "DM ww2t Pokeball Level 1 S3",
@@ -50,7 +51,8 @@
           "color": "#6B0000",
           "threshold": 1970.0
         }
-      ]
+      ],
+      "leaderboard_id": 177084
     },
     {
       "name": "DM 1w3ts Pokeball Level 1 S3",
@@ -75,7 +77,8 @@
           "color": "#6B0000",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 177085
     },
     {
       "name": "DM ww3t Pokeball Level 1 S3",
@@ -100,7 +103,8 @@
           "color": "#6B0000",
           "threshold": 2020.0
         }
-      ]
+      ],
+      "leaderboard_id": 177086
     },
     {
       "name": "DM 1w4ts Pokeball Level 1 S3",
@@ -125,7 +129,8 @@
           "color": "#6B0000",
           "threshold": 1940.0
         }
-      ]
+      ],
+      "leaderboard_id": 177087
     },
     {
       "name": "DM ww4t Pokeball Level 1 S3",
@@ -150,7 +155,8 @@
           "color": "#6B0000",
           "threshold": 2060.0
         }
-      ]
+      ],
+      "leaderboard_id": 177088
     },
     {
       "name": "DM 1w5ts Pokeball Level 1 S3",
@@ -175,7 +181,8 @@
           "color": "#6B0000",
           "threshold": 1970.0
         }
-      ]
+      ],
+      "leaderboard_id": 177089
     },
     {
       "name": "DM ww5t Pokeball Level 1 S3",
@@ -200,7 +207,8 @@
           "color": "#6B0000",
           "threshold": 2090.0
         }
-      ]
+      ],
+      "leaderboard_id": 177090
     },
     {
       "name": "DM 1w6ts Pokeball Level 1 S3",
@@ -225,7 +233,8 @@
           "color": "#6B0000",
           "threshold": 1990.0
         }
-      ]
+      ],
+      "leaderboard_id": 177091
     },
     {
       "name": "DM ww6t Pokeball Level 1 S3",
@@ -250,7 +259,8 @@
           "color": "#6B0000",
           "threshold": 2110.0
         }
-      ]
+      ],
+      "leaderboard_id": 177092
     }
   ],
   "generated_from": {
@@ -274,7 +284,8 @@
         "#6B0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:55.449803+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:40.104013+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -35,7 +35,8 @@
           "color": "#fdfebe",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 37923
     },
     {
       "name": "devTS Static Click Angelic",
@@ -70,7 +71,8 @@
           "color": "#fdfebe",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 38539
     },
     {
       "name": "Aimerz+ 1w4ts HF Hard S1",
@@ -105,7 +107,8 @@
           "color": "#fdfebe",
           "threshold": 220.0
         }
-      ]
+      ],
+      "leaderboard_id": 68287
     },
     {
       "name": "1w3ts Pasu Perfected Micro Goated",
@@ -140,7 +143,8 @@
           "color": "#fdfebe",
           "threshold": 1560.0
         }
-      ]
+      ],
+      "leaderboard_id": 65396
     },
     {
       "name": "FB DynMicros",
@@ -175,7 +179,8 @@
           "color": "#fdfebe",
           "threshold": 107.0
         }
-      ]
+      ],
+      "leaderboard_id": 93556
     },
     {
       "name": "Floating Heads Timing 400% FIXED",
@@ -210,7 +215,8 @@
           "color": "#fdfebe",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 1730
     },
     {
       "name": "Reflex Micro++ flick reload small",
@@ -245,7 +251,8 @@
           "color": "#fdfebe",
           "threshold": 118.0
         }
-      ]
+      ],
+      "leaderboard_id": 343
     },
     {
       "name": "400ms strafing Reflex Micro++ Horizontalish valorant",
@@ -280,7 +287,8 @@
           "color": "#fdfebe",
           "threshold": 92.0
         }
-      ]
+      ],
+      "leaderboard_id": 24869
     },
     {
       "name": "Valorant Reflex Flick Strafing",
@@ -315,7 +323,8 @@
           "color": "#fdfebe",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 320
     },
     {
       "name": "cloverRawControl Easy",
@@ -350,7 +359,8 @@
           "color": "#fdfebe",
           "threshold": 12100.0
         }
-      ]
+      ],
+      "leaderboard_id": 69150
     },
     {
       "name": "ADJUSTTRACK - VALORANT",
@@ -385,7 +395,8 @@
           "color": "#fdfebe",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 72941
     },
     {
       "name": "Centering I 180",
@@ -420,7 +431,8 @@
           "color": "#fdfebe",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 718
     },
     {
       "name": "Lovable SmoothBot",
@@ -455,7 +467,8 @@
           "color": "#fdfebe",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 50151
     },
     {
       "name": "waldoTS",
@@ -490,7 +503,8 @@
           "color": "#fdfebe",
           "threshold": 166.0
         }
-      ]
+      ],
+      "leaderboard_id": 81042
     },
     {
       "name": "Pokeball 5 Sphere Hipfire Extra Small",
@@ -525,7 +539,8 @@
           "color": "#fdfebe",
           "threshold": 147.0
         }
-      ]
+      ],
+      "leaderboard_id": 1172
     },
     {
       "name": "AvasiveTS Perfected",
@@ -560,7 +575,8 @@
           "color": "#fdfebe",
           "threshold": 7850.0
         }
-      ]
+      ],
+      "leaderboard_id": 129750
     },
     {
       "name": "domiSwitch Avasive",
@@ -595,7 +611,8 @@
           "color": "#fdfebe",
           "threshold": 6150.0
         }
-      ]
+      ],
+      "leaderboard_id": 129746
     }
   ],
   "generated_from": {
@@ -627,7 +644,8 @@
         "#fdfebe"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:56.372831+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:40.726207+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -25,7 +25,8 @@
           "color": "#EC44CA",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 29493
     },
     {
       "name": "VT Bounceshot Intermediate",
@@ -50,7 +51,8 @@
           "color": "#EC44CA",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 24955
     },
     {
       "name": "VT 1w5ts Rasp Intermediate",
@@ -75,7 +77,8 @@
           "color": "#EC44CA",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 29494
     },
     {
       "name": "VT Multiclick 120 Intermediate",
@@ -100,7 +103,8 @@
           "color": "#EC44CA",
           "threshold": 1660.0
         }
-      ]
+      ],
+      "leaderboard_id": 24957
     },
     {
       "name": "VT AngleStrafe Intermediate",
@@ -125,7 +129,8 @@
           "color": "#EC44CA",
           "threshold": 1000.0
         }
-      ]
+      ],
+      "leaderboard_id": 25063
     },
     {
       "name": "VT ArcStrafe Intermediate",
@@ -150,7 +155,8 @@
           "color": "#EC44CA",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 29403
     },
     {
       "name": "VT Smoothbot Intermediate",
@@ -175,7 +181,8 @@
           "color": "#EC44CA",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 24952
     },
     {
       "name": "VT PreciseOrb Intermediate",
@@ -200,7 +207,8 @@
           "color": "#EC44CA",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 24958
     },
     {
       "name": "VT Plaza Intermediate",
@@ -225,7 +233,8 @@
           "color": "#EC44CA",
           "threshold": 3530.0
         }
-      ]
+      ],
+      "leaderboard_id": 43184
     },
     {
       "name": "VT Air Intermediate",
@@ -250,7 +259,8 @@
           "color": "#EC44CA",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 43181
     },
     {
       "name": "VT PatStrafe Intermediate",
@@ -275,7 +285,8 @@
           "color": "#EC44CA",
           "threshold": 3050.0
         }
-      ]
+      ],
+      "leaderboard_id": 26261
     },
     {
       "name": "VT AirStrafe Intermediate",
@@ -300,7 +311,8 @@
           "color": "#EC44CA",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 29421
     },
     {
       "name": "VT psalmTS Intermediate",
@@ -325,7 +337,8 @@
           "color": "#EC44CA",
           "threshold": 1020.0
         }
-      ]
+      ],
+      "leaderboard_id": 24960
     },
     {
       "name": "VT skyTS Intermediate",
@@ -350,7 +363,8 @@
           "color": "#EC44CA",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 24964
     },
     {
       "name": "VT evaTS Intermediate",
@@ -375,7 +389,8 @@
           "color": "#EC44CA",
           "threshold": 700.0
         }
-      ]
+      ],
+      "leaderboard_id": 24962
     },
     {
       "name": "VT bounceTS Intermediate",
@@ -400,7 +415,33 @@
           "color": "#EC44CA",
           "threshold": 760.0
         }
-      ]
+      ],
+      "leaderboard_id": 24953
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrackingPrismaticPull",
+    "kovaaks_benchmark_id": 235,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:33.424306+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

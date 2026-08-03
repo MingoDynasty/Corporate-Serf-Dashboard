@@ -14,10 +14,16 @@ https://kovaaks.com/webapp-backend
 
 KovaaK's may return HTTP `429 Too Many Requests` during bursty access patterns, especially cold-cache playlist table loads that fetch many scenario ranks and totals.
 
+KovaaK's also has slow spells where `/leaderboard/scores/global` takes 9–28
+seconds to respond but still returns valid data (measured 2026-07-13). The
+request timeout must clear that band: it defaults to 30 seconds, configurable
+via `kovaaks_api_timeout_seconds` in `config.toml`.
+
 Project retry policy:
 
 - Retry GET requests once on HTTP `429`.
-- Retry GET requests once on narrow transient network failures: `requests.Timeout` and `requests.ConnectionError`.
+- Retry GET requests once on connection-level failures (`requests.ConnectionError`, which includes `ConnectTimeout`): the request never reached the server, so a retry is safe.
+- Never retry read timeouts (`requests.ReadTimeout`): the server received the request and is still working on it — abandoning the read does not cancel the server-side query — so an immediate duplicate doubles KovaaK's load with almost no chance of finishing sooner (2 of 63 retries succeeded during the 2026-07-13 slow spell).
 - Honor `Retry-After` when present.
 - Fall back to a short default delay when `Retry-After` is absent or invalid.
 - Cap the retry delay so the UI does not stall for a long server-requested wait.
@@ -35,6 +41,7 @@ Connection reuse:
 | --- | --- | --- | --- |
 | `/leaderboard/scores/global` | Current rank lookup and leaderboard total lookup | Yes | Use with `leaderboardId`. Add `usernameSearch` only for user rank lookup. |
 | `/user/scenario/total-play` | Metadata hydration/upsert for `scenarioName -> leaderboardId` | No | Can lag behind current score/rank. Returns `null` for unknown usernames. |
+| `/user/profile/by-username` | Identity detection: verify a local Steam persona against a KovaaK's profile | No | Unauthenticated. HTTP `409` is the confirmed "no such player" answer. Request parameters are never logged. |
 | `/scenario/popular` | Exact-name fallback for leaderboard ID resolution | No | Search can return many variants; require exact `scenarioName` match. |
 | `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires benchmark ID, so it does not cover all playlists. |
 | `/playlist/playlists` | Playlist discovery/metadata inspection | No | Does not include leaderboard IDs in observed responses. |
@@ -104,6 +111,64 @@ Failure handling:
 - `null` response means the configured KovaaK's username is unknown and should become an explicit unknown/error state, not `UNRANKED`.
 - Cache failures should not block active fallback lookup. If metadata is missing, resolve the selected scenario lazily through KovaaK's APIs.
 
+## `/user/profile/by-username`
+
+Example:
+
+```text
+GET /user/profile/by-username?username=MingoDynasty
+```
+
+Unauthenticated. Used only by identity detection
+(`config/identity_detection.py`), which probes each local Steam persona and
+keeps a profile only when its `steamId` equals that account's SteamID64.
+
+Fields we rely on (verified live 2026-07-20, re-verified 2026-08-02):
+
+- `steamId` — a 17-digit string, e.g. `"76561197986713986"`. The whole point
+  of the call: Steam persona and KovaaK's username are distinct namespaces
+  that merely often coincide, so this equality is what turns a guess into a
+  fact. Detection requires exactly that shape, and treats anything else —
+  including the same digits sent as a JSON number, which cannot survive a
+  float round-trip intact — as unchecked drift rather than risking a
+  confident mismatch on a mangled value.
+- `webapp.username` — the canonical webapp spelling, which can differ in case
+  from the persona that found it. Only this spelling is stored or sent to the
+  rest of the API.
+- `lastAccess` — ISO-8601 UTC, e.g. `"2026-08-02T14:56:42.919Z"`. Ranks
+  candidates newest-first.
+
+The response carries much more (`badges`, `country`, `kovaaksPlus`,
+`scenariosPlayed`, `steamAccountName`, `playerId`, and a large `webapp`
+object); none of it is read or stored.
+
+Important behavior:
+
+- An unknown username returns HTTP `409` with `{"error":"Player does not
+  exist"}`. That is an *answer*, not a failure: `get_user_profile_by_username`
+  turns it into `None`, and detection records the account as confirmed absent.
+  Every other status and every transport failure propagates, and detection
+  counts that account unchecked.
+- A 2xx payload missing any of the three fields above, or carrying one in an
+  unusable shape, is treated the same as an outage — unchecked — never as "no
+  match".
+- **No reverse lookup exists** (probed 2026-07-20; do not re-probe):
+  `/user/profile/by-steam-id` returns 404 and `/user/profile?steamId=`
+  returns 401. Going from a SteamID64 to a username is impossible, which is
+  why detection guesses with personas and verifies.
+
+Logging:
+
+- This call is the one `_get_with_retry` caller that passes `sensitive=True`:
+  the queried name is a Steam persona probed on the user's behalf, including
+  accounts they never save, and `data/logs/debug.log` is rotated, kept, and
+  collected with bug reports. Attempt lines log `<redacted>` in place of the
+  parameters, and failure summaries are scrubbed of the query string that
+  requests embeds in its exception text. Identity detection's own lines name
+  accounts by position ("2 of 3").
+- The username rides in `params`, never concatenated into the URL, so the
+  `url` in every other log line stays free of it.
+
 ## `/scenario/popular`
 
 Example:
@@ -137,6 +202,24 @@ Observed behavior:
 - Returns playlist-level metadata and `scenarioList`.
 - `scenarioList` includes scenario names/authors/aim types.
 - Observed responses do not include `leaderboardId`, so this endpoint is not enough for rank lookup.
+- Returns HTTP 400 on some invalid/gibberish `search` input (e.g. a pasted
+  code with stray punctuation). The playlist import flow
+  (`load_playlist_from_code`) catches this — along with timeouts, connection
+  failures, and schema-invalid responses — and degrades it to a refusal
+  message naming the pasted code rather than a raw callback error.
+
+Null-hydration quirk (diagnosed 2026-07-17): for some real, public playlists
+the search counts the match but returns a `null` record instead of the
+payload. Observed for `KovaaKsCarryingGodlikeTile` ("VDIM Adept S5 -
+Clicking I", 30 scenarios) — a code search returns `{"total": 1, "data":
+[null]}` (a 43-byte body, confirmed live and in the app's debug.log); a search
+on its display name returns 2 matches, both null. It is not a privacy setting:
+Evxl reports `is_private: false`. The app's `ignore_null_playlist_items`
+validator (`api_models.PlaylistAPIResponse`) drops the null so the response
+looks like zero results. Import handles this by falling back to Evxl's exact
+`playlist-by-code` lookup (below) whenever the search does not yield exactly
+one usable record; only if that fallback also fails does the user see the
+refusal.
 
 ## `/benchmarks/player-progress-rank-benchmark`
 
@@ -147,6 +230,20 @@ Important limitation:
 - Requires a benchmark ID.
 - Works for benchmark playlists, but not every playlist is a benchmark.
 - Scenario rank display should not depend on this endpoint.
+
+Leaderboard-ID facts (verified 2026-07-19; used by leaderboard-ID seeding —
+see the 2026-07-20 decision log entry):
+
+- The endpoint accepts the placeholder Steam ID `00000000000000000` — no real
+  user identity is needed. `get_benchmark_json` already sends exactly that
+  placeholder, so resolving a benchmark's scenario IDs works on a username-less
+  install.
+- Every scenario in the response carries its own `leaderboard_id` (a stable,
+  user-independent value), for the whole benchmark in one call. The benchmark
+  importer embeds these into the generated playlist JSONs, and the app folds
+  them into the permanent name->ID mapping cache at startup — so unplayed
+  bundled-playlist scenarios resolve their leaderboard ID without the slow,
+  timeout-prone exact-name search endpoint.
 
 Benchmark rank-data quirks (surfaced by `scripts/benchmark_importer`, which
 merges Evxl rank names/colors with this endpoint's per-scenario `rank_maxes`
@@ -169,6 +266,37 @@ one-to-one):
 
 These are upstream data issues, not app bugs; the affected benchmarks import
 normally once the source data is corrected.
+
+## Evxl `playlist-by-code` (external fallback)
+
+Not a KovaaK's endpoint — a third-party Evxl service the app uses as the
+playlist-import fallback for the null-hydration quirk above.
+
+```text
+GET https://api.evxl.app/kovaaks/playlist-by-code?shareCode=KovaaKsCarryingGodlikeTile
+```
+
+Observed behavior:
+
+- Exact-sharecode lookup. Resolves arbitrary community playlists (verified
+  against "GON MACHINE for VALO v2" and "MICRO GOLD MINE"), not just Evxl
+  benchmarks.
+- Response is snake_case: top-level `playlist_b64` (the raw KovaaK's offline
+  playlist JSON — the app ignores it), `updated` (epoch; Evxl's copy is cached
+  and can be days stale — acceptable for import), and `playlist` with
+  `playlist_name`, `playlist_code`, `scenario_list[].scenario_name`, plus
+  extras (`is_private`, `author_name`, `description`, `playlist_id`,
+  `author_steam_id`) the app does not need.
+- Unknown or **mis-cased** codes return HTTP 400. `_get_with_retry`
+  `raise_for_status()`es this immediately (no retry), so the import fallback
+  sees one `requests.HTTPError` and refuses.
+- There is no first-party KovaaK's by-code endpoint (path and query variants
+  404 or ignore the parameter).
+
+The app consumes only `playlist_name`, `playlist_code`, and
+`scenario_list[].scenario_name` (see `api_service.get_evxl_playlist` and the
+`Evxl*` models in `api_models.py`). The stored code is Evxl's canonical
+`playlist_code`, never the pasted input.
 
 ## Derived Data
 

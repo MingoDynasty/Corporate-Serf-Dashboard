@@ -25,7 +25,8 @@
           "color": "#CAB148",
           "threshold": 960.0
         }
-      ]
+      ],
+      "leaderboard_id": 32403
     },
     {
       "name": "DM ww2t Pokeball Level 2",
@@ -50,7 +51,8 @@
           "color": "#CAB148",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 34430
     },
     {
       "name": "DM 1w3ts Pokeball Level 2",
@@ -75,7 +77,8 @@
           "color": "#CAB148",
           "threshold": 1010.0
         }
-      ]
+      ],
+      "leaderboard_id": 26579
     },
     {
       "name": "DM ww3t Pokeball Level 2",
@@ -100,7 +103,8 @@
           "color": "#CAB148",
           "threshold": 1190.0
         }
-      ]
+      ],
+      "leaderboard_id": 36870
     },
     {
       "name": "DM 1w4ts Pokeball Level 2",
@@ -125,7 +129,8 @@
           "color": "#CAB148",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 26655
     },
     {
       "name": "DM ww4t Pokeball Level 2",
@@ -150,7 +155,8 @@
           "color": "#CAB148",
           "threshold": 1230.0
         }
-      ]
+      ],
+      "leaderboard_id": 34691
     },
     {
       "name": "DM 1w5ts Pokeball Level 2",
@@ -175,7 +181,8 @@
           "color": "#CAB148",
           "threshold": 1080.0
         }
-      ]
+      ],
+      "leaderboard_id": 26659
     },
     {
       "name": "DM ww5t Pokeball Level 2",
@@ -200,7 +207,8 @@
           "color": "#CAB148",
           "threshold": 1260.0
         }
-      ]
+      ],
+      "leaderboard_id": 34889
     },
     {
       "name": "DM 1w6ts Pokeball Level 2",
@@ -225,7 +233,8 @@
           "color": "#CAB148",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 26663
     },
     {
       "name": "DM ww6t Pokeball Level 2",
@@ -250,7 +259,33 @@
           "color": "#CAB148",
           "threshold": 1280.0
         }
-      ]
+      ],
+      "leaderboard_id": 34555
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsReloadingVermilionDiscord",
+    "kovaaks_benchmark_id": 859,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:27.346437+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

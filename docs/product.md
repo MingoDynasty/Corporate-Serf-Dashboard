@@ -76,6 +76,12 @@ list in the roadmap.)
   a playlist," but not "*which* playlist deserves attention" — this surfaces
   stale and weak playlists at a glance and directs training focus across
   playlists, the way the scenario table already does within one.
+- **Live percentile warmup** (PRs #129, #130, #132, #133). Played scenarios
+  from visible playlists fill their percentile caches politely in the
+  background; the overview shows honest coverage placeholders and live
+  remaining/ETA or paused status until complete. *Problem solved:* a cold cache
+  no longer produces misleading partial medians or makes the user open every
+  playlist by hand before cross-playlist weakness comparisons become useful.
 - **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
   filters every playlist dropdown (Home filter, Journey picker). Hidden
@@ -89,14 +95,25 @@ list in the roadmap.)
   rest wait behind "Show hidden" on the Playlists page. *Problem solved:* enabling a benchmark used to mean
   manually copying a JSON file and restarting — now it's one unhide click,
   and app updates refresh the whole library automatically.
-- **Playlist scenarios overview** (PRs #12, #15, #16). A sortable table of
+- **Bundled scenarios ship their leaderboard IDs** (PR #169). Every scenario
+  in the bundled benchmark library carries its KovaaK's leaderboard ID, folded
+  into the local name→ID mapping cache at startup. *Problem solved:* opening a
+  bundled playlist you have never played used to resolve each scenario's
+  leaderboard ID one slow, timeout-prone name-search call at a time — now those
+  IDs are already known, so first opens of unfamiliar playlists are faster and
+  less flaky, even before a username is configured.
+- **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
+  PR #127). A sortable table of
   every scenario in a playlist — rank, total, percentile, last played, runs,
   high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
-  the column labels remain visible while scanning deep rows. *Problem solved:*
-  the headline use case is *"show me the scenarios where I'm worst, sorted
-  ascending — that's my training priority list."* It also surfaces scenarios
-  gone stale. A session-planning tool, checked at the start of a training
-  session.
+  the column labels remain visible while scanning deep rows. The local and
+  cached parts paint immediately; unresolved leaderboard cells animate and
+  stream into place with a counter instead of hiding the table behind a
+  minutes-long spinner. *Problem solved:* the headline use case is *"show me
+  the scenarios where I'm worst, sorted ascending — that's my training
+  priority list."* It also surfaces scenarios gone stale, and remains usable
+  while KovaaK's is slow or unreachable. A session-planning tool, checked at
+  the start of a training session.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I
@@ -106,6 +123,16 @@ list in the roadmap.)
 
 ### Getting data in
 
+- **Settings page, and a stats folder the app finds itself** (`/settings`, PRs
+  #181–#184). The stats folder, KovaaK's username, and Steam ID are edited in
+  the app and stored in a file the app owns; a start with nothing configured
+  looks the stats folder up on this machine and stores what it finds. *Problem
+  solved:* configuring the dashboard used to mean finding a TOML file and
+  typing a Steam library path into it, and a moved Steam library turned that
+  chore into a dashboard that refused to start. It now starts regardless —
+  empty pages and a hint pointing at Settings when there is nothing to show —
+  and usually needs no configuration at all. Changes that cannot safely take
+  effect under a running app say "restart to apply" instead of pretending.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the Home Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the
@@ -131,6 +158,35 @@ list in the roadmap.)
   benchmark files under `resources/benchmarks/`. *Problem solved:*
   rank overlays need threshold data that no single public API provides; the
   importer builds it reproducibly, with provenance, instead of by hand.
+
+### Getting and updating the app
+
+- **One-line install with a self-updating shortcut** (PRs #155, #159, #163).
+  The whole install is one line pasted into PowerShell: it brings its own
+  Python and uv, asks nothing at all, and leaves a desktop shortcut (finding
+  the KovaaK's stats folder moved into the app itself, above). Each launch
+  updates to the newest release before starting, and
+  quietly runs the version already installed when there's no internet.
+  *Problem solved:* the audience is Windows gamers, not Python developers —
+  "clone the repo, install uv, run `uv sync`" excluded most of them. Everything
+  it installs stays in one folder, so uninstalling is deleting that folder and
+  the shortcut.
+- **Every build says what it is, and installer-era releases can be rolled back**
+  (PRs #154, #158, #159). Releases are dated, immutable, and kept forever; the
+  running build records its commit in the log. *Problem solved:* a bug report
+  couldn't be tied to a version, and a bad push had no "go back to yesterday" —
+  installing an older tag now pins it there until the user opts back into
+  updates. Rollback targets must ship the installer and launcher, so
+  `v2026.07.19.4` is the earliest; older tags predate that contract and their
+  installs abort.
+- **The version is on the Settings page** (PRs #188, #190). The page names the
+  release tag, with the commit it was built from underneath, and a freshly
+  updated app knows its own tag from its first session. *Problem solved:* the
+  two moments anyone wants a version are right after an update ("the console
+  said it updated — did it?") and while writing a bug report, and until now the
+  answer sat in a tooltip on the header's GitHub icon, where nobody looks. It
+  used to read "unknown" for the whole session after an update — exactly when
+  it was most likely to be checked, and exactly the look of a failed update.
 
 ## Where it's going
 

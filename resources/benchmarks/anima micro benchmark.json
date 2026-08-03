@@ -40,7 +40,8 @@
           "color": "#FC95FC",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 38536
     },
     {
       "name": "1w3ts Pasu Perfected Micro Goated",
@@ -80,7 +81,8 @@
           "color": "#FC95FC",
           "threshold": 1800.0
         }
-      ]
+      ],
+      "leaderboard_id": 65396
     },
     {
       "name": "Pasu Micro 50% Speed 2",
@@ -120,7 +122,8 @@
           "color": "#FC95FC",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 96385
     },
     {
       "name": "eth Precise Dots -2",
@@ -160,7 +163,8 @@
           "color": "#FC95FC",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 96335
     },
     {
       "name": "shimmicro",
@@ -200,7 +204,8 @@
           "color": "#FC95FC",
           "threshold": 125000.0
         }
-      ]
+      ],
+      "leaderboard_id": 84415
     },
     {
       "name": "1wall 2targets wide smaller denserer",
@@ -240,7 +245,8 @@
           "color": "#FC95FC",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 50419
     },
     {
       "name": "5 Sphere Hipfire Small",
@@ -280,7 +286,8 @@
           "color": "#FC95FC",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 125
     },
     {
       "name": "1w6ts trustechain Raspberry 30% smaller",
@@ -320,7 +327,8 @@
           "color": "#FC95FC",
           "threshold": 168.0
         }
-      ]
+      ],
+      "leaderboard_id": 44256
     },
     {
       "name": "cloverRawControl",
@@ -360,7 +368,8 @@
           "color": "#FC95FC",
           "threshold": 10800.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "Extra Controlsphere",
@@ -400,7 +409,8 @@
           "color": "#FC95FC",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 562
     },
     {
       "name": "e1se MicroTrack",
@@ -440,7 +450,8 @@
           "color": "#FC95FC",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 62726
     },
     {
       "name": "Microadjustment Tracking Small",
@@ -480,7 +491,45 @@
           "color": "#FC95FC",
           "threshold": 5800.0
         }
-      ]
+      ],
+      "leaderboard_id": 55928
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsScreamingBrickredFrenzy",
+    "kovaaks_benchmark_id": 550,
+    "rank_colors": [
+      [
+        "Retail",
+        "#FF8D8D"
+      ],
+      [
+        "Uber Driver",
+        "#FFC988"
+      ],
+      [
+        "Barber",
+        "#FCFF80"
+      ],
+      [
+        "Violinist",
+        "#A6FF94"
+      ],
+      [
+        "Artist",
+        "#34BECB"
+      ],
+      [
+        "Surgeon",
+        "#7DAEFF"
+      ],
+      [
+        "Cartoon",
+        "#FC95FC"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:03.173465+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

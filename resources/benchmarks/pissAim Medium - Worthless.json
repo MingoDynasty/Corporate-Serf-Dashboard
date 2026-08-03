@@ -30,7 +30,8 @@
           "color": "#62f500",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 24106
     },
     {
       "name": "Wide4t pAim",
@@ -60,7 +61,8 @@
           "color": "#62f500",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 24171
     },
     {
       "name": "1w3ts Smallflicks pAim",
@@ -90,7 +92,8 @@
           "color": "#62f500",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 24172
     },
     {
       "name": "Pasu pAim",
@@ -120,7 +123,8 @@
           "color": "#62f500",
           "threshold": 64.0
         }
-      ]
+      ],
+      "leaderboard_id": 24173
     },
     {
       "name": "beanClick pAim",
@@ -150,7 +154,8 @@
           "color": "#62f500",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 24174
     },
     {
       "name": "Controlsphere Click pAim",
@@ -180,7 +185,8 @@
           "color": "#62f500",
           "threshold": 36.0
         }
-      ]
+      ],
+      "leaderboard_id": 24175
     },
     {
       "name": "Smoothbot Speed Switching pAim",
@@ -210,7 +216,8 @@
           "color": "#62f500",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 24104
     },
     {
       "name": "voxTS Easy pAim",
@@ -240,7 +247,8 @@
           "color": "#62f500",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 24176
     },
     {
       "name": "1w4t NQS Pokeball pAim",
@@ -270,7 +278,8 @@
           "color": "#62f500",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 24177
     },
     {
       "name": "TrgSwitch pAim",
@@ -300,7 +309,8 @@
           "color": "#62f500",
           "threshold": 430.0
         }
-      ]
+      ],
+      "leaderboard_id": 24166
     },
     {
       "name": "beanTS Strafes pAim",
@@ -330,7 +340,8 @@
           "color": "#62f500",
           "threshold": 380.0
         }
-      ]
+      ],
+      "leaderboard_id": 24178
     },
     {
       "name": "psalmTS Angelic pAim",
@@ -360,7 +371,8 @@
           "color": "#62f500",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 24179
     },
     {
       "name": "Smoothsphere Easy pAim",
@@ -390,7 +402,8 @@
           "color": "#62f500",
           "threshold": 8400.0
         }
-      ]
+      ],
+      "leaderboard_id": 24167
     },
     {
       "name": "BC120TI pAim",
@@ -420,7 +433,8 @@
           "color": "#62f500",
           "threshold": 450.0
         }
-      ]
+      ],
+      "leaderboard_id": 24168
     },
     {
       "name": "Controlsphere Easy pAim",
@@ -450,7 +464,8 @@
           "color": "#62f500",
           "threshold": 8400.0
         }
-      ]
+      ],
+      "leaderboard_id": 24181
     },
     {
       "name": "UFO Fallen pAim",
@@ -480,7 +495,8 @@
           "color": "#62f500",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 24182
     },
     {
       "name": "Air AIO Angelic pAim",
@@ -510,7 +526,8 @@
           "color": "#62f500",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 24169
     },
     {
       "name": "STSR pAim",
@@ -540,7 +557,8 @@
           "color": "#62f500",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 24180
     }
   ],
   "generated_from": {
@@ -568,7 +586,8 @@
         "#62f500"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:15.950845+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:03.080062+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

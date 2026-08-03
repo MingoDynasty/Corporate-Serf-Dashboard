@@ -25,7 +25,8 @@
           "color": "#fb2d2d",
           "threshold": 116.0
         }
-      ]
+      ],
+      "leaderboard_id": 565
     },
     {
       "name": "Pokeball Frenzy Auto TE Wide",
@@ -50,7 +51,8 @@
           "color": "#fb2d2d",
           "threshold": 3450.0
         }
-      ]
+      ],
+      "leaderboard_id": 783
     },
     {
       "name": "1wall5targets_pasu Reload",
@@ -75,7 +77,8 @@
           "color": "#fb2d2d",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "1w2ts Pasu Perfected",
@@ -100,7 +103,8 @@
           "color": "#fb2d2d",
           "threshold": 104.0
         }
-      ]
+      ],
+      "leaderboard_id": 22601
     },
     {
       "name": "voxTargetClick 20% Small",
@@ -125,7 +129,8 @@
           "color": "#fb2d2d",
           "threshold": 101.0
         }
-      ]
+      ],
+      "leaderboard_id": 857
     },
     {
       "name": "Floating Heads Timing 400% Larger",
@@ -150,7 +155,8 @@
           "color": "#fb2d2d",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 1607
     },
     {
       "name": "Reflex Flick - Fair",
@@ -175,7 +181,8 @@
           "color": "#fb2d2d",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 10
     },
     {
       "name": "Static Wide Reflex",
@@ -200,7 +207,8 @@
           "color": "#fb2d2d",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 109422
     },
     {
       "name": "Reflex Flick - Mini",
@@ -225,7 +233,8 @@
           "color": "#fb2d2d",
           "threshold": 5500.0
         }
-      ]
+      ],
+      "leaderboard_id": 246
     },
     {
       "name": "Reflex Micro++ Flick",
@@ -250,7 +259,8 @@
           "color": "#fb2d2d",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1456
     },
     {
       "name": "RawMouseControl Reload",
@@ -275,7 +285,8 @@
           "color": "#fb2d2d",
           "threshold": 280.0
         }
-      ]
+      ],
+      "leaderboard_id": 17318
     },
     {
       "name": "waldoTS Intermediate",
@@ -300,7 +311,8 @@
           "color": "#fb2d2d",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 111273
     },
     {
       "name": "Tamspeed 2bpes Angelic",
@@ -325,7 +337,8 @@
           "color": "#fb2d2d",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 38536
     },
     {
       "name": "FB DynMicros",
@@ -350,7 +363,8 @@
           "color": "#fb2d2d",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 93556
     },
     {
       "name": "Smoothsphere",
@@ -375,7 +389,8 @@
           "color": "#fb2d2d",
           "threshold": 8000.0
         }
-      ]
+      ],
+      "leaderboard_id": 396
     },
     {
       "name": "centering I",
@@ -400,7 +415,8 @@
           "color": "#fb2d2d",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 25
     },
     {
       "name": "Controlsphere 80%",
@@ -425,7 +441,8 @@
           "color": "#fb2d2d",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 10944
     },
     {
       "name": "cloverRawControl Easy",
@@ -450,7 +467,8 @@
           "color": "#fb2d2d",
           "threshold": 10000.0
         }
-      ]
+      ],
+      "leaderboard_id": 69150
     }
   ],
   "generated_from": {
@@ -474,7 +492,8 @@
         "#fb2d2d"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:38.367217+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:35.775456+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

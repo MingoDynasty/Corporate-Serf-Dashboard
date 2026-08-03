@@ -40,7 +40,8 @@
           "color": "#050000",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 1106
     },
     {
       "name": "voxTargetSwitch 2 Small",
@@ -80,7 +81,8 @@
           "color": "#050000",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 16624
     },
     {
       "name": "StaticSwitchingVox xxSmall",
@@ -120,7 +122,8 @@
           "color": "#050000",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 18203
     },
     {
       "name": "patCircleSwitch NR Small",
@@ -160,7 +163,8 @@
           "color": "#050000",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 178947
     },
     {
       "name": "patCircleSwitch 90 NR Small",
@@ -200,7 +204,8 @@
           "color": "#050000",
           "threshold": 116.0
         }
-      ]
+      ],
+      "leaderboard_id": 178949
     },
     {
       "name": "StaticSwitchingPat 90 xxSmall",
@@ -240,7 +245,8 @@
           "color": "#050000",
           "threshold": 125.0
         }
-      ]
+      ],
+      "leaderboard_id": 18204
     },
     {
       "name": "xenTargetSwitch Small v2",
@@ -280,7 +286,8 @@
           "color": "#050000",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 178975
     },
     {
       "name": "xenTargetSwitch Static Small",
@@ -320,7 +327,8 @@
           "color": "#050000",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 178974
     },
     {
       "name": "devTS Goated NR Small",
@@ -360,7 +368,8 @@
           "color": "#050000",
           "threshold": 510.0
         }
-      ]
+      ],
+      "leaderboard_id": 3632
     },
     {
       "name": "devTS Goated NR Static Small",
@@ -400,7 +409,8 @@
           "color": "#050000",
           "threshold": 810.0
         }
-      ]
+      ],
+      "leaderboard_id": 1633
     },
     {
       "name": "FloatTS Angelic",
@@ -440,7 +450,8 @@
           "color": "#050000",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 38548
     },
     {
       "name": "Floatswitch Advanced",
@@ -480,7 +491,8 @@
           "color": "#050000",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 112006
     },
     {
       "name": "beanTS 30% Smaller",
@@ -520,7 +532,8 @@
           "color": "#050000",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 6779
     },
     {
       "name": "DotTS",
@@ -560,7 +573,8 @@
           "color": "#050000",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 75317
     },
     {
       "name": "waldoTS Elite",
@@ -600,7 +614,8 @@
           "color": "#050000",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 111257
     },
     {
       "name": "vietTS Small",
@@ -640,7 +655,8 @@
           "color": "#050000",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 136564
     },
     {
       "name": "3D Switching Small",
@@ -680,7 +696,8 @@
           "color": "#050000",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 178965
     },
     {
       "name": "Skeet Tracking Goated Small v2",
@@ -720,7 +737,8 @@
           "color": "#050000",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 178968
     }
   ],
   "generated_from": {
@@ -756,7 +774,8 @@
         "#050000"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:17.771092+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:30.702002+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

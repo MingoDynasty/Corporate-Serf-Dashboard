@@ -100,7 +100,8 @@
           "color": "#E51C3E",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 28404
     },
     {
       "name": "PureG BounceSphere",
@@ -200,7 +201,8 @@
           "color": "#E51C3E",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 44105
     },
     {
       "name": "PureG Fuglaa React",
@@ -300,7 +302,8 @@
           "color": "#E51C3E",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 28414
     },
     {
       "name": "PureG Thin Strafes",
@@ -400,7 +403,8 @@
           "color": "#E51C3E",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 28585
     },
     {
       "name": "PureG Horizontal Clicking",
@@ -500,7 +504,8 @@
           "color": "#E51C3E",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 28581
     },
     {
       "name": "PureG Leapcorn",
@@ -600,7 +605,8 @@
           "color": "#E51C3E",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 28582
     },
     {
       "name": "PureG Static Clicking",
@@ -700,7 +706,8 @@
           "color": "#E51C3E",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 28586
     },
     {
       "name": "PureG Pokeball",
@@ -800,7 +807,8 @@
           "color": "#E51C3E",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 28587
     },
     {
       "name": "PureG Pasu Switch",
@@ -900,7 +908,8 @@
           "color": "#E51C3E",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 28397
     },
     {
       "name": "PureG KinTS",
@@ -1000,7 +1009,8 @@
           "color": "#E51C3E",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 29522
     },
     {
       "name": "PureG Static Switching",
@@ -1100,7 +1110,8 @@
           "color": "#E51C3E",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 28584
     },
     {
       "name": "PureG Pill Switch",
@@ -1200,7 +1211,93 @@
           "color": "#E51C3E",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 28406
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrackingCaffeinatedBuystation",
+    "kovaaks_benchmark_id": 725,
+    "rank_colors": [
+      [
+        "Copper III",
+        "#885157"
+      ],
+      [
+        "Copper II",
+        "#A0716B"
+      ],
+      [
+        "Copper I",
+        "#B89381"
+      ],
+      [
+        "Silver III",
+        "#6A6A6A"
+      ],
+      [
+        "Silver II",
+        "#8C8C8C"
+      ],
+      [
+        "Silver I",
+        "#AEAEAE"
+      ],
+      [
+        "Gold III",
+        "#B09335"
+      ],
+      [
+        "Gold II",
+        "#C7A63D"
+      ],
+      [
+        "Gold I",
+        "#DDB845"
+      ],
+      [
+        "Mithril III",
+        "#5878A5"
+      ],
+      [
+        "Mithril II",
+        "#96B2D9"
+      ],
+      [
+        "Mithril I",
+        "#B6D9FF"
+      ],
+      [
+        "Adamant III",
+        "#0E7C01"
+      ],
+      [
+        "Adamant II",
+        "#61CE61"
+      ],
+      [
+        "Adamant I",
+        "#5BC16B"
+      ],
+      [
+        "Master III",
+        "#8200F4"
+      ],
+      [
+        "Master II",
+        "#9741F2"
+      ],
+      [
+        "Master I",
+        "#A078F9"
+      ],
+      [
+        "PURE",
+        "#E51C3E"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:21.999536+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -186,3 +187,29 @@ def test_load_csv_file_into_database_reports_extract_failure(
 
     assert data_service.load_csv_file_into_database("broken.csv") is False
     assert "Failed to get run data for CSV file: broken.csv" in caplog.messages
+
+
+def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
+    monkeypatch,
+    tmp_path,
+    caplog,
+) -> None:
+    (tmp_path / "loaded.csv").touch()
+    (tmp_path / "failed.csv").touch()
+    (tmp_path / "ignored.txt").touch()
+    monkeypatch.setattr(
+        data_service,
+        "load_csv_file_into_database",
+        lambda path: Path(path).name == "loaded.csv",
+    )
+
+    with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
+        data_service.initialize_kovaaks_data(str(tmp_path))
+
+    assert any(
+        message.startswith(
+            "CSV startup load complete: 2 scanned, 1 loaded, 1 failed in "
+        )
+        and message.endswith(" seconds.")
+        for message in caplog.messages
+    )

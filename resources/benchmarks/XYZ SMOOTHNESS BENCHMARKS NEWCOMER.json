@@ -35,7 +35,8 @@
           "color": "#999999",
           "threshold": 5800.0
         }
-      ]
+      ],
+      "leaderboard_id": 163300
     },
     {
       "name": "VSTP Varied Newcomer",
@@ -70,7 +71,8 @@
           "color": "#999999",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 163285
     },
     {
       "name": "Curvesphere Vertical Newcomer",
@@ -105,7 +107,8 @@
           "color": "#999999",
           "threshold": 5300.0
         }
-      ]
+      ],
+      "leaderboard_id": 163299
     },
     {
       "name": "Farmtrack Goated Fixed Newcomer",
@@ -140,7 +143,8 @@
           "color": "#999999",
           "threshold": 5375.0
         }
-      ]
+      ],
+      "leaderboard_id": 163287
     },
     {
       "name": "SYW Smooth Your Wrist Newcomer",
@@ -175,7 +179,8 @@
           "color": "#999999",
           "threshold": 5900.0
         }
-      ]
+      ],
+      "leaderboard_id": 163288
     },
     {
       "name": "Spherical Centering II 180 Newcomer",
@@ -210,7 +215,8 @@
           "color": "#999999",
           "threshold": 5550.0
         }
-      ]
+      ],
+      "leaderboard_id": 163301
     },
     {
       "name": "Bipolar Centering 360 Newcomer",
@@ -245,7 +251,8 @@
           "color": "#999999",
           "threshold": 5500.0
         }
-      ]
+      ],
+      "leaderboard_id": 163289
     },
     {
       "name": "Anti-Centering Newcomer",
@@ -280,7 +287,8 @@
           "color": "#999999",
           "threshold": 5475.0
         }
-      ]
+      ],
+      "leaderboard_id": 163290
     },
     {
       "name": "GliderTrack Newcomer",
@@ -315,7 +323,8 @@
           "color": "#999999",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 163302
     },
     {
       "name": "Multi Angle Smoothness Newcomer",
@@ -350,7 +359,8 @@
           "color": "#999999",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 163291
     },
     {
       "name": "ClockTrack Newcomer",
@@ -385,7 +395,8 @@
           "color": "#999999",
           "threshold": 5700.0
         }
-      ]
+      ],
+      "leaderboard_id": 163303
     },
     {
       "name": "PTXS Newcomer",
@@ -420,7 +431,8 @@
           "color": "#999999",
           "threshold": 5900.0
         }
-      ]
+      ],
+      "leaderboard_id": 163292
     }
   ],
   "generated_from": {
@@ -452,7 +464,8 @@
         "#999999"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:36.349487+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:25.751643+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

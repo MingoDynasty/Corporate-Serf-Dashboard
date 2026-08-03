@@ -2,6 +2,7 @@
 
 import json
 import logging
+import uuid
 from datetime import datetime
 from typing import TypedDict
 
@@ -21,6 +22,7 @@ from dash import (
 
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
+from source.config.settings_service import get_identity, get_usable_stats_dir
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info
 from source.kovaaks.data_service import (
@@ -45,10 +47,14 @@ from source.plot.plot_service import (
     add_score_threshold_overlay,
     apply_light_dark_mode,
     generate_empty_plot,
+    generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
 )
-from source.utilities.dash_logging import get_dash_logger
+from source.utilities.dash_logging import (
+    drain_background_notifications,
+    get_dash_logger,
+)
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -77,7 +83,7 @@ SETTINGS_HELP_TEXT = {
         "the run against the personal best it was chasing."
     ),
     "score-threshold-notification": (
-        "Notifies after each new run whether the score reached the score threshold."
+        "Notifies after each new run whether it reached the score threshold."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "
@@ -114,6 +120,11 @@ dash.register_page(
 def _empty_plot_json(title: str, message: str) -> str:
     """Serialize an empty-state graph for the cached plot store."""
     return generate_empty_plot(title, message).to_json()
+
+
+def _placeholder_plot_json() -> str:
+    """Serialize the neutral pre-hydration graph placeholder."""
+    return generate_placeholder_plot().to_json()
 
 
 class RunEventData(TypedDict):
@@ -250,6 +261,25 @@ def check_for_new_data(_, automatically_change_scenario, selected_scenario):
 
 
 @callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Input("interval-component", "n_intervals"),
+    prevent_initial_call=True,
+)
+def flush_background_notifications(_n_intervals):
+    """Deliver notifications queued by threads without a callback context.
+
+    The file watchdog and the rank-freshness Timer chain log through
+    ``dash_logger`` from plain threads, where ``set_props`` is unavailable;
+    the handler queues those records and this callback hands them to the
+    notification container on the next poll tick.
+    """
+    notifications = drain_background_notifications()
+    if not notifications:
+        return no_update
+    return notifications
+
+
+@callback(
     Output("scenario_num_runs", "children"),
     Output("last-played-ts", "data"),
     Output("last-played-empty-value", "data"),
@@ -287,7 +317,7 @@ def get_scenario_num_runs(
         scenario_stats.date_last_played.timestamp(),
         "Never",  # Defensive fallback; unused for a valid timestamp.
         format_absolute_timestamp(scenario_stats.date_last_played),
-        "last-played-affordance",
+        "cell-tooltip-affordance",
         0,
         False,
     )
@@ -316,21 +346,24 @@ def _rank_allows_network(triggered: list[dict[str, str]]) -> bool:
 
 
 def _emit_rank_messages(rank_info: ScenarioRankInfo) -> None:
-    """Surface rank warnings and errors through the dashboard notification logger."""
+    """Surface rank warnings and errors through the dashboard notification logger.
+
+    No module-logger echo: the ``.dash`` records propagate to the root
+    handlers, so the files already keep the exact user-visible message.
+    """
     if rank_info.warning_message:
-        logger.warning("Scenario rank warning: %s", rank_info.warning_message)
         dash_logger.warning(rank_info.warning_message)
     if rank_info.error_message:
-        logger.warning("Scenario rank unavailable: %s", rank_info.error_message)
         dash_logger.error(rank_info.error_message)
 
 
 def _rank_lookup_config() -> tuple[str | None, str | None, int, int, int]:
     """Return the shared rank-service arguments sourced from app configuration."""
     rank_config = get_config()
+    username, steam_id = get_identity()
     return (
-        rank_config.kovaaks_username,
-        rank_config.steam_id,
+        username,
+        steam_id,
         rank_config.scenario_metadata_cache_ttl_hours,
         rank_config.scenario_rank_cache_ttl_hours,
         rank_config.leaderboard_total_cache_ttl_hours,
@@ -347,6 +380,7 @@ def _render_scenario_rank(selected_scenario: str | None, allow_network: bool) ->
             selected_scenario,
             *_rank_lookup_config(),
             allow_network=allow_network,
+            record_activity=allow_network,
         )
     except Exception:  # noqa: BLE001
         logger.exception("Failed to fetch scenario rank for %s", selected_scenario)
@@ -373,14 +407,32 @@ def get_scenario_rank(_, selected_scenario, _n_intervals) -> str:
 
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("rank-refresh-button", "n_clicks"),
     State("scenario-dropdown-selection", "value"),
+    # Show the button's spinner for the duration of the fetch. Mantine's
+    # loading state also swallows clicks, so the button cannot be spammed
+    # into repeat KovaaK's calls while one refresh is in flight.
+    running=[(Output("rank-refresh-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def refresh_rank(_, selected_scenario: str | None) -> str:
-    """Fetch and display authoritative board truth after an explicit user request."""
+def refresh_rank(n_clicks, selected_scenario: str | None):
+    """Fetch and display authoritative board truth after an explicit user request.
+
+    A green toast confirms a genuinely fresh refresh. Degraded paths already
+    toast through ``dash_logger`` -- red when the fetch failed with nothing
+    cached, yellow when it failed but a stale cached rank was served (or on a
+    steam-mismatch warning) -- so any error or warning suppresses the green
+    confirmation.
+
+    Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
+    fire once on initial page load despite ``prevent_initial_call``, and a
+    page load must not force a network refresh or pop a stray toast.
+    """
+    if not n_clicks:
+        return no_update, no_update
     if not selected_scenario:
-        return "N/A"
+        return "N/A", no_update
 
     try:
         rank_info = get_scenario_rank_info(
@@ -391,10 +443,23 @@ def refresh_rank(_, selected_scenario: str | None) -> str:
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
         dash_logger.error("Position refresh for %s failed.", selected_scenario)
-        return "N/A"
+        return "N/A", no_update
 
     _emit_rank_messages(rank_info)
-    return format_scenario_rank(rank_info)
+    if rank_info.error_message or rank_info.warning_message:
+        return format_scenario_rank(rank_info), no_update
+    notification = {
+        "action": "show",
+        "title": "Notification",
+        "message": f"Refreshed position for {selected_scenario}.",
+        "color": "green",
+        # Fresh id per refresh: ``show`` silently ignores a duplicate id while
+        # the previous toast is still visible, which would eat the "done" cue
+        # on back-to-back refreshes.
+        "id": f"rank-refresh-notification-{uuid.uuid4()}",
+        "icon": local_icon("material-symbols:refresh-rounded"),
+    }
+    return format_scenario_rank(rank_info), [notification]
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
@@ -761,10 +826,7 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
     :return: Figure with theme applied.
     """
     if not plot_json:
-        plot_json = _empty_plot_json(
-            _SELECT_SCENARIO_PLOT_TITLE,
-            _SELECT_SCENARIO_PLOT_MESSAGE,
-        )
+        plot_json = _placeholder_plot_json()
     return apply_light_dark_mode(go.Figure(json.loads(plot_json)), color_scheme)
 
 
@@ -809,6 +871,12 @@ def modal_demo(_, opened):
     return not opened
 
 
+def _local_scenario_options() -> list:
+    """List the scenarios in the stats directory, or none without a usable one."""
+    stats_dir = get_usable_stats_dir()
+    return get_unique_scenarios(stats_dir) if stats_dir else []
+
+
 @callback(
     Output("scenario-dropdown-selection", "data"),
     Input("playlist-dropdown-selection", "value"),
@@ -816,8 +884,28 @@ def modal_demo(_, opened):
 def select_playlist(selected_playlist):
     """List scenarios for the selected playlist or all local scenarios."""
     if not selected_playlist or get_playlist_by_code(selected_playlist) is None:
-        return get_unique_scenarios(get_config().stats_dir)
+        return _local_scenario_options()
     return get_scenarios_from_playlist_code(selected_playlist)
+
+
+def _stats_dir_hint() -> list:
+    """Say so, persistently, when the app booted without a stats directory.
+
+    Unset and unusable read the same to the user, and both are repaired in the
+    same place, so the hint carries one link to the settings page.
+    """
+    if get_usable_stats_dir() is not None:
+        return []
+    return [
+        dmc.Text(
+            [
+                "No stats directory configured — set it in ",
+                dmc.Anchor("Settings", href="/settings", refresh=False),
+            ],
+            className="stats-dir-hint",
+            id="stats-dir-hint",
+        )
+    ]
 
 
 def _home_initial_selection(
@@ -833,7 +921,7 @@ def _home_initial_selection(
     scenario_options = (
         get_scenarios_from_playlist_code(selected_playlist)
         if selected_playlist
-        else get_unique_scenarios(get_config().stats_dir)
+        else _local_scenario_options()
     )
     return selected_playlist, scenario_options, scenario or None
 
@@ -858,21 +946,19 @@ def layout(
     scenario_persistence = scenario is None
 
     return dmc.Box(
+        className="home-page",
         children=[
             dcc.Store(id="run-events"),
             dcc.Store(
                 id="cached-plot",
-                data=_empty_plot_json(
-                    _SELECT_SCENARIO_PLOT_TITLE,
-                    _SELECT_SCENARIO_PLOT_MESSAGE,
-                ),
+                data=_placeholder_plot_json(),
             ),  # caches the plot for easy light/dark mode
             dcc.Store(
                 id="last-played-ts"
             ),  # raw epoch for the relative "Last played" text
             dcc.Store(
                 id="last-played-empty-value",
-                data="—",
+                data="",
             ),
             dcc.Interval(
                 id="startup-playlist-warning-interval",
@@ -893,6 +979,7 @@ def layout(
                 interval=30_000,
                 n_intervals=0,
             ),
+            *_stats_dir_hint(),
             dmc.Grid(
                 children=[
                     dmc.GridCol(
@@ -907,7 +994,10 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    ml="xl",
+                                    # Indent only where the row has room; the
+                                    # margin plus min-width 100% would overflow
+                                    # a narrow viewport.
+                                    ml={"base": 0, "lg": "xl"},
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
@@ -920,7 +1010,7 @@ def layout(
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
                                     maxDropdownHeight="75vh",
-                                    miw=400,
+                                    miw="min(400px, 100%)",
                                     persistence=scenario_persistence,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
@@ -937,11 +1027,11 @@ def layout(
                                     ),
                                     min=1,
                                     persistence=True,
-                                    placeholder="Top N scores to consider...",
                                     radius="sm",
                                     size="sm",
                                     variant="default",
                                     value=5,
+                                    w="8rem",
                                 ),
                                 dmc.DatePickerInput(
                                     id="date-picker",
@@ -972,7 +1062,7 @@ def layout(
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Text(
-                                                        "—",
+                                                        "",
                                                         id="scenario_datetime_last_played",
                                                         span=True,
                                                         size="sm",
@@ -1001,30 +1091,33 @@ def layout(
                                         ),
                                         dmc.Group(
                                             [
-                                                dmc.Text(
+                                                dmc.Group(
                                                     [
                                                         dmc.Text(
-                                                            "Position: ",
+                                                            "Position:",
                                                             fw=700,
                                                             span=True,
+                                                            size="sm",
                                                         ),
+                                                        # dcc.Loading renders
+                                                        # divs, which cannot
+                                                        # nest inside a Text's
+                                                        # default <p> root, so
+                                                        # it sits beside the
+                                                        # label in a Group
+                                                        # (like "Last played:"
+                                                        # above).
                                                         dcc.Loading(
                                                             dmc.Text(
                                                                 id="scenario_rank",
                                                                 span=True,
+                                                                size="sm",
                                                             ),
                                                             delay_show=SCENARIO_RANK_LOADING_DELAY_MS,
                                                             show_initially=False,
-                                                            parent_style={
-                                                                "display": "inline-block",
-                                                                "verticalAlign": "baseline",
-                                                            },
-                                                            style={
-                                                                "display": "inline-block",
-                                                            },
                                                         ),
                                                     ],
-                                                    size="sm",
+                                                    gap="0.25em",
                                                 ),
                                                 dmc.Tooltip(
                                                     dmc.Button(
@@ -1049,15 +1142,16 @@ def layout(
                                         ),
                                     ],
                                     w=300,
+                                    maw="100%",
                                 ),
                             ],
-                            gap="md",
+                            gap="sm",
                             justify="flex-start",
                             align="flex-start",
                             direction="row",
                             wrap="wrap",
                         ),
-                        span=10,
+                        span={"base": 12, "lg": 10},
                     ),
                     dmc.GridCol(
                         dmc.Flex(
@@ -1188,7 +1282,7 @@ def layout(
                             direction="row",
                             wrap="wrap",
                         ),
-                        span="auto",
+                        span={"base": 12, "lg": "auto"},
                     ),
                 ],
                 gutter="xl",
@@ -1196,11 +1290,11 @@ def layout(
             ),
             dcc.Graph(
                 id="graph-content",
-                figure=generate_empty_plot(
-                    _SELECT_SCENARIO_PLOT_TITLE,
-                    _SELECT_SCENARIO_PLOT_MESSAGE,
-                ).to_plotly_json(),
-                style={"height": "80vh"},
+                figure=generate_placeholder_plot().to_plotly_json(),
+                className="home-graph",
+                # Redraw the plot whenever the flex container resizes, not
+                # just on window resize.
+                responsive=True,
             ),
         ],
     )

@@ -12,6 +12,7 @@ from sortedcontainers import SortedKeyList
 from watchdog.events import FileSystemEventHandler
 
 from source.config.config_service import get_config
+from source.config.settings_service import get_identity
 from source.kovaaks.api_service import schedule_rank_freshness_refresh
 from source.kovaaks.data_service import (
     extract_data_from_file,
@@ -46,7 +47,6 @@ def _get_created_csv_path(event) -> str | None:
         return None
 
     file = event.src_path
-    print()
     logger.debug("Detected new file: %s", Path(file).name)
     if not file.endswith(".csv"):
         return None
@@ -65,17 +65,17 @@ def _refresh_rank_after_high_score(
     scenario_name: str,
     expected_score: float,
 ) -> None:
-    config = get_config()
-    if not config.kovaaks_username:
+    username, steam_id = get_identity()
+    if not username:
         return
 
     try:
         schedule_rank_freshness_refresh(
             scenario_name,
-            config.kovaaks_username,
-            config.steam_id,
+            username,
+            steam_id,
             expected_score,
-            config.scenario_metadata_cache_ttl_hours,
+            get_config().scenario_metadata_cache_ttl_hours,
         )
     except Exception:
         logger.exception("Failed to schedule rank refresh for %s", scenario_name)
@@ -89,6 +89,23 @@ class NewFileHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         """Import a newly created run CSV and notify interested UI callbacks."""
+        try:
+            self._import_created_file(event)
+        except Exception:  # noqa: BLE001 -- watchdog does not guard handlers.
+            # An escaped exception would kill the observer thread and silently
+            # end run tracking for the rest of the session (e.g. an OSError
+            # from a CSV still locked by KovaaK's); the next run must still
+            # find a live handler. Log it and tell the UI instead.
+            logger.exception(
+                "Failed to process new stats file: %s",
+                getattr(event, "src_path", "(unknown)"),
+            )
+            dash_logger.error(
+                "Could not process a new run file. See debug.log for details."
+            )
+
+    def _import_created_file(self, event):
+        """Parse, store, and announce one created file; may raise on surprises."""
         file = _get_created_csv_path(event)
         if file is None:
             return

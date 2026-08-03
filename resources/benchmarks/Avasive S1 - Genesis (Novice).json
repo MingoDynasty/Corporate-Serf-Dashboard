@@ -30,7 +30,8 @@
           "color": "#7B8DD1",
           "threshold": 2575.0
         }
-      ]
+      ],
+      "leaderboard_id": 137090
     },
     {
       "name": "Smoothsphere Glider Easy",
@@ -60,7 +61,8 @@
           "color": "#7B8DD1",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 136518
     },
     {
       "name": "Avasphere Novice",
@@ -90,7 +92,8 @@
           "color": "#7B8DD1",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 134667
     },
     {
       "name": "Airva Control Easy",
@@ -120,7 +123,8 @@
           "color": "#7B8DD1",
           "threshold": 2875.0
         }
-      ]
+      ],
+      "leaderboard_id": 136868
     },
     {
       "name": "AvaTrack Ground Flicker Easy",
@@ -150,7 +154,8 @@
           "color": "#7B8DD1",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 138191
     },
     {
       "name": "cuteTrack Easy",
@@ -180,7 +185,8 @@
           "color": "#7B8DD1",
           "threshold": 2750.0
         }
-      ]
+      ],
+      "leaderboard_id": 137192
     },
     {
       "name": "SilkyTS Easy",
@@ -210,7 +216,8 @@
           "color": "#7B8DD1",
           "threshold": 560.0
         }
-      ]
+      ],
+      "leaderboard_id": 137860
     },
     {
       "name": "TrixieSwitch Easy",
@@ -240,7 +247,8 @@
           "color": "#7B8DD1",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 137884
     },
     {
       "name": "AvomiTS Easy",
@@ -270,7 +278,8 @@
           "color": "#7B8DD1",
           "threshold": 4225.0
         }
-      ]
+      ],
+      "leaderboard_id": 135725
     },
     {
       "name": "avaSwitch Easy",
@@ -300,7 +309,8 @@
           "color": "#7B8DD1",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 137536
     },
     {
       "name": "Avasive Speed Switch Easy",
@@ -330,7 +340,8 @@
           "color": "#7B8DD1",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 136917
     },
     {
       "name": "AviaTS Easy",
@@ -360,7 +371,8 @@
           "color": "#7B8DD1",
           "threshold": 880.0
         }
-      ]
+      ],
+      "leaderboard_id": 137114
     },
     {
       "name": "Avomi ww4t Easy",
@@ -390,7 +402,8 @@
           "color": "#7B8DD1",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 136891
     },
     {
       "name": "Avasive 1w3ts Easy",
@@ -420,7 +433,8 @@
           "color": "#7B8DD1",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 137128
     },
     {
       "name": "miaoClick Easy",
@@ -450,7 +464,8 @@
           "color": "#7B8DD1",
           "threshold": 480.0
         }
-      ]
+      ],
+      "leaderboard_id": 136489
     },
     {
       "name": "B180 Avasive Easy",
@@ -480,7 +495,8 @@
           "color": "#7B8DD1",
           "threshold": 350.0
         }
-      ]
+      ],
+      "leaderboard_id": 137544
     },
     {
       "name": "domiClick Easy",
@@ -510,7 +526,8 @@
           "color": "#7B8DD1",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 136913
     },
     {
       "name": "MadClick Easy",
@@ -540,7 +557,37 @@
           "color": "#7B8DD1",
           "threshold": 640.0
         }
-      ]
+      ],
+      "leaderboard_id": 136910
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTeleportingOrangeTroll",
+    "kovaaks_benchmark_id": 738,
+    "rank_colors": [
+      [
+        "Lily",
+        "#F3DEFF"
+      ],
+      [
+        "Plumbago",
+        "#E1D0F7"
+      ],
+      [
+        "Poppy",
+        "#C6B8F0"
+      ],
+      [
+        "Salvia",
+        "#9CA3E0"
+      ],
+      [
+        "Lavender",
+        "#7B8DD1"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:58.878915+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

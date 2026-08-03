@@ -30,7 +30,8 @@
           "color": "#B479C3",
           "threshold": 17200.0
         }
-      ]
+      ],
+      "leaderboard_id": 128
     },
     {
       "name": "Close Fast Strafes Invincible",
@@ -60,7 +61,8 @@
           "color": "#B479C3",
           "threshold": 12400.0
         }
-      ]
+      ],
+      "leaderboard_id": 494
     },
     {
       "name": "Midrange Fast Strafes Invincible",
@@ -90,7 +92,8 @@
           "color": "#B479C3",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 176
     },
     {
       "name": "Cata IC Fast Strafes Invincible",
@@ -120,7 +123,8 @@
           "color": "#B479C3",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1631
     },
     {
       "name": "Narrow Strafe",
@@ -150,7 +154,8 @@
           "color": "#B479C3",
           "threshold": 6500.0
         }
-      ]
+      ],
+      "leaderboard_id": 233
     },
     {
       "name": "Narrow Strafe 2",
@@ -180,7 +185,8 @@
           "color": "#B479C3",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 1591
     },
     {
       "name": "Air no UFO no SKYBOTS",
@@ -210,7 +216,8 @@
           "color": "#B479C3",
           "threshold": 885.0
         }
-      ]
+      ],
+      "leaderboard_id": 234
     },
     {
       "name": "Air Angelic",
@@ -240,7 +247,8 @@
           "color": "#B479C3",
           "threshold": 918.0
         }
-      ]
+      ],
+      "leaderboard_id": 419
     },
     {
       "name": "Air no UFO no SKYBOTS Small 3478",
@@ -270,7 +278,8 @@
           "color": "#B479C3",
           "threshold": 912.0
         }
-      ]
+      ],
+      "leaderboard_id": 433
     },
     {
       "name": "L180TI Sparky",
@@ -300,7 +309,8 @@
           "color": "#B479C3",
           "threshold": 5150.0
         }
-      ]
+      ],
+      "leaderboard_id": 2548
     },
     {
       "name": "B180TI Extra Small Sparky",
@@ -330,7 +340,8 @@
           "color": "#B479C3",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 69
     },
     {
       "name": "PGTI Voltaic 1",
@@ -360,7 +371,8 @@
           "color": "#B479C3",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 1055
     },
     {
       "name": "fuglaab180t Extra Small",
@@ -390,7 +402,8 @@
           "color": "#B479C3",
           "threshold": 30.0
         }
-      ]
+      ],
+      "leaderboard_id": 16784
     },
     {
       "name": "Ascended Tracking 90 Smooth",
@@ -420,7 +433,8 @@
           "color": "#B479C3",
           "threshold": 29200.0
         }
-      ]
+      ],
+      "leaderboard_id": 374
     },
     {
       "name": "Ascended Tracking 90 Small",
@@ -450,7 +464,8 @@
           "color": "#B479C3",
           "threshold": 21500.0
         }
-      ]
+      ],
+      "leaderboard_id": 146
     },
     {
       "name": "Ascended Tracking v3",
@@ -480,7 +495,8 @@
           "color": "#B479C3",
           "threshold": 18200.0
         }
-      ]
+      ],
+      "leaderboard_id": 14
     },
     {
       "name": "Thin Aiming Long",
@@ -510,7 +526,8 @@
           "color": "#B479C3",
           "threshold": 2301.0
         }
-      ]
+      ],
+      "leaderboard_id": 21
     },
     {
       "name": "Thin Aiming Long Invincible",
@@ -540,7 +557,8 @@
           "color": "#B479C3",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 121
     },
     {
       "name": "Thin Gauntlet",
@@ -570,7 +588,8 @@
           "color": "#B479C3",
           "threshold": 905.0
         }
-      ]
+      ],
+      "leaderboard_id": 13
     },
     {
       "name": "XY Tracking Dodge",
@@ -600,7 +619,8 @@
           "color": "#B479C3",
           "threshold": 23000.0
         }
-      ]
+      ],
+      "leaderboard_id": 752
     },
     {
       "name": "lgc3 Reborn",
@@ -630,7 +650,8 @@
           "color": "#B479C3",
           "threshold": 27500.0
         }
-      ]
+      ],
+      "leaderboard_id": 175
     },
     {
       "name": "Close FS Easy Dodge",
@@ -660,7 +681,8 @@
           "color": "#B479C3",
           "threshold": 18000.0
         }
-      ]
+      ],
+      "leaderboard_id": 477
     },
     {
       "name": "Tracking God Aoi",
@@ -690,7 +712,8 @@
           "color": "#B479C3",
           "threshold": 865.0
         }
-      ]
+      ],
+      "leaderboard_id": 16481
     },
     {
       "name": "Tracking God Hard Aoi",
@@ -720,7 +743,37 @@
           "color": "#B479C3",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 16504
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingSlowRaid",
+    "kovaaks_benchmark_id": 711,
+    "rank_colors": [
+      [
+        "Gold",
+        "#F3D63B"
+      ],
+      [
+        "Platinum",
+        "#2FE7C2"
+      ],
+      [
+        "Diamond",
+        "#C9DCF3"
+      ],
+      [
+        "Sapphire",
+        "#457FB8"
+      ],
+      [
+        "Aoi",
+        "#B479C3"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:56.004277+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

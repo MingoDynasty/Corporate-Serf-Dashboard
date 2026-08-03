@@ -25,7 +25,8 @@
           "color": "#F85B74",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 80982
     },
     {
       "name": "cAt 5 cats micro",
@@ -50,7 +51,8 @@
           "color": "#F85B74",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 80822
     },
     {
       "name": "cAt 4 cats",
@@ -75,7 +77,8 @@
           "color": "#F85B74",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 80980
     },
     {
       "name": "cAt purrClick Easy",
@@ -100,7 +103,8 @@
           "color": "#F85B74",
           "threshold": 750.0
         }
-      ]
+      ],
+      "leaderboard_id": 83324
     },
     {
       "name": "cAt pawClick Easy",
@@ -125,7 +129,8 @@
           "color": "#F85B74",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 83376
     },
     {
       "name": "cAt yarnClick Easy",
@@ -150,7 +155,8 @@
           "color": "#F85B74",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 83377
     },
     {
       "name": "cAt laserTrack Easy",
@@ -175,7 +181,8 @@
           "color": "#F85B74",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 83469
     },
     {
       "name": "cAt meowTrack Easy",
@@ -200,7 +207,8 @@
           "color": "#F85B74",
           "threshold": 2600.0
         }
-      ]
+      ],
+      "leaderboard_id": 83465
     },
     {
       "name": "cAt yarnTrack Easy",
@@ -225,7 +233,8 @@
           "color": "#F85B74",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 83449
     },
     {
       "name": "cAt sausageTrack Easy",
@@ -250,7 +259,8 @@
           "color": "#F85B74",
           "threshold": 2100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83460
     },
     {
       "name": "cAt fluffyTrack Easy",
@@ -275,7 +285,8 @@
           "color": "#F85B74",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 83462
     },
     {
       "name": "cAt furTrack Easy",
@@ -300,7 +311,8 @@
           "color": "#F85B74",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 83466
     },
     {
       "name": "cAt mealSwitch Easy",
@@ -325,7 +337,8 @@
           "color": "#F85B74",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 83477
     },
     {
       "name": "cAt tabbySwitch Easy",
@@ -350,7 +363,8 @@
           "color": "#F85B74",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83592
     },
     {
       "name": "cAt wobbleSwitch Easy",
@@ -375,7 +389,8 @@
           "color": "#F85B74",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 83446
     },
     {
       "name": "cAt tailSwitch Easy",
@@ -400,7 +415,8 @@
           "color": "#F85B74",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 83335
     },
     {
       "name": "cAt snortSwitch Easy",
@@ -425,7 +441,8 @@
           "color": "#F85B74",
           "threshold": 390.0
         }
-      ]
+      ],
+      "leaderboard_id": 83332
     },
     {
       "name": "cAt yarnSwitch Easy",
@@ -450,7 +467,33 @@
           "color": "#F85B74",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 83345
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBobbingPeachPrism",
+    "kovaaks_benchmark_id": 829,
+    "rank_colors": [
+      [
+        "Manul",
+        "#334053"
+      ],
+      [
+        "Ocelot",
+        "#B1D9EB"
+      ],
+      [
+        "Serval",
+        "#49D8AC"
+      ],
+      [
+        "Caracal",
+        "#F85B74"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:14.071067+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

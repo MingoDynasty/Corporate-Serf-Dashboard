@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 26396
     },
     {
       "name": "DM ww2t",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1660.0
         }
-      ]
+      ],
+      "leaderboard_id": 34439
     },
     {
       "name": "DM 1w3ts",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 26397
     },
     {
       "name": "DM ww3t",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 34446
     },
     {
       "name": "DM 1w4ts",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1610.0
         }
-      ]
+      ],
+      "leaderboard_id": 26398
     },
     {
       "name": "DM ww4t",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1790.0
         }
-      ]
+      ],
+      "leaderboard_id": 34614
     },
     {
       "name": "DM 1w5ts",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 1640.0
         }
-      ]
+      ],
+      "leaderboard_id": 26400
     },
     {
       "name": "DM ww5t",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 1820.0
         }
-      ]
+      ],
+      "leaderboard_id": 34631
     },
     {
       "name": "DM 1w6ts",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1660.0
         }
-      ]
+      ],
+      "leaderboard_id": 26401
     },
     {
       "name": "DM ww6t",
@@ -650,7 +659,65 @@
           "color": "#24DDD8",
           "threshold": 1840.0
         }
-      ]
+      ],
+      "leaderboard_id": 34572
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrolling90Buff",
+    "kovaaks_benchmark_id": 869,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:37.087184+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

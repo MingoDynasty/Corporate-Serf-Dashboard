@@ -50,7 +50,8 @@
           "color": "#E191FE",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 85628
     },
     {
       "name": "thundahRawControl",
@@ -100,7 +101,8 @@
           "color": "#E191FE",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 84437
     },
     {
       "name": "TrampolineTrack",
@@ -150,7 +152,8 @@
           "color": "#E191FE",
           "threshold": 3325.0
         }
-      ]
+      ],
+      "leaderboard_id": 89685
     },
     {
       "name": "CastleTrack",
@@ -200,7 +203,8 @@
           "color": "#E191FE",
           "threshold": 3975.0
         }
-      ]
+      ],
+      "leaderboard_id": 89723
     },
     {
       "name": "SkyTrack",
@@ -250,7 +254,8 @@
           "color": "#E191FE",
           "threshold": 3750.0
         }
-      ]
+      ],
+      "leaderboard_id": 89688
     },
     {
       "name": "LeafTrack",
@@ -300,7 +305,8 @@
           "color": "#E191FE",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 88035
     },
     {
       "name": "AngelTrack",
@@ -350,7 +356,8 @@
           "color": "#E191FE",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 89591
     },
     {
       "name": "TunnelTrack",
@@ -400,7 +407,8 @@
           "color": "#E191FE",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 89593
     },
     {
       "name": "CatTrack",
@@ -450,7 +458,8 @@
           "color": "#E191FE",
           "threshold": 3050.0
         }
-      ]
+      ],
+      "leaderboard_id": 89687
     },
     {
       "name": "OrbTrack",
@@ -500,7 +509,53 @@
           "color": "#E191FE",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 89592
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsDodgingDynamicFov",
+    "kovaaks_benchmark_id": 286,
+    "rank_colors": [
+      [
+        "Ape",
+        "#804000"
+      ],
+      [
+        "Reptilian",
+        "#73C960"
+      ],
+      [
+        "Neanderthal",
+        "#BA8D5C"
+      ],
+      [
+        "Sentient",
+        "#674EA7"
+      ],
+      [
+        "Human",
+        "#F3E5AB"
+      ],
+      [
+        "Humanoid",
+        "#A64D79"
+      ],
+      [
+        "Cyborg",
+        "#A90000"
+      ],
+      [
+        "CPU",
+        "#6AE5C8"
+      ],
+      [
+        "Ai",
+        "#E191FE"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:00.272818+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

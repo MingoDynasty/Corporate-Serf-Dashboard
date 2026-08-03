@@ -67,6 +67,11 @@ def test_theme_toggle_is_wrapped_in_tooltip():
     assert toggle.to_plotly_json()["props"]["aria-label"] == "Toggle color scheme"
 
 
+def test_github_tooltip_is_a_plain_link_label():
+    """The build identity lives on the settings page, not behind this hover."""
+    assert app_shell.github_component.label == "View this app on GitHub"
+
+
 def test_color_scheme_is_restored_before_styles_load():
     script_position = app_shell.APP_INDEX_STRING.index(
         'const colorSchemeKey = "mantine-color-scheme-value"',
@@ -92,6 +97,35 @@ def test_nav_link_uses_single_mantine_anchor_for_dash_navigation():
     assert isinstance(link, dmc.NavLink)
     assert link.href == "/"
     assert link.refresh is False
+
+
+def test_navbar_links_to_every_navigable_page():
+    shell = app_shell.layout()
+
+    links = [
+        (component.label, component.href)
+        for component in _walk_components(shell)
+        if isinstance(component, dmc.NavLink)
+    ]
+
+    assert links == [
+        ("Home", "/"),
+        ("Playlists", "/playlists"),
+        ("Settings", "/settings"),
+    ]
+
+
+def test_navbar_defaults_to_open_on_a_first_run():
+    shell = app_shell.layout()
+
+    burger = _find_component_by_id(shell, "burger")
+    appshell = _find_component_by_id(shell, "appshell")
+
+    assert burger.opened is True
+    # The shell's initial `collapsed` has to agree with the burger: the
+    # clientside callback recomputes it from `opened` on load, so a
+    # disagreement shows a collapsed navbar for a frame before it opens.
+    assert appshell.navbar["collapsed"] == {"mobile": False, "desktop": False}
 
 
 def test_navbar_burger_open_state_persists_across_refresh():

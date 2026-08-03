@@ -60,7 +60,8 @@
           "color": "#FFFFFF",
           "threshold": 62.0
         }
-      ]
+      ],
+      "leaderboard_id": 24115
     },
     {
       "name": "Frog Simulator - @wa11p1per",
@@ -120,7 +121,8 @@
           "color": "#FFFFFF",
           "threshold": 5800.0
         }
-      ]
+      ],
+      "leaderboard_id": 35942
     },
     {
       "name": "Reactive Flick hard",
@@ -180,7 +182,8 @@
           "color": "#FFFFFF",
           "threshold": 1640.0
         }
-      ]
+      ],
+      "leaderboard_id": 1655
     },
     {
       "name": "Awesome Dynamic hibi",
@@ -240,7 +243,8 @@
           "color": "#FFFFFF",
           "threshold": 975.0
         }
-      ]
+      ],
+      "leaderboard_id": 147578
     },
     {
       "name": "Aim Coaster",
@@ -300,7 +304,8 @@
           "color": "#FFFFFF",
           "threshold": 1660.0
         }
-      ]
+      ],
+      "leaderboard_id": 3365
     },
     {
       "name": "WaveClick - KaliAIM",
@@ -360,7 +365,8 @@
           "color": "#FFFFFF",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 31863
     },
     {
       "name": "Ballsheet BB",
@@ -420,7 +426,8 @@
           "color": "#FFFFFF",
           "threshold": 137.0
         }
-      ]
+      ],
+      "leaderboard_id": 18678
     },
     {
       "name": "VT Speedswitch 90 Entry",
@@ -480,7 +487,8 @@
           "color": "#FFFFFF",
           "threshold": 2100.0
         }
-      ]
+      ],
+      "leaderboard_id": 128337
     },
     {
       "name": "Pole Switching 360 Easy More Bots",
@@ -540,7 +548,8 @@
           "color": "#FFFFFF",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 77123
     },
     {
       "name": "B180TI Inverted",
@@ -600,7 +609,8 @@
           "color": "#FFFFFF",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 13825
     },
     {
       "name": "Super Hoover Cart Racers",
@@ -660,7 +670,8 @@
           "color": "#FFFFFF",
           "threshold": 7127.0
         }
-      ]
+      ],
+      "leaderboard_id": 65667
     },
     {
       "name": "Worm The Eater - @wa11p1per",
@@ -720,7 +731,8 @@
           "color": "#FFFFFF",
           "threshold": 44.0
         }
-      ]
+      ],
+      "leaderboard_id": 96623
     },
     {
       "name": "Tennis - @wa11p1per",
@@ -780,7 +792,8 @@
           "color": "#FFFFFF",
           "threshold": 12.0
         }
-      ]
+      ],
+      "leaderboard_id": 67932
     }
   ],
   "generated_from": {
@@ -832,7 +845,8 @@
         "#FFFFFF"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:47.259337+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:15.934366+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

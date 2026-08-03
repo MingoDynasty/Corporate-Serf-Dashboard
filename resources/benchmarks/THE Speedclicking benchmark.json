@@ -35,7 +35,8 @@
           "color": "#03045e",
           "threshold": 75000.0
         }
-      ]
+      ],
+      "leaderboard_id": 41986
     },
     {
       "name": "GridShot 3x3",
@@ -70,7 +71,8 @@
           "color": "#03045e",
           "threshold": 135000.0
         }
-      ]
+      ],
+      "leaderboard_id": 30879
     },
     {
       "name": "Tile Frenzy",
@@ -105,7 +107,8 @@
           "color": "#03045e",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 11
     },
     {
       "name": "Tile Frenzy Mini",
@@ -140,7 +143,8 @@
           "color": "#03045e",
           "threshold": 165.0
         }
-      ]
+      ],
+      "leaderboard_id": 67
     },
     {
       "name": "RawMouseControl Reload",
@@ -175,7 +179,8 @@
           "color": "#03045e",
           "threshold": 300.0
         }
-      ]
+      ],
+      "leaderboard_id": 17318
     },
     {
       "name": "RawMousima",
@@ -210,7 +215,8 @@
           "color": "#03045e",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 128525
     },
     {
       "name": "eth 1w4tes Micro",
@@ -245,7 +251,8 @@
           "color": "#03045e",
           "threshold": 260.0
         }
-      ]
+      ],
+      "leaderboard_id": 66475
     },
     {
       "name": "uv VBR Micro 2ts",
@@ -280,7 +287,8 @@
           "color": "#03045e",
           "threshold": 250.0
         }
-      ]
+      ],
+      "leaderboard_id": 60162
     },
     {
       "name": "1wall 2targets far smaller denserer",
@@ -315,7 +323,8 @@
           "color": "#03045e",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1236
     }
   ],
   "generated_from": {
@@ -347,7 +356,8 @@
         "#03045e"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:52.768527+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:56.374689+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

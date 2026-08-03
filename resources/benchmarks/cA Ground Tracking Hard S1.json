@@ -30,7 +30,8 @@
           "color": "#faa0fc",
           "threshold": 3930.0
         }
-      ]
+      ],
+      "leaderboard_id": 194935
     },
     {
       "name": "cA MFSI Hard S1",
@@ -60,7 +61,8 @@
           "color": "#faa0fc",
           "threshold": 14350.0
         }
-      ]
+      ],
+      "leaderboard_id": 194933
     },
     {
       "name": "cA FBS Hard S1",
@@ -90,7 +92,8 @@
           "color": "#faa0fc",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 194928
     },
     {
       "name": "cA SLIPPERY Hard S1",
@@ -120,7 +123,8 @@
           "color": "#faa0fc",
           "threshold": 10950.0
         }
-      ]
+      ],
+      "leaderboard_id": 194931
     },
     {
       "name": "cA VSS Hard S1",
@@ -150,7 +154,8 @@
           "color": "#faa0fc",
           "threshold": 16000.0
         }
-      ]
+      ],
+      "leaderboard_id": 194939
     },
     {
       "name": "cA FLUIDITY Hard S1",
@@ -180,7 +185,8 @@
           "color": "#faa0fc",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 194932
     },
     {
       "name": "cA XYZ Hard S1",
@@ -210,7 +216,8 @@
           "color": "#faa0fc",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 194945
     }
   ],
   "generated_from": {
@@ -238,7 +245,8 @@
         "#faa0fc"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:32.848860+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:03.202377+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

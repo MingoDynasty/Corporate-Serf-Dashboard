@@ -35,7 +35,8 @@
           "color": "#0000ff",
           "threshold": 80.0
         }
-      ]
+      ],
+      "leaderboard_id": 186309
     },
     {
       "name": "Popcorn rAim Easy",
@@ -70,7 +71,8 @@
           "color": "#0000ff",
           "threshold": 380.0
         }
-      ]
+      ],
+      "leaderboard_id": 607
     },
     {
       "name": "6wall18targets small reload",
@@ -105,7 +107,8 @@
           "color": "#0000ff",
           "threshold": 109.0
         }
-      ]
+      ],
+      "leaderboard_id": 929
     },
     {
       "name": "Floating Heads Timing 360 Easy",
@@ -140,7 +143,8 @@
           "color": "#0000ff",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 186411
     },
     {
       "name": "Smoothbot Pauer Easy",
@@ -175,7 +179,8 @@
           "color": "#0000ff",
           "threshold": 5900.0
         }
-      ]
+      ],
+      "leaderboard_id": 4878
     },
     {
       "name": "Whisphere Sky&Floorbot 70%",
@@ -210,7 +215,8 @@
           "color": "#0000ff",
           "threshold": 22000.0
         }
-      ]
+      ],
+      "leaderboard_id": 189101
     },
     {
       "name": "NRS Air Easy",
@@ -245,7 +251,8 @@
           "color": "#0000ff",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 192102
     },
     {
       "name": "Ground Fundamentals",
@@ -280,7 +287,8 @@
           "color": "#0000ff",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 186656
     },
     {
       "name": "DotTS 360 Easy",
@@ -315,7 +323,8 @@
           "color": "#0000ff",
           "threshold": 1120.0
         }
-      ]
+      ],
+      "leaderboard_id": 186645
     },
     {
       "name": "patTS Voltaic 360",
@@ -350,7 +359,8 @@
           "color": "#0000ff",
           "threshold": 81.0
         }
-      ]
+      ],
+      "leaderboard_id": 11977
     },
     {
       "name": "KinTs 360 NR Varied",
@@ -385,7 +395,8 @@
           "color": "#0000ff",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5942
     },
     {
       "name": "domiSwitch 360 Easy",
@@ -420,7 +431,8 @@
           "color": "#0000ff",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 178592
     }
   ],
   "generated_from": {
@@ -452,7 +464,8 @@
         "#0000ff"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:02.739579+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:57.351450+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

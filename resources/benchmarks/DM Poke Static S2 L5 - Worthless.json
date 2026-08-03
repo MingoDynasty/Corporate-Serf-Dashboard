@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1470.0
         }
-      ]
+      ],
+      "leaderboard_id": 26403
     },
     {
       "name": "DM ww2t Pokeball",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1610.0
         }
-      ]
+      ],
+      "leaderboard_id": 34434
     },
     {
       "name": "DM 1w3ts Pokeball",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 1520.0
         }
-      ]
+      ],
+      "leaderboard_id": 26404
     },
     {
       "name": "DM ww3t Pokeball",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 34451
     },
     {
       "name": "DM 1w4ts Pokeball",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1560.0
         }
-      ]
+      ],
+      "leaderboard_id": 26405
     },
     {
       "name": "DM ww4t Pokeball",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1740.0
         }
-      ]
+      ],
+      "leaderboard_id": 34940
     },
     {
       "name": "DM 1w5ts Pokeball",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 1590.0
         }
-      ]
+      ],
+      "leaderboard_id": 26406
     },
     {
       "name": "DM ww5t Pokeball",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 1770.0
         }
-      ]
+      ],
+      "leaderboard_id": 34635
     },
     {
       "name": "DM 1w6ts Pokeball",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1610.0
         }
-      ]
+      ],
+      "leaderboard_id": 26407
     },
     {
       "name": "DM ww6t Pokeball",
@@ -650,7 +659,65 @@
           "color": "#24DDD8",
           "threshold": 1790.0
         }
-      ]
+      ],
+      "leaderboard_id": 34581
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRoamingVibrantGunsmith",
+    "kovaaks_benchmark_id": 862,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:30.474872+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -35,7 +35,8 @@
           "color": "#ff0000",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 99962
     },
     {
       "name": "Pole Centering Dodge",
@@ -70,7 +71,8 @@
           "color": "#ff0000",
           "threshold": 3120.0
         }
-      ]
+      ],
+      "leaderboard_id": 99933
     },
     {
       "name": "Sphere 90 Centering Dodge",
@@ -105,7 +107,8 @@
           "color": "#ff0000",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 99953
     },
     {
       "name": "Kindaclose Fast Strafes",
@@ -140,7 +143,8 @@
           "color": "#ff0000",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 60
     },
     {
       "name": "VT Air Advanced",
@@ -175,7 +179,8 @@
           "color": "#ff0000",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 43182
     },
     {
       "name": "LDDH LG56 AIMGOD",
@@ -210,7 +215,8 @@
           "color": "#ff0000",
           "threshold": 450.0
         }
-      ]
+      ],
+      "leaderboard_id": 41500
     },
     {
       "name": "cloverRawControl",
@@ -245,7 +251,8 @@
           "color": "#ff0000",
           "threshold": 9125.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "VT PreciseOrb Advanced",
@@ -280,7 +287,8 @@
           "color": "#ff0000",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 25176
     },
     {
       "name": "VT Smoothbot Advanced",
@@ -315,7 +323,8 @@
           "color": "#ff0000",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 25151
     }
   ],
   "generated_from": {
@@ -347,7 +356,8 @@
         "#ff0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:27.848366+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:57.327538+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

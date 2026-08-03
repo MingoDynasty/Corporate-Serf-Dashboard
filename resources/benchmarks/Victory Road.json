@@ -25,7 +25,8 @@
           "color": "#eed74d",
           "threshold": 21500.0
         }
-      ]
+      ],
+      "leaderboard_id": 34966
     },
     {
       "name": "Extra Controlsphere",
@@ -50,7 +51,8 @@
           "color": "#eed74d",
           "threshold": 10500.0
         }
-      ]
+      ],
+      "leaderboard_id": 562
     },
     {
       "name": "Air Angelic 4 Voltaic",
@@ -75,7 +77,8 @@
           "color": "#eed74d",
           "threshold": 4226.0
         }
-      ]
+      ],
+      "leaderboard_id": 30
     },
     {
       "name": "Air CELESTIAL No UFO",
@@ -100,7 +103,8 @@
           "color": "#eed74d",
           "threshold": 910.0
         }
-      ]
+      ],
+      "leaderboard_id": 70970
     },
     {
       "name": "Centering II 180 no strafes",
@@ -125,7 +129,8 @@
           "color": "#eed74d",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 423
     },
     {
       "name": "Aimerz+ Week #7 - Suavetrack",
@@ -150,7 +155,8 @@
           "color": "#eed74d",
           "threshold": 29000.0
         }
-      ]
+      ],
+      "leaderboard_id": 40784
     },
     {
       "name": "Smoothbot rAim",
@@ -175,7 +181,8 @@
           "color": "#eed74d",
           "threshold": 5200.0
         }
-      ]
+      ],
+      "leaderboard_id": 5151
     },
     {
       "name": "PGTI Voltaic",
@@ -200,7 +207,8 @@
           "color": "#eed74d",
           "threshold": 2588.0
         }
-      ]
+      ],
+      "leaderboard_id": 99
     },
     {
       "name": "Air no UFO no SKYBOTS",
@@ -225,7 +233,8 @@
           "color": "#eed74d",
           "threshold": 895.0
         }
-      ]
+      ],
+      "leaderboard_id": 234
     },
     {
       "name": "Ground Plaza Sparky v3 OW",
@@ -250,7 +259,8 @@
           "color": "#eed74d",
           "threshold": 904.0
         }
-      ]
+      ],
+      "leaderboard_id": 871
     },
     {
       "name": "MFSI rAim",
@@ -275,7 +285,8 @@
           "color": "#eed74d",
           "threshold": 14000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5075
     },
     {
       "name": "Close Fast Strafes Invincible",
@@ -300,7 +311,8 @@
           "color": "#eed74d",
           "threshold": 15000.0
         }
-      ]
+      ],
+      "leaderboard_id": 494
     },
     {
       "name": "Stralroom FS Dodge Hard",
@@ -325,7 +337,8 @@
           "color": "#eed74d",
           "threshold": 21000.0
         }
-      ]
+      ],
+      "leaderboard_id": 3974
     },
     {
       "name": "VT PatStrafe Advanced",
@@ -350,7 +363,8 @@
           "color": "#eed74d",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 26262
     },
     {
       "name": "Air Dodge II",
@@ -375,7 +389,8 @@
           "color": "#eed74d",
           "threshold": 150.0
         }
-      ]
+      ],
+      "leaderboard_id": 1788
     },
     {
       "name": "Revolving Tracking Strafes",
@@ -400,7 +415,33 @@
           "color": "#eed74d",
           "threshold": 6300.0
         }
-      ]
+      ],
+      "leaderboard_id": 389
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingThinAutomatic",
+    "kovaaks_benchmark_id": 745,
+    "rank_colors": [
+      [
+        "Dragonite",
+        "#f6c383"
+      ],
+      [
+        "Charizard",
+        "#f7a569"
+      ],
+      [
+        "Greninja",
+        "#354698"
+      ],
+      [
+        "Pikachu",
+        "#eed74d"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:05.699854+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

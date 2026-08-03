@@ -25,6 +25,11 @@ from source.kovaaks.data_service import (
     get_user_root_playlist_codes,
     load_playlist_from_code,
 )
+from source.kovaaks.percentile_warmup_service import (
+    PercentileWarmupSnapshot,
+    enqueue_playlist_percentile_warmup,
+    get_percentile_warmup_state,
+)
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
 from source.kovaaks.playlist_visibility_service import (
     hide_playlist,
@@ -32,6 +37,7 @@ from source.kovaaks.playlist_visibility_service import (
     show_playlist,
     toggle_playlist_visibility,
 )
+from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +45,7 @@ VISIBILITY_COLUMN_ID = "hidden"
 # The delete action cell's colId. Matches the ``deletable`` row flag so the
 # renderer can hide itself on bundled rows; excluded from row navigation.
 DELETE_COLUMN_ID = "deletable"
+WARMUP_REFRESH_INTERVAL_MS = 1_000
 
 # Reused from the former Settings-modal import control, with the trailing
 # clause reworded for the overview: importing here lands the playlist as a new
@@ -53,6 +60,17 @@ IMPORT_HELP_TEXT = (
 # point them at the toggle that surfaces it.
 HIDDEN_DUPLICATE_HINT = (
     ' It is currently hidden — toggle "Show hidden" on this page to unhide it.'
+)
+
+# Appended to the import toast when the playlist file landed but the visibility
+# write failed. The import itself succeeded, so the message must say so and then
+# name the one thing that did not happen, plus its recovery: the new code is
+# absent from the shown set, so its row renders as hidden and "Show hidden" is
+# what surfaces it before the eye toggle can be clicked.
+IMPORT_VISIBILITY_FAILED_HINT = (
+    " It could not be marked visible, so it may be missing from playlist"
+    ' selectors — toggle "Show hidden" on this page, then click its row\'s eye'
+    " icon to show it."
 )
 
 dash.register_page(
@@ -86,23 +104,57 @@ LAST_PLAYED_TOOLTIP = (
     " + relativeTime(params.data.stalest_sort, 'Never')))"
 )
 
-LOWEST_PERCENTILE_TOOLTIP = (
-    "params.value == null ? null : ('Lowest: ' + params.data.lowest_scenario)"
+PERCENTILE_PLACEHOLDER_TOOLTIP = (
+    "('Shown once all ' + params.data.played_count"
+    " + ' played scenarios have data — open the playlist to fetch now')"
 )
 
-# The Hide/Unhide labels act immediately with no confirm step, so the hover
-# copy carries the consequence and the way back (Show hidden).
+PERCENTILE_TOOLTIP = (
+    "params.data.percentile_aggregates_resolved ? null : "
+    f"{PERCENTILE_PLACEHOLDER_TOOLTIP}"
+)
+
+LOWEST_PERCENTILE_TOOLTIP = (
+    "params.data.percentile_aggregates_resolved"
+    " ? (params.value == null ? null : ('Lowest: '"
+    " + params.data.lowest_scenario))"
+    f" : {PERCENTILE_PLACEHOLDER_TOOLTIP}"
+)
+
+PERCENTILE_CELL_CLASS = (
+    "params.data.percentile_aggregates_resolved"
+    " ? null : 'playlist-overview-percentile-placeholder'"
+)
+
+# Unlike Median, a resolved Lowest value carries hover-only detail (which
+# scenario is the weakest), so it gets the shared dotted-underline affordance.
+LOWEST_PERCENTILE_CELL_CLASS = (
+    "params.data.percentile_aggregates_resolved"
+    " ? (params.value == null ? null : 'cell-tooltip-affordance')"
+    " : 'playlist-overview-percentile-placeholder'"
+)
+
+# The eye toggle acts immediately with no confirm step, so the hover copy
+# carries the action and its consequence.
 VISIBILITY_TOOLTIP = (
     "params.data.hidden"
     " ? 'Show this playlist again in the overview and playlist selectors'"
-    " : 'Hide this playlist from the overview and playlist selectors;"
-    " restore it later via Show hidden'"
+    " : 'Hide this playlist from the overview and playlist selectors'"
 )
+
+# The delete icon carries no text label, so the tooltip supplies the click
+# consequence. Bundled rows render no icon; return null there so no tooltip
+# shows on the empty cell.
+DELETE_TOOLTIP = "params.data.deletable ? 'Delete this playlist' : null"
 
 TABLE_COLUMN_DEFS = [
     {
         "headerName": "Playlist",
         "field": "name",
+        # Real anchor to /playlists/<code> (built client-side from the row's
+        # share code). Whole-row click nav still works; the anchor adds
+        # new-tab / copy-link affordances a server-callback nav can't.
+        "cellRenderer": "PlaylistNameLink",
         "sortable": True,
         "flex": 1,
         "minWidth": 280,
@@ -117,15 +169,15 @@ TABLE_COLUMN_DEFS = [
         ),
         "cellRenderer": "TypeBadge",
         "sortable": True,
-        "minWidth": 110,
+        # Wide enough for the BENCHMARK pill plus cell padding: autoSize can
+        # run before rows arrive, leaving the column at this floor, and 110
+        # ellipsized the badge.
+        "minWidth": 140,
     },
     {
         "headerName": "Played",
         "field": "played_sort",
-        "headerTooltip": (
-            "Scenarios you have played at least once, out of the scenarios in "
-            "the playlist."
-        ),
+        "headerTooltip": "Scenarios played / total scenarios",
         "valueFormatter": {"function": "params.data.played_display"},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -149,7 +201,7 @@ TABLE_COLUMN_DEFS = [
         "valueFormatter": {"function": "relativeTime(params.value, 'Never')"},
         "tooltipValueGetter": {"function": LAST_PLAYED_TOOLTIP},
         "cellClass": {
-            "function": "params.value == null ? null : 'last-played-affordance'"
+            "function": "params.value == null ? null : 'cell-tooltip-affordance'"
         },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
@@ -159,12 +211,13 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Median Percentile",
         "field": "median_percentile_sort",
         "headerTooltip": (
-            "Median leaderboard percentile across this playlist's scenarios "
-            "with a cached position. N/M = scenarios with a cached position "
-            "out of scenarios in the playlist - fills in as you open "
-            "playlists."
+            "Median leaderboard percentile across ranked scenarios you have "
+            "played. Shown once every played scenario has enough cached "
+            "leaderboard data."
         ),
         "valueFormatter": {"function": "params.data.median_percentile_display"},
+        "tooltipValueGetter": {"function": PERCENTILE_TOOLTIP},
+        "cellClass": {"function": PERCENTILE_CELL_CLASS},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 160,
@@ -173,12 +226,13 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Lowest Percentile",
         "field": "lowest_percentile_sort",
         "headerTooltip": (
-            "The playlist's weakest scenario by leaderboard percentile, over "
-            "the same N/M coverage as Median Percentile. Hover a value to see "
-            "which scenario."
+            "The weakest leaderboard percentile among ranked scenarios you "
+            "have played. Shown once every played scenario has enough cached "
+            "leaderboard data; hover a value to see which scenario."
         ),
         "valueFormatter": {"function": "params.data.lowest_percentile_display"},
         "tooltipValueGetter": {"function": LOWEST_PERCENTILE_TOOLTIP},
+        "cellClass": {"function": LOWEST_PERCENTILE_CELL_CLASS},
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 160,
@@ -202,6 +256,7 @@ TABLE_COLUMN_DEFS = [
         "headerName": "",
         "field": DELETE_COLUMN_ID,
         "cellRenderer": "DeleteAction",
+        "tooltipValueGetter": {"function": DELETE_TOOLTIP},
         "sortable": False,
         "resizable": False,
         "minWidth": 90,
@@ -228,35 +283,111 @@ def route_to_clicked_playlist(cell_clicked):
 
 
 @callback(
+    Output("playlists-rows-refresh", "data", allow_duplicate=True),
+    Input("playlists-overview-grid", "cellClicked"),
+    State("playlists-rows-refresh", "data"),
+    prevent_initial_call=True,
+)
+def update_playlist_visibility(cell_clicked, rows_refresh):
+    """Toggle one visibility cell and wake warmup work after an unhide."""
+    if (
+        ctx.triggered_id != "playlists-overview-grid"
+        or not isinstance(cell_clicked, dict)
+        or cell_clicked.get("colId") != VISIBILITY_COLUMN_ID
+        or not isinstance(cell_clicked.get("rowId"), str)
+        or not cell_clicked["rowId"]
+    ):
+        return no_update
+
+    playlist_code = cell_clicked["rowId"]
+    if toggle_playlist_visibility(playlist_code):
+        enqueue_playlist_percentile_warmup(playlist_code)
+    # Hides need an ordinary row rebuild. Unhides additionally need this
+    # explicit bump so the disabled warmup interval's owner observes the new
+    # enqueue generation and re-arms it.
+    return (rows_refresh or 0) + 1
+
+
+@callback(
     Output("playlists-overview-grid", "rowData"),
     Output("playlists-overview-status", "children"),
+    Output("playlists-overview-warmup-interval", "disabled"),
+    Output("playlists-overview-warmup-status", "children"),
+    Output("playlists-overview-warmup-generation", "data"),
     Input("playlists-overview-mounted", "data"),
     Input("playlists-overview-show-hidden", "checked"),
-    Input("playlists-overview-grid", "cellClicked"),
     Input("playlists-rows-refresh", "data"),
+    Input("playlists-overview-warmup-interval", "n_intervals"),
+    State("playlists-overview-warmup-generation", "data"),
 )
-def load_playlist_overview_rows(_mounted, show_hidden, cell_clicked, _rows_refresh):
-    """Build overview rows from local run data and rank caches (no network).
-
-    Also handles hide/unhide: a click on the visibility action cell toggles
-    that playlist's preference, then the rows rebuild from the new state.
-    """
-    if ctx.triggered_id == "playlists-overview-grid":
-        if (
-            not isinstance(cell_clicked, dict)
-            or cell_clicked.get("colId") != VISIBILITY_COLUMN_ID
-            or not isinstance(cell_clicked.get("rowId"), str)
-            or not cell_clicked["rowId"]
-        ):
-            return no_update, no_update
-        toggle_playlist_visibility(cell_clicked["rowId"])
-
-    rows = build_playlist_overview_rows(include_hidden=bool(show_hidden))
+def load_playlist_overview_rows(
+    _mounted,
+    show_hidden,
+    _rows_refresh,
+    _warmup_tick,
+    observed_generation,
+):
+    """Snapshot warmup state, then build cache-only rows before disabling."""
+    warmup_outputs = _playlist_overview_warmup_state(observed_generation)
+    record_activity = ctx.triggered_id != "playlists-overview-warmup-interval"
+    rows = build_playlist_overview_rows(
+        include_hidden=bool(show_hidden),
+        record_activity=record_activity,
+    )
     if not rows:
-        if build_playlist_overview_rows(include_hidden=True):
-            return [], 'All playlists are hidden. Toggle "Show hidden" to manage them.'
-        return [], "No playlists are loaded."
-    return rows, ""
+        if build_playlist_overview_rows(
+            include_hidden=True,
+            record_activity=record_activity,
+        ):
+            return (
+                [],
+                'All playlists are hidden. Toggle "Show hidden" to manage them.',
+                *warmup_outputs,
+            )
+        return [], "No playlists are loaded.", *warmup_outputs
+    return rows, "", *warmup_outputs
+
+
+def _format_retry_time(snapshot: PercentileWarmupSnapshot) -> str:
+    """Render the worker's UTC deadline in the desktop's local time."""
+    if snapshot.paused_until is None:
+        return ""
+    return snapshot.paused_until.astimezone().strftime("%I:%M %p").lstrip("0")
+
+
+def _format_warmup_status(snapshot: PercentileWarmupSnapshot) -> str:
+    if snapshot.fatal_state:
+        return f"Percentile update stopped: {snapshot.fatal_state}"
+    if not snapshot.remaining_count:
+        return ""
+
+    status = f"Updating percentile data: {snapshot.remaining_count} remaining"
+    if snapshot.paused_until is not None:
+        return f"{status} · paused; retrying at {_format_retry_time(snapshot)}"
+    if snapshot.recent_pace_seconds is not None:
+        eta = snapshot.remaining_count * snapshot.recent_pace_seconds
+        status += f" (~{format_approximate_duration(eta)})"
+    return status
+
+
+def _playlist_overview_warmup_state(observed_generation):
+    """Compute interval outputs before the caller's sequenced row rebuild."""
+    snapshot = get_percentile_warmup_state()
+    observed_generation = (
+        observed_generation if isinstance(observed_generation, int) else 0
+    )
+
+    # A callback response based on an older snapshot must never disable an
+    # interval that has already observed and re-armed for a newer enqueue.
+    if snapshot.enqueue_generation < observed_generation:
+        return False, no_update, observed_generation
+
+    busy = bool(snapshot.queued_names) or snapshot.in_flight is not None
+    new_generation = snapshot.enqueue_generation > observed_generation
+    disabled = not (busy or new_generation)
+    if snapshot.fatal_state:
+        disabled = True
+    return disabled, _format_warmup_status(snapshot), snapshot.enqueue_generation
 
 
 @callback(
@@ -275,12 +406,18 @@ def toggle_import_modal(_, opened):
     Output("playlists-rows-refresh", "data"),
     Output("playlists-import-modal", "opened", allow_duplicate=True),
     Output("playlists-import-textinput", "value"),
+    Output("playlists-import-textinput", "error"),
     Input("playlists-import-button", "n_clicks"),
     State("playlists-import-textinput", "value"),
     State("playlists-rows-refresh", "data"),
+    # The Import button spins (and, via Mantine's loading state, refuses further
+    # clicks) for the duration of the fetch. The playlist search is the
+    # timeout-prone endpoint, so a slow import can hang for tens of seconds; the
+    # spinner is the whole loading design and the disable covers spam-clicks.
+    running=[(Output("playlists-import-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def import_playlist(_, playlist_to_import, rows_refresh):
+def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
@@ -290,10 +427,24 @@ def import_playlist(_, playlist_to_import, rows_refresh):
     leaves the modal open with the pasted code intact so the user can correct
     it; a duplicate-code refusal whose conflicting playlist is hidden gets the
     unhide hint appended (R14).
+
+    An empty or whitespace-only submit is a local validation problem, not an
+    event, so it sets an inline field error rather than sending a notification;
+    any non-empty submit clears that error. The phantom initial fire (guarded
+    on ``ctx.triggered_id``/``n_clicks``) must leave the error untouched.
+
+    A failed visibility write does not fail the import: the playlist file is
+    already on disk, so the toast turns orange and reports the split outcome
+    rather than vanishing (see the 2026-08-02 committed-side-effect entry in
+    ``docs/decision_log.md``).
     """
+    if ctx.triggered_id != "playlists-import-button" or not n_clicks:
+        return no_update, no_update, no_update, no_update, no_update
+    playlist_to_import = (playlist_to_import or "").strip()
     if not playlist_to_import:
-        return no_update, no_update, no_update, no_update
-    playlist_to_import = playlist_to_import.strip()
+        # Inline field error, not a notification: this is a local validation
+        # problem. Touch nothing else so the modal and field stay as they are.
+        return no_update, no_update, no_update, no_update, "Enter a playlist code."
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
 
@@ -310,23 +461,57 @@ def import_playlist(_, playlist_to_import, rows_refresh):
             "id": "imported-playlist-failed-notification",
             "icon": local_icon("material-symbols:upload"),
         }
-        return [notification], no_update, no_update, no_update
+        return [notification], no_update, no_update, no_update, None
 
     # Importing is the intent to see: new playlists arrive visible. Mark the
     # canonical stored code, which can differ from the pasted input. The
     # is-not-None guard is defensive; the service contract guarantees a code
     # here, but never persist a None into the shown-set if that ever changes.
+    visibility_write_failed = False
     if canonical_code is not None:
-        show_playlist(canonical_code)
-    notification = {
-        "action": "show",
-        "title": "Notification",
-        "message": "Successfully imported playlist!",
-        "color": "green",
-        "id": "imported-playlist-successful-notification",
-        "icon": local_icon("material-symbols:upload"),
-    }
-    return [notification], (rows_refresh or 0) + 1, False, ""
+        try:
+            show_playlist(canonical_code)
+        except OSError:
+            # The playlist file is already written — an irreversible step that
+            # succeeded — so failing the request here would leave the user with
+            # no report at all for something that happened. Report the split
+            # outcome instead. The store is untouched (temp file plus atomic
+            # replace), so the code is simply absent from the shown set.
+            logger.exception(
+                "Failed to mark imported playlist '%s' as shown", canonical_code
+            )
+            visibility_write_failed = True
+        # Outside the try: the playlist file exists either way, so warm it.
+        enqueue_playlist_percentile_warmup(canonical_code)
+    # Name the imported playlist using the canonical stored code (never the
+    # pasted input, which can differ in case) so the toast confirms exactly
+    # what landed. The fallback mirrors the guard above: the service contract
+    # guarantees a code here, but never render a "None" into the toast — or
+    # pass one to the str-typed label lookup — if that ever changes.
+    imported_code = canonical_code if canonical_code is not None else playlist_to_import
+    label = get_playlist_display_label(imported_code)
+    imported_message = f'Imported "{label}" ({imported_code}).'
+    if visibility_write_failed:
+        notification = {
+            "action": "show",
+            "title": "Playlist Imported — Not Shown",
+            "message": imported_message + IMPORT_VISIBILITY_FAILED_HINT,
+            "color": "orange",
+            "id": "imported-playlist-visibility-failed-notification",
+            "icon": local_icon("material-symbols:upload"),
+        }
+    else:
+        notification = {
+            "action": "show",
+            "title": "Playlist Imported",
+            "message": imported_message,
+            "color": "green",
+            "id": "imported-playlist-successful-notification",
+            "icon": local_icon("material-symbols:upload"),
+        }
+    # Every other output matches the success path: the import happened, so the
+    # grid rebuilds and the modal closes with a cleared field either way.
+    return [notification], (rows_refresh or 0) + 1, False, "", None
 
 
 @callback(
@@ -357,14 +542,13 @@ def manage_delete_modal(cell_clicked, _cancel):
     # Bundled rows render no Delete link, but their (empty) delete cell still
     # emits cellClicked with this colId. Refuse non-user codes here — same
     # source of truth as the row's ``deletable`` flag — so a bundled row can
-    # never open a misleading "will be removed from data/playlists" dialog
-    # (delete_user_playlist would refuse it anyway, but only after a scare).
+    # never open a misleading delete-confirm dialog (delete_user_playlist
+    # would refuse it anyway, but only after a scare).
     if playlist_code not in get_user_root_playlist_codes():
         return no_update, no_update, no_update
     label = get_playlist_display_label(playlist_code)
     message = (
-        f'Delete "{label}" ({playlist_code})? This removes its playlist file '
-        "from data/playlists. You can re-import it later by share code."
+        f'Delete "{label}" ({playlist_code})? You can re-import it later by share code.'
     )
     return True, playlist_code, message
 
@@ -384,8 +568,10 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     On failure the red notification carries the service's message and the grid
     is left untouched. On success the visibility membership is dropped too
     (in a show-list, forgetting a code IS removing its membership — this keeps
-    preferences.json from accumulating dead codes) and the refresh store bumps
-    so the deleted row disappears without a page reload.
+    playlist_visibility.json from accumulating dead codes) and the refresh store bumps
+    so the deleted row disappears without a page reload. A failed visibility
+    write is logged and otherwise ignored: the delete is what the toast reports
+    (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log.md``).
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     still fire once on initial page load despite ``prevent_initial_call``, so a
@@ -394,6 +580,9 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     """
     if not n_clicks or not target_code:
         return no_update, no_update, no_update
+    # Look up the label before the delete: afterwards the code is gone from
+    # the playlist database and the lookup falls back to the raw code.
+    label = get_playlist_display_label(target_code)
     error_message = delete_user_playlist(target_code)
     if error_message:
         notification = {
@@ -404,11 +593,23 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
             "id": "deleted-playlist-failed-notification",
         }
         return [notification], no_update, False
-    hide_playlist(target_code)
+    try:
+        hide_playlist(target_code)
+    except OSError:
+        # Membership bookkeeping only, and it has no observable consequence: the
+        # row is gone either way, a dead code renders nowhere, and a later
+        # re-import early-returns on the still-shown code. So log it and still
+        # report the delete — the outcome the user actually asked about, and
+        # which has already committed. Failing the request instead would show
+        # nothing, and the natural retry deletes an absent file and renders a
+        # red "delete failed" toast for a delete that succeeded.
+        logger.exception(
+            "Failed to drop deleted playlist '%s' from the shown set", target_code
+        )
     notification = {
         "action": "show",
-        "title": "Notification",
-        "message": "Deleted playlist.",
+        "title": "Playlist Deleted",
+        "message": f'Deleted "{label}" ({target_code}).',
         "color": "green",
         "id": "deleted-playlist-successful-notification",
     }
@@ -416,7 +617,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
 
 
 @callback(
-    Output("playlists-superseded-alert", "style"),
+    Output("playlists-superseded-alert", "className"),
     Output("playlists-superseded-text", "children"),
     Input("playlists-overview-mounted", "data"),
     Input("playlists-rows-refresh", "data"),
@@ -430,7 +631,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
     """
     superseded_files = get_superseded_user_playlist_files()
     if not superseded_files:
-        return {"display": "none"}, ""
+        return "playlists-superseded-alert-hidden", ""
     count = len(superseded_files)
     noun = "file" if count == 1 else "files"
     verb = "is" if count == 1 else "are"
@@ -438,7 +639,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
         f"{count} leftover playlist {noun} in data/playlists {verb} superseded "
         "by bundled benchmarks."
     )
-    return {}, message
+    return "", message
 
 
 @callback(
@@ -504,7 +705,7 @@ def confirm_delete_superseded(n_clicks, rows_refresh):
         return [notification], next_refresh, False
     notification = {
         "action": "show",
-        "title": "Notification",
+        "title": "Leftover Files Deleted",
         "message": "Deleted leftover playlist files.",
         "color": "green",
         "id": "superseded-cleanup-successful-notification",
@@ -533,6 +734,29 @@ clientside_callback(
 )
 
 
+# Client-side quick filter: pipe the text input straight into AG Grid's built-in
+# quick filter so rows narrow as the user types, with no server round-trip.
+clientside_callback(
+    """
+    async (value) => {
+        if (!window.dash_ag_grid || !window.dash_ag_grid.getApiAsync) {
+            return window.dash_clientside.no_update;
+        }
+
+        try {
+            const gridApi = await window.dash_ag_grid.getApiAsync("playlists-overview-grid");
+            gridApi.setGridOption("quickFilterText", value || "");
+        } catch (error) {
+            console.warn("Failed to apply playlist overview quick filter.", error);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output("playlists-overview-quick-filter-sink", "data"),
+    Input("playlists-overview-quick-filter", "value"),
+)
+
+
 def layout(**kwargs):  # noqa: ARG001
     """Build the playlist-level overview page."""
     return dmc.Stack(
@@ -541,26 +765,58 @@ def layout(**kwargs):  # noqa: ARG001
             # The row load is driven by this layout-bound store so revisiting
             # the page rebuilds rows exactly once from current local state.
             dcc.Store(id="playlists-overview-mounted", data=True),
-            # Bumped by a successful import or delete so the row-load callback
-            # (and the superseded alert) rebuild without a page reload.
+            # Bumped by visibility, import, or delete actions so row consumers
+            # rebuild without a page reload; warmup also uses it to re-arm.
             dcc.Store(id="playlists-rows-refresh", data=0),
+            # Browser-observed worker generation. The warmup interval owner
+            # uses this to preserve re-arms across idle/enqueue races.
+            dcc.Store(id="playlists-overview-warmup-generation", data=0),
             # Holds the code the delete confirmation modal is targeting.
             dcc.Store(id="playlists-delete-target"),
             dcc.Store(id="playlists-overview-relative-time-refresh"),
+            # Dummy sink for the client-side quick-filter callback's output.
+            dcc.Store(id="playlists-overview-quick-filter-sink"),
             dcc.Interval(
                 id="playlists-overview-relative-time-interval",
                 interval=30_000,
                 n_intervals=0,
             ),
+            dcc.Interval(
+                id="playlists-overview-warmup-interval",
+                interval=WARMUP_REFRESH_INTERVAL_MS,
+                n_intervals=0,
+                disabled=True,
+            ),
+            dmc.Title("Playlists", order=2),
             dmc.Group(
                 children=[
-                    dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                    dmc.Group(
+                        children=[
+                            dmc.TextInput(
+                                id="playlists-overview-quick-filter",
+                                placeholder="Filter playlists...",
+                                size="sm",
+                                w=240,
+                            ),
+                            dmc.Text("", c="dimmed", id="playlists-overview-status"),
+                            dmc.Text(
+                                "",
+                                c="dimmed",
+                                id="playlists-overview-warmup-status",
+                            ),
+                        ],
+                        gap="md",
+                        align="center",
+                    ),
                     dmc.Group(
                         children=[
                             dmc.Switch(
                                 checked=False,
                                 id="playlists-overview-show-hidden",
                                 label="Show hidden",
+                                # Remembered across visits (localStorage) so
+                                # the management view stays how it was left.
+                                persistence=True,
                                 size="sm",
                             ),
                             dmc.Button(
@@ -632,12 +888,12 @@ def layout(**kwargs):  # noqa: ARG001
                 ),
             ),
             # Cleanup affordance for user files superseded by bundled
-            # benchmarks. Hidden (display:none) until superseded files exist.
+            # benchmarks. Hidden until superseded files exist.
             dmc.Alert(
                 id="playlists-superseded-alert",
                 title="Leftover playlist files",
                 color="yellow",
-                style={"display": "none"},
+                className="playlists-superseded-alert-hidden",
                 children=dmc.Group(
                     justify="space-between",
                     align="center",
@@ -678,53 +934,40 @@ def layout(**kwargs):  # noqa: ARG001
                     ],
                 ),
             ),
-            dcc.Loading(
-                dag.AgGrid(
-                    id="playlists-overview-grid",
-                    className="ag-theme-quartz playlist-overview-grid",
-                    columnDefs=TABLE_COLUMN_DEFS,
-                    rowData=[],
-                    rowClassRules={
-                        "playlist-overview-row-hidden": "params.data.hidden",
-                    },
-                    defaultColDef={
-                        "resizable": True,
-                        "sortable": True,
-                        # Always reserve the sort-indicator slot (a faint
-                        # unsorted icon) so autoSize measures the header with
-                        # room for the arrow; clicking to sort then swaps the
-                        # icon in place instead of truncating the label to "…".
-                        "unSortIcon": True,
-                    },
-                    dashGridOptions={
-                        "animateRows": False,
-                        "tooltipShowDelay": 0,
-                        # Row ids carry the playlist code so any cell click can
-                        # navigate to /playlists/{code}.
-                        "getRowId": {"function": "params.data.code"},
-                    },
-                    columnSize="autoSize",
-                    columnSizeOptions=COLUMN_SIZE_OPTIONS,
-                    dangerously_allow_code=True,
-                    style={
-                        "height": "100%",
-                        "width": "100%",
-                        "minHeight": 300,
-                    },
-                ),
-                parent_style={
+            dag.AgGrid(
+                id="playlists-overview-grid",
+                className="ag-theme-quartz playlist-overview-grid",
+                columnDefs=TABLE_COLUMN_DEFS,
+                rowClassRules={
+                    "playlist-overview-row-hidden": "params.data.hidden",
+                },
+                defaultColDef={
+                    "resizable": True,
+                    "sortable": True,
+                    # Always reserve the sort-indicator slot (a faint
+                    # unsorted icon) so autoSize measures the header with
+                    # room for the arrow; clicking to sort then swaps the
+                    # icon in place instead of truncating the label to "…".
+                    "unSortIcon": True,
+                },
+                dashGridOptions={
+                    "animateRows": False,
+                    "tooltipShowDelay": 0,
+                    # Row ids carry the playlist code so any cell click can
+                    # navigate to /playlists/{code}.
+                    "getRowId": {"function": "params.data.code"},
+                },
+                columnSize="autoSize",
+                columnSizeOptions=COLUMN_SIZE_OPTIONS,
+                dangerously_allow_code=True,
+                style={
                     "flex": 1,
-                    "minHeight": 0,
-                    "display": "flex",
-                    "flexDirection": "column",
+                    "height": "100%",
+                    "width": "100%",
+                    "minHeight": 300,
                 },
             ),
         ],
         gap="md",
-        style={
-            "height": (
-                "calc(100dvh - var(--app-shell-header-offset, 0rem) "
-                "- 2*var(--app-shell-padding, 1rem))"
-            )
-        },
+        className="page-fill-column",
     )

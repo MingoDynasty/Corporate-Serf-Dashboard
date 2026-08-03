@@ -40,7 +40,8 @@
           "color": "#B5F5DF",
           "threshold": 202.0
         }
-      ]
+      ],
+      "leaderboard_id": 89599
     },
     {
       "name": "1w4t Pasu Raspberry Master 6mag",
@@ -80,7 +81,8 @@
           "color": "#B5F5DF",
           "threshold": 160.0
         }
-      ]
+      ],
+      "leaderboard_id": 90763
     },
     {
       "name": "cAt purrClick Easy",
@@ -120,7 +122,8 @@
           "color": "#B5F5DF",
           "threshold": 2100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83324
     },
     {
       "name": "1wall5targets_pasu Reload",
@@ -160,7 +163,8 @@
           "color": "#B5F5DF",
           "threshold": 240.0
         }
-      ]
+      ],
+      "leaderboard_id": 43
     },
     {
       "name": "psalmTS angelic click 30% Larger",
@@ -200,7 +204,8 @@
           "color": "#B5F5DF",
           "threshold": 168.0
         }
-      ]
+      ],
+      "leaderboard_id": 89546
     },
     {
       "name": "Leapcorn Pure Easy",
@@ -240,7 +245,8 @@
           "color": "#B5F5DF",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 42061
     },
     {
       "name": "Tamspeed 2bpes",
@@ -280,7 +286,8 @@
           "color": "#B5F5DF",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 340
     },
     {
       "name": "Star Clicking 30% Larger",
@@ -320,7 +327,8 @@
           "color": "#B5F5DF",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 89545
     },
     {
       "name": "Popcorn Goated rAim easy",
@@ -360,7 +368,8 @@
           "color": "#B5F5DF",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 63202
     },
     {
       "name": "Pasu Angelic 20% Larger",
@@ -400,7 +409,8 @@
           "color": "#B5F5DF",
           "threshold": 166.0
         }
-      ]
+      ],
+      "leaderboard_id": 89821
     },
     {
       "name": "Aimerz+ hopClick Med S1",
@@ -440,7 +450,8 @@
           "color": "#B5F5DF",
           "threshold": 1650.0
         }
-      ]
+      ],
+      "leaderboard_id": 69291
     },
     {
       "name": "Controlsphere Click Easy",
@@ -480,7 +491,8 @@
           "color": "#B5F5DF",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 89547
     }
   ],
   "generated_from": {
@@ -516,7 +528,8 @@
         "#B5F5DF"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:53.282284+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:06.043297+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

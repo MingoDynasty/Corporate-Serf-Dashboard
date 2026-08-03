@@ -7,6 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime, timedelta
 from email.utils import format_datetime
+from itertools import count
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,12 @@ from source.kovaaks.api_models import (
 from source.utilities import atomic_write
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
+
+
+def _ticking_monotonic():
+    """Deterministic time.monotonic stand-in: each call advances 1.0s."""
+    ticks = count(step=1.0)
+    return lambda: float(next(ticks))
 
 
 class FakeResponse:
@@ -103,13 +110,47 @@ def test_get_with_retry_reuses_session_within_thread(monkeypatch):
     assert created_sessions[0].calls == [
         (
             "https://example.test/first",
-            {"timeout": api_service.TIMEOUT},
+            {"timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
         (
             "https://example.test/second",
-            {"params": {"a": 1}, "timeout": api_service.TIMEOUT},
+            {"params": {"a": 1}, "timeout": api_service.DEFAULT_TIMEOUT_SECONDS},
         ),
     ]
+
+
+def test_get_with_retry_records_real_network_success(monkeypatch):
+    monkeypatch.setattr(api_service, "_last_network_success", 0.0)
+    monkeypatch.setattr(api_service.time, "monotonic", lambda: 42.0)
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse({"ok": True}),
+    )
+
+    api_service._get_with_retry("https://example.test/success")
+
+    _interactive, network_success = api_service.get_api_activity_timestamps()
+    assert network_success == 42.0
+
+
+def test_set_request_timeout_applies_to_requests(monkeypatch):
+    calls = []
+
+    def fake_get(_url, **kwargs):
+        calls.append(kwargs)
+        return FakeResponse({"ok": True})
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    # setattr registers teardown restoration before set_request_timeout mutates.
+    monkeypatch.setattr(
+        api_service, "_timeout_seconds", api_service.DEFAULT_TIMEOUT_SECONDS
+    )
+
+    api_service.set_request_timeout(45)
+    api_service._get_with_retry("https://example.test")
+
+    assert calls == [{"timeout": 45}]
 
 
 def test_get_thread_session_is_thread_local(monkeypatch):
@@ -246,7 +287,6 @@ def test_get_with_retry_gives_up_after_second_429(monkeypatch):
 @pytest.mark.parametrize(
     "transient_exception",
     [
-        api_service.requests.ReadTimeout("read timed out"),
         api_service.requests.ConnectTimeout("connect timed out"),
         api_service.requests.ConnectionError("connection dropped"),
     ],
@@ -281,14 +321,31 @@ def test_get_with_retry_gives_up_after_second_transient_exception(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with pytest.raises(api_service.requests.ConnectionError):
+        api_service._get_with_retry("https://example.test")
+
+    assert len(calls) == 2
+
+
+def test_get_with_retry_does_not_retry_read_timeouts(monkeypatch):
+    # Regression: a read timeout means the server got the request and is still
+    # working (KovaaK's slow spells reach ~28s), so retrying just doubles load.
+    calls = []
+
+    def fake_get(*_args, **_kwargs):
+        calls.append(True)
+        raise api_service.requests.ReadTimeout("read timed out")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
 
     with pytest.raises(api_service.requests.ReadTimeout):
         api_service._get_with_retry("https://example.test")
 
-    assert len(calls) == 2
+    assert len(calls) == 1
 
 
 def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
@@ -297,12 +354,12 @@ def test_get_with_retry_respects_attempts_and_clamps_backoff(monkeypatch):
 
     def fake_get(*_args, **_kwargs):
         calls.append(True)
-        raise api_service.requests.ReadTimeout("still slow")
+        raise api_service.requests.ConnectionError("still unreachable")
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
 
-    with pytest.raises(api_service.requests.ReadTimeout):
+    with pytest.raises(api_service.requests.ConnectionError):
         api_service._get_with_retry(
             "https://example.test",
             attempts=5,
@@ -326,7 +383,7 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
     monkeypatch.setattr(api_service.time, "sleep", sleeps.append)
-    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+    caplog.set_level(logging.INFO, logger=api_service.__name__)
 
     response = api_service._get_with_retry(
         "https://example.test",
@@ -343,11 +400,16 @@ def test_get_with_retry_keeps_retry_after_for_custom_attempts(monkeypatch, caplo
         "Rate limited at https://example.test (attempt 1/3); retrying after 0.50s",
         "Rate limited at https://example.test (attempt 2/3); retrying after 0.50s",
     ]
+    # Retries that may recover are INFO; only exhausted attempts warn upstream.
+    assert [record.levelno for record in caplog.records] == [
+        logging.INFO,
+        logging.INFO,
+    ]
 
 
 def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog):
     responses = [
-        api_service.requests.ReadTimeout("read timed out"),
+        api_service.requests.ConnectionError("connection dropped"),
         FakeResponse({"ok": True}),
     ]
 
@@ -358,13 +420,106 @@ def test_get_with_retry_logs_provider_neutral_attempt_counts(monkeypatch, caplog
         return response
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
-    caplog.set_level(logging.WARNING, logger=api_service.__name__)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    caplog.set_level(logging.INFO, logger=api_service.__name__)
 
     api_service._get_with_retry("https://evxl.gg/api", attempts=3)
 
     assert caplog.messages == [
-        "Transient GET failure at https://evxl.gg/api "
-        "(attempt 1/3); retrying: read timed out"
+        "Transient GET failure at https://evxl.gg/api after 1.00s "
+        "(attempt 1/3); retrying: connection dropped"
+    ]
+    # Retries that may recover are INFO; only exhausted attempts warn upstream.
+    assert [record.levelno for record in caplog.records] == [logging.INFO]
+
+
+def test_get_with_retry_logs_debug_outcome_for_every_attempt(monkeypatch, caplog):
+    # Regression: retried failures must also emit the DEBUG outcome line --
+    # it is the only line carrying params, which tie a failure to its
+    # leaderboard during concurrent playlist loads.
+    responses = [
+        api_service.requests.ConnectionError("connection dropped"),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://example.test",
+        params={"leaderboardId": 98330},
+    )
+
+    debug_messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno == logging.DEBUG
+    ]
+    assert debug_messages == [
+        "GET https://example.test {'leaderboardId': 98330} failed after 1.00s "
+        "(attempt 1/2): connection dropped",
+        "GET https://example.test {'leaderboardId': 98330} -> HTTP 200 in 1.00s "
+        "(attempt 2/2)",
+    ]
+
+
+def test_get_with_retry_keeps_a_sensitive_requests_params_out_of_the_log(
+    monkeypatch,
+    caplog,
+):
+    # The identity probe sends Steam personas the app never persists, and
+    # debug.log is rotated, kept, and collected with bug reports. Both leaks
+    # are covered here: the attempt line's params, and the prepared URL that
+    # requests embeds in a transport failure's text.
+    responses = [
+        api_service.requests.ConnectionError(
+            "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+            "exceeded with url: /webapp-backend/user/profile/by-username"
+            "?username=SecretPersona (Caused by NewConnectionError())"
+        ),
+        FakeResponse({"ok": True}),
+    ]
+
+    def fake_get(*_args, **_kwargs):
+        response = responses.pop(0)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    monkeypatch.setattr(api_service.time, "monotonic", _ticking_monotonic())
+    monkeypatch.setattr(api_service.time, "sleep", lambda _seconds: None)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    api_service._get_with_retry(
+        "https://kovaaks.com/webapp-backend/user/profile/by-username",
+        params={"username": "SecretPersona"},
+        sensitive=True,
+    )
+
+    assert "SecretPersona" not in caplog.text
+    assert [record.getMessage() for record in caplog.records] == [
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> failed after 1.00s (attempt 1/2): "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "Transient GET failure at "
+        "https://kovaaks.com/webapp-backend/user/profile/by-username after "
+        "1.00s (attempt 1/2); retrying: "
+        "HTTPSConnectionPool(host='kovaaks.com', port=443): Max retries "
+        "exceeded with url: /webapp-backend/user/profile/by-username"
+        "?<redacted> (Caused by NewConnectionError())",
+        "GET https://kovaaks.com/webapp-backend/user/profile/by-username "
+        "<redacted> -> HTTP 200 in 1.00s (attempt 2/2)",
     ]
 
 
@@ -381,6 +536,62 @@ def test_get_with_retry_propagates_unexpected_exceptions(monkeypatch):
         api_service._get_with_retry("https://example.test")
 
     assert len(calls) == 1
+
+
+def test_get_user_profile_by_username_sends_the_name_as_a_sensitive_parameter(
+    monkeypatch,
+    caplog,
+):
+    profile = {"steamId": "76561198000000001", "webapp": {"username": "MingoDynasty"}}
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append((url, kwargs))
+        return FakeResponse(profile)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+    caplog.set_level(logging.DEBUG, logger=api_service.__name__)
+
+    assert api_service.get_user_profile_by_username("SecretPersona") == profile
+    # In params, never concatenated into the URL: that is what keeps the
+    # bare-URL log lines clean.
+    assert calls == [
+        (
+            "https://kovaaks.com/webapp-backend/user/profile/by-username",
+            {
+                "params": {"username": "SecretPersona"},
+                "timeout": api_service.DEFAULT_TIMEOUT_SECONDS,
+            },
+        )
+    ]
+    assert "SecretPersona" not in caplog.text
+
+
+def test_get_user_profile_by_username_maps_409_to_a_confirmed_absence(monkeypatch):
+    # 409 {"error":"Player does not exist"} is this endpoint's answer for "no
+    # such player", so identity detection must not have to read exceptions.
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(
+            {"error": "Player does not exist"},
+            status_code=409,
+        ),
+    )
+
+    assert api_service.get_user_profile_by_username("Nobody") is None
+
+
+def test_get_user_profile_by_username_propagates_other_http_errors(monkeypatch):
+    """A server failure is not evidence that the player does not exist."""
+    monkeypatch.setattr(
+        api_service,
+        "_session_get",
+        lambda *_args, **_kwargs: FakeResponse(None, status_code=500),
+    )
+
+    with pytest.raises(api_service.requests.HTTPError):
+        api_service.get_user_profile_by_username("MingoDynasty")
 
 
 def test_get_benchmark_json_parses_fresh_response_once(tmp_path, monkeypatch):
@@ -520,7 +731,6 @@ def test_get_benchmark_json_forwards_custom_retry_policy(tmp_path, monkeypatch):
                     "benchmarkId": 123,
                     "steamId": "00000000000000000",
                 },
-                "timeout": api_service.TIMEOUT,
                 "attempts": 4,
                 "backoff_seconds": (2, 4, 8),
             },
@@ -604,8 +814,7 @@ def test_write_json_raises_after_replace_retries_exhausted(tmp_path, monkeypatch
 
 
 def test_get_leaderboard_scores_allows_custom_pagination(monkeypatch):
-    def fake_get_with_retry(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+    def fake_get_with_retry(_url, params):
         assert params == {
             "page": 2,
             "max": 25,
@@ -735,6 +944,105 @@ def test_save_leaderboard_id_handles_concurrent_upserts(monkeypatch):
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def _reset_mapping_cache(monkeypatch, tmp_path):
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(api_service, "_leaderboard_mapping_cache", None)
+    monkeypatch.setattr(api_service, "_leaderboard_mapping_signature", None)
+
+
+def test_mapping_cache_serves_forged_signature_rewrite_until_next_write(
+    monkeypatch, tmp_path
+):
+    """A same-size rewrite forging the old mtime is deliberately NOT detected
+    (accepted limitation, 2026-07-18 decision log entry): the cache promises
+    fast reads until the next write, and the next real write is detected."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    mapping_file = api_service._leaderboard_mapping_file()
+    stat_before = mapping_file.stat()
+    original = mapping_file.read_text(encoding="utf-8")
+    rewritten = original.replace("111", "999")
+    assert len(rewritten) == len(original)
+    mapping_file.write_text(rewritten, encoding="utf-8")
+    os.utime(mapping_file, ns=(stat_before.st_atime_ns, stat_before.st_mtime_ns))
+    stat_after = mapping_file.stat()
+    assert stat_after.st_mtime_ns == stat_before.st_mtime_ns
+    assert stat_after.st_size == stat_before.st_size
+
+    # The forged rewrite is invisible to metadata revalidation: accepted.
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    # The next genuine write changes the signature and reloads everything,
+    # surfacing the forged content too.
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 999
+
+
+def test_leaderboard_mapping_cache_parses_file_once(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+
+    reads = []
+    original_read_json = api_service._read_json
+
+    def counting_read_json(cache_file):
+        reads.append(cache_file)
+        return original_read_json(cache_file)
+
+    monkeypatch.setattr(api_service, "_read_json", counting_read_json)
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+    assert api_service.get_cached_leaderboard_id("Missing") is None
+    assert len(reads) == 1
+
+
+def test_save_leaderboard_id_invalidates_mapping_cache(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") is None
+
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+
+
+def test_mapping_cache_reflects_external_rewrite(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    api_service._leaderboard_mapping_file().write_text(
+        json.dumps({"Scenario A": {"leaderboard_id": 999, "source": "external"}}),
+        encoding="utf-8",
+    )
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 999
+
+
+def test_mapping_cache_tolerates_file_deletion(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+    api_service._leaderboard_mapping_file().unlink()
+    assert api_service.get_cached_leaderboard_id("Scenario A") is None
+
+    api_service.save_leaderboard_id("Scenario A", 112, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 112
+
+
+def test_mapping_cache_tolerates_malformed_file(monkeypatch, tmp_path):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    mapping_file = api_service._leaderboard_mapping_file()
+    mapping_file.parent.mkdir(parents=True)
+    mapping_file.write_text("not json", encoding="utf-8")
+    assert api_service.get_cached_leaderboard_id("Scenario A") is None
+
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+
 def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     monkeypatch,
 ):
@@ -774,7 +1082,7 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -841,7 +1149,7 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(responses[params["page"]])
 
@@ -877,7 +1185,7 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
     fetched_pages = []
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         fetched_pages.append(params["page"])
         return FakeResponse(None)
 
@@ -910,6 +1218,88 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "error": "unknown_username",
         "username": "UnknownUser",
     }
+
+    with pytest.raises(api_service.UnknownKovaaksUserError):
+        api_service.get_user_scenario_total_play("UnknownUser")
+
+    assert fetched_pages == [0]
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_rejects_stale_unknown_username_marker(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
+    api_service._write_json(
+        cache_file,
+        {
+            "page": 0,
+            "max": 100,
+            "total": 0,
+            "data": [],
+            "error": "unknown_username",
+            "username": "UnknownUser",
+        },
+    )
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_get(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+    with pytest.raises(api_service.UnknownKovaaksUserError) as exc_info:
+        api_service.get_user_scenario_total_play("UnknownUser")
+
+    assert str(exc_info.value) == "KovaaK's username 'UnknownUser' was not found."
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_serves_stale_valid_cache_after_failure(
+    monkeypatch,
+    caplog,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    api_service._write_json(
+        cache_file,
+        {
+            "page": 0,
+            "max": 100,
+            "total": 1,
+            "data": [
+                {
+                    "leaderboardId": "1",
+                    "scenarioName": "Cached Scenario",
+                    "counts": {"plays": 10},
+                    "rank": 12,
+                    "score": 100,
+                }
+            ],
+        },
+    )
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_get(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        response = api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert response.total == 1
+    assert [scenario.scenarioName for scenario in response.data] == ["Cached Scenario"]
+    assert "Using stale total-play cache for MingoDynasty" in caplog.text
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -971,7 +1361,7 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
     ]
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(responses[params["page"]])
 
     monkeypatch.setattr(api_service, "_session_get", fake_get)
@@ -1003,7 +1393,7 @@ def test_get_user_scenario_total_play_allows_null_rank(monkeypatch):
     api_service.make_cache()
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,
@@ -1120,6 +1510,8 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
         raise AssertionError("fresh cache should avoid network calls")
 
     monkeypatch.setattr(api_service, "_session_get", fail_get)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 0.0)
+    monkeypatch.setattr(api_service, "_last_network_success", 123.0)
 
     rank_info = api_service.get_scenario_rank_info(
         "Cached Scenario",
@@ -1130,6 +1522,9 @@ def test_get_scenario_rank_info_reads_fresh_rank_cache(monkeypatch):
     assert rank_info.rank == 99
     assert rank_info.total_players == 123
     assert round(rank_info.percentile, 2) == 19.92
+    interactive, network_success = api_service.get_api_activity_timestamps()
+    assert interactive > 0
+    assert network_success == 123.0
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -1420,7 +1815,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
         return LeaderboardAPIResponse(page=0, max=50, total=0, data=[])
 
     def fake_get(_url, params, timeout):
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         assert params["username"] == "UnknownUser"
         return FakeResponse(None)
 
@@ -1516,6 +1911,174 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
+def _raise_request_exception(*_args, **_kwargs):
+    raise api_service.requests.RequestException("leaderboard unavailable")
+
+
+def _raise_validation_error(*_args, **_kwargs):
+    # A successful HTTP response with a schema-invalid body: model_validate is
+    # what fetch_scenario_rank runs under the hood, so this reproduces the real
+    # ValidationError shape rather than fabricating one.
+    api_service.LeaderboardAPIResponse.model_validate({"unexpected": "shape"})
+    raise AssertionError("model_validate should have raised")  # pragma: no cover
+
+
+def _seed_expired_rank_cache(monkeypatch, *, with_total, fetch_fake=None):
+    """Seed an expired rank cache (scenario_name absent) for fallback tests.
+
+    ``fetch_fake`` replaces ``fetch_scenario_rank`` (defaults to raising
+    ``RequestException``). Returns the backdated rank cache file, its pre-call
+    bytes, and its mtime so callers can assert the fallback read path never
+    rewrites the cache.
+    """
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    api_service.save_scenario_rank(
+        98330,
+        "MingoDynasty",
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=98330,
+        ),
+    )
+    rank_cache_file = (
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
+    )
+    stale_timestamp = time.time() - (200 * 60 * 60)
+    os.utime(rank_cache_file, (stale_timestamp, stale_timestamp))
+    if with_total:
+        api_service.save_leaderboard_total(98330, 200)
+        total_cache_file = TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
+        os.utime(total_cache_file, (stale_timestamp, stale_timestamp))
+
+    monkeypatch.setattr(
+        api_service,
+        "fetch_scenario_rank",
+        fetch_fake or _raise_request_exception,
+    )
+
+    return (
+        rank_cache_file,
+        rank_cache_file.read_bytes(),
+        rank_cache_file.stat().st_mtime,
+    )
+
+
+@pytest.mark.parametrize("force_refresh", [False, True])
+def test_get_scenario_rank_info_serves_stale_rank_when_fetch_fails(
+    monkeypatch,
+    force_refresh,
+):
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=True,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        force_refresh=force_refresh,
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.leaderboard_id == 98330
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players == 200
+    assert round(rank_info.percentile, 2) == 75.25
+    # The degraded result is tagged so the UI can warn (yellow) instead of
+    # falsely confirming a refresh (green).
+    assert rank_info.warning_message is not None
+    assert "VT Pasu Intermediate S5" in rank_info.warning_message
+    assert rank_info.served_stale is True
+
+    # The fallback is read-only: the stale cache must not be laundered into a
+    # TTL-fresh file by a rewrite (content and mtime both unchanged).
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    assert b"served_stale" not in rank_cache_file.read_bytes()
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_serves_stale_rank_without_total_cache(monkeypatch):
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=False,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.leaderboard_id == 98330
+    assert rank_info.scenario_name == "VT Pasu Intermediate S5"
+    assert rank_info.total_players is None
+    assert rank_info.percentile is None
+    assert rank_info.warning_message is not None
+
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_serves_stale_rank_when_response_invalid(monkeypatch):
+    # A schema-invalid (but successful) leaderboard response raises
+    # ValidationError, not RequestException; it must reach the same stale
+    # fallback rather than escaping to N/A.
+    rank_cache_file, cache_bytes, cache_mtime = _seed_expired_rank_cache(
+        monkeypatch,
+        with_total=True,
+        fetch_fake=_raise_validation_error,
+    )
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.RANKED
+    assert rank_info.rank == 50
+    assert rank_info.total_players == 200
+    assert rank_info.warning_message is not None
+
+    assert rank_cache_file.read_bytes() == cache_bytes
+    assert rank_cache_file.stat().st_mtime == cache_mtime
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_scenario_rank_info_returns_unknown_when_response_invalid_no_cache(
+    monkeypatch,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+    api_service.save_leaderboard_id("VT Pasu Intermediate S5", 98330, "test")
+    monkeypatch.setattr(api_service, "fetch_scenario_rank", _raise_validation_error)
+
+    rank_info = api_service.get_scenario_rank_info(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+    )
+
+    assert rank_info.status == ScenarioRankStatus.UNKNOWN
+    assert rank_info.leaderboard_id == 98330
+    assert (
+        rank_info.error_message
+        == "Invalid leaderboard response for VT Pasu Intermediate S5."
+    )
+    rank_cache_file = (
+        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
+    )
+    assert not rank_cache_file.exists()
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
 def test_get_scenario_rank_info_keeps_unranked_when_username_validation_fails(
     monkeypatch,
 ):
@@ -1582,6 +2145,42 @@ def test_resolve_leaderboard_id_falls_back_to_search_after_total_play_failure(
     leaderboard_id = api_service.resolve_leaderboard_id(
         "VT Pasu Intermediate S5",
         "MingoDynasty",
+    )
+
+    assert leaderboard_id == 98330
+    assert searched_scenarios == ["VT Pasu Intermediate S5"]
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_resolve_leaderboard_id_skips_hydration_when_disabled(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    def forbidden_hydrate(*_args, **_kwargs):
+        raise AssertionError("hydration must not run when allow_hydration is False")
+
+    searched_scenarios = []
+
+    def fake_search_scenario_exact(scenario_name):
+        searched_scenarios.append(scenario_name)
+        return 98330
+
+    monkeypatch.setattr(
+        api_service,
+        "hydrate_leaderboard_id_cache",
+        forbidden_hydrate,
+    )
+    monkeypatch.setattr(
+        api_service,
+        "search_scenario_exact",
+        fake_search_scenario_exact,
+    )
+
+    leaderboard_id = api_service.resolve_leaderboard_id(
+        "VT Pasu Intermediate S5",
+        "MingoDynasty",
+        allow_hydration=False,
     )
 
     assert leaderboard_id == 98330
@@ -1828,7 +2427,7 @@ def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
     def fake_get(_url, params, timeout):
         assert params["scenarioNameSearch"] == "VT Pasu Intermediate S5"
         assert params["max"] == 100
-        assert timeout == api_service.TIMEOUT
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
         return FakeResponse(
             {
                 "page": 0,

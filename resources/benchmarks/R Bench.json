@@ -30,7 +30,8 @@
           "color": "#ff3100",
           "threshold": 17500.0
         }
-      ]
+      ],
+      "leaderboard_id": 17325
     },
     {
       "name": "Midrange Fast Strafes Easy Invincible",
@@ -60,7 +61,8 @@
           "color": "#ff3100",
           "threshold": 16000.0
         }
-      ]
+      ],
+      "leaderboard_id": 63043
     },
     {
       "name": "Cata IC Fast Strafes Easy Invincible",
@@ -90,7 +92,8 @@
           "color": "#ff3100",
           "threshold": 17000.0
         }
-      ]
+      ],
+      "leaderboard_id": 4131
     },
     {
       "name": "Centering I Easy",
@@ -120,7 +123,8 @@
           "color": "#ff3100",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1903
     },
     {
       "name": "Smooth Thin Strafes Raspberry Easy",
@@ -150,7 +154,8 @@
           "color": "#ff3100",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 5536
     },
     {
       "name": "Thin Aiming Long Invincible Easy",
@@ -180,7 +185,8 @@
           "color": "#ff3100",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 1302
     },
     {
       "name": "Ground Plaza Easy",
@@ -210,7 +216,8 @@
           "color": "#ff3100",
           "threshold": 925.0
         }
-      ]
+      ],
+      "leaderboard_id": 226
     },
     {
       "name": "Ground Plaza Voltaic Easy",
@@ -240,7 +247,8 @@
           "color": "#ff3100",
           "threshold": 910.0
         }
-      ]
+      ],
+      "leaderboard_id": 520
     },
     {
       "name": "VT Plaza Novice",
@@ -270,7 +278,8 @@
           "color": "#ff3100",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 43183
     },
     {
       "name": "VT Air Novice",
@@ -300,7 +309,8 @@
           "color": "#ff3100",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 43180
     },
     {
       "name": "KovaaKs Sandbox Intro Scenario",
@@ -330,7 +340,8 @@
           "color": "#ff3100",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 8680
     },
     {
       "name": "Close Tappy Strafes Easy",
@@ -360,7 +371,8 @@
           "color": "#ff3100",
           "threshold": 110.0
         }
-      ]
+      ],
+      "leaderboard_id": 16881
     }
   ],
   "generated_from": {
@@ -388,7 +400,8 @@
         "#ff3100"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:15.412823+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:05.946740+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

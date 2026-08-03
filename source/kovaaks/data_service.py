@@ -11,11 +11,16 @@ from datetime import date, datetime
 from pathlib import Path
 
 import numpy as np
+import requests
 from pydantic import ValidationError
 from sortedcontainers import SortedDict, SortedList
 
 from source.config.config_service import get_config
-from source.kovaaks.api_service import get_playlist_data
+from source.kovaaks.api_service import (
+    get_evxl_playlist,
+    get_playlist_data,
+    merge_seed_leaderboard_ids,
+)
 from source.kovaaks.data_models import (
     PlaylistData,
     Rank,
@@ -23,7 +28,9 @@ from source.kovaaks.data_models import (
     Scenario,
     ScenarioStats,
 )
+from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
+from source.utilities.paths import package_root, state_dir
 from source.utilities.stopwatch import Stopwatch
 
 # The bundled root is the full benchmark library (every committed file
@@ -31,8 +38,10 @@ from source.utilities.stopwatch import Stopwatch
 # show/hide preference in playlist_visibility_service, not file state.
 BUNDLED_PLAYLIST_DIRECTORY = "resources/benchmarks"
 USER_PLAYLIST_DIRECTORY = "data/playlists"
-BUNDLED_PLAYLIST_DIRECTORY_PATH = Path(BUNDLED_PLAYLIST_DIRECTORY).resolve()
-USER_PLAYLIST_DIRECTORY_PATH = Path(USER_PLAYLIST_DIRECTORY).resolve()
+# Resolved once at import, as before: the bundled library ships with the code,
+# the user's playlists live in the state root.
+BUNDLED_PLAYLIST_DIRECTORY_PATH = package_root() / BUNDLED_PLAYLIST_DIRECTORY
+USER_PLAYLIST_DIRECTORY_PATH = state_dir() / USER_PLAYLIST_DIRECTORY
 POSSIBLE_SUB_CSV_HEADERS = [
     # Latest CSV header
     "Weapon,Shots,Hits,Damage Done,Damage Possible,,Sens Scale,Horiz Sens,Vert Sens,FOV,Hide Gun,Crosshair,Crosshair Scale,Crosshair Color,ADS Sens,ADS Zoom Scale,Avg Target Scale,Avg Time Dilation",  # noqa: E501
@@ -72,6 +81,13 @@ _user_root_playlist_files: dict[str, list[Path]] = {}
 # their code (the pre-#90 copy-to-activate leftovers). Each entry is the dead
 # file plus the code it duplicated; the overview offers to clean them up.
 _superseded_user_playlist_files: list[tuple[Path, str]] = []
+# Embedded (scenario name, leaderboard id) pairs collected from the bundled
+# corpus during load_playlists, plus whether every bundled file loaded. The
+# startup seed merge folds these into the permanent name->ID mapping cache; a
+# partial bundled load suppresses removals. Both are reset on each
+# load_playlists() run.
+_bundled_seed_pairs: list[tuple[str, int]] = []
+_bundled_corpus_load_complete: bool = True
 playlist_startup_warning_queue: deque[str] = deque()
 _PLAYLIST_IO_LOCK = threading.RLock()
 
@@ -417,13 +433,16 @@ def initialize_kovaaks_data(stats_dir: str) -> None:
             if entry.is_file() and entry.name.endswith(".csv"):
                 csv_files.append(entry.path)
 
-    for csv_file in csv_files:
-        load_csv_file_into_database(csv_file)
+    loaded_count = sum(
+        1 for csv_file in csv_files if load_csv_file_into_database(csv_file)
+    )
     stopwatch.stop()
     logger.debug(
-        "Loaded %d CSV files in %.2f seconds.",
+        "CSV startup load complete: %d scanned, %d loaded, %d failed in %.2f seconds.",
         len(csv_files),
-        round(stopwatch.elapsed(), 2),
+        loaded_count,
+        len(csv_files) - loaded_count,
+        stopwatch.elapsed(),
     )
 
 
@@ -595,14 +614,25 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     )
 
 
-def load_playlists() -> None:
+def _collect_bundled_seed_pairs(playlist_data: PlaylistData) -> None:
+    """Record a bundled playlist's embedded (scenario name, leaderboard id) pairs."""
+    for scenario in playlist_data.scenarios:
+        if scenario.leaderboard_id is not None:
+            _bundled_seed_pairs.append((scenario.name, scenario.leaderboard_id))
+
+
+def load_playlists() -> None:  # noqa: PLR0912
     """Load valid playlist JSON files into the in-memory database."""
+    global _bundled_corpus_load_complete  # noqa: PLW0603
     playlist_database.clear()
     playlist_startup_warning_queue.clear()
     _user_root_playlist_codes.clear()
     _user_root_playlist_files.clear()
     _superseded_user_playlist_files.clear()
+    _bundled_seed_pairs.clear()
+    _bundled_corpus_load_complete = True
     playlist_sources: dict[str, Path] = {}
+    bundled_parsed = 0
     for root, missing_ok in (
         (BUNDLED_PLAYLIST_DIRECTORY_PATH, False),
         (USER_PLAYLIST_DIRECTORY_PATH, True),
@@ -613,11 +643,15 @@ def load_playlists() -> None:
                     json_data = file.read()
                 playlist_data = PlaylistData.model_validate_json(json_data)
             except OSError:
+                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                    _bundled_corpus_load_complete = False
                 _record_startup_playlist_warning(
                     f"Failed to read playlist file: {playlist_file}"
                 )
                 continue
             except ValidationError as exc:
+                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                    _bundled_corpus_load_complete = False
                 if _is_code_validation_error(exc):
                     _record_startup_playlist_warning(
                         "Skipping playlist file "
@@ -629,6 +663,14 @@ def load_playlists() -> None:
                         f"Invalid JSON format in playlist file: {playlist_file}"
                     )
                 continue
+
+            if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                # Collect the corpus's embedded leaderboard IDs (asserted-set
+                # merge happens after the whole scan). Gather from every parsed
+                # bundled file, before code dedup, so a shadowed file that
+                # disagrees still surfaces as a conflict.
+                bundled_parsed += 1
+                _collect_bundled_seed_pairs(playlist_data)
 
             if playlist_data.code in playlist_database:
                 winning_source = playlist_sources[playlist_data.code]
@@ -661,42 +703,181 @@ def load_playlists() -> None:
                 _user_root_playlist_files.setdefault(playlist_data.code, []).append(
                     playlist_file
                 )
+    if bundled_parsed == 0:
+        # A missing or empty bundled root (or one whose every file failed to
+        # parse) never trips the per-file failure handlers above, yet it is the
+        # maximal partial view of the corpus. Force the seed merge to suppress
+        # removals so a broken install does not retract every seeded mapping
+        # (an empty asserted set with allow_removals would wipe them all).
+        _bundled_corpus_load_complete = False
+    logger.debug(
+        "Playlist startup load complete: loaded=%d bundled=%d user=%d "
+        "warnings=%d superseded_files=%d.",
+        len(playlist_database),
+        len(playlist_database) - len(_user_root_playlist_codes),
+        len(_user_root_playlist_codes),
+        len(playlist_startup_warning_queue),
+        len(_superseded_user_playlist_files),
+    )
 
 
-def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str | None]:
+def get_bundled_leaderboard_seed() -> tuple[dict[str, int], bool]:
+    """Return the corpus-asserted name->ID map and whether the corpus fully loaded.
+
+    Names that two bundled files disagree on are excluded (with a warning): the
+    corpus does not stand behind a single value for them, so they are not part of
+    the asserted set. The boolean is False when any bundled file failed to load,
+    which the merge uses to suppress removals — a partial view of the corpus must
+    not retract mappings the corpus may still assert. Call after load_playlists().
+    """
+    ids_by_name: dict[str, set[int]] = {}
+    for scenario_name, leaderboard_id in _bundled_seed_pairs:
+        ids_by_name.setdefault(scenario_name, set()).add(leaderboard_id)
+
+    asserted: dict[str, int] = {}
+    for scenario_name, leaderboard_ids in ids_by_name.items():
+        if len(leaderboard_ids) > 1:
+            logger.warning(
+                "Bundled corpus disagrees on leaderboard id for scenario %r: %s; "
+                "excluding it from the seed.",
+                scenario_name,
+                sorted(leaderboard_ids),
+            )
+            continue
+        asserted[scenario_name] = next(iter(leaderboard_ids))
+    return asserted, _bundled_corpus_load_complete
+
+
+def seed_leaderboard_ids_from_bundled_corpus() -> None:
+    """Merge the bundled corpus's embedded leaderboard IDs into the mapping cache.
+
+    Runs once at startup after load_playlists() and before rank lookups matter
+    (see docs/decision_log.md, the leaderboard-ID seeding entry).
+    """
+    asserted, load_complete = get_bundled_leaderboard_seed()
+    merge_seed_leaderboard_ids(asserted, allow_removals=load_complete)
+
+
+def load_playlist_from_code(  # noqa: PLR0911
+    input_playlist_code: str,
+) -> tuple[str | None, str | None]:
     """Import the single playlist matching a KovaaK's playlist code.
 
     Returns ``(error_message, canonical_playlist_code)``. The second element
-    is the canonical ``playlistCode`` from KovaaK's — the imported code on a
-    successful import, or the conflicting existing code on a duplicate-code
-    refusal (so callers can, for example, ask whether that existing playlist
-    is hidden). It is None only when there is no canonical code to report:
-    the search returned nothing, was ambiguous, or the write failed. The
-    canonical code is what the store, the user-root tracking, and the
-    visibility show-list are keyed by; it can differ from the pasted input
-    (case normalization, non-exact search matches), so it must never be
-    derived from ``input_playlist_code``.
+    is the canonical code from whichever source resolved it — KovaaK's search
+    (``playlistCode``) or the Evxl by-code fallback (``playlist_code``) — the
+    imported code on a successful import, or the conflicting existing code on
+    a duplicate-code refusal (so callers can, for example, ask whether that
+    existing playlist is hidden). It is None only when there is no canonical
+    code to report: neither the search nor the Evxl fallback resolved the
+    code, or the write failed. The canonical code is what the store, the
+    user-root tracking, and the visibility show-list are keyed by; it can
+    differ from the pasted input (case normalization, non-exact search
+    matches), so it must never be derived from ``input_playlist_code``.
     """
-    response = get_playlist_data(input_playlist_code)
-    if not response or not response.data:
-        message = (
-            f"Failed to load playlist data for playlist code: {input_playlist_code}"
+    try:
+        response = get_playlist_data(input_playlist_code)
+    except (requests.RequestException, ValidationError) as exc:
+        # KovaaK's returns HTTP 400 on some gibberish codes, and a slow spell
+        # can time out or return schema-invalid JSON. Degrade any of these to a
+        # refusal naming the pasted code rather than letting the exception
+        # escape as a raw Dash callback error (docs/specs/scenario_rank.md,
+        # "Failure handling").
+        # Deliberately no Evxl fallback here: widening the fallback to fire
+        # when the search itself *raises* is a design change, not a bug fix.
+        detail = (
+            request_exception_summary(exc)
+            if isinstance(exc, requests.RequestException)
+            else exc.__class__.__name__
         )
-        logger.warning(message)
+        logger.warning(
+            "Failed to look up playlist code %s: %s",
+            input_playlist_code,
+            detail,
+        )
+        message = (
+            f"Failed to look up playlist code {input_playlist_code}: "
+            "KovaaK's API error."
+        )
         return message, None
+    if response and len(response.data) == 1:
+        # KovaaK's search produced exactly one usable record: the happy path,
+        # no Evxl call.
+        try:
+            playlist_data = PlaylistData(
+                name=response.data[0].playlistName,
+                code=response.data[0].playlistCode,
+                scenarios=[
+                    Scenario(name=item.scenarioName)
+                    for item in response.data[0].scenarioList
+                ],
+            )
+        except ValidationError:
+            # Built inside a guard for the same reason as the Evxl build below:
+            # PlaylistAPIResponse accepts any str playlistCode, but PlaylistData
+            # rejects a blank/whitespace one, so a structurally valid search
+            # response can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            message = (
+                "Invalid playlist data returned by API for playlist code: "
+                f"{input_playlist_code}"
+            )
+            logger.warning(message)
+            return message, None
+    else:
+        # KovaaK's search failed to produce exactly one usable record: zero
+        # records (its null-hydration quirk drops the match through the
+        # ignore_null_playlist_items validator) or an ambiguous multi-match.
+        # Fall back to Evxl's exact by-code lookup before refusing.
+        if not response or not response.data:
+            refusal_message = (
+                f"Failed to load playlist data for playlist code: {input_playlist_code}"
+            )
+            logger.info(
+                "KovaaK's search returned no usable record for %s; "
+                "trying Evxl playlist-by-code.",
+                input_playlist_code,
+            )
+        else:
+            refusal_message = (
+                f"Found more than one playlist from code: {input_playlist_code}"
+            )
+            logger.info(
+                "KovaaK's search returned %d records for %s; "
+                "trying Evxl playlist-by-code.",
+                len(response.data),
+                input_playlist_code,
+            )
 
-    if len(response.data) > 1:
-        message = f"Found more than one playlist from code: {input_playlist_code}"
-        logger.warning(message)
-        return message, None
+        try:
+            evxl_playlist = get_evxl_playlist(input_playlist_code)
+            # Built inside the guard on purpose: EvxlPlaylist accepts any str
+            # code, but PlaylistData rejects a blank one, so a structurally
+            # valid payload can still fail here and must degrade to the refusal
+            # rather than escape into the Dash callback.
+            playlist_data = PlaylistData(
+                name=evxl_playlist.playlist_name.strip(),
+                code=evxl_playlist.playlist_code.strip(),
+                scenarios=[
+                    Scenario(name=item.scenario_name)
+                    for item in evxl_playlist.scenario_list
+                ],
+            )
+        except (requests.RequestException, ValidationError) as exc:
+            # Includes Evxl's HTTP 400 for unknown or mis-cased codes. The user
+            # sees the same refusal as before the fallback existed.
+            logger.warning(
+                "Evxl playlist-by-code fallback failed for %s: %s",
+                input_playlist_code,
+                exc,
+            )
+            return refusal_message, None
 
-    playlist_data = PlaylistData(
-        name=response.data[0].playlistName,
-        code=response.data[0].playlistCode,
-        scenarios=[
-            Scenario(name=item.scenarioName) for item in response.data[0].scenarioList
-        ],
-    )
+        logger.info(
+            "Resolved %s through Evxl playlist-by-code (canonical code %s).",
+            input_playlist_code,
+            playlist_data.code,
+        )
 
     if playlist_data.code in playlist_database:
         existing_playlist = playlist_database[playlist_data.code]
@@ -733,6 +914,15 @@ def load_playlist_from_code(input_playlist_code: str) -> tuple[str | None, str |
     _user_root_playlist_files[playlist_data.code] = [
         get_playlist_file_path(playlist_data.name, playlist_data.code)
     ]
+    # The success record for the durable logs: the UI toast is ephemeral, and
+    # this is the one place both import paths (search and Evxl) converge after
+    # persistence actually succeeded.
+    logger.info(
+        "Imported playlist %s (%s): %d scenarios.",
+        playlist_data.name,
+        playlist_data.code,
+        len(playlist_data.scenarios),
+    )
     return None, playlist_data.code
 
 
@@ -791,6 +981,12 @@ def delete_user_playlist(playlist_code: str) -> str | None:
         playlist_database.pop(playlist_code, None)
         _user_root_playlist_codes.discard(playlist_code)
         _user_root_playlist_files.pop(playlist_code, None)
+    # Success record for the durable logs; failures logged above per file.
+    logger.info(
+        "Deleted user playlist %s (%d file(s)).",
+        playlist_code,
+        len(file_paths),
+    )
     return None
 
 

@@ -9,18 +9,27 @@ endpoint behavior see `docs/kovaaks_api_notes.md`; for workflow/conventions see
 
 ## Process & threads
 
-`source/app.py` (`main`) loads config, calls `initialize_kovaaks_data` to build
-the in-memory stores from existing CSVs, starts a watchdog `Observer` on
-`stats_dir`, and serves the Dash app with Waitress (Flask dev server when
-`config.debug`).
+`source/app.py` (`main`) loads config, detects the stats directory when nothing
+ever configured one (`stats_dir_detection.bootstrap_stats_dir`, before the pin
+so a first detection serves this boot), pins the stats directory for the process
+(`settings_service.resolve_stats_dir`), calls `initialize_kovaaks_data` to build
+the in-memory stores from existing CSVs, starts a watchdog `Observer` on that
+directory, and serves the Dash app with Waitress (Flask dev server when
+`config.debug`). With no usable stats directory — unset, or set but missing —
+the scan and the observer are both skipped and the app serves empty pages; only
+`port` is needed to serve.
 
 Threads at runtime:
 
-- **Server thread(s)** — Waitress/Flask serving Dash; runs the page callbacks.
+- **Server thread(s)** — Waitress (8 workers) or Flask serving Dash; runs the
+  page callbacks.
 - **Watchdog observer thread** — `NewFileHandler` fires on each new CSV.
 - **Rank freshness timers** — after a new high score, `api_service.py` uses a
   bounded chain of daemon `threading.Timer` attempts to poll until KovaaK's
   leaderboard reflects the local score.
+- **Percentile warmup worker** — one daemon thread fills stale rank/total
+  caches for played scenarios in visible playlists, yields to recent
+  interactive activity, and blocks on a condition variable when idle.
 - KovaaK's GETs use a **thread-local `requests.Session`**; cache file I/O is
   guarded by a single `threading.RLock` (`_CACHE_IO_LOCK` in `api_service.py`).
 
@@ -94,6 +103,14 @@ that summary and never accesses the queue directly.
 
 ## State
 
+- **Two filesystem roots** (`utilities/paths.py`). Every mutable path below is
+  relative to the **state root**: `config.toml` and everything under `data/`.
+  It is `CSD_STATE_DIR` when set (the launcher owns that variable; the app only
+  reads it) and the current working directory otherwise, so a dev checkout
+  behaves exactly as it always has. Read-only assets that ship with the code —
+  `resources/benchmarks/` — resolve against the **package root** instead
+  (derived from `__file__`), because a deployed install runs code from a
+  per-version directory while state lives at the install root.
 - **In-memory only, no database.** `data_service.py` holds the live stores as
   module globals, rebuilt from CSVs on every startup:
   - `kovaaks_database` — scenario stats keyed by scenario name
@@ -109,10 +126,16 @@ that summary and never accesses the queue directly.
   read tolerantly. Subtrees include `scenario_leaderboards/`,
   `user_scenario_total_play/`, `leaderboard/totals/`, `benchmarks/`, and
   per-scenario rank files. TTLs and rationale live in `docs/decision_log.md`.
-- **User preferences** — `data/preferences.json` (not committed) holds the
-  playlist show-list (`playlist_visibility_service.py`): written atomically on
-  each show/hide, read once and cached in-process, absent until the first
-  show/hide (reads fall back to the first-run seed).
+- **User settings** — `data/settings.json` (not committed) holds the app-owned
+  user settings (`config/settings_service.py`): the stats directory and the
+  KovaaK's identity. Written atomically and whole, read once and cached
+  in-process; a missing key, an empty value, and an unusable file all mean "not
+  configured". `stats_dir` is additionally pinned at startup and read from the
+  pin by every consumer, so it can only change across a restart.
+- **Playlist visibility** — `data/playlist_visibility.json` (not committed)
+  holds the playlist show-list (`playlist_visibility_service.py`): written
+  atomically on each show/hide, read once and cached in-process, absent until
+  the first show/hide (reads fall back to the first-run seed).
 
 ## Module map
 
@@ -132,6 +155,7 @@ flowchart LR
         Playlists["playlists.py"]
         PlaylistScenarios["playlist_scenarios.py"]
         Journey["aim_training_journey.py"]
+        SettingsPage["settings.py"]
     end
 
     subgraph SharedUI["Shared UI"]
@@ -141,6 +165,7 @@ flowchart LR
     subgraph Services["Domain & plotting services"]
         DataService["kovaaks/<br/>data_service.py"]
         ApiService["kovaaks/<br/>api_service.py"]
+        WarmupService["kovaaks/percentile_<br/>warmup_service.py"]
         PlaylistService["kovaaks/playlist_<br/>scenarios_service.py"]
         OverviewService["kovaaks/playlist_<br/>overview_service.py"]
         Visibility["kovaaks/playlist_<br/>visibility_service.py"]
@@ -154,6 +179,7 @@ flowchart LR
 
     App --> Shell
     App --> DataService
+    App --> WarmupService
     App --> FileWatchdog
 
     Shell --> LocalIcon
@@ -163,10 +189,15 @@ flowchart LR
     Home --> Queue
     Home --> LocalIcon
     Playlists --> OverviewService
+    Playlists --> WarmupService
+    WarmupService --> ApiService
+    WarmupService --> DataService
+    WarmupService --> Visibility
     PlaylistScenarios --> DataService
     PlaylistScenarios --> PlaylistService
     Journey --> DataService
     Journey --> PlotService
+    SettingsPage --> WarmupService
 
     Home --> Visibility
     Journey --> Visibility
@@ -187,8 +218,9 @@ flowchart LR
 
 ### Entry & shell
 - `source/app.py` — entry point (`main`): wiring described above.
-- `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`,
-  `toggle_navbar`), theme toggle, Dash `page_container`, and the notification host.
+- `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
+  collapse applied by a clientside callback), theme toggle, Dash `page_container`,
+  and the notification host.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
@@ -199,12 +231,22 @@ flowchart LR
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.
   Overview row rendering is local-only — it draws from local run data and rank
-  caches and never triggers KovaaK's API calls. Also hosts the visibility
-  controls: a per-row Hide/Unhide action cell and a "Show hidden" toggle that
-  reveals hidden playlists as muted rows. Hosts playlist import (share-code
+  caches and never triggers KovaaK's API calls. While the warmup worker is
+  busy, a one-second interval rebuilds those rows with activity recording
+  suppressed, shows remaining/ETA or paused/fatal state, and disables after a
+  final idle rebuild. One callback snapshots worker state, rebuilds rows, then
+  returns the rows and interval state together; an idle snapshot therefore
+  precedes the final cache read and cannot race it. That callback tracks the
+  worker's enqueue generation, and the shared row-refresh store re-arms it
+  after idle.
+  Also hosts the visibility controls: a per-row Hide/Unhide action cell and a
+  "Show hidden" toggle that reveals hidden playlists as muted rows. Unhide
+  prepends the playlist's played scenarios to warmup before bumping that
+  refresh store. Hosts playlist import (share-code
   modal) — the one networked action on this page: `load_playlist_from_code`
   calls the API, and on success a refresh store bump rebuilds the grid with the
-  new visible row without a page reload. Hosts playlist deletion: a per-row
+  new visible row without a page reload and re-arms any enqueued warmup work.
+  Hosts playlist deletion: a per-row
   Delete action cell (user playlists only; bundled rows render nothing) opens a
   confirmation modal, then `delete_user_playlist` unlinks the file and the same
   refresh store rebuilds the grid. When the loader recorded user files
@@ -212,8 +254,31 @@ flowchart LR
   cleanup (`delete_superseded_user_playlist_files`).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
-  mounted-route store, not the URL directly (see decision log).
+  mounted-route store, not the URL directly (see decision log). It paints
+  cache-only phase-1 rows, stores a per-open generation token, enables the
+  fill interval, and drains complete phase-2 rows through update-only AG Grid
+  transactions. The drain callback owns progress text, cancellation
+  finalization, and the one-shot aggregate completion toast.
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
+- `settings.py` (`/settings`) — the settings store's only runtime writer: the
+  stats directory, KovaaK's username, and Steam ID, with one all-or-nothing
+  Save. The form is built per visit from the stored view (never the pinned
+  accessors) so it always shows what is on disk. The stats-directory field is a
+  free-text `dmc.Autocomplete` whose suggestions are the detector's candidate
+  list, re-run on each visit; suggestions never bypass validation or Save. Its
+  filter is overridden (`allOptions` in `assets/dashMantineFunctions.js`)
+  because Mantine's default matches options against the input text, which would
+  leave the normally-prefilled field offering only the path it already holds.
+  Below the form, a static version section names the running build from
+  `utilities/build_info.py` — release label, then short SHA and commit date —
+  with no callback and no network.
+  Validation is offline only
+  (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
+  above the universe-1 base); a save writes all three keys,
+  cold-starts the warmup worker when a username was saved, and re-derives the
+  restart notice from `is_restart_pending()`. A write that fails (a locked file
+  exhausting the atomic replace's retries) is caught and reported in the status
+  line rather than escaping into a failed request the user cannot see.
 
 ### Shared UI components
 - `components/local_icon.py` — local SVG icon registry/helper used by the shell
@@ -230,22 +295,35 @@ flowchart LR
   `delete_superseded_user_playlist_files` are the write paths that unlink those
   files under the playlist I/O lock, keeping startup itself read-only.
 - `api_service.py` — KovaaK's HTTP client + rank pipeline: GET retry/session
-  helpers, JSON cache helpers, leaderboard-id resolution, the cache-first/cache-only
+  helpers (including `_get_with_retry`'s `sensitive` option, which keeps one
+  request's parameters and query string out of every log line), JSON cache
+  helpers, leaderboard-id resolution, the cache-first/cache-only
   `get_scenario_rank_info` read path, centralized monotonic rank writes, and the
-  bounded `schedule_rank_freshness_refresh` Timer poll. UI consumes
-  `ScenarioRankInfo` and never calls endpoints directly. See
+  bounded `schedule_rank_freshness_refresh` Timer poll. The stale fallback tags
+  its returned `ScenarioRankInfo` structurally without persisting the marker;
+  split interactive-activity/network-success timestamps coordinate the
+  percentile warmup worker. UI consumes `ScenarioRankInfo` and never calls endpoints directly. See
   `docs/kovaaks_api_notes.md`.
-- `playlist_scenarios_service.py` — builds rows for the per-playlist scenario
-  table (`build_playlist_scenario_rank_rows`), merging local stats with rank
-  info.
+- `percentile_warmup_service.py` — app-lifetime daemon worker for the
+  played/visible percentile cache queue. It owns playlist-completion ordering,
+  dequeue-time freshness/dedup, username validation before UNRANKED writes,
+  direct rank/total fetch classification, outage backoff, and the read-only
+  progress snapshot consumed by the overview UI.
+- `playlist_scenarios_service.py` — builds cache-only first-paint rows for the
+  per-playlist scenario table, then owns the generation-keyed progressive-fill
+  registry, synchronous cancellation/tombstones, four-worker fill, and atomic
+  interval drain. Every streamed/finalized item is a complete row merging
+  freshly read local stats with rank info.
 - `playlist_overview_service.py` — builds rows for the playlist-level overview
   (`build_playlist_overview_rows`): per-playlist aggregates over local stats
   plus cache-only rank reads (`get_scenario_rank_info` with
   `allow_network=False`), filtered by visibility unless the overview's "show
-  hidden" mode asks for everything.
-- `playlist_visibility_service.py` — per-code show/hide preferences (plain
-  show-list persisted at `data/preferences.json`, atomic writes under a module
-  lock). A missing file yields the first-run seed (bundled defaults plus
+  hidden" mode asks for everything. Automated warmup-interval builds thread
+  `record_activity=False` into those reads so polling does not postpone the
+  worker.
+- `playlist_visibility_service.py` — per-code show/hide visibility (plain
+  show-list persisted at `data/playlist_visibility.json`, atomic writes under a
+  module lock). A missing file yields the first-run seed (bundled defaults plus
   user-root codes) without writing. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Home
   filter, Journey picker, overview).
@@ -266,9 +344,61 @@ flowchart LR
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
   watchdog-to-UI hand-off.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
+  Unknown keys are named in one warning and ignored, so a config carrying keys
+  a release has retired still loads.
+- `config/settings_service.py` — the app-owned user-settings store
+  (`data/settings.json`): the KovaaK's identity, read per-operation, and the
+  stats directory, resolved once at startup (`resolve_stats_dir`) and read from
+  that pin afterwards (`get_usable_stats_dir`, which folds unset, unresolved,
+  and missing-directory into one "no stats directory"). The directory-exists
+  check is part of resolution, not of each read, so a directory that appears
+  mid-run cannot half-enable an app that skipped its scan. Nothing else writes
+  the file.
+- `config/stats_dir_detection.py` — finds the KovaaK's stats directory on this
+  machine (registry Steam roots → each root's `libraryfolders.vdf` → probe
+  `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`). One walk, two readers:
+  `detect_stats_dir_candidates` returns every library that hits, deduplicated
+  by normalized path and in roots-first order, which the settings page offers
+  as suggestions; `detect_stats_dir` is its first element, and seeds the value
+  (`bootstrap_stats_dir`, called from startup) when the `stats_dir` key has
+  never been set. An empty value is user intent and is never
+  overridden; a miss writes nothing and is retried next start. The registry
+  read is isolated in `_registry_value` so tests never touch the real registry.
+- `config/identity_detection.py` — verifies this machine's Steam accounts
+  against KovaaK's profiles (`detect_identity_candidates`), for the settings
+  page's Detect action. Reads every registry Steam root's
+  `config/loginusers.vdf` (roots come from `stats_dir_detection._steam_roots`),
+  merges accounts by SteamID64 keeping the newest `Timestamp`, and probes each
+  distinct persona once through `api_service.get_user_profile_by_username`. A
+  profile counts only when its `steamId` equals that account's ID64 — there is
+  no reverse lookup from a Steam ID, so detection guesses with personas and
+  verifies, and a persona that coincides with someone else's KovaaK's name is
+  discarded rather than believed. Failures are recorded, not raised: probe
+  failures and unusable payloads raise `unchecked_count`, and an account list
+  that existed but could not be read or understood clears
+  `discovery_complete`, both so the UI cannot present a partial answer as a
+  conclusive one. Pure functions: nothing here writes settings or runs at
+  startup, and the probed personas never reach the log.
+- `health.py` — registers the `/health` Flask route on `app.server`: the
+  running build's identity plus an echo of the `CSD_LAUNCH_TOKEN` environment
+  variable, which is how an updater tells "my new process is up" apart from
+  "something else answers on this port".
+- `utilities/build_info.py` — `get_build_info()`: the single source of build
+  identity (tag, commit SHA, commit date), read once per process from the
+  `release.json` copy the installer/launcher stage into the version directory,
+  then `install.json`, then the `git archive`-expanded `version.txt` stamp,
+  then `git`, then `unknown`. Both JSON layers answer only when they
+  corroborate the running code (their `sha` equals the stamp's); the staged
+  copy is read first because it is written beside the code before that version
+  ever runs, whereas an install's manifest still names the previous version
+  while a new one is on trial. Feeds the
+  startup log line, `/health`, and the settings page's version section.
 - `utilities/` — `dash_logging` (routes `logging` to on-screen Mantine
-  notifications), `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
-  `atomic_write` (Windows-lock-tolerant `os.replace` with retry).
+  notifications; records logged outside a callback context are queued and
+  drained by a Home interval callback, so background threads can log too),
+  `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
+  `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
+  `paths` (`state_dir()` / `package_root()` — see State above).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
 
@@ -278,6 +408,13 @@ flowchart LR
   (`playlists.py`, `playlist_scenarios.py`) reference these from their column
   defs and run with `dangerously_allow_code=True`. Custom grid sort/format
   behavior belongs here — see the decision log.
+- `assets/dashMantineFunctions.js` — repo-owned client-side functions for
+  dash-mantine-components function props, looked up by name in
+  `window.dashMantineFunctions` when a prop is passed as
+  `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
+  keeps every suggestion visible (see the settings page below).
+- `assets/stylesheet.css` — shared semantic presentation rules, including the
+  explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
 
 ## Where to look first
@@ -287,10 +424,12 @@ flowchart LR
 | The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
+| Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
 | Any plot/figure | `plot/plot_service.py` |
 | The playlist-level overview table at `/playlists` | `pages/playlists.py` + `kovaaks/playlist_overview_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js`, cell renderer components in `assets/dashAgGridComponentFunctions.js` |
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
-| Config / settings | `config/config_service.py` (+ `example.toml`) |
+| Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles |
+| Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

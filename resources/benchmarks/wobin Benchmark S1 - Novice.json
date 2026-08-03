@@ -30,7 +30,8 @@
           "color": "#CDB4DB",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 125392
     },
     {
       "name": "wobin ww6t Horizontal Easy",
@@ -60,7 +61,8 @@
           "color": "#CDB4DB",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 125407
     },
     {
       "name": "wobin 1w2ts Micro Easy",
@@ -90,7 +92,8 @@
           "color": "#CDB4DB",
           "threshold": 980.0
         }
-      ]
+      ],
+      "leaderboard_id": 125394
     },
     {
       "name": "wobinclick",
@@ -120,7 +123,8 @@
           "color": "#CDB4DB",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 114734
     },
     {
       "name": "wobin Sky Strafe Easy",
@@ -150,7 +154,8 @@
           "color": "#CDB4DB",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 125361
     },
     {
       "name": "wobin BounceTrack Easy",
@@ -180,7 +185,8 @@
           "color": "#CDB4DB",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 125451
     },
     {
       "name": "wobin Polarized Hell Dash Easy",
@@ -210,7 +216,8 @@
           "color": "#CDB4DB",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 125397
     },
     {
       "name": "wobin Blinkstrafe Easy",
@@ -240,7 +247,8 @@
           "color": "#CDB4DB",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 125456
     },
     {
       "name": "wobin Wobinorb Easy",
@@ -270,7 +278,8 @@
           "color": "#CDB4DB",
           "threshold": 4350.0
         }
-      ]
+      ],
+      "leaderboard_id": 125692
     },
     {
       "name": "wobin RawControl Easy",
@@ -300,7 +309,8 @@
           "color": "#CDB4DB",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 125671
     },
     {
       "name": "wobin DotTS Easy",
@@ -330,7 +340,8 @@
           "color": "#CDB4DB",
           "threshold": 1330.0
         }
-      ]
+      ],
+      "leaderboard_id": 125689
     },
     {
       "name": "wobin WobTS Easy",
@@ -360,7 +371,8 @@
           "color": "#CDB4DB",
           "threshold": 1180.0
         }
-      ]
+      ],
+      "leaderboard_id": 125672
     },
     {
       "name": "wobin CloudTS Easy",
@@ -390,7 +402,8 @@
           "color": "#CDB4DB",
           "threshold": 680.0
         }
-      ]
+      ],
+      "leaderboard_id": 125892
     },
     {
       "name": "wobin RawControlTS Easy",
@@ -420,7 +433,37 @@
           "color": "#CDB4DB",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 125820
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsFeedingButteryPrism",
+    "kovaaks_benchmark_id": 576,
+    "rank_colors": [
+      [
+        "Bluebell",
+        "#A2D2FF"
+      ],
+      [
+        "Tulip",
+        "#FEE18F"
+      ],
+      [
+        "Lily",
+        "#FFAFCC"
+      ],
+      [
+        "Orchid",
+        "#FFB8AF"
+      ],
+      [
+        "Iris",
+        "#CDB4DB"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:15.806777+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

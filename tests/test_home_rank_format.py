@@ -5,8 +5,9 @@ from types import SimpleNamespace
 import dash
 import dash_mantine_components as dmc
 import pytest
-from dash import dcc
+from dash import dcc, no_update
 
+from source.config import settings_service
 from source.kovaaks import api_service, data_service
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 
@@ -88,6 +89,31 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
     assert scenario_dropdown.persistence is False
 
 
+def test_home_top_n_input_uses_compact_width(monkeypatch):
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    page = home.layout()
+    top_n_scores = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "top_n_scores"
+    )
+    controls_flex = next(
+        component
+        for component in _walk_components(page)
+        if isinstance(component, dmc.Flex)
+        and any(
+            getattr(child, "id", None) == "top_n_scores" for child in component.children
+        )
+    )
+
+    assert top_n_scores.w == "8rem"
+    assert getattr(top_n_scores, "placeholder", None) is None
+    assert controls_flex.gap == "sm"
+    assert controls_flex.wrap == "wrap"
+
+
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
@@ -103,8 +129,14 @@ def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
         for component in components
         if getattr(component, "id", None) == "last-played-tooltip"
     )
+    empty_value = next(
+        component
+        for component in components
+        if getattr(component, "id", None) == "last-played-empty-value"
+    )
 
-    assert last_played.children == "—"
+    assert last_played.children == ""
+    assert empty_value.data == ""
     assert getattr(last_played, "style", None) is None
     assert getattr(last_played, "className", None) is None
     assert getattr(last_played, "tabIndex", None) is None
@@ -256,7 +288,7 @@ def test_get_scenario_num_runs_with_play_data(monkeypatch):
         last_played.timestamp(),
         "Never",
         "Jun 30, 2026, 9:05 AM",
-        "last-played-affordance",
+        "cell-tooltip-affordance",
         0,
         False,
     )
@@ -329,6 +361,7 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
 
     assert home._rank_allows_network([{"prop_id": "."}]) is True
     assert home._rank_allows_network([interval]) is False
+    assert home._rank_allows_network([{"prop_id": "run-events.data"}]) is True
     assert (
         home._rank_allows_network(
             [
@@ -338,6 +371,43 @@ def test_rank_trigger_classification_preserves_initial_and_cofired_network_reads
         )
         is True
     )
+
+
+def test_rank_render_records_only_interactive_activity(monkeypatch, tmp_path):
+    scenario_name = "Cached Scenario"
+    leaderboard_id = 98330
+    username = "MingoDynasty"
+    monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
+    settings_service.save_settings({"kovaaks_username": username})
+    api_service.make_cache()
+    api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
+    api_service.save_scenario_rank(
+        leaderboard_id,
+        username,
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=10,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            score=100.0,
+        ),
+    )
+    api_service.save_leaderboard_total(leaderboard_id, 100)
+    monkeypatch.setattr(api_service, "_last_interactive_activity", 10.0)
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=False)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interval_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interval_activity == 10.0
+
+    assert (
+        home._render_scenario_rank(scenario_name, allow_network=True)
+        == "10 of 100 (90.50% Percentile)"
+    )
+    interactive_activity, _network_success = api_service.get_api_activity_timestamps()
+    assert interactive_activity > interval_activity
 
 
 @pytest.mark.parametrize(
@@ -357,8 +427,7 @@ def test_interval_rank_render_is_ttl_independent_and_never_fetches(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
-    monkeypatch.setattr(home.get_config(), "steam_id", None)
+    settings_service.save_settings({"kovaaks_username": username})
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -394,7 +463,7 @@ def test_interval_rank_render_does_not_fetch_or_cache_unresolved_scenario(
 ):
     scenario_name = "Local Custom Scenario"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.get_config(), "kovaaks_username", "MingoDynasty")
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     api_service.make_cache()
 
     def fail_network(*_args, **_kwargs):
@@ -442,8 +511,9 @@ def test_interval_rank_render_does_not_retoast_derived_warning(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
-    monkeypatch.setattr(home.get_config(), "steam_id", "configured-steam-id")
+    settings_service.save_settings(
+        {"kovaaks_username": username, "steam_id": "configured-steam-id"}
+    )
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -507,8 +577,7 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     leaderboard_id = 98330
     username = "MingoDynasty"
     monkeypatch.setattr(api_service, "CACHE_DIR", tmp_path / "cache")
-    monkeypatch.setattr(home.get_config(), "kovaaks_username", username)
-    monkeypatch.setattr(home.get_config(), "steam_id", None)
+    settings_service.save_settings({"kovaaks_username": username})
     api_service.make_cache()
     api_service.save_leaderboard_id(scenario_name, leaderboard_id, "test")
     api_service.save_scenario_rank(
@@ -541,7 +610,13 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
         lambda rank_info, _ttl: rank_info,
     )
 
-    assert home.refresh_rank(1, scenario_name) == expected
+    rank_text, notifications = home.refresh_rank(1, scenario_name)
+    assert rank_text == expected
+    # Any completed refresh — ranked or unranked — confirms with a green
+    # toast; a fresh id per refresh so back-to-back clicks each confirm.
+    assert notifications[0]["color"] == "green"
+    assert scenario_name in notifications[0]["message"]
+    assert notifications[0]["id"].startswith("rank-refresh-notification-")
     assert fetched == [True]
     stored = api_service._cached_rank(leaderboard_id, username)
     assert stored is not None
@@ -566,10 +641,65 @@ def test_manual_rank_refresh_always_surfaces_returned_messages(monkeypatch):
     monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
     monkeypatch.setattr(home.dash_logger, "error", errors.append)
 
-    assert home.refresh_rank(1, "Scenario") == "N/A"
+    rank_text, notifications = home.refresh_rank(1, "Scenario")
+    assert rank_text == "N/A"
+    # The error already toasts red through dash_logger; a green "refreshed"
+    # confirmation on top would be contradictory.
+    assert notifications is no_update
     assert calls == [{"force_refresh": True}]
     assert warnings == ["Check the configured Steam ID."]
     assert errors == ["Rank lookup failed."]
+
+
+def test_manual_rank_refresh_warning_suppresses_green_toast(monkeypatch):
+    # A failed fetch served from stale cache returns a RANKED result carrying a
+    # warning_message (yellow) but no error_message. The green "refreshed"
+    # confirmation must not fire on top of it.
+    warnings = []
+
+    def get_rank(*_args, **_kwargs):
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=1,
+            scenario_name="Scenario",
+            warning_message="Couldn't refresh from KovaaK's; showing the last "
+            "cached position for Scenario.",
+        )
+
+    monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
+    monkeypatch.setattr(home.dash_logger, "warning", warnings.append)
+
+    rank_text, notifications = home.refresh_rank(1, "Scenario")
+    assert notifications is no_update
+    assert warnings and "last cached position" in warnings[0]
+    assert rank_text != "N/A"
+
+
+def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
+    # Under DashProxy an allow_duplicate callback can fire once on page load
+    # with n_clicks=None; that must not force a network refresh or toast.
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "an initial-load fire must not hit the network"
+        ),
+    )
+
+    assert home.refresh_rank(None, "Scenario") == (no_update, no_update)
+
+
+def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch):
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "a refresh without a scenario must not hit the network"
+        ),
+    )
+
+    assert home.refresh_rank(1, None) == ("N/A", no_update)
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):

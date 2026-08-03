@@ -45,7 +45,8 @@
           "color": "#094A93",
           "threshold": 1800.0
         }
-      ]
+      ],
+      "leaderboard_id": 170165
     },
     {
       "name": "Dynamic Triad",
@@ -90,7 +91,8 @@
           "color": "#094A93",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 169956
     },
     {
       "name": "Precise Triad",
@@ -135,7 +137,8 @@
           "color": "#094A93",
           "threshold": 4900.0
         }
-      ]
+      ],
+      "leaderboard_id": 170274
     },
     {
       "name": "Reactive Triad",
@@ -180,7 +183,8 @@
           "color": "#094A93",
           "threshold": 3150.0
         }
-      ]
+      ],
+      "leaderboard_id": 170352
     },
     {
       "name": "Speed Triad",
@@ -225,7 +229,8 @@
           "color": "#094A93",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 169877
     },
     {
       "name": "Evasive Triad",
@@ -270,7 +275,8 @@
           "color": "#094A93",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 169832
     }
   ],
   "generated_from": {
@@ -310,7 +316,8 @@
         "#094A93"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:25.672772+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:24.751659+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1610.0
         }
-      ]
+      ],
+      "leaderboard_id": 32404
     },
     {
       "name": "DM ww2t Pokeball Level 3",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 34432
     },
     {
       "name": "DM 1w3ts Pokeball Level 3",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 1660.0
         }
-      ]
+      ],
+      "leaderboard_id": 26580
     },
     {
       "name": "DM ww3t Pokeball Level 3",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 1840.0
         }
-      ]
+      ],
+      "leaderboard_id": 34449
     },
     {
       "name": "DM 1w4ts Pokeball Level 3",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 26672
     },
     {
       "name": "DM ww4t Pokeball Level 3",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1880.0
         }
-      ]
+      ],
+      "leaderboard_id": 34690
     },
     {
       "name": "DM 1w5ts Pokeball Level 3",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 1730.0
         }
-      ]
+      ],
+      "leaderboard_id": 26676
     },
     {
       "name": "DM ww5t Pokeball Level 3",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 1910.0
         }
-      ]
+      ],
+      "leaderboard_id": 34566
     },
     {
       "name": "DM 1w6ts Pokeball Level 3",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1750.0
         }
-      ]
+      ],
+      "leaderboard_id": 26680
     },
     {
       "name": "DM ww6t Pokeball Level 3",
@@ -650,7 +659,65 @@
           "color": "#24DDD8",
           "threshold": 1930.0
         }
-      ]
+      ],
+      "leaderboard_id": 34556
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsResettingVerticalBattleroyale",
+    "kovaaks_benchmark_id": 860,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Ruby",
+        "#CC0000"
+      ],
+      [
+        "Opal",
+        "#4A86E8"
+      ],
+      [
+        "Amethyst",
+        "#9900FF"
+      ],
+      [
+        "Emerald",
+        "#85FA85"
+      ],
+      [
+        "Elite",
+        "#8A2293"
+      ],
+      [
+        "Legend",
+        "#BA005C"
+      ],
+      [
+        "Ascendant",
+        "#BE3939"
+      ],
+      [
+        "Vertex",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:28.260372+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

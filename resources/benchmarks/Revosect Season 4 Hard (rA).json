@@ -35,7 +35,8 @@
           "color": "#00FF96",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 93780
     },
     {
       "name": "rA S4 FIVEWIDE HARD",
@@ -70,7 +71,8 @@
           "color": "#00FF96",
           "threshold": 1580.0
         }
-      ]
+      ],
+      "leaderboard_id": 93783
     },
     {
       "name": "rA S4 FOURWIDE SMALL HARD",
@@ -105,7 +107,8 @@
           "color": "#00FF96",
           "threshold": 1400.0
         }
-      ]
+      ],
+      "leaderboard_id": 93782
     },
     {
       "name": "rA S4 SNAPCLICK HARD",
@@ -140,7 +143,8 @@
           "color": "#00FF96",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 93779
     },
     {
       "name": "rA S4 XYCLICK HARD",
@@ -175,7 +179,8 @@
           "color": "#00FF96",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 93766
     },
     {
       "name": "rA S4 BOUNCECLICK HARD",
@@ -210,7 +215,8 @@
           "color": "#00FF96",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 93769
     },
     {
       "name": "rA S4 GLIDERTRACK HARD",
@@ -245,7 +251,8 @@
           "color": "#00FF96",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 93776
     },
     {
       "name": "rA S4 CAPSULETRACK HARD",
@@ -280,7 +287,8 @@
           "color": "#00FF96",
           "threshold": 2700.0
         }
-      ]
+      ],
+      "leaderboard_id": 93787
     },
     {
       "name": "rA S4 LEAPTRACK HARD",
@@ -315,7 +323,8 @@
           "color": "#00FF96",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 93788
     },
     {
       "name": "rA S4 AIRTRACK HARD",
@@ -350,7 +359,8 @@
           "color": "#00FF96",
           "threshold": 2650.0
         }
-      ]
+      ],
+      "leaderboard_id": 93768
     },
     {
       "name": "rA S4 REACTIVESPHERE HARD",
@@ -385,7 +395,8 @@
           "color": "#00FF96",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 93773
     },
     {
       "name": "rA S4 STRAFETRACK HARD",
@@ -420,7 +431,8 @@
           "color": "#00FF96",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 93786
     },
     {
       "name": "rA S4 WIDESWITCH HARD",
@@ -455,7 +467,8 @@
           "color": "#00FF96",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 93777
     },
     {
       "name": "rA S4 ORBSWITCH HARD",
@@ -490,7 +503,8 @@
           "color": "#00FF96",
           "threshold": 152.0
         }
-      ]
+      ],
+      "leaderboard_id": 93774
     },
     {
       "name": "rA S4 XYSWITCH HARD",
@@ -525,7 +539,8 @@
           "color": "#00FF96",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 93767
     },
     {
       "name": "rA S4 LAYERSWITCH HARD",
@@ -560,7 +575,8 @@
           "color": "#00FF96",
           "threshold": 112.0
         }
-      ]
+      ],
+      "leaderboard_id": 93775
     },
     {
       "name": "rA S4 EVASWITCH HARD",
@@ -595,7 +611,8 @@
           "color": "#00FF96",
           "threshold": 62.0
         }
-      ]
+      ],
+      "leaderboard_id": 93784
     },
     {
       "name": "rA S4 SPACESWITCH HARD",
@@ -630,7 +647,41 @@
           "color": "#00FF96",
           "threshold": 50.0
         }
-      ]
+      ],
+      "leaderboard_id": 93785
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChokingBadLowground",
+    "kovaaks_benchmark_id": 540,
+    "rank_colors": [
+      [
+        "Mythic",
+        "#FFD700"
+      ],
+      [
+        "Immortal",
+        "#C36EFF"
+      ],
+      [
+        "Archon",
+        "#FF0000"
+      ],
+      [
+        "Ethereal",
+        "#91D7E4"
+      ],
+      [
+        "Divine",
+        "#050000"
+      ],
+      [
+        "Omnipotent",
+        "#00FF96"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:43.397520+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

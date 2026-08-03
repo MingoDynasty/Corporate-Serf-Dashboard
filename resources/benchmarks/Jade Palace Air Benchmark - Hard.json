@@ -30,7 +30,8 @@
           "color": "#faa0fc",
           "threshold": 915.0
         }
-      ]
+      ],
+      "leaderboard_id": 189605
     },
     {
       "name": "Air Pure Perfected",
@@ -60,7 +61,8 @@
           "color": "#faa0fc",
           "threshold": 924.0
         }
-      ]
+      ],
+      "leaderboard_id": 189293
     },
     {
       "name": "Air Angelic",
@@ -90,7 +92,8 @@
           "color": "#faa0fc",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 419
     },
     {
       "name": "Air Voltaic",
@@ -120,7 +123,8 @@
           "color": "#faa0fc",
           "threshold": 904.0
         }
-      ]
+      ],
+      "leaderboard_id": 29
     },
     {
       "name": "Air Voltaic Invincible 4",
@@ -150,7 +154,8 @@
           "color": "#faa0fc",
           "threshold": 4700.0
         }
-      ]
+      ],
+      "leaderboard_id": 1092
     },
     {
       "name": "Air Voltaic Invincible 7",
@@ -180,7 +185,8 @@
           "color": "#faa0fc",
           "threshold": 4250.0
         }
-      ]
+      ],
+      "leaderboard_id": 443
     },
     {
       "name": "hizkuAirPalace",
@@ -210,7 +216,8 @@
           "color": "#faa0fc",
           "threshold": 4100.0
         }
-      ]
+      ],
+      "leaderboard_id": 189604
     },
     {
       "name": "Air CELESTIAL Harder",
@@ -240,7 +247,8 @@
           "color": "#faa0fc",
           "threshold": 907.0
         }
-      ]
+      ],
+      "leaderboard_id": 185225
     },
     {
       "name": "Air Spectral",
@@ -270,7 +278,8 @@
           "color": "#faa0fc",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 142893
     },
     {
       "name": "Air Palace Smooth Advanced",
@@ -300,7 +309,8 @@
           "color": "#faa0fc",
           "threshold": 918.0
         }
-      ]
+      ],
+      "leaderboard_id": 189637
     },
     {
       "name": "Air Smooth Revosect",
@@ -330,7 +340,8 @@
           "color": "#faa0fc",
           "threshold": 914.0
         }
-      ]
+      ],
+      "leaderboard_id": 142841
     },
     {
       "name": "Air Pure Revosect",
@@ -360,7 +371,8 @@
           "color": "#faa0fc",
           "threshold": 912.0
         }
-      ]
+      ],
+      "leaderboard_id": 142823
     },
     {
       "name": "Leisphere",
@@ -390,7 +402,8 @@
           "color": "#faa0fc",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 185126
     },
     {
       "name": "AA4V OW",
@@ -420,7 +433,8 @@
           "color": "#faa0fc",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 189514
     },
     {
       "name": "Pasutrack RCT Evo",
@@ -450,7 +464,8 @@
           "color": "#faa0fc",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 189520
     },
     {
       "name": "Controlsphere OW 150%",
@@ -480,7 +495,8 @@
           "color": "#faa0fc",
           "threshold": 11200.0
         }
-      ]
+      ],
+      "leaderboard_id": 83267
     },
     {
       "name": "Air Angelic invincible 6",
@@ -510,7 +526,8 @@
           "color": "#faa0fc",
           "threshold": 5050.0
         }
-      ]
+      ],
+      "leaderboard_id": 2021
     },
     {
       "name": "VT Aether Intermediate S5 Hard Bot 1",
@@ -540,7 +557,8 @@
           "color": "#faa0fc",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 140200
     },
     {
       "name": "Air Angelic 4 Voltaic",
@@ -570,7 +588,8 @@
           "color": "#faa0fc",
           "threshold": 4900.0
         }
-      ]
+      ],
+      "leaderboard_id": 30
     },
     {
       "name": "VT Aether Advanced S5 bot 2",
@@ -600,7 +619,8 @@
           "color": "#faa0fc",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 106775
     }
   ],
   "generated_from": {
@@ -628,7 +648,8 @@
         "#faa0fc"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:00.135216+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:37.916381+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

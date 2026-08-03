@@ -25,7 +25,8 @@
           "color": "#6B0000",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 176584
     },
     {
       "name": "DM ww2t Smaller S3",
@@ -50,7 +51,8 @@
           "color": "#6B0000",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 177057
     },
     {
       "name": "DM 1w3ts Smaller S3",
@@ -75,7 +77,8 @@
           "color": "#6B0000",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 177058
     },
     {
       "name": "DM ww3t Smaller S3",
@@ -100,7 +103,8 @@
           "color": "#6B0000",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 177059
     },
     {
       "name": "DM 1w4ts Smaller S3",
@@ -125,7 +129,8 @@
           "color": "#6B0000",
           "threshold": 1640.0
         }
-      ]
+      ],
+      "leaderboard_id": 177060
     },
     {
       "name": "DM ww4t Smaller S3",
@@ -150,7 +155,8 @@
           "color": "#6B0000",
           "threshold": 1760.0
         }
-      ]
+      ],
+      "leaderboard_id": 177061
     },
     {
       "name": "DM 1w5ts Smaller S3",
@@ -175,7 +181,8 @@
           "color": "#6B0000",
           "threshold": 1670.0
         }
-      ]
+      ],
+      "leaderboard_id": 177062
     },
     {
       "name": "DM ww5t Smaller S3",
@@ -200,7 +207,8 @@
           "color": "#6B0000",
           "threshold": 1790.0
         }
-      ]
+      ],
+      "leaderboard_id": 177063
     },
     {
       "name": "DM 1w6ts Smaller S3",
@@ -225,7 +233,8 @@
           "color": "#6B0000",
           "threshold": 1690.0
         }
-      ]
+      ],
+      "leaderboard_id": 177064
     },
     {
       "name": "DM ww6t Smaller S3",
@@ -250,7 +259,8 @@
           "color": "#6B0000",
           "threshold": 1810.0
         }
-      ]
+      ],
+      "leaderboard_id": 177065
     }
   ],
   "generated_from": {
@@ -274,7 +284,8 @@
         "#6B0000"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:50.076874+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:52.561550+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

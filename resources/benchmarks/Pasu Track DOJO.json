@@ -50,7 +50,8 @@
           "color": "#434343",
           "threshold": 8800.0
         }
-      ]
+      ],
+      "leaderboard_id": 32539
     },
     {
       "name": "Pasu Track Extrasmooth Small TE",
@@ -100,7 +101,8 @@
           "color": "#434343",
           "threshold": 7800.0
         }
-      ]
+      ],
+      "leaderboard_id": 32541
     },
     {
       "name": "PTeS eeSmall TE",
@@ -150,7 +152,8 @@
           "color": "#434343",
           "threshold": 6500.0
         }
-      ]
+      ],
+      "leaderboard_id": 45478
     },
     {
       "name": "delta&Normal PTS Extrasmooth",
@@ -200,7 +203,8 @@
           "color": "#434343",
           "threshold": 8500.0
         }
-      ]
+      ],
+      "leaderboard_id": 54728
     },
     {
       "name": "PTXS TE",
@@ -250,7 +254,8 @@
           "color": "#434343",
           "threshold": 5700.0
         }
-      ]
+      ],
+      "leaderboard_id": 126304
     },
     {
       "name": "PTXS Fast",
@@ -300,7 +305,8 @@
           "color": "#434343",
           "threshold": 5000.0
         }
-      ]
+      ],
+      "leaderboard_id": 126642
     },
     {
       "name": "PTXS Small Fast",
@@ -350,7 +356,8 @@
           "color": "#434343",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 126324
     },
     {
       "name": "Pasu Track Extrasmooth",
@@ -400,7 +407,8 @@
           "color": "#434343",
           "threshold": 7700.0
         }
-      ]
+      ],
+      "leaderboard_id": 992
     }
   ],
   "generated_from": {
@@ -444,7 +452,8 @@
         "#434343"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:34.959192+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:58.353310+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

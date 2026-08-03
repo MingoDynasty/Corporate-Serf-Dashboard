@@ -35,7 +35,8 @@
           "color": "#B5F5DF",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 18203
     },
     {
       "name": "DotTS",
@@ -70,7 +71,8 @@
           "color": "#B5F5DF",
           "threshold": 3250.0
         }
-      ]
+      ],
+      "leaderboard_id": 75317
     },
     {
       "name": "voxTS Viscose Varied",
@@ -105,7 +107,8 @@
           "color": "#B5F5DF",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 417
     },
     {
       "name": "patCircleSwitch NR",
@@ -140,7 +143,8 @@
           "color": "#B5F5DF",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 535
     },
     {
       "name": "patTargetSwitch 90 LowTTK",
@@ -175,7 +179,8 @@
           "color": "#B5F5DF",
           "threshold": 4240.0
         }
-      ]
+      ],
+      "leaderboard_id": 75617
     },
     {
       "name": "beanTS 200%",
@@ -210,7 +215,8 @@
           "color": "#B5F5DF",
           "threshold": 173.0
         }
-      ]
+      ],
+      "leaderboard_id": 58888
     },
     {
       "name": "Target Switching 360",
@@ -245,7 +251,8 @@
           "color": "#B5F5DF",
           "threshold": 19600.0
         }
-      ]
+      ],
+      "leaderboard_id": 22
     },
     {
       "name": "voxTargetSwitch 2",
@@ -280,7 +287,8 @@
           "color": "#B5F5DF",
           "threshold": 161.0
         }
-      ]
+      ],
+      "leaderboard_id": 551
     },
     {
       "name": "Aimerz+ goaTS Med S1",
@@ -315,7 +323,8 @@
           "color": "#B5F5DF",
           "threshold": 148.0
         }
-      ]
+      ],
+      "leaderboard_id": 69305
     },
     {
       "name": "Aimerz+ nuTS Med S1",
@@ -350,7 +359,8 @@
           "color": "#B5F5DF",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 69303
     },
     {
       "name": "Aimerz+ Week #5 - Static Switching",
@@ -385,7 +395,8 @@
           "color": "#B5F5DF",
           "threshold": 20000.0
         }
-      ]
+      ],
+      "leaderboard_id": 38996
     },
     {
       "name": "360 Static TS",
@@ -420,7 +431,8 @@
           "color": "#B5F5DF",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 976
     }
   ],
   "generated_from": {
@@ -452,7 +464,8 @@
         "#B5F5DF"
       ]
     ],
-    "generated_at": "2026-07-11T19:19:56.062648+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:08.912362+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

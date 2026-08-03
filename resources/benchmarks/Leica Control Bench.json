@@ -30,7 +30,8 @@
           "color": "#0c052e",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 122928
     },
     {
       "name": "VT Controlsphere Viscose Expert",
@@ -53,14 +54,15 @@
         {
           "name": "Nebula",
           "color": "#8965ec",
-          "threshold": 4400.0
+          "threshold": 4350.0
         },
         {
           "name": "Cosmic",
           "color": "#0c052e",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 184831
     },
     {
       "name": "VT Raw Control Advanced S5",
@@ -90,7 +92,8 @@
           "color": "#0c052e",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 98253
     },
     {
       "name": "Avasphere Euphoric",
@@ -113,14 +116,15 @@
         {
           "name": "Nebula",
           "color": "#8965ec",
-          "threshold": 4500.0
+          "threshold": 4450.0
         },
         {
           "name": "Cosmic",
           "color": "#0c052e",
           "threshold": 4700.0
         }
-      ]
+      ],
+      "leaderboard_id": 160419
     },
     {
       "name": "Leisphere",
@@ -150,7 +154,8 @@
           "color": "#0c052e",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 185126
     },
     {
       "name": "AbyssTrack",
@@ -178,9 +183,10 @@
         {
           "name": "Cosmic",
           "color": "#0c052e",
-          "threshold": 4500.0
+          "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 150957
     },
     {
       "name": "voidTrack",
@@ -188,29 +194,30 @@
         {
           "name": "Comet",
           "color": "#00fa11",
-          "threshold": 3900.0
+          "threshold": 3800.0
         },
         {
           "name": "Star",
           "color": "#e1ff00",
-          "threshold": 4100.0
+          "threshold": 4000.0
         },
         {
           "name": "Blaze",
           "color": "#ff4d4d",
-          "threshold": 4400.0
+          "threshold": 4300.0
         },
         {
           "name": "Nebula",
           "color": "#8965ec",
-          "threshold": 4700.0
+          "threshold": 4550.0
         },
         {
           "name": "Cosmic",
           "color": "#0c052e",
-          "threshold": 5000.0
+          "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 142077
     },
     {
       "name": "Silo",
@@ -218,12 +225,12 @@
         {
           "name": "Comet",
           "color": "#00fa11",
-          "threshold": 3400.0
+          "threshold": 3300.0
         },
         {
           "name": "Star",
           "color": "#e1ff00",
-          "threshold": 3600.0
+          "threshold": 3500.0
         },
         {
           "name": "Blaze",
@@ -240,7 +247,8 @@
           "color": "#0c052e",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 103000
     },
     {
       "name": "RawControlSphere Expert",
@@ -270,7 +278,8 @@
           "color": "#0c052e",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 184846
     },
     {
       "name": "Aethercontrol",
@@ -278,29 +287,30 @@
         {
           "name": "Comet",
           "color": "#00fa11",
-          "threshold": 3500.0
+          "threshold": 3300.0
         },
         {
           "name": "Star",
           "color": "#e1ff00",
-          "threshold": 3700.0
+          "threshold": 3500.0
         },
         {
           "name": "Blaze",
           "color": "#ff4d4d",
-          "threshold": 4000.0
+          "threshold": 3800.0
         },
         {
           "name": "Nebula",
           "color": "#8965ec",
-          "threshold": 4250.0
+          "threshold": 4150.0
         },
         {
           "name": "Cosmic",
           "color": "#0c052e",
-          "threshold": 4500.0
+          "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 177626
     },
     {
       "name": "Extra Controlsphere",
@@ -330,7 +340,8 @@
           "color": "#0c052e",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 562
     },
     {
       "name": "SteadyTrack - Small",
@@ -338,29 +349,30 @@
         {
           "name": "Comet",
           "color": "#00fa11",
-          "threshold": 3500.0
+          "threshold": 3300.0
         },
         {
           "name": "Star",
           "color": "#e1ff00",
-          "threshold": 3700.0
+          "threshold": 3500.0
         },
         {
           "name": "Blaze",
           "color": "#ff4d4d",
-          "threshold": 4000.0
+          "threshold": 3800.0
         },
         {
           "name": "Nebula",
           "color": "#8965ec",
-          "threshold": 4250.0
+          "threshold": 4150.0
         },
         {
           "name": "Cosmic",
           "color": "#0c052e",
-          "threshold": 4500.0
+          "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 70102
     },
     {
       "name": "Avasive bukeTrack Hard",
@@ -390,7 +402,8 @@
           "color": "#0c052e",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 125228
     },
     {
       "name": "Swing Tracking",
@@ -408,7 +421,7 @@
         {
           "name": "Blaze",
           "color": "#ff4d4d",
-          "threshold": 2250.0
+          "threshold": 2300.0
         },
         {
           "name": "Nebula",
@@ -418,9 +431,10 @@
         {
           "name": "Cosmic",
           "color": "#0c052e",
-          "threshold": 3000.0
+          "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 92189
     },
     {
       "name": "cloverRawControl",
@@ -450,7 +464,8 @@
           "color": "#0c052e",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "Flower Expert",
@@ -458,12 +473,12 @@
         {
           "name": "Comet",
           "color": "#00fa11",
-          "threshold": 3400.0
+          "threshold": 3300.0
         },
         {
           "name": "Star",
           "color": "#e1ff00",
-          "threshold": 3600.0
+          "threshold": 3500.0
         },
         {
           "name": "Blaze",
@@ -480,7 +495,8 @@
           "color": "#0c052e",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 185692
     }
   ],
   "generated_from": {
@@ -508,7 +524,8 @@
         "#0c052e"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:05.905982+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:06.901626+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

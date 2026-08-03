@@ -25,7 +25,8 @@
           "color": "#24DDD8",
           "threshold": 1270.0
         }
-      ]
+      ],
+      "leaderboard_id": 29492
     },
     {
       "name": "VT Bounceshot Advanced",
@@ -50,7 +51,8 @@
           "color": "#24DDD8",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 25154
     },
     {
       "name": "VT 1w3ts Rasp Advanced",
@@ -75,7 +77,8 @@
           "color": "#24DDD8",
           "threshold": 1580.0
         }
-      ]
+      ],
+      "leaderboard_id": 29479
     },
     {
       "name": "VT Multiclick 180 Advanced",
@@ -100,7 +103,8 @@
           "color": "#24DDD8",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 23559
     },
     {
       "name": "VT AngleStrafe Advanced",
@@ -125,7 +129,8 @@
           "color": "#24DDD8",
           "threshold": 1230.0
         }
-      ]
+      ],
+      "leaderboard_id": 24333
     },
     {
       "name": "VT ArcStrafe Advanced",
@@ -150,7 +155,8 @@
           "color": "#24DDD8",
           "threshold": 1230.0
         }
-      ]
+      ],
+      "leaderboard_id": 29412
     },
     {
       "name": "VT Smoothbot Advanced",
@@ -175,7 +181,8 @@
           "color": "#24DDD8",
           "threshold": 4300.0
         }
-      ]
+      ],
+      "leaderboard_id": 25151
     },
     {
       "name": "VT PreciseOrb Advanced",
@@ -200,7 +207,8 @@
           "color": "#24DDD8",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 25176
     },
     {
       "name": "VT Plaza Advanced",
@@ -225,7 +233,8 @@
           "color": "#24DDD8",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 43186
     },
     {
       "name": "VT Air Advanced",
@@ -250,7 +259,8 @@
           "color": "#24DDD8",
           "threshold": 3750.0
         }
-      ]
+      ],
+      "leaderboard_id": 43182
     },
     {
       "name": "VT PatStrafe Advanced",
@@ -275,7 +285,8 @@
           "color": "#24DDD8",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 26262
     },
     {
       "name": "VT AirStrafe Advanced",
@@ -300,7 +311,8 @@
           "color": "#24DDD8",
           "threshold": 3825.0
         }
-      ]
+      ],
+      "leaderboard_id": 29472
     },
     {
       "name": "VT psalmTS Advanced",
@@ -325,7 +337,8 @@
           "color": "#24DDD8",
           "threshold": 1330.0
         }
-      ]
+      ],
+      "leaderboard_id": 25177
     },
     {
       "name": "VT skyTS Advanced",
@@ -350,7 +363,8 @@
           "color": "#24DDD8",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 25150
     },
     {
       "name": "VT evaTS Advanced",
@@ -375,7 +389,8 @@
           "color": "#24DDD8",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 25181
     },
     {
       "name": "VT bounceTS Advanced",
@@ -400,7 +415,33 @@
           "color": "#24DDD8",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 25160
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCrankingPulledGauntlet",
+    "kovaaks_benchmark_id": 253,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:34.446186+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

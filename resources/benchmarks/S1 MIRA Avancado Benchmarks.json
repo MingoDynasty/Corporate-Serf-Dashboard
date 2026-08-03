@@ -30,7 +30,8 @@
           "color": "#020202",
           "threshold": 170.0
         }
-      ]
+      ],
+      "leaderboard_id": 63925
     },
     {
       "name": "Fourshot Hard MIRA Fixed",
@@ -60,7 +61,8 @@
           "color": "#020202",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 63934
     },
     {
       "name": "Bounceshot Hard MIRA",
@@ -90,7 +92,8 @@
           "color": "#020202",
           "threshold": 1130.0
         }
-      ]
+      ],
+      "leaderboard_id": 63926
     },
     {
       "name": "Pasu Hard MIRA",
@@ -120,7 +123,8 @@
           "color": "#020202",
           "threshold": 1120.0
         }
-      ]
+      ],
+      "leaderboard_id": 63935
     },
     {
       "name": "Smoothbot Hard MIRA Fixed",
@@ -150,7 +154,8 @@
           "color": "#020202",
           "threshold": 8600.0
         }
-      ]
+      ],
+      "leaderboard_id": 63927
     },
     {
       "name": "PTI Hard MIRA",
@@ -180,7 +185,8 @@
           "color": "#020202",
           "threshold": 13100.0
         }
-      ]
+      ],
+      "leaderboard_id": 63910
     },
     {
       "name": "Plaza Hard MIRA",
@@ -210,7 +216,8 @@
           "color": "#020202",
           "threshold": 6350.0
         }
-      ]
+      ],
+      "leaderboard_id": 63928
     },
     {
       "name": "AA4 Hard MIRA",
@@ -240,7 +247,8 @@
           "color": "#020202",
           "threshold": 10500.0
         }
-      ]
+      ],
+      "leaderboard_id": 63939
     },
     {
       "name": "VelozSwitch Hard MIRA",
@@ -270,7 +278,8 @@
           "color": "#020202",
           "threshold": 134.0
         }
-      ]
+      ],
+      "leaderboard_id": 63909
     },
     {
       "name": "kndTS Wide Hard MIRA",
@@ -300,7 +309,8 @@
           "color": "#020202",
           "threshold": 136.0
         }
-      ]
+      ],
+      "leaderboard_id": 63906
     },
     {
       "name": "r3dSwitch Hard MIRA",
@@ -330,7 +340,8 @@
           "color": "#020202",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 63908
     },
     {
       "name": "FugaSwitch Hard MIRA Fixed",
@@ -360,7 +371,8 @@
           "color": "#020202",
           "threshold": 66.0
         }
-      ]
+      ],
+      "leaderboard_id": 63907
     }
   ],
   "generated_from": {
@@ -388,7 +400,8 @@
         "#020202"
       ]
     ],
-    "generated_at": "2026-07-11T12:07:35.444654+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:24.856621+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

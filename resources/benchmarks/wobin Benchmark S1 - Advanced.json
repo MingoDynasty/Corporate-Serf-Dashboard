@@ -30,7 +30,8 @@
           "color": "#FB6F92",
           "threshold": 1850.0
         }
-      ]
+      ],
+      "leaderboard_id": 125388
     },
     {
       "name": "wobin ww5t Horizontal",
@@ -60,7 +61,8 @@
           "color": "#FB6F92",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 125615
     },
     {
       "name": "wobin 1w2ts Micro",
@@ -90,7 +92,8 @@
           "color": "#FB6F92",
           "threshold": 1090.0
         }
-      ]
+      ],
+      "leaderboard_id": 125797
     },
     {
       "name": "wobinclick ultra",
@@ -120,7 +123,8 @@
           "color": "#FB6F92",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 114747
     },
     {
       "name": "wobin Sky Strafe",
@@ -150,7 +154,8 @@
           "color": "#FB6F92",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 125360
     },
     {
       "name": "wobin BounceTrack",
@@ -180,7 +185,8 @@
           "color": "#FB6F92",
           "threshold": 2550.0
         }
-      ]
+      ],
+      "leaderboard_id": 125452
     },
     {
       "name": "wobin Polarized Hell Dash",
@@ -210,7 +216,8 @@
           "color": "#FB6F92",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 125263
     },
     {
       "name": "wobin Blinkstrafe",
@@ -240,7 +247,8 @@
           "color": "#FB6F92",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 125455
     },
     {
       "name": "wobin Wobinorb",
@@ -270,7 +278,8 @@
           "color": "#FB6F92",
           "threshold": 4050.0
         }
-      ]
+      ],
+      "leaderboard_id": 125693
     },
     {
       "name": "wobin RawControl",
@@ -300,7 +309,8 @@
           "color": "#FB6F92",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 125664
     },
     {
       "name": "wobin DotTS",
@@ -330,7 +340,8 @@
           "color": "#FB6F92",
           "threshold": 1420.0
         }
-      ]
+      ],
+      "leaderboard_id": 125691
     },
     {
       "name": "wobin WobTS",
@@ -360,7 +371,8 @@
           "color": "#FB6F92",
           "threshold": 1240.0
         }
-      ]
+      ],
+      "leaderboard_id": 125813
     },
     {
       "name": "wobin CloudTS",
@@ -390,7 +402,8 @@
           "color": "#FB6F92",
           "threshold": 690.0
         }
-      ]
+      ],
+      "leaderboard_id": 125894
     },
     {
       "name": "wobin RawControlTS",
@@ -420,7 +433,37 @@
           "color": "#FB6F92",
           "threshold": 630.0
         }
-      ]
+      ],
+      "leaderboard_id": 125818
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsFinishingCaffeinatedGamesense",
+    "kovaaks_benchmark_id": 577,
+    "rank_colors": [
+      [
+        "Lilac",
+        "#B9FBC0"
+      ],
+      [
+        "Rose",
+        "#98F5E1"
+      ],
+      [
+        "Lotus",
+        "#A3C4F3"
+      ],
+      [
+        "Hyacinth",
+        "#CFBAF0"
+      ],
+      [
+        "Aster",
+        "#FB6F92"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:16.805964+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -40,7 +40,8 @@
           "color": "#8ECEB8",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 38710
     },
     {
       "name": "1w3ts Micro Angelic Easy",
@@ -80,7 +81,8 @@
           "color": "#8ECEB8",
           "threshold": 145.0
         }
-      ]
+      ],
+      "leaderboard_id": 38716
     },
     {
       "name": "Tamspeed 2bpes Angelic Easy",
@@ -120,7 +122,8 @@
           "color": "#8ECEB8",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 38723
     },
     {
       "name": "devTS Static Click Angelic Easy",
@@ -160,7 +163,8 @@
           "color": "#8ECEB8",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 38726
     },
     {
       "name": "AmareTS Angelic Easy",
@@ -200,7 +204,8 @@
           "color": "#8ECEB8",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 38725
     },
     {
       "name": "skyTS Angelic Easy",
@@ -240,7 +245,8 @@
           "color": "#8ECEB8",
           "threshold": 1080.0
         }
-      ]
+      ],
+      "leaderboard_id": 38528
     },
     {
       "name": "skyTS Static Angelic Easy",
@@ -280,7 +286,8 @@
           "color": "#8ECEB8",
           "threshold": 1100.0
         }
-      ]
+      ],
+      "leaderboard_id": 38728
     },
     {
       "name": "FloatTS Angelic Easy",
@@ -320,7 +327,8 @@
           "color": "#8ECEB8",
           "threshold": 103.0
         }
-      ]
+      ],
+      "leaderboard_id": 38733
     },
     {
       "name": "1w6ts Angelic Easy",
@@ -360,7 +368,8 @@
           "color": "#8ECEB8",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 38727
     },
     {
       "name": "1w2ts Angelic Easy",
@@ -400,7 +409,8 @@
           "color": "#8ECEB8",
           "threshold": 108.0
         }
-      ]
+      ],
+      "leaderboard_id": 38738
     },
     {
       "name": "FloatTS Click Angelic Easy",
@@ -440,7 +450,8 @@
           "color": "#8ECEB8",
           "threshold": 98.0
         }
-      ]
+      ],
+      "leaderboard_id": 38739
     },
     {
       "name": "Smoothsphere Angelic Easy",
@@ -480,7 +491,8 @@
           "color": "#8ECEB8",
           "threshold": 9650.0
         }
-      ]
+      ],
+      "leaderboard_id": 38718
     },
     {
       "name": "Controlsphere Angelic Easy",
@@ -520,7 +532,8 @@
           "color": "#8ECEB8",
           "threshold": 11400.0
         }
-      ]
+      ],
+      "leaderboard_id": 38730
     },
     {
       "name": "Centering Angelic Easy",
@@ -560,7 +573,45 @@
           "color": "#8ECEB8",
           "threshold": 14800.0
         }
-      ]
+      ],
+      "leaderboard_id": 38724
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClearingPulledModifier",
+    "kovaaks_benchmark_id": 741,
+    "rank_colors": [
+      [
+        "Novice",
+        "#D3D3D3"
+      ],
+      [
+        "Iron",
+        "#757575"
+      ],
+      [
+        "Copper",
+        "#CE695D"
+      ],
+      [
+        "Bronze",
+        "#B3633E"
+      ],
+      [
+        "Silver",
+        "#CFCFCF"
+      ],
+      [
+        "Gold",
+        "#FFDC60"
+      ],
+      [
+        "Apprentice",
+        "#8ECEB8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:01.714350+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

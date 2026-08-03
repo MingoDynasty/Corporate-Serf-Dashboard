@@ -25,7 +25,8 @@
           "color": "#000000",
           "threshold": 1700.0
         }
-      ]
+      ],
+      "leaderboard_id": 80982
     },
     {
       "name": "cAt 5 cats micro",
@@ -50,7 +51,8 @@
           "color": "#000000",
           "threshold": 2240.0
         }
-      ]
+      ],
+      "leaderboard_id": 80822
     },
     {
       "name": "cAt 4 cats",
@@ -75,7 +77,8 @@
           "color": "#000000",
           "threshold": 1600.0
         }
-      ]
+      ],
+      "leaderboard_id": 80980
     },
     {
       "name": "cAt purrClick Hard",
@@ -100,7 +103,8 @@
           "color": "#000000",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 83380
     },
     {
       "name": "cAt pawClick Hard",
@@ -125,7 +129,8 @@
           "color": "#000000",
           "threshold": 820.0
         }
-      ]
+      ],
+      "leaderboard_id": 83325
     },
     {
       "name": "cAt yarnClick Hard",
@@ -150,7 +155,8 @@
           "color": "#000000",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 83403
     },
     {
       "name": "cAt laserTrack Hard",
@@ -175,7 +181,8 @@
           "color": "#000000",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 83400
     },
     {
       "name": "cAt meowTrack Hard",
@@ -200,7 +207,8 @@
           "color": "#000000",
           "threshold": 4000.0
         }
-      ]
+      ],
+      "leaderboard_id": 83326
     },
     {
       "name": "cAt yarnTrack Hard",
@@ -225,7 +233,8 @@
           "color": "#000000",
           "threshold": 5500.0
         }
-      ]
+      ],
+      "leaderboard_id": 83475
     },
     {
       "name": "cAt sausageTrack Hard",
@@ -250,7 +259,8 @@
           "color": "#000000",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 83322
     },
     {
       "name": "cAt fluffyTrack Hard",
@@ -275,7 +285,8 @@
           "color": "#000000",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 83399
     },
     {
       "name": "cAt furTrack Hard",
@@ -300,7 +311,8 @@
           "color": "#000000",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 83467
     },
     {
       "name": "cAt mealSwitch Hard",
@@ -325,7 +337,8 @@
           "color": "#000000",
           "threshold": 1500.0
         }
-      ]
+      ],
+      "leaderboard_id": 83461
     },
     {
       "name": "cAt tabbySwitch Hard",
@@ -350,7 +363,8 @@
           "color": "#000000",
           "threshold": 1390.0
         }
-      ]
+      ],
+      "leaderboard_id": 83334
     },
     {
       "name": "cAt wobbleSwitch Hard",
@@ -375,7 +389,8 @@
           "color": "#000000",
           "threshold": 1570.0
         }
-      ]
+      ],
+      "leaderboard_id": 83337
     },
     {
       "name": "cAt tailSwitch Hard",
@@ -400,7 +415,8 @@
           "color": "#000000",
           "threshold": 620.0
         }
-      ]
+      ],
+      "leaderboard_id": 83402
     },
     {
       "name": "cAt snortSwitch Hard",
@@ -425,7 +441,8 @@
           "color": "#000000",
           "threshold": 560.0
         }
-      ]
+      ],
+      "leaderboard_id": 83401
     },
     {
       "name": "cAt yarnSwitch Hard",
@@ -450,7 +467,33 @@
           "color": "#000000",
           "threshold": 770.0
         }
-      ]
+      ],
+      "leaderboard_id": 83347
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBloomingPeachArena",
+    "kovaaks_benchmark_id": 831,
+    "rank_colors": [
+      [
+        "Tressym",
+        "#49E6E6"
+      ],
+      [
+        "Chimera",
+        "#C69AF1"
+      ],
+      [
+        "Sphinx",
+        "#FFFFFF"
+      ],
+      [
+        "Bastet",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:16.533218+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

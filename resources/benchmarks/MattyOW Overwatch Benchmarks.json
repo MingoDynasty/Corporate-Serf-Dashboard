@@ -45,7 +45,8 @@
           "color": "#FEE264",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 134717
     },
     {
       "name": "Pasu 360 Reload Goated",
@@ -90,7 +91,8 @@
           "color": "#FEE264",
           "threshold": 95.0
         }
-      ]
+      ],
+      "leaderboard_id": 7353
     },
     {
       "name": "PureG Leapcorn",
@@ -135,7 +137,8 @@
           "color": "#FEE264",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 28582
     },
     {
       "name": "Smoothsphere Glider OW",
@@ -143,44 +146,45 @@
         {
           "name": "Novice",
           "color": "#944B33",
-          "threshold": 1600.0
+          "threshold": 1900.0
         },
         {
           "name": "Average",
           "color": "#57656D",
-          "threshold": 2000.0
+          "threshold": 2300.0
         },
         {
           "name": "Experienced",
           "color": "#E48825",
-          "threshold": 2500.0
+          "threshold": 2750.0
         },
         {
           "name": "Skilled",
           "color": "#789BE1",
-          "threshold": 2700.0
+          "threshold": 3150.0
         },
         {
           "name": "Adept",
           "color": "#0DB68F",
-          "threshold": 3000.0
+          "threshold": 3300.0
         },
         {
           "name": "Masterful",
           "color": "#CA202C",
-          "threshold": 3250.0
+          "threshold": 3550.0
         },
         {
           "name": "Inhuman",
           "color": "#886BA5",
-          "threshold": 3450.0
+          "threshold": 3800.0
         },
         {
           "name": "Godlike",
           "color": "#FEE264",
-          "threshold": 3600.0
+          "threshold": 4075.0
         }
-      ]
+      ],
+      "leaderboard_id": 132504
     },
     {
       "name": "PGTI rAim",
@@ -225,7 +229,8 @@
           "color": "#FEE264",
           "threshold": 2675.0
         }
-      ]
+      ],
+      "leaderboard_id": 4686
     },
     {
       "name": "odb MFSI",
@@ -270,7 +275,8 @@
           "color": "#FEE264",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 4010
     },
     {
       "name": "kinTS Amare",
@@ -315,7 +321,8 @@
           "color": "#FEE264",
           "threshold": 135.0
         }
-      ]
+      ],
+      "leaderboard_id": 54015
     },
     {
       "name": "Pasu Track Smaller rAim",
@@ -360,7 +367,8 @@
           "color": "#FEE264",
           "threshold": 92.0
         }
-      ]
+      ],
+      "leaderboard_id": 552
     },
     {
       "name": "PasuTS 360 OW",
@@ -405,7 +413,8 @@
           "color": "#FEE264",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 132708
     },
     {
       "name": "Air Dodge",
@@ -450,7 +459,8 @@
           "color": "#FEE264",
           "threshold": 156.0
         }
-      ]
+      ],
+      "leaderboard_id": 530
     },
     {
       "name": "patTargetClick Dodge",
@@ -495,7 +505,8 @@
           "color": "#FEE264",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 1579
     },
     {
       "name": "Leap 360 Reload Dodge",
@@ -540,7 +551,49 @@
           "color": "#FEE264",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 31660
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsMainingScaredTag",
+    "kovaaks_benchmark_id": 708,
+    "rank_colors": [
+      [
+        "Novice",
+        "#944B33"
+      ],
+      [
+        "Average",
+        "#57656D"
+      ],
+      [
+        "Experienced",
+        "#E48825"
+      ],
+      [
+        "Skilled",
+        "#789BE1"
+      ],
+      [
+        "Adept",
+        "#0DB68F"
+      ],
+      [
+        "Masterful",
+        "#CA202C"
+      ],
+      [
+        "Inhuman",
+        "#886BA5"
+      ],
+      [
+        "Godlike",
+        "#FEE264"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:55.011068+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

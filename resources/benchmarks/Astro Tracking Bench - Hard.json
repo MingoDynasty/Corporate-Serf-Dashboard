@@ -30,7 +30,8 @@
           "color": "#ffc8ab",
           "threshold": 7850.0
         }
-      ]
+      ],
+      "leaderboard_id": 14854
     },
     {
       "name": "Smoothbot Pauer Glider Intermediate",
@@ -60,7 +61,8 @@
           "color": "#ffc8ab",
           "threshold": 2350.0
         }
-      ]
+      ],
+      "leaderboard_id": 109836
     },
     {
       "name": "Avasive Horizontal Track Hard",
@@ -90,7 +92,8 @@
           "color": "#ffc8ab",
           "threshold": 11750.0
         }
-      ]
+      ],
+      "leaderboard_id": 128614
     },
     {
       "name": "CB SmoothTrack",
@@ -120,7 +123,8 @@
           "color": "#ffc8ab",
           "threshold": 2750.0
         }
-      ]
+      ],
+      "leaderboard_id": 92603
     },
     {
       "name": "VT Snake Track Intermediate S5 Hard",
@@ -150,7 +154,8 @@
           "color": "#ffc8ab",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 105219
     },
     {
       "name": "Controlsphere rAim",
@@ -180,7 +185,8 @@
           "color": "#ffc8ab",
           "threshold": 10750.0
         }
-      ]
+      ],
+      "leaderboard_id": 5102
     },
     {
       "name": "Avasphere Hard 75%",
@@ -210,7 +216,8 @@
           "color": "#ffc8ab",
           "threshold": 3150.0
         }
-      ]
+      ],
+      "leaderboard_id": 131964
     },
     {
       "name": "VT Raw Control Intermediate S5 Hard",
@@ -240,7 +247,8 @@
           "color": "#ffc8ab",
           "threshold": 3100.0
         }
-      ]
+      ],
+      "leaderboard_id": 105155
     },
     {
       "name": "Extra Whisphere 80%",
@@ -270,7 +278,8 @@
           "color": "#ffc8ab",
           "threshold": 13250.0
         }
-      ]
+      ],
+      "leaderboard_id": 104954
     },
     {
       "name": "Avasive bukeTrack Hard",
@@ -300,7 +309,8 @@
           "color": "#ffc8ab",
           "threshold": 7250.0
         }
-      ]
+      ],
+      "leaderboard_id": 125228
     },
     {
       "name": "cloverRawControl",
@@ -330,7 +340,8 @@
           "color": "#ffc8ab",
           "threshold": 8000.0
         }
-      ]
+      ],
+      "leaderboard_id": 68993
     },
     {
       "name": "Controlsphere Far",
@@ -360,7 +371,8 @@
           "color": "#ffc8ab",
           "threshold": 9750.0
         }
-      ]
+      ],
+      "leaderboard_id": 24247
     },
     {
       "name": "AmareRawControl",
@@ -390,7 +402,8 @@
           "color": "#ffc8ab",
           "threshold": 8200.0
         }
-      ]
+      ],
+      "leaderboard_id": 89540
     },
     {
       "name": "Air CELESTIAL No UFO",
@@ -420,7 +433,8 @@
           "color": "#ffc8ab",
           "threshold": 898.0
         }
-      ]
+      ],
+      "leaderboard_id": 70970
     },
     {
       "name": "VT Ground Intermediate S5 Hard",
@@ -450,7 +464,8 @@
           "color": "#ffc8ab",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 104677
     },
     {
       "name": "Air Angelic",
@@ -480,7 +495,8 @@
           "color": "#ffc8ab",
           "threshold": 925.0
         }
-      ]
+      ],
+      "leaderboard_id": 419
     },
     {
       "name": "Ground Plaza Sparky v3 OW",
@@ -510,7 +526,37 @@
           "color": "#ffc8ab",
           "threshold": 896.0
         }
-      ]
+      ],
+      "leaderboard_id": 871
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsExitfraggingBaitedBomb",
+    "kovaaks_benchmark_id": 699,
+    "rank_colors": [
+      [
+        "Emerald",
+        "#3af09a"
+      ],
+      [
+        "Amethyst",
+        "#ea8cff"
+      ],
+      [
+        "Ruby",
+        "#ee3169"
+      ],
+      [
+        "Opal",
+        "#f5fcff"
+      ],
+      [
+        "Cardboard",
+        "#ffc8ab"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:54.112120+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

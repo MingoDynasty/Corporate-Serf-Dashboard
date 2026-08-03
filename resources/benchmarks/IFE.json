@@ -35,7 +35,8 @@
           "color": "#e60000",
           "threshold": 909.0
         }
-      ]
+      ],
+      "leaderboard_id": 517
     },
     {
       "name": "Flicker Plaza rAim Easy",
@@ -70,7 +71,8 @@
           "color": "#e60000",
           "threshold": 917.0
         }
-      ]
+      ],
+      "leaderboard_id": 606
     },
     {
       "name": "Polarized Hell Easy 20% Slower",
@@ -105,7 +107,8 @@
           "color": "#e60000",
           "threshold": 3150.0
         }
-      ]
+      ],
+      "leaderboard_id": 124972
     },
     {
       "name": "beanTS",
@@ -140,7 +143,8 @@
           "color": "#e60000",
           "threshold": 149.0
         }
-      ]
+      ],
+      "leaderboard_id": 2648
     },
     {
       "name": "voxTargetSwitch 2",
@@ -175,7 +179,8 @@
           "color": "#e60000",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 551
     },
     {
       "name": "Smoothbot TS Voltaic",
@@ -210,7 +215,8 @@
           "color": "#e60000",
           "threshold": 55.0
         }
-      ]
+      ],
+      "leaderboard_id": 596
     },
     {
       "name": "WhisphereRawControl",
@@ -245,7 +251,8 @@
           "color": "#e60000",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 84199
     },
     {
       "name": "Air Angelic 4 Voltaic Easy",
@@ -280,7 +287,8 @@
           "color": "#e60000",
           "threshold": 4450.0
         }
-      ]
+      ],
+      "leaderboard_id": 42
     },
     {
       "name": "cloverRawControl Easy",
@@ -315,7 +323,8 @@
           "color": "#e60000",
           "threshold": 11500.0
         }
-      ]
+      ],
+      "leaderboard_id": 69150
     }
   ],
   "generated_from": {
@@ -347,7 +356,8 @@
         "#e60000"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:47.575997+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:04.111765+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

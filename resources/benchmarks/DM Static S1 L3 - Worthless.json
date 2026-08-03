@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 26580
     },
     {
       "name": "DM 1w3ts Level 3",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1770.0
         }
-      ]
+      ],
+      "leaderboard_id": 26669
     },
     {
       "name": "DM Tripleclick Pokeball Level 3",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 26670
     },
     {
       "name": "DM Tripleclick Level 3",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 1950.0
         }
-      ]
+      ],
+      "leaderboard_id": 26671
     },
     {
       "name": "DM 1w4ts Pokeball Level 3",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1760.0
         }
-      ]
+      ],
+      "leaderboard_id": 26672
     },
     {
       "name": "DM 1w4ts Level 3",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1810.0
         }
-      ]
+      ],
+      "leaderboard_id": 26673
     },
     {
       "name": "DM Quadclick Pokeball Level 3",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 1990.0
         }
-      ]
+      ],
+      "leaderboard_id": 26674
     },
     {
       "name": "DM Quadclick Level 3",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 2040.0
         }
-      ]
+      ],
+      "leaderboard_id": 26675
     },
     {
       "name": "DM 1w5ts Pokeball Level 3",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1790.0
         }
-      ]
+      ],
+      "leaderboard_id": 26676
     },
     {
       "name": "DM 1w5ts Level 3",
@@ -650,7 +659,8 @@
           "color": "#24DDD8",
           "threshold": 1840.0
         }
-      ]
+      ],
+      "leaderboard_id": 26677
     },
     {
       "name": "DM Pentaclick Pokeball Level 3",
@@ -715,7 +725,8 @@
           "color": "#24DDD8",
           "threshold": 2060.0
         }
-      ]
+      ],
+      "leaderboard_id": 26678
     },
     {
       "name": "DM Pentaclick Level 3",
@@ -780,7 +791,8 @@
           "color": "#24DDD8",
           "threshold": 2110.0
         }
-      ]
+      ],
+      "leaderboard_id": 26679
     },
     {
       "name": "DM 1w6ts Pokeball Level 3",
@@ -845,7 +857,8 @@
           "color": "#24DDD8",
           "threshold": 1810.0
         }
-      ]
+      ],
+      "leaderboard_id": 26680
     },
     {
       "name": "DM 1w6ts Level 3",
@@ -910,7 +923,8 @@
           "color": "#24DDD8",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 26682
     },
     {
       "name": "DM Hexaclick Pokeball Level 3",
@@ -975,7 +989,8 @@
           "color": "#24DDD8",
           "threshold": 2110.0
         }
-      ]
+      ],
+      "leaderboard_id": 26684
     },
     {
       "name": "DM Hexaclick Level 3",
@@ -1040,7 +1055,65 @@
           "color": "#24DDD8",
           "threshold": 2160.0
         }
-      ]
+      ],
+      "leaderboard_id": 26685
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSnipingWeeklyCheater",
+    "kovaaks_benchmark_id": 853,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:22.489286+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

@@ -40,7 +40,8 @@
           "color": "#FFFFFF",
           "threshold": 170000.0
         }
-      ]
+      ],
+      "leaderboard_id": 30879
     },
     {
       "name": "Gridshot 3x3 30s",
@@ -80,7 +81,8 @@
           "color": "#FFFFFF",
           "threshold": 88000.0
         }
-      ]
+      ],
+      "leaderboard_id": 44064
     },
     {
       "name": "Gridshot 3x3 50% Smaller",
@@ -120,7 +122,8 @@
           "color": "#FFFFFF",
           "threshold": 130000.0
         }
-      ]
+      ],
+      "leaderboard_id": 40235
     },
     {
       "name": "Gridshot",
@@ -160,7 +163,8 @@
           "color": "#FFFFFF",
           "threshold": 200.0
         }
-      ]
+      ],
+      "leaderboard_id": 902
     },
     {
       "name": "Gridshot Mini",
@@ -200,7 +204,8 @@
           "color": "#FFFFFF",
           "threshold": 140.0
         }
-      ]
+      ],
+      "leaderboard_id": 2840
     },
     {
       "name": "Gridshot Large",
@@ -240,7 +245,8 @@
           "color": "#FFFFFF",
           "threshold": 217.0
         }
-      ]
+      ],
+      "leaderboard_id": 2839
     },
     {
       "name": "Gridshot Ultimate",
@@ -280,7 +286,8 @@
           "color": "#FFFFFF",
           "threshold": 94000.0
         }
-      ]
+      ],
+      "leaderboard_id": 41986
     },
     {
       "name": "True Gridshot Ultimate",
@@ -320,7 +327,8 @@
           "color": "#FFFFFF",
           "threshold": 130000.0
         }
-      ]
+      ],
+      "leaderboard_id": 45403
     },
     {
       "name": "GridShot 5x5",
@@ -360,7 +368,8 @@
           "color": "#FFFFFF",
           "threshold": 142000.0
         }
-      ]
+      ],
+      "leaderboard_id": 32462
     }
   ],
   "generated_from": {
@@ -396,7 +405,8 @@
         "#FFFFFF"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:08.758723+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:10:05.068981+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

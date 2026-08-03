@@ -25,7 +25,8 @@
           "color": "#50C878",
           "threshold": 2900.0
         }
-      ]
+      ],
+      "leaderboard_id": 48103
     },
     {
       "name": "VT PreciseOrb Intermediate",
@@ -50,7 +51,8 @@
           "color": "#50C878",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 24958
     },
     {
       "name": "Glidertrack Avasive",
@@ -75,7 +77,8 @@
           "color": "#50C878",
           "threshold": 2600.0
         }
-      ]
+      ],
+      "leaderboard_id": 130525
     },
     {
       "name": "Smoothbot Voltaic",
@@ -100,7 +103,8 @@
           "color": "#50C878",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 300
     },
     {
       "name": "Avasive bukeTrack",
@@ -125,7 +129,8 @@
           "color": "#50C878",
           "threshold": 9750.0
         }
-      ]
+      ],
+      "leaderboard_id": 125117
     },
     {
       "name": "WhisphereRawControl",
@@ -150,7 +155,8 @@
           "color": "#50C878",
           "threshold": 10800.0
         }
-      ]
+      ],
+      "leaderboard_id": 84199
     },
     {
       "name": "Whisphere Small & Slow 75%",
@@ -175,7 +181,8 @@
           "color": "#50C878",
           "threshold": 14500.0
         }
-      ]
+      ],
+      "leaderboard_id": 77068
     },
     {
       "name": "Controlsphere rAim",
@@ -200,7 +207,8 @@
           "color": "#50C878",
           "threshold": 8500.0
         }
-      ]
+      ],
+      "leaderboard_id": 5102
     },
     {
       "name": "VT Plaza Viscose Thin",
@@ -225,7 +233,8 @@
           "color": "#50C878",
           "threshold": 3800.0
         }
-      ]
+      ],
+      "leaderboard_id": 49624
     },
     {
       "name": "Avasive Air Angelic",
@@ -250,7 +259,8 @@
           "color": "#50C878",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 130555
     },
     {
       "name": "Ground Plaza Sparky V3",
@@ -275,7 +285,8 @@
           "color": "#50C878",
           "threshold": 900.0
         }
-      ]
+      ],
+      "leaderboard_id": 517
     },
     {
       "name": "hizkuRawReactive 80%",
@@ -300,7 +311,8 @@
           "color": "#50C878",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 128401
     }
   ],
   "generated_from": {
@@ -324,7 +336,8 @@
         "#50C878"
       ]
     ],
-    "generated_at": "2026-07-11T19:20:00.851229+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:07:31.657588+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

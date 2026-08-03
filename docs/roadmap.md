@@ -19,73 +19,70 @@ after they ship and leave this file — lives in
 
 ---
 
-## Shipped
+## Shipped (recent)
 
-Design rationale for shipped work lives in
-[`decision_log.md`](./decision_log.md); runtime structure in
-[`architecture.md`](./architecture.md).
+The five most recently shipped milestones, newest first — older entries
+leave this file entirely. Their user-facing rationale lives in
+[`product.md`](./product.md), design rationale in
+[`decision_log.md`](./decision_log.md), runtime structure in
+[`architecture.md`](./architecture.md), and git history holds the full
+sequence.
 
-- **Scenario rank lookup** — current rank fetched from the live leaderboard,
-  with Steam ID identity matching, background refresh on new high scores, and
-  thread-safe cache I/O. (PR #8)
-- **Leaderboard total and percentile** — display extends to
-  `Position: 11,290 of 63,892 (82.33% Percentile)` using KovaaK's midpoint
-  formula. (PRs #9, #10)
-- **Playlist scenarios overview** (was milestone 1) — sortable per-playlist
-  table at `/playlists/{playlistCode}`: rank, total, percentile, last played,
-  runs, high score, and PB cm/360 + accuracy for every scenario in the
-  playlist. Long playlists use grid-owned scrolling so their column headers
-  remain visible. (PRs #12, #15, #16, on retry groundwork from #11)
-- **Relative "last played" timestamps** — humanized staleness display with
-  exact-time tooltips, live-ticking on home and the playlist grid.
-  (PRs #17, #19, #23)
-- **Score-aware rank refreshes** — bounded post-PB polling until the
-  leaderboard catches up, monotonic cache writes, manual Refresh escape
-  hatch. (PRs #38, #40)
-- **Benchmark importer** — script that resolves playlists via Evxl and rank
-  thresholds via KovaaK's into reviewable generated benchmark files with
-  provenance stamps. (PRs #45–#48)
-- **Playlist code identity and user-root imports** — playlists are keyed by
-  KovaaK's share code, duplicate names are preserved with disambiguated
-  labels, duplicate codes warn visibly, and imported playlists live under
-  `data/playlists/`. This shipped the enabling identity work for the
-  playlist-level overview. (PR #67)
-- **Playlist-level overview and stats** — a sortable overview at `/playlists`,
-  one row per imported playlist with coverage, runs, last-played, and
-  aggregate-percentile stats; any row drills into that playlist's scenario
-  table. Surfaces stale and weak playlists at a glance to direct attention
-  across playlists. Completing this milestone also removed the transitional
-  per-playlist selector. (PRs #78, #83)
-- **Playlist management & benchmark library** — the overview became the single
-  playlist-management surface: per-code show/hide filtering every dropdown, the
-  full importer-generated benchmark library shipped flat under
-  `resources/benchmarks/` with Voltaic + Viscose visible by default, and
-  overview-hosted import, delete (user playlists only), and cleanup of user
-  files superseded by bundled benchmarks. The whole library ships with the app
-  without flooding dropdowns, and playlists are managed in the app instead of
-  by copying files. (PRs #87, #90, #92, and #98) Design rationale distilled
+- **Version display** — the Settings page now names the running build: the
+  release tag, with the commit it came from underneath. A freshly updated app
+  knows its own tag from its first session, because the installer and launcher
+  leave a copy of the release description beside each installed version at
+  download time. Checking whether an update landed, or quoting a version in a
+  bug report, no longer means hovering the header's GitHub icon. (PRs #188,
+  #190; design in #187) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
+- **In-app settings** — the stats folder, KovaaK's username, and Steam ID moved
+  out of the hand-edited `config.toml` into an app-owned store with a Settings
+  page that edits all three. The app now starts and serves whatever its stats
+  folder is doing — unset, moved, or missing — instead of exiting, installs ask
+  no questions at all, and a start with nothing configured finds the KovaaK's
+  stats folder itself. Configuring the dashboard no longer means opening a text
+  editor. (PRs #181, #182, #183, #184; design in #171) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
+- **Leaderboard-ID seeding** — the bundled benchmark corpus now embeds each
+  scenario's KovaaK's leaderboard ID, and the app seeds them into the permanent
+  name→ID mapping cache at startup. First opens of unfamiliar bundled playlists
+  no longer fan out over the slow exact-name search endpoint, and ID resolution
+  no longer needs a configured username. (PR #169) Design rationale distilled
   into [`decision_log.md`](./decision_log.md).
+- **Install, update, and rollback** — the app installs from one PowerShell
+  line that brings its own Python and uv, finds the KovaaK's stats folder, and
+  leaves a desktop shortcut that updates itself on launch. Every push to `main`
+  that changes runtime code publishes an immutable CalVer release, and every
+  build identifies itself in the log and `/health`, so a bug report names a
+  version and any installer-era release (`v2026.07.19.4` and later) can be
+  rolled back to. Turns "clone the repo and run uv" into
+  something a non-technical player can do.
+  (PRs #154, #155, #158, #159, #163; design in #150) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
+- **Background playlist percentile warmup** — the Playlists overview now
+  fills cold percentile caches in one polite background queue, keeps partial
+  aggregates behind honest coverage placeholders, and shows remaining/ETA or
+  paused/fatal status while rows update live. Unhiding or importing a playlist
+  moves its played scenarios to the front without blocking the page. (PRs
+  #129, #130, #132, #133; design in #128)
 
 ---
 
 ## Upcoming milestones
 
-### Notification system redesign
-
-**What:** Collapse the two notification subsystems into one quiet-by-default
-toast layer: passive navigation never toasts errors, persistent conditions
-render in-place, and each run produces at most one verdict toast.
-
-**Why:** The default configuration currently produces a stacking wall of red
-error toasts plus a no-information "Graph updated!" toast during normal play —
-noise that drowns the in-session feedback the toasts exist to deliver.
-
-**Design:** [`notification_system_proposal.md`](./notification_system_proposal.md)
-(Proposed). Ships as three PRs (noise kill → consolidation → copy rework); the
-noise kill alone resolves the audit complaint.
+- **Settings detection** — the Settings page stops asking users to type what
+  the machine already knows. The stats-directory field suggests every Steam
+  library holding a KovaaK's stats folder, so a wrong first-start pick is a
+  click to repair instead of a path dug out of Explorer by hand; a Detect
+  button then finds the local Steam accounts that have a real KovaaK's
+  profile and fills in the verified username and Steam ID. Three PRs:
+  stats-directory candidates, the identity detection engine, then the
+  identity UI. Design in [`settings_detection_proposal.md`](./settings_detection_proposal.md)
+  (PR #186). The guided first-run flow is deliberately a later proposal.
 
 The sequenced next candidate after this is **Run history and sessions** (see
-Future); it will be promoted here with a full entry when work on it starts.
+Future).
 
 ---
 

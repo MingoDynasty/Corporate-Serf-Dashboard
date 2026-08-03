@@ -43,6 +43,12 @@ class Scenario(BaseModel):
 
     name: str
     ranks: list[Rank] | None = None
+    # KovaaK's leaderboard ID for this scenario, embedded by the benchmark
+    # importer from the benchmark payload it already holds. Optional so
+    # user-imported playlists and pre-change corpus files keep validating; the
+    # bundled corpus merges these into the permanent name->ID mapping cache at
+    # startup (see docs/decision_log.md, the leaderboard-ID seeding entry).
+    leaderboard_id: int | None = None
 
     @field_validator("name")
     @classmethod

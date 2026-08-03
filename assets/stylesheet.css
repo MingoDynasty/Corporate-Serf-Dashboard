@@ -41,22 +41,127 @@
     font-size: 1em;
 }
 
-.last-played-affordance {
+/* The AppShell header is a fixed 4em band; keep its content on one line and
+   truncate the title so a narrow window can't wrap it over the page content
+   below (the home page height calc assumes the header stays inside its
+   offset). */
+.app-header-title-col,
+.app-header-title-anchor {
+    /* Every flex level above the title must be allowed to shrink below its
+       content, or the nowrap title's min-content width wraps the icons
+       column onto a second header row instead of truncating. */
+    min-width: 0;
+}
+
+/* The title is a link home, but it reads as the app's wordmark rather than a
+   link, so it takes the plain text color instead of Mantine's anchor blue. */
+.app-header-title-anchor {
+    color: var(--mantine-color-text);
+}
+
+.app-header-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Home fills the viewport below the AppShell header so the graph can flex to
+   whatever height the controls leave over. A fixed-height graph forced
+   vertical scrolling to reach the X axis whenever zoom or a narrow window
+   made the controls wrap taller. */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 0rem)
+    );
+}
+
+/* Outer column for the grid pages (playlists overview, playlist scenarios).
+   Pinning the column to the viewport minus the AppShell header offset and the
+   shell's vertical padding leaves the grid to own its own scrolling, so the
+   grid headers stay put instead of the whole page scrolling away. */
+.page-fill-column {
+    height: calc(
+        100dvh
+        - var(--app-shell-header-offset, 0rem)
+        - 2 * var(--app-shell-padding, 1rem)
+    );
+}
+
+/* Floor the graph height so extreme zoom degrades to page scroll instead of
+   a crushed, unreadable plot. */
+.home-graph {
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
+/* Home's persistent notice when the app booted without a usable stats
+   directory. Every scenario control below it is empty, so the line has to
+   read as the explanation for that, not as decoration. */
+.stats-dir-hint {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-sm);
+    padding-bottom: 0.5rem;
+}
+
+/* Grid cells whose value carries hover-only detail (exact timestamps on Last
+   Played, the weakest scenario on Lowest Percentile). The dotted underline
+   plus help cursor signals "there is more on hover". */
+.cell-tooltip-affordance {
     cursor: help;
     text-decoration-line: underline;
     text-decoration-style: dotted;
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell {
+/* Navigation anchors rendered inside the playlist/scenario grid cells
+   (PlaylistNameLink / ScenarioLink in dashAgGridComponentFunctions.js). The
+   class carries the link styling on the anchor itself, overriding the UA
+   default link color for every state; the --mantine-color-blue-* variables are
+   theme-aware, so the color stays legible in dark mode. */
+a.playlist-scenario-link-cell,
+a.playlist-scenario-link-cell:visited {
     color: var(--mantine-color-blue-filled);
     cursor: pointer;
     text-decoration-line: underline;
     text-underline-offset: 0.15em;
 }
 
-.playlist-scenario-link-cell:hover {
+a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
+}
+
+/* The overview's leftover-files alert ships hidden and is revealed by the
+   render_superseded_alert callback, which toggles this class on and off. */
+.playlists-superseded-alert-hidden {
+    display: none;
+}
+
+/* The settings page's save status. Neutral by default; the save callback adds
+   the failed modifier when the write itself did not land, which is the one
+   outcome the user cannot see from the form alone. */
+.app-settings-save-status {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-sm);
+}
+
+.app-settings-save-status-failed {
+    color: var(--mantine-color-red-filled);
+}
+
+/* The settings page's restart notice: derived at render and after each save,
+   so it stays put until the restart actually happens. Ships hidden; the save
+   callback and the layout drop the modifier when a change is pending. */
+.app-settings-restart-notice {
+    color: var(--mantine-color-orange-filled);
+    font-size: var(--mantine-font-size-sm);
+}
+
+.app-settings-restart-notice-hidden {
+    display: none;
 }
 
 .settings-help-icon {
@@ -101,31 +206,58 @@
     opacity: 0.55;
 }
 
-/* Hide/Unhide link in the overview's visibility column (VisibilityAction
-   renderer in dashAgGridComponentFunctions.js). */
+/* Percentile aggregates remain undecided until every played scenario has
+   cache data. The placeholder is deliberately motion-neutral because hidden
+   or terminal-failure rows may retain it indefinitely. */
+.playlist-overview-grid .playlist-overview-percentile-placeholder {
+    color: var(--mantine-color-dimmed);
+}
+
+/* Hide/Unhide eye toggle in the overview's visibility column
+   (VisibilityAction renderer in dashAgGridComponentFunctions.js). The span is
+   a masked SVG recolored via background-color, matching the local_icon
+   component's technique. Open eye = row visible (click hides), struck-out
+   eye = row hidden (click unhides). */
 .visibility-action {
-    color: var(--mantine-color-blue-filled);
+    background-color: var(--mantine-color-blue-filled);
     cursor: pointer;
-    text-decoration-line: underline;
-    text-underline-offset: 0.15em;
+    display: inline-block;
+    height: 18px;
+    vertical-align: middle;
+    width: 18px;
 }
 
 .visibility-action:hover {
-    color: var(--mantine-color-blue-filled-hover);
+    background-color: var(--mantine-color-blue-filled-hover);
 }
 
-/* Delete link in the overview's delete column (DeleteAction renderer in
-   dashAgGridComponentFunctions.js). Styled like .visibility-action but red to
+.visibility-action-visible {
+    -webkit-mask: url("icons/material-symbols-visibility-outline.svg") no-repeat center / contain;
+    mask: url("icons/material-symbols-visibility-outline.svg") no-repeat center / contain;
+}
+
+.visibility-action-hidden {
+    -webkit-mask: url("icons/material-symbols-visibility-off-outline.svg") no-repeat center / contain;
+    mask: url("icons/material-symbols-visibility-off-outline.svg") no-repeat center / contain;
+}
+
+/* Delete action icon in the overview's delete column (DeleteAction renderer
+   in dashAgGridComponentFunctions.js). A masked SVG recolored via
+   background-color, mirroring the .visibility-action technique above. Red to
    signal the destructive, user-playlist-only action. */
 .delete-action {
-    color: var(--mantine-color-red-filled);
+    -webkit-mask: url("icons/material-symbols-delete-outline.svg") no-repeat center / contain;
+    background-color: var(--mantine-color-red-filled);
     cursor: pointer;
-    text-decoration-line: underline;
-    text-underline-offset: 0.15em;
+    display: inline-block;
+    height: 18px;
+    mask: url("icons/material-symbols-delete-outline.svg") no-repeat center / contain;
+    vertical-align: middle;
+    width: 18px;
 }
 
 .delete-action:hover {
-    color: var(--mantine-color-red-filled-hover);
+    background-color: var(--mantine-color-red-filled-hover);
 }
 
 /* Benchmark/Playlist pill in the overview's Type column (TypeBadge renderer
@@ -169,4 +301,31 @@
     --ag-odd-row-background-color: var(--mantine-color-dark-6);
     --ag-row-hover-color: var(--mantine-color-dark-5);
     --ag-selected-row-background-color: var(--mantine-color-blue-9);
+}
+
+/* Explicit progressive-fill state: values can legitimately be null after a
+   lookup resolves, so the row's pending flags -- never value nullity -- enable
+   this activity affordance. The static ellipsis is the animation fallback. */
+.playlist-rank-pending {
+    color: var(--mantine-color-dimmed);
+}
+
+.playlist-rank-pending::after {
+    animation: playlist-rank-pending-ellipsis 1.2s steps(3, end) infinite;
+    content: "…";
+}
+
+@keyframes playlist-rank-pending-ellipsis {
+    0% {
+        content: ".";
+    }
+
+    34% {
+        content: "..";
+    }
+
+    67%,
+    100% {
+        content: "…";
+    }
 }

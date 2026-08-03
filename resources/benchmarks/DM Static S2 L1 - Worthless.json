@@ -25,7 +25,8 @@
           "color": "#CAB148",
           "threshold": 1080.0
         }
-      ]
+      ],
+      "leaderboard_id": 26448
     },
     {
       "name": "DM ww2t Level 1",
@@ -50,7 +51,8 @@
           "color": "#CAB148",
           "threshold": 1220.0
         }
-      ]
+      ],
+      "leaderboard_id": 34411
     },
     {
       "name": "DM 1w3ts Level 1",
@@ -75,7 +77,8 @@
           "color": "#CAB148",
           "threshold": 1130.0
         }
-      ]
+      ],
+      "leaderboard_id": 26452
     },
     {
       "name": "DM ww3t Level 1",
@@ -100,7 +103,8 @@
           "color": "#CAB148",
           "threshold": 1310.0
         }
-      ]
+      ],
+      "leaderboard_id": 34412
     },
     {
       "name": "DM 1w4ts Level 1",
@@ -125,7 +129,8 @@
           "color": "#CAB148",
           "threshold": 1170.0
         }
-      ]
+      ],
+      "leaderboard_id": 26456
     },
     {
       "name": "DM ww4t Level 1",
@@ -150,7 +155,8 @@
           "color": "#CAB148",
           "threshold": 1350.0
         }
-      ]
+      ],
+      "leaderboard_id": 34413
     },
     {
       "name": "DM 1w5ts Level 1",
@@ -175,7 +181,8 @@
           "color": "#CAB148",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 26460
     },
     {
       "name": "DM ww5t Level 1",
@@ -200,7 +207,8 @@
           "color": "#CAB148",
           "threshold": 1380.0
         }
-      ]
+      ],
+      "leaderboard_id": 34414
     },
     {
       "name": "DM 1w6ts Level 1",
@@ -225,7 +233,8 @@
           "color": "#CAB148",
           "threshold": 1220.0
         }
-      ]
+      ],
+      "leaderboard_id": 26464
     },
     {
       "name": "DM ww6t Level 1",
@@ -250,7 +259,33 @@
           "color": "#CAB148",
           "threshold": 1400.0
         }
-      ]
+      ],
+      "leaderboard_id": 34415
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSwitchingWideCapture",
+    "kovaaks_benchmark_id": 865,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:33.348681+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

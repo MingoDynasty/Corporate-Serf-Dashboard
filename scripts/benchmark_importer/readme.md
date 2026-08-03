@@ -41,7 +41,57 @@ uv run python scripts/benchmark_importer/script.py
 - `--only SHARECODE` imports one sharecode; repeat the flag for more than one.
 - `--limit N` stops after generating N benchmarks.
 - `--max-consecutive-failures N` changes the circuit-breaker threshold
-  (default: 3).
+  (default: 3). Only *transient* failures count toward it — see below.
+
+## Failure handling
+
+Per-item failures are classified, because the two kinds want opposite
+treatment:
+
+- **Transient** — KovaaK's 5xx responses, rate limiting (429), connection
+  errors, and timeouts. These count toward the `--max-consecutive-failures`
+  circuit breaker, which aborts the sweep when the API is down entirely rather
+  than grinding through every sharecode.
+- **Deterministic** — a rank-count mismatch between Evxl and KovaaK's, a
+  schema-invalid response, or a 4xx other than 429. These recur on every
+  attempt because the upstream *data* is wrong, so they never touch the
+  breaker.
+
+Deterministic failures are recorded in `generated/failures.json`, a ledger
+mapping sharecode to the error, the UTC timestamp when it was recorded, and
+the Evxl metadata (benchmark id and rank ladder) the failure was recorded
+against. Later sweeps skip recorded sharecodes before making any network call
+and report them in the run summary's known-bad bucket. A skip is informational
+and does not affect the exit code — the failure was already reported by the
+run that recorded it.
+
+A recorded verdict is a statement about specific upstream data, so it expires
+when that data changes: if Evxl's benchmark id or rank ladder for the
+sharecode no longer matches what was recorded, the item is retried
+automatically. That is what makes the ledger self-healing — when Evxl fixes
+one of these data bugs, the next snapshot refresh flows the correction in
+without anyone remembering to clear the entry.
+
+Automatic expiry cannot detect a fix on the KovaaK's side (say, its benchmark
+API starting to return the full rank ladder) while Evxl's metadata stays
+byte-identical. Retry explicitly for that case.
+
+To retry a recorded sharecode explicitly, name it with `--only SHARECODE` or
+run with `--force` (which attempts everything). Naming a recorded sharecode is
+treated as retry intent, so it overrides the two things that would otherwise
+replay the failure: the manifest skip (an intact older output no longer causes
+an early return) and the KovaaK's benchmark cache (the response is refetched,
+since a cached rank-mismatch response is schema-valid and would reproduce the
+same mismatch forever). A retry that succeeds clears the entry; one that fails
+deterministically again refreshes it. Transient failures are never recorded.
+
+This retry override applies only to sharecodes in the ledger. `--only` on a
+healthy sharecode keeps its ordinary meaning — restrict the sweep — and an
+intact, current output is still skipped; use `--force` to regenerate that.
+
+Entries are only consulted for sharecodes still present in the Evxl snapshot,
+so a code that later leaves the snapshot just becomes dead weight in the file;
+delete `failures.json` at any time to clear the whole ledger.
 
 Evxl also publishes its
 [API documentation](https://api.evxl.app/documentation).

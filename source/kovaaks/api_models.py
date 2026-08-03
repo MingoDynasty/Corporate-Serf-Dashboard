@@ -53,6 +53,30 @@ class PlaylistAPIResponse(BaseModel):
         return value
 
 
+class EvxlPlaylistScenario(BaseModel):
+    """Represent one scenario in an Evxl playlist-by-code response."""
+
+    scenario_name: str
+
+
+class EvxlPlaylist(BaseModel):
+    """Represent the playlist payload in an Evxl playlist-by-code response.
+
+    Evxl returns snake_case fields and several extras (``is_private``,
+    ``author_name``, ...) the app does not need; pydantic ignores them.
+    """
+
+    playlist_name: str
+    playlist_code: str
+    scenario_list: list[EvxlPlaylistScenario]
+
+
+class EvxlPlaylistByCodeResponse(BaseModel):
+    """Represent Evxl's exact-sharecode playlist lookup response."""
+
+    playlist: EvxlPlaylist
+
+
 class BenchmarkScenario(BaseModel):
     """Represent one scenario's progress in a benchmark."""
 
@@ -231,3 +255,7 @@ class ScenarioRankInfo(BaseModel):
     fetched_at: datetime.datetime | None = None
     error_message: str | None = None
     warning_message: str | None = Field(default=None, exclude=True)
+    # Transient structural marker for the stale-rank fallback. That path is
+    # read-only, and every normal cache write drops the default None via
+    # exclude_none, so this never becomes persisted rank data.
+    served_stale: bool | None = None

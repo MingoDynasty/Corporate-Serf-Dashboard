@@ -35,7 +35,8 @@
           "color": "#65F0D8",
           "threshold": 5592.0
         }
-      ]
+      ],
+      "leaderboard_id": 126294
     },
     {
       "name": "Vertical Smoothing 120 Altered Easy",
@@ -70,7 +71,8 @@
           "color": "#65F0D8",
           "threshold": 5798.0
         }
-      ]
+      ],
+      "leaderboard_id": 126305
     },
     {
       "name": "VSTP Varied Easy",
@@ -105,7 +107,8 @@
           "color": "#65F0D8",
           "threshold": 5022.0
         }
-      ]
+      ],
+      "leaderboard_id": 126515
     },
     {
       "name": "Curvesphere Vertical Easy",
@@ -140,7 +143,8 @@
           "color": "#65F0D8",
           "threshold": 5358.0
         }
-      ]
+      ],
+      "leaderboard_id": 126213
     },
     {
       "name": "Curvesphere Altered Easy",
@@ -175,7 +179,8 @@
           "color": "#65F0D8",
           "threshold": 5275.0
         }
-      ]
+      ],
+      "leaderboard_id": 126215
     },
     {
       "name": "FarmTrack Goated Close Easy",
@@ -210,7 +215,8 @@
           "color": "#65F0D8",
           "threshold": 5607.0
         }
-      ]
+      ],
+      "leaderboard_id": 126296
     },
     {
       "name": "Farmtrack Goated Fixed Easy",
@@ -245,7 +251,8 @@
           "color": "#65F0D8",
           "threshold": 5354.0
         }
-      ]
+      ],
+      "leaderboard_id": 126216
     },
     {
       "name": "FarmTrack Goated Far Easy",
@@ -280,7 +287,8 @@
           "color": "#65F0D8",
           "threshold": 5166.0
         }
-      ]
+      ],
+      "leaderboard_id": 126217
     },
     {
       "name": "SYF Smooth Your Fingers Easy",
@@ -315,7 +323,8 @@
           "color": "#65F0D8",
           "threshold": 5848.0
         }
-      ]
+      ],
+      "leaderboard_id": 126218
     },
     {
       "name": "SYW Smooth Your Wrist Easy",
@@ -350,7 +359,8 @@
           "color": "#65F0D8",
           "threshold": 5892.0
         }
-      ]
+      ],
+      "leaderboard_id": 126219
     },
     {
       "name": "SYA Smooth Your Arm Easy",
@@ -385,7 +395,8 @@
           "color": "#65F0D8",
           "threshold": 5785.0
         }
-      ]
+      ],
+      "leaderboard_id": 126220
     },
     {
       "name": "Spherical Centering I 90 Easy",
@@ -420,7 +431,8 @@
           "color": "#65F0D8",
           "threshold": 5778.0
         }
-      ]
+      ],
+      "leaderboard_id": 126396
     },
     {
       "name": "Spherical Centering II 180 Easy",
@@ -455,7 +467,8 @@
           "color": "#65F0D8",
           "threshold": 5232.0
         }
-      ]
+      ],
+      "leaderboard_id": 126397
     },
     {
       "name": "Spherical Centering III 240 Easy",
@@ -490,7 +503,8 @@
           "color": "#65F0D8",
           "threshold": 4958.0
         }
-      ]
+      ],
+      "leaderboard_id": 127473
     },
     {
       "name": "Bipolar Centering 360 Easy",
@@ -525,7 +539,8 @@
           "color": "#65F0D8",
           "threshold": 5163.0
         }
-      ]
+      ],
+      "leaderboard_id": 126313
     },
     {
       "name": "Anti-Centering Easy",
@@ -560,7 +575,8 @@
           "color": "#65F0D8",
           "threshold": 5226.0
         }
-      ]
+      ],
+      "leaderboard_id": 126221
     },
     {
       "name": "GliderTrack Easy",
@@ -595,7 +611,8 @@
           "color": "#65F0D8",
           "threshold": 4109.0
         }
-      ]
+      ],
+      "leaderboard_id": 126222
     },
     {
       "name": "Multi Angle Smoothness Easy",
@@ -630,7 +647,8 @@
           "color": "#65F0D8",
           "threshold": 4735.0
         }
-      ]
+      ],
+      "leaderboard_id": 126223
     },
     {
       "name": "ClockTrack Close Small",
@@ -665,7 +683,8 @@
           "color": "#65F0D8",
           "threshold": 5479.0
         }
-      ]
+      ],
+      "leaderboard_id": 121890
     },
     {
       "name": "ClockTrack Small",
@@ -700,7 +719,8 @@
           "color": "#65F0D8",
           "threshold": 5174.0
         }
-      ]
+      ],
+      "leaderboard_id": 121897
     },
     {
       "name": "ClockTrack Very Far",
@@ -735,7 +755,8 @@
           "color": "#65F0D8",
           "threshold": 5519.0
         }
-      ]
+      ],
+      "leaderboard_id": 121898
     },
     {
       "name": "PTXS TE",
@@ -770,7 +791,8 @@
           "color": "#65F0D8",
           "threshold": 5931.0
         }
-      ]
+      ],
+      "leaderboard_id": 126304
     },
     {
       "name": "PTXS Fast TE",
@@ -805,7 +827,8 @@
           "color": "#65F0D8",
           "threshold": 5317.0
         }
-      ]
+      ],
+      "leaderboard_id": 125659
     },
     {
       "name": "PTXS Small Fast",
@@ -840,7 +863,41 @@
           "color": "#65F0D8",
           "threshold": 4800.0
         }
-      ]
+      ],
+      "leaderboard_id": 126324
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrollingSkyblueEngine",
+    "kovaaks_benchmark_id": 603,
+    "rank_colors": [
+      [
+        "Trainee",
+        "#F6B26B"
+      ],
+      [
+        "Initiate",
+        "#FFD966"
+      ],
+      [
+        "Adept",
+        "#93C47D"
+      ],
+      [
+        "Ascendant",
+        "#A4C2F4"
+      ],
+      [
+        "Virtuoso",
+        "#8E7CC3"
+      ],
+      [
+        "Prismatic",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:26.674726+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

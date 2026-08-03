@@ -1,0 +1,4 @@
+# Expanded by git archive (GitHub zip/release downloads). Unexpanded
+# placeholders mean you're reading a git checkout.
+sha: $Format:%H$
+commit-date: $Format:%cs$

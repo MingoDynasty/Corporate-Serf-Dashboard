@@ -25,7 +25,8 @@
           "color": "#9e8b3d",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 131955
     },
     {
       "name": "Valorant EddieClick Easy",
@@ -50,7 +51,8 @@
           "color": "#9e8b3d",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 132152
     },
     {
       "name": "Valorant Adjustshot Wide Easy",
@@ -75,7 +77,8 @@
           "color": "#9e8b3d",
           "threshold": 55.0
         }
-      ]
+      ],
+      "leaderboard_id": 131960
     },
     {
       "name": "Valorant DotTS Easy",
@@ -100,7 +103,8 @@
           "color": "#9e8b3d",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 132054
     },
     {
       "name": "Valorant MiniPhase Easy",
@@ -125,7 +129,8 @@
           "color": "#9e8b3d",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 131965
     },
     {
       "name": "Valorant Fourshot Adaptive Easy",
@@ -150,7 +155,8 @@
           "color": "#9e8b3d",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 132044
     },
     {
       "name": "Valorant 1w1t Easy",
@@ -175,7 +181,8 @@
           "color": "#9e8b3d",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 132165
     },
     {
       "name": "Valorant Wide Reflex Easy",
@@ -200,7 +207,8 @@
           "color": "#9e8b3d",
           "threshold": 40.0
         }
-      ]
+      ],
+      "leaderboard_id": 132137
     },
     {
       "name": "Valorant DevClick Easy",
@@ -225,7 +233,8 @@
           "color": "#9e8b3d",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 132172
     },
     {
       "name": "Valorant AngleShot Micro Easy",
@@ -250,7 +259,8 @@
           "color": "#9e8b3d",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 131997
     },
     {
       "name": "Valorant Skyclick Multi Easy",
@@ -275,7 +285,8 @@
           "color": "#9e8b3d",
           "threshold": 0.0
         }
-      ]
+      ],
+      "leaderboard_id": 132176
     },
     {
       "name": "Valorant DevClick Static Easy",
@@ -300,7 +311,8 @@
           "color": "#9e8b3d",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 132177
     },
     {
       "name": "Valorant WaldoTS Easy",
@@ -325,7 +337,8 @@
           "color": "#9e8b3d",
           "threshold": 90.0
         }
-      ]
+      ],
+      "leaderboard_id": 132077
     },
     {
       "name": "Valorant Micro 2 Sphere Easy",
@@ -350,7 +363,8 @@
           "color": "#9e8b3d",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 132073
     },
     {
       "name": "Valorant PeekShot Easy",
@@ -375,7 +389,8 @@
           "color": "#9e8b3d",
           "threshold": 40.0
         }
-      ]
+      ],
+      "leaderboard_id": 132006
     },
     {
       "name": "Valorant Micropace Easy",
@@ -400,7 +415,8 @@
           "color": "#9e8b3d",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 132195
     },
     {
       "name": "Valorant Microcluster Easy",
@@ -425,7 +441,8 @@
           "color": "#9e8b3d",
           "threshold": 105.0
         }
-      ]
+      ],
+      "leaderboard_id": 132074
     },
     {
       "name": "Valorant ControlStrafes Easy",
@@ -450,7 +467,8 @@
           "color": "#9e8b3d",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 132196
     },
     {
       "name": "Valorant Peektrack Easy",
@@ -475,7 +493,8 @@
           "color": "#9e8b3d",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 132184
     },
     {
       "name": "Valorant Controlsphere Blink Easy",
@@ -500,7 +519,8 @@
           "color": "#9e8b3d",
           "threshold": 13000.0
         }
-      ]
+      ],
+      "leaderboard_id": 132197
     },
     {
       "name": "Valorant Angle Smoothing Easy",
@@ -525,7 +545,33 @@
           "color": "#9e8b3d",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 132198
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPlunderingSpringgreenBattlepass",
+    "kovaaks_benchmark_id": 638,
+    "rank_colors": [
+      [
+        "Iron",
+        "#747473"
+      ],
+      [
+        "Bronze",
+        "#bc7509"
+      ],
+      [
+        "Silver",
+        "#9ba4aa"
+      ],
+      [
+        "Gold",
+        "#9e8b3d"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:42.286034+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

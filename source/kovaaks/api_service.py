@@ -19,6 +19,8 @@ from pydantic import ValidationError
 
 from source.kovaaks.api_models import (
     BenchmarksAPIResponse,
+    EvxlPlaylist,
+    EvxlPlaylistByCodeResponse,
     LeaderboardAPIResponse,
     PlaylistAPIResponse,
     RankingPlayer,
@@ -30,27 +32,76 @@ from source.kovaaks.api_models import (
 from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
 from source.utilities.dash_logging import get_dash_logger
+from source.utilities.paths import state_dir
 
-TIMEOUT = 10  # Default timeout for KovaaK's API requests.
+# KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
+# responses stay valid, so the default must clear that band (see the
+# 2026-07-13 decision log entry). Configurable via kovaaks_api_timeout_seconds.
+DEFAULT_TIMEOUT_SECONDS = 30
+_timeout_seconds = DEFAULT_TIMEOUT_SECONDS
 DEFAULT_RETRY_AFTER_SECONDS = 0.5  # Fallback delay when 429 lacks Retry-After.
 MAX_RETRY_AFTER_SECONDS = 5.0  # Upper bound for 429 retry waits.
-TRANSIENT_GET_EXCEPTIONS = (
-    requests.Timeout,
-    requests.ConnectionError,
-)  # Safe GET-only retry failures.
+# Read timeouts are deliberately not retried: the server received the request
+# and is still working on it (KovaaK's slow spells reach ~28s), so an immediate
+# duplicate doubles server load with almost no chance of finishing sooner
+# (observed 2/63 retry successes on 2026-07-13). ConnectTimeout still retries
+# through its ConnectionError base -- those requests never reached the server.
+TRANSIENT_GET_EXCEPTIONS = (requests.ConnectionError,)
 ATTEMPT_DELAYS_SECONDS = (2, 4, 8, 16, 32)
+# Stands in for a sensitive request's parameters in the per-attempt log lines,
+# so the line still ties a failure to its call without recording the value.
+REDACTED_PARAMS = "<redacted>"
 SCORE_EPSILON = 1e-6
 logger = logging.getLogger(__name__)
 dash_logger = get_dash_logger(__name__)
 _CACHE_IO_LOCK = threading.RLock()
 _HTTP_THREAD_LOCAL_STORAGE = threading.local()
 _rank_save_lock = threading.Lock()
+_ACTIVITY_LOCK = threading.Lock()
+_last_interactive_activity = 0.0
+_last_network_success = 0.0
 
-CACHE_DIR = "data/cache"
+CACHE_DIR = state_dir() / "data" / "cache"
+
+# Evxl's exact-sharecode playlist lookup. Not a KovaaK's endpoint (so it is not
+# in the Endpoints enum); used as a fallback when KovaaK's own playlist search
+# returns null records for a real playlist (see get_evxl_playlist).
+EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
 
 
 class UnknownKovaaksUserError(ValueError):
     """Raised when KovaaK's returns no user for the configured username."""
+
+
+def set_request_timeout(seconds: int) -> None:
+    """Apply the configured timeout for all KovaaK's API requests.
+
+    Called once at app startup with ``kovaaks_api_timeout_seconds``; callers
+    that never configure it (tests, scripts) get ``DEFAULT_TIMEOUT_SECONDS``.
+    """
+    # Startup-only mutation; requests read it per call, so no lock is needed.
+    global _timeout_seconds  # noqa: PLW0603
+    _timeout_seconds = seconds
+
+
+def record_interactive_activity() -> None:
+    """Record one user-facing rank lookup, including cache-served lookups."""
+    global _last_interactive_activity  # noqa: PLW0603
+    with _ACTIVITY_LOCK:
+        _last_interactive_activity = time.monotonic()
+
+
+def get_api_activity_timestamps() -> tuple[float, float]:
+    """Return last interactive activity and last successful HTTP request."""
+    with _ACTIVITY_LOCK:
+        return _last_interactive_activity, _last_network_success
+
+
+def _record_network_success() -> None:
+    """Record successful real HTTP traffic for outage-recovery coordination."""
+    global _last_network_success  # noqa: PLW0603
+    with _ACTIVITY_LOCK:
+        _last_network_success = time.monotonic()
 
 
 class Endpoints(StrEnum):
@@ -67,6 +118,7 @@ class Endpoints(StrEnum):
     LEADERBOARD = "/leaderboard/scores/global"
     PLAYLIST = "/playlist/playlists"
     SEARCH_SCENARIO = "/scenario/popular"
+    USER_PROFILE_BY_USERNAME = "/user/profile/by-username"
     USER_SCENARIO_TOTAL_PLAY = "/user/scenario/total-play"
 
 
@@ -130,6 +182,7 @@ def _get_with_retry(
     *,
     attempts: int = 2,
     backoff_seconds: Sequence[float] = (0.0,),
+    sensitive: bool = False,
     **kwargs,
 ) -> requests.Response:
     """
@@ -138,21 +191,53 @@ def _get_with_retry(
     Rate limits and narrow network failures can happen during cold-cache playlist
     loads. After all attempts fail, normal caller-level error handling decides
     whether the UI sees UNKNOWN/N/A.
+
+    Every attempt's outcome is logged at DEBUG with its duration, so slow spells
+    (e.g. successes landing just under the timeout) are visible without
+    cross-referencing urllib3 connection lines by timestamp.
+
+    ``sensitive`` keeps one request's parameters out of the log entirely:
+    attempt lines record a placeholder instead of ``params``, and failure
+    summaries are scrubbed of the query string the exception text carries. Set
+    it for parameters that are user data the app never persists -- the identity
+    probe's Steam personas -- because ``data/logs/debug.log`` is rotated, kept,
+    and collected with bug reports. The ``url`` in every other line stays
+    loggable: parameters ride in ``params``, never in the URL.
     """
-    kwargs.setdefault("timeout", TIMEOUT)
+    kwargs.setdefault("timeout", _timeout_seconds)
     backoff_schedule = backoff_seconds or (0.0,)
+    logged_params = REDACTED_PARAMS if sensitive else kwargs.get("params")
 
     for attempt in range(attempts):
+        started = time.monotonic()
         try:
             response = _session_get(url, **kwargs)
-        except TRANSIENT_GET_EXCEPTIONS as exc:
-            if attempt < attempts - 1:
-                logger.warning(
-                    "Transient GET failure at %s (attempt %d/%d); retrying: %s",
+        except requests.RequestException as exc:
+            elapsed_seconds = time.monotonic() - started
+            # Outcome line for every failed attempt, retried or not: the
+            # INFO below has no params, so during concurrent loads this is
+            # what ties a failure to its leaderboard.
+            logger.debug(
+                "GET %s %s failed after %.2fs (attempt %d/%d): %s",
+                url,
+                logged_params,
+                elapsed_seconds,
+                attempt + 1,
+                attempts,
+                request_exception_summary(exc, redact_query=sensitive),
+            )
+            if isinstance(exc, TRANSIENT_GET_EXCEPTIONS) and attempt < attempts - 1:
+                # INFO, not WARNING: a retried attempt that recovers is
+                # self-healed churn. The exhausted-attempts failure still
+                # warns at the caller with scenario context.
+                logger.info(
+                    "Transient GET failure at %s after %.2fs (attempt %d/%d); "
+                    "retrying: %s",
                     url,
+                    elapsed_seconds,
                     attempt + 1,
                     attempts,
-                    request_exception_summary(exc),
+                    request_exception_summary(exc, redact_query=sensitive),
                 )
                 delay_seconds = backoff_schedule[
                     min(attempt, len(backoff_schedule) - 1)
@@ -162,12 +247,23 @@ def _get_with_retry(
                 continue
             raise
 
+        logger.debug(
+            "GET %s %s -> HTTP %d in %.2fs (attempt %d/%d)",
+            url,
+            logged_params,
+            response.status_code,
+            time.monotonic() - started,
+            attempt + 1,
+            attempts,
+        )
         if response.status_code != 429 or attempt == attempts - 1:
             response.raise_for_status()
+            _record_network_success()
             return response
 
         delay_seconds = _retry_after_seconds(response)
-        logger.warning(
+        # INFO for the same reason as the transient-retry record above.
+        logger.info(
             "Rate limited at %s (attempt %d/%d); retrying after %.2fs",
             url,
             attempt + 1,
@@ -183,8 +279,53 @@ def get_playlist_data(playlist_code) -> PlaylistAPIResponse:
     """Fetch playlist metadata matching a KovaaK's playlist code."""
     params = {"page": 0, "max": 20, "search": playlist_code.strip()}
 
-    response = _get_with_retry(Endpoints.PLAYLIST, params=params, timeout=TIMEOUT)
+    response = _get_with_retry(Endpoints.PLAYLIST, params=params)
     return PlaylistAPIResponse.model_validate(response.json())
+
+
+def get_evxl_playlist(sharecode: str) -> EvxlPlaylist:
+    """Resolve one playlist through Evxl's exact-sharecode endpoint.
+
+    Fallback for KovaaK's null-hydration quirk (its search counts a match but
+    returns a null record for some real playlists). Evxl returns HTTP 400 for
+    unknown or mis-cased codes, which ``_get_with_retry`` surfaces as an
+    immediate ``requests.HTTPError``; that and ``ValidationError`` propagate to
+    the caller, which decides how to degrade.
+    """
+    response = _get_with_retry(
+        EVXL_PLAYLIST_BY_CODE_URL,
+        params={"shareCode": sharecode.strip()},
+    )
+    return EvxlPlaylistByCodeResponse.model_validate(response.json()).playlist
+
+
+def get_user_profile_by_username(username: str) -> object | None:
+    """Look up one KovaaK's webapp profile by name, or None when there is none.
+
+    Unauthenticated. HTTP 409 (``{"error":"Player does not exist"}``) is this
+    endpoint's confirmed-absence answer rather than a failure, so it becomes
+    ``None``; ``_get_with_retry`` surfaces it as an ``HTTPError`` through
+    ``raise_for_status``, which is caught here. Every other status and every
+    transport failure propagates for the caller to classify.
+
+    The parsed body is returned unvalidated -- identity detection decides which
+    payloads it can use, so schema drift degrades there like an outage instead
+    of raising here.
+
+    The request is marked sensitive: the name is a Steam persona probed on the
+    user's behalf, including accounts they never save.
+    """
+    try:
+        response = _get_with_retry(
+            Endpoints.USER_PROFILE_BY_USERNAME,
+            params={"username": username},
+            sensitive=True,
+        )
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code == 409:
+            return None
+        raise
+    return response.json()
 
 
 def get_benchmark_json(
@@ -214,7 +355,6 @@ def get_benchmark_json(
     response = _get_with_retry(
         Endpoints.BENCHMARKS,
         params=params,
-        timeout=TIMEOUT,
         attempts=attempts,
         backoff_seconds=backoff_seconds,
     )
@@ -246,7 +386,7 @@ def get_leaderboard_scores(
     }
     if username_search:
         params["usernameSearch"] = username_search
-    response = _get_with_retry(Endpoints.LEADERBOARD, params=params, timeout=TIMEOUT)
+    response = _get_with_retry(Endpoints.LEADERBOARD, params=params)
 
     return LeaderboardAPIResponse.model_validate(response.json())
 
@@ -257,6 +397,27 @@ def _is_cache_fresh(cache_file: Path, ttl_hours: int) -> bool:
 
     modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime, UTC)
     return datetime.now(UTC) - modified_at < timedelta(hours=ttl_hours)
+
+
+def _cache_age_hours(cache_file: Path) -> float | None:
+    """Return the cache file's age in hours, or None if it cannot be read."""
+    try:
+        modified_at = datetime.fromtimestamp(cache_file.stat().st_mtime, UTC)
+    except OSError:
+        return None
+    return (datetime.now(UTC) - modified_at).total_seconds() / 3600
+
+
+def _describe_cache_state(cache_file: Path, ttl_hours: int) -> str:
+    """Describe why a TTL-guarded cache read returned nothing, for debug logs."""
+    age_hours = _cache_age_hours(cache_file)
+    if age_hours is None:
+        return "miss (no cache file)"
+    if ttl_hours <= 0:
+        return f"disabled (ttl {ttl_hours}h, age {age_hours:.1f}h)"
+    if age_hours < ttl_hours:
+        return f"unreadable (age {age_hours:.1f}h, ttl {ttl_hours}h)"
+    return f"expired (age {age_hours:.1f}h > ttl {ttl_hours}h)"
 
 
 def _read_json(cache_file: Path) -> dict | list | None:
@@ -371,13 +532,53 @@ def _leaderboard_mapping_file() -> Path:
     )
 
 
+# In-memory mirror of the mapping file, revalidated on every read against the
+# file's identity (path, mtime_ns, size). Disk stays the source of truth:
+# writes go around this cache (save_leaderboard_id writes the file only), and
+# the per-read stat catches in-process writes, other processes, manual edits,
+# and cache-directory deletion alike. Guarded by _CACHE_IO_LOCK, which
+# _write_json also holds, so a lookup cannot interleave with a write.
+# Metadata alone cannot detect a same-size rewrite that also preserves the
+# timestamp (deliberate os.utime forgery after an in-place edit). Accepted
+# limitation, per the 2026-07-18 decision log entry: no realistic writer does
+# this (atomic replace, editors, and restores all shift mtime_ns or size),
+# and a periodic redundant reload would betray the cache's purpose — fast
+# reads until the next write.
+_leaderboard_mapping_cache: dict | None = None
+_leaderboard_mapping_signature: tuple[str, int, int] | None = None
+
+
+def _load_leaderboard_mapping() -> dict:
+    """Return the parsed mapping file, re-parsing only when the file changes.
+
+    The mapping is one large, rarely-written JSON dict consulted once per rank
+    lookup; parsing it per read dominated the playlist overview build (see the
+    2026-07-18 decision log entry). A missing or malformed file yields an
+    empty mapping, matching the tolerant-read cache convention. Callers must
+    treat the returned dict as read-only.
+    """
+    global _leaderboard_mapping_cache, _leaderboard_mapping_signature  # noqa: PLW0603
+    with _CACHE_IO_LOCK:
+        cache_file = _leaderboard_mapping_file()
+        try:
+            stat = cache_file.stat()
+            signature = (str(cache_file), stat.st_mtime_ns, stat.st_size)
+        except OSError:
+            signature = None
+        if (
+            _leaderboard_mapping_cache is not None
+            and signature == _leaderboard_mapping_signature
+        ):
+            return _leaderboard_mapping_cache
+        cache_data = _read_json(cache_file) if signature is not None else None
+        _leaderboard_mapping_cache = cache_data if isinstance(cache_data, dict) else {}
+        _leaderboard_mapping_signature = signature
+        return _leaderboard_mapping_cache
+
+
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     """Return the stored leaderboard ID for an exact scenario name."""
-    cache_data = _read_json(_leaderboard_mapping_file())
-    if not isinstance(cache_data, dict):
-        return None
-
-    scenario_data = cache_data.get(scenario_name)
+    scenario_data = _load_leaderboard_mapping().get(scenario_name)
     if not isinstance(scenario_data, dict):
         return None
 
@@ -418,6 +619,78 @@ def save_leaderboard_id(
             "fetched_at": datetime.now(UTC).isoformat(),
         }
         _write_json(cache_file, mappings)
+
+
+def merge_seed_leaderboard_ids(
+    asserted: dict[str, int],
+    *,
+    allow_removals: bool,
+) -> None:
+    """Fold the bundled corpus's asserted mappings into the permanent cache.
+
+    ``asserted`` is the set of ``scenario name -> leaderboard id`` pairs the
+    bundled corpus currently stands behind (names two bundled files disagree on
+    are already excluded by the caller). The whole merge is one atomic
+    read-modify-write, per the cache conventions.
+
+    Rules (see docs/decision_log.md, the leaderboard-ID seeding entry):
+
+    - an asserted name missing from the cache is added, tagged ``source="seed"``;
+    - a ``source="seed"`` entry whose asserted value changed is refreshed, so
+      corrected IDs reach existing installs;
+    - a ``source="seed"`` entry whose name is not asserted is removed, so an
+      upgraded install never keeps resolving a mapping a fresh install would not;
+    - entries learned from the live API (any other source) are never touched, and
+      a name that already has a learned entry never gets a seed-owned row.
+
+    ``allow_removals`` is False when any bundled file failed to load: a partial
+    view of the corpus adds and refreshes but must not retract mappings the
+    corpus may still assert.
+    """
+    with _CACHE_IO_LOCK:
+        cache_file = _leaderboard_mapping_file()
+        cache_data = _read_json(cache_file)
+        mappings = cache_data if isinstance(cache_data, dict) else {}
+        now = datetime.now(UTC).isoformat()
+        changed = False
+
+        for scenario_name, leaderboard_id in asserted.items():
+            existing = mappings.get(scenario_name)
+            if isinstance(existing, dict) and existing.get("source") != "seed":
+                # Learned (or otherwise non-seed) data is never overwritten by
+                # the seed: a name with a live-learned value keeps it.
+                continue
+            if (
+                isinstance(existing, dict)
+                and existing.get("leaderboard_id") == leaderboard_id
+            ):
+                continue  # unchanged seed entry
+            mappings[scenario_name] = {
+                "leaderboard_id": int(leaderboard_id),
+                "source": "seed",
+                "fetched_at": now,
+            }
+            changed = True
+
+        if allow_removals:
+            for scenario_name in list(mappings):
+                entry = mappings.get(scenario_name)
+                if (
+                    isinstance(entry, dict)
+                    and entry.get("source") == "seed"
+                    and scenario_name not in asserted
+                ):
+                    del mappings[scenario_name]
+                    changed = True
+
+        if not changed:
+            return
+        _write_json(cache_file, mappings)
+        logger.info(
+            "Seeded leaderboard IDs from the bundled corpus: %d asserted; removals %s.",
+            len(asserted),
+            "applied" if allow_removals else "suppressed (partial corpus load)",
+        )
 
 
 def get_user_scenario_total_play(
@@ -474,7 +747,6 @@ def get_user_scenario_total_play(
             response = _get_with_retry(
                 Endpoints.USER_SCENARIO_TOTAL_PLAY,
                 params=params,
-                timeout=TIMEOUT,
             )
             response.raise_for_status()
 
@@ -519,12 +791,16 @@ def get_user_scenario_total_play(
         # A network failure is not proof that the user has no plays. Reuse stale
         # metadata if we have it; otherwise let the caller decide how to degrade.
         if os.path.exists(cache_file):
+            cache_data = _read_json(cache_file)
+            if _is_unknown_username_total_play_response(cache_data):
+                raise UnknownKovaaksUserError(
+                    f"KovaaK's username '{username}' was not found."
+                )
             logger.warning(
                 "Using stale total-play cache for %s after failed request: %s",
                 username,
                 request_exception_summary(exc),
             )
-            cache_data = _read_json(cache_file)
             if isinstance(cache_data, dict):
                 return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
         raise
@@ -575,7 +851,6 @@ def search_scenario_exact(scenario_name: str) -> int | None:
     response = _get_with_retry(
         Endpoints.SEARCH_SCENARIO,
         params=params,
-        timeout=TIMEOUT,
     )
 
     search_response = ScenarioSearchAPIResponse.model_validate(response.json())
@@ -602,6 +877,7 @@ def resolve_leaderboard_id(
     username: str | None = None,
     metadata_cache_ttl_hours: int = 24,
     allow_network: bool = True,
+    allow_hydration: bool = True,
 ) -> int | None:
     """
     Resolve a selected scenario name to a leaderboard ID.
@@ -609,7 +885,9 @@ def resolve_leaderboard_id(
     The total-play cache is a best-effort metadata source. If it is unavailable,
     continue to exact scenario search rather than treating cache failure as a
     user-facing rank failure. When ``allow_network`` is false, only the permanent
-    local mapping cache is consulted.
+    local mapping cache is consulted. When ``allow_hydration`` is false, the
+    total-play hydration step is skipped so a caller that already hydrated once
+    (e.g. a playlist open) does not re-fan the full pagination per scenario.
 
     Fallback order:
     1. Permanent local mapping cache.
@@ -624,7 +902,7 @@ def resolve_leaderboard_id(
     if not allow_network:
         return None
 
-    if username:
+    if username and allow_hydration:
         # Hydration is opportunistic: it can fill many mappings at once, but
         # failure should not block exact search for the selected scenario.
         try:
@@ -831,8 +1109,17 @@ def get_leaderboard_total(
     """Return a cached leaderboard total, refreshing it when stale or missing."""
     cached_total = get_cached_leaderboard_total(leaderboard_id, cache_ttl_hours)
     if cached_total is not None:
+        logger.debug("Totals cache hit for leaderboard %s.", leaderboard_id)
         return cached_total
 
+    logger.debug(
+        "Totals cache %s for leaderboard %s; fetching.",
+        _describe_cache_state(
+            _leaderboard_total_cache_file(leaderboard_id),
+            cache_ttl_hours,
+        ),
+        leaderboard_id,
+    )
     total_players = fetch_leaderboard_total(leaderboard_id)
     save_leaderboard_total(leaderboard_id, total_players)
     return total_players
@@ -881,7 +1168,8 @@ def _with_leaderboard_total(
         )
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch leaderboard total for %s: %s",
+            "Failed to fetch leaderboard total for %s (leaderboard %s): %s",
+            rank_info.scenario_name or "?",
             rank_info.leaderboard_id,
             request_exception_summary(exc),
         )
@@ -1057,7 +1345,10 @@ def _run_attempt(  # noqa: PLR0913
             )
             return
         except requests.RequestException as exc:
-            logger.warning(
+            # INFO for the same reason as _get_with_retry's retry records: a
+            # scheduled attempt that may still recover is self-healed churn.
+            # Exhausting the schedule warns in _notify_exhaustion.
+            logger.info(
                 "Transient failure resolving leaderboard for %s; will retry: %s",
                 scenario_name,
                 request_exception_summary(exc),
@@ -1077,7 +1368,18 @@ def _run_attempt(  # noqa: PLR0913
             and _score_is_fresh(rank_info, expected_score)
         ):
             rank_info = rank_info.model_copy(update={"scenario_name": scenario_name})
-            _, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            winner, wrote = _save_rank_monotonic(leaderboard_id, username, rank_info)
+            logger.debug(
+                "Rank freshness complete for %s on attempt %d/%d "
+                "(leaderboard %s, cached rank %s, cached score %s, cache=%s).",
+                scenario_name,
+                attempt_index + 1,
+                len(ATTEMPT_DELAYS_SECONDS),
+                leaderboard_id,
+                winner.rank,
+                f"{winner.score:.2f}" if winner.score is not None else "N/A",
+                "updated" if wrote else "kept-existing",
+            )
             if wrote:
                 try:
                     _with_leaderboard_total(
@@ -1092,7 +1394,30 @@ def _run_attempt(  # noqa: PLR0913
             return
 
         next_index = attempt_index + 1
-        if next_index >= len(ATTEMPT_DELAYS_SECONDS):
+        status = rank_info.status.value if rank_info is not None else "NO_RESULT"
+        board_score = (
+            f"{rank_info.score:.2f}"
+            if rank_info is not None and rank_info.score is not None
+            else "N/A"
+        )
+        attempts_exhausted = next_index >= len(ATTEMPT_DELAYS_SECONDS)
+        next_action = (
+            "attempts exhausted"
+            if attempts_exhausted
+            else f"retrying in {ATTEMPT_DELAYS_SECONDS[next_index]}s"
+        )
+        logger.debug(
+            "Rank freshness attempt %d/%d for %s not ready "
+            "(status=%s, board score=%s, expected score >= %.2f); %s.",
+            attempt_index + 1,
+            len(ATTEMPT_DELAYS_SECONDS),
+            scenario_name,
+            status,
+            board_score,
+            _floor_2dp(expected_score),
+            next_action,
+        )
+        if attempts_exhausted:
             _notify_exhaustion(scenario_name, expected_score, rank_info)
             return
 
@@ -1134,6 +1459,7 @@ def _schedule_attempt(  # noqa: PLR0913
             attempt_index,
         ),
     )
+    timer.name = f"rank-refresh-{scenario_name}"
     timer.daemon = True
     timer.start()
 
@@ -1146,6 +1472,14 @@ def schedule_rank_freshness_refresh(
     metadata_cache_ttl_hours: int = 24,
 ) -> None:
     """Start a bounded score-aware refresh after a new local high score."""
+    logger.debug(
+        "Scheduled rank freshness refresh for %s "
+        "(expected score >= %.2f; first attempt in %ds, %d attempts total).",
+        scenario_name,
+        _floor_2dp(expected_score),
+        ATTEMPT_DELAYS_SECONDS[0],
+        len(ATTEMPT_DELAYS_SECONDS),
+    )
     _schedule_attempt(
         scenario_name,
         username,
@@ -1156,7 +1490,54 @@ def schedule_rank_freshness_refresh(
     )
 
 
-def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
+def _stale_rank_fallback(
+    leaderboard_id: int,
+    username: str,
+    steam_id: str | None,
+    scenario_name: str,
+) -> ScenarioRankInfo | None:
+    """Return the last cached rank tagged as stale, or None if nothing is cached.
+
+    Used when an authoritative rank fetch fails -- unreachable endpoint or an
+    unusable (schema-invalid) response -- but the leaderboard already resolved:
+    the app should never display less than it knows, mirroring the TTL-free
+    ``allow_network=False`` read path. Read-only: never writes the cache, so
+    stale data is not laundered into TTL-fresh on the next read.
+    """
+    stale_rank = _cached_rank(leaderboard_id, username)
+    if stale_rank is None:
+        return None
+    age_hours = _cache_age_hours(_rank_cache_file(leaderboard_id, username))
+    logger.warning(
+        "Serving stale cached position for %s (leaderboard %s, age %s) "
+        "after failed refresh.",
+        scenario_name,
+        leaderboard_id,
+        f"{age_hours:.1f}h" if age_hours is not None else "unknown",
+    )
+    if stale_rank.scenario_name is None:
+        stale_rank = stale_rank.model_copy(update={"scenario_name": scenario_name})
+    total_players = _cached_leaderboard_total(leaderboard_id)
+    if total_players is not None:
+        stale_rank = stale_rank.model_copy(update={"total_players": total_players})
+        stale_rank = _with_percentile(stale_rank)
+    # Tag the degraded result so the UI can warn (yellow) rather than falsely
+    # confirm a refresh (green) or error out (red). Derive the steam-mismatch
+    # warning first -- it clobbers warning_message -- then append the staleness
+    # note so both can coexist.
+    stale_rank = _with_derived_rank_warning(stale_rank, username, steam_id)
+    stale_warning = (
+        f"Couldn't refresh from KovaaK's; showing the last cached position "
+        f"for {scenario_name}."
+    )
+    if stale_rank.warning_message:
+        stale_warning = f"{stale_rank.warning_message} {stale_warning}"
+    return stale_rank.model_copy(
+        update={"warning_message": stale_warning, "served_stale": True}
+    )
+
+
+def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
     scenario_name: str,
     username: str | None,
     steam_id: str | None = None,
@@ -1165,14 +1546,21 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     leaderboard_total_cache_ttl_hours: int = 168,
     force_refresh: bool = False,
     allow_network: bool = True,
+    allow_hydration: bool = True,
+    record_activity: bool = True,
 ) -> ScenarioRankInfo:
     """
     Main rank lookup entry point for UI and background refresh callers.
 
     Expected KovaaK's API failures are converted into UNKNOWN rank states so UI
-    code can display N/A without knowing endpoint or cache details.
+    code can display N/A without knowing endpoint or cache details -- except a
+    rank fetch that fails after the leaderboard resolved, which falls back to
+    the last cached rank (TTL ignored, read-only) tagged with a
+    ``warning_message``; UNKNOWN only when nothing is cached.
     ``allow_network=False`` serves rank and total caches independent of TTL and
-    returns UNKNOWN on a miss without fetching.
+    returns UNKNOWN on a miss without fetching. ``allow_hydration=False`` skips
+    total-play hydration during leaderboard resolution, for callers that already
+    hydrated once before fanning out per scenario.
 
     Result states:
     - RANKED: leaderboard exists and the exact user has a score.
@@ -1181,6 +1569,9 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     - UNKNOWN: missing config, invalid username, unresolved leaderboard, or API
       failure.
     """
+    if record_activity:
+        record_interactive_activity()
+
     if not username:
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
@@ -1195,6 +1586,7 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
             username,
             metadata_cache_ttl_hours,
             allow_network=allow_network,
+            allow_hydration=allow_hydration,
         )
     except UnknownKovaaksUserError as exc:
         return ScenarioRankInfo(
@@ -1228,6 +1620,24 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
                 username,
                 rank_cache_ttl_hours,
             )
+            # Verdict logging only on the network path: the cache-only branch
+            # serves Home's per-second interval ticks and would spam debug.log.
+            if cached_rank:
+                logger.debug(
+                    "Rank cache hit for %s (leaderboard %s).",
+                    scenario_name,
+                    leaderboard_id,
+                )
+            else:
+                logger.debug(
+                    "Rank cache %s for %s (leaderboard %s).",
+                    _describe_cache_state(
+                        _rank_cache_file(leaderboard_id, username),
+                        rank_cache_ttl_hours,
+                    ),
+                    scenario_name,
+                    leaderboard_id,
+                )
         else:
             cached_rank = _cached_rank(leaderboard_id, username)
         if cached_rank:
@@ -1269,19 +1679,51 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
 
     # Fresh rank lookup is the authoritative path for current rank. total-play
     # is not used here because it can lag behind the leaderboard endpoint.
+    # Graceful degradation: a fetch that fails -- unreachable endpoint
+    # (RequestException) or an unusable response (ValidationError) -- should not
+    # hide a rank we already know. Fall back to the last cached rank; UNKNOWN
+    # only when nothing is cached.
+    logger.debug(
+        "Fetching current position for %s (leaderboard %s).",
+        scenario_name,
+        leaderboard_id,
+    )
     try:
         rank_info = fetch_scenario_rank(leaderboard_id, username, steam_id)
     except requests.RequestException as exc:
         logger.warning(
-            "Failed to fetch scenario rank for %s: %s",
+            "Failed to fetch scenario rank for %s (leaderboard %s): %s",
             scenario_name,
+            leaderboard_id,
             request_exception_summary(exc),
         )
+        stale_rank = _stale_rank_fallback(
+            leaderboard_id, username, steam_id, scenario_name
+        )
+        if stale_rank is not None:
+            return stale_rank
         return ScenarioRankInfo(
             status=ScenarioRankStatus.UNKNOWN,
             leaderboard_id=leaderboard_id,
             scenario_name=scenario_name,
             error_message=f"Failed to fetch leaderboard position for {scenario_name}.",
+        )
+    except ValidationError:
+        logger.warning(
+            "Invalid leaderboard response for %s",
+            scenario_name,
+            exc_info=True,
+        )
+        stale_rank = _stale_rank_fallback(
+            leaderboard_id, username, steam_id, scenario_name
+        )
+        if stale_rank is not None:
+            return stale_rank
+        return ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            leaderboard_id=leaderboard_id,
+            scenario_name=scenario_name,
+            error_message=f"Invalid leaderboard response for {scenario_name}.",
         )
     if rank_info.status == ScenarioRankStatus.UNRANKED:
         # A missing leaderboard row normally means the user has not played the
@@ -1311,6 +1753,11 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913
     )
     rank_info = rank_info.model_copy(
         update={"scenario_name": rank_info.scenario_name or scenario_name}
+    )
+    logger.debug(
+        "Fetching total positions for %s (leaderboard %s).",
+        scenario_name,
+        leaderboard_id,
     )
     rank_info = _with_leaderboard_total(
         rank_info,

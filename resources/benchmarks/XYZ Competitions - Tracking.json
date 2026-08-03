@@ -10,7 +10,8 @@
           "color": "#65F0D8",
           "threshold": 3721.0
         }
-      ]
+      ],
+      "leaderboard_id": 131893
     },
     {
       "name": "XYZ JagTrack",
@@ -20,7 +21,8 @@
           "color": "#65F0D8",
           "threshold": 4143.0
         }
-      ]
+      ],
+      "leaderboard_id": 134352
     },
     {
       "name": "XYZ PreciseTrack",
@@ -30,7 +32,8 @@
           "color": "#65F0D8",
           "threshold": 3598.0
         }
-      ]
+      ],
+      "leaderboard_id": 132451
     },
     {
       "name": "XYZ GroundTrack",
@@ -40,7 +43,8 @@
           "color": "#65F0D8",
           "threshold": 3984.0
         }
-      ]
+      ],
+      "leaderboard_id": 131989
     },
     {
       "name": "XYZ AirTrack",
@@ -50,7 +54,8 @@
           "color": "#65F0D8",
           "threshold": 3984.0
         }
-      ]
+      ],
+      "leaderboard_id": 135207
     },
     {
       "name": "XYZ ReactiveTrack",
@@ -60,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 3212.0
         }
-      ]
+      ],
+      "leaderboard_id": 132067
     },
     {
       "name": "XYZ TwisterTrack",
@@ -70,7 +76,8 @@
           "color": "#65F0D8",
           "threshold": 3502.0
         }
-      ]
+      ],
+      "leaderboard_id": 133226
     },
     {
       "name": "XYZ LeapTrack",
@@ -80,7 +87,21 @@
           "color": "#65F0D8",
           "threshold": 3445.0
         }
-      ]
+      ],
+      "leaderboard_id": 133353
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsEnragingBlueSupport",
+    "kovaaks_benchmark_id": 666,
+    "rank_colors": [
+      [
+        "World Record",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:07:38.615813+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

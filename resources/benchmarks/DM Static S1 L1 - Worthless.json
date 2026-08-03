@@ -65,7 +65,8 @@
           "color": "#24DDD8",
           "threshold": 1860.0
         }
-      ]
+      ],
+      "leaderboard_id": 26451
     },
     {
       "name": "DM 1w3ts Level 1",
@@ -130,7 +131,8 @@
           "color": "#24DDD8",
           "threshold": 1910.0
         }
-      ]
+      ],
+      "leaderboard_id": 26452
     },
     {
       "name": "DM Tripleclick Pokeball Level 1",
@@ -195,7 +197,8 @@
           "color": "#24DDD8",
           "threshold": 2040.0
         }
-      ]
+      ],
+      "leaderboard_id": 26453
     },
     {
       "name": "DM Tripleclick Level 1",
@@ -260,7 +263,8 @@
           "color": "#24DDD8",
           "threshold": 2090.0
         }
-      ]
+      ],
+      "leaderboard_id": 26454
     },
     {
       "name": "DM 1w4ts Pokeball Level 1",
@@ -325,7 +329,8 @@
           "color": "#24DDD8",
           "threshold": 1900.0
         }
-      ]
+      ],
+      "leaderboard_id": 26455
     },
     {
       "name": "DM 1w4ts Level 1",
@@ -390,7 +395,8 @@
           "color": "#24DDD8",
           "threshold": 1950.0
         }
-      ]
+      ],
+      "leaderboard_id": 26456
     },
     {
       "name": "DM Quadclick Pokeball Level 1",
@@ -455,7 +461,8 @@
           "color": "#24DDD8",
           "threshold": 2130.0
         }
-      ]
+      ],
+      "leaderboard_id": 26457
     },
     {
       "name": "DM Quadclick Level 1",
@@ -520,7 +527,8 @@
           "color": "#24DDD8",
           "threshold": 2180.0
         }
-      ]
+      ],
+      "leaderboard_id": 26458
     },
     {
       "name": "DM 1w5ts Pokeball Level 1",
@@ -585,7 +593,8 @@
           "color": "#24DDD8",
           "threshold": 1930.0
         }
-      ]
+      ],
+      "leaderboard_id": 26459
     },
     {
       "name": "DM 1w5ts Level 1",
@@ -650,7 +659,8 @@
           "color": "#24DDD8",
           "threshold": 1980.0
         }
-      ]
+      ],
+      "leaderboard_id": 26460
     },
     {
       "name": "DM Pentaclick Pokeball Level 1",
@@ -715,7 +725,8 @@
           "color": "#24DDD8",
           "threshold": 2200.0
         }
-      ]
+      ],
+      "leaderboard_id": 26461
     },
     {
       "name": "DM Pentaclick Level 1",
@@ -780,7 +791,8 @@
           "color": "#24DDD8",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 26462
     },
     {
       "name": "DM 1w6ts Pokeball Level 1",
@@ -845,7 +857,8 @@
           "color": "#24DDD8",
           "threshold": 1950.0
         }
-      ]
+      ],
+      "leaderboard_id": 26463
     },
     {
       "name": "DM 1w6ts Level 1",
@@ -910,7 +923,8 @@
           "color": "#24DDD8",
           "threshold": 2000.0
         }
-      ]
+      ],
+      "leaderboard_id": 26464
     },
     {
       "name": "DM Hexaclick Pokeball Level 1",
@@ -975,7 +989,8 @@
           "color": "#24DDD8",
           "threshold": 2250.0
         }
-      ]
+      ],
+      "leaderboard_id": 26465
     },
     {
       "name": "DM Hexaclick Level 1",
@@ -1040,7 +1055,65 @@
           "color": "#24DDD8",
           "threshold": 2300.0
         }
-      ]
+      ],
+      "leaderboard_id": 26466
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSensingViscousPopcorn",
+    "kovaaks_benchmark_id": 851,
+    "rank_colors": [
+      [
+        "Iron",
+        "#999999"
+      ],
+      [
+        "Bronze",
+        "#FF9900"
+      ],
+      [
+        "Silver",
+        "#CBD9E6"
+      ],
+      [
+        "Gold",
+        "#CAB148"
+      ],
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#EC44CA"
+      ],
+      [
+        "Grandmaster",
+        "#FFD700"
+      ],
+      [
+        "Nova",
+        "#7900FF"
+      ],
+      [
+        "Astra",
+        "#FF2262"
+      ],
+      [
+        "Celestial",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:20.567019+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

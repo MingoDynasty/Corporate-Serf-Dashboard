@@ -35,7 +35,8 @@
           "color": "#81d1ff",
           "threshold": 95.0
         }
-      ]
+      ],
+      "leaderboard_id": 44344
     },
     {
       "name": "aimerz+ B180C Normal",
@@ -70,7 +71,8 @@
           "color": "#81d1ff",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 44339
     },
     {
       "name": "aimerz+ WaveClick Normal",
@@ -105,7 +107,8 @@
           "color": "#81d1ff",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 44337
     },
     {
       "name": "aimerz+ 1w3ts Normal",
@@ -140,7 +143,8 @@
           "color": "#81d1ff",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 44333
     },
     {
       "name": "aimerz+ ww6t Normal",
@@ -175,7 +179,8 @@
           "color": "#81d1ff",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 44335
     },
     {
       "name": "aimerz+ 1w4ts HF Normal",
@@ -210,7 +215,8 @@
           "color": "#81d1ff",
           "threshold": 155.0
         }
-      ]
+      ],
+      "leaderboard_id": 44332
     },
     {
       "name": "aimerz+ Smoothbot Normal",
@@ -245,7 +251,8 @@
           "color": "#81d1ff",
           "threshold": 4400.0
         }
-      ]
+      ],
+      "leaderboard_id": 44347
     },
     {
       "name": "aimerz+ PTI Normal",
@@ -280,7 +287,8 @@
           "color": "#81d1ff",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 44352
     },
     {
       "name": "aimerz+ PreciseTrack Normal",
@@ -315,7 +323,8 @@
           "color": "#81d1ff",
           "threshold": 2950.0
         }
-      ]
+      ],
+      "leaderboard_id": 44354
     },
     {
       "name": "aimerz+ PipeTrack Normal",
@@ -350,7 +359,8 @@
           "color": "#81d1ff",
           "threshold": 3650.0
         }
-      ]
+      ],
+      "leaderboard_id": 44357
     },
     {
       "name": "aimerz+ VariedStrafes Normal",
@@ -385,7 +395,8 @@
           "color": "#81d1ff",
           "threshold": 3000.0
         }
-      ]
+      ],
+      "leaderboard_id": 44361
     },
     {
       "name": "aimerz+ Air Normal",
@@ -420,7 +431,8 @@
           "color": "#81d1ff",
           "threshold": 6000.0
         }
-      ]
+      ],
+      "leaderboard_id": 53742
     },
     {
       "name": "aimerz+ pivoTS Normal",
@@ -455,7 +467,8 @@
           "color": "#81d1ff",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 44376
     },
     {
       "name": "aimerz+ waveTS Normal",
@@ -490,7 +503,8 @@
           "color": "#81d1ff",
           "threshold": 70.0
         }
-      ]
+      ],
+      "leaderboard_id": 44374
     },
     {
       "name": "aimerz+ swingTS Normal",
@@ -525,7 +539,8 @@
           "color": "#81d1ff",
           "threshold": 950.0
         }
-      ]
+      ],
+      "leaderboard_id": 53595
     },
     {
       "name": "aimerz+ joeTS Normal",
@@ -560,7 +575,8 @@
           "color": "#81d1ff",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 44377
     },
     {
       "name": "aimerz+ B180TC Normal",
@@ -595,7 +611,8 @@
           "color": "#81d1ff",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 44380
     },
     {
       "name": "aimerz+ TomTS Normal",
@@ -630,7 +647,8 @@
           "color": "#81d1ff",
           "threshold": 50.0
         }
-      ]
+      ],
+      "leaderboard_id": 44394
     }
   ],
   "generated_from": {
@@ -662,7 +680,8 @@
         "#81d1ff"
       ]
     ],
-    "generated_at": "2026-07-11T12:11:48.840022+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:12.757925+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

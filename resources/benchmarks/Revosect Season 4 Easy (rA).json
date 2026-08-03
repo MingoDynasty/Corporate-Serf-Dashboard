@@ -1,6 +1,6 @@
 {
   "name": "Revosect Season 4 Easy (rA)",
-  "code": "KovaaKsExitFraggingWideCamp",
+  "code": "KovaaKsExitfraggingWideCamp",
   "scenarios": [
     {
       "name": "rA S4 THREESHOT EASY",
@@ -35,7 +35,8 @@
           "color": "#A64D79",
           "threshold": 1250.0
         }
-      ]
+      ],
+      "leaderboard_id": 98107
     },
     {
       "name": "rA S4 FIVEWIDE EASY",
@@ -70,7 +71,8 @@
           "color": "#A64D79",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 98099
     },
     {
       "name": "rA S4 FOURWIDE SMALL EASY",
@@ -105,7 +107,8 @@
           "color": "#A64D79",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 98100
     },
     {
       "name": "rA S4 SNAPCLICK EASY",
@@ -140,7 +143,8 @@
           "color": "#A64D79",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 98109
     },
     {
       "name": "rA S4 XYCLICK EASY",
@@ -175,7 +179,8 @@
           "color": "#A64D79",
           "threshold": 700.0
         }
-      ]
+      ],
+      "leaderboard_id": 98148
     },
     {
       "name": "rA S4 BOUNCECLICK EASY",
@@ -210,7 +215,8 @@
           "color": "#A64D79",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 98108
     },
     {
       "name": "rA S4 GLIDERTRACK EASY",
@@ -245,7 +251,8 @@
           "color": "#A64D79",
           "threshold": 3300.0
         }
-      ]
+      ],
+      "leaderboard_id": 98105
     },
     {
       "name": "rA S4 CAPSULETRACK EASY",
@@ -280,7 +287,8 @@
           "color": "#A64D79",
           "threshold": 2600.0
         }
-      ]
+      ],
+      "leaderboard_id": 98104
     },
     {
       "name": "rA S4 LEAPTRACK EASY",
@@ -315,7 +323,8 @@
           "color": "#A64D79",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 98102
     },
     {
       "name": "rA S4 AIRTRACK EASY",
@@ -350,7 +359,8 @@
           "color": "#A64D79",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 98103
     },
     {
       "name": "rA S4 REACTIVESPHERE EASY",
@@ -385,7 +395,8 @@
           "color": "#A64D79",
           "threshold": 2500.0
         }
-      ]
+      ],
+      "leaderboard_id": 98101
     },
     {
       "name": "rA S4 STRAFETRACK EASY",
@@ -420,7 +431,8 @@
           "color": "#A64D79",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 98112
     },
     {
       "name": "rA S4 WIDESWITCH EASY",
@@ -455,7 +467,8 @@
           "color": "#A64D79",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 98098
     },
     {
       "name": "rA S4 ORBSWITCH EASY",
@@ -490,7 +503,8 @@
           "color": "#A64D79",
           "threshold": 120.0
         }
-      ]
+      ],
+      "leaderboard_id": 98095
     },
     {
       "name": "rA S4 XYSWITCH EASY",
@@ -525,7 +539,8 @@
           "color": "#A64D79",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 98096
     },
     {
       "name": "rA S4 LAYERSWITCH EASY",
@@ -560,7 +575,8 @@
           "color": "#A64D79",
           "threshold": 94.0
         }
-      ]
+      ],
+      "leaderboard_id": 98134
     },
     {
       "name": "rA S4 EVASWITCH EASY",
@@ -595,7 +611,8 @@
           "color": "#A64D79",
           "threshold": 58.0
         }
-      ]
+      ],
+      "leaderboard_id": 98135
     },
     {
       "name": "rA S4 SPACESWITCH EASY",
@@ -630,7 +647,41 @@
           "color": "#A64D79",
           "threshold": 47.0
         }
-      ]
+      ],
+      "leaderboard_id": 98094
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsExitFraggingWideCamp",
+    "kovaaks_benchmark_id": 536,
+    "rank_colors": [
+      [
+        "Gold",
+        "#FFE599"
+      ],
+      [
+        "Platinum",
+        "#C9DAF8"
+      ],
+      [
+        "Ace",
+        "#E06666"
+      ],
+      [
+        "Legend",
+        "#B6D7A8"
+      ],
+      [
+        "Sentinel",
+        "#76A5AF"
+      ],
+      [
+        "Valour",
+        "#A64D79"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:42.396984+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

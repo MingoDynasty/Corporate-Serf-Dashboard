@@ -70,7 +70,8 @@
           "color": "#000000",
           "threshold": 152.0
         }
-      ]
+      ],
+      "leaderboard_id": 94345
     },
     {
       "name": "cA y-axis flick",
@@ -140,7 +141,8 @@
           "color": "#000000",
           "threshold": 152.0
         }
-      ]
+      ],
+      "leaderboard_id": 94344
     },
     {
       "name": "6 Sphere Hipfire Voltaic",
@@ -210,7 +212,8 @@
           "color": "#000000",
           "threshold": 218.0
         }
-      ]
+      ],
+      "leaderboard_id": 108
     },
     {
       "name": "cA voxTSs smaller",
@@ -280,7 +283,8 @@
           "color": "#000000",
           "threshold": 205.0
         }
-      ]
+      ],
+      "leaderboard_id": 94311
     },
     {
       "name": "1w4ts Voltaic",
@@ -350,7 +354,8 @@
           "color": "#000000",
           "threshold": 164.0
         }
-      ]
+      ],
+      "leaderboard_id": 319
     },
     {
       "name": "VT 1w3ts Rasp Advanced",
@@ -420,7 +425,8 @@
           "color": "#000000",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 29479
     },
     {
       "name": "ww3t Voltaic",
@@ -490,7 +496,8 @@
           "color": "#000000",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 68
     },
     {
       "name": "1w2ts Perfected",
@@ -560,7 +567,8 @@
           "color": "#000000",
           "threshold": 154.0
         }
-      ]
+      ],
+      "leaderboard_id": 565
     },
     {
       "name": "cA 1ts ruohong",
@@ -630,7 +638,8 @@
           "color": "#000000",
           "threshold": 940.0
         }
-      ]
+      ],
+      "leaderboard_id": 94276
     },
     {
       "name": "Ballsheet fixed",
@@ -700,7 +709,8 @@
           "color": "#000000",
           "threshold": 100.0
         }
-      ]
+      ],
+      "leaderboard_id": 13574
     },
     {
       "name": "Tamspeed 2bpes Angelic",
@@ -770,7 +780,8 @@
           "color": "#000000",
           "threshold": 153.0
         }
-      ]
+      ],
+      "leaderboard_id": 38536
     },
     {
       "name": "PureG Horizontal Clicking",
@@ -840,7 +851,8 @@
           "color": "#000000",
           "threshold": 164.0
         }
-      ]
+      ],
+      "leaderboard_id": 28581
     },
     {
       "name": "FloatingClick SuperbAim",
@@ -910,7 +922,8 @@
           "color": "#000000",
           "threshold": 1000.0
         }
-      ]
+      ],
+      "leaderboard_id": 35936
     },
     {
       "name": "VT Frogtagon Advanced S5",
@@ -980,7 +993,8 @@
           "color": "#000000",
           "threshold": 1360.0
         }
-      ]
+      ],
+      "leaderboard_id": 105776
     },
     {
       "name": "remClick - OW 85%",
@@ -1050,7 +1064,8 @@
           "color": "#000000",
           "threshold": 760.0
         }
-      ]
+      ],
+      "leaderboard_id": 134717
     },
     {
       "name": "VT Pasu Advanced S5",
@@ -1120,7 +1135,8 @@
           "color": "#000000",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 98023
     },
     {
       "name": "rA S4 XYCLICK HARD",
@@ -1190,7 +1206,8 @@
           "color": "#000000",
           "threshold": 780.0
         }
-      ]
+      ],
+      "leaderboard_id": 93766
     },
     {
       "name": "rA S4 SNAPCLICK HARD",
@@ -1260,7 +1277,8 @@
           "color": "#000000",
           "threshold": 660.0
         }
-      ]
+      ],
+      "leaderboard_id": 93779
     },
     {
       "name": "ToonsClick rAim",
@@ -1330,7 +1348,8 @@
           "color": "#000000",
           "threshold": 92.0
         }
-      ]
+      ],
+      "leaderboard_id": 5053
     },
     {
       "name": "VT Bounceshot Advanced",
@@ -1400,7 +1419,8 @@
           "color": "#000000",
           "threshold": 1030.0
         }
-      ]
+      ],
+      "leaderboard_id": 25154
     },
     {
       "name": "Centering III 180 no strafes",
@@ -1470,7 +1490,8 @@
           "color": "#000000",
           "threshold": 12000.0
         }
-      ]
+      ],
+      "leaderboard_id": 11408
     },
     {
       "name": "Far Angle Smoothness small",
@@ -1540,7 +1561,8 @@
           "color": "#000000",
           "threshold": 830.0
         }
-      ]
+      ],
+      "leaderboard_id": 25164
     },
     {
       "name": "VT Smoothbot Advanced",
@@ -1610,7 +1632,8 @@
           "color": "#000000",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 25151
     },
     {
       "name": "VT PreciseOrb Advanced",
@@ -1680,7 +1703,8 @@
           "color": "#000000",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 25176
     },
     {
       "name": "rA S4 AIRTRACK HARD",
@@ -1750,7 +1774,8 @@
           "color": "#000000",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 93768
     },
     {
       "name": "Extra Controlsphere",
@@ -1820,7 +1845,8 @@
           "color": "#000000",
           "threshold": 10200.0
         }
-      ]
+      ],
+      "leaderboard_id": 562
     },
     {
       "name": "Extra Smoothsphere Better",
@@ -1890,7 +1916,8 @@
           "color": "#000000",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 65507
     },
     {
       "name": "Air Angelic 4 Voltaic",
@@ -1960,7 +1987,8 @@
           "color": "#000000",
           "threshold": 4200.0
         }
-      ]
+      ],
+      "leaderboard_id": 30
     },
     {
       "name": "Leapstrafes Control Phantasy 30% Smaller",
@@ -2030,7 +2058,8 @@
           "color": "#000000",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 55631
     },
     {
       "name": "Polarized Hell",
@@ -2100,7 +2129,8 @@
           "color": "#000000",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 68464
     },
     {
       "name": "VT Ground Advanced S5",
@@ -2170,7 +2200,8 @@
           "color": "#000000",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 100768
     },
     {
       "name": "VT Plaza Advanced",
@@ -2240,7 +2271,8 @@
           "color": "#000000",
           "threshold": 3700.0
         }
-      ]
+      ],
+      "leaderboard_id": 43186
     },
     {
       "name": "VSS GP9 thin",
@@ -2310,7 +2342,8 @@
           "color": "#000000",
           "threshold": 9000.0
         }
-      ]
+      ],
+      "leaderboard_id": 356
     },
     {
       "name": "MFSI rAim - Thin",
@@ -2380,7 +2413,8 @@
           "color": "#000000",
           "threshold": 11000.0
         }
-      ]
+      ],
+      "leaderboard_id": 8400
     },
     {
       "name": "VT Air Advanced",
@@ -2450,7 +2484,8 @@
           "color": "#000000",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 43182
     },
     {
       "name": "VT Aether Advanced S5",
@@ -2520,7 +2555,8 @@
           "color": "#000000",
           "threshold": 3600.0
         }
-      ]
+      ],
+      "leaderboard_id": 100140
     },
     {
       "name": "Aimerz+ PipeTrack Hard S1",
@@ -2590,7 +2626,8 @@
           "color": "#000000",
           "threshold": 3500.0
         }
-      ]
+      ],
+      "leaderboard_id": 68328
     },
     {
       "name": "cAt furTrack Hard",
@@ -2660,7 +2697,8 @@
           "color": "#000000",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 83467
     },
     {
       "name": "cAt fluffyTrack Hard",
@@ -2730,7 +2768,8 @@
           "color": "#000000",
           "threshold": 2850.0
         }
-      ]
+      ],
+      "leaderboard_id": 83399
     },
     {
       "name": "Aimerz+ Week #10 - evyTrack",
@@ -2800,7 +2839,8 @@
           "color": "#000000",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 42886
     },
     {
       "name": "Aimerz+ Week #5 - Static Switching",
@@ -2870,7 +2910,8 @@
           "color": "#000000",
           "threshold": 18500.0
         }
-      ]
+      ],
+      "leaderboard_id": 38996
     },
     {
       "name": "Target Switching 360 Static Thin",
@@ -2940,7 +2981,8 @@
           "color": "#000000",
           "threshold": 16500.0
         }
-      ]
+      ],
+      "leaderboard_id": 27
     },
     {
       "name": "VT skyTS Advanced",
@@ -3010,7 +3052,8 @@
           "color": "#000000",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 25150
     },
     {
       "name": "patCircleSwitch NR",
@@ -3080,7 +3123,8 @@
           "color": "#000000",
           "threshold": 134.0
         }
-      ]
+      ],
+      "leaderboard_id": 535
     },
     {
       "name": "xenTargetSwitch speed Medium",
@@ -3150,7 +3194,8 @@
           "color": "#000000",
           "threshold": 114.0
         }
-      ]
+      ],
+      "leaderboard_id": 11424
     },
     {
       "name": "beanTS",
@@ -3220,7 +3265,8 @@
           "color": "#000000",
           "threshold": 168.0
         }
-      ]
+      ],
+      "leaderboard_id": 2648
     },
     {
       "name": "AngleSwitch Revosect",
@@ -3290,7 +3336,8 @@
           "color": "#000000",
           "threshold": 1320.0
         }
-      ]
+      ],
+      "leaderboard_id": 141047
     },
     {
       "name": "VT psalmTS Advanced",
@@ -3360,7 +3407,8 @@
           "color": "#000000",
           "threshold": 1290.0
         }
-      ]
+      ],
+      "leaderboard_id": 25177
     },
     {
       "name": "VT EddieTS Advanced S5",
@@ -3430,7 +3478,8 @@
           "color": "#000000",
           "threshold": 1220.0
         }
-      ]
+      ],
+      "leaderboard_id": 104864
     },
     {
       "name": "rA S4 ORBSWITCH HARD",
@@ -3500,7 +3549,8 @@
           "color": "#000000",
           "threshold": 146.0
         }
-      ]
+      ],
+      "leaderboard_id": 93774
     },
     {
       "name": "Aimerz+ caTS Hard S1",
@@ -3570,7 +3620,8 @@
           "color": "#000000",
           "threshold": 58.0
         }
-      ]
+      ],
+      "leaderboard_id": 68286
     },
     {
       "name": "VT bounceTS Advanced",
@@ -3640,7 +3691,8 @@
           "color": "#000000",
           "threshold": 980.0
         }
-      ]
+      ],
+      "leaderboard_id": 25160
     },
     {
       "name": "VT Penta Bounce Advanced S5",
@@ -3710,7 +3762,8 @@
           "color": "#000000",
           "threshold": 630.0
         }
-      ]
+      ],
+      "leaderboard_id": 98619
     },
     {
       "name": "rA S4 EVASWITCH HARD",
@@ -3780,7 +3833,8 @@
           "color": "#000000",
           "threshold": 60.0
         }
-      ]
+      ],
+      "leaderboard_id": 93784
     },
     {
       "name": "VT FlyTS Advanced S5",
@@ -3850,7 +3904,8 @@
           "color": "#000000",
           "threshold": 650.0
         }
-      ]
+      ],
+      "leaderboard_id": 105143
     },
     {
       "name": "CB AerialSwitch",
@@ -3920,7 +3975,8 @@
           "color": "#000000",
           "threshold": 600.0
         }
-      ]
+      ],
+      "leaderboard_id": 92561
     },
     {
       "name": "VT ControlTS Advanced S5",
@@ -3990,7 +4046,8 @@
           "color": "#000000",
           "threshold": 520.0
         }
-      ]
+      ],
+      "leaderboard_id": 104833
     },
     {
       "name": "VT evaTS Advanced",
@@ -4060,7 +4117,8 @@
           "color": "#000000",
           "threshold": 790.0
         }
-      ]
+      ],
+      "leaderboard_id": 25181
     },
     {
       "name": "VT DriftTS Advanced S5",
@@ -4130,7 +4188,8 @@
           "color": "#000000",
           "threshold": 500.0
         }
-      ]
+      ],
+      "leaderboard_id": 104866
     },
     {
       "name": "ToonsTS rAim",
@@ -4200,7 +4259,8 @@
           "color": "#000000",
           "threshold": 75.0
         }
-      ]
+      ],
+      "leaderboard_id": 5042
     }
   ],
   "generated_from": {
@@ -4260,7 +4320,8 @@
         "#000000"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:04.966426+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:18.604111+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

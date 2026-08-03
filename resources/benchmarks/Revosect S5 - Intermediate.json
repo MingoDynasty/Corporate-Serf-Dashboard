@@ -30,7 +30,8 @@
           "color": "#FFD700",
           "threshold": 1130.0
         }
-      ]
+      ],
+      "leaderboard_id": 142850
     },
     {
       "name": "StrawberryClick Revosect Int",
@@ -60,7 +61,8 @@
           "color": "#FFD700",
           "threshold": 1150.0
         }
-      ]
+      ],
+      "leaderboard_id": 142852
     },
     {
       "name": "1w5ts vbr Revosect Int",
@@ -90,7 +92,8 @@
           "color": "#FFD700",
           "threshold": 1440.0
         }
-      ]
+      ],
+      "leaderboard_id": 142874
     },
     {
       "name": "1w4t Pressure Revosect Int",
@@ -120,7 +123,8 @@
           "color": "#FFD700",
           "threshold": 1630.0
         }
-      ]
+      ],
+      "leaderboard_id": 143201
     },
     {
       "name": "Pasu Revosect Int",
@@ -150,7 +154,8 @@
           "color": "#FFD700",
           "threshold": 870.0
         }
-      ]
+      ],
+      "leaderboard_id": 143200
     },
     {
       "name": "SpringClick Revosect Int",
@@ -180,7 +185,8 @@
           "color": "#FFD700",
           "threshold": 850.0
         }
-      ]
+      ],
+      "leaderboard_id": 143204
     },
     {
       "name": "SnowClick Revosect Int",
@@ -210,7 +216,8 @@
           "color": "#FFD700",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 142899
     },
     {
       "name": "Floating Heads Revosect Int",
@@ -240,7 +247,8 @@
           "color": "#FFD700",
           "threshold": 820.0
         }
-      ]
+      ],
+      "leaderboard_id": 142901
     },
     {
       "name": "FloodTrack Revosect Int",
@@ -270,7 +278,8 @@
           "color": "#FFD700",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 142824
     },
     {
       "name": "VTP Revosect Int",
@@ -300,7 +309,8 @@
           "color": "#FFD700",
           "threshold": 2800.0
         }
-      ]
+      ],
+      "leaderboard_id": 142830
     },
     {
       "name": "Tornadosphere Revosect Int",
@@ -330,7 +340,8 @@
           "color": "#FFD700",
           "threshold": 3400.0
         }
-      ]
+      ],
+      "leaderboard_id": 142821
     },
     {
       "name": "Leapstrafes Revosect Int",
@@ -360,7 +371,8 @@
           "color": "#FFD700",
           "threshold": 3200.0
         }
-      ]
+      ],
+      "leaderboard_id": 142828
     },
     {
       "name": "Plaza Pure Revosect Int",
@@ -390,7 +402,8 @@
           "color": "#FFD700",
           "threshold": 903.0
         }
-      ]
+      ],
+      "leaderboard_id": 142844
     },
     {
       "name": "Plaza Smooth Revosect Int",
@@ -420,7 +433,8 @@
           "color": "#FFD700",
           "threshold": 894.0
         }
-      ]
+      ],
+      "leaderboard_id": 142848
     },
     {
       "name": "Air Pure Revosect Int",
@@ -450,7 +464,8 @@
           "color": "#FFD700",
           "threshold": 892.0
         }
-      ]
+      ],
+      "leaderboard_id": 142834
     },
     {
       "name": "Air Smooth Revosect Int",
@@ -480,7 +495,8 @@
           "color": "#FFD700",
           "threshold": 894.0
         }
-      ]
+      ],
+      "leaderboard_id": 142840
     },
     {
       "name": "AngleSwitch Revosect Int",
@@ -510,7 +526,8 @@
           "color": "#FFD700",
           "threshold": 1200.0
         }
-      ]
+      ],
+      "leaderboard_id": 143207
     },
     {
       "name": "DotSwitch Revosect Int",
@@ -540,7 +557,8 @@
           "color": "#FFD700",
           "threshold": 1300.0
         }
-      ]
+      ],
+      "leaderboard_id": 143208
     },
     {
       "name": "NovaSwitch Revosect Int",
@@ -570,7 +588,8 @@
           "color": "#FFD700",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 143209
     },
     {
       "name": "WaveSwitch Revosect Int",
@@ -600,7 +619,8 @@
           "color": "#FFD700",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 143210
     },
     {
       "name": "SpringTS Revosect Int",
@@ -630,7 +650,8 @@
           "color": "#FFD700",
           "threshold": 530.0
         }
-      ]
+      ],
+      "leaderboard_id": 142904
     },
     {
       "name": "WhisphereTS Revosect Int",
@@ -660,7 +681,8 @@
           "color": "#FFD700",
           "threshold": 580.0
         }
-      ]
+      ],
+      "leaderboard_id": 142905
     },
     {
       "name": "PasuTS Revosect Int",
@@ -690,7 +712,8 @@
           "color": "#FFD700",
           "threshold": 480.0
         }
-      ]
+      ],
+      "leaderboard_id": 142908
     },
     {
       "name": "SmoothTS Revosect Int",
@@ -720,7 +743,8 @@
           "color": "#FFD700",
           "threshold": 550.0
         }
-      ]
+      ],
+      "leaderboard_id": 142909
     }
   ],
   "generated_from": {
@@ -748,7 +772,8 @@
         "#FFD700"
       ]
     ],
-    "generated_at": "2026-07-11T12:10:32.043340+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:08:11.559080+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

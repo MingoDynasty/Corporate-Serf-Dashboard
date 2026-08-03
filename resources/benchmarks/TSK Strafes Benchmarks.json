@@ -55,7 +55,8 @@
           "color": "#24DDD8",
           "threshold": 2998.0
         }
-      ]
+      ],
+      "leaderboard_id": 71303
     },
     {
       "name": "Predictable Strafes",
@@ -110,7 +111,8 @@
           "color": "#24DDD8",
           "threshold": 2938.0
         }
-      ]
+      ],
+      "leaderboard_id": 71302
     },
     {
       "name": "Predictable Strafes r15",
@@ -165,7 +167,8 @@
           "color": "#24DDD8",
           "threshold": 2823.0
         }
-      ]
+      ],
+      "leaderboard_id": 101056
     },
     {
       "name": "Predictable Strafes Thin",
@@ -220,7 +223,8 @@
           "color": "#24DDD8",
           "threshold": 2383.0
         }
-      ]
+      ],
+      "leaderboard_id": 71477
     },
     {
       "name": "Predictable Strafes Long Easy",
@@ -275,7 +279,8 @@
           "color": "#24DDD8",
           "threshold": 2992.0
         }
-      ]
+      ],
+      "leaderboard_id": 71305
     },
     {
       "name": "Predictable Strafes Long",
@@ -330,7 +335,8 @@
           "color": "#24DDD8",
           "threshold": 2839.0
         }
-      ]
+      ],
+      "leaderboard_id": 71304
     },
     {
       "name": "Predictable Strafes Long r15",
@@ -385,7 +391,8 @@
           "color": "#24DDD8",
           "threshold": 2548.0
         }
-      ]
+      ],
+      "leaderboard_id": 101201
     },
     {
       "name": "Predictable Strafes Long Thin",
@@ -440,7 +447,8 @@
           "color": "#24DDD8",
           "threshold": 1949.0
         }
-      ]
+      ],
+      "leaderboard_id": 71472
     },
     {
       "name": "Predictable Strafes Short Easy",
@@ -495,7 +503,8 @@
           "color": "#24DDD8",
           "threshold": 2998.0
         }
-      ]
+      ],
+      "leaderboard_id": 71307
     },
     {
       "name": "Predictable Strafes Short",
@@ -550,7 +559,8 @@
           "color": "#24DDD8",
           "threshold": 2967.0
         }
-      ]
+      ],
+      "leaderboard_id": 71306
     },
     {
       "name": "Predictable Strafes Short r15",
@@ -605,7 +615,8 @@
           "color": "#24DDD8",
           "threshold": 2868.0
         }
-      ]
+      ],
+      "leaderboard_id": 101130
     },
     {
       "name": "Predictable Strafes Short Thin",
@@ -660,7 +671,8 @@
           "color": "#24DDD8",
           "threshold": 2457.0
         }
-      ]
+      ],
+      "leaderboard_id": 71473
     },
     {
       "name": "Predictable Strafes Gauntlet Easy",
@@ -715,7 +727,8 @@
           "color": "#24DDD8",
           "threshold": 2958.0
         }
-      ]
+      ],
+      "leaderboard_id": 100993
     },
     {
       "name": "Predictable Strafes Gauntlet",
@@ -770,7 +783,8 @@
           "color": "#24DDD8",
           "threshold": 2837.0
         }
-      ]
+      ],
+      "leaderboard_id": 100985
     },
     {
       "name": "Predictable Strafes Gauntlet r15",
@@ -825,7 +839,8 @@
           "color": "#24DDD8",
           "threshold": 2597.0
         }
-      ]
+      ],
+      "leaderboard_id": 101186
     },
     {
       "name": "Predictable Strafes Gauntlet Thin",
@@ -880,7 +895,57 @@
           "color": "#24DDD8",
           "threshold": 2113.0
         }
-      ]
+      ],
+      "leaderboard_id": 100986
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsGlidingIndigoBloom",
+    "kovaaks_benchmark_id": 671,
+    "rank_colors": [
+      [
+        "Basic",
+        "#93C47D"
+      ],
+      [
+        "Beginner",
+        "#FFE599"
+      ],
+      [
+        "Intermediate",
+        "#FCC1C1"
+      ],
+      [
+        "Pre-Advanced",
+        "#D2BFFE"
+      ],
+      [
+        "Advanced",
+        "#B5D1FF"
+      ],
+      [
+        "BLESSED",
+        "#E06666"
+      ],
+      [
+        "EXALTED",
+        "#FBBC04"
+      ],
+      [
+        "UBER",
+        "#351C75"
+      ],
+      [
+        "ARCADIA",
+        "#274E13"
+      ],
+      [
+        "HORIZON",
+        "#24DDD8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:06:53.730842+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }

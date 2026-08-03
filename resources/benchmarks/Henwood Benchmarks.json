@@ -50,7 +50,8 @@
           "color": "#6b2987",
           "threshold": 930.0
         }
-      ]
+      ],
+      "leaderboard_id": 27693
     },
     {
       "name": "1w1ts flick pressure",
@@ -100,7 +101,8 @@
           "color": "#6b2987",
           "threshold": 4500.0
         }
-      ]
+      ],
+      "leaderboard_id": 36679
     },
     {
       "name": "1w1t static microadjusts",
@@ -150,7 +152,8 @@
           "color": "#6b2987",
           "threshold": 1410.0
         }
-      ]
+      ],
+      "leaderboard_id": 96879
     },
     {
       "name": "1W1T - VALORANT",
@@ -200,7 +203,8 @@
           "color": "#6b2987",
           "threshold": 1000.0
         }
-      ]
+      ],
+      "leaderboard_id": 72916
     },
     {
       "name": "Avasive Micro Reflex",
@@ -250,7 +254,8 @@
           "color": "#6b2987",
           "threshold": 740.0
         }
-      ]
+      ],
+      "leaderboard_id": 128306
     },
     {
       "name": "waldoTS Intermediate",
@@ -300,7 +305,8 @@
           "color": "#6b2987",
           "threshold": 180.0
         }
-      ]
+      ],
+      "leaderboard_id": 111273
     },
     {
       "name": "Valorant Fireworks Flick Horizontal",
@@ -350,7 +356,8 @@
           "color": "#6b2987",
           "threshold": 970.0
         }
-      ]
+      ],
+      "leaderboard_id": 70231
     },
     {
       "name": "Valorant Fireworks Flick Horizontal - Far",
@@ -400,7 +407,8 @@
           "color": "#6b2987",
           "threshold": 1050.0
         }
-      ]
+      ],
+      "leaderboard_id": 73729
     },
     {
       "name": "C7N x OFA PRESSURE TARGET ACQUISITION",
@@ -450,7 +458,8 @@
           "color": "#6b2987",
           "threshold": 800.0
         }
-      ]
+      ],
+      "leaderboard_id": 155509
     },
     {
       "name": "tamSpeed 2beps harder",
@@ -500,7 +509,8 @@
           "color": "#6b2987",
           "threshold": 115.0
         }
-      ]
+      ],
+      "leaderboard_id": 1852
     },
     {
       "name": "1w1ts Pasu Perfected faster Small",
@@ -550,7 +560,8 @@
           "color": "#6b2987",
           "threshold": 41.0
         }
-      ]
+      ],
+      "leaderboard_id": 100712
     },
     {
       "name": "ADJUSTTRACK - VALORANT Medium",
@@ -600,7 +611,8 @@
           "color": "#6b2987",
           "threshold": 2400.0
         }
-      ]
+      ],
+      "leaderboard_id": 99329
     }
   ],
   "generated_from": {
@@ -644,7 +656,8 @@
         "#6b2987"
       ]
     ],
-    "generated_at": "2026-07-11T12:13:38.753059+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:26.206129+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

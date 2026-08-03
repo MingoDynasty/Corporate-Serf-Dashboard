@@ -40,7 +40,8 @@
           "color": "#ba7171",
           "threshold": 139.0
         }
-      ]
+      ],
+      "leaderboard_id": 11404
     },
     {
       "name": "1w4ts Voltaic 30% smaller",
@@ -80,7 +81,8 @@
           "color": "#ba7171",
           "threshold": 128.0
         }
-      ]
+      ],
+      "leaderboard_id": 7732
     },
     {
       "name": "1w4ts_truste Raspberry",
@@ -120,7 +122,8 @@
           "color": "#ba7171",
           "threshold": 175.0
         }
-      ]
+      ],
+      "leaderboard_id": 10631
     },
     {
       "name": "1w2ts Pasu Perfected 30% Smaller",
@@ -160,7 +163,8 @@
           "color": "#ba7171",
           "threshold": 107.0
         }
-      ]
+      ],
+      "leaderboard_id": 28243
     },
     {
       "name": "psalmTS angelic click small",
@@ -200,7 +204,8 @@
           "color": "#ba7171",
           "threshold": 67.0
         }
-      ]
+      ],
+      "leaderboard_id": 58658
     },
     {
       "name": "B180 Voltaic 30% Smaller",
@@ -240,7 +245,8 @@
           "color": "#ba7171",
           "threshold": 88.0
         }
-      ]
+      ],
+      "leaderboard_id": 10063
     },
     {
       "name": "Pokeball ww3t Voltaic smaller",
@@ -280,7 +286,8 @@
           "color": "#ba7171",
           "threshold": 130.0
         }
-      ]
+      ],
+      "leaderboard_id": 6559
     },
     {
       "name": "rx 1w4ts vbr Varied Pokeball",
@@ -320,7 +327,8 @@
           "color": "#ba7171",
           "threshold": 1450.0
         }
-      ]
+      ],
+      "leaderboard_id": 41641
     },
     {
       "name": "Leapstrafes Control Phantasy",
@@ -360,7 +368,8 @@
           "color": "#ba7171",
           "threshold": 15900.0
         }
-      ]
+      ],
+      "leaderboard_id": 55629
     },
     {
       "name": "VT PGT Intermediate S5 Precision Focus",
@@ -400,7 +409,8 @@
           "color": "#ba7171",
           "threshold": 4600.0
         }
-      ]
+      ],
+      "leaderboard_id": 103832
     },
     {
       "name": "VT Raw Control Elite S5 Reactive Focus",
@@ -440,7 +450,8 @@
           "color": "#ba7171",
           "threshold": 2450.0
         }
-      ]
+      ],
+      "leaderboard_id": 104822
     },
     {
       "name": "Polarized Hell memoire",
@@ -480,7 +491,8 @@
           "color": "#ba7171",
           "threshold": 3900.0
         }
-      ]
+      ],
+      "leaderboard_id": 144883
     },
     {
       "name": "Controlsphere rAim",
@@ -520,7 +532,8 @@
           "color": "#ba7171",
           "threshold": 12500.0
         }
-      ]
+      ],
+      "leaderboard_id": 5102
     },
     {
       "name": "VT Raw Control Advanced S5 Hard",
@@ -560,7 +573,8 @@
           "color": "#ba7171",
           "threshold": 2950.0
         }
-      ]
+      ],
+      "leaderboard_id": 106726
     },
     {
       "name": "voxTargetSwitch",
@@ -600,7 +614,8 @@
           "color": "#ba7171",
           "threshold": 139.0
         }
-      ]
+      ],
+      "leaderboard_id": 118
     },
     {
       "name": "patCircleSwitch NR",
@@ -640,7 +655,8 @@
           "color": "#ba7171",
           "threshold": 132.0
         }
-      ]
+      ],
+      "leaderboard_id": 535
     },
     {
       "name": "psalmTS angelic",
@@ -680,7 +696,8 @@
           "color": "#ba7171",
           "threshold": 85.0
         }
-      ]
+      ],
+      "leaderboard_id": 973
     },
     {
       "name": "tamTargetSwitch Control Small",
@@ -720,7 +737,8 @@
           "color": "#ba7171",
           "threshold": 40.0
         }
-      ]
+      ],
+      "leaderboard_id": 1486
     }
   ],
   "generated_from": {
@@ -756,7 +774,8 @@
         "#ba7171"
       ]
     ],
-    "generated_at": "2026-07-11T12:12:10.364755+00:00",
-    "generator": "benchmark_importer"
+    "generated_at": "2026-07-20T22:09:08.814795+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
   }
 }

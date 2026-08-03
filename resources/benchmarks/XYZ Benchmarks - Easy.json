@@ -65,7 +65,8 @@
           "color": "#65F0D8",
           "threshold": 1550.0
         }
-      ]
+      ],
+      "leaderboard_id": 132170
     },
     {
       "name": "XYZ MixClick Easy",
@@ -130,7 +131,8 @@
           "color": "#65F0D8",
           "threshold": 1840.0
         }
-      ]
+      ],
+      "leaderboard_id": 132149
     },
     {
       "name": "XYZ DepthClick Easy",
@@ -195,7 +197,8 @@
           "color": "#65F0D8",
           "threshold": 1760.0
         }
-      ]
+      ],
+      "leaderboard_id": 132160
     },
     {
       "name": "XYZ XYZClick Easy",
@@ -260,7 +263,8 @@
           "color": "#65F0D8",
           "threshold": 1830.0
         }
-      ]
+      ],
+      "leaderboard_id": 135602
     },
     {
       "name": "XYZ BounceClick Easy",
@@ -325,7 +329,8 @@
           "color": "#65F0D8",
           "threshold": 1420.0
         }
-      ]
+      ],
+      "leaderboard_id": 135594
     },
     {
       "name": "XYZ 3DClick Easy",
@@ -390,7 +395,8 @@
           "color": "#65F0D8",
           "threshold": 1720.0
         }
-      ]
+      ],
+      "leaderboard_id": 135589
     },
     {
       "name": "XYZ StarClick Easy",
@@ -455,7 +461,8 @@
           "color": "#65F0D8",
           "threshold": 1030.0
         }
-      ]
+      ],
+      "leaderboard_id": 135600
     },
     {
       "name": "XYZ AxisClick Easy",
@@ -520,7 +527,8 @@
           "color": "#65F0D8",
           "threshold": 1030.0
         }
-      ]
+      ],
+      "leaderboard_id": 137415
     },
     {
       "name": "XYZ SmoothTrack Easy",
@@ -585,7 +593,8 @@
           "color": "#65F0D8",
           "threshold": 4782.0
         }
-      ]
+      ],
+      "leaderboard_id": 140874
     },
     {
       "name": "XYZ BounceTrack Easy",
@@ -650,7 +659,8 @@
           "color": "#65F0D8",
           "threshold": 5052.0
         }
-      ]
+      ],
+      "leaderboard_id": 135247
     },
     {
       "name": "XYZ JagTrack Easy",
@@ -715,7 +725,8 @@
           "color": "#65F0D8",
           "threshold": 4334.0
         }
-      ]
+      ],
+      "leaderboard_id": 135299
     },
     {
       "name": "XYZ AirTrack Easy",
@@ -780,7 +791,8 @@
           "color": "#65F0D8",
           "threshold": 4995.0
         }
-      ]
+      ],
+      "leaderboard_id": 135606
     },
     {
       "name": "XYZ GroundTrack Easy",
@@ -845,7 +857,8 @@
           "color": "#65F0D8",
           "threshold": 4370.0
         }
-      ]
+      ],
+      "leaderboard_id": 132436
     },
     {
       "name": "XYZ ReactiveTrack Easy",
@@ -910,7 +923,8 @@
           "color": "#65F0D8",
           "threshold": 4006.0
         }
-      ]
+      ],
+      "leaderboard_id": 135736
     },
     {
       "name": "XYZ TwisterTrack Easy",
@@ -975,7 +989,8 @@
           "color": "#65F0D8",
           "threshold": 5336.0
         }
-      ]
+      ],
+      "leaderboard_id": 135226
     },
     {
       "name": "XYZ LeapTrack Easy",
@@ -1040,7 +1055,8 @@
           "color": "#65F0D8",
           "threshold": 4477.0
         }
-      ]
+      ],
+      "leaderboard_id": 135735
     },
     {
       "name": "XYZ SwaySwitch Easy",
@@ -1105,7 +1121,8 @@
           "color": "#65F0D8",
           "threshold": 1427.0
         }
-      ]
+      ],
+      "leaderboard_id": 142176
     },
     {
       "name": "XYZ FloatSwitch Easy",
@@ -1170,7 +1187,8 @@
           "color": "#65F0D8",
           "threshold": 1607.0
         }
-      ]
+      ],
+      "leaderboard_id": 142175
     },
     {
       "name": "XYZ BounceSwitch Easy",
@@ -1235,7 +1253,8 @@
           "color": "#65F0D8",
           "threshold": 1220.0
         }
-      ]
+      ],
+      "leaderboard_id": 142215
     },
     {
       "name": "XYZ AscendSwitch Easy",
@@ -1300,7 +1319,8 @@
           "color": "#65F0D8",
           "threshold": 862.0
         }
-      ]
+      ],
+      "leaderboard_id": 142216
     },
     {
       "name": "XYZ SnowSwitch Easy",
@@ -1365,7 +1385,8 @@
           "color": "#65F0D8",
           "threshold": 741.0
         }
-      ]
+      ],
+      "leaderboard_id": 142217
     },
     {
       "name": "XYZ WarpSwitch Easy",
@@ -1430,7 +1451,8 @@
           "color": "#65F0D8",
           "threshold": 860.0
         }
-      ]
+      ],
+      "leaderboard_id": 142218
     },
     {
       "name": "XYZ SlopeSwitch Easy",
@@ -1495,7 +1517,8 @@
           "color": "#65F0D8",
           "threshold": 793.0
         }
-      ]
+      ],
+      "leaderboard_id": 136989
     },
     {
       "name": "XYZ WideSwitch Easy",
@@ -1560,7 +1583,65 @@
           "color": "#65F0D8",
           "threshold": 576.0
         }
-      ]
+      ],
+      "leaderboard_id": 142220
     }
-  ]
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChattingCobaltChatfrag",
+    "kovaaks_benchmark_id": 904,
+    "rank_colors": [
+      [
+        "Trainee-",
+        "#FEC68C"
+      ],
+      [
+        "Trainee",
+        "#F6B26B"
+      ],
+      [
+        "Trainee+",
+        "#F59D40"
+      ],
+      [
+        "Initiate",
+        "#FFD966"
+      ],
+      [
+        "Initiate+",
+        "#F5CC50"
+      ],
+      [
+        "Adept",
+        "#93C47D"
+      ],
+      [
+        "Adept+",
+        "#7FC162"
+      ],
+      [
+        "Ascendant",
+        "#6D9EEB"
+      ],
+      [
+        "Ascendant+",
+        "#598CDC"
+      ],
+      [
+        "Virtuoso",
+        "#8E7CC3"
+      ],
+      [
+        "Virtuoso+",
+        "#8570C2"
+      ],
+      [
+        "Prismatic",
+        "#65F0D8"
+      ]
+    ],
+    "generated_at": "2026-07-20T22:08:08.563994+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
 }
