@@ -23,10 +23,12 @@ from source.plot.plot_service import (
     generate_empty_plot,
     generate_placeholder_plot,
 )
-from source.utilities.dash_logging import get_dash_logger
 
 logger = logging.getLogger(__name__)
-dash_logger = get_dash_logger(__name__)
+_NO_JOURNEY_DATA_PLOT_TITLE = "No playlist progress yet"
+_NO_JOURNEY_DATA_PLOT_MESSAGE = (
+    "Play scenarios from the selected playlists and the graph will fill in."
+)
 dash.register_page(
     __name__,
     path="/aim-training-journey",
@@ -71,18 +73,30 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
         )
 
     journey_data = get_aim_training_journey_for_playlists(selected_playlist_codes)
+    for playlist_code, data in journey_data.items():
+        if not data:
+            logger.warning(
+                "Insufficient data for playlist: %s",
+                get_playlist_display_label(playlist_code),
+            )
+
+    # Nothing to plot is a state, not an event: say so where the chart would
+    # be, the way Home's empty plots do, instead of toasting over the page.
+    # Only a selection with no runs at all takes the empty state; a partial
+    # selection still plots what it has.
+    if not any(journey_data.values()):
+        return apply_light_dark_mode(
+            generate_empty_plot(
+                _NO_JOURNEY_DATA_PLOT_TITLE,
+                _NO_JOURNEY_DATA_PLOT_MESSAGE,
+            ),
+            color_scheme,
+        )
+
     labeled_journey_data = {
         get_playlist_display_label(playlist_code): data
         for playlist_code, data in journey_data.items()
     }
-    for playlist_code, data in journey_data.items():
-        if not data:
-            message = (
-                "Insufficient data for playlist: "
-                f"{get_playlist_display_label(playlist_code)}"
-            )
-            dash_logger.warning(message)
-
     aim_training_checkpoints = get_aim_training_checkpoints(checkpoint_hour)
     figure = generate_aim_training_journey_plot(
         labeled_journey_data,
