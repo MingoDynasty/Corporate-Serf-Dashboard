@@ -7,8 +7,7 @@ from typing import Any
 
 from dash_extensions._typing import context_value
 
-# The dmc.NotificationContainer in the app shell that displays all toasts.
-NOTIFICATION_CONTAINER_ID = "notification-container"
+from source.utilities.notifications import NOTIFICATION_CONTAINER_ID
 
 # Notification color and title per log level, shared by the in-context
 # writers and the background-thread queue path.

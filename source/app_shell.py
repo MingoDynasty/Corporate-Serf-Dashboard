@@ -5,7 +5,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, State, clientside_callback
 
 from source.components.local_icon import local_icon
-from source.utilities.dash_logging import NOTIFICATION_CONTAINER_ID
+from source.utilities.notifications import NOTIFICATION_CONTAINER_ID
 
 APP_INDEX_STRING = """<!DOCTYPE html>
 <html lang="en">
