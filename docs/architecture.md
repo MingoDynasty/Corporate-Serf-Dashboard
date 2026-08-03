@@ -265,7 +265,10 @@ flowchart LR
   Save. The form is built per visit from the stored view (never the pinned
   accessors) so it always shows what is on disk. The stats-directory field is a
   free-text `dmc.Autocomplete` whose suggestions are the detector's candidate
-  list, re-run on each visit; suggestions never bypass validation or Save.
+  list, re-run on each visit; suggestions never bypass validation or Save. Its
+  filter is overridden (`allOptions` in `assets/dashMantineFunctions.js`)
+  because Mantine's default matches options against the input text, which would
+  leave the normally-prefilled field offering only the path it already holds.
   Validation is offline only
   (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
   above the universe-1 base); a save writes all three keys,
@@ -382,6 +385,11 @@ flowchart LR
   (`playlists.py`, `playlist_scenarios.py`) reference these from their column
   defs and run with `dangerously_allow_code=True`. Custom grid sort/format
   behavior belongs here — see the decision log.
+- `assets/dashMantineFunctions.js` — repo-owned client-side functions for
+  dash-mantine-components function props, looked up by name in
+  `window.dashMantineFunctions` when a prop is passed as
+  `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
+  keeps every suggestion visible (see the settings page below).
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.

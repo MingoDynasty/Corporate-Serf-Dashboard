@@ -48,6 +48,12 @@ STEAM_ID_DESCRIPTION = (
     "KovaaK's username."
 )
 
+# Mantine filters an Autocomplete's options against whatever the input holds,
+# which would leave a prefilled field offering only the path it already has.
+# ``assets/dashMantineFunctions.js`` explains why that is the wrong default
+# here; this names the replacement.
+SHOW_EVERY_CANDIDATE = {"function": "allOptions"}
+
 STATS_DIR_ERROR = "No such directory."
 STEAM_ID_ERROR = "Enter a 17-digit SteamID64 — it starts with 7656119."
 
@@ -222,7 +228,8 @@ def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
     An Autocomplete rather than a Select because the candidates are hints, not
     the allowed set: a path this machine's Steam does not know about is still a
     valid answer, and with no candidates the field is exactly the text input it
-    replaced.
+    replaced. Filtering is off, so a prefilled field still offers the other
+    libraries it found.
     """
     return dmc.Autocomplete(
         id="app-settings-stats-dir",
@@ -230,6 +237,7 @@ def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
         description=STATS_DIR_DESCRIPTION,
         value=value,
         data=candidates,
+        filter=SHOW_EVERY_CANDIDATE,
         w=_FIELD_WIDTH,
     )
 

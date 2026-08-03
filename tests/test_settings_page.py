@@ -110,6 +110,21 @@ def test_detected_directories_are_offered_as_suggestions(candidates, tmp_path):
     assert field.value == str(tmp_path / "typed")
 
 
+def test_a_prefilled_field_still_offers_the_other_libraries(candidates, tmp_path):
+    """The wrong-library repair is the whole point, and it starts prefilled.
+
+    Mantine's default filter matches options against the input text, so the
+    seeded path would hide every alternative — the one case the suggestions
+    exist for. Pinned at the prop because the behavior lives in Mantine.
+    """
+    candidates[:] = [str(tmp_path / "primary"), str(tmp_path / "second")]
+    settings_service.save_settings({"stats_dir": str(tmp_path / "primary")})
+
+    field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
+
+    assert field.filter == settings_page.SHOW_EVERY_CANDIDATE
+
+
 def test_detecting_nothing_leaves_a_plain_text_field(candidates):
     """A machine without Steam gets exactly the field that shipped."""
     candidates.clear()
