@@ -167,7 +167,11 @@ class RunEventsPayload(TypedDict):
 def _settings_help_label(label: str, help_text: str) -> dmc.Group:
     return dmc.Group(
         [
-            dmc.Text(label, span=True),
+            # `inherit` so the label text takes the enclosing <label>'s font
+            # instead of dmc.Text's own defaults (md/400). Without it these
+            # labels render 16px/400 beside the 14px/700 of every label
+            # passed as a plain string.
+            dmc.Text(label, span=True, inherit=True),
             dmc.Tooltip(
                 dmc.ActionIcon(
                     local_icon("material-symbols:info-outline", width=16),
