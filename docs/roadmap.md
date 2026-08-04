@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Notification system redesign** — the app is quiet during normal play. The
+  wall of red error toasts about an unconfigured username is gone: persistent
+  conditions now explain themselves in place, beside the value they affect,
+  and passive navigation never interrupts. Each run produces at most one
+  toast, whose title states the verdict — a threshold pass or miss, or the
+  placement it earned — and playing again replaces it instead of stacking a
+  second one beside it. The no-information "Graph updated!" toast is gone
+  too. (PRs #194, #196, #198, #199; design in #82, #195) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Settings detection** — the Settings page now offers what the machine
   already knows. The stats-folder box suggests every Steam library holding a
   KovaaK's stats folder, so a wrong first-start pick is a click to repair
@@ -59,33 +68,10 @@ sequence.
   no longer fan out over the slow exact-name search endpoint, and ID resolution
   no longer needs a configured username. (PR #169) Design rationale distilled
   into [`decision_log.md`](./decision_log.md).
-- **Install, update, and rollback** — the app installs from one PowerShell
-  line that brings its own Python and uv, finds the KovaaK's stats folder, and
-  leaves a desktop shortcut that updates itself on launch. Every push to `main`
-  that changes runtime code publishes an immutable CalVer release, and every
-  build identifies itself in the log and `/health`, so a bug report names a
-  version and any installer-era release (`v2026.07.19.4` and later) can be
-  rolled back to. Turns "clone the repo and run uv" into
-  something a non-technical player can do.
-  (PRs #154, #155, #158, #159, #163; design in #150) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
 
 ---
 
 ## Upcoming milestones
-
-- **Notification system redesign** — collapse the two notification
-  subsystems into one quiet-by-default toast layer: persistent conditions
-  render in-place, passive navigation never toasts an error, and each run
-  produces at most one verdict toast. Before this work the default
-  configuration produced a stacking wall of red error toasts plus a
-  no-information "Graph updated!" toast during normal play — and since the
-  background-delivery fix, formerly invisible diagnostic errors rendered
-  too. Ships as three PRs (noise kill → consolidation → copy rework); the
-  noise kill alone resolves the audit complaint. Design in
-  [`notification_system_proposal.md`](./notification_system_proposal.md)
-  (all three decisions Accepted 2026-08-03; PR 1, the noise kill, is in
-  flight — PR 2, the System A consolidation, is next up).
 
 - **Run history and sessions** — a reviewable, persistent record of past runs
   that the ephemeral per-run toast can't provide: the current cross-scenario
