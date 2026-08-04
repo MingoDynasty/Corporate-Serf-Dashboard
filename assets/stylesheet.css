@@ -1,8 +1,10 @@
-.mantine-Select-label {
-    font-weight: bold;
-}
-
-.mantine-MultiSelect-label {
+/* Every Mantine field label, bolded once. Enumerating per-component label
+   classes instead (Select, TextInput, ...) silently missed whichever
+   component was added next: the stats-directory field lost its bold when it
+   became an Autocomplete. This is the class they all share, and it covers
+   only field labels — a Switch's or Radio's caption is control text, not a
+   field label, and carries its own class. */
+.mantine-InputWrapper-label {
     font-weight: bold;
 }
 
@@ -14,18 +16,6 @@
 .mantine-MultiSelect-option[data-checked] {
     font-weight: bold;
     background-color: rgb(229, 236, 246, 0.5);
-}
-
-.mantine-NumberInput-label {
-    font-weight: bold;
-}
-
-.mantine-DatePickerInput-label {
-    font-weight: bold;
-}
-
-.mantine-TextInput-label {
-    font-weight: bold;
 }
 
 .mantine-Modal-title {
