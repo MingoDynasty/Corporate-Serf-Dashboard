@@ -78,6 +78,18 @@ commands becomes burdensome.
 
 ## UI/UX
 
+### Manual-refresh failure color, and the title it depends on
+
+`source/pages/home.py` — a hard refresh failure is red and a served-stale
+refresh is yellow, and both are titled "Position refresh failed". Softening the
+red to yellow was raised during the notification redesign and deliberately left
+open: the color is currently the *only* thing separating the two outcomes, so
+softening it without first giving the served-stale toast a title of its own
+makes them nearly indistinguishable, which is worse than leaving red alone.
+Decide the title first; the color follows. Note Mantine suppresses a
+notification's full-height color bar whenever an icon is present, and both of
+these carry one, so the color is a 28 px circle rather than a stripe.
+
 ### Watch for `is_scenario_in_database` early-return pattern
 
 `source/pages/home.py` previously had a bug where the rank callback short-circuited with `is_scenario_in_database(selected_scenario)`, which silently hid rank data for scenarios the user had not played locally. Fixed in PR #9.

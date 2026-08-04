@@ -2,10 +2,13 @@
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, clientside_callback
+from dash import Input, Output, State, clientside_callback, dcc
 
 from source.components.local_icon import local_icon
-from source.utilities.notifications import NOTIFICATION_CONTAINER_ID
+from source.utilities.notifications import (
+    NOTIFICATION_CONTAINER_ID,
+    TOAST_LIFETIME_STORE_ID,
+)
 
 APP_INDEX_STRING = """<!DOCTYPE html>
 <html lang="en">
@@ -136,6 +139,10 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.AppShell(
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
+                    # Beside the container on purpose: a toast outlives the
+                    # page that emitted it, so the counter that keeps its
+                    # replacement lifetimes honest has to outlive it too.
+                    dcc.Store(id=TOAST_LIFETIME_STORE_ID, data=0),
                     dmc.AppShellHeader(
                         dmc.Grid(
                             children=[

@@ -32,20 +32,34 @@ list in the roadmap.)
   runs grouped by sensitivity. *Problem solved:* "is my current sensitivity
   actually better?" and "am I trending up on this scenario?" are answered
   visually instead of by gut feel.
-- **Run notifications.** A new run gets a toast when it earns one of two
-  conditional classifications: a top-N placement within the run's sensitivity
-  ("40.2 cm/360 has a new 2nd place score"), shown when the run makes the
-  configured top N for the on-screen scenario; and a score-threshold
-  pass/fail against the run's previous high score ("ready to move on" vs
-  "keep grinding"), shown when the threshold notification switch is on and a
-  previous high score exists. The overlay line for that same percentage tracks
-  the current personal best. A run that qualifies for neither is reported by
-  its new point on the plot and nothing else. A new personal best has no toast
-  of its own; it triggers the background rank refresh. If runs accumulate while Home
-  is not open, the next visit rebuilds once from final state and gives one
-  scenario-named summary instead of replaying stale toasts and selections.
+- **Run notifications.** A run earns at most one toast, and its title is the
+  verdict. A score-threshold pass or miss against the run's previous high
+  score headlines whenever the threshold switch is on and a previous high
+  score exists ("Threshold passed" / "Below threshold", the miss naming the
+  target percentage it fell short of); otherwise a top-N placement within the
+  run's sensitivity is the headline ("New 2nd-best score"). When a run earns
+  both, the threshold verdict leads and the placement trails it. The message
+  leads with the scenario, and the sensitivity is a trailing qualifier. The
+  overlay line for that same percentage tracks the current personal best. A
+  run that qualifies for neither is reported by its new point on the plot and
+  nothing else. A new personal best has no toast of its own; it triggers the
+  background rank refresh. If runs accumulate while Home is not open, the next
+  visit rebuilds once from final state and gives one scenario-named summary
+  instead of replaying stale toasts and selections — and the next run you play
+  replaces that catch-up digest, which is by then the staler news.
   *Problem solved:* immediate in-session feedback on whether the run you just
-  played met your bar, without a noisy catch-up sequence after time away.
+  played met your bar, readable at a glance without leaning in, and without a
+  pile of toasts accumulating over a session or a noisy catch-up sequence
+  after time away.
+- **Quiet by default.** Toasts are reserved for what you did, what you
+  achieved, and failures you would act on. A condition that stays true — no
+  username configured, a leaderboard lookup that failed, a scenario with no
+  runs yet — explains itself where it happens instead of interrupting again on
+  every scenario switch. *Problem solved:* with no username set (the default
+  on a fresh install) the app used to report that supported state as a red
+  error on every rank render, stacking into a wall of red during normal play;
+  now nothing turns red unless something you asked for failed, or a run of
+  yours failed to record.
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is.

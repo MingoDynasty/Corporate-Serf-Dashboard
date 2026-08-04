@@ -44,7 +44,9 @@ benchmark tier) — see the
   A mismatch is a persistent condition with no in-place home, so it gets one
   toast per app session — fired by the first passive render that observes it
   (scenario switch, new run, interval tick), titled "Steam ID mismatch", and
-  persistent until dismissed. Later renders carry it silently, and a manual
+  persistent until dismissed, one of the two named exceptions to the
+  quiet-by-default routing policy
+  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)). Later renders carry it silently, and a manual
   Refresh that merely re-observes the mismatch still reports a clean refresh:
   the fetch succeeded. A render nothing triggered — the duplicate-output fire
   Dash can make on page load — renders the value without spending the
@@ -127,7 +129,10 @@ benchmark tier) — see the
   `UNKNOWN` only when nothing is cached. `force_refresh=True` inherits the
   same fallback
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)).
-- Passive renders never toast. The Home Position field carries its own
+- Passive renders never toast — the routing policy sends persistent conditions
+  to in-place UI
+  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  The Home Position field carries its own
   explanation instead: `N/A` plus a link to the Settings page when no
   username is configured, `N/A` plus "lookup failed, Refresh to retry" when
   the lookup failed with nothing cached, and the cached value plus "from
@@ -145,10 +150,14 @@ benchmark tier) — see the
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
   position unchanged." is true whether a cached position was on screen or
-  not. A served-stale result is yellow, and its value carries the same
-  "from cache, Refresh to update" affordance a passive render would give it.
-  Only a genuinely fresh result gets the green confirmation, which keeps a
-  fresh id per click so back-to-back refreshes each answer.
+  not. A served-stale result is yellow under that same title — deliberately,
+  since both are outcomes of one click and only the id has to differ so a
+  later result is not swallowed — and its value carries the same "from cache,
+  Refresh to update" affordance a passive render would give it. Only a
+  genuinely fresh result gets the green confirmation, titled "Position
+  refreshed", which keeps a fresh id per click so back-to-back refreshes each
+  answer. That per-click id is the one named exception to the stable-id rule
+  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).

@@ -244,7 +244,9 @@ flowchart LR
 - `source/app.py` — entry point (`main`): wiring described above.
 - `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
   collapse applied by a clientside callback), theme toggle, Dash `page_container`,
-  and the notification host.
+  and the notification host — the one `dmc.NotificationContainer`, plus the
+  toast-lifetime `dcc.Store` beside it, shell-hosted so its lifecycle matches
+  the toasts' rather than resetting when a page remounts.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
@@ -433,7 +435,10 @@ flowchart LR
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
   the one builder for `sendNotifications` payloads: stable semantic id, title,
   message, color, optional icon, and the shared auto-close duration —
-  `auto_close=False` for the conditions that must survive until dismissed),
+  `auto_close=False` for the conditions that must survive until dismissed;
+  `upsert_toast()` pairs the `update`+`show` actions and alternates the
+  duration so a replacement under a reused id starts a full lifetime, keyed off
+  the per-client `TOAST_LIFETIME_STORE_ID` counter),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
   `paths` (`state_dir()` / `package_root()` — see State above).

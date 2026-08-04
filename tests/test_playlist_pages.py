@@ -479,7 +479,7 @@ def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monke
     The dropped shown-set entry is bookkeeping with no observable consequence,
     so there is deliberately no split-outcome message here. What matters is
     that the request no longer fails: failing it would show nothing, and the
-    natural retry renders a red "Playlist Delete Failed" toast for a delete
+    natural retry renders a red "Playlist delete failed" toast for a delete
     that actually succeeded.
     """
     deleted = []
@@ -503,7 +503,7 @@ def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monke
 
     assert deleted == ["UserCode"]
     assert notifications[0]["color"] == "green"
-    assert notifications[0]["title"] == "Playlist Deleted"
+    assert notifications[0]["title"] == "Playlist deleted"
     assert notifications[0]["message"] == 'Deleted "User Label" (UserCode).'
     assert rows_refresh == 5
     assert opened is False
@@ -741,7 +741,7 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
     # The toast names the playlist by its canonical stored code, not the pasted
     # input. "CanonicalCode" is not in the database, so its display label is the
     # code itself.
-    assert notifications[0]["title"] == "Playlist Imported"
+    assert notifications[0]["title"] == "Playlist imported"
     assert notifications[0]["message"] == 'Imported "CanonicalCode" (CanonicalCode).'
     # A successful import bumps the refresh store so the grid rebuilds, then
     # closes the modal and clears the field so the user sees the new row.
@@ -882,7 +882,7 @@ def test_import_playlist_success_message_uses_display_label(monkeypatch):
 
     notifications, *_ = playlists.import_playlist(1, "canonicalcode", 0)
 
-    assert notifications[0]["title"] == "Playlist Imported"
+    assert notifications[0]["title"] == "Playlist imported"
     assert notifications[0]["message"] == 'Imported "My Playlist" (CanonicalCode).'
 
 
@@ -1584,6 +1584,7 @@ def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
         "1 of 3 positions unavailable · 1 from cache — KovaaK's unreachable"
     )
     assert first[2][0]["color"] == "red"
+    assert first[2][0]["title"] == "Position update incomplete"
     assert first[2][0]["message"] == (
         "Couldn't update 1 of 3 positions; 1 more served from cache"
     )
@@ -1597,6 +1598,7 @@ def test_playlist_fill_stale_only_is_yellow_and_clean_is_silent():
     clean = playlist_scenarios._fill_summary_notification(_fill_drain())
 
     assert stale[0]["color"] == "yellow"
+    assert stale[0]["title"] == "Positions served from cache"
     assert stale[0]["message"] == (
         "2 of 3 positions served from cache — KovaaK's was unreachable"
     )

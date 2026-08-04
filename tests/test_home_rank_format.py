@@ -187,6 +187,16 @@ def test_startup_playlist_warnings_flush_after_mount_and_drain_once():
     notifications = home.flush_startup_playlist_warnings(1)
 
     assert [notification["message"] for notification in notifications] == warnings
+    # They fire seconds after a server start, when nobody is guaranteed to be
+    # looking, so they wait for a dismissal instead of timing out.
+    assert [notification["title"] for notification in notifications] == [
+        "Playlist not loaded",
+        "Playlist not loaded",
+    ]
+    assert [notification["autoClose"] for notification in notifications] == [
+        False,
+        False,
+    ]
     assert home.flush_startup_playlist_warnings(2) is dash.no_update
 
 
@@ -863,6 +873,7 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
     # Any completed refresh — ranked or unranked — confirms with a green
     # toast; a fresh id per refresh so back-to-back clicks each confirm.
     assert notifications[0]["color"] == "green"
+    assert notifications[0]["title"] == "Position refreshed"
     assert scenario_name in notifications[0]["message"]
     assert notifications[0]["id"].startswith("rank-refresh-notification-")
     assert fetched == [True]
