@@ -608,7 +608,7 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     """
     return toast(
         f"rank-refresh-notification-{uuid.uuid4()}",
-        "Notification",
+        "Position refreshed",
         f"Refreshed position for {selected_scenario}.",
         color="green",
         icon=local_icon("material-symbols:refresh-rounded"),
@@ -1098,16 +1098,20 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
 def _build_startup_playlist_warning_notifications(
     warnings: list[str],
 ) -> list[dict[str, object]]:
+    """Report the playlists that did not survive the startup scan.
+
+    Persistent, not timed: these fire once per boot, seconds after the server
+    starts, which is exactly when nobody is guaranteed to be watching.
+    """
     return [
-        {
-            "action": "show",
-            "title": "Playlist Warning",
-            "message": warning,
-            "color": "yellow",
-            "id": f"startup-playlist-warning-{idx}",
-            "icon": local_icon("material-symbols:warning-outline"),
-            "autoClose": 10000,
-        }
+        toast(
+            f"startup-playlist-warning-{idx}",
+            "Playlist not loaded",
+            warning,
+            color="yellow",
+            icon=local_icon("material-symbols:warning-outline"),
+            auto_close=False,
+        )
         for idx, warning in enumerate(warnings)
     ]
 
