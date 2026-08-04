@@ -26,9 +26,9 @@ and the two wide dropdowns narrow a little before the row gives up and wraps.
 
 Decision: Home's controls `dmc.Grid` sets `type="container"` and passes
 `breakpoints`, and both wide playlist/scenario dropdowns swap a hard
-`miw="min(400px, 100%)"` floor for `flex="0 1 400px"` over a
-`miw="min(200px, 100%)"` floor. The breakpoint *values* are unchanged Mantine
-defaults; only the box they measure moves.
+`miw="min(400px, 100%)"` floor for `flex="1 1 200px"` under a
+`maw="min(400px, 100%)"` cap and over a matching `miw` floor. The breakpoint
+*values* are unchanged Mantine defaults; only the box they measure moves.
 
 Why: `dmc.AppShellNavbar` is `position: fixed` with `width: 250px` and offsets
 main's padding, so the content area shrinks by 250px while the viewport does
@@ -37,10 +37,21 @@ not. Mantine's default Grid emits `@media (min-width: …)` for responsive
 a 1200px *window* even when the content area was only ~900px. Both columns then
 got a share of width the page did not have: the left column's controls wrapped
 and the right column's radio labels were squeezed. The 400px `min-width` floor
-compounded it — `min-width` beats `flex-shrink`, so the dropdowns could not
-give ground and the row wrapped instead.
+compounded it, for the reason recorded below.
 
 Consequences and constraints:
+
+- **Line-breaking reads the hypothetical main size, not the shrunk size.** A
+  flex item is collected onto a line at its flex-basis clamped by min/max
+  width; `flex-shrink` only redistributes space *inside* a line that has
+  already been collected. Anything pinning a dropdown's pre-wrap size at the
+  400px target — the original `min-width: 400px`, and equally a
+  `flex: 0 1 400px` basis — books 400px of the row before shrinking can run, so
+  the row wraps at exactly the width it did before. The basis must therefore sit
+  at the 200px *floor*, with `flex-grow` climbing back toward the 400px cap on a
+  line that has room. `tests/test_home_layout.py` asserts the derived
+  hypothetical size stays below the target rather than asserting the prop
+  strings, because a prop-shaped test passes on all of the broken combinations.
 
 - **`breakpoints` is not optional here.** Mantine renders the element carrying
   `container: mantine-grid / inline-size` only when a Grid passes *both*
@@ -56,7 +67,7 @@ Consequences and constraints:
   Mantine resolves responsive *style props* through theme media queries with no
   container equivalent. It is a 32px cosmetic indent that cannot cause wrapping,
   and it degrades sensibly at every width, so it is left alone deliberately.
-- **The shrink rule lives in `PLAYLIST_SELECTOR_PRESET`**, so the Aim Training
+- **The sizing rule lives in `PLAYLIST_SELECTOR_PRESET`**, so the Aim Training
   Journey page's `dmc.MultiSelect` picks it up too. Both sit in wrapping rows
   and want the same behavior; splitting the rule to spare the second page would
   cost more than it saves.

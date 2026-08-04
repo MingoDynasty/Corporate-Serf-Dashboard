@@ -1289,11 +1289,13 @@ def layout(
                                     checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     data=scenario_options,
-                                    # Matches the playlist filter beside it:
-                                    # aim for 400px, narrow before wrapping.
-                                    flex="0 1 400px",
+                                    # Mirrors the playlist filter beside it; see
+                                    # PLAYLIST_SELECTOR_PRESET for why the basis
+                                    # is the floor and not the 400px target.
+                                    flex="1 1 200px",
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
+                                    maw="min(400px, 100%)",
                                     maxDropdownHeight="75vh",
                                     miw="min(200px, 100%)",
                                     persistence=scenario_persistence,
