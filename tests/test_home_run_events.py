@@ -195,228 +195,212 @@ def test_drain_run_events_tolerates_popleft_race(monkeypatch):
     assert payload == _payload()
 
 
-def test_single_run_notifications_preserve_the_top_n_toast_alone():
-    # No previous high score means no threshold verdict; the top-N placement
-    # is the whole story, with no content-free companion toast beside it.
-    notifications = home._build_run_event_notifications(
-        _payload(previous_high_score=None),
+def _notification(
+    payload: home.RunEventsPayload,
+    *,
+    top_n_scores: int = 5,
+    score_threshold_percentage: float | str | None = 100.0,
+    score_threshold_notification_switch: bool = True,
+) -> dict[str, object] | None:
+    return home._build_run_event_notification(
+        payload,
         "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=100.0,
-        score_threshold_notification_switch=True,
-    )
-
-    assert [notification["id"] for notification in notifications] == [
-        "new-top-n-score-notification",
-    ]
-    assert notifications[0]["message"] == (
-        "34.64 cm/360 has a new 2nd place score: 812.40"
+        top_n_scores,
+        score_threshold_percentage,
+        score_threshold_notification_switch,
     )
 
 
-def test_single_run_threshold_notification_uses_previous_high_score():
-    notifications = home._build_run_event_notifications(
+def test_every_run_verdict_shares_one_replaceable_id():
+    # One run, one toast: the placement toast, the threshold verdict, and the
+    # catch-up digest all land under the same id, so the newest one replaces
+    # whatever is on screen instead of stacking beside it.
+    ids = {
+        _notification(_payload(previous_high_score=None))["id"],
+        _notification(_payload(score=830.0))["id"],
+        _notification(_payload(score=780.0, previous_high_score=800.0))["id"],
+        _notification(_payload(count=3))["id"],
+    }
+
+    assert ids == {"run-verdict"}
+
+
+def test_top_n_placement_alone_leads_with_the_scenario():
+    # No previous high score means no threshold verdict; the placement is the
+    # whole story and the title carries it.
+    notification = _notification(_payload(previous_high_score=None))
+
+    assert notification["title"] == "New 2nd-best score"
+    assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
+    assert notification["color"] == "green"
+
+
+def test_a_first_place_run_is_titled_new_best_score():
+    # Deliberately not "New personal best!": the recorded decision is that a PB
+    # gets no toast of its own, and a retitle would create one by the back door.
+    notification = _notification(_payload(nth_score=1, previous_high_score=None))
+
+    assert notification["title"] == "New best score"
+    assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
+
+
+def test_threshold_pass_headlines_over_the_placement_it_also_earned():
+    notification = _notification(
         _payload(score=830.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
         score_threshold_percentage=102.5,
-        score_threshold_notification_switch=True,
     )
 
-    assert [notification["id"] for notification in notifications] == [
-        "new-top-n-score-notification",
-        "score-threshold-notification",
-    ]
-    assert notifications[1]["message"] == (
-        "Current score percentage (103.8%) successfully passed the score "
-        "threshold! Ready to move onto the next scenario."
+    assert notification["title"] == "Threshold passed"
+    assert notification["color"] == "green"
+    assert notification["message"] == (
+        "Scenario A — 830.00, 103.8% of PB. Also your 2nd-best at 34.64 cm/360."
     )
 
 
-def test_single_run_threshold_notification_passes_at_exact_threshold():
-    notifications = home._build_run_event_notifications(
-        _payload(score=820.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
+def test_threshold_pass_without_a_placement_points_at_the_next_scenario():
+    notification = _notification(
+        _payload(score=830.0, previous_high_score=800.0, nth_score=9),
         score_threshold_percentage=102.5,
-        score_threshold_notification_switch=True,
     )
 
-    assert notifications[1]["color"] == "green"
-    assert notifications[1]["message"] == (
-        "Current score percentage (102.5%) successfully passed the score "
-        "threshold! Ready to move onto the next scenario."
-    )
-
-
-def test_single_run_threshold_notification_passes_new_pb_above_100_percent_goal():
-    notifications = home._build_run_event_notifications(
-        _payload(score=850.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=105.0,
-        score_threshold_notification_switch=True,
-    )
-
-    assert notifications[1]["color"] == "green"
-    assert notifications[1]["message"] == (
-        "Current score percentage (106.2%) successfully passed the score "
-        "threshold! Ready to move onto the next scenario."
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"] == (
+        "Scenario A — 830.00, 103.8% of PB. Ready to move on."
     )
 
 
-def test_single_run_threshold_notification_fails_new_pb_short_of_100_plus_goal():
-    notifications = home._build_run_event_notifications(
+def test_threshold_passes_at_exactly_the_goal():
+    notification = _notification(
         _payload(score=820.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=105.0,
-        score_threshold_notification_switch=True,
+        score_threshold_percentage=102.5,
     )
 
-    assert notifications[1]["color"] == "yellow"
-    assert notifications[1]["message"] == (
-        "Current score percentage (102.5%) failed to meet the score threshold. "
-        "Keep grinding..."
-    )
+    assert notification["title"] == "Threshold passed"
+    assert notification["message"].startswith("Scenario A — 820.00, 102.5% of PB.")
 
 
-def test_single_run_threshold_failure_preserves_legacy_toast():
-    notifications = home._build_run_event_notifications(
+def test_threshold_fail_names_the_target_it_missed():
+    notification = _notification(
         _payload(score=780.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
         score_threshold_percentage=98.75,
-        score_threshold_notification_switch=True,
     )
 
-    assert [notification["id"] for notification in notifications] == [
-        "new-top-n-score-notification",
-        "score-threshold-notification",
-    ]
-    assert notifications[1]["message"] == (
-        "Current score percentage (97.5%) failed to meet the score threshold. "
-        "Keep grinding..."
+    assert notification["title"] == "Below threshold"
+    assert notification["color"] == "yellow"
+    assert notification["message"] == (
+        "Scenario A — 780.00, 97.5% of PB — need 98.8%. "
+        "Still your 2nd-best at 34.64 cm/360. Keep grinding..."
     )
 
 
-def test_single_run_threshold_notification_ignores_empty_percentage():
+def test_a_new_pb_short_of_a_stretch_goal_still_reads_as_below_threshold():
+    # Reachable whenever the goal exceeds 100%: the run beat the old PB and
+    # still missed the bar. The verdict is the title, so it stays "Below
+    # threshold" rather than being retitled for the PB.
+    notification = _notification(
+        _payload(score=820.0, previous_high_score=800.0, nth_score=1),
+        score_threshold_percentage=105.0,
+    )
+
+    assert notification["title"] == "Below threshold"
+    assert notification["message"] == (
+        "Scenario A — 820.00, 102.5% of PB — need 105.0%. "
+        "Still your best at 34.64 cm/360. Keep grinding..."
+    )
+
+
+def test_threshold_fail_without_a_placement_drops_the_placement_clause():
+    notification = _notification(
+        _payload(score=780.0, previous_high_score=800.0, nth_score=9),
+        score_threshold_percentage=98.75,
+    )
+
+    assert notification["message"] == (
+        "Scenario A — 780.00, 97.5% of PB — need 98.8%. Keep grinding..."
+    )
+
+
+def test_an_empty_threshold_percentage_leaves_the_run_unjudged():
     for empty_percentage in (None, ""):
-        notifications = home._build_run_event_notifications(
+        notification = _notification(
             _payload(score=780.0, previous_high_score=800.0),
-            "Scenario A",
-            top_n_scores=5,
             score_threshold_percentage=empty_percentage,
-            score_threshold_notification_switch=True,
         )
 
-        assert [notification["id"] for notification in notifications] == [
-            "new-top-n-score-notification",
-        ]
+        assert notification["title"] == "New 2nd-best score"
 
 
 def test_a_run_qualifying_for_neither_verdict_says_nothing():
-    notifications = home._build_run_event_notifications(
-        _payload(nth_score=9, previous_high_score=None),
-        "Scenario A",
-        top_n_scores=5,
-        score_threshold_percentage=100.0,
-        score_threshold_notification_switch=True,
-    )
-
-    assert notifications == []
+    assert _notification(_payload(nth_score=9, previous_high_score=None)) is None
 
 
-def test_backlog_notification_is_one_scenario_named_summary():
-    notifications = home._build_run_event_notifications(
+def test_backlog_summary_reports_the_count_and_the_latest_verdict():
+    notification = _notification(
         _payload(count=3, score=780.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
         score_threshold_percentage=98.75,
-        score_threshold_notification_switch=True,
     )
 
-    assert len(notifications) == 1
-    assert notifications[0]["id"] == "run-summary-notification"
-    assert notifications[0]["color"] == "yellow"
-    assert notifications[0]["message"] == (
-        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
-        "a new 2nd place score: 780.00. Current score percentage (97.5%) "
-        "failed to meet the score threshold. Keep grinding..."
+    assert notification["title"] == "While you were away"
+    assert notification["color"] == "yellow"
+    assert notification["message"] == (
+        "3 new Scenario A runs. Latest: 780.00 — 97.5% of PB, below the "
+        "98.8% threshold."
     )
 
 
-def test_backlog_threshold_summary_ignores_empty_percentage():
+def test_backlog_summary_without_a_verdict_stays_neutral():
     for empty_percentage in (None, ""):
-        notifications = home._build_run_event_notifications(
+        notification = _notification(
             _payload(count=3, score=780.0, previous_high_score=800.0),
-            "Scenario A",
-            top_n_scores=5,
             score_threshold_percentage=empty_percentage,
-            score_threshold_notification_switch=True,
         )
 
-        assert len(notifications) == 1
-        assert notifications[0]["color"] == "blue"
-        assert notifications[0]["message"] == (
-            "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
-            "a new 2nd place score: 780.00."
+        assert notification["title"] == "While you were away"
+        assert notification["color"] == "blue"
+        assert notification["message"] == (
+            "3 new Scenario A runs. Latest: 780.00 at 34.64 cm/360."
         )
 
 
-def test_backlog_threshold_summary_passes_at_exact_threshold():
-    notifications = home._build_run_event_notifications(
+def test_backlog_summary_passes_at_exactly_the_goal():
+    notification = _notification(
         _payload(count=3, score=820.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
         score_threshold_percentage=102.5,
-        score_threshold_notification_switch=True,
     )
 
-    assert len(notifications) == 1
-    assert notifications[0]["color"] == "green"
-    assert notifications[0]["message"] == (
-        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
-        "a new 2nd place score: 820.00. Current score percentage (102.5%) "
-        "successfully passed the score threshold! Ready to move onto the next "
-        "scenario."
+    assert notification["color"] == "green"
+    assert notification["message"] == (
+        "3 new Scenario A runs. Latest: 820.00 — 102.5% of PB, passed threshold."
     )
 
 
-def test_backlog_threshold_summary_passes_new_pb_above_100_percent_goal():
-    notifications = home._build_run_event_notifications(
+def test_backlog_summary_passes_a_new_pb_above_a_stretch_goal():
+    notification = _notification(
         _payload(count=3, score=850.0, previous_high_score=800.0),
-        "Scenario A",
-        top_n_scores=5,
         score_threshold_percentage=105.0,
-        score_threshold_notification_switch=True,
     )
 
-    assert len(notifications) == 1
-    assert notifications[0]["color"] == "green"
-    assert notifications[0]["message"] == (
-        "3 new Scenario A runs while you were away. Latest: 34.64 cm/360 has "
-        "a new 2nd place score: 850.00. Current score percentage (106.2%) "
-        "successfully passed the score threshold! Ready to move onto the next "
-        "scenario."
+    assert notification["color"] == "green"
+    assert notification["message"] == (
+        "3 new Scenario A runs. Latest: 850.00 — 106.2% of PB, passed threshold."
     )
 
 
 def test_notifications_ignore_payload_for_another_scenario():
     assert (
-        home._build_run_event_notifications(
+        home._build_run_event_notification(
             _payload("Scenario B"),
             "Scenario A",
-            top_n_scores=5,
-            score_threshold_percentage=100.0,
-            score_threshold_notification_switch=True,
+            5,
+            100.0,
+            True,
         )
-        == []
+        is None
     )
 
 
 def test_generate_graph_returns_empty_state_before_scenario_selection():
-    plot_json, notifications = home.generate_graph(
+    plot_json, notifications, lifetime_sequence = home.generate_graph(
         None,
         None,
         5,
@@ -428,11 +412,13 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
         95,
         True,
         None,
+        0,
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
+    assert lifetime_sequence is no_update
     assert "No scenario selected" in plot["layout"]["annotations"][0]["text"]
     assert plot["layout"]["annotations"][1]["text"] == (
         "Select a scenario to see your score history."
@@ -450,7 +436,7 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
 
     monkeypatch.setattr(home, "get_high_score", fail_if_called)
 
-    plot_json, notifications = home.generate_graph(
+    plot_json, notifications, lifetime_sequence = home.generate_graph(
         None,
         "Scenario A",
         5,
@@ -462,11 +448,13 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
         95,
         True,
         None,
+        0,
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
+    assert lifetime_sequence is no_update
     assert "Unsupported graph option" in plot["layout"]["annotations"][0]["text"]
     assert plot["layout"]["annotations"][1]["text"] == (
         "Choose Score vs Sensitivity or Score vs Time."
@@ -481,7 +469,7 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
     # and nothing else; the parallel toast was a redundant second copy.
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
 
-    plot_json, notifications = home.generate_graph(
+    plot_json, notifications, lifetime_sequence = home.generate_graph(
         None,
         "Unplayed Scenario",
         5,
@@ -493,11 +481,13 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
         95,
         True,
         None,
+        0,
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
+    assert lifetime_sequence is no_update
     assert home._NO_SCENARIO_DATA_PLOT_TITLE in plot["layout"]["annotations"][0]["text"]
 
 
@@ -520,7 +510,7 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         SimpleNamespace(triggered=[{"prop_id": "date-picker.value"}]),
     )
 
-    _plot, notifications = home.generate_graph(
+    _plot, notifications, lifetime_sequence = home.generate_graph(
         _payload(),
         "Scenario A",
         5,
@@ -532,9 +522,11 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         95,
         True,
         None,
+        0,
     )
 
     assert notifications == []
+    assert lifetime_sequence is no_update
 
 
 def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
@@ -563,8 +555,8 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
     )
 
-    for empty_percentage in (None, ""):
-        _plot, notifications = home.generate_graph(
+    for sequence, empty_percentage in enumerate((None, "")):
+        _plot, notifications, lifetime_sequence = home.generate_graph(
             _payload(score=780.0, previous_high_score=800.0),
             "Scenario A",
             5,
@@ -576,8 +568,14 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
             empty_percentage,
             True,
             None,
+            sequence,
         )
 
-        assert [notification["id"] for notification in notifications] == [
-            "new-top-n-score-notification",
+        # An unjudged run still placed, so one toast goes out -- as the paired
+        # update+show that lets it replace whatever is on screen.
+        assert [notification["action"] for notification in notifications] == [
+            "update",
+            "show",
         ]
+        assert notifications[0]["title"] == "New 2nd-best score"
+        assert lifetime_sequence == sequence + 1
