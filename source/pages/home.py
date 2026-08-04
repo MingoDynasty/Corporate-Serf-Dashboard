@@ -4,7 +4,7 @@ import json
 import logging
 import uuid
 from datetime import datetime
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
 
 import dash
 import dash_mantine_components as dmc
@@ -52,7 +52,11 @@ from source.plot.plot_service import (
     generate_sensitivity_plot,
     generate_time_plot,
 )
-from source.utilities.notifications import toast
+from source.utilities.notifications import (
+    TOAST_LIFETIME_STORE_ID,
+    toast,
+    upsert_toast,
+)
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -113,6 +117,10 @@ _STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
 _RANK_REFRESH_FAILED_NOTIFICATION_ID = "rank-refresh-failed"
 _RANK_REFRESH_STALE_NOTIFICATION_ID = "rank-refresh-stale"
 _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
+# One run, one toast: every run verdict and the catch-up digest share this id,
+# so the newest verdict replaces whatever is on screen instead of stacking.
+_RUN_VERDICT_NOTIFICATION_ID = "run-verdict"
+_BACKLOG_NOTIFICATION_TITLE = "While you were away"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
 # Both refresh-failure paths leave the displayed value alone, so one line
 # covers them: the hard failure keeps whatever was on screen, and the
@@ -600,7 +608,7 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     """
     return toast(
         f"rank-refresh-notification-{uuid.uuid4()}",
-        "Notification",
+        "Position refreshed",
         f"Refreshed position for {selected_scenario}.",
         color="green",
         icon=local_icon("material-symbols:refresh-rounded"),
@@ -702,130 +710,170 @@ def _normalize_score_threshold_percentage(
         return None
 
 
-def _build_run_event_notifications(
+class _ThresholdVerdict(NamedTuple):
+    """How a run measured up against the score threshold it was judged on."""
+
+    passed: bool
+    percentage: float
+    goal_percentage: float
+
+
+def _threshold_verdict(
+    latest: RunEventData,
+    score_threshold_percentage: float | str | None,
+    score_threshold_notification_switch: bool,
+) -> _ThresholdVerdict | None:
+    """Judge a run against the threshold, or return None when nothing judges it.
+
+    A run goes unjudged when the switch is off, the goal percentage is blank,
+    or the scenario/sensitivity has no previous high score to be a percentage
+    of -- there is no denominator, not a failing one.
+    """
+    goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
+    previous_high_score = latest["previous_high_score"]
+    if (
+        not score_threshold_notification_switch
+        or not goal_percentage
+        or previous_high_score is None
+        or previous_high_score <= 0
+    ):
+        return None
+    return _ThresholdVerdict(
+        passed=latest["score"] >= previous_high_score * goal_percentage / 100,
+        percentage=latest["score"] / previous_high_score * 100,
+        goal_percentage=goal_percentage,
+    )
+
+
+def _placement_phrase(nth_score: int) -> str:
+    """Name a top-N placement: first place is "best", the rest are "Nth-best"."""
+    return "best" if nth_score == 1 else f"{ordinal(nth_score)}-best"
+
+
+def _build_live_run_notification(
+    latest: RunEventData,
+    selected_scenario: str,
+    top_n_scores: int,
+    verdict: _ThresholdVerdict | None,
+) -> dict[str, object] | None:
+    """Build the one toast a just-played run earned, if it earned one.
+
+    The threshold verdict is the headline whenever there is one; a top-N
+    placement is the trailing detail. A run that is neither judged nor placed
+    says nothing worth interrupting for -- its new point on the plot is the
+    confirmation that it landed.
+    """
+    placed = latest["nth_score"] <= top_n_scores
+    placement = (
+        f"your {_placement_phrase(latest['nth_score'])} at {latest['sensitivity']}"
+    )
+    score = f"{selected_scenario} — {latest['score']:.2f}"
+
+    if verdict is None:
+        if not placed:
+            return None
+        return toast(
+            _RUN_VERDICT_NOTIFICATION_ID,
+            f"New {_placement_phrase(latest['nth_score'])} score",
+            f"{score} at {latest['sensitivity']}.",
+            color="green",
+            icon=local_icon("fontisto:line-chart"),
+        )
+
+    if verdict.passed:
+        detail = f"Also {placement}." if placed else "Ready to move on."
+        return toast(
+            _RUN_VERDICT_NOTIFICATION_ID,
+            "Threshold passed",
+            f"{score}, {verdict.percentage:.1f}% of PB. {detail}",
+            color="green",
+            icon=local_icon("material-symbols:check"),
+        )
+
+    shortfall = f"{score}, {verdict.percentage:.1f}% of PB — "
+    shortfall += f"need {verdict.goal_percentage:.1f}%."
+    if placed:
+        shortfall += f" Still {placement}."
+    return toast(
+        _RUN_VERDICT_NOTIFICATION_ID,
+        "Below threshold",
+        f"{shortfall} Keep grinding...",
+        color="yellow",
+        icon=local_icon("material-symbols:warning-outline"),
+    )
+
+
+def _build_backlog_notification(
+    run_events: RunEventsPayload,
+    selected_scenario: str,
+    verdict: _ThresholdVerdict | None,
+) -> dict[str, object]:
+    """Summarize runs that accrued while Home was closed.
+
+    Shares the live run's id, so playing again replaces this digest with the
+    fresher verdict rather than stacking beside it.
+    """
+    latest = run_events["latest"]
+    summary = (
+        f"{run_events['count']} new {selected_scenario} runs. "
+        f"Latest: {latest['score']:.2f}"
+    )
+    if verdict is None:
+        return toast(
+            _RUN_VERDICT_NOTIFICATION_ID,
+            _BACKLOG_NOTIFICATION_TITLE,
+            f"{summary} at {latest['sensitivity']}.",
+            color="blue",
+            icon=local_icon("fontisto:line-chart"),
+        )
+    if verdict.passed:
+        return toast(
+            _RUN_VERDICT_NOTIFICATION_ID,
+            _BACKLOG_NOTIFICATION_TITLE,
+            f"{summary} — {verdict.percentage:.1f}% of PB, passed threshold.",
+            color="green",
+            icon=local_icon("material-symbols:check"),
+        )
+    return toast(
+        _RUN_VERDICT_NOTIFICATION_ID,
+        _BACKLOG_NOTIFICATION_TITLE,
+        f"{summary} — {verdict.percentage:.1f}% of PB, below the "
+        f"{verdict.goal_percentage:.1f}% threshold.",
+        color="yellow",
+        icon=local_icon("material-symbols:warning-outline"),
+    )
+
+
+def _build_run_event_notification(
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
     score_threshold_percentage: float | str | None,
     score_threshold_notification_switch: bool,
-) -> list[dict[str, object]]:
-    """Build either the legacy single-run toasts or one backlog summary."""
+) -> dict[str, object] | None:
+    """Build the at-most-one toast a batch of run events earned."""
     if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
-        return []
+        return None
 
-    score_threshold_goal_percentage = _normalize_score_threshold_percentage(
-        score_threshold_percentage
-    )
     latest = run_events["latest"]
+    verdict = _threshold_verdict(
+        latest,
+        score_threshold_percentage,
+        score_threshold_notification_switch,
+    )
     if run_events["count"] > 1:
-        message = (
-            f"{run_events['count']} new {selected_scenario} runs while you were away. "
-            f"Latest: {latest['sensitivity']} has a new "
-            f"{ordinal(latest['nth_score'])} place score: {latest['score']:.2f}."
-        )
-        color = "blue"
-        if (
-            score_threshold_notification_switch
-            and score_threshold_goal_percentage
-            and latest["previous_high_score"] is not None
-            and latest["previous_high_score"] > 0
-        ):
-            percentage = latest["score"] / latest["previous_high_score"] * 100
-            if (
-                latest["score"]
-                >= latest["previous_high_score"] * score_threshold_goal_percentage / 100
-            ):
-                message += (
-                    f" Current score percentage ({percentage:.1f}%) successfully "
-                    "passed the score threshold! Ready to move onto the next scenario."
-                )
-                color = "green"
-            else:
-                message += (
-                    f" Current score percentage ({percentage:.1f}%) failed to meet "
-                    "the score threshold. Keep grinding..."
-                )
-                color = "yellow"
-        return [
-            {
-                "action": "show",
-                "title": "Run Summary",
-                "message": message,
-                "color": color,
-                "id": "run-summary-notification",
-                "icon": local_icon("fontisto:line-chart"),
-                "autoClose": 8000,
-            }
-        ]
-
-    notifications: list[dict[str, object]] = []
-    if latest["nth_score"] <= top_n_scores:
-        notification_message = (
-            f"{latest['sensitivity']} has a new "
-            f"{ordinal(latest['nth_score'])} place score: {latest['score']:.2f}"
-        )
-        notifications.append(
-            {
-                "action": "show",
-                "title": "Notification",
-                "message": notification_message,
-                "color": "green",
-                "id": "new-top-n-score-notification",
-                "icon": local_icon("fontisto:line-chart"),
-                "autoClose": 8000,
-            }
-        )
-
-    if (
-        score_threshold_notification_switch
-        and score_threshold_goal_percentage
-        and latest["previous_high_score"] is not None
-        and latest["previous_high_score"] > 0
-    ):
-        percentage = latest["score"] / latest["previous_high_score"] * 100
-        if (
-            latest["score"]
-            >= latest["previous_high_score"] * score_threshold_goal_percentage / 100
-        ):
-            notifications.append(
-                {
-                    "action": "show",
-                    "title": "Score Threshold",
-                    "message": (
-                        f"Current score percentage ({percentage:.1f}%) "
-                        "successfully passed the score threshold! Ready to "
-                        "move onto the next scenario."
-                    ),
-                    "color": "green",
-                    "id": "score-threshold-notification",
-                    "icon": local_icon("material-symbols:check"),
-                    "autoClose": 8000,
-                }
-            )
-        else:
-            notifications.append(
-                {
-                    "action": "show",
-                    "title": "Score Threshold",
-                    "message": (
-                        f"Current score percentage ({percentage:.1f}%) "
-                        "failed to meet the score threshold. Keep grinding..."
-                    ),
-                    "color": "yellow",
-                    "id": "score-threshold-notification",
-                    "icon": local_icon("material-symbols:warning-outline"),
-                    "autoClose": 8000,
-                }
-            )
-    # A run that places in neither the top N nor a threshold verdict says
-    # nothing worth interrupting for; the new point on the plot is the
-    # confirmation that it landed.
-    return notifications
+        return _build_backlog_notification(run_events, selected_scenario, verdict)
+    return _build_live_run_notification(
+        latest,
+        selected_scenario,
+        top_n_scores,
+        verdict,
+    )
 
 
-def _empty_state_graph_response(title: str, message: str) -> tuple[str, object]:
+def _empty_state_graph_response(title: str, message: str) -> tuple[str, object, object]:
     """Return a cached empty-state plot with notifications left unchanged."""
-    return _empty_plot_json(title, message), no_update
+    return _empty_plot_json(title, message), no_update, no_update
 
 
 def _build_scenario_figure(  # noqa: PLR0913
@@ -927,6 +975,7 @@ def _build_scenario_figure(  # noqa: PLR0913
 @callback(
     Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
+    Output(TOAST_LIFETIME_STORE_ID, "data"),
     Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("top_n_scores", "value"),
@@ -938,6 +987,7 @@ def _build_scenario_figure(  # noqa: PLR0913
     Input("score-threshold-percentage", "value"),
     Input("score-threshold-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
+    State(TOAST_LIFETIME_STORE_ID, "data"),
 )
 # This callback coordinates the page's graph controls and notification states.
 def generate_graph(  # noqa: PLR0913
@@ -952,6 +1002,7 @@ def generate_graph(  # noqa: PLR0913
     score_threshold_percentage,
     score_threshold_notification_switch,
     selected_playlist,
+    toast_lifetime_sequence,
 ):
     """
     Updates to the graph.
@@ -962,7 +1013,8 @@ def generate_graph(  # noqa: PLR0913
     :param x_axis_radiogroup: user-selected x-axis radio group.
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
     :param selected_playlist: user-selected playlist code.
-    :return: Figure serialized to JSON, Notification
+    :param toast_lifetime_sequence: this client's run-verdict emission counter.
+    :return: Figure serialized to JSON, Notification, next emission counter
     """
     if not selected_scenario:
         return _empty_state_graph_response(
@@ -998,6 +1050,7 @@ def generate_graph(  # noqa: PLR0913
     )
 
     notifications = no_update
+    next_toast_lifetime_sequence = no_update
     if supports_overlays:
         high_score = get_high_score(selected_scenario)
         if high_score_overlay_switch:
@@ -1012,14 +1065,17 @@ def generate_graph(  # noqa: PLR0913
 
         notifications = []
         if _run_events_were_triggered(ctx.triggered):
-            notifications = _build_run_event_notifications(
+            run_verdict = _build_run_event_notification(
                 run_events,
                 selected_scenario,
                 top_n_scores,
                 score_threshold_percentage,
                 score_threshold_notification_switch,
             )
-    return plot.to_json(), notifications
+            if run_verdict is not None:
+                notifications = upsert_toast(run_verdict, toast_lifetime_sequence)
+                next_toast_lifetime_sequence = (toast_lifetime_sequence or 0) + 1
+    return plot.to_json(), notifications, next_toast_lifetime_sequence
 
 
 @callback(
@@ -1042,16 +1098,20 @@ def apply_light_dark_theme_to_graph(color_scheme, plot_json):
 def _build_startup_playlist_warning_notifications(
     warnings: list[str],
 ) -> list[dict[str, object]]:
+    """Report the playlists that did not survive the startup scan.
+
+    Persistent, not timed: these fire once per boot, seconds after the server
+    starts, which is exactly when nobody is guaranteed to be watching.
+    """
     return [
-        {
-            "action": "show",
-            "title": "Playlist Warning",
-            "message": warning,
-            "color": "yellow",
-            "id": f"startup-playlist-warning-{idx}",
-            "icon": local_icon("material-symbols:warning-outline"),
-            "autoClose": 10000,
-        }
+        toast(
+            f"startup-playlist-warning-{idx}",
+            "Playlist not loaded",
+            warning,
+            color="yellow",
+            icon=local_icon("material-symbols:warning-outline"),
+            auto_close=False,
+        )
         for idx, warning in enumerate(warnings)
     ]
 

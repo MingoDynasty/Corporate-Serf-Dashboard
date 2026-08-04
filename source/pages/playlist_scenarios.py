@@ -27,6 +27,7 @@ from source.kovaaks.playlist_scenarios_service import (
     scenario_home_href,
     start_playlist_scenario_fill,
 )
+from source.utilities.notifications import toast
 
 
 def _page_title(playlist_code=None, **_kwargs):
@@ -255,11 +256,13 @@ def _fill_summary_notification(fill: PlaylistScenarioFillDrain):
     if fill.terminal != "complete" or not fill.consuming_terminal:
         return no_update
     if fill.unknown_count:
+        title = "Position update incomplete"
         message = f"Couldn't update {fill.unknown_count} of {fill.total} positions"
         if fill.stale_count:
             message += f"; {fill.stale_count} more served from cache"
         color = "red"
     elif fill.stale_count:
+        title = "Positions served from cache"
         message = (
             f"{fill.stale_count} of {fill.total} positions served from cache — "
             "KovaaK's was unreachable"
@@ -268,15 +271,13 @@ def _fill_summary_notification(fill: PlaylistScenarioFillDrain):
     else:
         return no_update
     return [
-        {
-            "action": "show",
-            "title": "Playlist Position Update",
-            "message": message,
-            "color": color,
-            "id": f"playlist-progressive-fill-{fill.generation_token}",
-            "icon": local_icon("material-symbols:warning-outline"),
-            "autoClose": 8000,
-        }
+        toast(
+            f"playlist-progressive-fill-{fill.generation_token}",
+            title,
+            message,
+            color=color,
+            icon=local_icon("material-symbols:warning-outline"),
+        )
     ]
 
 

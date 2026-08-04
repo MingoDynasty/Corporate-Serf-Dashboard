@@ -37,6 +37,7 @@ from source.kovaaks.playlist_visibility_service import (
     show_playlist,
     toggle_playlist_visibility,
 )
+from source.utilities.notifications import toast
 from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
@@ -453,14 +454,13 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
         # playlist is hidden, tell the user where to find it.
         if canonical_code is not None and not is_playlist_shown(canonical_code):
             error_message += HIDDEN_DUPLICATE_HINT
-        notification = {
-            "action": "show",
-            "title": "Playlist Import Failed",
-            "message": error_message,
-            "color": "red",
-            "id": "imported-playlist-failed-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
+        notification = toast(
+            "imported-playlist-failed-notification",
+            "Playlist import failed",
+            error_message,
+            color="red",
+            icon=local_icon("material-symbols:upload"),
+        )
         return [notification], no_update, no_update, no_update, None
 
     # Importing is the intent to see: new playlists arrive visible. Mark the
@@ -492,23 +492,21 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     label = get_playlist_display_label(imported_code)
     imported_message = f'Imported "{label}" ({imported_code}).'
     if visibility_write_failed:
-        notification = {
-            "action": "show",
-            "title": "Playlist Imported — Not Shown",
-            "message": imported_message + IMPORT_VISIBILITY_FAILED_HINT,
-            "color": "orange",
-            "id": "imported-playlist-visibility-failed-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
+        notification = toast(
+            "imported-playlist-visibility-failed-notification",
+            "Playlist imported — not shown",
+            imported_message + IMPORT_VISIBILITY_FAILED_HINT,
+            color="orange",
+            icon=local_icon("material-symbols:upload"),
+        )
     else:
-        notification = {
-            "action": "show",
-            "title": "Playlist Imported",
-            "message": imported_message,
-            "color": "green",
-            "id": "imported-playlist-successful-notification",
-            "icon": local_icon("material-symbols:upload"),
-        }
+        notification = toast(
+            "imported-playlist-successful-notification",
+            "Playlist imported",
+            imported_message,
+            color="green",
+            icon=local_icon("material-symbols:upload"),
+        )
     # Every other output matches the success path: the import happened, so the
     # grid rebuilds and the modal closes with a cleared field either way.
     return [notification], (rows_refresh or 0) + 1, False, "", None
@@ -585,13 +583,12 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     label = get_playlist_display_label(target_code)
     error_message = delete_user_playlist(target_code)
     if error_message:
-        notification = {
-            "action": "show",
-            "title": "Playlist Delete Failed",
-            "message": error_message,
-            "color": "red",
-            "id": "deleted-playlist-failed-notification",
-        }
+        notification = toast(
+            "deleted-playlist-failed-notification",
+            "Playlist delete failed",
+            error_message,
+            color="red",
+        )
         return [notification], no_update, False
     try:
         hide_playlist(target_code)
@@ -606,13 +603,12 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
         logger.exception(
             "Failed to drop deleted playlist '%s' from the shown set", target_code
         )
-    notification = {
-        "action": "show",
-        "title": "Playlist Deleted",
-        "message": f'Deleted "{label}" ({target_code}).',
-        "color": "green",
-        "id": "deleted-playlist-successful-notification",
-    }
+    notification = toast(
+        "deleted-playlist-successful-notification",
+        "Playlist deleted",
+        f'Deleted "{label}" ({target_code}).',
+        color="green",
+    )
     return [notification], (rows_refresh or 0) + 1, False
 
 
@@ -695,21 +691,19 @@ def confirm_delete_superseded(n_clicks, rows_refresh):
     error_message = delete_superseded_user_playlist_files()
     next_refresh = (rows_refresh or 0) + 1
     if error_message:
-        notification = {
-            "action": "show",
-            "title": "Cleanup Failed",
-            "message": error_message,
-            "color": "red",
-            "id": "superseded-cleanup-failed-notification",
-        }
+        notification = toast(
+            "superseded-cleanup-failed-notification",
+            "Cleanup failed",
+            error_message,
+            color="red",
+        )
         return [notification], next_refresh, False
-    notification = {
-        "action": "show",
-        "title": "Leftover Files Deleted",
-        "message": "Deleted leftover playlist files.",
-        "color": "green",
-        "id": "superseded-cleanup-successful-notification",
-    }
+    notification = toast(
+        "superseded-cleanup-successful-notification",
+        "Leftover files deleted",
+        "Deleted leftover playlist files.",
+        color="green",
+    )
     return [notification], next_refresh, False
 
 
