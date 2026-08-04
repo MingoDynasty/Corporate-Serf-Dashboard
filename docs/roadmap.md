@@ -35,7 +35,7 @@ sequence.
   toast, whose title states the verdict — a threshold pass or miss, or the
   placement it earned — and playing again replaces it instead of stacking a
   second one beside it. The no-information "Graph updated!" toast is gone
-  too. (PRs #194, #196, #198, #199; design in #82, #195) Design rationale
+  too. (PRs #194, #196, #198, #200; design in #82, #195) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
 - **Settings detection** — the Settings page now offers what the machine
   already knows. The stats-folder box suggests every Steam library holding a

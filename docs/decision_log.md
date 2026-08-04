@@ -28,7 +28,7 @@ Predecessor: the
 [2026-08-03 background-diagnostics entry](#2026-08-03-background-rank-diagnostics-are-console-only)
 deleted four toasts under this policy before the policy itself was recorded;
 that entry stands unchanged and this one supersedes nothing. Shipped in
-PRs #194, #196, #198, and #199; design in #82 and #195.
+PRs #194, #196, #198, and #200; design in #82 and #195.
 
 **One delivery path.** The app had two notification subsystems. The
 logging-driven one routed Python `logging` records into Mantine toasts through
