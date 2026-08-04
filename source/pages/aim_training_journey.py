@@ -130,7 +130,6 @@ def layout(**kwargs):  # noqa: ARG001
                                     data=get_visible_playlist_selector_options(),
                                     id="playlists-multi-select",
                                     label="Playlist filter",
-                                    ml="xl",
                                     persistence=True,
                                 ),
                                 dmc.NumberInput(

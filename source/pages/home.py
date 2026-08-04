@@ -1207,10 +1207,6 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    # Indent only where the row has room; the
-                                    # margin plus min-width 100% would overflow
-                                    # a narrow viewport.
-                                    ml={"base": 0, "lg": "xl"},
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
