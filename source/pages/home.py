@@ -175,7 +175,11 @@ class RunEventsPayload(TypedDict):
 def _settings_help_label(label: str, help_text: str) -> dmc.Group:
     return dmc.Group(
         [
-            dmc.Text(label, span=True),
+            # `inherit` so the label text takes the enclosing <label>'s font
+            # instead of dmc.Text's own defaults (md/400). Without it these
+            # labels render 16px/400 beside the 14px/700 of every label
+            # passed as a plain string.
+            dmc.Text(label, span=True, inherit=True),
             dmc.Tooltip(
                 dmc.ActionIcon(
                     local_icon("material-symbols:info-outline", width=16),
@@ -1263,10 +1267,6 @@ def layout(
                                     data=get_visible_playlist_selector_options(),
                                     id="playlist-dropdown-selection",
                                     label="Playlist filter",
-                                    # Indent only where the row has room; the
-                                    # margin plus min-width 100% would overflow
-                                    # a narrow viewport.
-                                    ml={"base": 0, "lg": "xl"},
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
