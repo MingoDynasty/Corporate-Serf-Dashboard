@@ -22,8 +22,11 @@ from source.pages import home  # noqa: E402
 
 STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
-# Anything that would push a control right of its row's left edge.
-LEFT_OFFSET_PROPS = ("m", "mx", "ms", "ml")
+# Anything that would push a control right of its row's left edge. Padding
+# counts as much as margin: it leaves the wrapper's own box where it is, so a
+# measurement of that box misses it, while the label and input inside shift by
+# exactly the amount a margin would have moved them.
+LEFT_OFFSET_PROPS = ("m", "mx", "ms", "ml", "p", "px", "ps", "pl")
 
 # A per-component label class taking a font-weight of its own. The captured
 # group is the component name, so a failure names whoever crept back in.
