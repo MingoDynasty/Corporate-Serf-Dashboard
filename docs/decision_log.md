@@ -63,10 +63,13 @@ Consequences and constraints:
   width with the sidebar open, Home now stacks its two columns where it
   previously split them. That is the band where the split was crushing both
   columns, so the stack is the intended outcome rather than a regression.
-- **`ml={"base": 0, "lg": "xl"}` on the playlist filter stays viewport-keyed.**
-  Mantine resolves responsive *style props* through theme media queries with no
-  container equivalent. It is a 32px cosmetic indent that cannot cause wrapping,
-  and it degrades sensibly at every width, so it is left alone deliberately.
+- **Responsive *style props* have no container equivalent.** Mantine resolves
+  those through theme media queries only, so this fix reaches responsive `span`
+  values and nothing else. Nothing on Home relies on one today: the playlist
+  filter's `ml={"base": 0, "lg": "xl"}` was the last, and PR #201 removed it
+  outright for left-edge alignment — `tests/test_ui_presentation.py` now
+  rejects any left offset on either playlist filter. A responsive margin or
+  padding added elsewhere later would silently go back to measuring the window.
 - **The sizing rule lives in `PLAYLIST_SELECTOR_PRESET`**, so the Aim Training
   Journey page's `dmc.MultiSelect` picks it up too. Both sit in wrapping rows
   and want the same behavior; splitting the rule to spare the second page would
