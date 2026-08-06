@@ -96,6 +96,19 @@ RANK_REFRESH_TOOLTIP = (
     "Fetch your current position live from the KovaaK's leaderboard. The "
     "displayed value can come from a local cache and may lag the live board."
 )
+# The controls grid measures these against its own width rather than the
+# window's (``type="container"``). The AppShell navbar is fixed-position and
+# 250px wide, so a media query splits the columns on space the content area
+# does not have: with the navbar open the row crossed the threshold while
+# still 250px short of fitting, then wrapped. The threshold values are the
+# Mantine defaults, unchanged -- only the box they are measured against moves.
+#
+# Copied, not aliased: this is a Dash prop, and the theme dict is shared
+# process-wide. Mantine also renders the container element only when a Grid
+# passes both ``type="container"`` and ``breakpoints``, so dropping this
+# constant would leave the ``@container`` queries with nothing to match and
+# collapse every column to its ``base`` span.
+HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1276,10 +1289,15 @@ def layout(
                                     checkIconPosition="right",
                                     clearSearchOnFocus=True,
                                     data=scenario_options,
+                                    # Mirrors the playlist filter beside it; see
+                                    # PLAYLIST_SELECTOR_PRESET for why the basis
+                                    # is the floor and not the 400px target.
+                                    flex="1 1 200px",
                                     id="scenario-dropdown-selection",
                                     label="Selected scenario",
+                                    maw="min(400px, 100%)",
                                     maxDropdownHeight="75vh",
-                                    miw="min(400px, 100%)",
+                                    miw="min(200px, 100%)",
                                     persistence=scenario_persistence,
                                     placeholder="Select a scenario...",
                                     scrollAreaProps={"type": "auto"},
@@ -1554,8 +1572,10 @@ def layout(
                         span={"base": 12, "lg": "auto"},
                     ),
                 ],
+                breakpoints=HOME_GRID_BREAKPOINTS,
                 gutter="xl",
                 overflow="hidden",
+                type="container",
             ),
             dcc.Graph(
                 id="graph-content",
