@@ -100,18 +100,20 @@ This is not a current bug; it is a code-pattern reminder so the same mistake doe
 
 ### Zero-width `dmc.Space` separators offset a wrapped control row
 
-`source/pages/home.py:1289-1290` (and `:1445`) use `dmc.Space(h="xl")` as
+`source/pages/home.py:1307-1308` (and `:1463`) use `dmc.Space(h="xl")` as
 separators inside `direction="row"` flex rows, but `h` sets height — they are
 zero-width flex items contributing only the row's own 12px gap. When the row
 wraps so that one lands at the start of a line, that line's first control sits
-12px right of the row's left edge: measured at a 1280px viewport, `Top N
-scores` at x=278 against the row's 266.
+12px right of the row's left edge. Originally measured at a 1280px viewport,
+with `Top N scores` at x=278 against the row's 266; PR #199 then changed where
+that row wraps, so reproduce it at whatever width now puts a separator first
+rather than at that one.
 
 Same defect class as the 32px playlist-filter indent fixed in PR #201, whose
-rewrap is what made this visible at that width; left out of #201 because
-removing the separators is a judgment call about intended spacing rather than
-a mechanical fix. The modal's `Space(h="xs")` (`:1464-1532`) sit in a vertical
-block context where `h` is correct — don't sweep those.
+rewrap is what made this visible; left out of #201 because removing the
+separators is a judgment call about intended spacing rather than a mechanical
+fix. The modal's `Space(h="xs")` (`:1482-1550`) sit in a vertical block
+context where `h` is correct — don't sweep those.
 
 ## Performance
 
