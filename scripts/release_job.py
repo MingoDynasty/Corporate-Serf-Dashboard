@@ -32,7 +32,7 @@ ASSET_STEM = "Corporate-Serf-Dashboard"
 # failure directions are asymmetric, since a redundant release is only noise
 # while a missed one strands distribution inputs (install.ps1, the launcher,
 # example.toml, .python-version, .gitattributes) at an older tag.
-_BLOCKED_DIRECTORIES = ("docs/", "tests/", ".github/")
+_BLOCKED_DIRECTORIES = ("docs/", "tests/", ".github/", ".idea/")
 _BLOCKED_FILES = (".gitignore", ".pre-commit-config.yaml")
 _BLOCKED_SUFFIX = ".md"
 

@@ -86,6 +86,7 @@ def _problems(archive: Path, metadata: Path) -> list[str]:
         "source/notes.md",
         ".gitignore",
         ".pre-commit-config.yaml",
+        ".idea/misc.xml",
     ],
 )
 def test_blocked_paths_do_not_release(path: str) -> None:
