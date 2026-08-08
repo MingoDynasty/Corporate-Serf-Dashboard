@@ -46,8 +46,16 @@ target-version = "py314"
 # pre-commit passes filenames explicitly; without this, exclusions
 # (PR-2's lint.exclude for scripts/) are ignored for explicit paths.
 force-exclude = true
+# ruff 0.16 added "*.md" to the default `include`, so it now lints and formats
+# Python blocks inside Markdown. Opting back out keeps the checked file set
+# identical to 0.15's.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
+# ruff 0.16 widened the default rule set from 4 prefixes (E4/E7/E9/F) to 30.
+# Pinning the pre-0.16 default keeps the enabled set exactly what this project
+# chose; anything beyond it arrives through `extend-select` below, deliberately.
+select = ["E4", "E7", "E9", "F"]
 extend-select = [
     "I",    # import sorting (from PR-1)
     "E",    # pycodestyle errors, incl. E501 line length
@@ -60,6 +68,12 @@ extend-select = [
 ]
 ignore = [
     "PLR2004",  # magic-value comparisons — not part of the old bar
+    # ruff 0.16 promoted this out of preview, so `PL` above now picks it up.
+    # The 2026-07-03 "Consolidate Formatting And Linting On Ruff" decision
+    # recorded it as disabled; keeping it off holds that decision. Turning it
+    # on is a separate call — it flags 5 existing `source/` functions that
+    # already carry a `# noqa: PLR0913`.
+    "PLR0917",  # too-many-positional-arguments
 ]
 exclude = ["scripts/**"]  # lint-only exclusion (frozen decision 3);
                           # holds for explicit paths via force-exclude (PR-1)
