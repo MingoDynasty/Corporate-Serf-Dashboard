@@ -13,6 +13,59 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-08: PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once
+
+Status: Accepted
+
+An IDE upgrade changed the format PyCharm writes its own tracked config files
+in, and PyCharm re-emits that format every time it launches. Reverting the diff
+therefore only defers it, so the project commits it once instead. The IDE
+config directory also no longer counts as a reason to cut an automated release,
+which it previously would have. One caveat rides along: a leftover Black
+on-save setting stays in the tracked config, and it is harmless only while the
+Black plugin is switched off in the IDE.
+
+Decision: `.idea/` stays tracked, IDE-upgrade schema churn is committed rather
+than reverted, and `.idea/` joins `_BLOCKED_DIRECTORIES` in
+`scripts/release_job.py` so an IDE-config-only push does not release.
+
+Why: the same tool-config diff was committed as `89d54cf` on 2026-08-04 and
+reverted by `b44901a`; launching PyCharm on `main` rewrote both XML files
+immediately, so the revert bought nothing. Untracking `.idea/` instead would
+throw away real configuration work — the interpreter and mypy setup, the source
+root, and the indexing exclusions — while the genuinely volatile per-user files
+(`workspace.xml`, `tasks.xml`, `shelf/`, datasources) are already covered
+between the root `.gitignore` and `.idea/.gitignore`. On the release side,
+`is_release_worthy()` is a blocklist, and `.idea/` matched no entry, so
+`should_release()` returned `True` for a PyCharm tool map and
+`.github/workflows/ci.yml` would have tagged CalVer and published a Latest
+release that cannot be deleted. `.gitignore` and `.pre-commit-config.yaml` were
+already blocked for exactly this reason.
+
+Consequences and constraints:
+
+- **Committing is not self-enforcing.** `.idea/pyLspTools.xml` records the
+  registered tool map, so the loop restarts whenever a tool is toggled in the
+  IDE: `89d54cf` registered `black` and `ruff`, while the settled state
+  registers `ruff` only. What ended the churn is that tool state is now stable,
+  not the act of committing it.
+- **Two on-save formatters are configured in tracked files.**
+  `.idea/misc.xml` keeps a `Black` component with `enabledOnSave=true` against
+  the `uv (Corporate-Serf-Dashboard)` SDK — where `black.exe` really resolves —
+  while `.idea/ruff.xml` sets `runRuffOnSave=true`. The Black half is inert
+  only while the Black plugin is disabled IDE-side, which is a per-user setting
+  the committed files do not encode. Clearing it properly means toggling the
+  plugin off so PyCharm drops the component itself; hand-editing generated
+  files invites the churn back.
+- **black is a transitive dependency, not an absent one.** It is not in
+  `pyproject.toml` and not a configured project tool, but it stays in the lock
+  under `datamodel-code-generator` and is installed in `.venv` — see
+  [Consolidate Formatting And Linting On Ruff](#2026-07-03-consolidate-formatting-and-linting-on-ruff).
+- **Blocking is about triggering, not shipping.** `.gitattributes` sets no
+  `export-ignore`, so `.idea/` still travels inside the release zip. That
+  matches `docs/` and `tests/`, which are likewise blocked from triggering a
+  release while still shipping.
+
 ## 2026-08-03: Home's Controls Row Measures The Content Area, Not The Window
 
 Status: Accepted
