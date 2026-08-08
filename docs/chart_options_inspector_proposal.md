@@ -16,17 +16,12 @@ selector, and no setting changes its meaning, default, or storage.
 
 ## Decisions needed
 
-One decision is open; everything else below was ruled by the maintainer on
-2026-08-04 after a live-size mockup comparison, with both AI reviewers
-concurring.
-
-- **Follow-switch placement.** Recommended: promote "Automatically Change
-  Scenario" out of the panel, rendered as a compact switch directly under
-  the scenario selector (the mockup's placement — at a 1600 px viewport the
-  header's first row has no room for a labeled switch). Alternative: a
-  one-item "Behavior" group inside the inspector. The alternative keeps the
-  header sparser, at the cost of hiding a selection-behavior control inside
-  a chart-options surface, where its effect is least discoverable.
+None — all ruled. The container, naming, scope boundaries, and open-state
+calls were ruled by the maintainer on 2026-08-04 after a live-size mockup
+comparison, with both AI reviewers concurring; the last open item,
+Follow-switch placement, was ratified on 2026-08-08 (promoted out of the
+panel to sit by the scenario selector; an in-inspector "Behavior" group
+was the rejected alternative).
 
 ## Problem
 
@@ -80,15 +75,30 @@ narrow-width mode of the same design, not a competing one.
 - The chart row is a CSS grid: graph track `minmax(0, 1fr)` — the `0`
   matters, Plotly overflows grid/flex tracks without it — beside an
   inspector column of ~19–20 rem.
+- The chart row replaces `.home-graph` as the direct flex child of
+  `.home-page` (a flex column pinned to the viewport height), so the
+  chart-row class must take over the `flex: 1 1 0` growth and the
+  `min-height` floor that `.home-graph` carries today — otherwise the row
+  falls back to intrinsic content height and the graph stops consuming the
+  remaining viewport. `.home-graph` keeps filling its grid track inside
+  the row.
 - Collapsed, the inspector column is removed and the graph returns to full
   width. The panel starts closed on each page visit; its open state is not
-  persisted (ruled).
+  persisted (ruled — the maintainer's stated usage, collapsed most of the
+  time, was given container-neutrally, so the call carries to the rail).
 - Narrow windows: the same DOM re-flows so the inspector stacks above the
   chart. One component tree, one set of ids, no duplicated controls across
   modes. The breakpoint criterion is minimum useful chart width, not
-  device class (author-owned).
-- `dcc.Graph(responsive=True)` already redraws on container resize; the
-  graph component itself does not change.
+  device class; implement the threshold from the existing
+  `HOME_GRID_BREAKPOINTS` scale (which already sizes the controls grid)
+  rather than inventing a new token (author-owned).
+- Plotly redraws a responsive graph only on window `resize` events;
+  container-driven redraws on Home come from `assets/homeGraphResize.js`,
+  whose ResizeObserver locates graph containers by the `.home-graph`
+  class. That script and its class hook must survive the refactor
+  unchanged — opening and collapsing the inspector is exactly the
+  container-resize-without-window-resize case it exists for. The graph
+  component itself does not change.
 
 **Disclosure.** The Home "Settings" button becomes **"Chart options"**
 (name adopted 2026-08-04), with a disclosure chevron and `aria-expanded`.
@@ -107,16 +117,25 @@ flat list:
   run is judged against the goal (`_threshold_verdict` returns None when it
   is off) — placement toasts still fire regardless. Its label must not
   claim to control run notifications wholesale; "Verdict on new runs",
-  read inside the Score goal group, is the recommended copy.
+  read inside the Score goal group, is the recommended copy, and the
+  existing help tooltip ("Notifies after each new run whether it reached
+  the score threshold") is already accurate and carries over unchanged.
 
 The three "Score Threshold *" controls are one user concept; a Score goal
 group makes the relationship explicit. Help tooltips (`SETTINGS_HELP_TEXT`
 via `_settings_help_label`) carry over per control.
 
-**Promotion.** `automatically-change-scenario-switch` governs what the
-scenario selector does when a new run lands — selection behavior, not chart
-presentation. It moves out of the panel to sit by the scenario selector
-(the open decision above), relabeled "Follow newly played scenario".
+**Promotion (ratified 2026-08-08).** `automatically-change-scenario-switch`
+governs what the scenario selector does when a new run lands — selection
+behavior, not chart presentation; the callback wiring corroborates the
+taxonomy mechanically, since it is the one moved control that is not an
+input to `generate_graph`. It moves out of the panel to sit by the
+scenario selector, relabeled "Follow newly played scenario". Exact spot is
+the implementer's: the mockup placed it directly under the selector, but
+that measurement predates the header-responsiveness rework (PR #199
+changed exactly this geometry), so re-measure the header fit at build
+time — the ratified placement rests on the association argument, not on
+the stale row-1-gap figure.
 
 **Header.** Everything else stays put and visible: playlist filter,
 scenario selector, Top N, oldest date, axis radio, Scenario Stats, Refresh.
