@@ -21,9 +21,9 @@ An IDE upgrade changed the format PyCharm writes its own tracked config files
 in, and PyCharm re-emits that format every time it launches. Reverting the diff
 therefore only defers it, so the project commits it once instead. The IDE
 config directory also no longer counts as a reason to cut an automated release,
-which it previously would have. One caveat rides along: a leftover Black
-on-save setting stays in the tracked config, and it is harmless only while the
-Black plugin is switched off in the IDE.
+which it previously would have. A leftover Black on-save setting turned out to
+be orphaned by the same upgrade, and deleting it survived an IDE restart, so it
+is gone rather than merely documented.
 
 Decision: `.idea/` stays tracked, IDE-upgrade schema churn is committed rather
 than reverted, and `.idea/` joins `_BLOCKED_DIRECTORIES` in
@@ -49,14 +49,20 @@ Consequences and constraints:
   IDE: `89d54cf` registered `black` and `ruff`, while the settled state
   registers `ruff` only. What ended the churn is that tool state is now stable,
   not the act of committing it.
-- **Two on-save formatters are configured in tracked files.**
-  `.idea/misc.xml` keeps a `Black` component with `enabledOnSave=true` against
-  the `uv (Corporate-Serf-Dashboard)` SDK — where `black.exe` really resolves —
-  while `.idea/ruff.xml` sets `runRuffOnSave=true`. The Black half is inert
-  only while the Black plugin is disabled IDE-side, which is a per-user setting
-  the committed files do not encode. Clearing it properly means toggling the
-  plugin off so PyCharm drops the component itself; hand-editing generated
-  files invites the churn back.
+- **Neither remaining on-save formatter switch is live.** `.idea/misc.xml`'s
+  `Black` component (`enabledOnSave=true`, against the
+  `uv (Corporate-Serf-Dashboard)` SDK where `black.exe` really resolves) was
+  deleted, because the upgrade orphaned it rather than leaving it live: tool
+  state moved to `pyLspTools.xml`, and dropping `enabledOnReformat` was a
+  one-time migration write. Hand-editing a generated file is normally what
+  invites churn back, so this was tested — after the deletion a PyCharm restart
+  rewrote `pyLspTools.xml` and `workspace.xml` and left `misc.xml` alone.
+  `.idea/ruff.xml`'s `RuffConfigService` (`runRuffOnSave=true`) is inert for a
+  different reason: it belongs to the third-party `com.koxudaxi.ruff` plugin,
+  which is disabled IDE-side, so ruff-on-save runs from the built-in tool state
+  instead. Read `ruff.xml` as a dormant plugin's config, not as live state. If
+  a future upgrade re-emits either component, repeat the delete-and-restart
+  check rather than reverting the config.
 - **black is a transitive dependency, not an absent one.** It is not in
   `pyproject.toml` and not a configured project tool, but it stays in the lock
   under `datamodel-code-generator` and is installed in `.venv` — see
