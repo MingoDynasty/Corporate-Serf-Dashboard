@@ -179,6 +179,13 @@ its own small PR (delivery plan below).
 - Route restructure (`/` reserved for a future Overview page, a durable
   `/scenario` route): deferred until an Overview has concrete plans
   (ruled 2026-08-04).
+- Any Run History surface. The maintainer's current thinking (2026-08-08)
+  has Run History — possibly a compact version — living on the page's
+  right side someday, Home-tied or app-wide undecided. This proposal's
+  inspector therefore claims no exclusive tenancy of the right rail: it
+  is a page-local column that a later design may share, stack with, or
+  re-host. How Run History and the inspector coexist is the run-history
+  proposal's question, not this one's.
 - Renaming the `/settings` page — it keeps "Settings".
 - Splitting Top N's dual role (plot density and top-N notification
   qualification): a documented coupling; no evidence two values are
