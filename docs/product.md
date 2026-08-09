@@ -117,9 +117,9 @@ list in the roadmap.)
   IDs are already known, so first opens of unfamiliar playlists are faster and
   less flaky, even before a username is configured.
 - **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
-  PR #127). A sortable table of
-  every scenario in a playlist — rank, total, percentile, last played, runs,
-  high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
+  PR #127 and PB date in PR #216). A sortable table of every scenario in a
+  playlist — rank, total, percentile, last played, runs, high score, PB date,
+  PB cm/360, PB accuracy. Long playlists scroll inside the table so
   the column labels remain visible while scanning deep rows. The local and
   cached parts paint immediately; unresolved leaderboard cells animate and
   stream into place with a counter instead of hiding the table behind a
