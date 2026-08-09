@@ -15,10 +15,10 @@ automatically in the background.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your high score, or the top-N placement it earned. Playing again replaces it
   rather than stacking a second one beside it, and a run that earns neither says nothing.
-- **Leaderboard standing** — your global rank and percentile for the selected scenario, e.g.
-  `Rank: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
+- **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
+  `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
-- **Playlist scenarios table** — every scenario in a playlist with rank, percentile, last played,
+- **Playlist scenarios table** — every scenario in a playlist with position, percentile, last played,
   runs, high score, and personal-best stats; sort by percentile to build a training priority list.
 
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
@@ -178,7 +178,7 @@ can write it by hand instead:
   it the dashboard still starts, but it has no runs to show and says so on the
   Home page. Left empty on purpose, it stays empty: the startup detection only
   fills the value in when it has never been set.
-- `kovaaks_username` — enables the leaderboard rank and percentile features;
+- `kovaaks_username` — enables the leaderboard position and percentile features;
   leave it out to run fully offline. `steam_id` is optional and makes player
   matching exact when usernames are ambiguous.
 
