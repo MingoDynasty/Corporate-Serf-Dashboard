@@ -115,6 +115,12 @@ expanded into its own roadmap entry when it becomes the next thing up.
   overview → scenario table → Home drill chain covers playlist-first
   navigation; this would answer "show me this scenario regardless of
   playlist."
+- **Cross-scale sensitivity conversion** — normalize runs recorded under
+  per-game sensitivity scales (Valorant, Overwatch) to cm/360 so they sort
+  and group correctly on the Score vs Sensitivity axis, using conversion
+  fields the stats files already carry. Fully designed and evidence-backed;
+  parked with one open decision (conversion mechanism). Design in
+  [`sensitivity_conversion_proposal.md`](./sensitivity_conversion_proposal.md).
 
 ---
 
