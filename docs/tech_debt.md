@@ -100,7 +100,7 @@ This is not a current bug; it is a code-pattern reminder so the same mistake doe
 
 ### Zero-width `dmc.Space` separators offset a wrapped control row
 
-`source/pages/home.py:1500-1501` (and `:1656`) use `dmc.Space(h="xl")` as
+`source/pages/home.py:1501-1502` (and `:1657`) use `dmc.Space(h="xl")` as
 separators inside `direction="row"` flex rows, but `h` sets height — they are
 zero-width flex items contributing only the row's own 12px gap. When the row
 wraps so that one lands at the start of a line, that line's first control sits
