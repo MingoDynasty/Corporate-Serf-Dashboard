@@ -22,7 +22,13 @@ from dash import (
 
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
-from source.config.settings_service import get_identity, get_usable_stats_dir
+from source.config.settings_service import (
+    STATS_DIR_KEY,
+    get_identity,
+    get_settings,
+    get_usable_stats_dir,
+    is_stats_dir_change_pending,
+)
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
 from source.kovaaks.data_service import (
@@ -1210,9 +1216,32 @@ def _stats_dir_hint() -> list:
 
     Unset and unusable read the same to the user, and both are repaired in the
     same place, so the hint carries one link to the settings page.
+
+    A save this process has not applied yet is neither: the settings page just
+    confirmed the save, so claiming nothing is configured would tell the user
+    it failed. The hint defers to the restart instead, the same pin-versus-store
+    reconciliation the settings page's notice derives from.
+
+    That deferral is doubly narrow, because the restart copy carries no link
+    and whatever it displaces has to be worth displacing. The pending change
+    has to be to the *stats directory*: an identity change leaves the directory
+    as unconfigured as it was, and no restart will configure it. And it has to
+    leave one *set*: clearing the field is a pending change too -- rightly so
+    for the settings page's notice, since this process serves the old directory
+    until it restarts -- but what the restart would then apply is nothing
+    configured, which is what the plain hint below already says, and it says it
+    with the link.
     """
     if get_usable_stats_dir() is not None:
         return []
+    if is_stats_dir_change_pending() and get_settings().get(STATS_DIR_KEY):
+        return [
+            dmc.Text(
+                "Settings saved — restart the dashboard to apply them.",
+                className="stats-dir-hint",
+                id="stats-dir-hint",
+            )
+        ]
     return [
         dmc.Text(
             [

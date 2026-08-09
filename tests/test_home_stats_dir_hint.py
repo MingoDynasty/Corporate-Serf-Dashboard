@@ -11,6 +11,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source.pages import home  # noqa: E402
 
 HINT_TEXT = "No stats directory configured — set it in "
+RESTART_HINT_TEXT = "Settings saved — restart the dashboard to apply them."
 
 
 def _walk_components(component):
@@ -77,6 +78,70 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     assert link.children == "Settings"
     assert link.href == "/settings"
     assert _component_by_id(page, "scenario-dropdown-selection").data == []
+
+
+def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path):
+    """A saved-but-unapplied directory must not read as "not configured"."""
+    settings_service.save_settings({})
+    settings_service.resolve_stats_dir()
+    settings_service.save_settings({settings_service.STATS_DIR_KEY: str(tmp_path)})
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    hint = _component_by_id(page, "stats-dir-hint")
+    assert hint is not None
+    assert hint.children == RESTART_HINT_TEXT
+
+
+def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
+    """A restart cannot configure a directory the user never set."""
+    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "First"})
+    settings_service.resolve_stats_dir()
+    # Freeze the identity pin, as a boot-time consumer would.
+    settings_service.get_identity()
+    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "Second"})
+    assert settings_service.is_restart_pending() is True
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    hint = _component_by_id(page, "stats-dir-hint")
+    assert hint is not None
+    text, link = hint.children
+    assert text == HINT_TEXT
+    assert isinstance(link, dmc.Anchor)
+
+
+def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
+    """A restart cannot apply a directory the user just emptied."""
+    settings_service.save_settings(
+        {settings_service.STATS_DIR_KEY: "no-such-stats-dir"}
+    )
+    settings_service.resolve_stats_dir()
+    settings_service.save_settings({settings_service.STATS_DIR_KEY: ""})
+    assert settings_service.is_stats_dir_change_pending() is True
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    hint = _component_by_id(page, "stats-dir-hint")
+    assert hint is not None
+    text, link = hint.children
+    assert text == HINT_TEXT
+    assert isinstance(link, dmc.Anchor)
 
 
 def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):

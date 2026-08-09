@@ -215,6 +215,20 @@ def save_settings(values: Mapping[str, str]) -> None:
         _settings_cache["value"] = settings
 
 
+def is_stats_dir_change_pending() -> bool:
+    """Say whether the stored stats directory differs from this process's pin.
+
+    The stats-directory half of ``is_restart_pending``, split out for consumers
+    that speak about the directory alone. A restart repairs whichever setting
+    moved and nothing else, so anything phrased about the stats directory has
+    to ask this rather than the aggregate: an identity change leaves the
+    directory exactly as it was, and a page that answered the aggregate would
+    promise a restart that fixes nothing.
+    """
+    with _SETTINGS_LOCK:
+        return _get_setting(STATS_DIR_KEY) != _stats_dir_pin["configured"]
+
+
 def is_restart_pending() -> bool:
     """Say whether stored settings differ from what this process is running on.
 
@@ -226,7 +240,7 @@ def is_restart_pending() -> bool:
     path, which applies live -- nothing has consumed the old (unset) value.
     """
     with _SETTINGS_LOCK:
-        if _get_setting(STATS_DIR_KEY) != _stats_dir_pin["configured"]:
+        if is_stats_dir_change_pending():
             return True
         pinned_identity = _identity_pin["value"]
         if pinned_identity is None:
