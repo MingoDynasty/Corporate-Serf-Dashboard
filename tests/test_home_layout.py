@@ -1,6 +1,6 @@
 """Home's controls row and chart row size themselves against the content area.
 
-The AppShell navbar is fixed-position and 250px wide, so a viewport media
+The AppShell navbar is fixed-position and 225px wide, so a viewport media
 query splits Home's layout on space the page does not have. These tests pin
 the halves of the fix: the controls grid measures its own width, the wide
 dropdowns break onto a line at less than their target width so the row narrows
@@ -226,7 +226,7 @@ def test_chart_row_holds_the_graph_beside_the_options_inspector():
 
 def test_chart_row_measures_its_own_width_rather_than_the_windows(stylesheet):
     """A viewport media query would keep the inspector beside a chart the
-    fixed 250px navbar has already crushed."""
+    fixed 225px navbar has already crushed."""
     area = _css_block(stylesheet, ".home-chart-area")
 
     assert "container: home-chart-area / inline-size;" in area

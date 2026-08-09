@@ -104,9 +104,9 @@ RANK_REFRESH_TOOLTIP = (
 )
 # The controls grid measures these against its own width rather than the
 # window's (``type="container"``). The AppShell navbar is fixed-position and
-# 250px wide, so a media query splits the columns on space the content area
+# 225px wide, so a media query splits the columns on space the content area
 # does not have: with the navbar open the row crossed the threshold while
-# still 250px short of fitting, then wrapped. The threshold values are the
+# still 225px short of fitting, then wrapped. The threshold values are the
 # Mantine defaults, unchanged -- only the box they are measured against moves.
 #
 # Copied, not aliased: this is a Dash prop, and the theme dict is shared
