@@ -262,8 +262,9 @@ one-to-one):
   changed shape — see the next bullet — but the failure class stands.
 - A benchmark can return **no scenarios at all** while still declaring a full
   rank ladder. Observed 2026-08-08 on that same benchmark 2412: 9 placeholder
-  tiers (`Rank 1`…`Rank 9`, every one `#ffffff`, description `-`) and zero
-  categories, while Evxl's playlist for it still lists 36 scenarios. This is
+  tiers (`Rank 1`…`Rank 9`, all white or near-white — eight `#ffffff` and
+  `Rank 9` `#fcf1f1` — every description `-`) and an empty `categories`
+  mapping, while Evxl's playlist for it still lists 36 scenarios. This is
   the dangerous shape, because the per-scenario rank-count check above never
   executes when there are no scenarios to check — the counts trivially agree.
   `build_scenarios` therefore refuses an empty result explicitly, raising the

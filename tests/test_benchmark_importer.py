@@ -387,8 +387,14 @@ def test_rank_mismatch_is_typed():
 @pytest.mark.parametrize(
     "make_payload",
     [
-        # The shape observed live on benchmark 2412 (2026-08-08): the category
-        # survives but holds no scenarios.
+        # The shape observed live on benchmark 2412 (2026-08-08): the whole
+        # categories mapping comes back empty.
+        pytest.param(
+            lambda: {**_benchmark_response([100]), "categories": {}},
+            id="empty-categories",
+        ),
+        # Constructed variant: a category survives but its scenario dict is
+        # empty. Covered because the terminal guard has to catch it too.
         pytest.param(
             lambda: {
                 **_benchmark_response([100]),
@@ -402,10 +408,6 @@ def test_rank_mismatch_is_typed():
                 },
             },
             id="empty-scenarios",
-        ),
-        pytest.param(
-            lambda: {**_benchmark_response([100]), "categories": {}},
-            id="empty-categories",
         ),
     ],
 )
