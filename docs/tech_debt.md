@@ -100,7 +100,7 @@ This is not a current bug; it is a code-pattern reminder so the same mistake doe
 
 ### Zero-width `dmc.Space` separators offset a wrapped control row
 
-`source/pages/home.py:1307-1308` (and `:1463`) use `dmc.Space(h="xl")` as
+`source/pages/home.py:1500-1501` (and `:1656`) use `dmc.Space(h="xl")` as
 separators inside `direction="row"` flex rows, but `h` sets height — they are
 zero-width flex items contributing only the row's own 12px gap. When the row
 wraps so that one lands at the start of a line, that line's first control sits
@@ -112,8 +112,8 @@ rather than at that one.
 Same defect class as the 32px playlist-filter indent fixed in PR #201, whose
 rewrap is what made this visible; left out of #201 because removing the
 separators is a judgment call about intended spacing rather than a mechanical
-fix. The modal's `Space(h="xs")` (`:1482-1550`) sit in a vertical block
-context where `h` is correct — don't sweep those.
+fix. The graph-settings modal that held the other `Space(h="xs")` is gone
+(PR #209), so the three above are all that remain.
 
 ## Performance
 

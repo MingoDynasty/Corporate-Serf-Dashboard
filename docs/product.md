@@ -64,6 +64,18 @@ list in the roadmap.)
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is.
+- **Chart options beside the chart** (Scenario Performance page, PRs #209,
+  #215). The graph's display preferences — the overlays, and the score
+  threshold and its percentage — open in a panel next to the chart, grouped by
+  what they affect, and collapse back out of the way. On a narrow window the
+  panel stacks above the chart. *Problem solved:* these settings used to live
+  in a modal that dimmed and blocked the only surface that shows what they do,
+  so picking a threshold percentage meant guessing, closing the modal to look,
+  and opening it again. Now the chart answers immediately. The same change
+  gave the page a name of its own, **Scenario Performance**, so "Settings"
+  means the Settings page and nothing else — the modal, the button that opened
+  it, and the navbar link had all been calling themselves Settings, two of
+  them with the same icon.
 
 ### Standing: where do I rank
 
