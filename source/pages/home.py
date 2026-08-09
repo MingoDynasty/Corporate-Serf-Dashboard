@@ -23,7 +23,9 @@ from dash import (
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import (
+    STATS_DIR_KEY,
     get_identity,
+    get_settings,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
 )
@@ -1189,14 +1191,19 @@ def _stats_dir_hint() -> list:
     it failed. The hint defers to the restart instead, the same pin-versus-store
     reconciliation the settings page's notice derives from.
 
-    Narrowly, though: it asks whether the *stats directory* moved, not whether
-    any restart is pending. An identity change alone leaves the directory as
-    unconfigured as it was, and a restart would not configure it, so displacing
-    the link to the one page that repairs it would strand the user.
+    That deferral is doubly narrow, because the restart copy carries no link
+    and whatever it displaces has to be worth displacing. The pending change
+    has to be to the *stats directory*: an identity change leaves the directory
+    as unconfigured as it was, and no restart will configure it. And it has to
+    leave one *set*: clearing the field is a pending change too -- rightly so
+    for the settings page's notice, since this process serves the old directory
+    until it restarts -- but what the restart would then apply is nothing
+    configured, which is what the plain hint below already says, and it says it
+    with the link.
     """
     if get_usable_stats_dir() is not None:
         return []
-    if is_stats_dir_change_pending():
+    if is_stats_dir_change_pending() and get_settings().get(STATS_DIR_KEY):
         return [
             dmc.Text(
                 "Settings saved — restart the dashboard to apply them.",

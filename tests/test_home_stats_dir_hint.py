@@ -121,6 +121,29 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
     assert isinstance(link, dmc.Anchor)
 
 
+def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
+    """A restart cannot apply a directory the user just emptied."""
+    settings_service.save_settings(
+        {settings_service.STATS_DIR_KEY: "no-such-stats-dir"}
+    )
+    settings_service.resolve_stats_dir()
+    settings_service.save_settings({settings_service.STATS_DIR_KEY: ""})
+    assert settings_service.is_stats_dir_change_pending() is True
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    hint = _component_by_id(page, "stats-dir-hint")
+    assert hint is not None
+    text, link = hint.children
+    assert text == HINT_TEXT
+    assert isinstance(link, dmc.Anchor)
+
+
 def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()
