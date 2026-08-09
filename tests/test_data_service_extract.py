@@ -146,6 +146,28 @@ def test_extract_data_from_file_returns_none_for_truncated_sub_csv_row() -> None
         file_path.unlink(missing_ok=True)
 
 
+def test_extract_data_from_file_returns_none_for_unreadable_file() -> None:
+    """An unopenable CSV — locked or deleted mid-scan — drops the run, not the app."""
+    fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
+    file_path = fixtures_dir / "gone - Challenge - 2025.01.01-10.00.00 Stats.csv"
+    assert not file_path.exists()
+
+    assert extract_data_from_file(str(file_path)) is None
+
+
+def test_extract_data_from_file_returns_none_for_mid_write_line() -> None:
+    """A "Score:" line with no value column yet is what a mid-write file looks like."""
+    fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
+    fixtures_dir.mkdir(parents=True, exist_ok=True)
+    file_path = fixtures_dir / "midwrite - Challenge - 2025.01.01-10.00.00 Stats.csv"
+    try:
+        file_path.write_text("Score:\n", encoding="utf-8")
+
+        assert extract_data_from_file(str(file_path)) is None
+    finally:
+        file_path.unlink(missing_ok=True)
+
+
 def test_extract_data_from_file_returns_none_when_shots_is_zero() -> None:
     fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "generated"
     fixtures_dir.mkdir(parents=True, exist_ok=True)
