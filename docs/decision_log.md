@@ -63,27 +63,44 @@ would be false: importing a playlist by share code can fall back to a
 third-party service. Public statements about network behavior therefore
 enumerate every reachable host and when it is reached, or say nothing at all.
 
-Decision: the canonical outbound surface is exactly four hosts, and every
-public network/privacy statement (README, posts, replies) either carries the
-full enumeration with conditions or makes no network claim.
+Decision: the canonical outbound surface is the two tables below — the app
+process and the launcher/updater are separate surfaces with separate
+conditions — and every public network/privacy statement (README, posts,
+replies) either carries the full enumeration with conditions or makes no
+network claim.
+
+The app process:
 
 | Host | When | Where |
 |---|---|---|
-| `kovaaks.com` | leaderboard position/total lookups, playlist import, identity probe — only with an identity configured | `api_service.py` |
-| `github.com` | the launcher's self-update check; a header link | `launcher.ps1`, `app_shell.py` |
+| `kovaaks.com` | automatic leaderboard position/total lookups and the identity warmup (identity configured); Settings' Detect button and playlist import by share code (user-initiated, no identity required) | `api_service.py`, `identity_detection.py`, `data_service.py` |
 | `api.evxl.app` | fallback for share-code playlist import when KovaaK's own search returns null | `api_service.py` (`EVXL_PLAYLIST_BY_CODE_URL`) |
+| `github.com` | a header link's href | `app_shell.py` |
 | `discordapp.com` | a contact anchor's href only — the app never calls it | `app_shell.py` |
+
+The launcher/updater, on every non-pinned launch or (re)install:
+
+| Host | When | Where |
+|---|---|---|
+| `api.github.com` | the latest-release lookup | `launcher.ps1` (`Get-LatestTag`) |
+| `github.com` | downloading the release | `launcher.ps1` |
+| `raw.githubusercontent.com` | fetching `get.ps1` — the install one-liner and the shortcut bootstrap (the launcher only prints this command) | `launch_bootstrap.ps1` |
+| `astral.sh` | downloading uv when the pinned version is missing | `launcher.ps1` |
 
 Zero telemetry, verified by sweep (`telemetry|analytics|sentry|posthog|
 mixpanel|amplitude|bugsnag|rollbar` over `source/`, `scripts/`,
-`pyproject.toml`: no hits). The offline contract stands: with no identity
-configured the app makes no KovaaK's requests and serves fully offline.
+`pyproject.toml`: no hits). The offline posture, stated precisely: with no
+identity configured the app makes no *automatic* KovaaK's requests;
+user-initiated actions that need the network — Detect, playlist import —
+reach it regardless of identity, and fail soft offline.
 
 Consequences: adding an outbound host means updating every public statement
 that carries the enumeration in the same PR — the enumeration is an
 invariant, not documentation. The truthful short form, when brevity is
-needed: "no telemetry; talks to KovaaK's and GitHub, plus evxl.app only as a
-playlist-import fallback."
+needed: "no telemetry; the app talks to KovaaK's (plus evxl.app as a
+playlist-import fallback), and the launcher talks to GitHub to update
+itself — nothing else, and nothing without an identity or an explicit
+action."
 
 ## 2026-08-08: AI-Assisted Authorship Is Answered Plainly, Never Led With, Never Obscured
 
