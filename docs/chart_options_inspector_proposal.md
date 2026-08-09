@@ -88,10 +88,16 @@ narrow-width mode of the same design, not a competing one.
   time, was given container-neutrally, so the call carries to the rail).
 - Narrow windows: the same DOM re-flows so the inspector stacks above the
   chart. One component tree, one set of ids, no duplicated controls across
-  modes. The breakpoint criterion is minimum useful chart width, not
-  device class; implement the threshold from the existing
-  `HOME_GRID_BREAKPOINTS` scale (which already sizes the controls grid)
-  rather than inventing a new token (author-owned).
+  modes. The reflow threshold must measure the chart row's own available
+  width — a CSS container query, the same mechanism PR #199 gave the
+  controls grid (`type="container"` emits `@container` rules that measure
+  the grid rather than the window) — never a viewport `@media`: the fixed
+  250 px navbar shrinks the content area without touching the viewport,
+  so a viewport threshold would keep the inspector beside the graph while
+  crushing it. Take the threshold value from the existing
+  `HOME_GRID_BREAKPOINTS` scale rather than inventing a token, derived
+  from minimum useful chart width (author-owned), and validate both
+  navbar-open and navbar-closed states around it.
 - Plotly redraws a responsive graph only on window `resize` events;
   container-driven redraws on Home come from `assets/homeGraphResize.js`,
   whose ResizeObserver locates graph containers by the `.home-graph`
@@ -101,7 +107,11 @@ narrow-width mode of the same design, not a competing one.
   component itself does not change.
 
 **Disclosure.** The Home "Settings" button becomes **"Chart options"**
-(name adopted 2026-08-04), with a disclosure chevron and `aria-expanded`.
+(name adopted 2026-08-04), with a disclosure chevron and the full
+disclosure contract: the panel has a stable id, the button carries
+`aria-controls` naming it alongside `aria-expanded`, and the collapsed
+class hides with `display: none` (or equivalent) so hidden controls leave
+the tab order and accessibility tree while staying mounted for Dash.
 `/settings` keeps the name "Settings" — the collision is resolved from the
 Home side (ruled; an "App setup" rename was considered and rejected).
 
@@ -116,10 +126,11 @@ flat list:
   review: since the notification redesign, this switch gates only whether a
   run is judged against the goal (`_threshold_verdict` returns None when it
   is off) — placement toasts still fire regardless. Its label must not
-  claim to control run notifications wholesale; "Verdict on new runs",
-  read inside the Score goal group, is the recommended copy, and the
-  existing help tooltip ("Notifies after each new run whether it reached
-  the score threshold") is already accurate and carries over unchanged.
+  claim to control run notifications wholesale; "Show goal verdict" is
+  the recommended copy — it names the effect inside the run toast without
+  implying placement toasts are gated — and the existing help tooltip
+  ("Notifies after each new run whether it reached the score threshold")
+  is already accurate and carries over unchanged.
 
 The three "Score Threshold *" controls are one user concept; a Score goal
 group makes the relationship explicit. Help tooltips (`SETTINGS_HELP_TEXT`
@@ -184,8 +195,9 @@ its own small PR (delivery plan below).
   right side someday, Home-tied or app-wide undecided. This proposal's
   inspector therefore claims no exclusive tenancy of the right rail: it
   is a page-local column that a later design may share, stack with, or
-  re-host. How Run History and the inspector coexist is the run-history
-  proposal's question, not this one's.
+  re-host. If Run History does become Home-tied, it composes into this
+  same rail/stack rather than adding a second side column. How the two
+  coexist is the run-history proposal's question, not this one's.
 - Renaming the `/settings` page — it keeps "Settings".
 - Splitting Top N's dual role (plot density and top-N notification
   qualification): a documented coupling; no evidence two values are
@@ -205,15 +217,18 @@ its own small PR (delivery plan below).
   exist with unchanged ids and defaults; no `settings-modal` remains in
   the layout; the collapsed state is a CSS-class change, not removal (all
   controls remain in the layout tree).
-- The disclosure toggle is UI-only, but under DashProxy `allow_duplicate`
-  callbacks can fire on initial page load despite
-  `prevent_initial_call=True` — guard the toggle on `n_clicks` and add the
-  None-trigger regression test if it ever writes more than the panel
-  class.
+- The disclosure toggle writes state by definition — the panel class *is*
+  the open state, and `aria-expanded` rides with it — and under DashProxy
+  `allow_duplicate` callbacks can fire on initial page load despite
+  `prevent_initial_call=True`. The `n_clicks`/trigger guard and the
+  None-trigger regression test are therefore unconditional: before a real
+  click, both the panel class and `aria-expanded` must be unchanged.
 - Live check in the implementation PR: open the inspector in the browser
   pane (it is in-flow DOM, unlike the modal), toggle an overlay, confirm
   the chart updates without dimming, and confirm the chart resizes cleanly
   on open/collapse — if Plotly misbehaves during an animated width
-  transition, drop the transition. Reload before judging the console; the
-  known first-load Dash race is unrelated.
+  transition, drop the transition. Exercise the open and closed layouts
+  with the navbar both open and closed around the reflow threshold, not
+  only at the 1600×900 reference size. Reload before judging the console;
+  the known first-load Dash race is unrelated.
 - Gates: the standard five local commands.
