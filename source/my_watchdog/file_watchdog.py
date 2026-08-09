@@ -77,6 +77,11 @@ def _get_created_csv_path(event) -> str | None:
 def _enqueue_after_loading(file: str, message: NewFileMessage) -> bool:
     """Make a run visible to Home only after it is queryable in the stores."""
     if not load_csv_file_into_database(file):
+        # The store re-reads the CSV, so a file that parsed a moment ago in
+        # _import_created_file can still fail here -- deleted or replaced in
+        # between. Rare, but the run did not land either way, and this was the
+        # last path that dropped one with nothing but a log line.
+        run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
         return False
     message_queue.append(message)
     return True
@@ -131,7 +136,13 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         run_data = extract_data_from_file(file)
         if not run_data:
+            # extract_data_from_file contains its own read and parse failures --
+            # a CSV still locked by KovaaK's, a mid-write line -- and returns
+            # None, so on_created's guard above never sees them. This handler
+            # only sees the creation event and never retries, so the run stays
+            # missing until a restart: notify here or the user is never told.
             logger.warning("Failed to get run data for CSV file: %s", file)
+            run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
             return
 
         sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"

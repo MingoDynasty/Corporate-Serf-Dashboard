@@ -1,4 +1,11 @@
-"""Crash hooks and the watchdog guard must leave log records, not dead threads."""
+"""Crash hooks and the watchdog guard must leave log records, not dead threads.
+
+Both of the import-failure shapes on_created itself sees -- an exception that
+escapes to its handler, and a None that extract_data_from_file already
+contained -- have to reach the user, so their notification assertions sit
+together here. The third shape, a store load that fails after the parse
+succeeded, is asserted beside its siblings in test_file_watchdog_rank_refresh.py.
+"""
 
 import logging
 import sys
@@ -89,6 +96,26 @@ def test_on_created_survives_unexpected_error(monkeypatch, caplog):
     assert "file still locked" in caplog.text
     # The watchdog thread has no callback context, so it publishes the failure
     # for Home's interval callback to drain rather than driving a UI output.
+    assert file_watchdog.drain_run_import_failures() == [
+        "Could not process a new run file. See debug.log for details."
+    ]
+    assert file_watchdog.drain_run_import_failures() == []
+
+
+def test_on_created_reports_contained_parse_failure(monkeypatch, caplog):
+    """A locked or mid-write CSV returns None instead of raising -- still notify."""
+    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(file_watchdog, "extract_data_from_file", lambda _path: None)
+    file_watchdog.run_import_failure_queue.clear()
+
+    with caplog.at_level(logging.WARNING, logger=file_watchdog.logger.name):
+        file_watchdog.NewFileHandler().on_created(
+            SimpleNamespace(is_directory=False, src_path="run.csv")
+        )
+
+    assert "Failed to get run data for CSV file: run.csv" in caplog.text
+    # The failure never reaches on_created's handler, so this path has to
+    # publish the toast itself -- once.
     assert file_watchdog.drain_run_import_failures() == [
         "Could not process a new run file. See debug.log for details."
     ]

@@ -294,6 +294,7 @@ def test_on_created_loads_before_enqueuing(monkeypatch):
 def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
     run_data = _run_data()
     messages, loads, schedules = _patch_common(monkeypatch, run_data)
+    file_watchdog.run_import_failure_queue.clear()
     monkeypatch.setattr(
         file_watchdog,
         "is_scenario_in_database",
@@ -313,3 +314,8 @@ def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
     assert loads == ["run.csv"]
     assert messages == []
     assert schedules == []
+    # The store's own re-read failed, so the run never landed -- the user hears
+    # about it here rather than only in debug.log.
+    assert file_watchdog.drain_run_import_failures() == [
+        file_watchdog.RUN_IMPORT_FAILURE_MESSAGE
+    ]
