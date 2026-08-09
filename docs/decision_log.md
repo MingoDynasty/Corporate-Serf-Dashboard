@@ -29,9 +29,13 @@ takes "N/A" as its null sentinel, even when the value is a timestamp
 rendered with the shared relative-time helpers. "Never" stays scoped to
 Last Played (in a playlist but never played). On an unplayed row, Last
 Played reads "Never" while PB Score / PB Date / PB cm/360 / PB Accuracy
-read "N/A"; the sentinels co-occur by design, and their nulls are
-equivalent by construction (both mean the scenario has no local runs). The
-playlist grid's live tick now refreshes both timestamp columns:
+read "N/A"; the sentinels co-occur by design. Last Played and PB Date are
+null under exactly the same condition — the scenario has no local runs —
+so an unplayed row is the only place "Never" and "N/A" describe the same
+fact. (PB cm/360 additionally reads "N/A" on played rows whose PB used a
+different sensitivity scale; "N/A" in a PB column is not by itself
+evidence the scenario is unplayed.) The playlist grid's live tick now
+refreshes both timestamp columns:
 `refreshCells({force: true, columns: ["last_played_sort",
 "pb_timestamp_sort"]})`.
 
