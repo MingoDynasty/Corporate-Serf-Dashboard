@@ -1,0 +1,1279 @@
+{
+  "name": "REVENGE Main Benchmarks",
+  "code": "KovaaKsAdventuringClippyModifier",
+  "scenarios": [
+    {
+      "name": "REVENGE - 1Click Reflex Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 850.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 900.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 950.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 198772
+    },
+    {
+      "name": "REVENGE - 2Click Pressure Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1660.0
+        }
+      ],
+      "leaderboard_id": 198778
+    },
+    {
+      "name": "REVENGE - 2-3Click Wide Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1320.0
+        }
+      ],
+      "leaderboard_id": 198777
+    },
+    {
+      "name": "REVENGE - 3Click Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1280.0
+        }
+      ],
+      "leaderboard_id": 199136
+    },
+    {
+      "name": "REVENGE - 4Click Precise Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 980.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1160.0
+        }
+      ],
+      "leaderboard_id": 199152
+    },
+    {
+      "name": "REVENGE - 5Click Depart Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1610.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1720.0
+        }
+      ],
+      "leaderboard_id": 199205
+    },
+    {
+      "name": "REVENGE - 6Click Clusters Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1510.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1630.0
+        }
+      ],
+      "leaderboard_id": 198783
+    },
+    {
+      "name": "REVENGE - 7Click Multi Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1530.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1770.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1890.0
+        }
+      ],
+      "leaderboard_id": 198785
+    },
+    {
+      "name": "REVENGE - XYClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 930.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1260.0
+        }
+      ],
+      "leaderboard_id": 199082
+    },
+    {
+      "name": "REVENGE - BunClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 630.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 720.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 810.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 199087
+    },
+    {
+      "name": "REVENGE - BirdClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 790.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 870.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 950.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1050.0
+        }
+      ],
+      "leaderboard_id": 199072
+    },
+    {
+      "name": "REVENGE - LinearClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 680.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 780.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 890.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 199078
+    },
+    {
+      "name": "REVENGE - BeeClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 410.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 490.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 580.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 670.0
+        }
+      ],
+      "leaderboard_id": 199075
+    },
+    {
+      "name": "REVENGE - WeaselClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 480.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 570.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 660.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 750.0
+        }
+      ],
+      "leaderboard_id": 199080
+    },
+    {
+      "name": "REVENGE - ControlClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 820.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 900.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 980.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1060.0
+        }
+      ],
+      "leaderboard_id": 199076
+    },
+    {
+      "name": "REVENGE - DodgeClick Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 690.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 780.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 880.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 980.0
+        }
+      ],
+      "leaderboard_id": 199085
+    },
+    {
+      "name": "REVENGE - SmoothTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3650.0
+        }
+      ],
+      "leaderboard_id": 198788
+    },
+    {
+      "name": "REVENGE - BounceTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 199046
+    },
+    {
+      "name": "REVENGE - PreciseTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3475.0
+        }
+      ],
+      "leaderboard_id": 198805
+    },
+    {
+      "name": "REVENGE - ControlTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3525.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3700.0
+        }
+      ],
+      "leaderboard_id": 199013
+    },
+    {
+      "name": "REVENGE - TechTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 198962
+    },
+    {
+      "name": "REVENGE - MicroTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3975.0
+        }
+      ],
+      "leaderboard_id": 198814
+    },
+    {
+      "name": "REVENGE - PasuTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 4275.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 4525.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 4775.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 5025.0
+        }
+      ],
+      "leaderboard_id": 198790
+    },
+    {
+      "name": "REVENGE - AngleTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3700.0
+        }
+      ],
+      "leaderboard_id": 198792
+    },
+    {
+      "name": "REVENGE - GroundTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3225.0
+        }
+      ],
+      "leaderboard_id": 199068
+    },
+    {
+      "name": "REVENGE - AirTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 199055
+    },
+    {
+      "name": "REVENGE - DeceptiveTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 198799
+    },
+    {
+      "name": "REVENGE - TwitchyTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1925.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 2150.0
+        }
+      ],
+      "leaderboard_id": 199010
+    },
+    {
+      "name": "REVENGE - DiagTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 2775.0
+        }
+      ],
+      "leaderboard_id": 198803
+    },
+    {
+      "name": "REVENGE - LeapTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 2500.0
+        }
+      ],
+      "leaderboard_id": 199027
+    },
+    {
+      "name": "REVENGE - DodgeTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 6650.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 6850.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 7050.0
+        }
+      ],
+      "leaderboard_id": 199018
+    },
+    {
+      "name": "REVENGE - NarcoTrack Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1875.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 2550.0
+        }
+      ],
+      "leaderboard_id": 198948
+    },
+    {
+      "name": "REVENGE - PokeSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1230.0
+        }
+      ],
+      "leaderboard_id": 199180
+    },
+    {
+      "name": "REVENGE - DepthSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1290.0
+        }
+      ],
+      "leaderboard_id": 199173
+    },
+    {
+      "name": "REVENGE - ChillSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 850.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 900.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 960.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1020.0
+        }
+      ],
+      "leaderboard_id": 199213
+    },
+    {
+      "name": "REVENGE - FlashSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1340.0
+        }
+      ],
+      "leaderboard_id": 199175
+    },
+    {
+      "name": "REVENGE - BirdSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 870.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 920.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 970.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1030.0
+        }
+      ],
+      "leaderboard_id": 199162
+    },
+    {
+      "name": "REVENGE - TacSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 840.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 880.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 920.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 960.0
+        }
+      ],
+      "leaderboard_id": 199196
+    },
+    {
+      "name": "REVENGE - WaldoSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1310.0
+        }
+      ],
+      "leaderboard_id": 199206
+    },
+    {
+      "name": "REVENGE - PsalmSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 960.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 1190.0
+        }
+      ],
+      "leaderboard_id": 199190
+    },
+    {
+      "name": "REVENGE - XYSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 690.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 740.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 800.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 860.0
+        }
+      ],
+      "leaderboard_id": 199199
+    },
+    {
+      "name": "REVENGE - BunSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 570.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 620.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 670.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 720.0
+        }
+      ],
+      "leaderboard_id": 199210
+    },
+    {
+      "name": "REVENGE - LinearSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 510.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 540.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 570.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 199177
+    },
+    {
+      "name": "REVENGE - SmoothSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 360.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 390.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 420.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 450.0
+        }
+      ],
+      "leaderboard_id": 199192
+    },
+    {
+      "name": "REVENGE - PreciseSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 380.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 410.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 450.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 500.0
+        }
+      ],
+      "leaderboard_id": 199185
+    },
+    {
+      "name": "REVENGE - ControlSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 550.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 580.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 610.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 640.0
+        }
+      ],
+      "leaderboard_id": 199169
+    },
+    {
+      "name": "REVENGE - MicroSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 420.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 450.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 480.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 520.0
+        }
+      ],
+      "leaderboard_id": 199208
+    },
+    {
+      "name": "REVENGE - StrafeSwitch Main",
+      "ranks": [
+        {
+          "name": "Ruby",
+          "color": "#e30d1f",
+          "threshold": 560.0
+        },
+        {
+          "name": "Obsidian",
+          "color": "#2a0087",
+          "threshold": 600.0
+        },
+        {
+          "name": "Onyx",
+          "color": "#08228e",
+          "threshold": 650.0
+        },
+        {
+          "name": "Bloodstone",
+          "color": "#880808",
+          "threshold": 700.0
+        }
+      ],
+      "leaderboard_id": 199194
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAdventuringClippyModifier",
+    "kovaaks_benchmark_id": 2725,
+    "rank_colors": [
+      [
+        "Ruby",
+        "#e30d1f"
+      ],
+      [
+        "Obsidian",
+        "#2a0087"
+      ],
+      [
+        "Onyx",
+        "#08228e"
+      ],
+      [
+        "Bloodstone",
+        "#880808"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:50.886023+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

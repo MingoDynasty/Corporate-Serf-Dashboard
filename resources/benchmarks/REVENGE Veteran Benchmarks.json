@@ -1,0 +1,1279 @@
+{
+  "name": "REVENGE Veteran Benchmarks",
+  "code": "KovaaKsSensingRangedMachine",
+  "scenarios": [
+    {
+      "name": "REVENGE - 1Click Reflex",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 950.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 196694
+    },
+    {
+      "name": "REVENGE - 2Click Pressure",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1900.0
+        }
+      ],
+      "leaderboard_id": 196709
+    },
+    {
+      "name": "REVENGE - 2-3Click Wide",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1550.0
+        }
+      ],
+      "leaderboard_id": 196708
+    },
+    {
+      "name": "REVENGE - 3Click",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1500.0
+        }
+      ],
+      "leaderboard_id": 196710
+    },
+    {
+      "name": "REVENGE - 4Click Precise",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1400.0
+        }
+      ],
+      "leaderboard_id": 196711
+    },
+    {
+      "name": "REVENGE - 5Click Depart",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2200.0
+        }
+      ],
+      "leaderboard_id": 196712
+    },
+    {
+      "name": "REVENGE - 6Click Clusters",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2100.0
+        }
+      ],
+      "leaderboard_id": 196713
+    },
+    {
+      "name": "REVENGE - 7Click Multi",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2350.0
+        }
+      ],
+      "leaderboard_id": 196714
+    },
+    {
+      "name": "REVENGE - XYClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1600.0
+        }
+      ],
+      "leaderboard_id": 196722
+    },
+    {
+      "name": "REVENGE - BunClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 800.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 900.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1100.0
+        }
+      ],
+      "leaderboard_id": 196717
+    },
+    {
+      "name": "REVENGE - BirdClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1450.0
+        }
+      ],
+      "leaderboard_id": 196723
+    },
+    {
+      "name": "REVENGE - LinearClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 900.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1400.0
+        }
+      ],
+      "leaderboard_id": 196720
+    },
+    {
+      "name": "REVENGE - BeeClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 560.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 670.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 780.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 196715
+    },
+    {
+      "name": "REVENGE - WeaselClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 640.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 760.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 880.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 196721
+    },
+    {
+      "name": "REVENGE - ControlClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 960.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1230.0
+        }
+      ],
+      "leaderboard_id": 196718
+    },
+    {
+      "name": "REVENGE - DodgeClick",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 900.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1300.0
+        }
+      ],
+      "leaderboard_id": 196719
+    },
+    {
+      "name": "REVENGE - SmoothTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 196697
+    },
+    {
+      "name": "REVENGE - BounceTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 4175.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4650.0
+        }
+      ],
+      "leaderboard_id": 196700
+    },
+    {
+      "name": "REVENGE - PreciseTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 3750.0
+        }
+      ],
+      "leaderboard_id": 196704
+    },
+    {
+      "name": "REVENGE - ControlTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3875.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4250.0
+        }
+      ],
+      "leaderboard_id": 196701
+    },
+    {
+      "name": "REVENGE - TechTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 196705
+    },
+    {
+      "name": "REVENGE - MicroTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 196702
+    },
+    {
+      "name": "REVENGE - PasuTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 4900.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 5200.0
+        }
+      ],
+      "leaderboard_id": 196703
+    },
+    {
+      "name": "REVENGE - AngleTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 196765
+    },
+    {
+      "name": "REVENGE - GroundTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 196730
+    },
+    {
+      "name": "REVENGE - AirTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 196726
+    },
+    {
+      "name": "REVENGE - DeceptiveTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 196727
+    },
+    {
+      "name": "REVENGE - TwitchyTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2400.0
+        }
+      ],
+      "leaderboard_id": 196733
+    },
+    {
+      "name": "REVENGE - DiagTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 3200.0
+        }
+      ],
+      "leaderboard_id": 196728
+    },
+    {
+      "name": "REVENGE - LeapTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2900.0
+        }
+      ],
+      "leaderboard_id": 196731
+    },
+    {
+      "name": "REVENGE - DodgeTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 6375.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 6850.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 7625.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 8400.0
+        }
+      ],
+      "leaderboard_id": 196729
+    },
+    {
+      "name": "REVENGE - NarcoTrack",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 2950.0
+        }
+      ],
+      "leaderboard_id": 196732
+    },
+    {
+      "name": "REVENGE - PokeSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1510.0
+        }
+      ],
+      "leaderboard_id": 196741
+    },
+    {
+      "name": "REVENGE - DepthSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1440.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1540.0
+        }
+      ],
+      "leaderboard_id": 196737
+    },
+    {
+      "name": "REVENGE - ChillSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 980.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1280.0
+        }
+      ],
+      "leaderboard_id": 196736
+    },
+    {
+      "name": "REVENGE - FlashSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1600.0
+        }
+      ],
+      "leaderboard_id": 196739
+    },
+    {
+      "name": "REVENGE - BirdSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 980.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1280.0
+        }
+      ],
+      "leaderboard_id": 196740
+    },
+    {
+      "name": "REVENGE - TacSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 910.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 970.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1110.0
+        }
+      ],
+      "leaderboard_id": 196743
+    },
+    {
+      "name": "REVENGE - WaldoSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1740.0
+        }
+      ],
+      "leaderboard_id": 196744
+    },
+    {
+      "name": "REVENGE - PsalmSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1460.0
+        }
+      ],
+      "leaderboard_id": 196742
+    },
+    {
+      "name": "REVENGE - XYSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 800.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 870.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 940.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 1010.0
+        }
+      ],
+      "leaderboard_id": 196909
+    },
+    {
+      "name": "REVENGE - BunSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 680.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 750.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 820.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 196753
+    },
+    {
+      "name": "REVENGE - LinearSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 550.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 600.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 650.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 700.0
+        }
+      ],
+      "leaderboard_id": 196747
+    },
+    {
+      "name": "REVENGE - SmoothSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 400.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 450.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 520.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 196751
+    },
+    {
+      "name": "REVENGE - PreciseSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 450.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 520.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 590.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 670.0
+        }
+      ],
+      "leaderboard_id": 196749
+    },
+    {
+      "name": "REVENGE - ControlSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 600.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 660.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 720.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 790.0
+        }
+      ],
+      "leaderboard_id": 196746
+    },
+    {
+      "name": "REVENGE - MicroSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 480.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 540.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 600.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 670.0
+        }
+      ],
+      "leaderboard_id": 196748
+    },
+    {
+      "name": "REVENGE - StrafeSwitch",
+      "ranks": [
+        {
+          "name": "Phantom",
+          "color": "#ffdf00",
+          "threshold": 650.0
+        },
+        {
+          "name": "Eclipse",
+          "color": "#00bc83",
+          "threshold": 700.0
+        },
+        {
+          "name": "Vengeance",
+          "color": "#0c343d",
+          "threshold": 760.0
+        },
+        {
+          "name": "Void",
+          "color": "#000000",
+          "threshold": 820.0
+        }
+      ],
+      "leaderboard_id": 196752
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSensingRangedMachine",
+    "kovaaks_benchmark_id": 2724,
+    "rank_colors": [
+      [
+        "Phantom",
+        "#ffdf00"
+      ],
+      [
+        "Eclipse",
+        "#00bc83"
+      ],
+      [
+        "Vengeance",
+        "#0c343d"
+      ],
+      [
+        "Void",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:51.874840+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

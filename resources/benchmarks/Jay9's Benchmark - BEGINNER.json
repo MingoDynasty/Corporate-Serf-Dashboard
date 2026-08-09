@@ -1,0 +1,407 @@
+{
+  "name": "Jay9's Benchmark - BEGINNER",
+  "code": "KovaaKsChallengingVividtangerineLostsector",
+  "scenarios": [
+    {
+      "name": "SmoothBot Perfected 80%",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 185958
+    },
+    {
+      "name": "Smoothsphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 7250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 8750.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 10000.0
+        }
+      ],
+      "leaderboard_id": 185342
+    },
+    {
+      "name": "cloverRawControl Viscose Easier 50cm",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 8250.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 10000.0
+        }
+      ],
+      "leaderboard_id": 185349
+    },
+    {
+      "name": "VT Raw Control Novice S5",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 98047
+    },
+    {
+      "name": "RawControlSphere Easier",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 6250.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 11750.0
+        }
+      ],
+      "leaderboard_id": 185356
+    },
+    {
+      "name": "Swing Tracking Easy 80%",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 750.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 1850.0
+        }
+      ],
+      "leaderboard_id": 132530
+    },
+    {
+      "name": "VT Aether Novice S5 Bot 3",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3750.0
+        }
+      ],
+      "leaderboard_id": 108046
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy 70%",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 14155
+    },
+    {
+      "name": "VT Ground Novice S5 Bot 3",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 108183
+    },
+    {
+      "name": "VT Aether Novice S5 Bot 1",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 108042
+    },
+    {
+      "name": "Air Spectral Easy 80%",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 875.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 890.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 905.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 915.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 925.0
+        }
+      ],
+      "leaderboard_id": 185359
+    },
+    {
+      "name": "Air Voltaic Invincible 4 Medium",
+      "ranks": [
+        {
+          "name": "Wanderer",
+          "color": "#c0b9b9",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Stone",
+          "color": "#393737",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Bronze",
+          "color": "#CD7F32",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Silver",
+          "color": "#C0C0C0",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Gold",
+          "color": "#FFD700",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 184775
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChallengingVividtangerineLostsector",
+    "kovaaks_benchmark_id": 2750,
+    "rank_colors": [
+      [
+        "Wanderer",
+        "#c0b9b9"
+      ],
+      [
+        "Stone",
+        "#393737"
+      ],
+      [
+        "Bronze",
+        "#CD7F32"
+      ],
+      [
+        "Silver",
+        "#C0C0C0"
+      ],
+      [
+        "Gold",
+        "#FFD700"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:59.125523+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

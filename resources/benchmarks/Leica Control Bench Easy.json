@@ -1,0 +1,531 @@
+{
+  "name": "Leica Control Bench Easy",
+  "code": "KovaaKsRevolvingTaggedVehicle",
+  "scenarios": [
+    {
+      "name": "Avasive Control Track Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 16500.0
+        }
+      ],
+      "leaderboard_id": 142571
+    },
+    {
+      "name": "VT Controlsphere Viscose 80%",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 4600.0
+        }
+      ],
+      "leaderboard_id": 186564
+    },
+    {
+      "name": "VT Raw Control Novice S5 Hard",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5450.0
+        }
+      ],
+      "leaderboard_id": 106739
+    },
+    {
+      "name": "Avasphere Euphoric Basic",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5200.0
+        }
+      ],
+      "leaderboard_id": 161234
+    },
+    {
+      "name": "Leisphere Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 185129
+    },
+    {
+      "name": "AbyssTrack Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5300.0
+        }
+      ],
+      "leaderboard_id": 150967
+    },
+    {
+      "name": "voidTrack Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5400.0
+        }
+      ],
+      "leaderboard_id": 142080
+    },
+    {
+      "name": "Silo Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5400.0
+        }
+      ],
+      "leaderboard_id": 103365
+    },
+    {
+      "name": "RawControlSphere",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 17000.0
+        }
+      ],
+      "leaderboard_id": 184301
+    },
+    {
+      "name": "Aethercontrol Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5400.0
+        }
+      ],
+      "leaderboard_id": 183600
+    },
+    {
+      "name": "Controlsphere rAim Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 16500.0
+        }
+      ],
+      "leaderboard_id": 5137
+    },
+    {
+      "name": "SteadyTrack",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 70101
+    },
+    {
+      "name": "Avasive bukeTrack Easy",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 11500.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 14500.0
+        }
+      ],
+      "leaderboard_id": 130665
+    },
+    {
+      "name": "Swing Tracking Easy 80%",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 3300.0
+        }
+      ],
+      "leaderboard_id": 132530
+    },
+    {
+      "name": "cloverRawControl Big",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 10500.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 17000.0
+        }
+      ],
+      "leaderboard_id": 69579
+    },
+    {
+      "name": "Flower Easier",
+      "ranks": [
+        {
+          "name": "Glow",
+          "color": "#67E8F9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Spark",
+          "color": "#E1FF00",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Ember",
+          "color": "#FF9F43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Meteor",
+          "color": "#FF5C5C",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Cosmic",
+          "color": "#24105E",
+          "threshold": 5800.0
+        }
+      ],
+      "leaderboard_id": 185710
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsRevolvingTaggedVehicle",
+    "kovaaks_benchmark_id": 2721,
+    "rank_colors": [
+      [
+        "Glow",
+        "#67E8F9"
+      ],
+      [
+        "Spark",
+        "#E1FF00"
+      ],
+      [
+        "Ember",
+        "#FF9F43"
+      ],
+      [
+        "Meteor",
+        "#FF5C5C"
+      ],
+      [
+        "Cosmic",
+        "#24105E"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:56.378539+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

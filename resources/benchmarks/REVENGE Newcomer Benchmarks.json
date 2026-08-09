@@ -1,0 +1,1279 @@
+{
+  "name": "REVENGE Newcomer Benchmarks",
+  "code": "KovaaKsBaitingCobaltKillstreak",
+  "scenarios": [
+    {
+      "name": "REVENGE - 1Click Reflex Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 600.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 700.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 800.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 198774
+    },
+    {
+      "name": "REVENGE - 2Click Pressure Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1310.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1430.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1550.0
+        }
+      ],
+      "leaderboard_id": 198780
+    },
+    {
+      "name": "REVENGE - 2-3Click Wide Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 900.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 198775
+    },
+    {
+      "name": "REVENGE - 3Click Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 870.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 960.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1160.0
+        }
+      ],
+      "leaderboard_id": 198939
+    },
+    {
+      "name": "REVENGE - 4Click Precise Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 800.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 860.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 930.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1050.0
+        }
+      ],
+      "leaderboard_id": 198781
+    },
+    {
+      "name": "REVENGE - 5Click Depart Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1500.0
+        }
+      ],
+      "leaderboard_id": 198782
+    },
+    {
+      "name": "REVENGE - 6Click Clusters Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1400.0
+        }
+      ],
+      "leaderboard_id": 198784
+    },
+    {
+      "name": "REVENGE - 7Click Multi Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1360.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1600.0
+        }
+      ],
+      "leaderboard_id": 198787
+    },
+    {
+      "name": "REVENGE - XYClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 700.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 810.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 930.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1050.0
+        }
+      ],
+      "leaderboard_id": 199083
+    },
+    {
+      "name": "REVENGE - BunClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 320.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 460.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 600.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 750.0
+        }
+      ],
+      "leaderboard_id": 199088
+    },
+    {
+      "name": "REVENGE - BirdClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 600.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 670.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 750.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 840.0
+        }
+      ],
+      "leaderboard_id": 199073
+    },
+    {
+      "name": "REVENGE - LinearClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 430.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 530.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 630.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 730.0
+        }
+      ],
+      "leaderboard_id": 199079
+    },
+    {
+      "name": "REVENGE - BeeClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 320.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 380.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 440.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 510.0
+        }
+      ],
+      "leaderboard_id": 199074
+    },
+    {
+      "name": "REVENGE - WeaselClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 400.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 460.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 520.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 580.0
+        }
+      ],
+      "leaderboard_id": 199081
+    },
+    {
+      "name": "REVENGE - ControlClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 590.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 690.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 790.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 890.0
+        }
+      ],
+      "leaderboard_id": 199077
+    },
+    {
+      "name": "REVENGE - DodgeClick Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 410.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 510.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 620.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 740.0
+        }
+      ],
+      "leaderboard_id": 199086
+    },
+    {
+      "name": "REVENGE - SmoothTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3025.0
+        }
+      ],
+      "leaderboard_id": 198789
+    },
+    {
+      "name": "REVENGE - BounceTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 199047
+    },
+    {
+      "name": "REVENGE - PreciseTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3000.0
+        }
+      ],
+      "leaderboard_id": 198809
+    },
+    {
+      "name": "REVENGE - ControlTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 3050.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3600.0
+        }
+      ],
+      "leaderboard_id": 199014
+    },
+    {
+      "name": "REVENGE - TechTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3900.0
+        }
+      ],
+      "leaderboard_id": 198963
+    },
+    {
+      "name": "REVENGE - MicroTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3700.0
+        }
+      ],
+      "leaderboard_id": 198815
+    },
+    {
+      "name": "REVENGE - PasuTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 3425.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 198791
+    },
+    {
+      "name": "REVENGE - AngleTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3200.0
+        }
+      ],
+      "leaderboard_id": 198793
+    },
+    {
+      "name": "REVENGE - GroundTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3000.0
+        }
+      ],
+      "leaderboard_id": 199070
+    },
+    {
+      "name": "REVENGE - AirTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3750.0
+        }
+      ],
+      "leaderboard_id": 199062
+    },
+    {
+      "name": "REVENGE - DeceptiveTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 3700.0
+        }
+      ],
+      "leaderboard_id": 198801
+    },
+    {
+      "name": "REVENGE - TwitchyTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 2000.0
+        }
+      ],
+      "leaderboard_id": 199012
+    },
+    {
+      "name": "REVENGE - DiagTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1325.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 2600.0
+        }
+      ],
+      "leaderboard_id": 198804
+    },
+    {
+      "name": "REVENGE - LeapTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 2350.0
+        }
+      ],
+      "leaderboard_id": 199028
+    },
+    {
+      "name": "REVENGE - DodgeTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 4875.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 6775.0
+        }
+      ],
+      "leaderboard_id": 199021
+    },
+    {
+      "name": "REVENGE - NarcoTrack Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 2300.0
+        }
+      ],
+      "leaderboard_id": 198950
+    },
+    {
+      "name": "REVENGE - PokeSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 860.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 930.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1100.0
+        }
+      ],
+      "leaderboard_id": 199181
+    },
+    {
+      "name": "REVENGE - DepthSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1190.0
+        }
+      ],
+      "leaderboard_id": 199174
+    },
+    {
+      "name": "REVENGE - ChillSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 730.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 780.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 840.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 199214
+    },
+    {
+      "name": "REVENGE - FlashSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 199176
+    },
+    {
+      "name": "REVENGE - BirdSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 730.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 790.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 850.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 199163
+    },
+    {
+      "name": "REVENGE - TacSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 750.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 790.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 830.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 880.0
+        }
+      ],
+      "leaderboard_id": 199198
+    },
+    {
+      "name": "REVENGE - WaldoSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 970.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 199207
+    },
+    {
+      "name": "REVENGE - PsalmSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 770.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 840.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 920.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 199191
+    },
+    {
+      "name": "REVENGE - XYSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 590.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 640.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 690.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 750.0
+        }
+      ],
+      "leaderboard_id": 199200
+    },
+    {
+      "name": "REVENGE - BunSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 470.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 520.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 570.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 620.0
+        }
+      ],
+      "leaderboard_id": 199212
+    },
+    {
+      "name": "REVENGE - LinearSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 410.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 450.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 490.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 550.0
+        }
+      ],
+      "leaderboard_id": 199178
+    },
+    {
+      "name": "REVENGE - SmoothSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 310.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 340.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 370.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 400.0
+        }
+      ],
+      "leaderboard_id": 199193
+    },
+    {
+      "name": "REVENGE - PreciseSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 300.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 330.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 370.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 420.0
+        }
+      ],
+      "leaderboard_id": 199186
+    },
+    {
+      "name": "REVENGE - ControlSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 460.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 500.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 550.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 199170
+    },
+    {
+      "name": "REVENGE - MicroSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 390.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 410.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 430.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 460.0
+        }
+      ],
+      "leaderboard_id": 199209
+    },
+    {
+      "name": "REVENGE - StrafeSwitch Newcomer",
+      "ranks": [
+        {
+          "name": "Rust",
+          "color": "#8c3927",
+          "threshold": 520.0
+        },
+        {
+          "name": "Iron",
+          "color": "#474547",
+          "threshold": 540.0
+        },
+        {
+          "name": "Steel",
+          "color": "#a2acbd",
+          "threshold": 570.0
+        },
+        {
+          "name": "Copper",
+          "color": "#d1793b",
+          "threshold": 600.0
+        }
+      ],
+      "leaderboard_id": 199195
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBaitingCobaltKillstreak",
+    "kovaaks_benchmark_id": 2727,
+    "rank_colors": [
+      [
+        "Rust",
+        "#8c3927"
+      ],
+      [
+        "Iron",
+        "#474547"
+      ],
+      [
+        "Steel",
+        "#a2acbd"
+      ],
+      [
+        "Copper",
+        "#d1793b"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:49.863686+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
