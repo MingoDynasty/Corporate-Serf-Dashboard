@@ -53,9 +53,9 @@ treatment:
   circuit breaker, which aborts the sweep when the API is down entirely rather
   than grinding through every sharecode.
 - **Deterministic** — a rank-count mismatch between Evxl and KovaaK's, a
-  schema-invalid response, or a 4xx other than 429. These recur on every
-  attempt because the upstream *data* is wrong, so they never touch the
-  breaker.
+  benchmark that returns no scenarios at all, a schema-invalid response, or a
+  4xx other than 429. These recur on every attempt because the upstream *data*
+  is wrong, so they never touch the breaker.
 
 Deterministic failures are recorded in `generated/failures.json`, a ledger
 mapping sharecode to the error, the UTC timestamp when it was recorded, and
