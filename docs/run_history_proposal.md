@@ -83,8 +83,8 @@ capture is required.
 - **Navigation surface.** *No permanent sidebar* — a sidebar plus a page would
   be two surfaces onto overlapping data (noise + duplicated wiring). The real
   choice is between one consolidated Run History page hosting both views, and a
-  per-scenario history panel on the home page (contextual to the selected
-  scenario) plus a separate current-session page. Trade-off is context vs
+  per-scenario history panel on the Scenario Performance page (contextual to
+  the selected scenario) plus a separate current-session page. Trade-off is context vs
   consolidation. The analogous question for the playlists feature was settled
   as two pages with drill-down (see the 2026-07-03 "Playlists Routes Are
   Stable" decision-log entry); settle this one as part of the app's overall

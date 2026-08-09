@@ -43,10 +43,11 @@ list in the roadmap.)
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
   nothing else. A new personal best has no toast of its own; it triggers the
-  background rank refresh. If runs accumulate while Home is not open, the next
-  visit rebuilds once from final state and gives one scenario-named summary
-  instead of replaying stale toasts and selections — and the next run you play
-  replaces that catch-up digest, which is by then the staler news.
+  background rank refresh. If runs accumulate while Scenario Performance is
+  not open, the next visit rebuilds once from final state and gives one
+  scenario-named summary instead of replaying stale toasts and selections —
+  and the next run you play replaces that catch-up digest, which is by then
+  the staler news.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
   pile of toasts accumulating over a session or a noisy catch-up sequence
@@ -66,8 +67,8 @@ list in the roadmap.)
 
 ### Standing: where do I rank
 
-- **Scenario rank and percentile** (PRs #8–#10). The home page shows your
-  global leaderboard standing for the selected scenario —
+- **Scenario rank and percentile** (PRs #8–#10). The Scenario Performance page
+  shows your global leaderboard standing for the selected scenario —
   `Position: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
   personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
@@ -98,8 +99,9 @@ list in the roadmap.)
   playlist by hand before cross-playlist weakness comparisons become useful.
 - **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
-  filters every playlist dropdown (Home filter, Journey picker). Hidden
-  playlists stay loaded — routes and rank overlays keep working. *Problem
+  filters every playlist dropdown (Scenario Performance filter, Journey
+  picker). Hidden playlists stay loaded — routes and rank overlays keep
+  working. *Problem
   solved:* focus — dropdowns and the overview show only the playlists you
   care about, which is what makes shipping the full benchmark library
   tolerable.

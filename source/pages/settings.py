@@ -4,8 +4,9 @@ The one runtime writer of the settings store. It shows what is on disk (never
 the process-pinned accessors), saves all three keys at once, and says when the
 running process no longer matches what was saved.
 
-Component ids are ``app-settings-*``: Home's graph-settings modal already owns
-the bare ``settings-*`` namespace.
+Component ids are ``app-settings-*``: the prefix kept them clear of the bare
+``settings-*`` namespace that the Scenario Performance page's graph-settings
+modal owned, and it stays now that the modal is gone.
 """
 
 import logging

@@ -3,8 +3,8 @@
 The name of this app is in honor of [Corporate Serf](https://www.youtube.com/watch?v=a-MShVYe3kY).
 
 This app watches your KovaaK's stats directory and turns your runs into training insight. As you keep
-playing and generating new scores, the home page's plots, stats, and notifications update
-automatically in the background.
+playing and generating new scores, the Scenario Performance page's plots, stats, and
+notifications update automatically in the background.
 
 ![Corporate Serf Dashboard example](docs/example.png "Corporate Serf Dashboard example")
 
@@ -48,8 +48,9 @@ disturbed. It asks you nothing. Along the way the installer:
 On its first start the dashboard looks for your KovaaK's stats folder itself,
 through Steam, and remembers what it finds. If it comes up empty — KovaaK's
 installed somewhere unusual, or not installed yet — the dashboard still starts;
-it simply has no runs to show and says so on the Home page until you point it
-at the folder on the Settings page (see [Configuration](#configuration)).
+it simply has no runs to show and says so on the Scenario Performance page
+until you point it at the folder on the Settings page (see
+[Configuration](#configuration)).
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
@@ -176,8 +177,8 @@ can write it by hand instead:
 - `stats_dir` — the folder KovaaK's writes its run files into, usually
   `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
   it the dashboard still starts, but it has no runs to show and says so on the
-  Home page. Left empty on purpose, it stays empty: the startup detection only
-  fills the value in when it has never been set.
+  Scenario Performance page. Left empty on purpose, it stays empty: the startup
+  detection only fills the value in when it has never been set.
 - `kovaaks_username` — enables the leaderboard rank and percentile features;
   leave it out to run fully offline. `steam_id` is optional and makes player
   matching exact when usernames are ambiguous.
@@ -195,8 +196,9 @@ open while the dashboard is running — **closing it stops the dashboard**, whic
 is how you shut it down. Double-clicking the shortcut again while it is already
 running just opens another browser tab; it will not start a second copy.
 
-Use one active Home tab at a time. Additional Home tabs are crash-safe, but they
-share one in-memory run-event queue and are not synchronized with each other.
+Use one active Scenario Performance tab at a time. Additional ones are
+crash-safe, but they share one in-memory run-event queue and are not
+synchronized with each other.
 
 ## Playlists and Benchmarks
 
