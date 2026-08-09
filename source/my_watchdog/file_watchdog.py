@@ -133,7 +133,7 @@ class NewFileHandler(FileSystemEventHandler):
         if not run_data:
             # extract_data_from_file contains its own read and parse failures --
             # a CSV still locked by KovaaK's, a mid-write line -- and returns
-            # None, so on_created's guard below never sees them. This handler
+            # None, so on_created's guard above never sees them. This handler
             # only sees the creation event and never retries, so the run stays
             # missing until a restart: notify here or the user is never told.
             logger.warning("Failed to get run data for CSV file: %s", file)
