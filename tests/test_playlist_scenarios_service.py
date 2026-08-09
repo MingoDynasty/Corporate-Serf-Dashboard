@@ -72,8 +72,10 @@ def test_format_playlist_scenario_rank_row_ranked():
         total_players=63892,
         percentile=82.33,
     )
+    # Last played is deliberately later than the PB run: the row must keep the
+    # two timestamps distinct ("played since you last improved").
     scenario_stats = ScenarioStats(
-        date_last_played=datetime(2026, 4, 28, 21, 30, 0),
+        date_last_played=datetime(2026, 5, 3, 19, 0, 0),
         number_of_runs=1234,
         high_score=3180,
     )
@@ -105,7 +107,7 @@ def test_format_playlist_scenario_rank_row_ranked():
         "total_sort": 63892,
         "percentile_display": "82.33%",
         "percentile_sort": 82.33,
-        "last_played_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
+        "last_played_sort": datetime(2026, 5, 3, 19, 0, 0).timestamp(),
         "runs_display": "1,234",
         "runs_sort": 1234,
         "high_score_display": "3,180",

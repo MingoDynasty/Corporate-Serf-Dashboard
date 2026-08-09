@@ -274,7 +274,12 @@ def get_high_score(scenario_name: str) -> float:
 
 
 def get_personal_best_run(scenario_name: str) -> RunData | None:
-    """Return the highest-score local run for a scenario, if it has local runs."""
+    """Return the highest-score local run for a scenario, if it has local runs.
+
+    On a score tie the earliest run wins: ``max`` only replaces on strictly
+    greater, and ``time_vs_runs`` iterates oldest-first. The run's timestamp
+    therefore reads as "first time the current PB score was reached".
+    """
     if scenario_name not in kovaaks_database:
         return None
 
