@@ -72,8 +72,10 @@ def test_format_playlist_scenario_rank_row_ranked():
         total_players=63892,
         percentile=82.33,
     )
+    # Last played is deliberately later than the PB run: the row must keep the
+    # two timestamps distinct ("played since you last improved").
     scenario_stats = ScenarioStats(
-        date_last_played=datetime(2026, 4, 28, 21, 30, 0),
+        date_last_played=datetime(2026, 5, 3, 19, 0, 0),
         number_of_runs=1234,
         high_score=3180,
     )
@@ -105,11 +107,12 @@ def test_format_playlist_scenario_rank_row_ranked():
         "total_sort": 63892,
         "percentile_display": "82.33%",
         "percentile_sort": 82.33,
-        "last_played_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
+        "last_played_sort": datetime(2026, 5, 3, 19, 0, 0).timestamp(),
         "runs_display": "1,234",
         "runs_sort": 1234,
         "high_score_display": "3,180",
         "high_score_sort": 3180,
+        "pb_timestamp_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
         "pb_cm360_display": "45",
         "pb_cm360_sort": 45,
         "pb_accuracy_display": "76.15%",
@@ -136,6 +139,7 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["runs_sort"] == 0
     assert row["high_score_display"] == "N/A"
     assert row["high_score_sort"] is None
+    assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "N/A"
@@ -167,6 +171,7 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["runs_sort"] == 3
     assert row["high_score_display"] == "863.93"
     assert row["high_score_sort"] == 863.935
+    assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "N/A"
@@ -195,6 +200,8 @@ def test_format_playlist_scenario_rank_row_uses_hit_accuracy_fallback():
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "50.00%"
     assert row["pb_accuracy_sort"] == 50
+    # The PB timestamp does not depend on the run's sensitivity scale.
+    assert row["pb_timestamp_sort"] == datetime(2026, 4, 28, 21, 30, 0).timestamp()
 
 
 def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures(

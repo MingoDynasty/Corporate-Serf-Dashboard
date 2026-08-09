@@ -19,8 +19,8 @@ notifications update automatically in the background.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
 - **Playlist scenarios table** — every scenario in a playlist with position, percentile, last
-  played, runs, and personal-best stats (PB Score, PB cm/360, PB Accuracy); sort by percentile to
-  build a training priority list.
+  played, runs, and personal-best stats (PB Score, PB Date, PB cm/360, PB Accuracy); sort by
+  percentile to build a training priority list.
 
 The rationale behind each feature lives in [docs/product.md](docs/product.md); what's next in
 [docs/roadmap.md](docs/roadmap.md).
