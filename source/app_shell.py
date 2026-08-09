@@ -199,7 +199,11 @@ def layout(**kwargs):  # noqa: ARG001
                     dmc.AppShellNavbar(
                         id="navbar",
                         children=[
-                            nav_link("Home", "/", "bi:house-door-fill"),
+                            nav_link(
+                                "Scenario Performance",
+                                "/",
+                                "bi:house-door-fill",
+                            ),
                             nav_link(
                                 "Playlists",
                                 "/playlists",

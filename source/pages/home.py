@@ -172,7 +172,8 @@ _last_rank_hints: dict[str, tuple[str, str | None]] = {}
 dash.register_page(
     __name__,
     path="/",
-    title="Corporate Serf Dashboard",
+    name="Scenario Performance",
+    title="Scenario Performance",
     redirect_from=["/home", "/index"],
 )
 
