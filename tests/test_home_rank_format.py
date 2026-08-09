@@ -335,7 +335,7 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
     }
 
     assert labels == {
-        "rank-overlay-switch": "Rank Threshold lines",
+        "rank-overlay-switch": "Rank Thresholds",
         "high-score-overlay-switch": "PB Score",
         "score-threshold-overlay-switch": "Score Threshold Overlay",
         "score-threshold-percentage": "Score Threshold Percentage",

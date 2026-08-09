@@ -1264,7 +1264,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="rank-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Rank Threshold lines",
+                            "Rank Thresholds",
                             SETTINGS_HELP_TEXT["rank-overlay"],
                         ),
                         checked=True,
