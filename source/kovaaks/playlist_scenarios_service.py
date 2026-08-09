@@ -176,6 +176,11 @@ def format_playlist_scenario_rank_row(  # noqa: PLR0913
         "runs_sort": number_of_runs,
         "high_score_display": _format_score(high_score),
         "high_score_sort": high_score,
+        "pb_timestamp_sort": (
+            personal_best_run.datetime_object.timestamp()
+            if personal_best_run is not None
+            else None
+        ),
         "pb_cm360_display": _format_score(personal_best_cm360),
         "pb_cm360_sort": personal_best_cm360,
         "pb_accuracy_display": _format_accuracy(personal_best_accuracy),

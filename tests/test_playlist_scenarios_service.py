@@ -110,6 +110,7 @@ def test_format_playlist_scenario_rank_row_ranked():
         "runs_sort": 1234,
         "high_score_display": "3,180",
         "high_score_sort": 3180,
+        "pb_timestamp_sort": datetime(2026, 4, 28, 21, 30, 0).timestamp(),
         "pb_cm360_display": "45",
         "pb_cm360_sort": 45,
         "pb_accuracy_display": "76.15%",
@@ -136,6 +137,7 @@ def test_format_playlist_scenario_rank_row_unranked_with_total():
     assert row["runs_sort"] == 0
     assert row["high_score_display"] == "N/A"
     assert row["high_score_sort"] is None
+    assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "N/A"
@@ -167,6 +169,7 @@ def test_format_playlist_scenario_rank_row_unknown():
     assert row["runs_sort"] == 3
     assert row["high_score_display"] == "863.93"
     assert row["high_score_sort"] == 863.935
+    assert row["pb_timestamp_sort"] is None
     assert row["pb_cm360_display"] == "N/A"
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "N/A"
@@ -195,6 +198,8 @@ def test_format_playlist_scenario_rank_row_uses_hit_accuracy_fallback():
     assert row["pb_cm360_sort"] is None
     assert row["pb_accuracy_display"] == "50.00%"
     assert row["pb_accuracy_sort"] == 50
+    # The PB timestamp does not depend on the run's sensitivity scale.
+    assert row["pb_timestamp_sort"] == datetime(2026, 4, 28, 21, 30, 0).timestamp()
 
 
 def test_build_playlist_scenario_rank_rows_preserves_order_and_isolates_failures(
