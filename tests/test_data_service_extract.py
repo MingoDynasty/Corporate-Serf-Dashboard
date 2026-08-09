@@ -6,6 +6,7 @@ from sortedcontainers import SortedList
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import RunData, ScenarioStats
+from source.my_watchdog import file_watchdog
 
 extract_data_from_file = data_service.extract_data_from_file
 
@@ -216,14 +217,27 @@ def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
     tmp_path,
     caplog,
 ) -> None:
-    (tmp_path / "loaded.csv").touch()
-    (tmp_path / "failed.csv").touch()
+    # Real files through the real loader: stubbing load_csv_file_into_database
+    # would stub out the very helper a future refactor could move the toast
+    # into, leaving the queue assertion below unable to fail.
+    _write_stats_file(
+        tmp_path / "1w4ts - Challenge - 2025.01.01-10.00.00 Stats.csv",
+        "Rifle,10,5,50,100",
+    )
+    # A "Score:" line with no value column -- what a mid-write file looks like,
+    # the failure that motivated the watchdog-side toast.
+    (tmp_path / "1w4ts - Challenge - 2025.01.01-11.00.00 Stats.csv").write_text(
+        "Score:\n",
+        encoding="utf-8",
+    )
     (tmp_path / "ignored.txt").touch()
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
     monkeypatch.setattr(
         data_service,
-        "load_csv_file_into_database",
-        lambda path: Path(path).name == "loaded.csv",
+        "run_database",
+        SortedList([], key=lambda item: item.datetime_object),
     )
+    file_watchdog.run_import_failure_queue.clear()
 
     with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
         data_service.initialize_kovaaks_data(str(tmp_path))
@@ -235,3 +249,9 @@ def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
         and message.endswith(" seconds.")
         for message in caplog.messages
     )
+    # The good file really landed, so "1 loaded" counts a genuine store write.
+    assert data_service.get_scenario_stats("1w4ts").number_of_runs == 1
+    # Startup failures are batch information -- the counted log line above is
+    # the whole report. Only the watchdog's live path toasts, so a rescan of a
+    # directory full of unreadable CSVs must not queue a toast per file.
+    assert file_watchdog.drain_run_import_failures() == []
