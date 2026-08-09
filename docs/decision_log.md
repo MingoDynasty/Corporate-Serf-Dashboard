@@ -13,6 +13,114 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-08: The Next Reddit Post Is An Update In Its Own Lane, Led By What Is Visibly New
+
+Status: Accepted
+
+This project has been posted to r/FPSAimTrainer twice already, and a
+well-liked active tool there makes the same one-line promise this project's
+internal principle states. The next post is therefore an update, not a debut.
+It leads with capability that is new and visible since the last post, answers
+the how-is-this-different question in its own body, and never advertises
+features that have not shipped.
+
+Decision: launch communications adopt four rules.
+
+- **Frame as an update.** Prior posts exist (2025-10-29, 2025-11-17) and the
+  audience remembers; a debut frame reads false and forfeits the returning
+  reader. The post says what changed since last time.
+- **Hold the complementary lane; do not contest the incumbent's slogan.**
+  RefleK's public tagline occupies the "gives answers" framing that
+  `docs/product.md` states as this project's own principle. That principle
+  keeps steering the product; the public copy instead states the lane the
+  maintainer has already drawn publicly: this app is the local-first live
+  dashboard — it watches the stats folder as you play, plots and notifies,
+  and shows leaderboard position — and it links the neighbours rather than
+  comparing against them. The proven division-of-labour answer is the
+  template, placed in the post body before anyone asks.
+- **The headline is shipped, visible capability plus a current screenshot.**
+  In the observed survey, the only follow-up posts that out-scored their
+  debut made new capability visible. `docs/example.png` predates the entire
+  position/percentile UI and must be regenerated before any post.
+- **No unshipped features in the pitch.** The improving/plateauing/declining
+  verdict is roadmap; it enters a post the release after it ships, not
+  before.
+
+Consequences: the README rework and the post draft inherit these rules. The
+subreddit's rules could not be retrieved by any agent route and must be read
+in a browser before posting. Vote counts in the survey are observational;
+these rules rest on the direction of the evidence, not its magnitudes, and a
+future post that contradicts them should supersede this entry rather than
+quietly ignore it.
+
+## 2026-08-08: Network Disclosure Names Every Reachable Host Or Says Nothing
+
+Status: Accepted
+
+The app sends no telemetry, and saying so precisely is worth more trust than
+any slogan. But a privacy line shaped "talks only to KovaaK's and GitHub"
+would be false: importing a playlist by share code can fall back to a
+third-party service. Public statements about network behavior therefore
+enumerate every reachable host and when it is reached, or say nothing at all.
+
+Decision: the canonical outbound surface is exactly four hosts, and every
+public network/privacy statement (README, posts, replies) either carries the
+full enumeration with conditions or makes no network claim.
+
+| Host | When | Where |
+|---|---|---|
+| `kovaaks.com` | leaderboard position/total lookups, playlist import, identity probe — only with an identity configured | `api_service.py` |
+| `github.com` | the launcher's self-update check; a header link | `launcher.ps1`, `app_shell.py` |
+| `api.evxl.app` | fallback for share-code playlist import when KovaaK's own search returns null | `api_service.py` (`EVXL_PLAYLIST_BY_CODE_URL`) |
+| `discordapp.com` | a contact anchor's href only — the app never calls it | `app_shell.py` |
+
+Zero telemetry, verified by sweep (`telemetry|analytics|sentry|posthog|
+mixpanel|amplitude|bugsnag|rollbar` over `source/`, `scripts/`,
+`pyproject.toml`: no hits). The offline contract stands: with no identity
+configured the app makes no KovaaK's requests and serves fully offline.
+
+Consequences: adding an outbound host means updating every public statement
+that carries the enumeration in the same PR — the enumeration is an
+invariant, not documentation. The truthful short form, when brevity is
+needed: "no telemetry; talks to KovaaK's and GitHub, plus evxl.app only as a
+playlist-import fallback."
+
+## 2026-08-08: AI-Assisted Authorship Is Answered Plainly, Never Led With, Never Obscured
+
+Status: Accepted
+
+The commit history is public and names coding agents as authors on well over
+a hundred commits, so anyone can settle "was this AI-written" in seconds, and
+that exact question is being asked of comparable tools in the target
+community. The project answers in its own words — one factual README line and
+a direct reply when asked — instead of leading with it or leaving the
+audience to conclude on its own.
+
+Decision:
+
+- The README carries one short, factual line: the maintainer is a career
+  software engineer who uses AI coding agents under review, with the test
+  suite, CI gates, and this decision log as the visible engineering record.
+  Wording lands with the README rework; this entry fixes that the line
+  exists, is factual, and does not editorialize.
+- Posts and replies never lead with AI involvement; when asked, the answer is
+  direct, draws the assisted-versus-unreviewed distinction, and points at the
+  record rather than arguing.
+- Agent authorship in commit metadata is never rewritten, denied, or
+  minimized. The history is the proof that the honest answer is safe.
+
+Why: the observed failure mode is silence — on a comparable launch the
+community reasoned it out from repo shape and answered for the author. The
+maintainer has already answered this question publicly once, drawing exactly
+this distinction, and it closed without damage. Leading with AI makes the
+tooling the story with no observed upside; obscuring it is impossible against
+public metadata and would convert a neutral fact into a caught claim.
+
+Consequences: the README rework carries the line; contributors and agents
+drafting public replies follow the same three rules. If a future launch
+context changes the calculus, supersede this entry — do not improvise a
+different posture in a live thread.
+
 ## 2026-08-08: Rank Observations Are Captured From Now On, Decoupled From The Storage Engine
 
 Status: Accepted
