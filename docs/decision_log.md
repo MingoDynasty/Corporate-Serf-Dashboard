@@ -149,9 +149,9 @@ Consequences and constraints:
   Overview page and giving this page a durable `/scenario` route waits until an
   Overview has concrete plans.
 - **Run History composes into this column rather than adding a second one.** If
-  a Home-tied run history arrives, how the two share the space is the
-  run-history proposal's question; this one only promises not to have claimed
-  the space.
+  a run history tied to Scenario Performance arrives, how the two share the
+  space is the run-history proposal's question; this one only promises not to
+  have claimed the space.
 
 Shipped in PRs #209 and #215; design discussion in #206. Distilled with
 [the inspector entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)

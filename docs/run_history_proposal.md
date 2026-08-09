@@ -92,8 +92,8 @@ capture is required.
 
   **This proposal owns the space-sharing question.** If the panel option
   wins, that page's right column is already occupied by the chart options
-  panel, which claimed no exclusive tenancy of it and expects a
-  Home-tied history to compose into the same column rather than to add a
+  panel, which claimed no exclusive tenancy of it and expects a history
+  panel hosted there to compose into the same column rather than to add a
   second one (see the 2026-08-09
   ["The Graph Page Is Scenario Performance…"](decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
   entry, which delegates the question here, and the
