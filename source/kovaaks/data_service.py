@@ -588,8 +588,16 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
-    except ValueError:
-        logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
+    except OSError, ValueError, IndexError:
+        # OSError: the CSV can be locked by a still-running KovaaK's or vanish
+        # between listing and open. IndexError: a mid-write line like "Score:"
+        # has no value column yet. Either must cost the one run -- which the
+        # next rescan re-imports -- never the startup scan that hit it; the
+        # watchdog path already holds the same line (file_watchdog.on_created).
+        # UnicodeDecodeError is a ValueError subclass, already covered.
+        logger.warning(
+            "Failed to read or parse file: %s", full_file_path, exc_info=True
+        )
         return None
 
     if (
