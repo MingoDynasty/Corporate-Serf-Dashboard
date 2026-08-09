@@ -64,6 +64,39 @@ def _walk_components(component):
     yield from _walk_components(children)
 
 
+def _layout_components(monkeypatch) -> dict:
+    """Render Home without touching disk and index the tree by component id."""
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    return {
+        getattr(component, "id", None): component
+        for component in _walk_components(home.layout())
+    }
+
+
+def _label_text(component) -> str:
+    """Flatten a control's label into the text a reader would see."""
+    return "".join(
+        part for part in _walk_components(component.label) if isinstance(part, str)
+    )
+
+
+# The chart options inspector's five inputs, with the defaults that must not
+# move: Dash persistence is keyed by component id, and changing a layout
+# default silently wipes every value the browser already stored under it.
+CHART_OPTIONS_INPUT_DEFAULTS = {
+    "rank-overlay-switch": ("checked", True),
+    "high-score-overlay-switch": ("checked", True),
+    "score-threshold-overlay-switch": ("checked", True),
+    "score-threshold-percentage": ("value", 95),
+    "score-threshold-notification-switch": ("checked", True),
+}
+COLLAPSED_PANEL_CLASS = (
+    f"{home.CHART_OPTIONS_PANEL_CLASS} {home.CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
+)
+
+
 def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
     monkeypatch.setattr(
         home,
@@ -217,6 +250,15 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
 
 
+def test_page_is_named_scenario_performance_and_keeps_the_root_route():
+    """The rename is labels-only: the product name moved, the route did not."""
+    page = dash.page_registry["source.pages.home"]
+
+    assert page["name"] == "Scenario Performance"
+    assert page["title"] == "Scenario Performance"
+    assert page["path"] == "/"
+
+
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
@@ -231,18 +273,16 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
 
     assert titles["Scenario Stats"].order == 2
     assert titles["Scenario Stats"].size == "h6"
-    assert titles["Display Settings"].order == 2
-    assert titles["Display Settings"].size == "h4"
+    # The inspector's two groups sit under the page's h2 sections.
+    assert titles["Overlays"].order == 3
+    assert titles["Overlays"].size == "h6"
+    assert titles["Score Threshold"].order == 3
+    assert titles["Score Threshold"].size == "h6"
 
 
-def test_settings_modal_controls_have_help_tooltips(monkeypatch):
-    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
-
-    components = {
-        getattr(component, "id", None): component
-        for component in _walk_components(home.layout())
-    }
+def test_chart_options_controls_have_help_tooltips(monkeypatch):
+    """Coverage is per control id, wherever the control now lives."""
+    components = _layout_components(monkeypatch)
     expected_settings = {
         "automatically-change-scenario-switch": "automatically-change-scenario",
         "rank-overlay-switch": "rank-overlay",
@@ -269,6 +309,105 @@ def test_settings_modal_controls_have_help_tooltips(monkeypatch):
 
     score_threshold_percentage = components["score-threshold-percentage"]
     assert score_threshold_percentage.min == 1
+
+
+def test_home_no_longer_builds_the_settings_modal(monkeypatch):
+    components = _layout_components(monkeypatch)
+
+    assert "settings-modal" not in components
+    assert "settings-modal-open-button" not in components
+    assert not [
+        component
+        for component in components.values()
+        if isinstance(component, dmc.Modal)
+    ]
+
+
+def test_chart_options_inputs_keep_their_ids_and_defaults(monkeypatch):
+    components = _layout_components(monkeypatch)
+
+    for component_id, (prop, default) in CHART_OPTIONS_INPUT_DEFAULTS.items():
+        control = components[component_id]
+
+        assert getattr(control, prop) == default
+        assert control.persistence is True
+
+
+def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch):
+    components = _layout_components(monkeypatch)
+    panel = components[home.CHART_OPTIONS_PANEL_ID]
+
+    labels = {
+        component.id: _label_text(component)
+        for component in _walk_components(panel)
+        if getattr(component, "id", None) in CHART_OPTIONS_INPUT_DEFAULTS
+    }
+
+    assert labels == {
+        "rank-overlay-switch": "Rank Thresholds",
+        "high-score-overlay-switch": "PB Score",
+        "score-threshold-overlay-switch": "Score Threshold Overlay",
+        "score-threshold-percentage": "Score Threshold Percentage",
+        "score-threshold-notification-switch": "Score Threshold Notification",
+    }
+
+
+def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):
+    components = _layout_components(monkeypatch)
+    panel = components[home.CHART_OPTIONS_PANEL_ID]
+    toggle = components[home.CHART_OPTIONS_TOGGLE_ID].to_plotly_json()["props"]
+
+    # Collapsed is a class, never conditional rendering: the inputs stay in the
+    # layout tree feeding their callbacks with their persisted values.
+    assert panel.className == COLLAPSED_PANEL_CLASS
+    mounted = {getattr(child, "id", None) for child in _walk_components(panel)}
+    assert set(CHART_OPTIONS_INPUT_DEFAULTS) <= mounted
+
+    assert toggle["children"] == "Chart options"
+    assert toggle["aria-expanded"] == "false"
+    assert toggle["aria-controls"] == home.CHART_OPTIONS_PANEL_ID
+
+
+def test_chart_options_toggle_flips_the_panel_class_and_aria_expanded():
+    assert home.toggle_chart_options(1, COLLAPSED_PANEL_CLASS) == (
+        home.CHART_OPTIONS_PANEL_CLASS,
+        "true",
+    )
+    assert home.toggle_chart_options(2, home.CHART_OPTIONS_PANEL_CLASS) == (
+        COLLAPSED_PANEL_CLASS,
+        "false",
+    )
+
+
+def test_chart_options_toggle_ignores_a_fire_no_click_caused():
+    # Under DashProxy a callback can fire once on page load with n_clicks=None.
+    # The inspector starts closed on every visit, so that fire must change
+    # neither the panel class nor the state the button announces.
+    assert home.toggle_chart_options(None, COLLAPSED_PANEL_CLASS) == (
+        no_update,
+        no_update,
+    )
+
+
+def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
+    """It is stacked with the selector, not spread across the controls row."""
+    monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
+    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+
+    scenario_field = next(
+        component
+        for component in _walk_components(home.layout())
+        if getattr(component, "className", None) == "home-scenario-field"
+    )
+    switch = scenario_field.children[1]
+
+    assert [getattr(child, "id", None) for child in scenario_field.children] == [
+        "scenario-dropdown-selection",
+        "automatically-change-scenario-switch",
+    ]
+    assert _label_text(switch) == "Follow newly played scenario"
+    assert switch.checked is True
+    assert switch.persistence is True
 
 
 def test_rank_refresh_button_has_tooltip(monkeypatch):

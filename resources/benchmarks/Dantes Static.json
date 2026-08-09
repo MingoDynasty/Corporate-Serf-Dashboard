@@ -1,0 +1,687 @@
+{
+  "name": "Dantes Static",
+  "code": "KovaaKsParachutingOrangeDiscord",
+  "scenarios": [
+    {
+      "name": "Pokeball 1w4ts 30%",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 83.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 91.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 99.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 104.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 112.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 119.0
+        }
+      ],
+      "leaderboard_id": 456
+    },
+    {
+      "name": "Pokeball Frenzy Auto Small 60s",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 89.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 96.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 104.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 110.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 117.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 124.0
+        }
+      ],
+      "leaderboard_id": 400
+    },
+    {
+      "name": "Pokeball Frenzy Auto Wide Wall 4 Targets Small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 72.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 81.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 89.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 96.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 108.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 116.0
+        }
+      ],
+      "leaderboard_id": 448
+    },
+    {
+      "name": "VT 1w2ts Horizontal Small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 870.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 940.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1020.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1130.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 108494
+    },
+    {
+      "name": "VT 1w2ts Vertical Small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 800.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 870.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 940.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1020.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1130.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 108493
+    },
+    {
+      "name": "Wide Wall 4 Targets Small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 75.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 84.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 92.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 100.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 109.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 116.0
+        }
+      ],
+      "leaderboard_id": 339
+    },
+    {
+      "name": "RawMouseControl Reload LG56",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 135.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 142.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 150.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 159.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 168.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 179.0
+        }
+      ],
+      "leaderboard_id": 35486
+    },
+    {
+      "name": "eth 1w4tes Micro",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 160.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 170.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 180.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 192.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 204.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 215.0
+        }
+      ],
+      "leaderboard_id": 66475
+    },
+    {
+      "name": "1w3ts Pasu Perfected Micro Goated",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 850.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 940.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 1020.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1080.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1150.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1220.0
+        }
+      ],
+      "leaderboard_id": 65396
+    },
+    {
+      "name": "rx 1w8ts Clusterish",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 1050.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 1120.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 1200.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1280.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1350.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1420.0
+        }
+      ],
+      "leaderboard_id": 41632
+    },
+    {
+      "name": "cluster farm click smaller 2ts",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 150.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 162.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 174.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 186.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 198.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 210.0
+        }
+      ],
+      "leaderboard_id": 57144
+    },
+    {
+      "name": "VT 1w2ts Advanced S5 Clusters",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 990.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 1070.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 1180.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1290.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1370.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1460.0
+        }
+      ],
+      "leaderboard_id": 106409
+    },
+    {
+      "name": "1wall6targets TE Small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 105.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 112.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 119.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 127.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 136.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 142.0
+        }
+      ],
+      "leaderboard_id": 2713
+    },
+    {
+      "name": "1w6ts reload",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 98.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 107.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 114.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 122.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 130.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 139.0
+        }
+      ],
+      "leaderboard_id": 563
+    },
+    {
+      "name": "cA micropressure",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 145.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 152.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 163.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 175.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 187.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 195.0
+        }
+      ],
+      "leaderboard_id": 94271
+    },
+    {
+      "name": "1wall 6targets small",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 980.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 1070.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 1180.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1260.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1340.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1420.0
+        }
+      ],
+      "leaderboard_id": 2
+    },
+    {
+      "name": "1w4ts Voltaic",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 92.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 103.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 114.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 125.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 136.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 142.0
+        }
+      ],
+      "leaderboard_id": 319
+    },
+    {
+      "name": "VT 1w2ts Advanced S5",
+      "ranks": [
+        {
+          "name": "DIAMOND",
+          "color": "#c800ff",
+          "threshold": 950.0
+        },
+        {
+          "name": "ASCENDANT",
+          "color": "#369900",
+          "threshold": 1020.0
+        },
+        {
+          "name": "IMMORTAL",
+          "color": "#ff0000",
+          "threshold": 1100.0
+        },
+        {
+          "name": "RADIANT",
+          "color": "#ffea00",
+          "threshold": 1180.0
+        },
+        {
+          "name": "CELESTIAL",
+          "color": "#00ccff",
+          "threshold": 1260.0
+        },
+        {
+          "name": "GODLIKE",
+          "color": "#FFFFFF",
+          "threshold": 1340.0
+        }
+      ],
+      "leaderboard_id": 98025
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsParachutingOrangeDiscord",
+    "kovaaks_benchmark_id": 2775,
+    "rank_colors": [
+      [
+        "DIAMOND",
+        "#c800ff"
+      ],
+      [
+        "ASCENDANT",
+        "#369900"
+      ],
+      [
+        "IMMORTAL",
+        "#ff0000"
+      ],
+      [
+        "RADIANT",
+        "#ffea00"
+      ],
+      [
+        "CELESTIAL",
+        "#00ccff"
+      ],
+      [
+        "GODLIKE",
+        "#FFFFFF"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:57:01.961448+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

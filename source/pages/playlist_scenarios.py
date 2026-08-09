@@ -55,6 +55,7 @@ AUTO_SIZE_COLUMN_KEYS = [
     "total_sort",
     "percentile_sort",
     "high_score_sort",
+    "pb_timestamp_sort",
     "pb_cm360_sort",
     "pb_accuracy_sort",
 ]
@@ -153,6 +154,22 @@ TABLE_COLUMN_DEFS = [
         "headerName": "PB Score",
         "field": "high_score_sort",
         "valueFormatter": {"function": "params.data.high_score_display"},
+        "comparator": {"function": "nullsLastComparator"},
+        "sortable": True,
+        "minWidth": 120,
+    },
+    {
+        "headerName": "PB Date",
+        "field": "pb_timestamp_sort",
+        "valueFormatter": {"function": "relativeTime(params.value, 'N/A')"},
+        "tooltipValueGetter": {
+            "function": (
+                "params.value == null ? null : absoluteTime(params.value, 'N/A')"
+            )
+        },
+        "cellClass": {
+            "function": "params.value == null ? null : 'cell-tooltip-affordance'"
+        },
         "comparator": {"function": "nullsLastComparator"},
         "sortable": True,
         "minWidth": 120,
@@ -314,7 +331,7 @@ clientside_callback(
 
         try {
             const gridApi = await window.dash_ag_grid.getApiAsync("playlist-scenarios-grid");
-            gridApi.refreshCells({force: true, columns: ["last_played_sort"]});
+            gridApi.refreshCells({force: true, columns: ["last_played_sort", "pb_timestamp_sort"]});
         } catch (error) {
             console.warn("Failed to refresh playlist scenario relative timestamps.", error);
         }

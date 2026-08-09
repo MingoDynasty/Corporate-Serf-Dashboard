@@ -274,7 +274,12 @@ def get_high_score(scenario_name: str) -> float:
 
 
 def get_personal_best_run(scenario_name: str) -> RunData | None:
-    """Return the highest-score local run for a scenario, if it has local runs."""
+    """Return the highest-score local run for a scenario, if it has local runs.
+
+    On a score tie the earliest run wins: ``max`` only replaces on strictly
+    greater, and ``time_vs_runs`` iterates oldest-first. The run's timestamp
+    therefore reads as "first time the current PB score was reached".
+    """
     if scenario_name not in kovaaks_database:
         return None
 
@@ -588,8 +593,16 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 )
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
-    except ValueError:
-        logger.warning("Failed to parse file: %s", full_file_path, exc_info=True)
+    except OSError, ValueError, IndexError:
+        # OSError: the CSV can be locked by a still-running KovaaK's or vanish
+        # between listing and open. IndexError: a mid-write line like "Score:"
+        # has no value column yet. Either must cost the one run -- which the
+        # next rescan re-imports -- never the startup scan that hit it; the
+        # watchdog path already holds the same line (file_watchdog.on_created).
+        # UnicodeDecodeError is a ValueError subclass, already covered.
+        logger.warning(
+            "Failed to read or parse file: %s", full_file_path, exc_info=True
+        )
         return None
 
     if (

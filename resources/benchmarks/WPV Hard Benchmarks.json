@@ -1,0 +1,562 @@
+{
+  "name": "WPV Hard Benchmarks",
+  "code": "KovaaKsSnipingGodlikeDeathball",
+  "scenarios": [
+    {
+      "name": "WPV Reflex Speed Flick - 75",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 30.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 42.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 50.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 55.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 60.0
+        }
+      ],
+      "leaderboard_id": 27695
+    },
+    {
+      "name": "WPV TAF Speed",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 33.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 39.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 45.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 49.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 55.0
+        }
+      ],
+      "leaderboard_id": 27826
+    },
+    {
+      "name": "WPV ww10tes_vbr",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 80.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 95.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 105.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 115.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 128.0
+        }
+      ],
+      "leaderboard_id": 27785
+    },
+    {
+      "name": "WPV 1w4tes horizontalish",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 800.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 960.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 1420.0
+        }
+      ],
+      "leaderboard_id": 34397
+    },
+    {
+      "name": "WPV 5 Sphere",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 100.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 120.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 135.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 149.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 163.0
+        }
+      ],
+      "leaderboard_id": 39038
+    },
+    {
+      "name": "WPV 1w2t FSD Chain",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 2160.0
+        }
+      ],
+      "leaderboard_id": 27696
+    },
+    {
+      "name": "WPV LineTrack V2",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 600.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 800.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 1800.0
+        }
+      ],
+      "leaderboard_id": 37941
+    },
+    {
+      "name": "WPV Multipeek Ascent",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 21.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 25.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 29.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 33.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 38.0
+        }
+      ],
+      "leaderboard_id": 27799
+    },
+    {
+      "name": "WPV valFS 180 Click",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 35.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 42.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 50.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 55.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 60.0
+        }
+      ],
+      "leaderboard_id": 27573
+    },
+    {
+      "name": "WPV Floating Heads Pasu Angelic",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 40.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 55.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 67.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 82.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 100.0
+        }
+      ],
+      "leaderboard_id": 27845
+    },
+    {
+      "name": "WPV Pasu ESH Fixed",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 25.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 34.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 42.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 48.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 55.0
+        }
+      ],
+      "leaderboard_id": 41433
+    },
+    {
+      "name": "WPV Floating Heads Timing",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 550.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 700.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 870.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 38452
+    },
+    {
+      "name": "WPV B360",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 330.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 420.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 600.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 720.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 850.0
+        }
+      ],
+      "leaderboard_id": 38750
+    },
+    {
+      "name": "WPV starkTS",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 60.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 75.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 85.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 97.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 115.0
+        }
+      ],
+      "leaderboard_id": 34062
+    },
+    {
+      "name": "WPV Vertsphere",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 3750.0
+        }
+      ],
+      "leaderboard_id": 28031
+    },
+    {
+      "name": "WPV Mixed Short Strafes",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 3100.0
+        }
+      ],
+      "leaderboard_id": 38647
+    },
+    {
+      "name": "WPV Semi-Reactive Strafes",
+      "ranks": [
+        {
+          "name": "Tier 5",
+          "color": "#006c80",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Tier 6",
+          "color": "#562f7e",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Tier 7",
+          "color": "#106b21",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Tier 8",
+          "color": "#a10000",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Tier 9",
+          "color": "#c7be75",
+          "threshold": 2250.0
+        }
+      ],
+      "leaderboard_id": 27847
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsSnipingGodlikeDeathball",
+    "kovaaks_benchmark_id": 2781,
+    "rank_colors": [
+      [
+        "Tier 5",
+        "#006c80"
+      ],
+      [
+        "Tier 6",
+        "#562f7e"
+      ],
+      [
+        "Tier 7",
+        "#106b21"
+      ],
+      [
+        "Tier 8",
+        "#a10000"
+      ],
+      [
+        "Tier 9",
+        "#c7be75"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:57:02.862472+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

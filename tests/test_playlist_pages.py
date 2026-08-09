@@ -1702,8 +1702,27 @@ def test_playlist_scenarios_table_includes_personal_best_metadata_columns():
         column["field"]: column for column in playlist_scenarios.TABLE_COLUMN_DEFS
     }
 
+    assert columns["pb_timestamp_sort"]["headerName"] == "PB Date"
     assert columns["pb_cm360_sort"]["headerName"] == "PB cm/360"
     assert columns["pb_accuracy_sort"]["headerName"] == "PB Accuracy"
+
+
+def test_playlist_scenarios_pb_date_mirrors_last_played_look_and_feel():
+    fields = [column["field"] for column in playlist_scenarios.TABLE_COLUMN_DEFS]
+    column = playlist_scenarios.TABLE_COLUMN_DEFS[fields.index("pb_timestamp_sort")]
+
+    # The timestamp qualifies the PB Score beside it, so it sits directly after.
+    assert fields.index("pb_timestamp_sort") == fields.index("high_score_sort") + 1
+    # Null copy is "N/A" to match the row's other PB columns, not "Never".
+    assert column["valueFormatter"] == {"function": "relativeTime(params.value, 'N/A')"}
+    assert column["tooltipValueGetter"] == {
+        "function": ("params.value == null ? null : absoluteTime(params.value, 'N/A')")
+    }
+    assert column["cellClass"] == {
+        "function": "params.value == null ? null : 'cell-tooltip-affordance'"
+    }
+    assert column["comparator"] == {"function": "nullsLastComparator"}
+    assert "pb_timestamp_sort" in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
 
 
 def test_playlist_scenarios_header_tooltips_cover_exactly_the_jargon_columns():

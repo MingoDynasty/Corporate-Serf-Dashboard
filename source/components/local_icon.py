@@ -38,6 +38,11 @@ ICONS: dict[str, IconAsset] = {
         24,
         24,
     ),
+    "material-symbols:keyboard-arrow-down": IconAsset(
+        "material-symbols-keyboard-arrow-down.svg",
+        24,
+        24,
+    ),
     "material-symbols:playlist-play": IconAsset(
         "material-symbols-playlist-play.svg",
         24,

@@ -43,10 +43,11 @@ list in the roadmap.)
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
   nothing else. A new personal best has no toast of its own; it triggers the
-  background rank refresh. If runs accumulate while Home is not open, the next
-  visit rebuilds once from final state and gives one scenario-named summary
-  instead of replaying stale toasts and selections — and the next run you play
-  replaces that catch-up digest, which is by then the staler news.
+  background rank refresh. If runs accumulate while Scenario Performance is
+  not open, the next visit rebuilds once from final state and gives one
+  scenario-named summary instead of replaying stale toasts and selections —
+  and the next run you play replaces that catch-up digest, which is by then
+  the staler news.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
   pile of toasts accumulating over a session or a noisy catch-up sequence
@@ -63,11 +64,23 @@ list in the roadmap.)
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is.
+- **Chart options beside the chart** (Scenario Performance page, PRs #209,
+  #215). The graph's display preferences — the overlays, and the score
+  threshold and its percentage — open in a panel next to the chart, grouped by
+  what they affect, and collapse back out of the way. On a narrow window the
+  panel stacks above the chart. *Problem solved:* these settings used to live
+  in a modal that dimmed and blocked the only surface that shows what they do,
+  so picking a threshold percentage meant guessing, closing the modal to look,
+  and opening it again. Now the chart answers immediately. The same change
+  gave the page a name of its own, **Scenario Performance**, so "Settings"
+  means the Settings page and nothing else — the modal, the button that opened
+  it, and the navbar link had all been calling themselves Settings, two of
+  them with the same icon.
 
 ### Standing: where do I rank
 
-- **Scenario rank and percentile** (PRs #8–#10). The home page shows your
-  global leaderboard standing for the selected scenario —
+- **Scenario rank and percentile** (PRs #8–#10). The Scenario Performance page
+  shows your global leaderboard standing for the selected scenario —
   `Position: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
   personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
@@ -98,8 +111,9 @@ list in the roadmap.)
   playlist by hand before cross-playlist weakness comparisons become useful.
 - **Playlist show/hide** (PR #87). Per-playlist Hide/Unhide on the
   overview, a "Show hidden" toggle for managing hidden ones, and hiding
-  filters every playlist dropdown (Home filter, Journey picker). Hidden
-  playlists stay loaded — routes and rank overlays keep working. *Problem
+  filters every playlist dropdown (Scenario Performance filter, Journey
+  picker). Hidden playlists stay loaded — routes and rank overlays keep
+  working. *Problem
   solved:* focus — dropdowns and the overview show only the playlists you
   care about, which is what makes shipping the full benchmark library
   tolerable.
@@ -117,17 +131,20 @@ list in the roadmap.)
   IDs are already known, so first opens of unfamiliar playlists are faster and
   less flaky, even before a username is configured.
 - **Playlist scenarios overview** (PRs #12, #15, #16, plus progressive fill in
-  PR #127). A sortable table of
-  every scenario in a playlist — rank, total, percentile, last played, runs,
-  high score, PB cm/360, PB accuracy. Long playlists scroll inside the table so
+  PR #127 and PB Date in PR #216). A sortable table of every scenario in a
+  playlist — position, total players, percentile, last played, runs, PB Score,
+  PB Date, PB cm/360, PB Accuracy. Long playlists scroll inside the table so
   the column labels remain visible while scanning deep rows. The local and
   cached parts paint immediately; unresolved leaderboard cells animate and
   stream into place with a counter instead of hiding the table behind a
   minutes-long spinner. *Problem solved:* the headline use case is *"show me
   the scenarios where I'm worst, sorted ascending — that's my training
   priority list."* It also surfaces scenarios gone stale, and remains usable
-  while KovaaK's is slow or unreachable. A session-planning tool, checked at
-  the start of a training session.
+  while KovaaK's is slow or unreachable. Last played tells you recency of
+  play while PB Date tells you recency of improvement, so sorting PB Date
+  ascending surfaces plateaus — scenarios still being played whose best
+  hasn't moved. A session-planning tool, checked at the start of a training
+  session.
 - **Relative "last played" timestamps** (PRs #17, #19, #23). "5 minutes ago"
   / "3 months ago" everywhere a timestamp appears, exact time on hover.
   *Problem solved:* staleness is the actual question ("how long since I

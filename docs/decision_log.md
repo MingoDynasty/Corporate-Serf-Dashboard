@@ -13,6 +13,188 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-09: PB Columns Keep Their N/A Sentinel Even For Timestamps
+
+Status: Accepted
+
+The playlist table gained a PB Date column showing when the personal best
+was achieved. On a scenario with no local runs it renders "N/A" like the
+other PB columns beside it, rather than the grid's "Never" sentinel, so an
+unplayed row shows both words at once. This was chosen deliberately: each
+word keeps one meaning, and the row's PB cells stay consistent with each
+other.
+
+Decision: A grid column whose value is a stat of the personal-best run
+takes "N/A" as its null sentinel, even when the value is a timestamp
+rendered with the shared relative-time helpers. "Never" stays scoped to
+Last Played (in a playlist but never played). On an unplayed row, Last
+Played reads "Never" while PB Score / PB Date / PB cm/360 / PB Accuracy
+read "N/A"; the sentinels co-occur by design. Last Played and PB Date are
+null under exactly the same condition — the scenario has no local runs —
+so an unplayed row is the only place "Never" and "N/A" describe the same
+fact. (PB cm/360 additionally reads "N/A" on played rows whose PB used a
+different sensitivity scale; "N/A" in a PB column is not by itself
+evidence the scenario is unplayed.) The playlist grid's live tick now
+refreshes both timestamp columns:
+`refreshCells({force: true, columns: ["last_played_sort",
+"pb_timestamp_sort"]})`.
+
+Why: "Never" answers "have I played this?"; "N/A" marks a stat that does
+not exist because there is nothing to measure, and a missing PB is the
+second kind. Column-family consistency (a row's PB cells agreeing with
+each other) was judged to beat renderer consistency (every relative-time
+cell sharing one sentinel). Maintainer-ratified copy call.
+
+Consequences: Shipped in PR #216. Narrows the sentinel rule and extends
+the single-column `refreshCells` call of the
+[2026-06-21 relative timestamp entry](#2026-06-21-relative-humanized-last-played-timestamps),
+whose Status line points here. Future timestamp columns choose their null
+sentinel by column family, not by renderer.
+
+## 2026-08-09: Chart Options Live In A Collapsible Panel Beside The Graph
+
+Status: Accepted
+
+The graph's display preferences used to open in a modal that dimmed the page
+and blocked the chart behind it, so tuning an overlay meant adjusting, closing,
+looking, and opening again. They now sit in a panel that slides out beside the
+chart, which stays live and readable the whole time. On a narrow window the
+same panel stacks above the chart instead. No preference changed what it does,
+what it defaults to, or where it is stored.
+
+Decision: `settings-modal`, `settings-modal-open-button`, and the `modal_demo`
+callback are deleted. Their five chart preferences move into an in-flow
+`chart-options-panel` beside `graph-content`, disclosed by a
+`chart-options-toggle` button labelled "Chart options" and grouped under
+*Overlays* and *Score Threshold* headings. `automatically-change-scenario-switch`
+governs selection rather than presentation — it is the one moved control that is
+not an input to `generate_graph` — so it is promoted out of the panel to sit
+under the scenario selector. The panel starts closed on every visit and its open
+state is not persisted.
+
+Why: the container was adjudicated on a live-size interactive mockup built from
+measured app geometry (1600×900, real element positions), not from taste. Open
+plot area came out near-identical either way — stacked above the chart
+1318×477 ≈ 629k px², beside it 1002×639 ≈ 640k px² — so the call fell to shape,
+growth, and ergonomics, and all three favour the side panel: 1.57:1 stays
+visually balanced where 2.76:1 reads wide and shallow, a vertical column absorbs
+future controls without shrinking the chart further, and the panel can stay open
+through sustained tuning. `dmc.Drawer` (a fixed overlay over the graph) and
+`AppShellAside` (global chrome on every page) were rejected for the modal's own
+reason: the graph is the only feedback surface these controls have. Folding them
+into `/settings` was rejected earlier still — disjoint content, instant-apply
+against deliberate-Save commit models, and no chart there to give feedback.
+
+Consequences and constraints:
+
+- **The flex role transfers; it is not duplicated.** `.home-chart-area` is now
+  the direct flex child of `.home-page` and carries the `flex: 1 1 0` growth and
+  the `min-height` floor that `.home-graph` used to hold. Leave those on the
+  graph and the row falls back to intrinsic content height, so the graph stops
+  consuming the remaining viewport.
+- **`.home-graph` is a resize hook, not decoration.**
+  `assets/homeGraphResize.js` locates graph containers by that class, and
+  opening or collapsing the panel is exactly the
+  container-resize-without-window-resize case Plotly does not redraw for on its
+  own. The class and the script survive any future refactor of this row.
+- **The reflow threshold is a container query, never a media query.**
+  `@container home-chart-area (max-width: 62em)` measures the chart row's own
+  box. The fixed 250px navbar shrinks the content area without touching the
+  viewport, so a viewport threshold would keep the panel beside a chart it had
+  already crushed — the same trap as
+  [2026-08-03](#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window).
+  62em is Mantine's `md` step, off the scale the controls grid already uses. A
+  container query cannot match on the element that declares the container, so
+  `.home-chart-area` declares it and `.home-chart-row` carries the layout.
+- **Collapsing animates the track, and the row clips.** The inspector's grid
+  track transitions between `0` and 20rem at `dmc.AppShell`'s own 200 ms rather
+  than being removed, so the graph grows and shrinks the way it does when the
+  navbar collapses. Two facts make that work: the panel holds its own width
+  while the track moves under it, so it is revealed rather than squeezed; and
+  `.home-chart-row` clips, because Plotly redraws exactly once ~200 ms *after*
+  its container stops moving and until then is still drawn at its old width.
+  The navbar hides that overhang by being fixed-position and painting over it;
+  an in-flow panel has to clip from the other side. Stacked, there is no width
+  to animate, so that mode sets the duration to zero.
+- **Ids and defaults survive verbatim.** Dash persistence is keyed by component
+  id, and changing a layout default silently drops every stored value, so all
+  six preference inputs kept both across the move. Collapsed controls hide with
+  `display: none` — mounted, in the layout tree, still feeding their callbacks —
+  and are never conditionally rendered.
+- **The toggle's `n_clicks` guard is unconditional.** Under DashProxy a
+  callback can fire on initial page load despite `prevent_initial_call=True`,
+  which here would spring the panel open on arrival. The panel's class *is* the
+  open state and `aria-expanded` rides with it, so a regression test pins that
+  both are unchanged before a real click.
+
+Shipped in PRs #209 and #215; design discussion in #206. This entry and
+[the naming entry](#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
+distil `docs/chart_options_inspector_proposal.md`, now deleted.
+
+## 2026-08-09: The Graph Page Is Scenario Performance, Its Panel Is Chart Options
+
+Status: Accepted
+
+Three surfaces used to answer to the name "Settings", two of them with the same
+icon. The graph page's preference panel is now called "Chart options", the page
+itself is called "Scenario Performance" in the navbar and the browser tab, and
+the Settings page keeps its name. The controls inside the panel are named the
+way the app's own charts and the aim-training community already name them,
+rather than in invented vocabulary.
+
+Decision, four rulings:
+
+- The disclosure button and the panel are **"Chart options"**.
+- **`/settings` keeps the name "Settings".** The collision is resolved from the
+  graph page's side; an "App setup" rename was considered and rejected.
+- The graph page's product name is **"Scenario Performance"**, applied as
+  labels only: the navbar link, the page's registered `name` and `title`, and
+  doc vocabulary. `/` still serves it and `/home` and `/index` still redirect.
+- The panel's column claims **no exclusive tenancy of the page's right side**.
+  It is a page-local column a later design may share, stack with, or re-host.
+
+Why: the surfaces sharing the "Settings" name are different in kind. `/settings`
+edits server-persisted app setup through one validated Save with restart
+semantics; the panel edits instant-apply browser preferences that only the chart
+can give feedback on. Naming the panel after what it configures also follows the
+repo's precedent that controls live on the surface owning their effect —
+playlist management left this same modal for `/playlists`
+([2026-07-11](#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
+"Scenario Performance" is the page's product identity, distinct from its route
+position as the default landing page, which is why the rename is labels-only.
+
+Consequences and constraints:
+
+- **The control labels are the app's own vocabulary, not the proposal's.** The
+  proposal recommended a *Score goal* group with "Playlist rank lines",
+  "Personal-best line", "Show goal line", "Goal percentage of PB", and "Show
+  goal verdict". The maintainer rejected that on first local test: the app's own
+  chart annotations already render "PB Score" and "Score Threshold", and "Score
+  Threshold" is what the aim-training community says. What shipped is *Overlays*
+  ("Rank Thresholds", "PB Score") and *Score Threshold* ("Score Threshold
+  Overlay", "Score Threshold Percentage", "Score Threshold Notification") —
+  the modal's original labels, verbatim. The general rule this carries: proposed
+  UI copy is checked against the app's existing plot annotations and sibling
+  pages before it ships, however settled a proposal declares it.
+- **"Score Threshold Notification" is knowingly imprecise.** Since the
+  notification redesign it gates only whether a run is judged against the
+  threshold (`_threshold_verdict` returns `None` when it is off); placement
+  toasts fire regardless. The maintainer accepted the wording and deferred the
+  fix to a later copy pass; a dated comment at the control in
+  `source/pages/home.py` records it. The help tooltip is accurate as written and
+  is unchanged.
+- **The route restructure is deferred, not dropped.** Reserving `/` for a future
+  Overview page and giving this page a durable `/scenario` route waits until an
+  Overview has concrete plans.
+- **Run History composes into this column rather than adding a second one.** If
+  a run history tied to Scenario Performance arrives, how the two share the
+  space is the run-history proposal's question; this one only promises not to
+  have claimed the space.
+
+Shipped in PRs #209 and #215; design discussion in #206. Distilled with
+[the inspector entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)
+from `docs/chart_options_inspector_proposal.md`, now deleted.
+
 ## 2026-08-08: Rank-History Capture Is Deferred Until A Position-Over-Time Feature Is Designed
 
 Status: Accepted
@@ -2297,7 +2479,7 @@ reports line-ending format drift; the migration's first CI run did not.
 
 ## 2026-06-21: Relative ("Humanized") Last-Played Timestamps
 
-Status: Superseded in part by the 2026-06-30 home empty-state decision and, for the exact absolute-string format (`%Y-%m-%d %I:%M:%S %p`), by the 2026-07-11 humanized absolute-format decision
+Status: Superseded in part by the 2026-06-30 home empty-state decision; for the exact absolute-string format (`%Y-%m-%d %I:%M:%S %p`), by the 2026-07-11 humanized absolute-format decision; and, for the grid sentinel's scope and the single-column `refreshCells` call, by the [2026-08-09 PB-sentinel decision](#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)
 
 Decision: "Last played" renders as a relative, humanized string ("5 minutes ago") in both the home Scenario Stats block and the playlists grid, with the exact timestamp shown on hover (`%Y-%m-%d %I:%M:%S %p`). Formatting lives in a single shared pair of pure JS helpers (`relativeTime`/`absoluteTime`) in `assets/dashAgGridFunctions.js`. Rules: a single rounded unit, never compound — just now (≤60s, including ≤0 / future) → N minutes → N hours → N days → N months → N years, with months/years calendar-based and a `max(0, …)` clamp (no `Intl` dependency, no "over"/"about" prefix). The value stays relative all the way (no absolute-date cutover) because it is a staleness gauge, not a reference date. Timestamps are epoch **seconds** end-to-end (the JS multiplies by 1000). Sentinels: "Never" on the grid (in a playlist but never played), "N/A" on home (no selection / not in DB) — never blank. The home value self-updates via a dedicated 30s `dcc.Interval` (decoupled from `polling_interval`); the grid live-ticks via a dedicated interval + `refreshCells({force: true, columns: ['last_played_sort']})`.
 

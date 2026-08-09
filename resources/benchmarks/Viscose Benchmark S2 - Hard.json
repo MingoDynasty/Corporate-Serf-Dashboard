@@ -12,7 +12,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 9700.0
         },
         {
@@ -32,7 +32,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 12050.0
         },
         {
@@ -58,7 +58,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 15850.0
         },
         {
@@ -78,7 +78,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 19750.0
         },
         {
@@ -104,7 +104,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 4325.0
         },
         {
@@ -124,7 +124,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 5350.0
         },
         {
@@ -150,7 +150,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 3100.0
         },
         {
@@ -170,7 +170,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3875.0
         },
         {
@@ -196,7 +196,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 10450.0
         },
         {
@@ -216,7 +216,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 13000.0
         },
         {
@@ -242,7 +242,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 2975.0
         },
         {
@@ -262,7 +262,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3875.0
         },
         {
@@ -288,7 +288,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 3635.0
         },
         {
@@ -308,7 +308,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 4375.0
         },
         {
@@ -334,7 +334,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 8375.0
         },
         {
@@ -354,7 +354,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 11100.0
         },
         {
@@ -380,7 +380,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 2950.0
         },
         {
@@ -400,7 +400,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3925.0
         },
         {
@@ -426,7 +426,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 2100.0
         },
         {
@@ -446,7 +446,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3150.0
         },
         {
@@ -472,7 +472,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 865.0
         },
         {
@@ -492,7 +492,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 889.0
         },
         {
@@ -518,7 +518,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 11400.0
         },
         {
@@ -538,7 +538,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 13950.0
         },
         {
@@ -564,7 +564,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 892.5
         },
         {
@@ -584,7 +584,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 906.5
         },
         {
@@ -610,7 +610,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 909.0
         },
         {
@@ -630,7 +630,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 924.0
         },
         {
@@ -656,7 +656,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 2550.0
         },
         {
@@ -676,7 +676,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3375.0
         },
         {
@@ -702,7 +702,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 2925.0
         },
         {
@@ -722,7 +722,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 3435.0
         },
         {
@@ -748,7 +748,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 897.0
         },
         {
@@ -768,7 +768,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 912.0
         },
         {
@@ -794,7 +794,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 3325.0
         },
         {
@@ -814,7 +814,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 4025.0
         },
         {
@@ -840,7 +840,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 138.0
         },
         {
@@ -860,7 +860,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 163.0
         },
         {
@@ -886,7 +886,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 115.0
         },
         {
@@ -906,7 +906,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 130.0
         },
         {
@@ -932,7 +932,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 136.0
         },
         {
@@ -952,7 +952,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 154.0
         },
         {
@@ -978,7 +978,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 123.0
         },
         {
@@ -998,7 +998,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 149.0
         },
         {
@@ -1024,7 +1024,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 128.0
         },
         {
@@ -1044,7 +1044,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 149.0
         },
         {
@@ -1070,7 +1070,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 118.0
         },
         {
@@ -1090,7 +1090,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 142.0
         },
         {
@@ -1116,7 +1116,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 151.0
         },
         {
@@ -1136,7 +1136,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 173.0
         },
         {
@@ -1162,7 +1162,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 1350.0
         },
         {
@@ -1182,7 +1182,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 1650.0
         },
         {
@@ -1208,7 +1208,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 142.0
         },
         {
@@ -1228,7 +1228,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 167.0
         },
         {
@@ -1254,7 +1254,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 69.0
         },
         {
@@ -1274,7 +1274,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 87.0
         },
         {
@@ -1300,7 +1300,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 5500.0
         },
         {
@@ -1320,7 +1320,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 7000.0
         },
         {
@@ -1346,7 +1346,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 70.0
         },
         {
@@ -1366,7 +1366,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 90.0
         },
         {
@@ -1392,7 +1392,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 88.0
         },
         {
@@ -1412,7 +1412,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 109.0
         },
         {
@@ -1438,7 +1438,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 800.0
         },
         {
@@ -1458,7 +1458,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 1020.0
         },
         {
@@ -1484,7 +1484,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 76.0
         },
         {
@@ -1504,7 +1504,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 99.0
         },
         {
@@ -1530,7 +1530,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 1060.0
         },
         {
@@ -1550,7 +1550,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 1420.0
         },
         {
@@ -1576,7 +1576,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 380.0
         },
         {
@@ -1596,7 +1596,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 510.0
         },
         {
@@ -1622,7 +1622,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 127.0
         },
         {
@@ -1642,7 +1642,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 148.0
         },
         {
@@ -1668,7 +1668,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 107.0
         },
         {
@@ -1688,7 +1688,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 127.0
         },
         {
@@ -1714,7 +1714,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 875.0
         },
         {
@@ -1734,7 +1734,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 1150.0
         },
         {
@@ -1760,7 +1760,7 @@
         },
         {
           "name": "Rayon",
-          "color": "#F1ECEB",
+          "color": "#F1E1EB",
           "threshold": 79.0
         },
         {
@@ -1780,7 +1780,7 @@
         },
         {
           "name": "Tricot",
-          "color": "#5CA9C6",
+          "color": "#76B0E0",
           "threshold": 99.0
         },
         {
@@ -1807,7 +1807,7 @@
       ],
       [
         "Rayon",
-        "#F1ECEB"
+        "#F1E1EB"
       ],
       [
         "Linen",
@@ -1823,7 +1823,7 @@
       ],
       [
         "Tricot",
-        "#5CA9C6"
+        "#76B0E0"
       ],
       [
         "Satin",
@@ -1834,7 +1834,7 @@
         "#2E6F8A"
       ]
     ],
-    "generated_at": "2026-07-20T22:09:43.601806+00:00",
+    "generated_at": "2026-08-09T02:56:54.560416+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

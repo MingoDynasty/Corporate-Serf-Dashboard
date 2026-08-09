@@ -384,6 +384,51 @@ def test_rank_mismatch_is_typed():
         )
 
 
+@pytest.mark.parametrize(
+    "make_payload",
+    [
+        # The shape observed live on benchmark 2412 (2026-08-08): the whole
+        # categories mapping comes back empty.
+        pytest.param(
+            lambda: {**_benchmark_response([100]), "categories": {}},
+            id="empty-categories",
+        ),
+        # Constructed variant: a category survives but its scenario dict is
+        # empty. Covered because the terminal guard has to catch it too.
+        pytest.param(
+            lambda: {
+                **_benchmark_response([100]),
+                "categories": {
+                    "Clicking": {
+                        "benchmark_progress": 0,
+                        "category_rank": 0,
+                        "rank_maxes": [100],
+                        "scenarios": {},
+                    }
+                },
+            },
+            id="empty-scenarios",
+        ),
+    ],
+)
+def test_empty_benchmark_is_typed(make_payload):
+    # Without a scenario the per-scenario rank-count guard never runs, so an
+    # emptied-out upstream benchmark would otherwise import as `scenarios: []`.
+    response = script.BenchmarksAPIResponse.model_validate(make_payload())
+
+    with pytest.raises(
+        script.BenchmarkDataMismatchError,
+        match="No scenarios returned .* for benchmark 42",
+    ):
+        script.build_scenarios(
+            response,
+            EvxlDatabaseItem(
+                kovaaksBenchmarkId=42,
+                rankColors={"Bronze": "#111"},
+            ),
+        )
+
+
 def test_build_scenarios_strips_padded_scenario_names():
     # KovaaK's occasionally returns padded scenario keys; CSV run import strips
     # the `Scenario:` value, so unstripped playlist names never match lookups.
