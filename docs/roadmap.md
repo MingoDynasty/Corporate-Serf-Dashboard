@@ -80,6 +80,11 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
+- **Chart options inspector** — the Home graph's display preferences move out
+  of the blocking "Settings" modal into a collapsible panel beside the chart,
+  so tuning happens against the live chart and the surface stops sharing the
+  Settings page's name. Design in
+  [`chart_options_inspector_proposal.md`](./chart_options_inspector_proposal.md).
 
 The settings arc's guided first-run flow — a setup card for a fresh install,
 and what "skip" should mean — was deliberately left out of settings detection
