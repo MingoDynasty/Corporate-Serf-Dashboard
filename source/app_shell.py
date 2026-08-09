@@ -222,7 +222,7 @@ def layout(**kwargs):  # noqa: ARG001
                 header={"height": "4em"},
                 padding="md",
                 navbar={
-                    "width": 250,
+                    "width": 225,
                     "breakpoint": "sm",
                     # Mirrors the burger's `opened` default. The clientside
                     # callback below derives this from the burger on every

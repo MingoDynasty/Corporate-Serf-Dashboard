@@ -104,7 +104,7 @@
 
 /* The chart and its options inspector share this area. The reflow threshold
    measures the area rather than the window: the AppShell navbar is
-   fixed-position and 250px wide, so it shrinks the content area without
+   fixed-position and 225px wide, so it shrinks the content area without
    touching the viewport, and a media query would keep the inspector beside a
    chart it has already crushed. A container query cannot match on the element
    that declares the container, hence the wrapper -- this is the flex child
