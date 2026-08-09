@@ -13,69 +13,56 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
-## 2026-08-08: Rank Observations Are Captured From Now On, Decoupled From The Storage Engine
+## 2026-08-08: Rank-History Capture Is Deferred Until A Position-Over-Time Feature Is Designed
 
 Status: Accepted
 
-The app keeps only the latest leaderboard position per scenario, so every
-older observation is overwritten and gone for good. Rank observations will
-now be captured to a small append-only file, without waiting for the SQLite
-migration to be decided or built. Users notice nothing today; the score-trend
-features being designed will have real history to draw instead of starting
-blind on the day they ship.
+The app keeps only the latest leaderboard position per scenario, so past
+positions are overwritten and cannot be reconstructed later. A proposal to
+start capturing them now, ahead of any feature that uses them, was reviewed
+and deferred. Score-over-time needs no capture — runs are kept as files and
+can be recomputed at any time. Position- and percentile-over-time would need
+capture running before they ship, but those features are ideas rather than
+designs, so the project accepts losing that history until one is fleshed out.
 
-Decision: every fetched rank observation is appended, where fetch results
-are handled, to an append-only NDJSON file under `data/` — deliberately not
-`data/cache/`, because it is capture, not a cache, and must never inherit
-the delete-and-refetch tolerance. One line per observation with the field
-set from the 2026-08-01 vault design's Phase 2 ledger: `leaderboard_id`,
-`username`, `scenario_name`, `rank`, `score`, `observed_at` (UTC ISO-8601,
-from the fetch), plus `total_players` as an optional enrichment — the rank
-fetch itself does not carry it, so it is a best-effort join at append time
-whose denominator has its own fetch moment, and historical percentile
-analysis must treat it as temporally approximate rather than atomic with
-the rank. Boundaries:
+Decision: rank-observation capture does not ship now. The revisit trigger is
+concrete: the day any position- or percentile-over-time feature moves from
+idea to design, that design's **first** deliverable is the capture below —
+history starts when capture starts, and the gap between now and then is the
+accepted, known cost. Agents: do not re-propose capture absent that trigger;
+cite this entry instead. Do not silently widen any rank-cache write into a
+history store either — the serving cache stays a cache.
 
-- The capture boundary is the fetch, not the serving-cache writer. The
-  PB-refresh loop discards fetches whose score has not propagated before
-  they ever reach `_save_rank_monotonic` (the `_score_is_fresh` gate), and
-  those are real observations of the board that the ledger records.
-  `_save_rank_monotonic` stays the serving-cache authority and a natural
-  implementation anchor, but a capture hooked only there under-collects.
-- The monotonic filter governs the serving cache, not the ledger. A candidate
-  the cache rejects for being worse is recorded anyway — a rank that got
-  worse is exactly what trend analysis needs to see.
-- Only fetched observations are recorded. Cache re-serves and re-saves of an
-  already-cached value (the `allow_network` re-save path) are not
-  observations and must not be logged as new ones.
-- Consecutive identical observations per `(leaderboard_id, username)` are
-  deduplicated to keep noise down.
-- Appends are fail-soft: an append failure logs and never interrupts rank
-  serving — the same posture cache writes already hold.
-- No reader ships with capture. The file is written now and queried later;
-  building any consumer is its own proposal.
+The reviewed capture spec is preserved here so revival needs no re-derivation
+(it was review-corrected twice and is believed sound): append one NDJSON line
+per **fetched** observation to an append-only file under `data/` (not
+`data/cache/` — capture, not cache); fields `leaderboard_id`, `username`,
+`scenario_name`, `rank`, `score`, `observed_at` (UTC ISO-8601, from the
+fetch), plus `total_players` as an optional best-effort join with its own
+fetch moment (the rank fetch does not carry it; percentile analysis must
+treat the denominator as temporally approximate). The capture boundary is
+fetch-result handling, not `_save_rank_monotonic` — the `_score_is_fresh`
+gate discards real observations before the monotonic writer, and candidates
+the monotonic filter rejects are recorded (a worsening rank is signal). Cache
+re-serves and the `allow_network` re-save of an already-cached value are not
+observations. Consecutive identical observations per
+`(leaderboard_id, username)` dedupe; appends are fail-soft; no reader ships
+with capture.
 
-Why: `_save_rank_monotonic` overwrites, so unrecorded history cannot be
-backfilled — the one irreversible cost in the storage arc, priced at a day of
-data per day of delay. The 2026-08-06 `json-vs-sqlite-storage` note dropped
-the vault design's Phase 2 ledger without argument: its three-bucket taxonomy
-has no bucket for an append-only capture file, so the concept fell through
-rather than being rejected. Capture is engine-neutral — NDJSON re-ingests
-into whatever `rank_observation` table a later migration creates — so this
-entry neither presumes nor prejudices the open SQLite questions (whether it
-ships as Run History's storage layer, and its sequencing against the analysis
-features). The consuming arc is real, not speculative: score trend has three
-design documents and hand-maintained metric definitions, and every candidate
-method consumes observations over time.
+Why: maintainer review. Position- and percentile-over-time sound useful on
+paper but are unfleshed, and both are less settled than score-over-time,
+which needs none of this. Capturing data for an undesigned feature class is
+exactly the speculative scope this project prunes; the irreversibility
+argument for capturing anyway was weighed and accepted as a known loss. The
+2026-08-06 `json-vs-sqlite-storage` note had dropped the vault design's
+Phase 2 ledger by taxonomy accident — this entry replaces that silence with
+a deliberate call.
 
-Consequences: a new append-only file grows slowly under `data/` (tens of
-bytes per accepted observation; warmup bursts are bounded by dedupe). The
-existing SQLite triggers ("reconsider SQLite when we need rank history…") are
-unchanged — this entry decides capture, not the engine; if a migration's
-Phase 2 lands, the writer becomes a table insert and the accumulated file is
-imported, and if SQLite never ships the file stands alone. This entry is the
-go decision, not the code: implementation lands as its own PR with tests, and
-observations continue to be lost until it merges.
+Consequences: every day before revival is unrecorded position history, by
+choice. The existing SQLite triggers ("reconsider SQLite when we need rank
+history…") are unchanged — if capture is revived it remains engine-neutral
+(NDJSON re-ingests into whatever table a migration creates), so this defers
+nothing about, and prejudices nothing in, the open SQLite questions.
 
 ## 2026-08-08: PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once
 
