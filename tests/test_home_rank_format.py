@@ -267,8 +267,8 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     # The inspector's two groups sit under the page's h2 sections.
     assert titles["Overlays"].order == 3
     assert titles["Overlays"].size == "h6"
-    assert titles["Score goal"].order == 3
-    assert titles["Score goal"].size == "h6"
+    assert titles["Score Threshold"].order == 3
+    assert titles["Score Threshold"].size == "h6"
 
 
 def test_chart_options_controls_have_help_tooltips(monkeypatch):
@@ -335,13 +335,11 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
     }
 
     assert labels == {
-        "rank-overlay-switch": "Playlist rank lines",
-        "high-score-overlay-switch": "Personal-best line",
-        "score-threshold-overlay-switch": "Show goal line",
-        "score-threshold-percentage": "Goal percentage of PB",
-        # It gates the goal verdict inside the run toast; placement toasts
-        # fire regardless, so the label must not claim more than that.
-        "score-threshold-notification-switch": "Show goal verdict",
+        "rank-overlay-switch": "Rank Threshold lines",
+        "high-score-overlay-switch": "PB Score",
+        "score-threshold-overlay-switch": "Score Threshold Overlay",
+        "score-threshold-percentage": "Score Threshold Percentage",
+        "score-threshold-notification-switch": "Score Threshold Notification",
     }
 
 
@@ -382,27 +380,22 @@ def test_chart_options_toggle_ignores_a_fire_no_click_caused():
     )
 
 
-def test_follow_switch_sits_with_the_scenario_selector_it_governs(monkeypatch):
+def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
+    """It is stacked with the selector, not spread across the controls row."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
-    controls_flex = next(
+    scenario_field = next(
         component
         for component in _walk_components(home.layout())
-        if isinstance(component, dmc.Flex)
-        and any(
-            getattr(child, "id", None) == "scenario-dropdown-selection"
-            for child in component.children
-        )
+        if getattr(component, "className", None) == "home-scenario-field"
     )
-    control_ids = [getattr(child, "id", None) for child in controls_flex.children]
-    switch = controls_flex.children[
-        control_ids.index("automatically-change-scenario-switch")
-    ]
+    switch = scenario_field.children[1]
 
-    assert control_ids.index("automatically-change-scenario-switch") == (
-        control_ids.index("scenario-dropdown-selection") + 1
-    )
+    assert [getattr(child, "id", None) for child in scenario_field.children] == [
+        "scenario-dropdown-selection",
+        "automatically-change-scenario-switch",
+    ]
     assert _label_text(switch) == "Follow newly played scenario"
     assert switch.checked is True
     assert switch.persistence is True

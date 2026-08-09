@@ -120,7 +120,7 @@ CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # Below this much room for the chart row, the inspector stacks above the chart
 # instead of sitting beside it (assets/stylesheet.css measures the row's own
 # width with an ``@container`` query, never the window's). ``md`` is where a
-# 19rem rail stops leaving a chart worth reading.
+# 20rem rail stops leaving a chart worth reading.
 CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
@@ -1264,7 +1264,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="rank-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Playlist rank lines",
+                            "Rank Threshold lines",
                             SETTINGS_HELP_TEXT["rank-overlay"],
                         ),
                         checked=True,
@@ -1274,7 +1274,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="high-score-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Personal-best line",
+                            "PB Score",
                             SETTINGS_HELP_TEXT["high-score-overlay"],
                         ),
                         checked=True,
@@ -1283,13 +1283,13 @@ def _chart_options_panel() -> dmc.Box:
                 ],
             ),
             _chart_options_group(
-                "Score goal",
+                "Score Threshold",
                 [
                     dmc.Switch(
                         id="score-threshold-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Show goal line",
+                            "Score Threshold Overlay",
                             SETTINGS_HELP_TEXT["score-threshold-overlay"],
                         ),
                         checked=True,
@@ -1298,7 +1298,7 @@ def _chart_options_panel() -> dmc.Box:
                     dmc.NumberInput(
                         id="score-threshold-percentage",
                         label=_settings_help_label(
-                            "Goal percentage of PB",
+                            "Score Threshold Percentage",
                             SETTINGS_HELP_TEXT["score-threshold-percentage"],
                         ),
                         min=1,
@@ -1308,17 +1308,22 @@ def _chart_options_panel() -> dmc.Box:
                         size="sm",
                         variant="default",
                         value=95,
-                        w="12em",
+                        # Fills the rail. A Mantine label is only as wide as
+                        # its input, so the modal's 12em box would wrap this
+                        # label and strand its help icon on the line above.
+                        w="100%",
                     ),
-                    # Named for what it gates and nothing more: since the
-                    # notification redesign this switch decides whether a run
-                    # is judged against the goal, while placement toasts fire
-                    # either way.
+                    # The modal's wording, kept for now (2026-08-08): it reads
+                    # as though it gates run notifications wholesale, when
+                    # since the notification redesign it decides only whether
+                    # a run is judged against the threshold -- placement
+                    # toasts fire either way. Revisit with the rest of the
+                    # group's copy.
                     dmc.Switch(
                         id="score-threshold-notification-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Show goal verdict",
+                            "Score Threshold Notification",
                             SETTINGS_HELP_TEXT["score-threshold-notification"],
                         ),
                         checked=True,
@@ -1416,43 +1421,52 @@ def layout(
                                     persistence=playlist_persistence,
                                     value=selected_playlist,
                                 ),
-                                dmc.Select(
-                                    allowDeselect=False,
-                                    autoSelectOnBlur=True,
-                                    checkIconPosition="right",
-                                    clearSearchOnFocus=True,
-                                    data=scenario_options,
-                                    # Mirrors the playlist filter beside it; see
-                                    # PLAYLIST_SELECTOR_PRESET for why the basis
-                                    # is the floor and not the 400px target.
+                                dmc.Stack(
+                                    [
+                                        dmc.Select(
+                                            allowDeselect=False,
+                                            autoSelectOnBlur=True,
+                                            checkIconPosition="right",
+                                            clearSearchOnFocus=True,
+                                            data=scenario_options,
+                                            id="scenario-dropdown-selection",
+                                            label="Selected scenario",
+                                            maxDropdownHeight="75vh",
+                                            persistence=scenario_persistence,
+                                            placeholder="Select a scenario...",
+                                            scrollAreaProps={"type": "auto"},
+                                            searchable=True,
+                                            value=selected_scenario,
+                                        ),
+                                        # Selection behavior, not chart
+                                        # presentation: it decides what the
+                                        # selector does when a new run lands,
+                                        # so it sits under the selector rather
+                                        # than in the chart options inspector.
+                                        dmc.Switch(
+                                            id="automatically-change-scenario-switch",
+                                            labelPosition="right",
+                                            label=_settings_help_label(
+                                                "Follow newly played scenario",
+                                                SETTINGS_HELP_TEXT[
+                                                    "automatically-change-scenario"
+                                                ],
+                                            ),
+                                            checked=True,
+                                            persistence=True,
+                                        ),
+                                    ],
+                                    className="home-scenario-field",
+                                    # The column, not the Select inside it, is
+                                    # the flex item this row breaks lines on.
+                                    # Mirrors the playlist filter beside it;
+                                    # see PLAYLIST_SELECTOR_PRESET for why the
+                                    # basis is the floor and not the 400px
+                                    # target.
                                     flex="1 1 200px",
-                                    id="scenario-dropdown-selection",
-                                    label="Selected scenario",
+                                    gap="xs",
                                     maw="min(400px, 100%)",
-                                    maxDropdownHeight="75vh",
                                     miw="min(200px, 100%)",
-                                    persistence=scenario_persistence,
-                                    placeholder="Select a scenario...",
-                                    scrollAreaProps={"type": "auto"},
-                                    searchable=True,
-                                    value=selected_scenario,
-                                ),
-                                # Selection behavior, not chart presentation:
-                                # it decides what the selector does when a new
-                                # run lands, so it sits with the selector
-                                # rather than in the chart options inspector.
-                                dmc.Switch(
-                                    id="automatically-change-scenario-switch",
-                                    className="home-follow-switch",
-                                    labelPosition="right",
-                                    label=_settings_help_label(
-                                        "Follow newly played scenario",
-                                        SETTINGS_HELP_TEXT[
-                                            "automatically-change-scenario"
-                                        ],
-                                    ),
-                                    checked=True,
-                                    persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
                                 dmc.Space(h="xl"),

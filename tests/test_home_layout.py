@@ -23,7 +23,9 @@ from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET  # noqa: E40
 REPO_ROOT = Path(__file__).resolve().parents[1]
 STYLESHEET = REPO_ROOT / "assets" / "stylesheet.css"
 GRAPH_RESIZE_SCRIPT = REPO_ROOT / "assets" / "homeGraphResize.js"
-SHRINKABLE_SELECT_IDS = ("playlist-dropdown-selection", "scenario-dropdown-selection")
+SCENARIO_SELECT_ID = "scenario-dropdown-selection"
+SCENARIO_FIELD_CLASS = "home-scenario-field"
+SHRINKABLE_SELECT_IDS = ("playlist-dropdown-selection", SCENARIO_SELECT_ID)
 _FLEX_SHORTHAND = re.compile(r"^(?P<grow>\d+) (?P<shrink>\d+) (?P<basis>\d+)px$")
 _PX_CLAMP = re.compile(r"^min\((?P<px>\d+)px, 100%\)$")
 
@@ -107,6 +109,26 @@ def test_breakpoints_are_a_copy_of_the_shared_theme_dict():
     assert home.HOME_GRID_BREAKPOINTS is not dmc.DEFAULT_THEME["breakpoints"]
 
 
+def _sizing_carrier(select_id):
+    """Find the flex item whose sizing decides when the controls row breaks.
+
+    The playlist filter is its own flex item. The scenario selector shares a
+    column with the follow switch stacked under it, so the column is the item
+    the row measures and the Select inside it just fills the column.
+    """
+
+    def is_carrier(component):
+        if select_id == SCENARIO_SELECT_ID:
+            return getattr(component, "className", None) == SCENARIO_FIELD_CLASS
+        return getattr(component, "id", None) == select_id
+
+    return next(
+        component
+        for component in _walk_components(home.layout())
+        if is_carrier(component)
+    )
+
+
 @pytest.mark.parametrize("select_id", SHRINKABLE_SELECT_IDS)
 def test_wide_dropdowns_join_a_line_below_their_target_width(select_id):
     """The whole fix: a control booking its full target width wraps instead.
@@ -115,13 +137,7 @@ def test_wide_dropdowns_join_a_line_below_their_target_width(select_id):
     400px target reserves 400px of the row before flex-shrink ever runs -- the
     row then wraps at exactly the width it did before.
     """
-    select = next(
-        component
-        for component in _walk_components(home.layout())
-        if getattr(component, "id", None) == select_id
-    )
-
-    _grow, hypothetical, target = _sizing_of(select)
+    _grow, hypothetical, target = _sizing_of(_sizing_carrier(select_id))
 
     assert hypothetical < target
 
@@ -129,23 +145,29 @@ def test_wide_dropdowns_join_a_line_below_their_target_width(select_id):
 @pytest.mark.parametrize("select_id", SHRINKABLE_SELECT_IDS)
 def test_wide_dropdowns_grow_back_toward_their_target(select_id):
     """Breaking small is only half of it; a row with room must still fill it."""
+    grow, _hypothetical, _target = _sizing_of(_sizing_carrier(select_id))
+
+    assert grow >= 1
+
+
+def test_the_scenario_column_carries_the_sizing_not_the_select_inside_it():
+    """Two boxes both booking a width would fight over the same line break."""
     select = next(
         component
         for component in _walk_components(home.layout())
-        if getattr(component, "id", None) == select_id
+        if getattr(component, "id", None) == SCENARIO_SELECT_ID
     )
 
-    grow, _hypothetical, _target = _sizing_of(select)
-
-    assert grow >= 1
+    assert getattr(select, "flex", None) is None
+    assert getattr(select, "maw", None) is None
+    assert getattr(select, "miw", None) is None
 
 
 def test_both_wide_dropdowns_size_identically():
     """They sit side by side; a mismatch reads as a rendering bug."""
     sizings = {
-        component.id: _sizing_of(component)
-        for component in _walk_components(home.layout())
-        if getattr(component, "id", None) in SHRINKABLE_SELECT_IDS
+        select_id: _sizing_of(_sizing_carrier(select_id))
+        for select_id in SHRINKABLE_SELECT_IDS
     }
 
     assert len(sizings) == len(SHRINKABLE_SELECT_IDS)
@@ -209,6 +231,46 @@ def test_chart_row_measures_its_own_width_rather_than_the_windows(stylesheet):
 
     assert "container: home-chart-area / inline-size;" in area
     assert "@container home-chart-area (max-width:" in stylesheet
+
+
+def test_collapsing_the_inspector_animates_the_track_the_graph_grows_into(
+    stylesheet,
+):
+    """The graph has to grow and shrink, not jump.
+
+    Plotly redraws off the ResizeObserver, so the animation is what turns one
+    jump into a sequence of redraws -- and the panel holding its own width
+    while the track moves under it is what keeps a lagging redraw from
+    painting over the controls.
+    """
+    row = _css_block(stylesheet, ".home-chart-row")
+    collapsed = _css_block(
+        stylesheet,
+        ".home-chart-row:has(> .chart-options-panel-hidden)",
+    )
+    panel = _css_block(stylesheet, ".chart-options-panel")
+
+    assert "transition:" in row
+    assert "grid-template-columns var(--chart-options-collapse-duration)" in row
+    assert "overflow: hidden;" in row
+    assert "grid-template-columns: minmax(0, 1fr) 0;" in collapsed
+    assert "column-gap: 0;" in collapsed
+    assert "width: 20rem;" in panel
+    # Opaque, or the wider plot shows through the panel for a frame.
+    assert "background-color: var(--mantine-color-body);" in panel
+
+
+def test_the_collapsed_panel_leaves_the_tab_order_after_the_animation(stylesheet):
+    """display: none is what removes it; allow-discrete is what defers that
+    flip to the end of the collapse instead of cancelling the animation."""
+    hidden = _css_block(stylesheet, ".chart-options-panel-hidden")
+    deferred = _css_block(
+        stylesheet,
+        ".chart-options-panel,\n.chart-options-panel-hidden",
+    )
+
+    assert "display: none;" in hidden
+    assert "allow-discrete" in deferred
 
 
 def test_chart_row_reflow_threshold_comes_from_the_grid_breakpoint_scale(stylesheet):
