@@ -250,6 +250,15 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
     assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
 
 
+def test_page_is_named_scenario_performance_and_keeps_the_root_route():
+    """The rename is labels-only: the product name moved, the route did not."""
+    page = dash.page_registry["source.pages.home"]
+
+    assert page["name"] == "Scenario Performance"
+    assert page["title"] == "Scenario Performance"
+    assert page["path"] == "/"
+
+
 def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):

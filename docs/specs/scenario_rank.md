@@ -105,8 +105,8 @@ benchmark tier) — see the
   leaderboard as caught up only when its score reaches the two-decimal floor
   of the local score; an exhausted chain leaves the previous cache untouched
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
-- The Home rank widget passively re-reads the rank and total caches on its
-  existing interval — TTL ignored, no network calls
+- The Scenario Performance rank widget passively re-reads the rank and total
+  caches on its existing interval — TTL ignored, no network calls
   ([2026-07-01](../decision_log.md#2026-07-01-keep-scenario-rank-consistent-with-score-aware-refreshes)).
 - Background refresh failures are recorded in the console/file logs only;
   they produce no UI notification. The chain degrades silently — the widget
@@ -132,7 +132,7 @@ benchmark tier) — see the
 - Passive renders never toast — the routing policy sends persistent conditions
   to in-place UI
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
-  The Home Position field carries its own
+  The Scenario Performance Position field carries its own
   explanation instead: `N/A` plus a link to the Settings page when no
   username is configured, `N/A` plus "lookup failed, Refresh to retry" when
   the lookup failed with nothing cached, and the cached value plus "from

@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Chart options inspector** — the Scenario Performance graph's display
+  preferences left the blocking "Settings" modal for a collapsible panel beside
+  the chart, so an overlay is tuned against the live chart instead of through an
+  open-close-open loop behind a dimmed page. On a narrow window the panel stacks
+  above the chart instead. The page itself is now named Scenario Performance in
+  the navbar and the browser tab, so only the Settings page answers to
+  "Settings". No preference changed what it does or where it is stored. (PRs
+  #209, #215; design in #206) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Notification system redesign** — the app is quiet during normal play. The
   wall of red error toasts about an unconfigured username is gone: persistent
   conditions now explain themselves in place, beside the value they affect,
@@ -62,12 +71,6 @@ sequence.
   stats folder itself. Configuring the dashboard no longer means opening a text
   editor. (PRs #181, #182, #183, #184; design in #171) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Leaderboard-ID seeding** — the bundled benchmark corpus now embeds each
-  scenario's KovaaK's leaderboard ID, and the app seeds them into the permanent
-  name→ID mapping cache at startup. First opens of unfamiliar bundled playlists
-  no longer fan out over the slow exact-name search endpoint, and ID resolution
-  no longer needs a configured username. (PR #169) Design rationale distilled
-  into [`decision_log.md`](./decision_log.md).
 
 ---
 
@@ -80,11 +83,6 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
-- **Chart options inspector** — the Home graph's display preferences move out
-  of the blocking "Settings" modal into a collapsible panel beside the chart,
-  so tuning happens against the live chart and the surface stops sharing the
-  Settings page's name. Design in
-  [`chart_options_inspector_proposal.md`](./chart_options_inspector_proposal.md).
 
 The settings arc's guided first-run flow — a setup card for a fresh install,
 and what "skip" should mean — was deliberately left out of settings detection
@@ -112,9 +110,9 @@ expanded into its own roadmap entry when it becomes the next thing up.
   concern to revisit later, not a replacement for it.
 - **Scenarios page** — scenario-first navigation for scenarios that live in
   several playlists or in none, parked from the playlist-overview design. The
-  overview → scenario table → Home drill chain covers playlist-first
-  navigation; this would answer "show me this scenario regardless of
-  playlist."
+  overview → scenario table → Scenario Performance drill chain covers
+  playlist-first navigation; this would answer "show me this scenario
+  regardless of playlist."
 
 ---
 
