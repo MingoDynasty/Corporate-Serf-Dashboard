@@ -97,9 +97,9 @@ The watchdog and UI share two channels: `message_queue` (a `deque`) carries
 *notifications* that new data exists, while the run data itself is shared through
 the `data_service.py` module-global stores the UI reads directly. Note the order
 above — the run is loaded into the stores before its message becomes visible.
-The UI is pull-based: a `dcc.Interval` on the home page drains the entire queue
-each tick and publishes one scenario-specific summary. `generate_graph` reads
-that summary and never accesses the queue directly.
+The UI is pull-based: a `dcc.Interval` on the Scenario Performance page drains
+the entire queue each tick and publishes one scenario-specific summary.
+`generate_graph` reads that summary and never accesses the queue directly.
 
 ### Background threads never drive UI outputs
 
@@ -116,9 +116,10 @@ The sanctioned channels, each typed and single-purpose:
 - `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only; its
   consumer assumes run-specific fields.
 - `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
-  drained by a dedicated Home interval callback.
+  drained by a dedicated Scenario Performance interval callback.
 - `file_watchdog.run_import_failure_queue` — run files the watchdog thread
-  could not import, drained by a Home interval callback into one red toast.
+  could not import, drained by a Scenario Performance interval callback into
+  one red toast.
 - The JSON caches under `data/cache/` — the rank pipeline: refresh Timers
   write, cache-only interval reads pick the value up on the next tick.
 
@@ -249,8 +250,9 @@ flowchart LR
   the toasts' rather than resetting when a page remounts.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
-- `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
-  and the chart options inspector. Owns the live-update callbacks
+- `home.py` (`/`) — the Scenario Performance page (the module and route keep
+  their names; the rename was labels-only): sensitivity/time plots, high score,
+  rank, and the chart options inspector. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
   The inspector is a collapsible in-flow panel beside the chart holding the
@@ -376,8 +378,8 @@ flowchart LR
   show-list persisted at `data/playlist_visibility.json`, atomic writes under a
   module lock). A missing file yields the first-run seed (bundled defaults plus
   user-root codes) without writing. `get_visible_playlist_selector_options()`
-  is the single visibility filter every playlist option list consumes (Home
-  filter, Journey picker, overview).
+  is the single visibility filter every playlist option list consumes (Scenario
+  Performance filter, Journey picker, overview).
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
   `Rank`, `Scenario`).
 - `api_models.py` — pydantic models for KovaaK's API responses, plus

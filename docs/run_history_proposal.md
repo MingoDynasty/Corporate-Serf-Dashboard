@@ -83,12 +83,24 @@ capture is required.
 - **Navigation surface.** *No permanent sidebar* — a sidebar plus a page would
   be two surfaces onto overlapping data (noise + duplicated wiring). The real
   choice is between one consolidated Run History page hosting both views, and a
-  per-scenario history panel on the home page (contextual to the selected
-  scenario) plus a separate current-session page. Trade-off is context vs
+  per-scenario history panel on the Scenario Performance page (contextual to
+  the selected scenario) plus a separate current-session page. Trade-off is context vs
   consolidation. The analogous question for the playlists feature was settled
   as two pages with drill-down (see the 2026-07-03 "Playlists Routes Are
   Stable" decision-log entry); settle this one as part of the app's overall
   navigation story, once, rather than piecemeal.
+
+  **This proposal owns the space-sharing question.** If the panel option
+  wins, that page's right column is already occupied by the chart options
+  panel, which claimed no exclusive tenancy of it and expects a history
+  panel hosted there to compose into the same column rather than to add a
+  second one (see the 2026-08-09
+  ["The Graph Page Is Scenario Performance…"](decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
+  entry, which delegates the question here, and the
+  ["Chart Options Live In A Collapsible Panel…"](decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)
+  entry for the column's layout constraints). Whether the two share the
+  column, stack in it, or the history re-hosts the options panel
+  entirely is decided here.
 - **Columns per view.** Straw man: time, score, % of PB, delta vs previous
   run, accuracy, threshold pass. `accuracy` / `damage_accuracy` are barely
   surfaced today and this is their natural home.
