@@ -131,7 +131,13 @@ class NewFileHandler(FileSystemEventHandler):
         time.sleep(1)  # Wait a second to avoid permission issues with race condition
         run_data = extract_data_from_file(file)
         if not run_data:
+            # extract_data_from_file contains its own read and parse failures --
+            # a CSV still locked by KovaaK's, a mid-write line -- and returns
+            # None, so on_created's guard below never sees them. This handler
+            # only sees the creation event and never retries, so the run stays
+            # missing until a restart: notify here or the user is never told.
             logger.warning("Failed to get run data for CSV file: %s", file)
+            run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
             return
 
         sensitivity_key = f"{run_data.horizontal_sens} {run_data.sens_scale}"
