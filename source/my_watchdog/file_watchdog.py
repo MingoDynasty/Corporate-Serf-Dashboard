@@ -77,6 +77,11 @@ def _get_created_csv_path(event) -> str | None:
 def _enqueue_after_loading(file: str, message: NewFileMessage) -> bool:
     """Make a run visible to Home only after it is queryable in the stores."""
     if not load_csv_file_into_database(file):
+        # The store re-reads the CSV, so a file that parsed a moment ago in
+        # _import_created_file can still fail here -- deleted or replaced in
+        # between. Rare, but the run did not land either way, and this was the
+        # last path that dropped one with nothing but a log line.
+        run_import_failure_queue.append(RUN_IMPORT_FAILURE_MESSAGE)
         return False
     message_queue.append(message)
     return True

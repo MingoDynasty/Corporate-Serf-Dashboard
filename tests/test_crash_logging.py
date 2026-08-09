@@ -1,8 +1,10 @@
 """Crash hooks and the watchdog guard must leave log records, not dead threads.
 
-The watchdog's two import-failure shapes -- an exception that escapes to
-on_created, and a None that extract_data_from_file already contained -- both
-have to reach the user, so their notification assertions live together here.
+Both of the import-failure shapes on_created itself sees -- an exception that
+escapes to its handler, and a None that extract_data_from_file already
+contained -- have to reach the user, so their notification assertions sit
+together here. The third shape, a store load that fails after the parse
+succeeded, is asserted beside its siblings in test_file_watchdog_rank_refresh.py.
 """
 
 import logging
