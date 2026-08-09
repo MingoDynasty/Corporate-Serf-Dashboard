@@ -11,10 +11,10 @@ automatically in the background.
 ## Features
 
 - **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
-  high-score, score-threshold, and benchmark-rank overlays.
+  PB-score, score-threshold, and benchmark-rank overlays.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
-  pass/fail against your high score, or the top-N placement it earned. Playing again replaces it
-  rather than stacking a second one beside it, and a run that earns neither says nothing.
+  pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
+  it rather than stacking a second one beside it, and a run that earns neither says nothing.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
