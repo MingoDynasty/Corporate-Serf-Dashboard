@@ -1,0 +1,1011 @@
+{
+  "name": "FN Prospects Benchmarks 2026",
+  "code": "KovaaKsKillstreakingJumboXur",
+  "scenarios": [
+    {
+      "name": "Slide Bounce Tracking a+",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 6000.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 11000.0
+        }
+      ],
+      "leaderboard_id": 198861
+    },
+    {
+      "name": "VT PGT Novice S5 Precision Focus",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 104348
+    },
+    {
+      "name": "TSK - DVD Tracking Big",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 1550.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 2300.0
+        }
+      ],
+      "leaderboard_id": 123665
+    },
+    {
+      "name": "PGTI Voltaic Easy 80% Size 150%",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 3850.0
+        }
+      ],
+      "leaderboard_id": 155023
+    },
+    {
+      "name": "PureG Glider",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 3950.0
+        }
+      ],
+      "leaderboard_id": 28404
+    },
+    {
+      "name": "Smoothsphere Angelic Easy",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 8000.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 8800.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 9600.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 11200.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 12000.0
+        }
+      ],
+      "leaderboard_id": 38718
+    },
+    {
+      "name": "Air Pure Intermediate Slower No UFO",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 916.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 919.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 922.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 925.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 928.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 931.0
+        }
+      ],
+      "leaderboard_id": 128776
+    },
+    {
+      "name": "Ground Plaza Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 872.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 876.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 880.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 884.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 888.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 892.0
+        }
+      ],
+      "leaderboard_id": 520
+    },
+    {
+      "name": "Air Voltaic Easy Invincible 4",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 21792
+    },
+    {
+      "name": "RawControlSphere",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 10400.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 11300.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 12200.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 13100.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 14000.0
+        }
+      ],
+      "leaderboard_id": 184301
+    },
+    {
+      "name": "Avasive Control Track Easy",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 10600.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 12200.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 13000.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 13800.0
+        }
+      ],
+      "leaderboard_id": 142571
+    },
+    {
+      "name": "cloverRawControl Big",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 7800.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 10200.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 12600.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 13800.0
+        }
+      ],
+      "leaderboard_id": 69579
+    },
+    {
+      "name": "Whisphere Small & Slow 70%",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 11400.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 12800.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 14200.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 15600.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 17000.0
+        }
+      ],
+      "leaderboard_id": 132191
+    },
+    {
+      "name": "Arm Turning Training 60s FIXED",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 5000.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 5500.0
+        }
+      ],
+      "leaderboard_id": 31640
+    },
+    {
+      "name": "Tarzaning 360 Switching",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 30.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 33.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 36.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 39.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 42.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 45.0
+        }
+      ],
+      "leaderboard_id": 24194
+    },
+    {
+      "name": "Skeet Clicking v2",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 70.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 85.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 100.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 115.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 130.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 8971
+    },
+    {
+      "name": "Popcorn MV Novice",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 260.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 300.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 340.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 380.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 420.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 460.0
+        }
+      ],
+      "leaderboard_id": 76965
+    },
+    {
+      "name": "voxTS Static Click rAim",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 113.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 124.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 135.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 146.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 157.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 168.0
+        }
+      ],
+      "leaderboard_id": 573
+    },
+    {
+      "name": "shizaTS - Clicking",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 25.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 35.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 44.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 52.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 60.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 68.0
+        }
+      ],
+      "leaderboard_id": 42278
+    },
+    {
+      "name": "beanClick Micro",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 112.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 124.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 136.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 148.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 160.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 172.0
+        }
+      ],
+      "leaderboard_id": 11083
+    },
+    {
+      "name": "YoxTS Euphoric",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 87.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 96.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 105.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 114.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 123.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 132.0
+        }
+      ],
+      "leaderboard_id": 160397
+    },
+    {
+      "name": "voxTS Viscose Varied",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 92.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 96.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 100.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 104.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 108.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 112.0
+        }
+      ],
+      "leaderboard_id": 417
+    },
+    {
+      "name": "aimerz+ ww6t Normal",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 97.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 106.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 115.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 124.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 133.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 142.0
+        }
+      ],
+      "leaderboard_id": 44335
+    },
+    {
+      "name": "devTS Goated NR Static Small",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 525.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 560.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 595.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 630.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 665.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 700.0
+        }
+      ],
+      "leaderboard_id": 1633
+    },
+    {
+      "name": "VT ControlTS Novice S5 Smooth Small",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 220.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 240.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 260.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 280.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 300.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 320.0
+        }
+      ],
+      "leaderboard_id": 106614
+    },
+    {
+      "name": "Leapstrafes Control wobin Easier",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 185344
+    },
+    {
+      "name": "VT EvaTS Intermediate Regen",
+      "ranks": [
+        {
+          "name": "Flopper",
+          "color": "#ff7438",
+          "threshold": 625.0
+        },
+        {
+          "name": "Jonesy",
+          "color": "#bdc8a2",
+          "threshold": 660.0
+        },
+        {
+          "name": "Slurp",
+          "color": "#5ebbe4",
+          "threshold": 695.0
+        },
+        {
+          "name": "Tempest",
+          "color": "#8545d3",
+          "threshold": 730.0
+        },
+        {
+          "name": "Midas",
+          "color": "#fff194",
+          "threshold": 765.0
+        },
+        {
+          "name": "Grim",
+          "color": "#048662",
+          "threshold": 800.0
+        }
+      ],
+      "leaderboard_id": 42422
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsKillstreakingJumboXur",
+    "kovaaks_benchmark_id": 2696,
+    "rank_colors": [
+      [
+        "Flopper",
+        "#ff7438"
+      ],
+      [
+        "Jonesy",
+        "#bdc8a2"
+      ],
+      [
+        "Slurp",
+        "#5ebbe4"
+      ],
+      [
+        "Tempest",
+        "#8545d3"
+      ],
+      [
+        "Midas",
+        "#fff194"
+      ],
+      [
+        "Grim",
+        "#048662"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:58.231374+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

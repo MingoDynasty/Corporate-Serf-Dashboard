@@ -1,0 +1,543 @@
+{
+  "name": "Lemon Static Benchmarks - Intermediate",
+  "code": "KovaaKsBottingRockyBm",
+  "scenarios": [
+    {
+      "name": "Pokeball 1w4ts 30% Easy",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 92.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 98.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 108.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 120.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 135.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 146.0
+        }
+      ],
+      "leaderboard_id": 178814
+    },
+    {
+      "name": "Aimerz+ Week #5 - Static Switching 30% Larger",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 14000.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 15700.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 16200.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 17000.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 17800.0
+        }
+      ],
+      "leaderboard_id": 111216
+    },
+    {
+      "name": "6 Sphere Hipfire Small Easy",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 1580.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 1650.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 1720.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 1830.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 1900.0
+        }
+      ],
+      "leaderboard_id": 178815
+    },
+    {
+      "name": "devTS Static Click Angelic Easy",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 124.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 130.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 141.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 150.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 161.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 176.0
+        }
+      ],
+      "leaderboard_id": 38726
+    },
+    {
+      "name": "1w2ts Pasu Perfected",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 70.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 84.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 95.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 103.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 109.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 115.0
+        }
+      ],
+      "leaderboard_id": 22601
+    },
+    {
+      "name": "Aimerz+ ww2t Easy S1",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 125.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 134.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 148.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 152.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 160.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 170.0
+        }
+      ],
+      "leaderboard_id": 68458
+    },
+    {
+      "name": "Wide Wall 3 Targets TE",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 132.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 141.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 156.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 170.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 182.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 190.0
+        }
+      ],
+      "leaderboard_id": 591
+    },
+    {
+      "name": "1w2ts Perfected Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 96.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 104.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 115.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 121.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 130.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 146.0
+        }
+      ],
+      "leaderboard_id": 160751
+    },
+    {
+      "name": "1w2ts Vertical Flicks easy",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 102.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 110.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 122.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 130.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 142.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 150.0
+        }
+      ],
+      "leaderboard_id": 164921
+    },
+    {
+      "name": "1w2ts reload smallflicks Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 119.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 127.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 138.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 149.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 162.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 176.0
+        }
+      ],
+      "leaderboard_id": 178816
+    },
+    {
+      "name": "1w2ts reload Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 96.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 104.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 112.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 119.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 126.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 133.0
+        }
+      ],
+      "leaderboard_id": 178817
+    },
+    {
+      "name": "1w3ts reload Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 100.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 107.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 116.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 123.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 131.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 144.0
+        }
+      ],
+      "leaderboard_id": 178818
+    },
+    {
+      "name": "1w4ts reload Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 115.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 120.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 127.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 136.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 143.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 157.0
+        }
+      ],
+      "leaderboard_id": 178819
+    },
+    {
+      "name": "1w6ts reload Easier",
+      "ranks": [
+        {
+          "name": "Berry",
+          "color": "#A60000",
+          "threshold": 120.0
+        },
+        {
+          "name": "Peach",
+          "color": "#A66300",
+          "threshold": 128.0
+        },
+        {
+          "name": "Cherry",
+          "color": "#A6A600",
+          "threshold": 136.0
+        },
+        {
+          "name": "Pear",
+          "color": "#00A600",
+          "threshold": 141.0
+        },
+        {
+          "name": "Kiwi",
+          "color": "#00A6A6",
+          "threshold": 150.0
+        },
+        {
+          "name": "Durian",
+          "color": "#305797",
+          "threshold": 161.0
+        }
+      ],
+      "leaderboard_id": 178820
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBottingRockyBm",
+    "kovaaks_benchmark_id": 2277,
+    "rank_colors": [
+      [
+        "Berry",
+        "#A60000"
+      ],
+      [
+        "Peach",
+        "#A66300"
+      ],
+      [
+        "Cherry",
+        "#A6A600"
+      ],
+      [
+        "Pear",
+        "#00A600"
+      ],
+      [
+        "Kiwi",
+        "#00A6A6"
+      ],
+      [
+        "Durian",
+        "#305797"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:56:52.690624+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

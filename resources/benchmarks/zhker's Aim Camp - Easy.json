@@ -1,6 +1,6 @@
 {
-  "name": "zhker's Benchmark for Beginners v1,3",
-  "code": "KovaaKsBackflippingSeagreenHero",
+  "name": "zhker's Aim Camp - Easy",
+  "code": "KovaaKsQuesting180Cinematic",
   "scenarios": [
     {
       "name": "RawMouseControlClickingXYZ",
@@ -287,27 +287,27 @@
         {
           "name": "Novum",
           "color": "#c96e7c",
-          "threshold": 9000.0
+          "threshold": 8000.0
         },
         {
           "name": "Isthmius",
           "color": "#7a84cd",
-          "threshold": 10000.0
+          "threshold": 9000.0
         },
         {
           "name": "Robustus",
           "color": "#cfc27d",
-          "threshold": 11000.0
+          "threshold": 10000.0
         },
         {
           "name": "Aesopi",
           "color": "#2fb16e",
-          "threshold": 12000.0
+          "threshold": 11000.0
         },
         {
           "name": "Sirasakae",
           "color": "#62e4fe",
-          "threshold": 13000.0
+          "threshold": 12000.0
         }
       ],
       "leaderboard_id": 131597
@@ -624,7 +624,7 @@
     }
   ],
   "generated_from": {
-    "sharecode": "KovaaKsBackflippingSeagreenHero",
+    "sharecode": "KovaaKsQuesting180Cinematic",
     "kovaaks_benchmark_id": 2256,
     "rank_colors": [
       [
@@ -648,7 +648,7 @@
         "#62e4fe"
       ]
     ],
-    "generated_at": "2026-07-20T22:09:34.032295+00:00",
+    "generated_at": "2026-08-09T02:56:53.618606+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

@@ -1,0 +1,343 @@
+{
+  "name": "Jay9's Benchmark - ADVANCED",
+  "code": "KovaaKsCheatingWetSentinel",
+  "scenarios": [
+    {
+      "name": "Smoothsphere Viscose Hard",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 9500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 10750.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 12000.0
+        }
+      ],
+      "leaderboard_id": 184518
+    },
+    {
+      "name": "SmoothBot Perfected Hard",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 4200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 4650.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 184347
+    },
+    {
+      "name": "cloverRawControl Viscose Hard 50cm",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 9750.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 11000.0
+        }
+      ],
+      "leaderboard_id": 184568
+    },
+    {
+      "name": "VT Raw Control Advanced S5 80%",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 116078
+    },
+    {
+      "name": "RawControlSphere Hard",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 12300.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 13750.0
+        }
+      ],
+      "leaderboard_id": 184794
+    },
+    {
+      "name": "Air CELESTIAL No UFO Medium",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 890.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 896.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 903.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 912.0
+        }
+      ],
+      "leaderboard_id": 184763
+    },
+    {
+      "name": "VT Aether Advanced S5 bot 3 80%",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 173186
+    },
+    {
+      "name": "Air Angelic 4 Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 4150.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 4400.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 42
+    },
+    {
+      "name": "VT Ground Advanced S5 Bot 3",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 106732
+    },
+    {
+      "name": "VT Aether Intermediate S5 Bot 1 Invincible",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 3600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 113406
+    },
+    {
+      "name": "Air Spectral",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 895.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 904.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 912.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 142893
+    },
+    {
+      "name": "Aethercontrol Easy",
+      "ranks": [
+        {
+          "name": "Euphoric",
+          "color": "#b21f8b",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#5dd6df",
+          "threshold": 4250.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#5d5bd2",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Ethereal",
+          "color": "#8748c7",
+          "threshold": 5000.0
+        }
+      ],
+      "leaderboard_id": 183600
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsCheatingWetSentinel",
+    "kovaaks_benchmark_id": 2763,
+    "rank_colors": [
+      [
+        "Euphoric",
+        "#b21f8b"
+      ],
+      [
+        "Celestial",
+        "#5dd6df"
+      ],
+      [
+        "Transcendent",
+        "#5d5bd2"
+      ],
+      [
+        "Ethereal",
+        "#8748c7"
+      ]
+    ],
+    "generated_at": "2026-08-09T02:57:00.934883+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
