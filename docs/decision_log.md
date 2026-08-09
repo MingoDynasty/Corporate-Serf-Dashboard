@@ -132,14 +132,24 @@ migration to be decided or built. Users notice nothing today; the score-trend
 features being designed will have real history to draw instead of starting
 blind on the day they ship.
 
-Decision: every fetched rank observation is appended, at the
-`_save_rank_monotonic` choke point, to an append-only NDJSON file under
-`data/` — deliberately not `data/cache/`, because it is capture, not a cache,
-and must never inherit the delete-and-refetch tolerance. One line per
-observation with the field set from the 2026-08-01 vault design's Phase 2
-ledger: `leaderboard_id`, `username`, `scenario_name`, `rank`, `score`,
-`total_players`, `observed_at` (UTC ISO-8601, from the fetch). Boundaries:
+Decision: every fetched rank observation is appended, where fetch results
+are handled, to an append-only NDJSON file under `data/` — deliberately not
+`data/cache/`, because it is capture, not a cache, and must never inherit
+the delete-and-refetch tolerance. One line per observation with the field
+set from the 2026-08-01 vault design's Phase 2 ledger: `leaderboard_id`,
+`username`, `scenario_name`, `rank`, `score`, `observed_at` (UTC ISO-8601,
+from the fetch), plus `total_players` as an optional enrichment — the rank
+fetch itself does not carry it, so it is a best-effort join at append time
+whose denominator has its own fetch moment, and historical percentile
+analysis must treat it as temporally approximate rather than atomic with
+the rank. Boundaries:
 
+- The capture boundary is the fetch, not the serving-cache writer. The
+  PB-refresh loop discards fetches whose score has not propagated before
+  they ever reach `_save_rank_monotonic` (the `_score_is_fresh` gate), and
+  those are real observations of the board that the ledger records.
+  `_save_rank_monotonic` stays the serving-cache authority and a natural
+  implementation anchor, but a capture hooked only there under-collects.
 - The monotonic filter governs the serving cache, not the ledger. A candidate
   the cache rejects for being worse is recorded anyway — a rank that got
   worse is exactly what trend analysis needs to see.
