@@ -252,6 +252,21 @@ def _generate_xy_plot(
         font={
             "size": 14,
         },
+        # Lay the legend out horizontally above the plot instead of taking
+        # Plotly's default right-hand column: two entries never earned a
+        # reserved column, and the plot is the scarce thing on this page. It
+        # lands in the top margin the title already reserved, so the plot area
+        # keeps its full height and gains the column's width. Right-anchored
+        # to balance the left-aligned title; at the narrowest the chart gets
+        # (the options panel open just above its stacking threshold) it still
+        # clears the title rather than colliding with it.
+        legend={
+            "orientation": "h",
+            "x": 1,
+            "xanchor": "right",
+            "y": 1.02,
+            "yanchor": "bottom",
+        },
     )
     figure_combined["data"][0]["name"] = "Run Data Point"
     figure_combined["data"][0]["showlegend"] = True

@@ -126,6 +126,24 @@ def test_generate_time_plot_has_expected_traces() -> None:
     assert fig.data[1].name == "Average Score"
 
 
+def test_score_plots_lay_the_legend_above_the_plot() -> None:
+    # Horizontal and anchored above the plot area, so the legend stops
+    # reserving a right-hand column of chart width for its two entries.
+    day = datetime(2025, 1, 1).date()
+    runs = [_build_run(100.0, 2.0, datetime(2025, 1, 1, 10, 0, 0))]
+
+    for fig in (
+        generate_sensitivity_plot({"2.0 Overwatch": runs}, "1w4ts", False, []),
+        generate_time_plot({day: runs}, "1w4ts", False, []),
+    ):
+        assert fig.layout.legend.orientation == "h"
+        assert fig.layout.legend.y is not None
+        assert fig.layout.legend.y > 1
+        assert fig.layout.legend.yanchor == "bottom"
+        assert fig.layout.legend.x == 1
+        assert fig.layout.legend.xanchor == "right"
+
+
 def test_scatter_x_locks_sensitivity_vs_time_asymmetry() -> None:
     # The sensitivity scatter's per-point x is derived from the run
     # ("<horizontal_sens> <sens_scale>"), not the grouping dict key -- so a key
