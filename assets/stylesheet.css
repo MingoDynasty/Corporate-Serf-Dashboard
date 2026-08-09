@@ -82,10 +82,140 @@
 }
 
 /* Floor the graph height so extreme zoom degrades to page scroll instead of
-   a crushed, unreadable plot. */
+   a crushed, unreadable plot. The graph fills whatever the chart row hands
+   it, in either orientation: its own grid track when the inspector is beside
+   it, the leftover column height when the inspector stacks above.
+   min-width: 0 because a grid item's automatic minimum is its content, and
+   Plotly's is wide enough to push past the track the row gave it.
+
+   Clipped because Plotly redraws once, after the container has finished
+   moving -- measured at ~200ms behind an inspector collapse and behind an
+   AppShell navbar collapse alike. Until that redraw lands the plot is still
+   drawn at its old width, and without this it paints over whatever the
+   container gave up. The navbar gets away with it by being fixed-position
+   and painting on top; an in-flow inspector has to be given the same
+   guarantee from the other side. */
 .home-graph {
     flex: 1 1 0;
     min-height: 20rem;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* The chart and its options inspector share this area. The reflow threshold
+   measures the area rather than the window: the AppShell navbar is
+   fixed-position and 250px wide, so it shrinks the content area without
+   touching the viewport, and a media query would keep the inspector beside a
+   chart it has already crushed. A container query cannot match on the element
+   that declares the container, hence the wrapper -- this is the flex child
+   .home-page grows, so it carries the growth and height floor. */
+.home-chart-area {
+    /* Matches dmc.AppShell's own transitionDuration, so opening the inspector
+       and collapsing the navbar move the chart at the same speed. */
+    --chart-options-collapse-duration: 200ms;
+
+    container: home-chart-area / inline-size;
+    display: grid;
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
+/* Beside the chart: the graph's track absorbs whatever the inspector's does
+   not take. The inspector's track is animated rather than removed so the
+   graph grows and shrinks the way the page does when the navbar collapses --
+   Plotly redraws off the ResizeObserver in assets/homeGraphResize.js, so a
+   gradual container width gives a gradual redraw instead of one jump. The row
+   clips: the panel holds its 20rem while the track shrinks under it, so it is
+   revealed and hidden rather than squeezed. */
+.home-chart-row {
+    display: grid;
+    gap: var(--mantine-spacing-md);
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    min-height: 0;
+    overflow: hidden;
+    transition:
+        grid-template-columns var(--chart-options-collapse-duration) ease,
+        column-gap var(--chart-options-collapse-duration) ease;
+}
+
+/* Collapsed. Driven off the panel's own class so the open state stays one
+   thing the toggle callback writes, rather than two that can disagree. */
+.home-chart-row:has(> .chart-options-panel-hidden) {
+    column-gap: 0;
+    grid-template-columns: minmax(0, 1fr) 0;
+}
+
+.chart-options-panel {
+    /* Opaque: for the frame or two before Plotly catches up with its
+       container, the wider plot would otherwise show through the panel. */
+    background-color: var(--mantine-color-body);
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mantine-spacing-md);
+    /* Its own scroll if the controls ever outgrow the chart beside them. */
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--mantine-spacing-md);
+    /* Hold the open width while the track animates under it. */
+    width: 20rem;
+}
+
+/* Collapsed, not unmounted: display: none takes the controls out of the tab
+   order and the accessibility tree, while Dash keeps them feeding the graph
+   callbacks with their persisted values. allow-discrete defers that flip to
+   the end of the collapse (and brings it forward to the start of the open),
+   so the panel is on screen for the animation it is part of. */
+.chart-options-panel-hidden {
+    display: none;
+}
+
+.chart-options-panel,
+.chart-options-panel-hidden {
+    transition: display var(--chart-options-collapse-duration) allow-discrete;
+}
+
+/* The disclosure chevron points down when the panel is closed and up when it
+   is open. aria-expanded is the state the toggle callback writes, so the
+   rotation rides on it rather than on a second class. */
+.chart-options-toggle-chevron {
+    transition: transform 150ms ease;
+}
+
+[aria-expanded="true"] .chart-options-toggle-chevron {
+    transform: rotate(180deg);
+}
+
+/* Below this much room for the chart row, a 20rem rail leaves too little
+   chart to read: the same DOM stacks the inspector above the graph instead.
+   The threshold is Mantine's md step, the scale Home's controls grid already
+   measures itself against (home.CHART_OPTIONS_REFLOW_BREAKPOINT). */
+@container home-chart-area (max-width: 62em) {
+    .home-chart-row {
+        /* Stacking is a height change with no width to animate, so the panel
+           appears and goes at once rather than lingering for a collapse that
+           is not happening. Inherited by the panel. */
+        --chart-options-collapse-duration: 0s;
+
+        display: flex;
+        flex-direction: column;
+        /* Nothing overflows sideways here, and clipping would cut the graph
+           off at the row instead of letting the page scroll. */
+        overflow: visible;
+    }
+
+    /* Stacked, the panel is as wide as the page and every row of controls it
+       adds is height the chart loses, so the groups run side by side and the
+       panel keeps its natural height instead of shrinking the graph. */
+    .chart-options-panel {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--mantine-spacing-xl);
+        order: -1;
+        width: auto;
+    }
 }
 
 /* Home's persistent notice when the app booted without a usable stats

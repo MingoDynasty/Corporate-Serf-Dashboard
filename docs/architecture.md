@@ -250,9 +250,21 @@ flowchart LR
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — main scenario view: sensitivity/time plots, high score, rank,
-  settings modal. Owns the live-update callbacks
+  and the chart options inspector. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
+  The inspector is a collapsible in-flow panel beside the chart holding the
+  overlay and score-threshold preferences, so every adjustment shows on the
+  live chart; `toggle_chart_options` writes its open state as a CSS class,
+  which hides the controls without unmounting them. It starts closed on every
+  visit and is never persisted. The CSS (`assets/stylesheet.css`) owns two
+  behaviors worth knowing before editing it: the reflow threshold is a
+  container query measuring the chart row rather than the window, because the
+  fixed navbar shrinks the content area without touching the viewport; and
+  collapsing animates the inspector's grid track instead of removing it, so
+  the graph resizes the way it does when the navbar collapses. The
+  follow-newly-played-scenario switch is stacked directly under the scenario
+  selector it governs rather than living in the inspector.
 - `playlists.py` (`/playlists`) — playlist-level overview (AG Grid): one row
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.

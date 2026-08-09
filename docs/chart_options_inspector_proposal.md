@@ -1,6 +1,6 @@
 # Chart Options Inspector Proposal
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-04
 
 ## TL;DR
@@ -82,10 +82,27 @@ narrow-width mode of the same design, not a competing one.
   falls back to intrinsic content height and the graph stops consuming the
   remaining viewport. `.home-graph` keeps filling its grid track inside
   the row.
-- Collapsed, the inspector column is removed and the graph returns to full
-  width. The panel starts closed on each page visit; its open state is not
-  persisted (ruled — the maintainer's stated usage, collapsed most of the
-  time, was given container-neutrally, so the call carries to the rail).
+- Collapsed, the inspector column goes to zero and the graph returns to
+  full width. The panel starts closed on each page visit; its open state is
+  not persisted (ruled — the maintainer's stated usage, collapsed most of
+  the time, was given container-neutrally, so the call carries to the rail).
+- **Collapse is animated (added 2026-08-08, after local testing).** The
+  track transitions between `0` and the rail width at `dmc.AppShell`'s own
+  200 ms rather than being removed outright, so the graph grows and shrinks
+  the way it does when the navbar collapses. Two facts make it work and are
+  the ones to preserve: the panel holds its own width while the track moves
+  under it (so it is revealed, not squeezed), and `.home-graph` clips,
+  because Plotly redraws exactly once ~200 ms *after* its container stops
+  moving — measured behind an inspector collapse and a navbar collapse
+  alike — and until then the plot is still drawn at its old width. The
+  navbar hides that overhang by being fixed-position and painting over it;
+  an in-flow inspector has to clip from the other side. `display: none`
+  still removes the collapsed controls, with
+  `transition-behavior: allow-discrete` deferring that flip to the end of
+  the collapse. Stacked, there is no width to animate, so that mode sets
+  the duration to zero. Not reproducible: the navbar also *translates* the
+  drawn plot 244 px as the content area's left edge moves; a right-side
+  rail moves only the right edge, so there is nothing to carry.
 - Narrow windows: the same DOM re-flows so the inspector stacks above the
   chart. One component tree, one set of ids, no duplicated controls across
   modes. The reflow threshold must measure the chart row's own available
@@ -116,25 +133,39 @@ the tab order and accessibility tree while staying mounted for Dash.
 Home side (ruled; an "App setup" rename was considered and rejected).
 
 **Contents.** Five controls, grouped by user concept rather than kept as a
-flat list:
+flat list. Labels below are the copy that shipped in PR #209, superseding
+this section's original recommendations (revised 2026-08-08 — see the
+deviation note that follows):
 
-- *Overlays* — `rank-overlay-switch` ("Playlist rank lines"),
-  `high-score-overlay-switch` ("Personal-best line").
-- *Score goal* — `score-threshold-overlay-switch` ("Show goal line"),
-  `score-threshold-percentage` ("Goal percentage of PB"),
-  `score-threshold-notification-switch`. Label caveat pinned during design
-  review: since the notification redesign, this switch gates only whether a
-  run is judged against the goal (`_threshold_verdict` returns None when it
-  is off) — placement toasts still fire regardless. Its label must not
-  claim to control run notifications wholesale; "Show goal verdict" is
-  the recommended copy — it names the effect inside the run toast without
-  implying placement toasts are gated — and the existing help tooltip
-  ("Notifies after each new run whether it reached the score threshold")
-  is already accurate and carries over unchanged.
+- *Overlays* — `rank-overlay-switch` ("Rank Thresholds"),
+  `high-score-overlay-switch` ("PB Score").
+- *Score Threshold* — `score-threshold-overlay-switch` ("Score Threshold
+  Overlay"), `score-threshold-percentage` ("Score Threshold Percentage"),
+  `score-threshold-notification-switch` ("Score Threshold Notification").
 
-The three "Score Threshold *" controls are one user concept; a Score goal
-group makes the relationship explicit. Help tooltips (`SETTINGS_HELP_TEXT`
-via `_settings_help_label`) carry over per control.
+The three "Score Threshold *" controls are one user concept; a Score
+Threshold group makes the relationship explicit. Help tooltips
+(`SETTINGS_HELP_TEXT` via `_settings_help_label`) carry over per control.
+
+**Copy deviation (2026-08-08).** This section originally proposed *Score
+goal* with "Playlist rank lines", "Personal-best line", "Show goal line",
+"Goal percentage of PB", and "Show goal verdict". The maintainer rejected
+that vocabulary on first local test: the app's own chart annotations
+already render "PB Score" and "Score Threshold", and "Score Threshold" is
+what the aim-training community says. The three Score Threshold controls
+therefore keep the modal's original labels verbatim. Distill the shipped
+copy above, not the original recommendations.
+
+One design caveat outlived the rename and is **not** resolved: since the
+notification redesign, `score-threshold-notification-switch` gates only
+whether a run is judged against the threshold (`_threshold_verdict`
+returns None when it is off) — placement toasts still fire regardless —
+so "Score Threshold Notification" overstates what it controls. The
+maintainer accepted that wording for now and deferred the fix to a later
+copy pass; a dated comment at the control in `source/pages/home.py`
+records it. The existing help tooltip ("Notifies after each new run
+whether it reached the score threshold") is accurate and carries over
+unchanged.
 
 **Promotion (ratified 2026-08-08).** `automatically-change-scenario-switch`
 governs what the scenario selector does when a new run lands — selection
@@ -146,7 +177,10 @@ the implementer's: the mockup placed it directly under the selector, but
 that measurement predates the header-responsiveness rework (PR #199
 changed exactly this geometry), so re-measure the header fit at build
 time — the ratified placement rests on the association argument, not on
-the stale row-1-gap figure.
+the stale row-1-gap figure. Shipped stacked directly under the selector,
+in a column that carries PR #199's flex sizing so the Select inside it
+simply fills the column; beside the selector was tried first and rejected
+by the maintainer for eating a control's worth of the header row.
 
 **Header.** Everything else stays put and visible: playlist filter,
 scenario selector, Top N, oldest date, axis radio, Scenario Stats, Refresh.
