@@ -98,6 +98,29 @@ def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path
     assert hint.children == RESTART_HINT_TEXT
 
 
+def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
+    """A restart cannot configure a directory the user never set."""
+    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "First"})
+    settings_service.resolve_stats_dir()
+    # Freeze the identity pin, as a boot-time consumer would.
+    settings_service.get_identity()
+    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "Second"})
+    assert settings_service.is_restart_pending() is True
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    hint = _component_by_id(page, "stats-dir-hint")
+    assert hint is not None
+    text, link = hint.children
+    assert text == HINT_TEXT
+    assert isinstance(link, dmc.Anchor)
+
+
 def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
     settings_service.save_settings({})
     settings_service.resolve_stats_dir()

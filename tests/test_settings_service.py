@@ -379,6 +379,29 @@ def test_changing_a_frozen_identity_is_pending(settings_path, saved):
     assert settings.is_restart_pending() is True
 
 
+def test_only_a_stats_directory_change_is_a_stats_directory_change(
+    settings_path,
+    tmp_path,
+):
+    """The narrow helper must ignore the identity half of the aggregate."""
+    booted = tmp_path / "booted"
+    booted.mkdir()
+    settings.save_settings({"stats_dir": str(booted), "kovaaks_username": "First"})
+    settings.resolve_stats_dir()
+    settings.get_identity()
+
+    settings.save_settings({"stats_dir": str(booted), "kovaaks_username": "Second"})
+
+    assert settings.is_restart_pending() is True
+    assert settings.is_stats_dir_change_pending() is False
+
+    moved = tmp_path / "moved"
+    moved.mkdir()
+    settings.save_settings({"stats_dir": str(moved), "kovaaks_username": "Second"})
+
+    assert settings.is_stats_dir_change_pending() is True
+
+
 def test_a_first_time_identity_set_is_not_pending(settings_path):
     """The live-apply path: nothing has consumed the old, unset identity."""
     settings.save_settings({})

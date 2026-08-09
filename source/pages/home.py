@@ -25,7 +25,7 @@ from source.config.config_service import get_config
 from source.config.settings_service import (
     get_identity,
     get_usable_stats_dir,
-    is_restart_pending,
+    is_stats_dir_change_pending,
 )
 from source.kovaaks.api_models import ScenarioRankInfo, ScenarioRankStatus
 from source.kovaaks.api_service import get_scenario_rank_info, steam_id_mismatch_warning
@@ -1186,12 +1186,17 @@ def _stats_dir_hint() -> list:
 
     A save this process has not applied yet is neither: the settings page just
     confirmed the save, so claiming nothing is configured would tell the user
-    it failed. The hint defers to the restart instead, the same
-    ``is_restart_pending()`` reconciliation the settings page's notice uses.
+    it failed. The hint defers to the restart instead, the same pin-versus-store
+    reconciliation the settings page's notice derives from.
+
+    Narrowly, though: it asks whether the *stats directory* moved, not whether
+    any restart is pending. An identity change alone leaves the directory as
+    unconfigured as it was, and a restart would not configure it, so displacing
+    the link to the one page that repairs it would strand the user.
     """
     if get_usable_stats_dir() is not None:
         return []
-    if is_restart_pending():
+    if is_stats_dir_change_pending():
         return [
             dmc.Text(
                 "Settings saved — restart the dashboard to apply them.",
