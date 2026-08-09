@@ -1,6 +1,6 @@
 # Chart Options Inspector Proposal
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-04
 
 ## TL;DR

@@ -109,6 +109,19 @@ RANK_REFRESH_TOOLTIP = (
 # constant would leave the ``@container`` queries with nothing to match and
 # collapse every column to its ``base`` span.
 HOME_GRID_BREAKPOINTS = dict(dmc.DEFAULT_THEME["breakpoints"])
+# The chart options inspector. Its collapsed class is the open state: hiding
+# with ``display: none`` takes the controls out of the tab order and the
+# accessibility tree while leaving them mounted, so their persisted values keep
+# feeding the graph callbacks either way.
+CHART_OPTIONS_PANEL_ID = "chart-options-panel"
+CHART_OPTIONS_TOGGLE_ID = "chart-options-toggle"
+CHART_OPTIONS_PANEL_CLASS = "chart-options-panel"
+CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
+# Below this much room for the chart row, the inspector stacks above the chart
+# instead of sitting beside it (assets/stylesheet.css measures the row's own
+# width with an ``@container`` query, never the window's). ``md`` is where a
+# 19rem rail stops leaving a chart worth reading.
+CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1146,15 +1159,33 @@ def flush_startup_playlist_warnings(_):
     return _build_startup_playlist_warning_notifications(warnings)
 
 
+def _chart_options_panel_class(opened: bool) -> str:
+    """Return the inspector's class list for the open or collapsed state."""
+    if opened:
+        return CHART_OPTIONS_PANEL_CLASS
+    return f"{CHART_OPTIONS_PANEL_CLASS} {CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
+
+
 @callback(
-    Output("settings-modal", "opened"),
-    Input("settings-modal-open-button", "n_clicks"),
-    State("settings-modal", "opened"),
+    Output(CHART_OPTIONS_PANEL_ID, "className"),
+    Output(CHART_OPTIONS_TOGGLE_ID, "aria-expanded"),
+    Input(CHART_OPTIONS_TOGGLE_ID, "n_clicks"),
+    State(CHART_OPTIONS_PANEL_ID, "className"),
     prevent_initial_call=True,
 )
-def modal_demo(_, opened):
-    """This function simply handles opening/closing the Settings modal."""
-    return not opened
+def toggle_chart_options(n_clicks, panel_class):
+    """Open or collapse the chart options inspector.
+
+    The panel's class is the open state and ``aria-expanded`` rides with it, so
+    the ``n_clicks`` guard is unconditional: the inspector starts closed on
+    every visit, and under DashProxy a callback can fire once on page load with
+    nothing triggering it, which would spring the panel open on arrival.
+    """
+    if not n_clicks:
+        return no_update, no_update
+
+    will_open = CHART_OPTIONS_PANEL_HIDDEN_CLASS in (panel_class or "")
+    return _chart_options_panel_class(will_open), "true" if will_open else "false"
 
 
 def _local_scenario_options() -> list:
@@ -1210,6 +1241,108 @@ def _home_initial_selection(
         else _local_scenario_options()
     )
     return selected_playlist, scenario_options, scenario or None
+
+
+def _chart_options_group(title: str, controls: list) -> dmc.Stack:
+    """Group the inspector's controls under the concept they share."""
+    return dmc.Stack(
+        [dmc.Title(title, order=3, size="h6"), *controls],
+        gap="xs",
+    )
+
+
+def _chart_options_panel() -> dmc.Box:
+    """Build the collapsible inspector that sits beside the chart."""
+    return dmc.Box(
+        id=CHART_OPTIONS_PANEL_ID,
+        className=_chart_options_panel_class(False),
+        children=[
+            _chart_options_group(
+                "Overlays",
+                [
+                    dmc.Switch(
+                        id="rank-overlay-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Playlist rank lines",
+                            SETTINGS_HELP_TEXT["rank-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                    dmc.Switch(
+                        id="high-score-overlay-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Personal-best line",
+                            SETTINGS_HELP_TEXT["high-score-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                ],
+            ),
+            _chart_options_group(
+                "Score goal",
+                [
+                    dmc.Switch(
+                        id="score-threshold-overlay-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Show goal line",
+                            SETTINGS_HELP_TEXT["score-threshold-overlay"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                    dmc.NumberInput(
+                        id="score-threshold-percentage",
+                        label=_settings_help_label(
+                            "Goal percentage of PB",
+                            SETTINGS_HELP_TEXT["score-threshold-percentage"],
+                        ),
+                        min=1,
+                        persistence=True,
+                        placeholder="Score Percentage...",
+                        radius="sm",
+                        size="sm",
+                        variant="default",
+                        value=95,
+                        w="12em",
+                    ),
+                    # Named for what it gates and nothing more: since the
+                    # notification redesign this switch decides whether a run
+                    # is judged against the goal, while placement toasts fire
+                    # either way.
+                    dmc.Switch(
+                        id="score-threshold-notification-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Show goal verdict",
+                            SETTINGS_HELP_TEXT["score-threshold-notification"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def _chart_options_toggle() -> dmc.Button:
+    """Build the disclosure button that opens and collapses the inspector."""
+    return dmc.Button(
+        "Chart options",
+        id=CHART_OPTIONS_TOGGLE_ID,
+        variant="default",
+        rightSection=local_icon(
+            "material-symbols:keyboard-arrow-down",
+            className="chart-options-toggle-chevron",
+            width=20,
+        ),
+        **{"aria-controls": CHART_OPTIONS_PANEL_ID, "aria-expanded": "false"},
+    )
 
 
 # Add Dash Mantine Component figure templates to Plotly's templates.
@@ -1303,6 +1436,23 @@ def layout(
                                     scrollAreaProps={"type": "auto"},
                                     searchable=True,
                                     value=selected_scenario,
+                                ),
+                                # Selection behavior, not chart presentation:
+                                # it decides what the selector does when a new
+                                # run lands, so it sits with the selector
+                                # rather than in the chart options inspector.
+                                dmc.Switch(
+                                    id="automatically-change-scenario-switch",
+                                    className="home-follow-switch",
+                                    labelPosition="right",
+                                    label=_settings_help_label(
+                                        "Follow newly played scenario",
+                                        SETTINGS_HELP_TEXT[
+                                            "automatically-change-scenario"
+                                        ],
+                                    ),
+                                    checked=True,
+                                    persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
                                 dmc.Space(h="xl"),
@@ -1461,107 +1611,7 @@ def layout(
                                     persistence=True,
                                 ),
                                 dmc.Space(h="xl"),
-                                dmc.Button(
-                                    "Settings",
-                                    id="settings-modal-open-button",
-                                    variant="default",
-                                    leftSection=local_icon(
-                                        "clarity:settings-line",
-                                        width=25,
-                                    ),
-                                ),
-                                dmc.Modal(
-                                    title="Settings",
-                                    id="settings-modal",
-                                    children=[
-                                        dmc.Title(
-                                            "Display Settings",
-                                            order=2,
-                                            size="h4",
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.Switch(
-                                            id="automatically-change-scenario-switch",
-                                            labelPosition="right",
-                                            label=_settings_help_label(
-                                                "Automatically Change Scenario",
-                                                SETTINGS_HELP_TEXT[
-                                                    "automatically-change-scenario"
-                                                ],
-                                            ),
-                                            checked=True,
-                                            persistence=True,
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.Switch(
-                                            id="rank-overlay-switch",
-                                            labelPosition="right",
-                                            label=_settings_help_label(
-                                                "Rank Overlay",
-                                                SETTINGS_HELP_TEXT["rank-overlay"],
-                                            ),
-                                            checked=True,
-                                            persistence=True,
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.Switch(
-                                            id="high-score-overlay-switch",
-                                            labelPosition="right",
-                                            label=_settings_help_label(
-                                                "PB Score Overlay",
-                                                SETTINGS_HELP_TEXT[
-                                                    "high-score-overlay"
-                                                ],
-                                            ),
-                                            checked=True,
-                                            persistence=True,
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.Switch(
-                                            id="score-threshold-overlay-switch",
-                                            labelPosition="right",
-                                            label=_settings_help_label(
-                                                "Score Threshold Overlay",
-                                                SETTINGS_HELP_TEXT[
-                                                    "score-threshold-overlay"
-                                                ],
-                                            ),
-                                            checked=True,
-                                            persistence=True,
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.NumberInput(
-                                            id="score-threshold-percentage",
-                                            label=_settings_help_label(
-                                                "Score Threshold Percentage",
-                                                SETTINGS_HELP_TEXT[
-                                                    "score-threshold-percentage"
-                                                ],
-                                            ),
-                                            min=1,
-                                            persistence=True,
-                                            placeholder="Score Percentage...",
-                                            radius="sm",
-                                            size="sm",
-                                            variant="default",
-                                            value=95,
-                                            w="12em",
-                                        ),
-                                        dmc.Space(h="xs"),
-                                        dmc.Switch(
-                                            id="score-threshold-notification-switch",
-                                            labelPosition="right",
-                                            label=_settings_help_label(
-                                                "Score Threshold Notification",
-                                                SETTINGS_HELP_TEXT[
-                                                    "score-threshold-notification"
-                                                ],
-                                            ),
-                                            checked=True,
-                                            persistence=True,
-                                        ),
-                                    ],
-                                ),
+                                _chart_options_toggle(),
                             ],
                             gap="md",
                             justify="flex-end",
@@ -1577,13 +1627,26 @@ def layout(
                 overflow="hidden",
                 type="container",
             ),
-            dcc.Graph(
-                id="graph-content",
-                figure=generate_placeholder_plot().to_plotly_json(),
-                className="home-graph",
-                # Redraw the plot whenever the flex container resizes, not
-                # just on window resize.
-                responsive=True,
+            # The chart and its inspector share one row. The wrapper is the box
+            # the reflow threshold measures: a container query cannot match on
+            # the element that declares the container, so the row carrying the
+            # layout sits inside it.
+            dmc.Box(
+                className="home-chart-area",
+                children=dmc.Box(
+                    className="home-chart-row",
+                    children=[
+                        dcc.Graph(
+                            id="graph-content",
+                            figure=generate_placeholder_plot().to_plotly_json(),
+                            className="home-graph",
+                            # Redraw the plot whenever the flex container
+                            # resizes, not just on window resize.
+                            responsive=True,
+                        ),
+                        _chart_options_panel(),
+                    ],
+                ),
             ),
         ],
     )

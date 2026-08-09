@@ -82,10 +82,101 @@
 }
 
 /* Floor the graph height so extreme zoom degrades to page scroll instead of
-   a crushed, unreadable plot. */
+   a crushed, unreadable plot. The graph fills whatever the chart row hands
+   it, in either orientation: its own grid track when the inspector is beside
+   it, the leftover column height when the inspector stacks above.
+   min-width: 0 because a grid item's automatic minimum is its content, and
+   Plotly's is wide enough to push past the track the row gave it. */
 .home-graph {
     flex: 1 1 0;
     min-height: 20rem;
+    min-width: 0;
+}
+
+/* The chart and its options inspector share this area. The reflow threshold
+   measures the area rather than the window: the AppShell navbar is
+   fixed-position and 250px wide, so it shrinks the content area without
+   touching the viewport, and a media query would keep the inspector beside a
+   chart it has already crushed. A container query cannot match on the element
+   that declares the container, hence the wrapper -- this is the flex child
+   .home-page grows, so it carries the growth and height floor. */
+.home-chart-area {
+    container: home-chart-area / inline-size;
+    display: grid;
+    flex: 1 1 0;
+    min-height: 20rem;
+}
+
+/* Beside the chart: the inspector's column is implicit, so collapsing it to
+   display: none removes the track and its gap outright and the graph returns
+   to full width with no second rule. */
+.home-chart-row {
+    display: grid;
+    gap: var(--mantine-spacing-md);
+    grid-auto-columns: 19rem;
+    grid-auto-flow: column;
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+}
+
+.chart-options-panel {
+    border: 1px solid var(--mantine-color-default-border);
+    border-radius: var(--mantine-radius-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mantine-spacing-md);
+    /* Its own scroll if the controls ever outgrow the chart beside them. */
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--mantine-spacing-md);
+}
+
+/* Collapsed, not unmounted: display: none takes the controls out of the tab
+   order and the accessibility tree, while Dash keeps them feeding the graph
+   callbacks with their persisted values. */
+.chart-options-panel-hidden {
+    display: none;
+}
+
+/* The disclosure chevron points down when the panel is closed and up when it
+   is open. aria-expanded is the state the toggle callback writes, so the
+   rotation rides on it rather than on a second class. */
+.chart-options-toggle-chevron {
+    transition: transform 150ms ease;
+}
+
+[aria-expanded="true"] .chart-options-toggle-chevron {
+    transform: rotate(180deg);
+}
+
+/* Below this much room for the chart row, a 19rem rail leaves too little
+   chart to read: the same DOM stacks the inspector above the graph instead.
+   The threshold is Mantine's md step, the scale Home's controls grid already
+   measures itself against (home.CHART_OPTIONS_REFLOW_BREAKPOINT). */
+@container home-chart-area (max-width: 62em) {
+    .home-chart-row {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Stacked, the panel is as wide as the page and every row of controls it
+       adds is height the chart loses, so the groups run side by side and the
+       panel keeps its natural height instead of shrinking the graph. */
+    .chart-options-panel {
+        flex: 0 0 auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--mantine-spacing-xl);
+        order: -1;
+    }
+}
+
+/* The follow-scenario switch sits in the controls row beside the scenario
+   selector it governs. The row aligns to the top, and every control next to
+   the switch carries its label above the input, so the switch drops by that
+   much to line up with the inputs rather than with their labels. */
+.home-follow-switch {
+    margin-top: 2rem;
 }
 
 /* Home's persistent notice when the app booted without a usable stats
