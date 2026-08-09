@@ -558,6 +558,19 @@ def build_scenarios(
                     leaderboard_id=benchmark_scenario.leaderboard_id,
                 )
             )
+
+    # An upstream benchmark can go empty (no categories, or categories whose
+    # scenario dicts are all empty) while still declaring a rank ladder. The
+    # per-scenario guard above never runs in that case, so without this the
+    # merge would "succeed" and write a playlist with no scenarios at all.
+    if not scenario_list:
+        message = (
+            "No scenarios returned by KovaaK's Benchmark API for benchmark "
+            f"{evxl_database_item.kovaaksBenchmarkId}"
+        )
+        logger.error(message)
+        raise BenchmarkDataMismatchError(message)
+
     return scenario_list
 
 

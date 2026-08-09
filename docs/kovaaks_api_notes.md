@@ -256,13 +256,28 @@ one-to-one):
   Evxl), so `api_models.Rank.color` is now optional and a missing value no
   longer fails response validation.
 - A benchmark's rank count can disagree with the Evxl rank ladder it is paired
-  with, which aborts the 1:1 merge. Observed: benchmark 2412 ("Black Dawn /
-  Celestial Forge") exposes 3 tiers (Emperor/Angelic/Morningstar) while Evxl
-  lists 9.
+  with, which aborts the 1:1 merge. Observed 2026-07-11 on benchmark 2412
+  ("Black Dawn / Celestial Forge"), which then exposed 3 tiers
+  (Emperor/Angelic/Morningstar) against Evxl's 9. That benchmark has since
+  changed shape — see the next bullet — but the failure class stands.
+- A benchmark can return **no scenarios at all** while still declaring a full
+  rank ladder. Observed 2026-08-08 on that same benchmark 2412: 9 placeholder
+  tiers (`Rank 1`…`Rank 9`, every one `#ffffff`, description `-`) and zero
+  categories, while Evxl's playlist for it still lists 36 scenarios. This is
+  the dangerous shape, because the per-scenario rank-count check above never
+  executes when there are no scenarios to check — the counts trivially agree.
+  `build_scenarios` therefore refuses an empty result explicitly, raising the
+  same typed deterministic failure, so the run records it in the ledger rather
+  than writing a playlist with `"scenarios": []` and reporting a clean import.
 - Upstream-adjacent gap: a mis-cased `sharecode` in Evxl's benchmark snapshot
   makes Evxl's own `playlist-by-code` endpoint return HTTP 400, blocking the
-  import before this endpoint is reached (observed: `KovaaksBottingRockyBm`,
-  which should be `KovaaKsBottingRockyBm`).
+  import before this endpoint is reached. Observed 2026-07-11 as
+  `KovaaksBottingRockyBm` (should be `KovaaKsBottingRockyBm`), which kept
+  "Lemon Static Benchmark / Intermediate" out of the corpus; reported to Evxl
+  and corrected upstream 2026-08-08, and that difficulty shipped in PR #207.
+  Recorded because the class recurs rather than because this instance is open:
+  `Revosect Season 4 Easy (rA)` hit the same casing drift during the PR #169
+  regeneration, in that case resolving rather than 400ing.
 
 These are upstream data issues, not app bugs; the affected benchmarks import
 normally once the source data is corrected.
