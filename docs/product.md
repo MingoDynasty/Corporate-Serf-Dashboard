@@ -61,7 +61,7 @@ list in the roadmap.)
   error on every rank render, stacking into a wall of red during normal play;
   now nothing turns red unless something you asked for failed, or a run of
   yours failed to record.
-- **No username means quiet, on the position surfaces too** (PR #226). With
+- **No username means quiet, on the position surfaces too** (PR #227). With
   no KovaaK's username configured, opening a playlist skips the position
   update entirely and the table says "Positions unavailable — set your
   KovaaK's username in Settings"; clicking Refresh on Scenario Performance
