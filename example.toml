@@ -32,3 +32,9 @@ percentile_warmup_enabled = true
 # the leaderboard endpoint takes close to 30 seconds to respond but still returns
 # valid data; raise this if position lookups keep timing out.
 kovaaks_api_timeout_seconds = 30
+
+# Prefix every browser tab title with this build's release label, so several
+# instances running side by side are told apart from the tab bar alone: a
+# release install shows its tag ("v2026.08.09.9 - Playlists"), a git checkout
+# shows "dev", and a build that cannot identify itself shows "unknown".
+show_version_in_title = false

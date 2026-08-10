@@ -95,8 +95,13 @@ def _add_rank_overlays(
     rank_overlay_switch: bool,
     rank_data: list[Rank],
     scores: list[float],
+    show_all_ranks: bool = False,
 ) -> None:
-    """Overlay rank threshold lines spanning the plotted score range."""
+    """Overlay rank threshold lines spanning the plotted score range.
+
+    With ``show_all_ranks`` the bracketing selection is skipped and the whole
+    ladder is drawn, so the y-axis stretches to cover every threshold.
+    """
     if not (rank_overlay_switch and rank_data):
         return
 
@@ -117,6 +122,8 @@ def _add_rank_overlays(
     nearest_above = min(thresholds_above) if thresholds_above else None
 
     def _is_selected(threshold: float) -> bool:
+        if show_all_ranks:
+            return True
         return low <= threshold <= high or threshold in (nearest_below, nearest_above)
 
     # Draw in original ladder order; do not sort or mutate rank_data (shared).
@@ -154,11 +161,12 @@ class _AxisDescriptor(Generic[_K]):
     hover_x_label: str
 
 
-def _generate_xy_plot(
+def _generate_xy_plot(  # noqa: PLR0913
     scenario_data: dict[_K, list[RunData]],
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
+    show_all_ranks: bool,
     axis: _AxisDescriptor[_K],
 ) -> go.Figure:
     """
@@ -168,6 +176,8 @@ def _generate_xy_plot(
     :param scenario_name: the name of the scenario to use for the plot.
     :param rank_overlay_switch: enable/disable rank overlay.
     :param rank_data: an optional list of ranks to plot.
+    :param show_all_ranks: draw the full rank ladder instead of the bracketing
+        selection around the plotted score range.
     :param axis: descriptor for the x column, values, and hover label.
     :return: go.Figure Plot
     """
@@ -278,6 +288,7 @@ def _generate_xy_plot(
         rank_overlay_switch,
         rank_data,
         scores,
+        show_all_ranks,
     )
     return figure_combined
 
@@ -287,6 +298,7 @@ def generate_sensitivity_plot(
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
+    show_all_ranks: bool = False,
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
@@ -294,6 +306,8 @@ def generate_sensitivity_plot(
     :param scenario_name: the name of the scenario to use for the plot.
     :param rank_overlay_switch: enable/disable rank overlay.
     :param rank_data: an optional list of ranks to plot.
+    :param show_all_ranks: draw the full rank ladder instead of the bracketing
+        selection around the plotted score range.
     :return: go.Figure Plot
     """
     return _generate_xy_plot(
@@ -301,6 +315,7 @@ def generate_sensitivity_plot(
         scenario_name,
         rank_overlay_switch,
         rank_data,
+        show_all_ranks,
         _AxisDescriptor[str](
             axis_title="Sensitivity",
             empty_message="No sensitivity data is available for this scenario yet.",
@@ -316,6 +331,7 @@ def generate_time_plot(
     scenario_name: str,
     rank_overlay_switch: bool,
     rank_data: list[Rank],
+    show_all_ranks: bool = False,
 ) -> go.Figure:
     """
     Generate a plot using the scenario data.
@@ -323,6 +339,8 @@ def generate_time_plot(
     :param scenario_name: the name of the scenario to use for the plot.
     :param rank_overlay_switch: enable/disable rank overlay.
     :param rank_data: an optional list of ranks to plot.
+    :param show_all_ranks: draw the full rank ladder instead of the bracketing
+        selection around the plotted score range.
     :return: go.Figure Plot
     """
     return _generate_xy_plot(
@@ -330,6 +348,7 @@ def generate_time_plot(
         scenario_name,
         rank_overlay_switch,
         rank_data,
+        show_all_ranks,
         _AxisDescriptor[date](
             axis_title="Date",
             empty_message="No score history is available for this scenario yet.",

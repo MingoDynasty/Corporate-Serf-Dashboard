@@ -35,6 +35,12 @@ Connection reuse:
 - KovaaK's GET requests use one `requests.Session` per worker thread.
 - Thread-local sessions allow keep-alive connection pooling during cold-cache playlist table loads without sharing one mutable `Session` across concurrent workers.
 
+Client identification:
+
+- Every request carries a product-token `User-Agent` set once per session at construction, shaped `Corporate-Serf-Dashboard/<release label> (+<repo URL>)` — for example `Corporate-Serf-Dashboard/v2026.08.09.9 (+https://github.com/MingoDynasty/Corporate-Serf-Dashboard)` (release tags are CalVer).
+- The release label is the build's tag for installs and `dev` for checkouts, so server-side logs (and our own `data/logs/debug.log`) separate release traffic from development traffic.
+- Client-side courtesy only: KovaaK's has never asked for it, and nothing in the app's behavior depends on it.
+
 ## Endpoint Summary
 
 | Endpoint | Project Use | Authoritative For Current Rank? | Notes |

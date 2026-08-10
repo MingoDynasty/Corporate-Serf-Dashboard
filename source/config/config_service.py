@@ -40,6 +40,9 @@ class ConfigData:
     # gt=0: requests raises an unhandled ValueError on timeout<=0, so reject it
     # at config validation where the startup error message is actionable.
     kovaaks_api_timeout_seconds: Annotated[int, Field(gt=0)] = 30
+    # Off by default: the marker only helps an operator running several
+    # instances at once, and every other user would just see it as noise.
+    show_version_in_title: bool = False
 
 
 def _warn_unknown_keys(config_dict: Mapping[str, Any]) -> None:

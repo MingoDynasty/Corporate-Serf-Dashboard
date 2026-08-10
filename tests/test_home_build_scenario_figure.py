@@ -36,7 +36,7 @@ def test_build_scenario_figure_sensitivity_mode_builds_traces(monkeypatch):
     monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: data)
 
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, None
+        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, False, None
     )
 
     assert supports_overlays is True
@@ -62,13 +62,50 @@ def test_build_scenario_figure_fetches_and_applies_playlist_ranks(monkeypatch):
     monkeypatch.setattr(home, "get_rank_data_from_playlist_code", rank_fetch)
 
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, "playlist-code"
+        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, False, "playlist-code"
     )
 
     assert supports_overlays is True
     rank_fetch.assert_called_once_with("playlist-code", "1w4ts")
     # The fetched ranks reach the plot builder as rank-overlay lines.
     assert any(shape["type"] == "line" for shape in figure.layout.shapes)
+
+
+def test_build_scenario_figure_threads_show_all_ranks_to_the_plot(monkeypatch):
+    data = {
+        "2.0 Overwatch": [
+            _build_run(90.0, 2.0, datetime(2025, 1, 1, 10, 0, 0)),
+            _build_run(120.0, 2.0, datetime(2025, 1, 1, 11, 0, 0)),
+        ],
+    }
+    # Silver(110) lands inside the plotted range; Bronze(80) and Gold(150) are
+    # the nearest context below/above; Platinum(500) is only drawn when the
+    # toggle is on.
+    ranks = [
+        Rank(name="Bronze", color="#aaaaaa", threshold=80),
+        Rank(name="Silver", color="#bbbbbb", threshold=110),
+        Rank(name="Gold", color="#ffcc00", threshold=150),
+        Rank(name="Platinum", color="#cccccc", threshold=500),
+    ]
+    monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: data)
+    monkeypatch.setattr(home, "get_rank_data_from_playlist_code", lambda *_: ranks)
+
+    def drawn_ranks(show_all_ranks: bool) -> list[str]:
+        figure, _ = home._build_scenario_figure(
+            "score_vs_sensitivity",
+            "1w4ts",
+            5,
+            _OLDEST,
+            True,
+            show_all_ranks,
+            "playlist-code",
+        )
+        return [
+            annotation.text.split(" (")[0] for annotation in figure.layout.annotations
+        ]
+
+    assert drawn_ranks(False) == ["Bronze", "Silver", "Gold"]
+    assert drawn_ranks(True) == ["Bronze", "Silver", "Gold", "Platinum"]
 
 
 def test_build_scenario_figure_time_mode_builds_traces(monkeypatch):
@@ -84,7 +121,7 @@ def test_build_scenario_figure_time_mode_builds_traces(monkeypatch):
     monkeypatch.setattr(home, "get_time_vs_runs", lambda *_: data)
 
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_time", "1w4ts", 5, _OLDEST, False, None
+        "score_vs_time", "1w4ts", 5, _OLDEST, False, False, None
     )
 
     assert supports_overlays is True
@@ -99,7 +136,7 @@ def test_build_scenario_figure_sensitivity_mode_empty_range_suppresses_overlays(
     monkeypatch.setattr(home, "get_sensitivities_vs_runs_filtered", lambda *_: {})
 
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, None
+        "score_vs_sensitivity", "1w4ts", 5, _OLDEST, True, False, None
     )
 
     # The on-canvas empty state is the whole notice: the helper returns no
@@ -113,7 +150,7 @@ def test_build_scenario_figure_time_mode_empty_range_suppresses_overlays(monkeyp
     monkeypatch.setattr(home, "get_time_vs_runs", lambda *_: {})
 
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_time", "1w4ts", 5, _OLDEST, True, None
+        "score_vs_time", "1w4ts", 5, _OLDEST, True, False, None
     )
 
     # Same as the sensitivity-mode case above: the second empty-range call
@@ -125,7 +162,7 @@ def test_build_scenario_figure_time_mode_empty_range_suppresses_overlays(monkeyp
 
 def test_build_scenario_figure_unsupported_mode_suppresses_overlays():
     figure, supports_overlays = home._build_scenario_figure(
-        "score_vs_nonsense", "1w4ts", 5, _OLDEST, True, None
+        "score_vs_nonsense", "1w4ts", 5, _OLDEST, True, False, None
     )
 
     assert supports_overlays is False

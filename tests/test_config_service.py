@@ -125,3 +125,22 @@ def test_tuning_fields_default_when_omitted() -> None:
 
     assert config.polling_interval == 1000
     assert config.sens_round_decimal_places == 1
+    # Every config predating the key parses as opted out.
+    assert config.show_version_in_title is False
+
+
+@pytest.mark.parametrize("configured", [True, False])
+def test_show_version_in_title_round_trips_through_the_config_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    configured: bool,
+) -> None:
+    """An explicit setting survives the TOML round trip either way."""
+    config_path = tmp_path / "config.toml"
+    config_path.write_text(
+        f"port = 8050\nshow_version_in_title = {str(configured).lower()}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
+
+    assert load_config().show_version_in_title is configured

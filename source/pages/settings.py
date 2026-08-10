@@ -32,6 +32,7 @@ from source.config.settings_service import (
 )
 from source.config.stats_dir_detection import detect_stats_dir_candidates
 from source.kovaaks.percentile_warmup_service import start_percentile_warmup_worker
+from source.pages.page_title import page_title
 from source.utilities.build_info import get_build_info
 from source.utilities.utilities import format_absolute_timestamp
 
@@ -40,7 +41,7 @@ logger = logging.getLogger(__name__)
 dash.register_page(
     __name__,
     path="/settings",
-    title="Settings",
+    title=page_title("Settings"),
 )
 
 STATS_DIR_DESCRIPTION = (

@@ -16,6 +16,7 @@ from source.kovaaks.data_service import (
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
+from source.pages.page_title import page_title
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     apply_light_dark_mode,
@@ -32,7 +33,7 @@ _NO_JOURNEY_DATA_PLOT_MESSAGE = (
 dash.register_page(
     __name__,
     path="/aim-training-journey",
-    title="Aim Training Journey",
+    title=page_title("Aim Training Journey"),
 )
 
 

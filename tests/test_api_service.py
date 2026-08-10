@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import shutil
 import threading
 import time
@@ -22,6 +23,7 @@ from source.kovaaks.api_models import (
     ScenarioRankStatus,
 )
 from source.utilities import atomic_write
+from source.utilities.build_info import BuildInfo
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
@@ -94,6 +96,7 @@ def test_get_with_retry_reuses_session_within_thread(monkeypatch):
     class FakeSession:
         def __init__(self):
             self.calls = []
+            self.headers = {}
             created_sessions.append(self)
 
         def get(self, url, **kwargs):
@@ -158,6 +161,7 @@ def test_get_thread_session_is_thread_local(monkeypatch):
 
     class FakeSession:
         def __init__(self):
+            self.headers = {}
             created_sessions.append(self)
 
     monkeypatch.setattr(api_service, "_HTTP_THREAD_LOCAL_STORAGE", threading.local())
@@ -174,6 +178,27 @@ def test_get_thread_session_is_thread_local(monkeypatch):
 
     assert len(set(session_ids)) == 2
     assert len(created_sessions) == 2
+
+
+def test_thread_session_sends_product_token_user_agent(monkeypatch):
+    build = BuildInfo(
+        sha="0123456789abcdef",
+        commit_date="2026-08-09",
+        tag="v9.9.9",
+        source="release-file",
+    )
+    monkeypatch.setattr(api_service, "_HTTP_THREAD_LOCAL_STORAGE", threading.local())
+    monkeypatch.setattr(api_service, "get_build_info", lambda: build)
+
+    user_agent = api_service._get_thread_session().headers["User-Agent"]
+
+    match = re.fullmatch(
+        r"Corporate-Serf-Dashboard/(\S+) "
+        r"\(\+https://github\.com/MingoDynasty/Corporate-Serf-Dashboard\)",
+        user_agent,
+    )
+    assert match, user_agent
+    assert match.group(1) == build.release_label
 
 
 def test_get_with_retry_retries_once_on_429(monkeypatch):

@@ -48,6 +48,7 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.my_watchdog.file_watchdog import drain_run_import_failures
+from source.pages.page_title import page_title
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
@@ -76,6 +77,10 @@ SETTINGS_HELP_TEXT = {
     "rank-overlay": (
         "Shows the selected playlist's rank threshold lines on the graph when "
         "rank data is available."
+    ),
+    "show-all-ranks": (
+        "Draws every rank in the playlist's ladder instead of only the ones "
+        "around your plotted scores. Needs Rank Thresholds turned on."
     ),
     "high-score-overlay": (
         "Shows your current personal best score as a reference line on the graph."
@@ -173,7 +178,7 @@ dash.register_page(
     __name__,
     path="/",
     name="Scenario Performance",
-    title="Scenario Performance",
+    title=page_title("Scenario Performance"),
     redirect_from=["/home", "/index"],
 )
 
@@ -919,6 +924,7 @@ def _build_scenario_figure(  # noqa: PLR0913
     top_n_scores: int,
     oldest_datetime: datetime,
     rank_overlay_switch: bool,
+    show_all_ranks_switch: bool,
     selected_playlist: str | None,
 ) -> tuple[go.Figure, bool]:
     """Query the selected x-axis mode and build its figure.
@@ -959,6 +965,7 @@ def _build_scenario_figure(  # noqa: PLR0913
                 selected_scenario,
                 rank_overlay_switch,
                 rank_data,
+                show_all_ranks_switch,
             ),
             True,
         )
@@ -995,6 +1002,7 @@ def _build_scenario_figure(  # noqa: PLR0913
                 selected_scenario,
                 rank_overlay_switch,
                 rank_data,
+                show_all_ranks_switch,
             ),
             True,
         )
@@ -1019,6 +1027,7 @@ def _build_scenario_figure(  # noqa: PLR0913
     Input("date-picker", "value"),
     Input("x-axis-radiogroup", "value"),
     Input("rank-overlay-switch", "checked"),
+    Input("show-all-ranks-switch", "checked"),
     Input("high-score-overlay-switch", "checked"),
     Input("score-threshold-overlay-switch", "checked"),
     Input("score-threshold-percentage", "value"),
@@ -1034,6 +1043,7 @@ def generate_graph(  # noqa: PLR0913
     selected_date,
     x_axis_radiogroup,
     rank_overlay_switch,
+    show_all_ranks_switch,
     high_score_overlay_switch,
     score_threshold_overlay_switch,
     score_threshold_percentage,
@@ -1049,6 +1059,8 @@ def generate_graph(  # noqa: PLR0913
     :param selected_date: user-selected date.
     :param x_axis_radiogroup: user-selected x-axis radio group.
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
+    :param show_all_ranks_switch: show all ranks switch. True=draw the full
+        ladder instead of the ranks bracketing the plotted scores.
     :param selected_playlist: user-selected playlist code.
     :param toast_lifetime_sequence: this client's run-verdict emission counter.
     :return: Figure serialized to JSON, Notification, next emission counter
@@ -1083,6 +1095,7 @@ def generate_graph(  # noqa: PLR0913
         top_n_scores,
         oldest_datetime,
         rank_overlay_switch,
+        show_all_ranks_switch,
         selected_playlist,
     )
 
@@ -1298,6 +1311,16 @@ def _chart_options_panel() -> dmc.Box:
                             SETTINGS_HELP_TEXT["rank-overlay"],
                         ),
                         checked=True,
+                        persistence=True,
+                    ),
+                    dmc.Switch(
+                        id="show-all-ranks-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Show all ranks",
+                            SETTINGS_HELP_TEXT["show-all-ranks"],
+                        ),
+                        checked=False,
                         persistence=True,
                     ),
                     dmc.Switch(
