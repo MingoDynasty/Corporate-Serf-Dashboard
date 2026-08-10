@@ -31,6 +31,7 @@ from source.kovaaks.api_models import (
 )
 from source.kovaaks.request_logging import request_exception_summary
 from source.utilities.atomic_write import replace_with_retry
+from source.utilities.build_info import get_build_info
 from source.utilities.paths import state_dir
 
 # KovaaK's slow spells push /leaderboard/scores/global latency to ~28s while
@@ -65,6 +66,10 @@ CACHE_DIR = state_dir() / "data" / "cache"
 # in the Endpoints enum); used as a fallback when KovaaK's own playlist search
 # returns null records for a real playlist (see get_evxl_playlist).
 EVXL_PLAYLIST_BY_CODE_URL = "https://api.evxl.app/kovaaks/playlist-by-code"
+
+# Contact point carried in the User-Agent, so anyone reading server logs can
+# find out what this client is and reach its maintainer.
+PROJECT_URL = "https://github.com/MingoDynasty/Corporate-Serf-Dashboard"
 
 
 class UnknownKovaaksUserError(ValueError):
@@ -161,11 +166,25 @@ def _retry_after_seconds(response: requests.Response) -> float:
     return min(delay_seconds, MAX_RETRY_AFTER_SECONDS)
 
 
+def _user_agent() -> str:
+    """Name this client and its release for KovaaK's server logs.
+
+    Sent instead of requests' generic ``python-requests/x.y``, which reads as
+    anonymous scraper traffic and is what blanket WAF rules match first. The
+    release label (a tag for installs, ``dev`` for checkouts) splits release
+    traffic from development traffic. ``get_build_info`` is cached.
+    """
+    return f"Corporate-Serf-Dashboard/{get_build_info().release_label} (+{PROJECT_URL})"
+
+
 def _get_thread_session() -> requests.Session:
     """Return one reusable HTTP session per worker thread."""
     session = getattr(_HTTP_THREAD_LOCAL_STORAGE, "session", None)
     if session is None:
         session = requests.Session()
+        # Set once at construction so every request through _session_get
+        # inherits it; no per-call header plumbing.
+        session.headers["User-Agent"] = _user_agent()
         _HTTP_THREAD_LOCAL_STORAGE.session = session
     return session
 
