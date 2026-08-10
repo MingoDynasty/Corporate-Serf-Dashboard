@@ -27,11 +27,14 @@ build report the old identity, and the launcher would never promote it; an
 uncorroborated release file is a stray copy. A missing file is the normal
 development case, not an error.
 
-Every user-visible build string derives from this one reader, and there are
-three: the startup log line, ``/health``, and the version section on the
-settings page. ``app.py`` also folds the tag into the Dash app title, but that
-is not a fourth surface — Dash Pages sets a per-page title on every
-navigation, so it survives only until the client router runs.
+Every user-visible build string derives from this one reader. Three are always
+on: the startup log line, ``/health``, and the version section on the settings
+page. A fourth is opt-in — with ``show_version_in_title`` set, every browser
+tab title carries the release label (``pages/page_title.py``), which is how an
+operator running several instances tells their tabs apart. ``app.py`` also
+folds the tag into the Dash app title, but that is not a surface of its own —
+Dash Pages sets a per-page title on every navigation, so it survives only until
+the client router runs.
 """
 
 import json

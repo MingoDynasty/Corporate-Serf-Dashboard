@@ -27,6 +27,7 @@ from source.kovaaks.playlist_scenarios_service import (
     scenario_home_href,
     start_playlist_scenario_fill,
 )
+from source.pages.page_title import page_title
 from source.utilities.notifications import toast
 
 
@@ -45,7 +46,7 @@ def _page_title(playlist_code=None, **_kwargs):
 dash.register_page(
     __name__,
     path_template="/playlists/<playlist_code>",
-    title=_page_title,
+    title=page_title(_page_title),
 )
 
 AUTO_SIZE_COLUMN_KEYS = [
