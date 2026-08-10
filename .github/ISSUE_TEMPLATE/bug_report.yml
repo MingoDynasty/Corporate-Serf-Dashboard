@@ -1,0 +1,79 @@
+name: Bug report
+description: Something in the dashboard is broken, wrong, or won't start.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: >-
+        Describe the problem. If it involves a particular scenario, playlist,
+        or benchmark, name it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What you did, in order, if you can retrace it.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown on the Settings page.
+      placeholder: v2026.07.19.4
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ### Before you attach the log
+
+        This issue and any file you attach are **public** — anyone on the
+        internet can read them, no GitHub account required.
+
+        `debug.log` includes your KovaaK's username and Steam ID (the same
+        values stamped on your public leaderboard scores), your scenario
+        scores and play times, and file paths that may include your Windows
+        username. It never contains passwords or Steam credentials.
+
+        It is a plain text file — open it in any text editor first if you
+        want to see exactly what you are sharing.
+
+  - type: upload
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: |
+        Attach `debug.log`. An installed copy keeps it in
+        `%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`; running from source,
+        it is `data/logs` in your checkout.
+
+        **If the dashboard won't start at all**, attach
+        `launcher-app-stderr.log` and `launcher-app-stdout.log` from that same
+        folder *instead* — plus `debug.log` only if it exists. The app can die
+        before its own logging starts.
+    validations:
+      required: true
+      accept: ".log"
+
+  - type: upload
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: For anything visual — a wrong plot, a broken layout, an odd toast.
+    validations:
+      required: false
+      accept: ".png,.jpg,.jpeg,.gif,.webp"

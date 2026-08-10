@@ -217,6 +217,15 @@ KovaaK's API and saves it under `data/playlists`. Playlists imported this way
 carry no rank data — the benchmark-rank overlays come only from the bundled
 library.
 
+## Found a bug?
+
+Open an issue from the
+[issue chooser](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new/choose)
+— there is a form for bug reports and one for feature requests. The bug form
+asks for your app version and your `debug.log`, which is what makes a failure
+on a machine no one else can see diagnosable; it also spells out what the log
+contains before you attach it.
+
 ## Run From Source
 
 For development, or if you would rather manage the toolchain yourself. The app

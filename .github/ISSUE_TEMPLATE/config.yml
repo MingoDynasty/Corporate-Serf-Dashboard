@@ -1,0 +1,5 @@
+# Blank issues are disabled in favor of the two forms, and GitHub Issues is the
+# only intake channel — no Discussions, no Discord — so there are no
+# contact_links. This setting does not affect `gh issue create`, which is how
+# feedback arriving elsewhere gets transcribed into the canonical record.
+blank_issues_enabled: false
