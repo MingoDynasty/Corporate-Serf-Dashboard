@@ -449,7 +449,7 @@ def _version_section() -> dmc.Stack:
         children=[
             dmc.Text(f"Version {build.release_label}", id="app-settings-version"),
             dmc.Text(
-                build.short_description,
+                f"Commit {build.short_description}",
                 id="app-settings-build",
                 c="dimmed",
                 size="sm",

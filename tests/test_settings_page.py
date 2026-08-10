@@ -450,7 +450,7 @@ def test_the_page_names_the_running_build(monkeypatch):
         "Version v2026.08.02.1"
     )
     assert _component_by_id(page, "app-settings-build").children == (
-        "0123456 (2026-08-02)"
+        "Commit 0123456 (2026-08-02)"
     )
 
 
