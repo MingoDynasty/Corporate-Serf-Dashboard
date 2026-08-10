@@ -88,6 +88,10 @@ The settings arc's guided first-run flow — a setup card for a fresh install,
 and what "skip" should mean — was deliberately left out of settings detection
 and still needs a proposal of its own before it can be sequenced.
 
+Launch readiness has one process counterpart: where feedback and bug reports
+land once the app has real users, and what a report must carry, is designed
+in [`feedback_intake_proposal.md`](./feedback_intake_proposal.md).
+
 ---
 
 ## Future (briefly)
