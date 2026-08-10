@@ -37,9 +37,13 @@ Recommended: accept. Blank issues are disabled in favor of the two forms; no
 Discord server and no GitHub Discussions; feedback arriving anywhere else
 (Discord communities, Reddit) is transcribed into an issue by the maintainer
 as the canonical record (`gh issue create` is unaffected by the blank-issue
-setting). Consequence of choosing differently: a second moderated inbox
-(Discord) or a second triage surface (Discussions) for a single maintainer,
-ahead of any demonstrated volume.
+setting). Accepting this knowingly accepts an exclusion: users without a
+GitHub account — likely a real share of a gamer audience — have no direct
+submission path, and their reports reach the tracker only if they surface in
+a channel the maintainer watches and transcribes. Revisit if launch feedback
+shows reports dying for want of an account. Consequence of choosing
+differently: a second moderated inbox (Discord) or a second triage surface
+(Discussions) for a single maintainer, ahead of any demonstrated volume.
 
 **D3 — Ship the Settings-page "Report a bug" affordance?**
 Status: Open.
@@ -47,9 +51,10 @@ Recommended: yes, as the second delivery PR — a pre-filled issue link plus
 making the log's location visible removes the two failure points of
 user-driven reports (wrong/missing version, missing log). All user-facing
 copy in the forms and on the Settings page is maintainer-approved at its
-implementation PR, not settled here. Consequence of no: reports arrive
-without version or log more often, and users must find
-`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs` by hand.
+implementation PR, not settled here. Consequence of no: every report costs
+the user a manual version lookup (the form requires the field) and a
+hand-dug log path (`%LOCALAPPDATA%\CorporateSerfDashboard\data\logs`),
+raising abandonment risk on exactly the least technical reports.
 
 ## Problem
 
@@ -139,11 +144,14 @@ when the app dies before its own logging starts.
 ### The bug report form
 
 Fields, in order: what happened (required, free text); what you expected
-(optional); steps to reproduce (optional); app version (optional dropdown-free
-text, pre-fillable via URL — the log's first line names the build regardless,
-so a blank field costs nothing); attach `debug.log` (drag-and-drop
-instruction naming the path, `won't start at all` variant asking for the two
-launcher logs as well); screenshots for anything visual (optional).
+(optional); steps to reproduce (optional); app version (required, free text
+with a "shown on the Settings page" hint, pre-fillable via URL — the log
+names the build only until rotation moves the startup record into a backup,
+so the field cannot rely on the attached log carrying it, and the pre-filled
+link absorbs the friction for the in-app path); attach `debug.log`
+(drag-and-drop instruction naming the path, `won't start at all` variant
+asking for the two launcher logs as well); screenshots for anything visual
+(optional).
 
 The form deliberately does **not** ask for browser console output: the
 known first-load Dash pages race floods the console with alarming but
@@ -214,10 +222,13 @@ is deleted.
 
 - **This PR:** the standard gates; `tests/test_docs.py` enforces the Status
   line, leading-section order, and link resolution for this file.
-- **PR 1:** issue forms are repo config with no runnable surface — verify by
-  opening the new-issue chooser on the branch (GitHub validates form YAML
-  server-side; a broken form silently falls back to a blank issue, so the
-  check is that the chooser renders both forms and the required field is
-  enforced).
+- **PR 1:** issue forms are repo config with no runnable surface, and GitHub
+  reads them from the default branch only — the new-issue chooser cannot
+  render a PR branch's forms. Pre-merge gate: validate the YAML locally
+  (parse it and check the field structure against GitHub's issue-forms
+  schema). Acceptance check: immediately after merge, open the chooser and
+  confirm both forms render with the required fields enforced — a broken
+  form silently falls back to a blank issue, which is exactly the failure
+  the post-merge check exists to catch.
 - **PR 2:** unit tests for the issue-URL builder and the log-path display;
   standard gates.
