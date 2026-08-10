@@ -328,7 +328,14 @@ flowchart LR
   unchecked probes and unreadable account lists each say so in their own words.
   Below the form, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
-  with no callback and no network.
+  with no callback and no network. The same section carries the bug-report
+  affordance: a "Report a bug" anchor whose href `bug_report_url()` builds as
+  `…/issues/new?template=bug_report.yml&version=<release label>`
+  (URL-encoded; the template filename and the `version` field id are both
+  contracts with `.github/ISSUE_TEMPLATE/bug_report.yml`, and every label the
+  resolver produces is pre-filled, `dev` and `unknown` included), and the
+  resolved log directory from `utilities/paths.log_dir()`, so the form's
+  "attach `debug.log`" names a place to look.
   Validation is offline only
   (directory exists; Steam ID shaped like a SteamID64 — 17 ASCII digits at or
   above the universe-1 base); a save writes all three keys,
@@ -463,7 +470,9 @@ flowchart LR
   the per-client `TOAST_LIFETIME_STORE_ID` counter),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
-  `paths` (`state_dir()` / `package_root()` — see State above).
+  `paths` (`state_dir()` / `package_root()` — see State above — plus
+  `log_dir()`, the one construction of `data/logs`, because `app.py` writes
+  there and the settings page displays it and pages cannot import `app`).
 - `scripts/benchmark_importer/` — imports Evxl benchmark metadata and KovaaK's
   rank thresholds into reviewable benchmark files.
 
