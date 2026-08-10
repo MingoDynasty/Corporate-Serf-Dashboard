@@ -52,9 +52,11 @@ two-bucket: a port free on only one face is refused outright rather than
 half-served. So a half-bound instance cannot exist, and while the app is
 serving, whichever face the resolver hands `localhost` is ours — the old
 "browser gets a stranger's 404" failure needed an IPv6 face we did not hold.
-The launcher only opens the browser after `Wait-AppReady` succeeds, so that
-one IPv4 probe vouches for both faces. On a machine with no IPv6 the app
-serves IPv4 alone and `localhost` resolves to IPv4 anyway.
+The launcher's start and update paths open the browser only after
+`Wait-AppReady` succeeds, and the already-running path opens it at an instance
+that passed its own launcher's probe — so that one IPv4 probe vouches for both
+faces. On a machine with no IPv6 the app serves IPv4 alone and `localhost`
+resolves to IPv4 anyway.
 
 Consequences: Nothing is superseded; the bind decision stands unchanged. The
 maintainer's existing install has persisted toggles under the `127.0.0.1`
