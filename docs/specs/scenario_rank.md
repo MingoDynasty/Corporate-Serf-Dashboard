@@ -54,6 +54,14 @@ benchmark tier) — see the
 - An empty `kovaaks_username` keeps the app fully offline: the rank service
   short-circuits before any network call
   ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)).
+  Both position surfaces treat that as persistent configuration state rather
+  than a failure. The playlist scenarios page skips its progressive position
+  fill entirely and says so in place — "Positions unavailable — set your
+  KovaaK's username in Settings", with Settings linked — so the fill's red
+  summary toast cannot fire over a pass that fetched nothing
+  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  A username that is configured but wrong is a separate, still-open case: it
+  is knowable only per result and still produces the generic failure reporting.
 
 ## Domain model
 
@@ -145,7 +153,7 @@ benchmark tier) — see the
   the hint is retired rather than left contradicting a position that has
   since arrived.
 - Manual Refresh answers with a toast whatever happens — the user asked for
-  it — and all three outcomes come off the callback's own notification
+  it — and all four outcomes come off the callback's own notification
   output. A hard failure (an `error_message` result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
@@ -153,10 +161,16 @@ benchmark tier) — see the
   not. A served-stale result is yellow under that same title — deliberately,
   since both are outcomes of one click and only the id has to differ so a
   later result is not swallowed — and its value carries the same "from cache,
-  Refresh to update" affordance a passive render would give it. Only a
-  genuinely fresh result gets the green confirmation, titled "Position
-  refreshed", which keeps a fresh id per click so back-to-back refreshes each
-  answer. That per-click id is the one named exception to the stable-id rule
+  Refresh to update" affordance a passive render would give it. A click with
+  no username configured never reaches the service at all: it is caught on the
+  direct settings read after the `n_clicks` and selected-scenario guards, and
+  answered blue, titled "KovaaK's username not set", leaving the value alone
+  because the field's own hint already explains it
+  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  Only a genuinely fresh result gets the green confirmation, titled "Position
+  refreshed". The green confirmation and the blue unset-username notice both
+  keep a fresh id per click so back-to-back refreshes each answer; they are
+  the two instances of the same named exception to the stable-id rule
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
