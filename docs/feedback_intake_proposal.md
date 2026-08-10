@@ -1,6 +1,6 @@
 # Feedback and Bug Report Intake
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-09
 
 ## TL;DR
@@ -36,7 +36,7 @@ misspelled-username and mismatched-Steam-ID root causes.
 
 **D2 — Channel policy: GitHub Issues canonical, forms only, nothing else at
 launch.**
-Status: Open.
+Status: Ratified 2026-08-10 (chat).
 Recommended: accept. Blank issues are disabled in favor of the two forms; no
 Discord server and no GitHub Discussions; feedback arriving anywhere else
 (Discord communities, Reddit) is transcribed into an issue by the maintainer
@@ -50,7 +50,7 @@ differently: a second moderated inbox (Discord) or a second triage surface
 (Discussions) for a single maintainer, ahead of any demonstrated volume.
 
 **D3 — Ship the Settings-page "Report a bug" affordance?**
-Status: Open.
+Status: Ratified 2026-08-10 (chat).
 Recommended: yes, as the second delivery PR — a pre-filled issue link plus
 making the log's location visible removes the two failure points of
 user-driven reports (wrong/missing version, missing log). All user-facing
