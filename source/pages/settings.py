@@ -485,6 +485,9 @@ def _version_section() -> dmc.Stack:
                 href=bug_report_url(build.release_label),
                 target="_blank",
                 size="sm",
+                # A Stack child stretches, and a full-width anchor makes the
+                # whole empty row a click target.
+                w="fit-content",
             ),
             dmc.Text(
                 f"Logs {log_dir()}",
