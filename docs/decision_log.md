@@ -718,7 +718,10 @@ line, the commit it was built from on the next — instead of hiding in a
 tooltip on the header's GitHub icon. Anyone checking which version they are
 running, or quoting one in a bug report, can look somewhere they would think
 to look. The section is plain text: it shows what the app already knew about
-itself and asks the network nothing.
+itself and asks the network nothing. Its two dates can honestly disagree by a
+day, because the version dates the release and the second line dates the
+commit; that line is labelled Commit so the difference reads as fact, not
+error.
 
 Decision (PR #190): the settings page is the venue for build identity, and
 `github_component`'s tooltip reverts to a plain "View this app on GitHub".
@@ -738,6 +741,15 @@ Identity resolution is unchanged: the stage-time `release.json` copy and the
 full precedence live in
 [Build Identity Comes From The Manifest](#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp),
 whose surfaces list this entry rewrites.
+
+Clock semantics (PR #225): the CalVer tag date is the release date in UTC —
+CI mints the tag with `date -u` — while the displayed commit date is git's
+`%cs`, rendered in the commit's own recorded offset. They date different
+events on different clocks, so an evening local-time merge routinely
+straddles UTC midnight and picks up a next-day tag. Rather than
+UTC-normalising every identity producer to force agreement, the build line
+carries a `Commit` prefix that attributes the parenthesised date to its
+event.
 
 Sequencing behind that mechanism (PR #188) was a hard dependency, not a
 preference. Post-update verification — "the console said it updated to vX; did
