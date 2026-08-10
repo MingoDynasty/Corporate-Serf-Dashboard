@@ -78,8 +78,9 @@ def test_build_scenario_figure_threads_show_all_ranks_to_the_plot(monkeypatch):
             _build_run(120.0, 2.0, datetime(2025, 1, 1, 11, 0, 0)),
         ],
     }
-    # Bronze(80) and Silver(110) bracket the plotted scores; Gold(150) is the
-    # nearest context above, and Platinum(500) is only drawn when the toggle is on.
+    # Silver(110) lands inside the plotted range; Bronze(80) and Gold(150) are
+    # the nearest context below/above; Platinum(500) is only drawn when the
+    # toggle is on.
     ranks = [
         Rank(name="Bronze", color="#aaaaaa", threshold=80),
         Rank(name="Silver", color="#bbbbbb", threshold=110),
