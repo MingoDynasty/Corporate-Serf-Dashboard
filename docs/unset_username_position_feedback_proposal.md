@@ -21,11 +21,13 @@ lookup that really failed.
 Each decision carries its own status so review stays scoped. Decisions 1
 and 2 fix which surface answers; decision 3 is the wording and severity
 on those surfaces; decision 4 bounds the scope against the neighboring
-defect. The implementation PR starts once all four are ratified.
+defect. All four were ratified by the maintainer on 2026-08-09, with
+both reviewing sides' round-2 verdicts concurring on each; the
+implementation PR is unblocked.
 
 1. **Playlist page goes quiet — no fill pass and no toast when the
    username is unset; the grid's status line carries the condition
-   instead.** Status: Open. Recommended: yes. With no username, every
+   instead.** Status: Accepted (2026-08-09). Recommended: yes. With no username, every
    one of the fill's per-scenario lookups short-circuits to UNKNOWN
    without touching the network, so phase 2 is a no-op that exists only
    to mislead: a live progress line over zero network activity, ending
@@ -38,7 +40,7 @@ defect. The implementation PR starts once all four are ratified.
    keep the fill and merely reword the toast — keeps the fake progress
    display and spends a toast on a condition that has an in-place home.
 2. **Refresh keeps answering with a toast — one that names the real
-   verdict — rather than being disabled or silenced.** Status: Open.
+   verdict — rather than being disabled or silenced.** Status: Accepted (2026-08-09).
    Recommended: toast. Stated honestly, the ratified routing policy
    cuts both ways here. Its first branch sends persistent conditions to
    in-place UI, "never a toast", and its litmus test names the Position
@@ -58,7 +60,7 @@ defect. The implementation PR starts once all four are ratified.
    would need settings-reactive enable/disable wiring and would remove
    the answering surface; silence would leave a deliberate click with
    no visible result at all.
-3. **Copy, severity, and icon for the two new surfaces.** Status: Open.
+3. **Copy, severity, and icon for the two new surfaces.** Status: Accepted (2026-08-09).
    UI copy is a maintainer call; proposed package to react to, exact
    mechanics in Design. Playlist status line: "Positions unavailable —
    set your KovaaK's username in Settings" with Settings as a link,
@@ -79,7 +81,7 @@ defect. The implementation PR starts once all four are ratified.
    currently means degraded data (stale serve, threshold miss, Steam
    mismatch), which this is not.
 4. **The configured-but-invalid username sibling is deferred, not
-   folded in.** Status: Open. Recommended: defer, named in Out of
+   folded in.** Status: Accepted (2026-08-09). Recommended: defer, named in Out of
    scope. A username that is set but wrong raises the service's
    unknown-user error, lands as UNKNOWN plus an error message, counts
    into the fill's unknown tally, and fires the identical pair of red
@@ -239,10 +241,15 @@ applies):
   2026-08-03 routing entry and the 2026-08-01 fully-offline entry.
 - `docs/specs/scenario_rank.md`: the manual-Refresh paragraph in
   Failure handling gains the fourth outcome (unset username answers
-  with the named-verdict toast, not the red failure), and the named
-  per-click-id exception to the stable-id rule widens from the green
-  confirmation alone to repeatable manual-refresh answers. The
-  identity section notes the playlist page's in-place treatment.
+  with the named-verdict toast, not the red failure). No id policy
+  changes with it: the decision-log rule is already general —
+  repeatable user-action results use a per-click id, with the green
+  confirmation as its named *instance* — so this toast is a second
+  instance of the same exception. Only the spec's "the one named
+  exception" phrasing updates to say so; its existing 2026-08-03
+  citation stands, and no new decision-log clause is written for the
+  id. The identity section notes the playlist page's in-place
+  treatment.
 - The usual `architecture.md`/README sweep for restated behavior.
 
 ## Delivery plan
@@ -250,7 +257,8 @@ applies):
 - **PR 1 (this PR): the proposal.** Docs only, opened for maintainer
   ratification of decisions 1–4 and reviewer input.
 - **PR 2: the implementation**, gated on decisions 1–4 flipping to
-  Accepted. Both surfaces, regression tests, the decision-log entry and
+  Accepted (ratified 2026-08-09; the gate is open once this PR
+  merges). Both surfaces, regression tests, the decision-log entry and
   spec edits above, and deletion of this file per the shipping
   checklist. One PR — the two surfaces share the gate helper and the
   docs story, and neither is independently shippable without
