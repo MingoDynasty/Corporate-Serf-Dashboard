@@ -255,7 +255,9 @@ def test_page_is_named_scenario_performance_and_keeps_the_root_route():
     page = dash.page_registry["source.pages.home"]
 
     assert page["name"] == "Scenario Performance"
-    assert page["title"] == "Scenario Performance"
+    # Registered as a callable so the optional build-label prefix can be read
+    # per request; unprefixed here because the flag defaults off.
+    assert page["title"]() == "Scenario Performance"
     assert page["path"] == "/"
 
 

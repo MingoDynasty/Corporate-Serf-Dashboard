@@ -48,6 +48,7 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.my_watchdog.file_watchdog import drain_run_import_failures
+from source.pages.page_title import page_title
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     add_high_score_overlay,
@@ -173,7 +174,7 @@ dash.register_page(
     __name__,
     path="/",
     name="Scenario Performance",
-    title="Scenario Performance",
+    title=page_title("Scenario Performance"),
     redirect_from=["/home", "/index"],
 )
 

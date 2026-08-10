@@ -37,6 +37,7 @@ from source.kovaaks.playlist_visibility_service import (
     show_playlist,
     toggle_playlist_visibility,
 )
+from source.pages.page_title import page_title
 from source.utilities.notifications import toast
 from source.utilities.utilities import format_approximate_duration
 
@@ -77,7 +78,7 @@ IMPORT_VISIBILITY_FAILED_HINT = (
 dash.register_page(
     __name__,
     path="/playlists",
-    title="Playlists",
+    title=page_title("Playlists"),
 )
 
 AUTO_SIZE_COLUMN_KEYS = [

@@ -445,7 +445,11 @@ flowchart LR
   copy is read first because it is written beside the code before that version
   ever runs, whereas an install's manifest still names the previous version
   while a new one is on trial. Feeds the
-  startup log line, `/health`, and the settings page's version section.
+  startup log line, `/health`, and the settings page's version section — plus,
+  when `show_version_in_title` is on, a `<release label> - ` prefix on every
+  browser tab title (`pages/page_title.py` wraps all five `register_page`
+  titles as callables, so the flag is read per request rather than at import
+  time, when the config is not yet loaded).
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
   the one builder for `sendNotifications` payloads: stable semantic id, title,
   message, color, optional icon, and the shared auto-close duration —
