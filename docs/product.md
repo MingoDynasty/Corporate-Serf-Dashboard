@@ -63,7 +63,10 @@ list in the roadmap.)
   yours failed to record.
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
-  shows which rank band a score sits in and how far the next band is.
+  shows which rank band a score sits in and how far the next band is. By
+  default it draws only the bands around your scores, so the runs fill the
+  chart; a **Show all ranks** chart option draws the whole ladder instead, for
+  when you want to see how far the climb goes rather than what is next.
 - **Chart options beside the chart** (Scenario Performance page, PRs #209,
   #215). The graph's display preferences — the overlays, and the score
   threshold and its percentage — open in a panel next to the chart, grouped by

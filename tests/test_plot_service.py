@@ -26,10 +26,14 @@ VISCOSE_LADDER = [
 ]
 
 
-def _drawn_ranks(rank_data: list[Rank], scores: list[float]) -> list[str]:
+def _drawn_ranks(
+    rank_data: list[Rank],
+    scores: list[float],
+    show_all_ranks: bool = False,
+) -> list[str]:
     """Return the rank names overlaid for ``scores``, in draw order."""
     fig = go.Figure()
-    _add_rank_overlays(fig, True, rank_data, scores)
+    _add_rank_overlays(fig, True, rank_data, scores, show_all_ranks)
     # add_hline annotation text is "<name> (<threshold>) "; name has no " (".
     return [ann.text.split(" (")[0] for ann in fig.layout.annotations]
 
@@ -200,6 +204,21 @@ def test_rank_overlays_monotonic_equivalence() -> None:
     assert _drawn_ranks(ladder, [100.0, 120.0]) == ["Bronze", "Silver", "Gold"]
     # Range strictly between two thresholds: only the bracketing context ranks.
     assert _drawn_ranks(ladder, [111.0, 139.0]) == ["Silver", "Gold"]
+
+
+def test_rank_overlays_show_all_ranks_draws_the_whole_ladder() -> None:
+    # Scores land in the inverted band ~[55, 57], where the bracketing selection
+    # draws only Hare(54) and Penguin(58). Opting in draws every rank, in ladder
+    # order, including thresholds far outside the plotted range.
+    assert _drawn_ranks(VISCOSE_LADDER, [55.0, 57.0], show_all_ranks=True) == [
+        rank.name for rank in VISCOSE_LADDER
+    ]
+
+
+def test_rank_overlays_show_all_ranks_stays_subordinate_to_the_switch() -> None:
+    fig = go.Figure()
+    _add_rank_overlays(fig, False, VISCOSE_LADDER, [55.0, 57.0], True)
+    assert fig.layout.annotations == ()
 
 
 def test_rank_overlays_include_boundary_ties() -> None:
