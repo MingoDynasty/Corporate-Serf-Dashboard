@@ -107,7 +107,7 @@ function Get-ConfiguredPort {
 }
 
 function Open-Dashboard([int]$Port) {
-    Start-Process "http://127.0.0.1:$Port/"
+    Start-Process "http://localhost:$Port/"
 }
 
 function Get-LatestTag {
@@ -500,7 +500,7 @@ try {
     }
 
     # Hold the mutex for the launcher+app lifetime.
-    Write-Host "Dashboard running at http://127.0.0.1:$port/ -- close this window (or press Ctrl+C) to stop it."
+    Write-Host "Dashboard running at http://localhost:$port/ -- close this window (or press Ctrl+C) to stop it."
     $appProcess.WaitForExit()
     exit $appProcess.ExitCode
 } catch {
