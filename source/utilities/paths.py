@@ -26,6 +26,17 @@ def state_dir() -> Path:
     return Path.cwd().resolve()
 
 
+def log_dir() -> Path:
+    """Return the directory holding the app's rotating log files.
+
+    Shared because two surfaces name it: ``app.py`` writes there, and the
+    settings page shows the resolved path so a bug report can say where
+    ``debug.log`` is. Pages cannot import ``app``, so the construction lives
+    here rather than being spelled twice.
+    """
+    return state_dir() / "data" / "logs"
+
+
 def package_root() -> Path:
     """Return the root of the code tree (the parent of ``source/``)."""
     return Path(__file__).resolve().parents[2]

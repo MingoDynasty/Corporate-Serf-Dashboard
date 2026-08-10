@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Feedback and bug-report intake** — the app has a defined place to send
+  feedback and bug reports: GitHub Issues, with a bug form and a feature form
+  and no blank-issue option. The bug form asks almost nothing — what happened,
+  the version, and one attached log — and says plainly, before the upload box,
+  that the issue and its attachments are public and what the log contains. The
+  Settings page pre-fills the version into the form and shows where the log
+  lives, so filing a report is a click instead of a hunt. (PRs #228, #229;
+  design in #226) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Chart options inspector** — the Scenario Performance graph's display
   preferences left the blocking "Settings" modal for a collapsible panel beside
   the chart, so an overlay is tuned against the live chart instead of through an
@@ -63,14 +72,6 @@ sequence.
   bug report, no longer means hovering the header's GitHub icon. (PRs #188,
   #190; design in #187) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **In-app settings** — the stats folder, KovaaK's username, and Steam ID moved
-  out of the hand-edited `config.toml` into an app-owned store with a Settings
-  page that edits all three. The app now starts and serves whatever its stats
-  folder is doing — unset, moved, or missing — instead of exiting, installs ask
-  no questions at all, and a start with nothing configured finds the KovaaK's
-  stats folder itself. Configuring the dashboard no longer means opening a text
-  editor. (PRs #181, #182, #183, #184; design in #171) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
 
 ---
 
@@ -87,10 +88,6 @@ sequence.
 The settings arc's guided first-run flow — a setup card for a fresh install,
 and what "skip" should mean — was deliberately left out of settings detection
 and still needs a proposal of its own before it can be sequenced.
-
-Launch readiness has one process counterpart: where feedback and bug reports
-land once the app has real users, and what a report must carry, is designed
-in [`feedback_intake_proposal.md`](./feedback_intake_proposal.md).
 
 ---
 

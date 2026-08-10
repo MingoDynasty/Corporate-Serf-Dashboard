@@ -245,6 +245,21 @@ list in the roadmap.)
   answer sat in a tooltip on the header's GitHub icon, where nobody looks. It
   used to read "unknown" for the whole session after an update — exactly when
   it was most likely to be checked, and exactly the look of a failed update.
+- **Somewhere to send a bug report** (PRs #228, #229). GitHub Issues is the
+  place, with a bug form and a feature form so a report arrives with what it
+  needs instead of as a paragraph the maintainer has to interview. The bug
+  form asks almost nothing — what happened, the app version, and one attached
+  log file — and the Settings page fills in the version and shows where the
+  log lives, so filing one is a click rather than a hunt through
+  `%LOCALAPPDATA%`. Before the upload box, the form says in plain words that
+  the issue and its attachments are public and what the log contains — the
+  KovaaK's username and Steam ID already stamped on your leaderboard scores,
+  your scores and play times, and paths that may name your Windows account —
+  and invites you to open it in a text editor first. *Problem solved:* the app
+  runs entirely on the user's machine and phones nothing home, so a failure
+  nobody else can reproduce is only diagnosable if the user can hand over the
+  evidence — and they will only do that if what they are handing over, and to
+  whom, is stated honestly rather than buried.
 
 ## Where it's going
 

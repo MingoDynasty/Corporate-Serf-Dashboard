@@ -226,6 +226,10 @@ asks for your app version and your `debug.log`, which is what makes a failure
 on a machine no one else can see diagnosable; it also spells out what the log
 contains before you attach it.
 
+Easiest route: the **Settings** page has a "Report a bug" link that opens the
+form with your version already filled in, and shows the folder your logs are
+in.
+
 ## Run From Source
 
 For development, or if you would rather manage the toolchain yourself. The app
