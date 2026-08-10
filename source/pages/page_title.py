@@ -21,16 +21,18 @@ dynamic title keeps working.
 and Dash Pages overwrites it on every navigation anyway.
 """
 
+from collections.abc import Callable
+
 from source.config.config_service import get_config
 from source.utilities.build_info import get_build_info
 
 TITLE_SEPARATOR = " - "
 
 
-def page_title(title):
+def page_title(title: str | Callable[..., str]) -> Callable[..., str]:
     """Wrap a page title -- string or callable -- for ``register_page``."""
 
-    def resolve(**path_variables):
+    def resolve(**path_variables: str) -> str:
         """Resolve the title for one request, prefixed when opted in."""
         resolved = title(**path_variables) if callable(title) else title
         if not get_config().show_version_in_title:
