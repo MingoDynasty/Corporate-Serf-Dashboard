@@ -25,9 +25,13 @@ player's username and Steam ID are already public — every leaderboard score
 is stamped with both unless they opt out of leaderboards entirely — and both
 values are likely needed to reproduce identity-dependent bugs (rank lookups,
 benchmark row matching), which the audit predicts will be the top report
-class. Consequence of choosing differently: new redaction machinery across
-the several unredacted failure-logging sites plus the benchmark request
-params, and bug reports lose exactly the values that diagnose
+class. Disclosure must cover the audience as well as the contents: the form
+states that the issue and its attachments are public and invites the
+reporter to read the log before uploading (see the form design below) —
+without that, this decision would not communicate the exposure boundary it
+relies on. Consequence of choosing differently: new redaction machinery
+across the several unredacted failure-logging sites plus the benchmark
+request params, and bug reports lose exactly the values that diagnose
 misspelled-username and mismatched-Steam-ID root causes.
 
 **D2 — Channel policy: GitHub Issues canonical, forms only, nothing else at
@@ -122,8 +126,9 @@ the app-owned store). A launch user's install cannot produce them; they
 exist only in the maintainer's own pre-migration log history.
 
 Deployment facts the form copy relies on: logs rotate at 5 MB × 3 backups
-(`app.py`), so `debug.log` is always attachable (GitHub issue attachments
-accept `.log`); a deployed install also writes `launcher-app-stdout.log` and
+(`app.py`), so `debug.log` is always attachable (GitHub issue-form uploads
+accept `.log` at up to 25 MB — comfortably above the rotation cap); a
+deployed install also writes `launcher-app-stdout.log` and
 `launcher-app-stderr.log` beside it, which are the artifacts that matter
 when the app dies before its own logging starts.
 
@@ -148,10 +153,14 @@ Fields, in order: what happened (required, free text); what you expected
 with a "shown on the Settings page" hint, pre-fillable via URL — the log
 names the build only until rotation moves the startup record into a backup,
 so the field cannot rely on the attached log carrying it, and the pre-filled
-link absorbs the friction for the in-app path); attach `debug.log`
-(drag-and-drop instruction naming the path, `won't start at all` variant
-asking for the two launcher logs as well); screenshots for anything visual
-(optional).
+link absorbs the friction for the in-app path); diagnostics (a **required**
+`upload` field with `accept: .log` — GitHub's form schema enforces both — so
+every report carries at least one log: a normal report attaches `debug.log`,
+while a won't-start report attaches `launcher-app-stderr.log` and
+`launcher-app-stdout.log` *instead*, plus `debug.log` only if it exists,
+since the app may die before its own logging starts; the field description
+names the log directory); screenshots for anything visual (a separate
+optional `upload` field restricted to image extensions).
 
 The form deliberately does **not** ask for browser console output: the
 known first-load Dash pages race floods the console with alarming but
@@ -160,12 +169,19 @@ cosmetic errors (see the 2026-07-18 pages-race entry in
 Where console output matters, the maintainer asks in-thread with "reload
 first" instructions.
 
-Disclosure copy accompanies the attachment field, to the effect of:
-"`debug.log` includes your KovaaK's username and Steam ID (the same values
-stamped on your public leaderboard scores), your scenario scores and play
-times, and file paths that may include your Windows username. It never
-contains passwords or Steam credentials." Exact wording is settled at the
-implementation PR (D3's copy rule).
+Disclosure copy accompanies the diagnostics field and must state the
+audience, not just the contents: this repository is public, and GitHub
+serves attachments on public repositories to anyone, signed in or not. To
+the effect of: "This issue and any file you attach are public — anyone on
+the internet can read them, no GitHub account required. `debug.log` includes
+your KovaaK's username and Steam ID (the same values stamped on your public
+leaderboard scores), your scenario scores and play times, and file paths
+that may include your Windows username. It never contains passwords or
+Steam credentials. It's a plain text file — open it in any text editor
+first if you want to see exactly what you're sharing." Exact wording is
+settled at the implementation PR (D3's copy rule); the public-audience
+sentence and the review-before-upload invitation are required content, not
+style.
 
 ### Settings-page affordance (D3)
 
