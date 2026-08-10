@@ -82,11 +82,12 @@ def _label_text(component) -> str:
     )
 
 
-# The chart options inspector's five inputs, with the defaults that must not
-# move: Dash persistence is keyed by component id, and changing a layout
-# default silently wipes every value the browser already stored under it.
+# The chart options inspector's inputs, with the defaults that must not move:
+# Dash persistence is keyed by component id, and changing a layout default
+# silently wipes every value the browser already stored under it.
 CHART_OPTIONS_INPUT_DEFAULTS = {
     "rank-overlay-switch": ("checked", True),
+    "show-all-ranks-switch": ("checked", False),
     "high-score-overlay-switch": ("checked", True),
     "score-threshold-overlay-switch": ("checked", True),
     "score-threshold-percentage": ("value", 95),
@@ -286,6 +287,7 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
     expected_settings = {
         "automatically-change-scenario-switch": "automatically-change-scenario",
         "rank-overlay-switch": "rank-overlay",
+        "show-all-ranks-switch": "show-all-ranks",
         "high-score-overlay-switch": "high-score-overlay",
         "score-threshold-overlay-switch": "score-threshold-overlay",
         "score-threshold-percentage": "score-threshold-percentage",
@@ -345,6 +347,7 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
 
     assert labels == {
         "rank-overlay-switch": "Rank Thresholds",
+        "show-all-ranks-switch": "Show all ranks",
         "high-score-overlay-switch": "PB Score",
         "score-threshold-overlay-switch": "Score Threshold Overlay",
         "score-threshold-percentage": "Score Threshold Percentage",
