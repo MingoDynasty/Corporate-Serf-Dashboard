@@ -8,7 +8,8 @@ import pytest
 from dash import dcc, no_update
 from dash.exceptions import PreventUpdate
 
-from source.kovaaks import data_service
+from source.config import settings_service
+from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.data_models import PlaylistData, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
 
@@ -1317,6 +1318,7 @@ def test_playlist_scenarios_page_loads_rows_for_imported_playlist(monkeypatch):
         }
     ]
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
     def fake_build_rows(playlist_code, generation_token):
         assert playlist_code == "KovaaKsTestCode"
@@ -1361,6 +1363,7 @@ def test_playlist_scenarios_row_href_encodes_scenario_with_space(monkeypatch):
         scenarios=[Scenario(name="VT Pasu Air")],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
@@ -1492,6 +1495,7 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
         scenarios=[Scenario(name="First")],
     )
     monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
         playlist_scenarios,
         "build_playlist_scenario_rank_rows",
@@ -1520,6 +1524,80 @@ def test_playlist_fill_registration_race_clears_pending_cells(monkeypatch):
     assert status == "Update interrupted"
     assert generation is None
     assert disabled is True
+
+
+def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkeypatch):
+    # Every lookup would short-circuit offline, so the fill would fetch nothing
+    # and end in a red "couldn't update N of N" toast. Skip it and state the
+    # condition in the status line instead.
+    playlist = PlaylistData(
+        name="Voltaic Benchmarks",
+        code="KovaaKsTestCode",
+        scenarios=[Scenario(name="First")],
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "build_playlist_scenario_rank_rows",
+        lambda _code, _token: [
+            {
+                "scenario": "First",
+                "rank_display": "N/A",
+                "total_display": "N/A",
+                "percentile_display": "N/A",
+                "rank_pending": True,
+                "total_pending": True,
+                "percentile_pending": True,
+            }
+        ],
+    )
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "start_playlist_scenario_fill",
+        lambda *_args: pytest.fail("an unset username must not start a fill"),
+    )
+
+    rows, status, generation, disabled = playlist_scenarios.load_playlist_scenario_rows(
+        playlist.code
+    )
+
+    assert rows[0]["rank_display"] == "N/A"
+    assert rows[0]["total_display"] == "N/A"
+    assert rows[0]["percentile_display"] == "N/A"
+    # Nothing may be left animating for a fill that will never run.
+    assert rows[0]["rank_pending"] is False
+    assert rows[0]["total_pending"] is False
+    assert rows[0]["percentile_pending"] is False
+    assert generation is None
+    assert disabled is True
+    assert status[0] == "Positions unavailable — set your KovaaK's username in "
+    anchor = next(child for child in status if isinstance(child, dmc.Anchor))
+    assert anchor.href == "/settings"
+    assert anchor.children == "Settings"
+
+
+def test_playlist_scenarios_without_a_username_registers_no_fill(monkeypatch):
+    # The real service, not a fake: an empty registry is what guarantees no
+    # later interval drain can fire the summary toast.
+    playlist = PlaylistData(
+        name="Voltaic Benchmarks",
+        code="KovaaKsTestCode",
+        scenarios=[Scenario(name="First")],
+    )
+    monkeypatch.setattr(data_service, "playlist_database", {playlist.code: playlist})
+    monkeypatch.setattr(
+        playlist_scenarios,
+        "build_playlist_scenario_rank_rows",
+        lambda _code, _token: [{"scenario": "First"}],
+    )
+    registered_before = set(playlist_scenarios_service._FILL_REGISTRY)
+
+    _rows, _status, generation, _disabled = (
+        playlist_scenarios.load_playlist_scenario_rows(playlist.code)
+    )
+
+    assert generation is None
+    assert set(playlist_scenarios_service._FILL_REGISTRY) == registered_before
 
 
 def _fill_drain(

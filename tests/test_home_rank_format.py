@@ -1030,6 +1030,7 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
 def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
     monkeypatch,
 ):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     calls = []
 
     def get_rank(*_args, **kwargs):
@@ -1053,6 +1054,8 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
 
 
 def test_manual_rank_refresh_crash_toasts_red_and_leaves_the_value_alone(monkeypatch):
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+
     def explode(*_args, **_kwargs):
         raise RuntimeError("boom")
 
@@ -1070,6 +1073,8 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 ):
     # A failed fetch served from cache is neither a failure the user must act
     # on nor a refresh worth confirming: yellow, and the value says so too.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+
     def get_rank(*_args, **_kwargs):
         return ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1096,6 +1101,8 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeypatch):
     # The fetch succeeded; the mismatch is the passive path's once-per-session
     # toast, not a per-click complaint about a refresh that worked.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+
     def get_rank(*_args, **_kwargs):
         return ScenarioRankInfo(
             status=ScenarioRankStatus.RANKED,
@@ -1117,6 +1124,7 @@ def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeyp
 def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
     # ``show`` swallows a repeated id while the first toast is still up, so
     # each deliberate click gets its own.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
         home,
         "get_scenario_rank_info",
@@ -1135,6 +1143,47 @@ def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
     assert first[0]["id"] != second[0]["id"]
     assert first[0]["id"].startswith("rank-refresh-notification-")
     assert second[0]["id"].startswith("rank-refresh-notification-")
+
+
+def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch):
+    # Nothing failed: with no username the lookup would never touch the
+    # network, so the click is answered with the verdict rather than the
+    # generic red failure -- and the field's own hint is left alone.
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "an unset username must not reach the rank service"
+        ),
+    )
+
+    rank_display, notifications = home.refresh_rank(1, "Scenario")
+
+    assert rank_display is no_update
+    assert [notification["color"] for notification in notifications] == ["blue"]
+    assert notifications[0]["title"] == "KovaaK's username not set"
+    assert notifications[0]["message"] == (
+        "Set your KovaaK's username in Settings to see your leaderboard position."
+    )
+
+
+def test_back_to_back_unset_username_refreshes_each_answer(monkeypatch):
+    # Same reason the green confirmation carries a fresh id: a stable one would
+    # be swallowed while the first toast is still on screen.
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda *_args, **_kwargs: pytest.fail(
+            "an unset username must not reach the rank service"
+        ),
+    )
+
+    _first_display, first = home.refresh_rank(1, "Scenario")
+    _second_display, second = home.refresh_rank(2, "Scenario")
+
+    assert first[0]["id"] != second[0]["id"]
+    assert first[0]["id"].startswith("rank-refresh-username-unset-")
+    assert second[0]["id"].startswith("rank-refresh-username-unset-")
 
 
 def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):

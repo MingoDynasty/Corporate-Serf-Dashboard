@@ -25,6 +25,7 @@ from source.config.config_service import get_config
 from source.config.settings_service import (
     STATS_DIR_KEY,
     get_identity,
+    get_kovaaks_username,
     get_settings,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
@@ -657,6 +658,24 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     )
 
 
+def _rank_refresh_username_unset_notification() -> dict[str, object]:
+    """Answer a Refresh click that has no identity to look anything up with.
+
+    Blue, not red: nothing failed and no data is degraded -- the username is
+    simply not configured yet, and the title carries that verdict. Fresh id per
+    click for the same reason the success confirmation carries one: ``show``
+    ignores a duplicate id while the previous toast is still up, which would
+    leave a repeat click with no visible answer at all.
+    """
+    return toast(
+        f"rank-refresh-username-unset-{uuid.uuid4()}",
+        "KovaaK's username not set",
+        "Set your KovaaK's username in Settings to see your leaderboard position.",
+        color="blue",
+        icon=local_icon("material-symbols:refresh-rounded"),
+    )
+
+
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
@@ -668,13 +687,22 @@ def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, obje
     running=[(Output("rank-refresh-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def refresh_rank(n_clicks, selected_scenario: str | None):
+# One return per outcome the click can have -- three guards and four verdicts.
+# Collapsing any pair would only hide which answer a reader is looking at.
+def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
     """Fetch and display authoritative board truth after an explicit user request.
 
     The user asked, so every outcome answers on this callback's own
     notification output: red when the refresh failed outright, yellow when it
     failed but a cached position was served in its place, green only on a
-    genuinely fresh result.
+    genuinely fresh result, and blue when there is no username to look
+    anything up with.
+
+    The unset-username case is caught before the lookup, on the direct settings
+    read rather than the service's error copy. The passive field already
+    explains the condition in place, but it was explaining it before the click
+    too, so it cannot answer the click itself -- and a user clicking Refresh
+    beside that hint plausibly clicked because they had not read it.
 
     A failed refresh returns ``no_update`` for the value rather than ``N/A``,
     so whatever was on screen stays put -- usually the cached position -- and
@@ -688,6 +716,10 @@ def refresh_rank(n_clicks, selected_scenario: str | None):
         return no_update, no_update
     if not selected_scenario:
         return "N/A", no_update
+    if not get_kovaaks_username():
+        # ``no_update``: the field already reads "N/A — set your KovaaK's
+        # username in Settings", so only the toast is new.
+        return no_update, [_rank_refresh_username_unset_notification()]
 
     try:
         rank_info = get_scenario_rank_info(
