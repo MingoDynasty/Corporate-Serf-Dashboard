@@ -12,6 +12,7 @@ modal owned, and it stays now that the modal is gone.
 import logging
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlencode
 
 import dash
 import dash_mantine_components as dmc
@@ -34,6 +35,7 @@ from source.config.stats_dir_detection import detect_stats_dir_candidates
 from source.kovaaks.percentile_warmup_service import start_percentile_warmup_worker
 from source.pages.page_title import page_title
 from source.utilities.build_info import get_build_info
+from source.utilities.paths import log_dir
 from source.utilities.utilities import format_absolute_timestamp
 
 logger = logging.getLogger(__name__)
@@ -436,13 +438,36 @@ def _settings_input(
     )
 
 
+# Spelled here rather than reused from ``api_service.PROJECT_URL``: that one is
+# the contact point stamped into the User-Agent, and a settings page has no
+# business importing the KovaaK's client to render a link.
+ISSUES_URL = "https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new"
+# The filename of the merged issue form. GitHub pre-fills a form's fields from
+# query params named after their field ids, so this and ``version`` below are
+# both contracts with ``.github/ISSUE_TEMPLATE/bug_report.yml``.
+BUG_REPORT_TEMPLATE = "bug_report.yml"
+
+
+def bug_report_url(release_label: str) -> str:
+    """Build the pre-filled "Report a bug" link for the running build.
+
+    Every label the resolver can produce is pre-filled, ``dev`` and ``unknown``
+    included: the form requires the version field, the value is editable, and
+    "unknown" is itself the honest answer for a build nothing could identify.
+    """
+    query = urlencode({"template": BUG_REPORT_TEMPLATE, "version": release_label})
+    return f"{ISSUES_URL}?{query}"
+
+
 def _version_section() -> dmc.Stack:
-    """Name the running build: the release label, then the commit detail.
+    """Name the running build, then offer the two things a bug report needs.
 
     Static text read straight off ``BuildInfo`` — the identity is resolved once
     per process by one reader, and nothing here re-derives any part of it. It
-    answers "which version am I running?" after an update, and gives a bug
-    report something to quote.
+    answers "which version am I running?" after an update, and the link beside
+    it carries that same label into the report, so nobody has to transcribe it.
+    The log directory is shown for the same reason: the form asks for
+    ``debug.log``, and this names where to find it.
     """
     build = get_build_info()
     return dmc.Stack(
@@ -451,6 +476,19 @@ def _version_section() -> dmc.Stack:
             dmc.Text(
                 f"Commit {build.short_description}",
                 id="app-settings-build",
+                c="dimmed",
+                size="sm",
+            ),
+            dmc.Anchor(
+                "Report a bug",
+                id="app-settings-bug-report",
+                href=bug_report_url(build.release_label),
+                target="_blank",
+                size="sm",
+            ),
+            dmc.Text(
+                f"Logs {log_dir()}",
+                id="app-settings-log-dir",
                 c="dimmed",
                 size="sm",
             ),

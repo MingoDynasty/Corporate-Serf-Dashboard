@@ -46,10 +46,10 @@ from source.utilities.crash_logging import (
     SUPPRESS_CONSOLE_KEY,
     install_crash_logging,
 )
-from source.utilities.paths import state_dir
+from source.utilities.paths import log_dir
 
 # Logging setup
-LOG_DIR = state_dir() / "data" / "logs"
+LOG_DIR = log_dir()
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(threadName)s | %(name)s | %(message)s"
 LOG_MAX_BYTES = 5 * 1024 * 1024
 LOG_BACKUP_COUNT = 3

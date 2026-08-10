@@ -20,12 +20,14 @@ import json
 from source import app
 from source.config.config_service import config_file_path
 from source.kovaaks import api_service, data_service, playlist_visibility_service
+from source.utilities.paths import log_dir
 
 print(
     json.dumps(
         {
             "config": str(config_file_path()),
             "logs": str(app.LOG_DIR),
+            "logs_helper": str(log_dir()),
             "cache": str(api_service.CACHE_DIR),
             "playlists": str(data_service.USER_PLAYLIST_DIRECTORY_PATH),
             "benchmarks": str(data_service.BUNDLED_PLAYLIST_DIRECTORY_PATH),
@@ -96,6 +98,9 @@ def test_state_paths_follow_the_state_root(tmp_path: Path) -> None:
 
     assert paths["config"] == state_root / "config.toml"
     assert paths["logs"] == state_root / "data" / "logs"
+    # The settings page shows this path without importing ``app``, so the two
+    # have to keep agreeing.
+    assert paths["logs_helper"] == paths["logs"]
     assert paths["cache"] == state_root / "data" / "cache"
     assert paths["playlists"] == state_root / "data" / "playlists"
     assert paths["visibility"] == state_root / "data" / "playlist_visibility.json"
@@ -109,6 +114,7 @@ def test_unset_state_dir_keeps_cwd_relative_behavior(tmp_path: Path) -> None:
 
     assert paths["config"] == tmp_path / "config.toml"
     assert paths["logs"] == tmp_path / "data" / "logs"
+    assert paths["logs_helper"] == paths["logs"]
     assert paths["cache"] == tmp_path / "data" / "cache"
     assert paths["playlists"] == tmp_path / "data" / "playlists"
     assert paths["visibility"] == tmp_path / "data" / "playlist_visibility.json"

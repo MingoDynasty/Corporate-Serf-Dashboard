@@ -14,6 +14,7 @@ from source.config.identity_detection import (
     IdentityDetectionResult,
 )
 from source.utilities.build_info import BuildInfo
+from source.utilities.paths import log_dir
 from source.utilities.utilities import format_absolute_timestamp
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
@@ -451,6 +452,72 @@ def test_the_page_names_the_running_build(monkeypatch):
     )
     assert _component_by_id(page, "app-settings-build").children == (
         "Commit 0123456 (2026-08-02)"
+    )
+
+
+def test_the_bug_report_link_names_the_form_and_the_version():
+    url = settings_page.bug_report_url("v2026.08.02.1")
+
+    assert url == (
+        "https://github.com/MingoDynasty/Corporate-Serf-Dashboard/issues/new"
+        "?template=bug_report.yml&version=v2026.08.02.1"
+    )
+
+
+def test_a_bug_report_link_escapes_the_label_it_carries():
+    """The tag comes from JSON the app did not write, so it is encoded, not
+    pasted: an unescaped ``&`` or space would truncate or split the param."""
+    url = settings_page.bug_report_url("v1.0 rc&1")
+
+    assert "version=v1.0+rc%261" in url
+    assert url.count("&") == 1
+
+
+@pytest.mark.parametrize(
+    ("build", "expected_label"),
+    [
+        (
+            BuildInfo(sha="0" * 40, commit_date="2026-08-02", tag=None, source="git"),
+            "dev",
+        ),
+        (BuildInfo(sha=None, commit_date=None, tag=None, source="unknown"), "unknown"),
+    ],
+)
+def test_an_unreleased_build_still_prefills_the_version(
+    monkeypatch, build, expected_label
+):
+    """Never suppressed: the field is required and the user can correct it, so
+    a placeholder beats an empty box the reporter has to guess at."""
+    monkeypatch.setattr(settings_page, "get_build_info", lambda: build)
+
+    anchor = _component_by_id(settings_page.layout(), "app-settings-bug-report")
+
+    assert anchor.href == settings_page.bug_report_url(expected_label)
+    assert f"version={expected_label}" in anchor.href
+
+
+def test_the_page_offers_a_prefilled_report_and_says_where_the_log_is(monkeypatch):
+    """The two failure points of a user-driven report: a wrong version and a
+    log nobody can find."""
+    monkeypatch.setattr(
+        settings_page,
+        "get_build_info",
+        lambda: BuildInfo(
+            sha="0123456789abcdef",
+            commit_date="2026-08-02",
+            tag="v2026.08.02.1",
+            source="release-file",
+        ),
+    )
+
+    page = settings_page.layout()
+
+    anchor = _component_by_id(page, "app-settings-bug-report")
+    assert anchor.children == "Report a bug"
+    assert anchor.href == settings_page.bug_report_url("v2026.08.02.1")
+    assert anchor.target == "_blank"
+    assert _component_by_id(page, "app-settings-log-dir").children == (
+        f"Logs {log_dir()}"
     )
 
 
