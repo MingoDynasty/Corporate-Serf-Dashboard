@@ -104,12 +104,14 @@ Codex <codex@local>
   samples) goes under `ignore/` in a categorized subdirectory, never loose at
   the top level — routing table in [ignore/README.md](ignore/README.md).
 - `ignore/prompts/` is the live queue of ready-to-fire kickoff prompts. When
-  the PR that consumes a prompt merges, move the prompt to
-  `ignore/prompts/done/` as part of that PR's cleanup, so `ls ignore/prompts/*.md`
-  always answers "what's ready to start?" (the consumed corpus stays out of the
-  way in the `done/` subdir). The `done/` corpus is the
-  house-style reference for writing new prompts; it is untracked (no git
-  history), so move — never delete.
+  opening the PR that consumes a prompt, move the prompt to
+  `ignore/prompts/done/` as part of authoring that PR, so `ls ignore/prompts/*.md`
+  always answers "what's ready to start?" — a prompt whose PR is in review is
+  not ready, and archiving only at merge would advertise it to parallel
+  sessions for the whole review window. If the PR closes unmerged, move the
+  prompt back to the live queue (it usually needs revision anyway). The
+  `done/` corpus is the house-style reference for writing new prompts; it is
+  untracked (no git history), so move — never delete.
 - Do not log every small implementation choice as a decision.
 - When a durable decision changes, keep the old decision and mark it superseded instead of erasing history.
 - If a user direction changes an existing proposal or decision, call it out. After agreement, update the relevant docs as part of the implementation.
