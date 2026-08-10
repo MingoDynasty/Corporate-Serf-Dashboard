@@ -298,7 +298,11 @@ flowchart LR
   cache-only phase-1 rows, stores a per-open generation token, enables the
   fill interval, and drains complete phase-2 rows through update-only AG Grid
   transactions. The drain callback owns progress text, cancellation
-  finalization, and the one-shot aggregate completion toast.
+  finalization, and the one-shot aggregate completion toast. With no
+  `kovaaks_username` configured the fill is skipped entirely — phase-1 rows
+  with the pending flags cleared, a `None` generation token, the interval left
+  disabled, and the condition stated in the status line (see decision log), so
+  the completion toast cannot fire over a pass that would fetch nothing.
 - `aim_training_journey.py` (`/aim-training-journey`) — cumulative playtime/progress plot.
 - `settings.py` (`/settings`) — the settings store's only runtime writer: the
   stats directory, KovaaK's username, and Steam ID, with one all-or-nothing

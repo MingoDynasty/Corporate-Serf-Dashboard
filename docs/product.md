@@ -61,6 +61,18 @@ list in the roadmap.)
   error on every rank render, stacking into a wall of red during normal play;
   now nothing turns red unless something you asked for failed, or a run of
   yours failed to record.
+- **No username means quiet, on the position surfaces too** (PR #227). With
+  no KovaaK's username configured, opening a playlist skips the position
+  update entirely and the table says "Positions unavailable — set your
+  KovaaK's username in Settings"; clicking Refresh on Scenario Performance
+  answers with a blue notice naming the missing username. *Problem solved:*
+  a fresh install could not open a playlist without watching a progress line
+  count through an update that was fetching nothing, then land on a red
+  "couldn't update 16 of 16 positions" — and Refresh answered the same
+  configuration state with an anonymous "Position refresh failed". Both now
+  name the actual condition and point at where to fix it. (A username that is
+  set but wrong still reports as a generic failure; that case is not fixed
+  yet.)
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is. By

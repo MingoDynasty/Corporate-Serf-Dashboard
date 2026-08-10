@@ -16,6 +16,7 @@ from dash import (
 )
 
 from source.components.local_icon import local_icon
+from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
     get_playlist_by_code,
     get_playlist_display_label,
@@ -235,19 +236,46 @@ def load_playlist_scenario_rows(playlist_code):
 
     generation_token = uuid4().hex
     rows = build_playlist_scenario_rank_rows(playlist_code, generation_token)
+    if not get_kovaaks_username():
+        # Without a username every per-scenario lookup short-circuits offline
+        # to UNKNOWN, so phase 2 would fetch nothing and end in a red "couldn't
+        # update N of N" toast. That is persistent configuration state, not a
+        # failure: skip the fill and say so in place instead. Nothing on screen
+        # can contradict the line -- the service's no-username guard fires
+        # before any cache read, so every position cell renders N/A.
+        _clear_pending_flags(rows)
+        return rows, _username_unset_status(), None, True
     # Registration deliberately happens only after the phase-1 rows exist. A
     # spurious/fast interval tick must never drain updates into an empty grid.
     if not start_playlist_scenario_fill(playlist_code, generation_token):
         # A concurrent delete can remove the playlist between phase 1 and
         # registration. With no fill to settle the rows, clear every pending
         # flag here so the disabled interval cannot strand animation forever.
-        for row in rows:
-            row["rank_pending"] = False
-            row["total_pending"] = False
-            row["percentile_pending"] = False
+        _clear_pending_flags(rows)
         return rows, "Update interrupted", None, True
     status = _live_fill_status(0, len(rows))
     return rows, status, generation_token, False
+
+
+def _clear_pending_flags(rows: list[dict]) -> None:
+    """Settle every position cell for rows no fill will ever update."""
+    for row in rows:
+        row["rank_pending"] = False
+        row["total_pending"] = False
+        row["percentile_pending"] = False
+
+
+def _username_unset_status() -> list:
+    """State the unset-username condition in the grid's own status line.
+
+    Built fresh per call rather than shared at module scope: the value is a
+    callback output, and a mutable component list must not be reused across
+    requests.
+    """
+    return [
+        "Positions unavailable — set your KovaaK's username in ",
+        dmc.Anchor("Settings", href="/settings", refresh=False),
+    ]
 
 
 def _live_fill_status(done_count: int, total: int) -> str:
