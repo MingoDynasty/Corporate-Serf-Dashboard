@@ -6,7 +6,9 @@ else on the board. Placements are cached for a week and re-checked
 automatically after a new personal best, so the display stays current
 without hammering the API. When KovaaK's is slow or unavailable the app
 keeps showing the best data it already has rather than erroring, and with
-no username configured it makes no network calls at all. During normal
+no username configured it makes no network calls at all. A fresh install is
+offered the account once, on the landing page, and can turn the whole
+feature down for good there. During normal
 play the field explains its own state beside the value instead of popping
 up a notification, and only two things still interrupt: a Refresh the
 player clicked, and a Steam ID that disagrees with the account KovaaK's
@@ -54,8 +56,17 @@ benchmark tier) — see the
 - An empty `kovaaks_username` keeps the app fully offline: the rank service
   short-circuits before any network call
   ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)).
-  Both position surfaces treat that as persistent configuration state rather
-  than a failure. The playlist scenarios page skips its progressive position
+  Two paths reach it: never configuring a username, and declining the offer.
+  The landing page's setup card writes the key empty through
+  `settings_service.decline_identity`, so the fully-offline state is one a
+  user can choose deliberately and permanently without opening the Settings
+  page at all. While the key is absent that card is also what says the rank
+  features exist — it offers the account, and the in-place statements below
+  take over once the emptiness is on screen
+  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  Every surface that depends on the username treats an empty one as
+  persistent configuration state rather than a failure. The playlist
+  scenarios page skips its progressive position
   fill entirely and says so in place — "Positions unavailable — set your
   KovaaK's username in Settings", with Settings linked — so the fill's red
   summary toast cannot fire over a pass that fetched nothing
@@ -63,7 +74,8 @@ benchmark tier) — see the
   The playlists overview, whose percentile columns empty for the same reason,
   states it in its own status line as well: "Percentiles unavailable. Set your
   KovaaK's username in Settings.", again with Settings linked, and only when
-  the grid has rows to explain.
+  the grid has rows to explain
+  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
   A username that is configured but wrong is a separate, still-open case: it
   is knowable only per result and still produces the generic failure reporting.
 
