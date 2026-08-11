@@ -169,12 +169,19 @@ can write it by hand instead:
 
 ```json
 {
+  "schema_version": 1,
   "stats_dir": "S:/SteamLibrary/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats",
   "kovaaks_username": "YourKovaaksName",
   "steam_id": ""
 }
 ```
 
+- `schema_version` — which format this file is in. Required, and it must be the
+  whole number `1`. It is how a future version of the dashboard will know how to
+  read a file this one wrote. A file without it, or with a key not listed here,
+  is not used: the dashboard leaves it exactly as it is, starts with no settings
+  configured, and says so on the Settings page. Saving from that page rewrites
+  the file and keeps a copy of the old one beside it.
 - `stats_dir` — the folder KovaaK's writes its run files into, usually
   `<Steam library>/steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`. Without
   it the dashboard still starts, but it has no runs to show and says so on the
