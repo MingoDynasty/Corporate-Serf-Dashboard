@@ -92,8 +92,8 @@ starts (there is no username to warm anything for), and nothing pins, because
 the identity pin freezes only on a read that sees a configured username, so no
 restart notice appears either. Recovery from a decline is the settings page
 plus the point-of-impact hints; the card itself never returns. The callback
-guards on `n_clicks` and `ctx.triggered_id`, the DashProxy initial-call hazard
-(see the 2026-08-02
+guards on `n_clicks` and `ctx.triggered_id` against the DashProxy
+initial-call hazard (see the 2026-08-02
 ["A Committed Side Effect Reports Its Outcome Even When A Later Write Fails"](#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)
 entry's hazard note), which matters here because this callback writes to disk.
 
