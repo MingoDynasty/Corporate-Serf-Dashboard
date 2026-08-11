@@ -60,7 +60,7 @@ card and the hint each still state something true.
 
 **The card stands aside for a pending restart.** While
 `is_stats_dir_change_pending()` holds, nothing renders: the user is mid-setup,
-the existing "Settings saved — restart the dashboard to apply them." hint owns
+the existing "Restart the app to apply your saved settings." hint owns
 that moment, and stacking the identity ask on top would be two banners for one
 unfinished action. The card returns after the restart if identity is still
 unasked. It never claims completion; restart honesty stays with the settings
