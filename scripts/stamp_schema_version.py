@@ -1,4 +1,4 @@
-"""One-time conversion: stamp ``schema_version`` onto existing durable stores.
+r"""One-time conversion: stamp ``schema_version`` onto existing durable stores.
 
 Part of the release that introduced the stamp. Every install created before it
 holds an unstamped ``data/settings.json``, ``data/playlist_visibility.json``,
@@ -31,10 +31,10 @@ in a versioned directory while the state lives at the install root. Run the
 release's own interpreter by absolute path::
 
     $root = Join-Path $env:LOCALAPPDATA 'CorporateSerfDashboard'
-    $m = [System.IO.File]::ReadAllText("$root\\install.json") | ConvertFrom-Json
+    $m = [System.IO.File]::ReadAllText("$root\install.json") | ConvertFrom-Json
     $tag = if ($m.update_policy -eq 'pinned') { $m.pinned_tag } else { $m.tag }
-    & "$root\\versions\\$tag\\.venv\\Scripts\\python.exe" `
-        "$root\\versions\\$tag\\scripts\\stamp_schema_version.py"
+    & "$root\versions\$tag\.venv\Scripts\python.exe" `
+        "$root\versions\$tag\scripts\stamp_schema_version.py"
 
 **Which files get converted** is decided by the *state root*, resolved in this
 order: ``--state-dir``, then ``CSD_STATE_DIR`` (which the launcher sets around
