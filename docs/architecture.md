@@ -255,6 +255,14 @@ flowchart LR
   rank, and the chart options inspector. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
+  As the landing page it also carries the first-run setup card
+  (`_setup_card_children`), which renders while a settings key has never been
+  written — an absent `stats_dir`, or an absent `kovaaks_username` once the
+  directory exists — and is suppressed while a stats-directory change awaits a
+  restart. It only links to `/settings`; its Skip button calls
+  `settings_service.decline_identity` and removes the card. Key *presence* is
+  the line between it and `_stats_dir_hint`, which explains a directory that
+  is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
   overlay and score-threshold preferences, so every adjustment shows on the
   live chart; `toggle_chart_options` writes its open state as a CSS class,
@@ -417,7 +425,11 @@ flowchart LR
   and missing-directory into one "no stats directory"). The directory-exists
   check is part of resolution, not of each read, so a directory that appears
   mid-run cannot half-enable an app that skipped its scan. Nothing else writes
-  the file.
+  the file. Two runtime writers live here: `save_settings` (replace-all, the
+  settings page's Save) and `decline_identity`, which records a declined
+  identity ask by setting `kovaaks_username` to `""` and nothing else, under
+  the module lock so no other key can be resurrected from a caller's stale
+  snapshot.
 - `config/stats_dir_detection.py` — finds the KovaaK's stats directory on this
   machine (registry Steam roots → each root's `libraryfolders.vdf` → probe
   `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`). One walk, two readers:

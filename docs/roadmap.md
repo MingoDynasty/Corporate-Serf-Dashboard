@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Initial setup flow** — a fresh install now says what it could not set up
+  for itself. The Scenario Performance page carries a small setup card while
+  something has never been asked about: no KovaaK's stats folder was found, or
+  the account that turns leaderboard positions and percentiles on has never
+  been offered. The card links to Settings and nothing else — no wizard, no
+  modal — and the account offer can be skipped, which turns rank lookups off
+  and never asks again. The playlists overview explains its N/A percentile
+  columns in the same words. (PRs #235, #236; design in #231) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Feedback and bug-report intake** — the app has a defined place to send
   feedback and bug reports: GitHub Issues, with a bug form and a feature form
   and no blank-issue option. The bug form asks almost nothing — what happened,
@@ -64,15 +73,6 @@ sequence.
   ever fills the form — Save is still what writes. (PRs #189, #191, #193;
   design in #186) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Version display** — the Settings page now names the running build: the
-  release tag, with the commit it came from underneath. A freshly updated app
-  knows its own tag from its first session, because the installer and launcher
-  leave a copy of the release description beside each installed version at
-  download time. Checking whether an update landed, or quoting a version in a
-  bug report, no longer means hovering the header's GitHub icon. (PRs #188,
-  #190; design in #187) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-
 ---
 
 ## Upcoming milestones
@@ -84,12 +84,6 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
-
-The settings arc's guided first-run flow — a setup card for a fresh install,
-and what "skip" should mean — was deliberately left out of settings detection
-and is now proposed in
-[`initial_setup_proposal.md`](./initial_setup_proposal.md), awaiting
-sequencing against run history.
 
 ---
 

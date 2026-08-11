@@ -191,6 +191,18 @@ list in the roadmap.)
   one public KovaaK's lookup. Identity now arrives verified rather than
   remembered, and a wrong pick is repaired by choosing a suggestion. Nothing is
   written until Save, so a suggestion is never a decision made for the user.
+- **A fresh install explains itself, once** (Scenario Performance page, PRs
+  #235, #236). A setup card appears while something has never been asked
+  about: it says so when no stats folder was found, and otherwise offers the
+  KovaaK's account that turns leaderboard positions and percentiles on. Either
+  way it points at the Settings page and nothing else; the account offer can
+  be skipped, which turns rank lookups off and never asks again. The playlists
+  overview says the same thing where its percentile columns read N/A. *Problem
+  solved:* a first launch usually charts runs with no setup at all, which left
+  the one optional feature invisible unless a user stumbled onto it, and when
+  the folder lookup missed, exactly one page explained why everything was
+  empty. The app now states what is missing without a wizard, and stops asking
+  the moment the user answers — including when the answer is no.
 - **Playlist import via sharecode** (Playlists overview page, PR #92;
   previously the Home Settings modal). *Problem solved:* onboarding a playlist
   takes one code paste, not hand-building a scenario list. Lives on the

@@ -51,7 +51,10 @@ through Steam, and remembers what it finds. If it comes up empty — KovaaK's
 installed somewhere unusual, or not installed yet — the dashboard still starts;
 it simply has no runs to show and says so on the Scenario Performance page
 until you point it at the folder on the Settings page (see
-[Configuration](#configuration)).
+[Configuration](#configuration)). That same page offers the one thing the
+first start cannot work out for itself — your KovaaK's account, which turns
+leaderboard positions and percentiles on. Skipping the offer leaves those
+features off and the dashboard does not ask again.
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
