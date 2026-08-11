@@ -161,10 +161,10 @@ leaderboards. The stats folder is usually filled in for you on the first start
 cases it could not, and for turning the leaderboard features on. If you have
 KovaaK's in more than one Steam library, the stats folder box suggests each one
 it found, so picking the right copy is a click rather than a hunt through
-Explorer. For the username and Steam ID, **Detect** checks the Steam accounts
-on this machine against KovaaK's and fills in the one it can prove is yours —
-or lists what it found, for you to choose from, when it cannot be sure of
-exactly one. Nothing detected is kept until you press Save.
+Explorer. For the username and Steam ID, **Detect my accounts** checks the
+Steam accounts on this machine against KovaaK's and fills in the one it can
+prove is yours — or lists what it found, for you to choose from, when it
+cannot be sure of exactly one. Nothing detected is kept until you press Save.
 
 The page writes `data/settings.json`, the app-owned file beside `config.toml`
 (installed: `%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). You

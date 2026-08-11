@@ -23,6 +23,7 @@ import dash
 import dash_mantine_components as dmc
 from dash import Input, Output, State, callback, ctx, dcc, no_update
 
+from source.components.local_icon import local_icon
 from source.config.identity_detection import (
     IdentityCandidate,
     IdentityDetectionResult,
@@ -51,10 +52,23 @@ dash.register_page(
     title=page_title("Settings"),
 )
 
-STATS_DIR_DESCRIPTION = (
+_STATS_DIR_PURPOSE = (
     "The KovaaK's stats folder this app reads runs from, usually "
-    "...\\FPSAimTrainer\\FPSAimTrainer\\stats. Leave it empty to run without "
-    "run data."
+    "...\\FPSAimTrainer\\FPSAimTrainer\\stats."
+)
+_STATS_DIR_EMPTY_MEANS = "Leave it empty to run without run data."
+# Said only when detection actually found something: the field renders as a
+# plain text box on a machine with no Steam, and promising a list there would
+# send the user clicking at a dropdown that has nothing to open.
+STATS_DIR_SUGGESTIONS_HINT = (
+    "Click the field to pick from the folders found on this machine."
+)
+
+STATS_DIR_DESCRIPTION = f"{_STATS_DIR_PURPOSE} {_STATS_DIR_EMPTY_MEANS}"
+# The invitation sits before the empty-means clause: it is the actionable half,
+# and burying it last reads as a footnote to a footnote.
+STATS_DIR_DESCRIPTION_WITH_SUGGESTIONS = (
+    f"{_STATS_DIR_PURPOSE} {STATS_DIR_SUGGESTIONS_HINT} {_STATS_DIR_EMPTY_MEANS}"
 )
 USERNAME_DESCRIPTION = (
     "Your KovaaK's account name, used to look up your leaderboard rank. Leave "
@@ -102,6 +116,12 @@ RESTART_NOTICE_HIDDEN_CLASS = (
 )
 
 DETECT_STATUS_CLASS = "app-settings-detect-status"
+
+# What the button does, said before it is pressed rather than after. The status
+# line beside Detect used to ship empty, which left the label as the only clue
+# that the press costs nothing and needs no typing; a detection's own report
+# replaces this the moment there is one.
+DETECT_HINT = "Checks the Steam accounts on this machine against KovaaK's."
 
 PICKER_CLASS = "app-settings-identity-picker"
 # The picker ships hidden and stays hidden unless a detection produces
@@ -302,10 +322,15 @@ def _can_auto_fill(result: IdentityDetectionResult) -> bool:
 
 
 def _unchecked_status(count: int) -> str:
-    """Say how much of the machine detection could not answer for."""
+    """Say how much of the machine detection could not answer for.
+
+    Names the button exactly as the page shows it, the way the picker's
+    description names Save: a retry instruction that points at a label nobody
+    can find is worse than none.
+    """
     return (
         f"{count} Steam account{'' if count == 1 else 's'} could not be checked; "
-        "press Detect again to retry."
+        "press Detect my accounts again to retry."
     )
 
 
@@ -516,38 +541,71 @@ def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
     valid answer, and with no candidates the field is exactly the text input it
     replaced. Filtering is off, so a prefilled field still offers the other
     libraries it found.
+
+    Which is the problem this field's chevron and extra sentence solve. An
+    Autocomplete renders identically to the two text inputs below it, so a
+    prefilled box gave no sign that the other libraries were one click away,
+    and an empty one on a machine Steam knows read as "type a path by hand".
+    Both signs appear only when there is a list behind them.
     """
+    suggested = bool(candidates)
     return dmc.Autocomplete(
         id="app-settings-stats-dir",
         label="Stats directory",
-        description=STATS_DIR_DESCRIPTION,
+        description=(
+            STATS_DIR_DESCRIPTION_WITH_SUGGESTIONS
+            if suggested
+            else STATS_DIR_DESCRIPTION
+        ),
         value=value,
         data=candidates,
         filter=SHOW_EVERY_CANDIDATE,
+        # Dimmed to Mantine's own combobox register: this marks a field that
+        # opens, it is not a second control. Passed as a colour rather than a
+        # class because ``local_icon`` paints the mask inline, where a
+        # stylesheet rule could not reach it.
+        rightSection=(
+            local_icon(
+                "material-symbols:keyboard-arrow-down",
+                color="var(--mantine-color-dimmed)",
+                width=20,
+            )
+            if suggested
+            else None
+        ),
+        # The chevron is a sign, not a button: clicks fall through to the input,
+        # which is what opens the dropdown.
+        rightSectionPointerEvents="none",
         w=_FIELD_WIDTH,
     )
 
 
 def _identity_detection() -> dmc.Stack:
-    """Build the Detect control, its status line, and the picker it may fill.
+    """Build the Detect control, its standing hint, and the picker it may fill.
 
-    All three ship empty: identity detection costs KovaaK's calls, so it runs
-    behind the button and never on a render path. The picker stays hidden until
-    a detection produces something to choose between.
+    Nothing here has run yet: identity detection costs KovaaK's calls, so it
+    runs behind the button and never on a render path. What ships is the
+    explanation of what the button would do, in the line a detection later
+    reports into; the picker stays hidden until a detection produces something
+    to choose between.
+
+    The label names the two fields it fills rather than the mechanism, which is
+    the hint's job. Both are needed: a bare "Detect" on a page of three empty
+    boxes says neither what gets detected nor that pressing it is free.
     """
     return dmc.Stack(
         children=[
             dmc.Group(
                 children=[
                     dmc.Button(
-                        "Detect",
+                        "Detect my accounts",
                         id="app-settings-detect-button",
                         # Secondary to Save, which is the only button here that
                         # changes anything.
                         variant="default",
                     ),
                     dmc.Text(
-                        "",
+                        DETECT_HINT,
                         id="app-settings-detect-status",
                         className=DETECT_STATUS_CLASS,
                     ),
