@@ -271,7 +271,11 @@ flowchart LR
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.
   Overview row rendering is local-only — it draws from local run data and rank
-  caches and never triggers KovaaK's API calls. While the warmup worker is
+  caches and never triggers KovaaK's API calls. With no KovaaK's username
+  configured every percentile cell reads N/A, so the status line states that
+  condition in place and links Settings, the same in-place treatment
+  `playlist_scenarios.py` gives positions; the empty-grid messages outrank it,
+  since it only applies when rows exist. While the warmup worker is
   busy, a one-second interval rebuilds those rows with activity recording
   suppressed, shows remaining/ETA or paused/fatal state, and disables after a
   final idle rebuild. One callback snapshots worker state, rebuilds rows, then
