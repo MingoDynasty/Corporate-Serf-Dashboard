@@ -223,6 +223,13 @@ in the same PR — do not leave it for later:
 
 ## Styling Conventions
 
+- New user-facing copy avoids em dashes; use short sentences instead. Copy
+  the app shows a user reads as machine-written with them. This governs new
+  and edited copy only — sweeping the shipped strings is deferred to a future
+  review of all app messaging, so old-versus-new inconsistency is expected
+  and is not a defect to fix in passing. Docs, code comments, and commit
+  messages are unaffected.
+
 - Prefer semantic CSS classes in `assets/stylesheet.css` for static presentation rules, especially styles that callbacks conditionally enable or disable.
 - Keep inline style dictionaries for values that are genuinely computed at runtime or for small, highly local layout adjustments where a named class would add more indirection than clarity.
 
