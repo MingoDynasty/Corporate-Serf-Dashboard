@@ -70,13 +70,14 @@ Detect click plus Save on the shipped Settings page — it is a communication
 gap: the app silently looks broken in places, and its one optional feature
 is invisible unless stumbled upon.
 
-Market patterns for this genre agree on the shape of the fix. Blocking
-first-run wizards (the OBS model) suit apps whose required config is
-mandatory and multi-valued; game-companion apps (Tracker.gg, Blitz) instead
-self-configure silently and fall back to manual linking — which is exactly
-the shipped bootstrap-plus-Settings-page architecture. What they add that
-this app lacks is a dismissible getting-started surface on the home screen,
-and empty states that state their cause and link the fix.
+Market patterns agree on the shape of the fix. Blocking first-run wizards
+suit apps whose required configuration is mandatory and multi-valued — OBS's
+auto-configuration wizard is the canonical example — which this app's is
+not; the shipped bootstrap-plus-Settings-page architecture already matches
+the alternative pattern of self-configuring silently with a manual fallback.
+What the app lacks is the widely used getting-started card (a dismissible
+setup surface on the home screen) and empty states that state their cause
+and link the fix.
 
 ## Design
 
@@ -99,10 +100,10 @@ Settled with the maintainer; reviewers should treat these as fixed.
 4. **Skip is identity-only, surgical, and permanent.** Skip renders only
    when the account is the sole missing item, and writes
    `kovaaks_username: ""` — the shipped empty-means-off semantics — through
-   a write that alters no other key, so an absent `stats_dir` stays absent
-   and the bootstrap keeps retrying on later boots. Recovery from a decline
-   is the Settings page plus the point-of-impact hints; the card itself
-   never returns.
+   a locked settings-service operation that alters no other key, so an
+   absent `stats_dir` stays absent and the bootstrap keeps retrying on
+   later boots. Recovery from a decline is the Settings page plus the
+   point-of-impact hints; the card itself never returns.
 5. **Card copy** (final; no em dashes in app copy, per the same session):
    State A title "Add your KovaaK's account", body "See your leaderboard
    position and percentiles for every scenario.", buttons "Open Settings"
@@ -142,11 +143,28 @@ the Settings page's existing save statuses and notices.
 Skip's callback follows the repo's DashProxy discipline: guarded on
 `n_clicks` and `ctx.triggered_id` with a None-trigger regression test (an
 `allow_duplicate` callback can fire once on page load despite
-`prevent_initial_call`). Its write goes through the settings service's
-existing write path with a mapping that changes only the username key. It
-does not start the percentile warmup worker (the username is empty), and it
-removes the card in place — no restart, nothing pins (the identity pin
-freezes only on a non-empty read).
+`prevent_initial_call`). Its write is a new narrow settings-service
+operation — an identity decline — that re-reads the stored mapping and
+writes it back with only the username key set to `""`, entirely inside the
+service's existing module lock (the same `RLock` every read and
+`save_settings` take). That makes "alters no other key" an invariant of the
+operation rather than a read-merge-write sequence in a page callback, which
+a concurrent Settings save could interleave with: a stale snapshot taken at
+card render must never restore an old `stats_dir` or `steam_id` over values
+saved since. The shipped `save_settings` keeps its replace-all contract and
+its pinning test untouched.
+
+This is deliberately a second runtime write path, and it narrows the
+2026-08-03 decision that the store keeps a single runtime writer (see
+["Settings Detection Suggests, And Identity Is Offered Only Once Verified"](decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)):
+the Settings page's Save remains the only runtime writer of *values*; the
+decline operation can only record "asked and declined" for identity, never
+a value. The card PR's decision-log entry records this narrowing against
+the earlier entry — and updates the "one runtime writer" claim in
+`source/pages/settings.py`'s module docstring — rather than silently
+contradicting either. The callback does not start the percentile warmup
+worker (the username is empty), and it removes the card in place — no
+restart, nothing pins (the identity pin freezes only on a non-empty read).
 
 The bare stats-dir hint cedes its "never configured" case to the card: the
 hint's unconfigured branch shows only when the `stats_dir` key is *present*
@@ -178,19 +196,23 @@ sibling keeps its em dash until the deferred app-wide messaging review.
 
 ### Blast radius
 
-`source/pages/home.py` (card, hint-branch narrowing, Skip callback),
-`source/pages/playlists.py` (status line), `assets/stylesheet.css` (card
-classes), tests. No changes to the bootstrap, the detection engines, the
-settings schema, `api_service`, or the warmup worker.
+`source/config/settings_service.py` (one narrow, locked identity-decline
+operation), `source/pages/home.py` (card, hint-branch narrowing, Skip
+callback), `source/pages/playlists.py` (status line),
+`source/pages/settings.py` (module docstring only: the "one runtime writer"
+claim gains the decline exception), `assets/stylesheet.css` (card classes),
+tests. No changes to the bootstrap, the detection engines, the settings
+schema, `save_settings`, `api_service`, or the warmup worker.
 
 ## Delivery plan
 
 - **PR 1 — overview status line.** The companion fix alone: one status-line
   branch on the playlists overview plus its test. No dependencies. Gates on
   D2.
-- **PR 2 — the setup card.** Card states, hint-branch narrowing, Skip write
-  path, and their tests. No hard dependency on PR 1; soft-ordered after it.
-  Gates on D1.
+- **PR 2 — the setup card.** Card states, hint-branch narrowing, the
+  identity-decline service operation with its writer-narrowing decision-log
+  entry, and their tests. No hard dependency on PR 1; soft-ordered after
+  it. Gates on D1.
 
 ## Out of scope
 
@@ -214,6 +236,12 @@ settings schema, `api_service`, or the warmup worker.
 - Skip: writes `""` to the username key only; an absent `stats_dir` key is
   still absent afterwards; the card is gone on the next render; the warmup
   worker is not started; None-trigger DashProxy regression test.
+- Identity-decline atomicity: a Settings save that lands after a stale
+  settings snapshot was taken (the card-render read) and before Skip's
+  decline runs is preserved — the decline operation re-reads under the
+  lock, so the newer `stats_dir` and `steam_id` survive and only the
+  username key changes. `save_settings`'s replace-all pinning test stays
+  untouched.
 - Hint-branch narrowing: the bare hint no longer renders while the card
   owns the absent-key case; existing `tests/test_home_stats_dir_hint.py`
   cases updated to pin the split.
