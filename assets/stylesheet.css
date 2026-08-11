@@ -241,6 +241,38 @@
     font-weight: 600;
 }
 
+/* The card's primary action. It navigates, so it is an anchor, not a button —
+   a button nested in a link would be two tab stops with one name. These values
+   are Mantine's default filled-button metrics (size sm), inlined because the
+   Button component's own custom properties are scoped to it and cannot be
+   borrowed from outside. */
+.setup-card-cta {
+    align-items: center;
+    background-color: var(--mantine-color-blue-filled);
+    border-radius: var(--mantine-radius-default);
+    color: var(--mantine-color-white);
+    display: inline-flex;
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+    height: 2.25rem;
+    justify-content: center;
+    padding: 0 1.125rem;
+}
+
+.setup-card-cta:hover {
+    background-color: var(--mantine-color-blue-filled-hover);
+    /* The anchor's own colour, not the link default: Mantine keeps hovered
+       anchors underlined and blue, which would undo the button look. */
+    color: var(--mantine-color-white);
+}
+
+/* Stated rather than left to the user agent: the element no longer looks like
+   a link, so its keyboard focus has to be as obvious as the Skip button's. */
+.setup-card-cta:focus-visible {
+    outline: 2px solid var(--mantine-color-blue-filled);
+    outline-offset: 2px;
+}
+
 /* What Skip costs. Dimmed and smaller: it qualifies the buttons above it
    rather than competing with them for the first read. */
 .setup-card-fine-print {

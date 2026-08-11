@@ -65,6 +65,12 @@ def _button_labels(component):
     ]
 
 
+def _anchors(component):
+    return [
+        child for child in _walk_components(component) if isinstance(child, dmc.Anchor)
+    ]
+
+
 @pytest.fixture(autouse=True)
 def quiet_home(monkeypatch):
     """Keep the rest of the page out of the way of the card."""
@@ -104,14 +110,8 @@ def test_the_card_asks_for_the_account_when_only_identity_is_unasked(
         home.SETUP_CARD_IDENTITY_BODY,
         home.SETUP_CARD_SKIP_FINE_PRINT,
     ]
-    assert _button_labels(card) == [
-        home.SETUP_CARD_OPEN_SETTINGS_LABEL,
-        home.SETUP_CARD_SKIP_LABEL,
-    ]
-    settings_link = next(
-        child for child in _walk_components(card) if isinstance(child, dmc.Anchor)
-    )
-    assert settings_link.href == "/settings"
+    assert _button_labels(card) == [home.SETUP_CARD_SKIP_LABEL]
+    assert _anchors(card)[0].href == "/settings"
 
 
 @pytest.mark.parametrize(
@@ -129,7 +129,8 @@ def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
         home.SETUP_CARD_STATS_DIR_TITLE,
         home.SETUP_CARD_STATS_DIR_BODY,
     ]
-    assert _button_labels(card) == [home.SETUP_CARD_OPEN_SETTINGS_LABEL]
+    assert _button_labels(card) == []
+    assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
 
 
 @pytest.mark.parametrize("stats_dir_value", ["", "no-such-stats-dir"])
@@ -219,6 +220,35 @@ def test_skip_starts_no_warmup_worker_and_needs_no_restart(monkeypatch, stats_di
     home.skip_identity_setup(1)
 
     assert settings_service.is_restart_pending() is False
+
+
+@pytest.mark.parametrize("stored", [{}, {STATS_DIR_KEY: "no-such-stats-dir"}])
+def test_the_settings_cta_is_one_interactive_element(stored):
+    """A link wrapping a button is two tab stops sharing one name.
+
+    ``dmc`` 2.8.0 exposes no ``component`` prop, so the link wears the button's
+    styling from the stylesheet instead of containing one.
+    """
+    _store(**stored)
+
+    card = _card(home.layout())
+
+    anchors = _anchors(card)
+    assert len(anchors) == 1
+    cta = anchors[0]
+    assert cta.children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert cta.href == "/settings"
+    assert cta.className == home.SETUP_CARD_CTA_CLASS
+    assert _button_labels(cta) == []
+
+
+def test_the_settings_cta_class_is_styled():
+    """The link only reads as the primary action if the stylesheet dresses it."""
+    stylesheet = (
+        Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
+    ).read_text(encoding="utf-8")
+
+    assert f".{home.SETUP_CARD_CTA_CLASS} {{" in stylesheet
 
 
 def test_the_skip_input_is_optional():

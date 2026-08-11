@@ -154,6 +154,13 @@ SETUP_CARD_STATS_DIR_BODY = (
 )
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
+# The primary action navigates, so it ships as one link wearing the button's
+# styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
+# ``<button>`` inside a focusable ``<a>``: two tab stops with the same name,
+# and interactive content nested where HTML does not allow it. Mantine's own
+# escape hatch (``component="a"``) is not exposed by the dmc 2.8.0 wrapper, so
+# the styling lives in ``assets/stylesheet.css`` instead.
+SETUP_CARD_CTA_CLASS = "setup-card-cta"
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1332,17 +1339,22 @@ def _stats_dir_hint() -> list:
 def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
     """Build one state of the setup card: a heading, a reason, and a way out.
 
-    Navigation and dismissal only. The button is a link to the settings page,
-    where detection and Save already live, so the card never grows a second
-    detection UI and opening it costs no KovaaK's request. Skip comes with the
-    fine print that says what it gives up, because a dismissal the user cannot
-    interpret is worse than the question.
+    Navigation and dismissal only. The primary action is a link to the settings
+    page, where detection and Save already live, so the card never grows a
+    second detection UI and opening it costs no KovaaK's request. Skip comes
+    with the fine print that says what it gives up, because a dismissal the
+    user cannot interpret is worse than the question.
+
+    The two actions are deliberately different elements: one navigates and is a
+    link, the other acts on this page and is a button.
     """
     actions = [
         dmc.Anchor(
-            dmc.Button(SETUP_CARD_OPEN_SETTINGS_LABEL),
+            SETUP_CARD_OPEN_SETTINGS_LABEL,
             href="/settings",
             refresh=False,
+            className=SETUP_CARD_CTA_CLASS,
+            underline="never",
         )
     ]
     if offer_skip:
