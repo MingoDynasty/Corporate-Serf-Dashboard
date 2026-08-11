@@ -33,8 +33,11 @@ from pathlib import Path
 from source.config.settings_service import (
     STATS_DIR_KEY,
     get_settings,
+    get_settings_store_message,
+    get_settings_store_state,
     save_settings,
 )
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 
 logger = logging.getLogger(__name__)
 
@@ -142,7 +145,20 @@ def bootstrap_stats_dir() -> None:
     detection serves the boot that made it rather than the next one. A miss
     writes nothing and is retried on the next start: a dashboard installed
     before KovaaK's configures itself once KovaaK's appears.
+
+    This is an automatic writer, so it never touches a settings file the app
+    cannot use: an unusable or newer-stamped store reads as holding no keys,
+    and writing over it would silently destroy an identity the user really did
+    configure. It declines out loud and the boot continues without run data.
     """
+    store_state = get_settings_store_state()
+    if store_state in (StoreState.ERROR, StoreState.FUTURE):
+        logger.warning(
+            "Not detecting the KovaaK's stats directory, and not writing to the "
+            "settings file: %s",
+            get_settings_store_message(),
+        )
+        return
     settings = get_settings()
     if STATS_DIR_KEY in settings:
         return
@@ -163,4 +179,11 @@ def bootstrap_stats_dir() -> None:
         logger.warning(
             "Could not store the detected stats directory; serving without it.",
             exc_info=True,
+        )
+    except UnsupportedSchemaError as exc:
+        # Reachable despite the state check above: the check and the save take
+        # the settings lock separately, so another writer can land between them.
+        logger.warning(
+            "Refused to store the detected stats directory; serving without it: %s",
+            exc,
         )

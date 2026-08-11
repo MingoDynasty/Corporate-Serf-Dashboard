@@ -72,7 +72,9 @@ def _run_startup(
 def _write_settings(state_root: Path, payload: dict[str, str]) -> None:
     settings_path = state_root / "data" / "settings.json"
     settings_path.parent.mkdir(parents=True, exist_ok=True)
-    settings_path.write_text(json.dumps(payload), encoding="utf-8")
+    settings_path.write_text(
+        json.dumps({"schema_version": 1, **payload}), encoding="utf-8"
+    )
 
 
 def _debug_log(state_root: Path) -> str:
@@ -107,7 +109,7 @@ def test_startup_detects_a_never_configured_stats_dir_and_uses_it(
     assert f"Monitoring directory: {stats_dir}" in log_text
     assert json.loads(
         (state_root / "data" / "settings.json").read_text(encoding="utf-8")
-    ) == {"stats_dir": str(stats_dir)}
+    ) == {"schema_version": 1, "stats_dir": str(stats_dir)}
 
 
 def test_startup_leaves_a_configured_stats_dir_alone(state_root: Path) -> None:

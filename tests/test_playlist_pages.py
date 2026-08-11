@@ -123,13 +123,14 @@ def test_playlists_overview_visibility_click_toggles_and_bumps_refresh(monkeypat
         "enqueue_playlist_percentile_warmup",
         enqueued.append,
     )
-    rows_refresh = playlists.update_playlist_visibility(
+    notifications, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
         7,
     )
 
     assert toggled == ["KovaaKsTestCode"]
     assert enqueued == ["KovaaKsTestCode"]
+    assert notifications is no_update
     assert rows_refresh == 8
 
 
@@ -141,11 +142,12 @@ def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
         lambda _code: pytest.fail("navigation clicks must not toggle visibility"),
     )
 
-    rows_refresh = playlists.update_playlist_visibility(
+    notifications, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": "name"},
         0,
     )
 
+    assert notifications is no_update
     assert rows_refresh is no_update
 
 
@@ -159,7 +161,7 @@ def test_playlists_overview_visibility_callback_ignores_phantom_initial_fire(
         lambda _code: pytest.fail("phantom initial fire must not toggle visibility"),
     )
 
-    assert playlists.update_playlist_visibility(None, 3) is no_update
+    assert playlists.update_playlist_visibility(None, 3) == (no_update, no_update)
 
 
 def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
@@ -183,7 +185,7 @@ def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
         return 1
 
     monkeypatch.setattr(playlists, "enqueue_playlist_percentile_warmup", enqueue)
-    rows_refresh = playlists.update_playlist_visibility(
+    _notifications, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
         0,
     )

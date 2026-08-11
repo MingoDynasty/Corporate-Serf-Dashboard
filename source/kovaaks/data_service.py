@@ -2,6 +2,7 @@
 Provides business logic for managing Kovaaks data.
 """
 
+import json
 import logging
 import os
 import re
@@ -29,9 +30,18 @@ from source.kovaaks.data_models import (
     ScenarioStats,
 )
 from source.kovaaks.request_logging import request_exception_summary
-from source.utilities.atomic_write import replace_with_retry
+from source.utilities.atomic_write import atomic_write_text
 from source.utilities.paths import package_root, state_dir
 from source.utilities.stopwatch import Stopwatch
+from source.utilities.store_schema import (
+    SchemaPayloadError,
+    StoreDocument,
+    StoreState,
+    UnsupportedSchemaError,
+    back_up_unusable_store,
+    read_store_document,
+    stamped_payload,
+)
 
 # The bundled root is the full benchmark library (every committed file
 # carries rank data — CI-enforced); which of them the user sees is the
@@ -151,6 +161,47 @@ def drain_startup_playlist_warnings() -> list[str]:
 
 def _is_code_validation_error(exc: ValidationError) -> bool:
     return any(error.get("loc") == ("code",) for error in exc.errors())
+
+
+class PlaylistFileCollisionError(Exception):
+    """A different, usable playlist already occupies the destination filename.
+
+    Two playlists whose names sanitize to the same file component collide on
+    one path even though their codes differ. A healthy file is never
+    overwritten, so the import that would land on top of it is refused.
+    """
+
+
+def validate_playlist_v1(payload: dict) -> PlaylistData:
+    """Define playlist v1: the current ``PlaylistData`` shape, extras ignored.
+
+    Unlike settings and visibility, these files are machine-written envelopes
+    rather than hand-edit surfaces, so pydantic's ignore-extras stays: an
+    unknown field is upstream noise, not a user's typo.
+    """
+    try:
+        return PlaylistData.model_validate(payload)
+    except ValidationError as exc:
+        if _is_code_validation_error(exc):
+            msg = "has a missing or blank playlist code; add a `code` field."
+            raise SchemaPayloadError(msg) from exc
+        msg = "is not valid playlist data."
+        raise SchemaPayloadError(msg) from exc
+
+
+def read_user_playlist_document(playlist_file: Path) -> StoreDocument:
+    """Classify one user-root playlist file. Shared by the loader and writer.
+
+    The stamp is kept out of ``PlaylistData`` (pydantic would ignore it as an
+    extra field, and the domain model has no business carrying a storage
+    detail): the raw object is classified, the stamp stripped, and only then is
+    the payload validated.
+    """
+    return read_store_document(
+        playlist_file,
+        encoding="utf-8",
+        validate=validate_playlist_v1,
+    )
 
 
 def _playlist_display_labels(playlists: list[PlaylistData]) -> dict[str, str]:
@@ -634,6 +685,52 @@ def _collect_bundled_seed_pairs(playlist_data: PlaylistData) -> None:
             _bundled_seed_pairs.append((scenario.name, scenario.leaderboard_id))
 
 
+def _load_bundled_playlist_file(playlist_file: Path) -> PlaylistData | None:
+    """Parse one bundled corpus file, warning and skipping on failure.
+
+    The bundled root is unstamped by design: it ships with the code that reads
+    it, so its format can never be older or newer than this build.
+    """
+    global _bundled_corpus_load_complete  # noqa: PLW0603
+    try:
+        json_data = playlist_file.read_text(encoding="utf-8")
+        return PlaylistData.model_validate_json(json_data)
+    except OSError:
+        _bundled_corpus_load_complete = False
+        _record_startup_playlist_warning(
+            f"Failed to read playlist file: {playlist_file}"
+        )
+    except ValidationError as exc:
+        _bundled_corpus_load_complete = False
+        if _is_code_validation_error(exc):
+            _record_startup_playlist_warning(
+                "Skipping playlist file "
+                f"{playlist_file}: missing or blank playlist code; "
+                "add a `code` field."
+            )
+        else:
+            _record_startup_playlist_warning(
+                f"Invalid JSON format in playlist file: {playlist_file}"
+            )
+    return None
+
+
+def _load_user_playlist_file(playlist_file: Path) -> PlaylistData | None:
+    """Read one user-root playlist file through the four-state machine.
+
+    Startup stays read-only: an unusable or newer-stamped file is skipped with
+    an actionable warning and left exactly as it is, never rewritten.
+    """
+    document = read_user_playlist_document(playlist_file)
+    if document.state is StoreState.SUPPORTED:
+        return document.value
+    if document.state is not StoreState.MISSING:
+        # MISSING means the file vanished between listing and reading, which
+        # needs no warning; everything else is a file the user should know about.
+        _record_startup_playlist_warning(f"Skipping playlist file: {document.message}")
+    return None
+
+
 def load_playlists() -> None:  # noqa: PLR0912
     """Load valid playlist JSON files into the in-memory database."""
     global _bundled_corpus_load_complete  # noqa: PLW0603
@@ -651,30 +748,11 @@ def load_playlists() -> None:  # noqa: PLR0912
         (USER_PLAYLIST_DIRECTORY_PATH, True),
     ):
         for playlist_file in _iter_playlist_files(root, missing_ok=missing_ok):
-            try:
-                with open(playlist_file, encoding="utf-8") as file:
-                    json_data = file.read()
-                playlist_data = PlaylistData.model_validate_json(json_data)
-            except OSError:
-                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
-                    _bundled_corpus_load_complete = False
-                _record_startup_playlist_warning(
-                    f"Failed to read playlist file: {playlist_file}"
-                )
-                continue
-            except ValidationError as exc:
-                if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
-                    _bundled_corpus_load_complete = False
-                if _is_code_validation_error(exc):
-                    _record_startup_playlist_warning(
-                        "Skipping playlist file "
-                        f"{playlist_file}: missing or blank playlist code; "
-                        "add a `code` field."
-                    )
-                else:
-                    _record_startup_playlist_warning(
-                        f"Invalid JSON format in playlist file: {playlist_file}"
-                    )
+            if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
+                playlist_data = _load_bundled_playlist_file(playlist_file)
+            else:
+                playlist_data = _load_user_playlist_file(playlist_file)
+            if playlist_data is None:
                 continue
 
             if root == BUNDLED_PLAYLIST_DIRECTORY_PATH:
@@ -919,6 +997,20 @@ def load_playlist_from_code(  # noqa: PLR0911
         )
         logger.warning(message)
         return message, None
+    except UnsupportedSchemaError:
+        # The destination point-check found a file from a newer build. Nothing
+        # was written, and the incumbent is untouched.
+        message = (
+            f"Cannot save this playlist: {playlist_data.name} "
+            f"({playlist_data.code}) would replace a playlist file written by a "
+            "newer version of this app."
+        )
+        logger.warning(message)
+        return message, None
+    except PlaylistFileCollisionError as exc:
+        message = str(exc)
+        logger.warning(message)
+        return message, None
     playlist_database[playlist_data.code] = playlist_data
     _user_root_playlist_codes.add(playlist_data.code)
     # Record the file just written so a later delete unlinks the real path
@@ -1032,22 +1124,49 @@ def delete_superseded_user_playlist_files() -> str | None:
     return error_message
 
 
+def _guard_playlist_destination(file_path: Path) -> None:
+    """Classify whatever already sits at an import's destination path.
+
+    Runs immediately before the atomic replace. A rejected playlist file is
+    absent from ``playlist_database``, so the import's own duplicate-code check
+    cannot see it, and two different name/code pairs can sanitize onto one
+    filename anyway — so the file itself is asked, never the code.
+
+    A file from a newer build refuses the import (upholding the promise that no
+    write ever lands on one). A usable file refuses it too: a healthy playlist
+    is never overwritten by a different one that happens to collide. Only an
+    unusable file is displaced, and its bytes are copied aside first.
+    """
+    document = read_user_playlist_document(file_path)
+    if document.state is StoreState.MISSING:
+        return
+    if document.state is StoreState.FUTURE:
+        raise UnsupportedSchemaError(document.message)
+    if document.state is StoreState.SUPPORTED:
+        incumbent = document.value
+        msg = (
+            f"Cannot save this playlist: {file_path.name} already holds "
+            f"{incumbent.name} ({incumbent.code}). Delete that playlist first, "
+            "then import again."
+        )
+        raise PlaylistFileCollisionError(msg)
+    back_up_unusable_store(file_path)
+
+
 def write_playlist_data_to_file(playlist_data: PlaylistData) -> None:
-    """Persist imported playlist metadata as formatted JSON."""
+    """Persist imported playlist metadata as formatted JSON.
+
+    The ``schema_version`` stamp is injected into the serialized envelope
+    rather than modelled on ``PlaylistData``, which stays a pure domain type.
+    """
     file_path = get_playlist_file_path(playlist_data.name, playlist_data.code)
-    json_string = playlist_data.model_dump_json(indent=2, exclude_none=True)
+    envelope = json.loads(playlist_data.model_dump_json(exclude_none=True))
+    json_string = json.dumps(stamped_payload(envelope), indent=2)
     with _PLAYLIST_IO_LOCK:
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        temp_file = file_path.with_name(
-            f".{file_path.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+        atomic_write_text(
+            file_path,
+            json_string + "\n",
+            logger=logger,
+            before_replace=lambda: _guard_playlist_destination(file_path),
         )
-        try:
-            with open(temp_file, "w", encoding="utf-8") as file:
-                file.write(json_string)
-                file.write("\n")
-                file.flush()
-                os.fsync(file.fileno())
-            replace_with_retry(temp_file, file_path, logger=logger)
-        finally:
-            if temp_file.exists():
-                temp_file.unlink()

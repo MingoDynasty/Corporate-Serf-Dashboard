@@ -1,3 +1,4 @@
+import json
 import logging
 import subprocess
 from pathlib import Path
@@ -32,11 +33,18 @@ def _playlist(
 
 
 def _write_playlist(path: Path, playlist: PlaylistData) -> None:
+    """Write a bundled-style playlist file: no stamp, as the corpus ships."""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         playlist.model_dump_json(indent=2, exclude_none=True) + "\n",
         encoding="utf-8",
     )
+
+
+def _write_user_playlist(path: Path, playlist: PlaylistData) -> None:
+    """Write a user-root playlist file the way the app writes one: stamped."""
+    envelope = json.loads(playlist.model_dump_json(exclude_none=True))
+    _write_raw_playlist(path, json.dumps({"schema_version": 1, **envelope}, indent=2))
 
 
 def _write_raw_playlist(path: Path, payload: str) -> None:
@@ -130,10 +138,12 @@ def test_load_playlists_tracks_user_root_codes_for_visibility_seed(
 ):
     bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
-    _write_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+    _write_user_playlist(user_root / "user.json", _playlist("User", "UserCode"))
     # A user copy shadowed by a bundled duplicate never wins, so it must not
     # count as a user-root code either.
-    _write_playlist(user_root / "shadowed.json", _playlist("Shadow", "BundledCode"))
+    _write_user_playlist(
+        user_root / "shadowed.json", _playlist("Shadow", "BundledCode")
+    )
 
     with caplog.at_level(logging.DEBUG, logger=data_service.__name__):
         data_service.load_playlists()
@@ -190,8 +200,8 @@ def test_bundled_root_wins_over_user_root_and_user_file_is_not_deleted(
     user = _playlist("User Import", "SharedCode", "User Scenario", with_ranks=False)
     user_only = _playlist("User Only", "UserCode", "User Only Scenario")
     _write_playlist(bundled_root / "benchmark.json", bundled)
-    _write_playlist(user_root / "import.json", user)
-    _write_playlist(user_root / "user-only.json", user_only)
+    _write_user_playlist(user_root / "import.json", user)
+    _write_user_playlist(user_root / "user-only.json", user_only)
 
     data_service.load_playlists()
 
@@ -714,7 +724,7 @@ def test_load_playlists_records_user_root_file_paths(monkeypatch, tmp_path):
     # A hand-dropped file whose name get_playlist_file_path would never
     # reconstruct: delete must still find it via the recorded path.
     hand_named = user_root / "arbitrary-name.json"
-    _write_playlist(hand_named, _playlist("Hand Named", "HandCode"))
+    _write_user_playlist(hand_named, _playlist("Hand Named", "HandCode"))
 
     data_service.load_playlists()
 
@@ -735,11 +745,11 @@ def test_load_playlists_records_superseded_user_files_only_for_bundled_winners(
     _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
     # A user copy of a bundled code: a dead pre-#90 copy-to-activate leftover.
     superseded = user_root / "old-copy.json"
-    _write_playlist(superseded, _playlist("Old Copy", "BundledCode"))
+    _write_user_playlist(superseded, _playlist("Old Copy", "BundledCode"))
     # A user file shadowed by another *user* file is a plain duplicate, not
     # "superseded by bundled", so it must stay out of the cleanup list.
-    _write_playlist(user_root / "a-dup.json", _playlist("Dup", "DupCode"))
-    _write_playlist(user_root / "z-dup.json", _playlist("Dup Two", "DupCode"))
+    _write_user_playlist(user_root / "a-dup.json", _playlist("Dup", "DupCode"))
+    _write_user_playlist(user_root / "z-dup.json", _playlist("Dup Two", "DupCode"))
 
     data_service.load_playlists()
 
@@ -751,7 +761,7 @@ def test_load_playlists_records_superseded_user_files_only_for_bundled_winners(
 def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_path):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     user_file = user_root / "user.json"
-    _write_playlist(user_file, _playlist("User", "UserCode"))
+    _write_user_playlist(user_file, _playlist("User", "UserCode"))
     data_service.load_playlists()
     assert user_file.exists()
 
@@ -766,7 +776,7 @@ def test_delete_user_playlist_removes_file_store_and_tracking(monkeypatch, tmp_p
 
 def test_delete_user_playlist_success_is_logged_at_info(monkeypatch, tmp_path, caplog):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
-    _write_playlist(user_root / "user.json", _playlist("User", "UserCode"))
+    _write_user_playlist(user_root / "user.json", _playlist("User", "UserCode"))
     data_service.load_playlists()
 
     with caplog.at_level(logging.INFO, logger=data_service.logger.name):
@@ -780,8 +790,8 @@ def test_delete_user_playlist_removes_all_same_code_duplicates(monkeypatch, tmp_
     # leftover copy would resurrect the playlist on restart. Delete must remove
     # every copy (regression for PR #98 review).
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
-    _write_playlist(user_root / "a.json", _playlist("Dup A", "DupCode"))
-    _write_playlist(user_root / "b.json", _playlist("Dup B", "DupCode"))
+    _write_user_playlist(user_root / "a.json", _playlist("Dup A", "DupCode"))
+    _write_user_playlist(user_root / "b.json", _playlist("Dup B", "DupCode"))
     data_service.load_playlists()
     assert (user_root / "a.json").exists()
     assert (user_root / "b.json").exists()
@@ -807,8 +817,12 @@ def test_delete_user_playlist_keeps_served_winner_when_a_duplicate_is_locked(
     # winner's data after its file is deleted (which would silently swap in the
     # survivor on restart). Winner-last deletion keeps store == disk on failure.
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
-    _write_playlist(user_root / "a.json", _playlist("Winner", "DupCode", "Win Scen"))
-    _write_playlist(user_root / "b.json", _playlist("Survivor", "DupCode", "Surv Scen"))
+    _write_user_playlist(
+        user_root / "a.json", _playlist("Winner", "DupCode", "Win Scen")
+    )
+    _write_user_playlist(
+        user_root / "b.json", _playlist("Survivor", "DupCode", "Surv Scen")
+    )
     data_service.load_playlists()
     # a.json wins on filename order; its data is what the store serves.
     assert data_service.playlist_database["DupCode"].name == "Winner"
@@ -865,7 +879,7 @@ def test_delete_user_playlist_refuses_unknown_code(monkeypatch, tmp_path):
 def test_delete_user_playlist_tolerates_already_missing_file(monkeypatch, tmp_path):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     user_file = user_root / "user.json"
-    _write_playlist(user_file, _playlist("User", "UserCode"))
+    _write_user_playlist(user_file, _playlist("User", "UserCode"))
     data_service.load_playlists()
     user_file.unlink()  # vanished out from under us before delete
 
@@ -882,7 +896,7 @@ def test_delete_user_playlist_reports_oserror_without_touching_store(
 ):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     user_file = user_root / "user.json"
-    _write_playlist(user_file, _playlist("User", "UserCode"))
+    _write_user_playlist(user_file, _playlist("User", "UserCode"))
     data_service.load_playlists()
 
     def locked_unlink(_self):
@@ -905,7 +919,7 @@ def test_delete_superseded_user_playlist_files_removes_all_dead_copies(
     bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     _write_playlist(bundled_root / "bundled.json", _playlist("Bundled", "BundledCode"))
     superseded = user_root / "old-copy.json"
-    _write_playlist(superseded, _playlist("Old Copy", "BundledCode"))
+    _write_user_playlist(superseded, _playlist("Old Copy", "BundledCode"))
     data_service.load_playlists()
     assert superseded.exists()
     assert len(data_service.get_superseded_user_playlist_files()) == 1

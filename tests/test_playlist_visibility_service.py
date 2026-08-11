@@ -17,6 +17,17 @@ def _use_tmp_visibility(monkeypatch, tmp_path, user_root_codes=frozenset()):
     return visibility_path
 
 
+def _write_visibility(path, payload):
+    """Write a well-formed v1 store: the stamp plus the given payload."""
+    _write_raw_visibility(path, json.dumps({"schema_version": 1, **payload}))
+
+
+def _write_raw_visibility(path, text):
+    """Write whatever text the test wants, stamp included or not."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
 def test_missing_file_seeds_defaults_plus_user_root_without_writing(
     monkeypatch,
     tmp_path,
@@ -64,11 +75,7 @@ def test_empty_shown_list_is_authoritative_not_reseeded(monkeypatch, tmp_path):
         tmp_path,
         user_root_codes={"UserCode"},
     )
-    visibility_path.parent.mkdir(parents=True, exist_ok=True)
-    visibility_path.write_text(
-        json.dumps({"shown_playlists": []}),
-        encoding="utf-8",
-    )
+    _write_visibility(visibility_path, {"shown_playlists": []})
 
     assert visibility.get_shown_playlist_codes() == set()
 
@@ -78,8 +85,7 @@ def test_corrupt_file_falls_back_to_seed_and_recovers_on_write(
     tmp_path,
 ):
     visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
-    visibility_path.parent.mkdir(parents=True, exist_ok=True)
-    visibility_path.write_text("not json", encoding="utf-8")
+    _write_raw_visibility(visibility_path, "not json")
 
     assert visibility.get_shown_playlist_codes() == set(
         visibility.DEFAULT_VISIBLE_CODES
@@ -106,11 +112,7 @@ def test_invalid_utf8_file_falls_back_to_seed(monkeypatch, tmp_path):
 
 def test_non_list_shown_value_falls_back_to_seed(monkeypatch, tmp_path):
     visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
-    visibility_path.parent.mkdir(parents=True, exist_ok=True)
-    visibility_path.write_text(
-        json.dumps({"shown_playlists": "not-a-list"}),
-        encoding="utf-8",
-    )
+    _write_visibility(visibility_path, {"shown_playlists": "not-a-list"})
 
     assert visibility.get_shown_playlist_codes() == set(
         visibility.DEFAULT_VISIBLE_CODES

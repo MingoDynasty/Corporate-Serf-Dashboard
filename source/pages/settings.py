@@ -28,6 +28,8 @@ from source.config.settings_service import (
     STATS_DIR_KEY,
     STEAM_ID_KEY,
     get_settings,
+    get_settings_store_message,
+    get_settings_store_state,
     is_restart_pending,
     save_settings,
 )
@@ -36,6 +38,7 @@ from source.kovaaks.percentile_warmup_service import start_percentile_warmup_wor
 from source.pages.page_title import page_title
 from source.utilities.build_info import get_build_info
 from source.utilities.paths import log_dir
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp
 
 logger = logging.getLogger(__name__)
@@ -83,8 +86,19 @@ SAVE_FAILED_STATUS = (
     "Could not save settings — nothing was written. See data/logs/debug.log."
 )
 
+SAVE_REFUSED_STATUS = (
+    "Nothing was saved. The settings file was written by a newer version of "
+    "this app. Update the app to change settings."
+)
+
 SAVE_STATUS_CLASS = "app-settings-save-status"
 SAVE_STATUS_FAILED_CLASS = f"{SAVE_STATUS_CLASS} app-settings-save-status-failed"
+
+STORE_ALERT_TITLE = "Your saved settings are not being used"
+STORE_ALERT_CLASS = "app-settings-store-alert"
+# Like the restart notice, the alert ships hidden and the layout drops this
+# modifier when the store is in a state the user has to know about.
+STORE_ALERT_HIDDEN_CLASS = f"{STORE_ALERT_CLASS} app-settings-store-alert-hidden"
 
 RESTART_NOTICE_CLASS = "app-settings-restart-notice"
 # The notice ships hidden and is revealed by dropping this modifier, the same
@@ -158,6 +172,18 @@ def _restart_notice() -> tuple[str, str]:
     return RESTART_NOTICE, RESTART_NOTICE_CLASS
 
 
+def _store_alert() -> tuple[str, str]:
+    """Build the store alert's children and class for the file's read state.
+
+    Without it, a store the app cannot read renders as an ordinary empty form:
+    the same blank fields a first run shows, with no hint that a configured
+    identity is sitting on disk unused.
+    """
+    if get_settings_store_state() in (StoreState.ERROR, StoreState.FUTURE):
+        return get_settings_store_message(), STORE_ALERT_CLASS
+    return "", STORE_ALERT_HIDDEN_CLASS
+
+
 @callback(
     Output("app-settings-stats-dir", "error"),
     Output("app-settings-steam-id", "error"),
@@ -223,6 +249,22 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
             SAVE_FAILED_STATUS,
             SAVE_STATUS_FAILED_CLASS,
             # The store is untouched, so what the notice says is still true.
+            no_update,
+            no_update,
+        )
+    except UnsupportedSchemaError:
+        # A deliberate refusal, not a failure: the file on disk belongs to a
+        # newer build and must survive a downgrade intact. Distinct from the
+        # I/O message above because the remedy is the opposite — updating the
+        # app, not retrying the save.
+        logger.warning(
+            "Refused to save user settings: %s", get_settings_store_message()
+        )
+        return (
+            None,
+            None,
+            SAVE_REFUSED_STATUS,
+            SAVE_STATUS_FAILED_CLASS,
             no_update,
             no_update,
         )
@@ -567,7 +609,8 @@ def layout(**kwargs):  # noqa: ARG001
 
     Built per visit, and from the stored view rather than the pinned
     accessors, so the form always shows what is on disk — including a change
-    that is waiting on a restart. Stats-directory detection runs per visit too:
+    that is waiting on a restart, and including the alert that says when what
+    is on disk cannot be read at all. Stats-directory detection runs per visit too:
     it is a registry read, a couple of file reads, and a handful of directory
     probes, so the suggestions always describe the machine as it is now.
     Identity detection does not: it calls KovaaK's, so opening the page never
@@ -575,9 +618,17 @@ def layout(**kwargs):  # noqa: ARG001
     """
     stored = get_settings()
     notice, notice_class = _restart_notice()
+    store_alert, store_alert_class = _store_alert()
     return dmc.Stack(
         children=[
             dmc.Title("Settings", order=2),
+            dmc.Alert(
+                children=store_alert,
+                id="app-settings-store-alert",
+                title=STORE_ALERT_TITLE,
+                color="yellow",
+                className=store_alert_class,
+            ),
             _stats_dir_input(
                 stored.get(STATS_DIR_KEY, ""),
                 detect_stats_dir_candidates(),

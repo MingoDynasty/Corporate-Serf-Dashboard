@@ -11,38 +11,56 @@ the first read that observes a configured username (see ``get_identity``).
 Everything the settings page can change while the app runs is therefore either
 applied live or covered by its restart notice (see ``is_restart_pending``).
 
-Unset semantics are deliberately flat: a missing key, an empty value, and a
-missing/unreadable/malformed file all mean *not configured*. A malformed file
-is warned about once and treated as holding no keys; the next save rewrites it
-whole.
+Unset semantics are deliberately flat: a missing key and an empty value both
+mean *not configured*, and so does a file the app cannot use. The store carries
+a ``schema_version`` stamp, so "cannot use" now splits three ways: a missing
+file is first run, a file that is unreadable/malformed/unstamped/invalid is an
+error state that reads as no keys and says so on the settings page, and a file
+stamped by a newer build reads as no keys and refuses every write. Only a
+user-initiated save may overwrite an error-state file, and it copies the
+incumbent aside first.
 
 Hand-editing the file while the app is stopped is a legitimate escape hatch;
 edits made while it runs are not picked up, because reads are cached
-in-process.
+in-process. A hand edit must keep the stamp and use only the three known keys:
+within a version the key set is fixed, so an unknown key is reported rather
+than ignored.
 """
 
 import json
 import logging
-import os
 import threading
 from collections.abc import Mapping
 from pathlib import Path
 
-from source.utilities.atomic_write import replace_with_retry
+from source.utilities.atomic_write import atomic_write_text
 from source.utilities.paths import state_dir
+from source.utilities.store_schema import (
+    KOVAAKS_USERNAME_KEY,
+    STATS_DIR_KEY,
+    STEAM_ID_KEY,
+    StoreDocument,
+    StoreState,
+    UnsupportedSchemaError,
+    back_up_unusable_store,
+    read_store_document,
+    stamped_payload,
+    validate_settings_v1,
+)
 
 logger = logging.getLogger(__name__)
 
 SETTINGS_FILE_PATH = state_dir() / "data" / "settings.json"
 
-KOVAAKS_USERNAME_KEY = "kovaaks_username"
-STATS_DIR_KEY = "stats_dir"
-STEAM_ID_KEY = "steam_id"
+# KOVAAKS_USERNAME_KEY / STATS_DIR_KEY / STEAM_ID_KEY are defined in
+# ``store_schema``, beside the v1 key set they make up, so the schema definition
+# and the runtime constants cannot drift. They stay importable from here, which
+# is where the rest of the app has always read them.
 
 _SETTINGS_LOCK = threading.RLock()
-# Cached settings mapping under a single key; None means not yet read from
+# The store's last read result under a single key; None means not yet read from
 # disk. Mutated in place so no module-global rebinding is needed.
-_settings_cache: dict[str, dict[str, str] | None] = {"value": None}
+_settings_cache: dict[str, StoreDocument | None] = {"value": None}
 # The stats directory this process booted with: what was configured, and the
 # same value once it has been judged usable (None when it was not). Both are
 # None until startup resolves them, and stay None for a startup that never did
@@ -73,49 +91,55 @@ def clear_identity_pin() -> None:
         _identity_pin["value"] = None
 
 
-def _read_settings_from_disk() -> dict[str, str]:
-    """Read the persisted settings; anything unusable yields no keys."""
-    try:
-        # utf-8-sig, not utf-8: this file is the documented hand-edit escape
-        # hatch, and Windows editors write a UTF-8 BOM that json.loads rejects
-        # outright — which would read as "every setting unset" instead of as
-        # the identity the user just typed. Transparent when no BOM is present.
-        raw = SETTINGS_FILE_PATH.read_text(encoding="utf-8-sig")
-    except FileNotFoundError:
-        return {}
-    except OSError, UnicodeDecodeError:
-        logger.warning(
-            "Failed to read %s; treating every setting as unset.",
-            SETTINGS_FILE_PATH,
-            exc_info=True,
-        )
-        return {}
-    try:
-        payload = json.loads(raw)
-        if not isinstance(payload, dict) or not all(
-            isinstance(key, str) and isinstance(value, str)
-            for key, value in payload.items()
-        ):
-            raise TypeError("settings must be a flat object of string values")
-    except json.JSONDecodeError, TypeError:
-        logger.warning(
-            "Invalid settings file %s; treating every setting as unset. "
-            "The file is rewritten on the next save.",
-            SETTINGS_FILE_PATH,
-            exc_info=True,
-        )
-        return {}
-    return payload
+def _read_settings_document() -> StoreDocument:
+    """Classify the settings file through the shared four-state machine."""
+    # utf-8-sig, not utf-8: this file is the documented hand-edit escape hatch,
+    # and Windows editors write a UTF-8 BOM that json.loads rejects outright —
+    # which would read as "every setting unset" instead of as the identity the
+    # user just typed. Transparent when no BOM is present. The visibility and
+    # playlist stores are machine-written and stay plain UTF-8, where a BOM is
+    # invalid.
+    return read_store_document(
+        SETTINGS_FILE_PATH,
+        encoding="utf-8-sig",
+        validate=validate_settings_v1,
+    )
+
+
+def _settings_document() -> StoreDocument:
+    """Get the store's read result, hitting disk at most once per cache life."""
+    with _SETTINGS_LOCK:
+        document = _settings_cache["value"]
+        if document is None:
+            document = _read_settings_document()
+            _settings_cache["value"] = document
+        return document
 
 
 def get_settings() -> dict[str, str]:
-    """Get every stored setting, reading disk at most once per cache lifetime."""
-    with _SETTINGS_LOCK:
-        cached = _settings_cache["value"]
-        if cached is None:
-            cached = _read_settings_from_disk()
-            _settings_cache["value"] = cached
-        return dict(cached)
+    """Get every stored setting; anything but a usable file yields no keys.
+
+    The ``schema_version`` stamp is a storage detail and never leaks out: what
+    callers get is the domain mapping alone.
+    """
+    document = _settings_document()
+    if document.state is not StoreState.SUPPORTED:
+        return {}
+    return dict(document.value)
+
+
+def get_settings_store_state() -> StoreState:
+    """Say which of the four read states the settings file is in."""
+    return _settings_document().state
+
+
+def get_settings_store_message() -> str:
+    """Get the actionable message for an unusable store, or an empty string.
+
+    The settings page shows this, because a store read as "no keys" is
+    otherwise indistinguishable from a first run with an empty form.
+    """
+    return _settings_document().message
 
 
 def _get_setting(key: str) -> str | None:
@@ -208,11 +232,33 @@ def get_usable_stats_dir() -> str | None:
 
 
 def save_settings(values: Mapping[str, str]) -> None:
-    """Replace the stored settings with ``values`` and refresh the cache."""
+    """Replace the stored settings with ``values`` and refresh the cache.
+
+    A user-initiated save owns the file: an unusable incumbent is copied aside
+    first (so self-service recovery from a bad hand edit stays possible) and
+    then replaced whole. A file stamped by a newer build is never overwritten;
+    that raises ``UnsupportedSchemaError``, which every caller reports.
+    """
     settings = dict(values)
     with _SETTINGS_LOCK:
+        _guard_settings_write()
         _write_settings_to_disk(settings)
-        _settings_cache["value"] = settings
+        _settings_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=settings)
+
+
+def _guard_settings_write() -> None:
+    """Refuse a write over a newer schema; preserve an unusable file first.
+
+    Reads the store when nothing has yet, so the guard holds for a writer that
+    runs before any prior read (a save on a freshly started process).
+    """
+    document = _settings_document()
+    if document.state is StoreState.FUTURE:
+        raise UnsupportedSchemaError(document.message)
+    if document.state is StoreState.ERROR:
+        # Raises OSError when the copy cannot be made, which refuses the write:
+        # nothing is overwritten until its bytes are safely beside it.
+        back_up_unusable_store(SETTINGS_FILE_PATH)
 
 
 def is_stats_dir_change_pending() -> bool:
@@ -254,17 +300,8 @@ def is_restart_pending() -> bool:
 
 
 def _write_settings_to_disk(settings: Mapping[str, str]) -> None:
-    payload = json.dumps(dict(settings), indent=2, sort_keys=True)
+    # Written plain UTF-8 even though it is read as utf-8-sig: the app never
+    # authors a BOM, it only tolerates one a Windows editor left behind.
+    payload = json.dumps(stamped_payload(settings), indent=2, sort_keys=True)
     SETTINGS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    temp_file = SETTINGS_FILE_PATH.with_name(
-        f".{SETTINGS_FILE_PATH.name}.{os.getpid()}.{threading.get_ident()}.tmp"
-    )
-    try:
-        with open(temp_file, "w", encoding="utf-8") as file:
-            file.write(payload)
-            file.write("\n")
-            file.flush()
-            os.fsync(file.fileno())
-        replace_with_retry(temp_file, SETTINGS_FILE_PATH, logger=logger)
-    finally:
-        temp_file.unlink(missing_ok=True)
+    atomic_write_text(SETTINGS_FILE_PATH, payload + "\n", logger=logger)

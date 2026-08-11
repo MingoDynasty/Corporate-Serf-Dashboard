@@ -356,4 +356,4 @@ def test_the_bootstrap_write_is_visible_to_the_boot_pin(detected, tmp_path):
     assert settings_service.get_usable_stats_dir() == str(stats_dir)
     assert json.loads(
         settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8")
-    ) == {"stats_dir": str(stats_dir)}
+    ) == {"schema_version": 1, "stats_dir": str(stats_dir)}

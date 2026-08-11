@@ -32,6 +32,7 @@ from source.kovaaks.percentile_warmup_service import (
 )
 from source.kovaaks.playlist_overview_service import build_playlist_overview_rows
 from source.kovaaks.playlist_visibility_service import (
+    get_visibility_store_message,
     hide_playlist,
     is_playlist_shown,
     show_playlist,
@@ -39,6 +40,7 @@ from source.kovaaks.playlist_visibility_service import (
 )
 from source.pages.page_title import page_title
 from source.utilities.notifications import toast
+from source.utilities.store_schema import UnsupportedSchemaError
 from source.utilities.utilities import format_approximate_duration
 
 logger = logging.getLogger(__name__)
@@ -74,6 +76,16 @@ IMPORT_VISIBILITY_FAILED_HINT = (
     ' selectors — toggle "Show hidden" on this page, then click its row\'s eye'
     " icon to show it."
 )
+
+# Shown when a show/hide is refused because the visibility file belongs to a
+# newer build. Nothing was written and nothing changed, so the toast is the
+# whole report: without it the click would fail the Dash request silently.
+VISIBILITY_REFUSED_TITLE = "Show and hide are unavailable"
+
+VISIBILITY_ALERT_TITLE = "Playlist visibility is not being used"
+# The alert ships hidden and the render callback drops this modifier, the same
+# way the leftover-files alert below it works.
+VISIBILITY_ALERT_HIDDEN_CLASS = "playlists-visibility-alert-hidden"
 
 dash.register_page(
     __name__,
@@ -285,13 +297,21 @@ def route_to_clicked_playlist(cell_clicked):
 
 
 @callback(
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
     Output("playlists-rows-refresh", "data", allow_duplicate=True),
     Input("playlists-overview-grid", "cellClicked"),
     State("playlists-rows-refresh", "data"),
     prevent_initial_call=True,
 )
 def update_playlist_visibility(cell_clicked, rows_refresh):
-    """Toggle one visibility cell and wake warmup work after an unhide."""
+    """Toggle one visibility cell and wake warmup work after an unhide.
+
+    A refusal (the visibility file belongs to a newer build) reports through a
+    toast and leaves the rows alone: nothing was written, so rebuilding them
+    would only redraw the state the user just tried to change. An ordinary
+    write failure still propagates untouched — see the PR #183 rule pinned in
+    the tests.
+    """
     if (
         ctx.triggered_id != "playlists-overview-grid"
         or not isinstance(cell_clicked, dict)
@@ -299,15 +319,27 @@ def update_playlist_visibility(cell_clicked, rows_refresh):
         or not isinstance(cell_clicked.get("rowId"), str)
         or not cell_clicked["rowId"]
     ):
-        return no_update
+        return no_update, no_update
 
     playlist_code = cell_clicked["rowId"]
-    if toggle_playlist_visibility(playlist_code):
+    try:
+        unhidden = toggle_playlist_visibility(playlist_code)
+    except UnsupportedSchemaError as exc:
+        logger.warning("Refused to change playlist visibility: %s", exc)
+        notification = toast(
+            "visibility-refused-notification",
+            VISIBILITY_REFUSED_TITLE,
+            str(exc),
+            color="red",
+            icon=local_icon("material-symbols:warning-outline"),
+        )
+        return [notification], no_update
+    if unhidden:
         enqueue_playlist_percentile_warmup(playlist_code)
     # Hides need an ordinary row rebuild. Unhides additionally need this
     # explicit bump so the disabled warmup interval's owner observes the new
     # enqueue generation and re-arms it.
-    return (rows_refresh or 0) + 1
+    return no_update, (rows_refresh or 0) + 1
 
 
 @callback(
@@ -472,12 +504,13 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     if canonical_code is not None:
         try:
             show_playlist(canonical_code)
-        except OSError:
+        except OSError, UnsupportedSchemaError:
             # The playlist file is already written — an irreversible step that
             # succeeded — so failing the request here would leave the user with
             # no report at all for something that happened. Report the split
             # outcome instead. The store is untouched (temp file plus atomic
-            # replace), so the code is simply absent from the shown set.
+            # replace, and a newer-stamped file is never written at all), so
+            # the code is simply absent from the shown set.
             logger.exception(
                 "Failed to mark imported playlist '%s' as shown", canonical_code
             )
@@ -593,7 +626,7 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
         return [notification], no_update, False
     try:
         hide_playlist(target_code)
-    except OSError:
+    except OSError, UnsupportedSchemaError:
         # Membership bookkeeping only, and it has no observable consequence: the
         # row is gone either way, a dead code renders nowhere, and a later
         # re-import early-returns on the still-shown code. So log it and still
@@ -611,6 +644,27 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
         color="green",
     )
     return [notification], (rows_refresh or 0) + 1, False
+
+
+@callback(
+    Output("playlists-visibility-alert", "className"),
+    Output("playlists-visibility-text", "children"),
+    Input("playlists-overview-mounted", "data"),
+    Input("playlists-rows-refresh", "data"),
+)
+def render_visibility_alert(_mounted, _rows_refresh):
+    """Say when the visibility file is not the one driving these rows.
+
+    An unusable visibility store falls back to the first-run seed, which looks
+    exactly like a fresh install: every bundled benchmark visible, the user's
+    own choices silently gone. This is the only place that difference is
+    visible, so it renders on every visit and after every row refresh rather
+    than as a toast that scrolls away.
+    """
+    message = get_visibility_store_message()
+    if not message:
+        return VISIBILITY_ALERT_HIDDEN_CLASS, ""
+    return "", message
 
 
 @callback(
@@ -881,6 +935,15 @@ def layout(**kwargs):  # noqa: ARG001
                         ),
                     ],
                 ),
+            ),
+            # Why the show/hide state may not be the user's. Hidden until the
+            # visibility file is one this build cannot use.
+            dmc.Alert(
+                id="playlists-visibility-alert",
+                title=VISIBILITY_ALERT_TITLE,
+                color="yellow",
+                className=VISIBILITY_ALERT_HIDDEN_CLASS,
+                children=dmc.Text(id="playlists-visibility-text"),
             ),
             # Cleanup affordance for user files superseded by bundled
             # benchmarks. Hidden until superseded files exist.

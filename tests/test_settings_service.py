@@ -18,8 +18,14 @@ def settings_path(monkeypatch, tmp_path):
 
 
 def _write(path, payload):
+    """Write a well-formed v1 store: the stamp plus the given settings."""
+    _write_raw(path, json.dumps({"schema_version": 1, **payload}))
+
+
+def _write_raw(path, text):
+    """Write whatever text the test wants, stamp included or not."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload), encoding="utf-8")
+    path.write_text(text, encoding="utf-8")
 
 
 def test_missing_file_leaves_every_setting_unset(settings_path):
@@ -48,27 +54,25 @@ def test_empty_values_read_the_same_as_absent_keys(settings_path):
 
 
 def test_empty_file_is_tolerated_and_warned(settings_path, caplog):
-    settings_path.parent.mkdir(parents=True, exist_ok=True)
-    settings_path.write_text("", encoding="utf-8")
+    _write_raw(settings_path, "")
 
     with caplog.at_level(logging.WARNING):
         assert settings.get_kovaaks_username() is None
 
-    assert "Invalid settings file" in caplog.text
+    assert "is not valid JSON" in caplog.text
 
 
 def test_malformed_json_is_tolerated_and_warned(settings_path, caplog):
-    settings_path.parent.mkdir(parents=True, exist_ok=True)
-    settings_path.write_text("not json", encoding="utf-8")
+    _write_raw(settings_path, "not json")
 
     with caplog.at_level(logging.WARNING):
         assert settings.get_settings() == {}
 
-    assert "Invalid settings file" in caplog.text
+    assert "is not valid JSON" in caplog.text
 
 
 def test_non_object_payload_is_tolerated(settings_path):
-    _write(settings_path, ["kovaaks_username"])
+    _write_raw(settings_path, json.dumps(["kovaaks_username"]))
 
     assert settings.get_settings() == {}
 
@@ -84,7 +88,8 @@ def test_hand_written_file_with_a_utf8_bom_is_read(settings_path):
     """Windows editors write a BOM; json.loads rejects one outright."""
     settings_path.parent.mkdir(parents=True, exist_ok=True)
     settings_path.write_bytes(
-        b"\xef\xbb\xbf" + json.dumps({"kovaaks_username": "MingoDynasty"}).encode()
+        b"\xef\xbb\xbf"
+        + json.dumps({"schema_version": 1, "kovaaks_username": "MingoDynasty"}).encode()
     )
 
     assert settings.get_kovaaks_username() == "MingoDynasty"
@@ -120,19 +125,21 @@ def test_save_round_trips_across_a_cache_reset(settings_path):
     settings.clear_settings_cache()
     assert settings.get_settings()["kovaaks_username"] == "MingoDynasty"
     assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+        "schema_version": 1,
         "kovaaks_username": "MingoDynasty",
         "steam_id": "",
     }
 
 
 def test_save_replaces_the_file_whole_and_leaves_no_temp_files(settings_path):
-    _write(settings_path, {"kovaaks_username": "Old", "retired_key": "value"})
+    _write(settings_path, {"kovaaks_username": "Old"})
     settings.clear_settings_cache()
 
     settings.save_settings({"kovaaks_username": "New"})
 
     assert json.loads(settings_path.read_text(encoding="utf-8")) == {
-        "kovaaks_username": "New"
+        "schema_version": 1,
+        "kovaaks_username": "New",
     }
     assert [path.name for path in settings_path.parent.iterdir()] == [
         settings_path.name
@@ -140,8 +147,7 @@ def test_save_replaces_the_file_whole_and_leaves_no_temp_files(settings_path):
 
 
 def test_save_recovers_from_a_malformed_file(settings_path):
-    settings_path.parent.mkdir(parents=True, exist_ok=True)
-    settings_path.write_text("not json", encoding="utf-8")
+    _write_raw(settings_path, "not json")
     settings.clear_settings_cache()
 
     settings.save_settings({"steam_id": "76561197986713986"})
