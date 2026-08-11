@@ -432,6 +432,31 @@ def test_a_supported_stamp_never_leaks_into_the_domain_values(settings_path):
     assert settings.get_settings_store_message() == ""
 
 
+def test_the_stamp_is_written_first_and_the_rest_stays_sorted(settings_path):
+    """Every durable store leads with its format marker, this one included.
+
+    ``sort_keys=True`` would sort the marker into the middle of the settings
+    (``kovaaks_username`` precedes it alphabetically), so the keys are sorted
+    before the stamp is added rather than by the serializer.
+    """
+    settings.save_settings(
+        {
+            "steam_id": "76561197986713986",
+            "kovaaks_username": "MingoDynasty",
+            "stats_dir": "S:/stats",
+        }
+    )
+
+    written = json.loads(settings_path.read_text(encoding="utf-8"))
+
+    assert list(written) == [
+        "schema_version",
+        "kovaaks_username",
+        "stats_dir",
+        "steam_id",
+    ]
+
+
 def test_a_missing_file_is_its_own_state_not_an_error(settings_path):
     assert settings.get_settings_store_state() is store_schema.StoreState.MISSING
     assert settings.get_settings_store_message() == ""

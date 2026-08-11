@@ -302,6 +302,15 @@ def is_restart_pending() -> bool:
 def _write_settings_to_disk(settings: Mapping[str, str]) -> None:
     # Written plain UTF-8 even though it is read as utf-8-sig: the app never
     # authors a BOM, it only tolerates one a Windows editor left behind.
-    payload = json.dumps(stamped_payload(settings), indent=2, sort_keys=True)
+    #
+    # The keys are sorted *before* stamping rather than through json.dumps's
+    # sort_keys, which would sort the marker into the middle of the settings.
+    # Every durable store starts with its stamp: it is what a person opening
+    # the file needs first, and what the other two stores and the conversion
+    # script already do.
+    payload = json.dumps(
+        stamped_payload(dict(sorted(settings.items()))),
+        indent=2,
+    )
     SETTINGS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
     atomic_write_text(SETTINGS_FILE_PATH, payload + "\n", logger=logger)
