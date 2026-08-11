@@ -1413,7 +1413,11 @@ def _setup_card_children() -> list:
 
 @callback(
     Output(SETUP_CARD_ID, "children"),
-    Input(SETUP_CARD_SKIP_ID, "n_clicks"),
+    # ``allow_optional``: Skip renders only in the identity state, while the
+    # container it writes to is always mounted. Without it, every other state
+    # of the page -- the stats-folder card, and every configured install --
+    # logs "ID not found in layout" for this input on each load.
+    Input(SETUP_CARD_SKIP_ID, "n_clicks", allow_optional=True),
     prevent_initial_call=True,
 )
 def skip_identity_setup(n_clicks):

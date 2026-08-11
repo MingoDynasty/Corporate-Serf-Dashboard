@@ -12,6 +12,7 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 from dash import no_update
+from dash._callback import GLOBAL_CALLBACK_MAP
 
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
@@ -218,6 +219,23 @@ def test_skip_starts_no_warmup_worker_and_needs_no_restart(monkeypatch, stats_di
     home.skip_identity_setup(1)
 
     assert settings_service.is_restart_pending() is False
+
+
+def test_the_skip_input_is_optional():
+    """Skip renders only in the identity state; its container always does.
+
+    A non-optional input missing from the layout logs "ID not found in layout"
+    on every load of every other state of the page.
+    """
+    spec = GLOBAL_CALLBACK_MAP[f"{home.SETUP_CARD_ID}.children"]
+
+    assert spec["inputs"] == [
+        {
+            "id": home.SETUP_CARD_SKIP_ID,
+            "property": "n_clicks",
+            "allow_optional": True,
+        }
+    ]
 
 
 @pytest.mark.parametrize(

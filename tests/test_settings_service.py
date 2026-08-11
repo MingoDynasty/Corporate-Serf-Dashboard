@@ -456,6 +456,25 @@ def test_declining_identity_preserves_a_save_made_since_the_page_rendered(
     assert stale["stats_dir"] == "old-directory"
 
 
+@pytest.mark.parametrize("saved", ["MingoDynasty", ""])
+def test_declining_identity_never_overwrites_an_answered_question(
+    settings_path,
+    saved,
+):
+    """A stale tab's Skip must not discard a username saved from another one."""
+    settings.save_settings({"stats_dir": "somewhere"})
+    # What the card render read, before the other tab saved.
+    settings.get_settings()
+    settings.save_settings({"stats_dir": "somewhere", "kovaaks_username": saved})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {
+        "stats_dir": "somewhere",
+        "kovaaks_username": saved,
+    }
+
+
 def test_declining_identity_does_not_disturb_the_replace_all_save(settings_path):
     """Save keeps its contract: the next one still writes the file whole."""
     settings.save_settings({"stats_dir": "somewhere", "steam_id": "111"})

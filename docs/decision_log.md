@@ -75,7 +75,11 @@ the operation rather than a read-merge-write in a page callback: the card was
 rendered at some earlier moment, and a review of PR #231 reproduced the race
 where that stale snapshot restores an old `stats_dir` or `steam_id` over
 values saved since. `save_settings` keeps its replace-all contract and its
-pinning test untouched. This deliberately narrows the single-runtime-writer
+pinning test untouched. That staleness cuts one more way, so the operation is
+a no-op whenever the username key already exists: a card rendered in one tab
+and clicked after another tab saved a real username would otherwise erase it,
+and a refusal to answer is never grounds for discarding an answer somebody
+gave (found in PR #236's review). This deliberately narrows the single-runtime-writer
 clause of the 2026-08-03
 ["Settings Detection Suggests, And Identity Is Offered Only Once Verified"](#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)
 entry rather than contradicting it: Save remains the only runtime writer of

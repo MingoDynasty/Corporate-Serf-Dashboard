@@ -233,9 +233,17 @@ def decline_identity() -> None:
     Absent keys stay absent, so declining an identity never configures a stats
     directory the user has not set -- the startup bootstrap keeps looking for
     one on later boots.
+
+    A username key that already exists means the question has been answered
+    since, and this does nothing. The card offering the decline may have been
+    rendered in a tab left open while another tab saved a real username on the
+    settings page, and a decline is a refusal to answer -- never grounds for
+    discarding an answer somebody gave.
     """
     with _SETTINGS_LOCK:
         settings = get_settings()
+        if KOVAAKS_USERNAME_KEY in settings:
+            return
         settings[KOVAAKS_USERNAME_KEY] = ""
         _write_settings_to_disk(settings)
         _settings_cache["value"] = settings
