@@ -87,7 +87,9 @@ sequence.
 
 The settings arc's guided first-run flow — a setup card for a fresh install,
 and what "skip" should mean — was deliberately left out of settings detection
-and still needs a proposal of its own before it can be sequenced.
+and is now proposed in
+[`initial_setup_proposal.md`](./initial_setup_proposal.md), awaiting
+sequencing against run history.
 
 ---
 
