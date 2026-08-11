@@ -16,7 +16,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source.pages import home  # noqa: E402
 
 HINT_TEXT = "No stats directory configured — set it in "
-RESTART_HINT_TEXT = "Settings saved — restart the dashboard to apply them."
+RESTART_HINT_TEXT = "Restart the app to apply your saved settings."
 
 
 def _walk_components(component):

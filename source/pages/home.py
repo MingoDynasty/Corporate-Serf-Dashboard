@@ -1290,10 +1290,16 @@ def _stats_dir_hint() -> list:
     Unset and unusable read the same to the user, and both are repaired in the
     same place, so the hint carries one link to the settings page.
 
-    A save this process has not applied yet is neither: the settings page just
-    confirmed the save, so claiming nothing is configured would tell the user
-    it failed. The hint defers to the restart instead, the same pin-versus-store
+    A save this process has not applied yet is neither: a directory is
+    configured, so claiming nothing is would tell the user the save failed. The
+    hint defers to the restart instead, the same pin-versus-store
     reconciliation the settings page's notice derives from.
+
+    What that branch must not do is confirm the save. It renders on every visit
+    while the change is pending, so a user returning days later would be told
+    they had just saved. It names the restart and what the restart applies, in
+    the settings page's vocabulary: "the app", never "the dashboard", which a
+    user reads as the browser page they would merely reload.
 
     That deferral is doubly narrow, because the restart copy carries no link
     and whatever it displaces has to be worth displacing. The pending change
@@ -1317,7 +1323,7 @@ def _stats_dir_hint() -> list:
     if is_stats_dir_change_pending() and settings.get(STATS_DIR_KEY):
         return [
             dmc.Text(
-                "Settings saved — restart the dashboard to apply them.",
+                "Restart the app to apply your saved settings.",
                 className="stats-dir-hint",
                 id="stats-dir-hint",
             )
