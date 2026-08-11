@@ -213,13 +213,34 @@ def test_a_prefilled_field_still_offers_the_other_libraries(candidates, tmp_path
     assert field.filter == settings_page.SHOW_EVERY_CANDIDATE
 
 
+def test_the_field_says_it_has_folders_to_offer(candidates, tmp_path):
+    """An Autocomplete looks like a text box, so the suggestions say they exist.
+
+    Both signs are the fix for the same blind spot: a prefilled field gave no
+    hint that the other libraries were one click away.
+    """
+    candidates[:] = [str(tmp_path / "primary"), str(tmp_path / "second")]
+    settings_service.save_settings({"stats_dir": str(tmp_path / "primary")})
+
+    field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
+
+    assert field.rightSection is not None
+    assert settings_page.STATS_DIR_SUGGESTIONS_HINT in field.description
+
+
 def test_detecting_nothing_leaves_a_plain_text_field(candidates):
-    """A machine without Steam gets exactly the field that shipped."""
+    """A machine without Steam gets exactly the field that shipped.
+
+    Its signs included: a chevron over an empty list invites a click at a
+    dropdown with nothing to open.
+    """
     candidates.clear()
 
     field = _component_by_id(settings_page.layout(), "app-settings-stats-dir")
 
     assert field.data == []
+    assert field.rightSection is None
+    assert field.description == settings_page.STATS_DIR_DESCRIPTION
 
 
 def test_unset_settings_render_empty_fields():
@@ -547,6 +568,22 @@ def test_opening_the_page_never_calls_kovaaks(monkeypatch):
 
     assert picker.children == []
     assert picker.className == settings_page.PICKER_HIDDEN_CLASS
+
+
+def test_detect_explains_itself_before_it_is_pressed():
+    """The status line ships holding the hint, not empty.
+
+    A bare "Detect" beside three empty boxes named neither what it detects nor
+    that pressing it is free, and the line that would have said so only earned
+    its copy after the press.
+    """
+    page = settings_page.layout()
+
+    button = _component_by_id(page, DETECT_BUTTON_ID)
+    status = _component_by_id(page, "app-settings-detect-status")
+
+    assert button.children == "Detect my accounts"
+    assert status.children == settings_page.DETECT_HINT
 
 
 def test_one_certain_account_fills_the_identity_fields(detect_clicked, detects):
