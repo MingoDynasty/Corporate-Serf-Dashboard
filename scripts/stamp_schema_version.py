@@ -39,10 +39,13 @@ release's own interpreter by absolute path::
 **Which files get converted** is decided by the *state root*, resolved in this
 order: ``--state-dir``, then ``CSD_STATE_DIR`` (which the launcher sets around
 the app but not around a manual command), then the install root inferred from
-this file's own location when it sits in a ``versions/<tag>/scripts`` tree, then
-the working directory. The resolved root and how it was chosen are printed
-before anything is touched, because converting the wrong tree is the one
-mistake this script could make silently.
+this file's own location, then the working directory. The inference fires only
+on a real release tree -- a ``versions/<tag>/scripts`` shape *and* the
+installer's ``install.json`` at the candidate root -- so a checkout that merely
+sits under a directory called ``versions`` is not mistaken for an install. The
+resolved root and how it was chosen are printed before anything is touched,
+because converting the wrong tree is the one mistake this script could make
+silently.
 
 The per-file state machine is deliberately narrow:
 
@@ -98,10 +101,16 @@ SETTINGS_SUBPATH = Path("data/settings.json")
 VISIBILITY_SUBPATH = Path("data/playlist_visibility.json")
 USER_PLAYLIST_SUBPATH = Path("data/playlists")
 
-# An installed copy runs code out of ``<install root>/versions/<tag>/`` while
-# its state lives at the install root. This is the marker directory that tells
-# the two layouts apart.
+# An installed copy runs code out of ``<install root>/versions/<tag>/scripts/``
+# while its state lives at the install root. The shape alone is not evidence --
+# a source checkout that happens to sit under a directory called "versions"
+# matches it too, and inferring from that would point the conversion at the
+# checkout's parent. The installer writes ``install.json`` at the install root
+# and nowhere else, so requiring it is what makes the inference an install-only
+# signal rather than a coincidence of names.
 _VERSIONS_DIRECTORY_NAME = "versions"
+_SCRIPTS_DIRECTORY_NAME = "scripts"
+_INSTALL_MANIFEST_NAME = "install.json"
 
 
 @dataclass(frozen=True)
@@ -123,20 +132,32 @@ class Report:
 
 
 def installed_state_root() -> Path | None:
-    """Infer the install root when this file sits in a versioned release tree.
+    """Infer the install root when this file sits in a real release tree.
 
     ``<install root>/versions/<tag>/scripts/stamp_schema_version.py`` means the
     state root is the install root, four levels up. Whichever version directory
     the operator invoked is by construction the one they are running, so this
-    needs no manifest read and is right for a pinned install too.
+    needs no tag lookup and is right for a pinned install too.
+
+    Both the shape and the installer's ``install.json`` must be there. Names
+    alone would classify a checkout at ``...\\versions\\Corporate-Serf-Dashboard``
+    as an install and point the conversion at its parent, which is exactly the
+    silent wrong-tree write this resolution exists to prevent. Anything short of
+    both leaves the inference out and the caller falls through to the working
+    directory, which is what a source checkout wants anyway.
     """
     script = Path(__file__).resolve()
     try:
-        version_directory = script.parents[2]
+        scripts_directory = script.parents[0]
+        versions_directory = script.parents[2]
         install_root = script.parents[3]
     except IndexError:
         return None
-    if version_directory.name != _VERSIONS_DIRECTORY_NAME:
+    if (
+        scripts_directory.name != _SCRIPTS_DIRECTORY_NAME
+        or versions_directory.name != _VERSIONS_DIRECTORY_NAME
+        or not (install_root / _INSTALL_MANIFEST_NAME).is_file()
+    ):
         return None
     return install_root
 

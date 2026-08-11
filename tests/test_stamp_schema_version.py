@@ -300,6 +300,19 @@ def test_the_subpaths_match_the_services_own_store_locations():
     assert [root / subpath for subpath in subpaths] == list(APP_STORE_PATHS)
 
 
+def _release_tree(root, tag="v2026.08.11", *, with_manifest=True):
+    """Build the shape an installer leaves behind, and return its scripts dir."""
+    scripts_dir = root / "versions" / tag / "scripts"
+    scripts_dir.mkdir(parents=True)
+    if with_manifest:
+        # Written by install.ps1 at the install root and nowhere else.
+        (root / "install.json").write_text(
+            json.dumps({"schema_version": 1, "tag": tag, "update_policy": "latest"}),
+            encoding="utf-8",
+        )
+    return scripts_dir
+
+
 def test_an_explicit_state_dir_wins_over_everything(monkeypatch, tmp_path):
     monkeypatch.setenv("CSD_STATE_DIR", str(tmp_path / "from-env"))
 
@@ -332,8 +345,7 @@ def test_an_installed_copy_finds_its_install_root_without_the_variable(
     the wrong tree — leaving the real files unstamped and the app inert.
     """
     install_root = tmp_path / "CorporateSerfDashboard"
-    scripts_dir = install_root / "versions" / "v2026.08.11" / "scripts"
-    scripts_dir.mkdir(parents=True)
+    scripts_dir = _release_tree(install_root)
     monkeypatch.delenv("CSD_STATE_DIR", raising=False)
     monkeypatch.setattr(script, "__file__", str(scripts_dir / SCRIPT_PATH.name))
 
@@ -341,6 +353,86 @@ def test_an_installed_copy_finds_its_install_root_without_the_variable(
 
     assert root == install_root.resolve()
     assert chosen_by == "installed layout"
+
+
+def test_a_checkout_under_a_versions_directory_is_not_an_install(
+    monkeypatch,
+    tmp_path,
+):
+    r"""Names alone are a coincidence; install.json is the evidence.
+
+    A clone at ``...\versions\Corporate-Serf-Dashboard`` matches the shape
+    exactly, and inferring from that would point the conversion at the parent
+    of the checkout — the silent wrong-tree write this resolution exists to
+    prevent.
+    """
+    checkout_scripts = tmp_path / "versions" / "Corporate-Serf-Dashboard" / "scripts"
+    checkout_scripts.mkdir(parents=True)
+    monkeypatch.delenv("CSD_STATE_DIR", raising=False)
+    monkeypatch.setattr(script, "__file__", str(checkout_scripts / SCRIPT_PATH.name))
+    monkeypatch.chdir(checkout_scripts.parent)
+
+    root, chosen_by = script.resolve_state_root(None)
+
+    assert root == checkout_scripts.parent.resolve()
+    assert chosen_by == "working directory"
+
+
+def test_a_versions_shape_without_the_manifest_is_not_an_install(
+    monkeypatch,
+    tmp_path,
+):
+    """The same guard, stated as the missing half rather than the scenario."""
+    scripts_dir = _release_tree(tmp_path / "root", with_manifest=False)
+    monkeypatch.delenv("CSD_STATE_DIR", raising=False)
+    monkeypatch.setattr(script, "__file__", str(scripts_dir / SCRIPT_PATH.name))
+
+    assert script.installed_state_root() is None
+
+
+def test_a_release_tree_reached_by_another_filename_is_not_an_install(
+    monkeypatch,
+    tmp_path,
+):
+    """The scripts parent is part of the shape, so a copy elsewhere is not it."""
+    install_root = tmp_path / "CorporateSerfDashboard"
+    _release_tree(install_root)
+    stray = install_root / "versions" / "v2026.08.11" / "tools"
+    stray.mkdir(parents=True)
+    monkeypatch.delenv("CSD_STATE_DIR", raising=False)
+    monkeypatch.setattr(script, "__file__", str(stray / SCRIPT_PATH.name))
+
+    assert script.installed_state_root() is None
+
+
+def test_a_checkout_under_versions_converts_its_own_tree_not_the_parent(
+    monkeypatch,
+    tmp_path,
+):
+    """End to end over the false-positive shape: the parent is never touched."""
+    checkout = tmp_path / "versions" / "Corporate-Serf-Dashboard"
+    (checkout / "scripts").mkdir(parents=True)
+    _write(
+        checkout / "data" / "settings.json",
+        json.dumps({"kovaaks_username": "TheCheckout"}),
+    )
+    _write(
+        tmp_path / "data" / "settings.json",
+        json.dumps({"kovaaks_username": "NotMine"}),
+    )
+    monkeypatch.delenv("CSD_STATE_DIR", raising=False)
+    monkeypatch.setattr(
+        script, "__file__", str(checkout / "scripts" / SCRIPT_PATH.name)
+    )
+    monkeypatch.chdir(checkout)
+
+    assert script.main([]) == 0
+
+    assert _read(checkout / "data" / "settings.json") == {
+        "schema_version": 1,
+        "kovaaks_username": "TheCheckout",
+    }
+    assert _read(tmp_path / "data" / "settings.json") == {"kovaaks_username": "NotMine"}
 
 
 def test_a_source_checkout_falls_back_to_the_working_directory(
@@ -368,7 +460,7 @@ def test_an_installed_layout_converts_the_install_root_not_the_version_tree(
     """End to end over the real install shape, with the variable unset."""
     install_root = tmp_path / "CorporateSerfDashboard"
     version_dir = install_root / "versions" / "v2026.08.11"
-    (version_dir / "scripts").mkdir(parents=True)
+    _release_tree(install_root)
     # A decoy: state that would be converted if the version tree won.
     _write(
         version_dir / "data" / "settings.json",

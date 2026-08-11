@@ -144,9 +144,14 @@ to the wrong tree: the launcher exports `CSD_STATE_DIR` only around the app
 process, so a manual command inherits nothing, and the code lives in
 `versions/<tag>/` while the durable state lives at the install root. Resolution
 order is `--state-dir`, then `CSD_STATE_DIR`, then the install root inferred
-from the script's own location when it sits in a `versions/<tag>/scripts` tree,
-then the working directory; the chosen root and the rule that chose it are
-printed before any file is touched. The installed command runs the release's
+from the script's own location, then the working directory; the chosen root and
+the rule that chose it are printed before any file is touched. The inference
+demands install-only evidence, not just the `versions/<tag>/scripts` shape: the
+candidate root must also hold the installer's `install.json`. Shape alone would
+classify a checkout that happens to sit under a directory named `versions` as
+an install and convert its parent, which is the silent wrong-tree write this
+resolution exists to prevent; without the evidence the inference stays out and
+the working directory wins, which is what a source checkout wants anyway. The installed command runs the release's
 own `versions/<tag>/.venv/Scripts/python.exe` by absolute path, because a
 standard install deliberately puts neither uv nor Python on `PATH` (see the
 script's docstring for the exact snippet).
