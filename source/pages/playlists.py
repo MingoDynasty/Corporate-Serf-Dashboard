@@ -17,6 +17,7 @@ from dash import (
 )
 
 from source.components.local_icon import local_icon
+from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
     delete_superseded_user_playlist_files,
     delete_user_playlist,
@@ -379,7 +380,31 @@ def load_playlist_overview_rows(
                 *warmup_outputs,
             )
         return [], "No playlists are loaded.", *warmup_outputs
+    # Rows exist, so the empty-grid messages above have nothing to say and the
+    # slot is free for the one condition that silently empties both percentile
+    # columns.
+    if not get_kovaaks_username():
+        return rows, _username_unset_status(), *warmup_outputs
     return rows, "", *warmup_outputs
+
+
+def _username_unset_status() -> list:
+    """State the unset-username condition in the overview's status line.
+
+    Mirrors the playlist scenarios page one level up: with no username every
+    rank lookup short-circuits offline, so both percentile columns read N/A on
+    every row with nothing on screen to explain it. That is persistent
+    configuration state, not a failure.
+
+    Built fresh per call rather than shared at module scope: the value is a
+    callback output, and a mutable component list must not be reused across
+    requests.
+    """
+    return [
+        "Percentiles unavailable. Set your KovaaK's username in ",
+        dmc.Anchor("Settings", href="/settings", refresh=False),
+        ".",
+    ]
 
 
 def _format_retry_time(snapshot: PercentileWarmupSnapshot) -> str:

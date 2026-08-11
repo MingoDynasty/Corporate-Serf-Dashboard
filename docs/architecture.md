@@ -274,6 +274,14 @@ flowchart LR
   rank, and the chart options inspector. Owns the live-update callbacks
   (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
   resulting `run-events` summary).
+  As the landing page it also carries the first-run setup card
+  (`_setup_card_children`), which renders while a settings key has never been
+  written — an absent `stats_dir`, or an absent `kovaaks_username` once the
+  directory exists — and is suppressed while a stats-directory change awaits a
+  restart. It only links to `/settings`; its Skip button calls
+  `settings_service.decline_identity` and removes the card. Key *presence* is
+  the line between it and `_stats_dir_hint`, which explains a directory that
+  is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
   overlay and score-threshold preferences, so every adjustment shows on the
   live chart; `toggle_chart_options` writes its open state as a CSS class,
@@ -290,7 +298,11 @@ flowchart LR
   per visible playlist with coverage, runs, last-played, and cached-percentile
   aggregates; any cell click navigates to that playlist's scenario table.
   Overview row rendering is local-only — it draws from local run data and rank
-  caches and never triggers KovaaK's API calls. While the warmup worker is
+  caches and never triggers KovaaK's API calls. With no KovaaK's username
+  configured every percentile cell reads N/A, so the status line states that
+  condition in place and links Settings, the same in-place treatment
+  `playlist_scenarios.py` gives positions; the empty-grid messages outrank it,
+  since it only applies when rows exist. While the warmup worker is
   busy, a one-second interval rebuilds those rows with activity recording
   suppressed, shows remaining/ETA or paused/fatal state, and disables after a
   final idle rebuild. One callback snapshots worker state, rebuilds rows, then
@@ -332,7 +344,11 @@ flowchart LR
   filter is overridden (`allOptions` in `assets/dashMantineFunctions.js`)
   because Mantine's default matches options against the input text, which would
   leave the normally-prefilled field offering only the path it already holds.
-  A Detect button beside the identity fields runs
+  Because that field is otherwise indistinguishable from the text inputs below
+  it, it carries a chevron and a "click the field to pick" sentence in its
+  description — both only when the detector returned candidates, so neither
+  advertises a dropdown that would open empty. A "Detect my accounts" button
+  beside the identity fields runs
   `config/identity_detection.py` behind a `running=` spinner — the page's only
   network action, deliberately off the render path — and presents what comes
   back: exactly one candidate from a run with nothing unresolved (no unchecked
@@ -342,9 +358,11 @@ flowchart LR
   order. Picking one fills the same two inputs from a `dcc.Store` copy of the
   result, so no second detection is spent. Both callbacks are
   `n_clicks`/`triggered_id`-guarded (DashProxy initial-call hazard), neither
-  writes the store, and neither logs a persona. The status line keeps the
-  conclusive no-match message for the one outcome that ruled everything out;
-  unchecked probes and unreadable account lists each say so in their own words.
+  writes the store, and neither logs a persona. That status line ships holding
+  `DETECT_HINT` — what the button would check, said before it is pressed — and a
+  detection's report replaces it; it keeps the conclusive no-match message for
+  the one outcome that ruled everything out, while unchecked probes and
+  unreadable account lists each say so in their own words.
   Below the form, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
   with no callback and no network. The same section carries the bug-report
@@ -438,7 +456,11 @@ flowchart LR
   and missing-directory into one "no stats directory"). The directory-exists
   check is part of resolution, not of each read, so a directory that appears
   mid-run cannot half-enable an app that skipped its scan. Nothing else writes
-  the file.
+  the file. Two runtime writers live here: `save_settings` (replace-all, the
+  settings page's Save) and `decline_identity`, which records a declined
+  identity ask by setting `kovaaks_username` to `""` and nothing else, under
+  the module lock so no other key can be resurrected from a caller's stale
+  snapshot.
 - `config/stats_dir_detection.py` — finds the KovaaK's stats directory on this
   machine (registry Steam roots → each root's `libraryfolders.vdf` → probe
   `steamapps/common/FPSAimTrainer/FPSAimTrainer/stats`). One walk, two readers:

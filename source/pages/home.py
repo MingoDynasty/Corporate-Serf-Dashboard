@@ -23,7 +23,9 @@ from dash import (
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import (
+    KOVAAKS_USERNAME_KEY,
     STATS_DIR_KEY,
+    decline_identity,
     get_identity,
     get_kovaaks_username,
     get_settings,
@@ -65,6 +67,7 @@ from source.utilities.notifications import (
     toast,
     upsert_toast,
 )
+from source.utilities.store_schema import UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -134,6 +137,39 @@ CHART_OPTIONS_PANEL_HIDDEN_CLASS = "chart-options-panel-hidden"
 # width with an ``@container`` query, never the window's). ``md`` is where a
 # 20rem rail stops leaving a chart worth reading.
 CHART_OPTIONS_REFLOW_BREAKPOINT = HOME_GRID_BREAKPOINTS["md"]
+# The first-run setup card. Its container is always in the layout so the Skip
+# callback has an output to write to; the card itself is what comes and goes.
+SETUP_CARD_ID = "setup-card"
+SETUP_CARD_SKIP_ID = "setup-card-skip"
+SETUP_CARD_IDENTITY_TITLE = "Add your KovaaK's account"
+SETUP_CARD_IDENTITY_BODY = (
+    "See your leaderboard position and percentiles for every scenario."
+)
+SETUP_CARD_SKIP_FINE_PRINT = (
+    "Skipping username disables rank lookups. You can set it anytime in Settings."
+)
+SETUP_CARD_STATS_DIR_TITLE = "Finish setting up"
+SETUP_CARD_STATS_DIR_BODY = (
+    "No KovaaK's stats folder was found, so the dashboard can't read your runs "
+    "yet. Set it in Settings."
+)
+SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
+SETUP_CARD_SKIP_LABEL = "Skip"
+# Shown when Skip cannot be recorded because the settings file belongs to a
+# newer build. The card has to stay up (nothing was written), so the toast is
+# what explains why the click appeared to do nothing.
+SETUP_CARD_SKIP_REFUSED_TITLE = "Skip was not saved"
+SETUP_CARD_SKIP_REFUSED_MESSAGE = (
+    "The settings file was written by a newer version of this app. Update the "
+    "app to change settings."
+)
+# The primary action navigates, so it ships as one link wearing the button's
+# styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
+# ``<button>`` inside a focusable ``<a>``: two tab stops with the same name,
+# and interactive content nested where HTML does not allow it. Mantine's own
+# escape hatch (``component="a"``) is not exposed by the dmc 2.8.0 wrapper, so
+# the styling lives in ``assets/stylesheet.css`` instead.
+SETUP_CARD_CTA_CLASS = "setup-card-cta"
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1263,10 +1299,16 @@ def _stats_dir_hint() -> list:
     Unset and unusable read the same to the user, and both are repaired in the
     same place, so the hint carries one link to the settings page.
 
-    A save this process has not applied yet is neither: the settings page just
-    confirmed the save, so claiming nothing is configured would tell the user
-    it failed. The hint defers to the restart instead, the same pin-versus-store
+    A save this process has not applied yet is neither: a directory is
+    configured, so claiming nothing is would tell the user the save failed. The
+    hint defers to the restart instead, the same pin-versus-store
     reconciliation the settings page's notice derives from.
+
+    What that branch must not do is confirm the save. It renders on every visit
+    while the change is pending, so a user returning days later would be told
+    they had just saved. It names the restart and what the restart applies, in
+    the settings page's vocabulary: "the app", never "the dashboard", which a
+    user reads as the browser page they would merely reload.
 
     That deferral is doubly narrow, because the restart copy carries no link
     and whatever it displaces has to be worth displacing. The pending change
@@ -1277,17 +1319,26 @@ def _stats_dir_hint() -> list:
     until it restarts -- but what the restart would then apply is nothing
     configured, which is what the plain hint below already says, and it says it
     with the link.
+
+    The plain hint is narrower still: it speaks only for a ``stats_dir`` key
+    that *exists* and cannot be used -- deliberately emptied, or a stored path
+    that has since vanished. A key that was never written is the never-asked
+    case, which the setup card owns, so each condition is explained by exactly
+    one surface instead of two stacked lines saying the same thing.
     """
+    settings = get_settings()
     if get_usable_stats_dir() is not None:
         return []
-    if is_stats_dir_change_pending() and get_settings().get(STATS_DIR_KEY):
+    if is_stats_dir_change_pending() and settings.get(STATS_DIR_KEY):
         return [
             dmc.Text(
-                "Settings saved — restart the dashboard to apply them.",
+                "Restart the app to apply your saved settings.",
                 className="stats-dir-hint",
                 id="stats-dir-hint",
             )
         ]
+    if STATS_DIR_KEY not in settings:
+        return []
     return [
         dmc.Text(
             [
@@ -1298,6 +1349,141 @@ def _stats_dir_hint() -> list:
             id="stats-dir-hint",
         )
     ]
+
+
+def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
+    """Build one state of the setup card: a heading, a reason, and a way out.
+
+    Navigation and dismissal only. The primary action is a link to the settings
+    page, where detection and Save already live, so the card never grows a
+    second detection UI and opening it costs no KovaaK's request. Skip comes
+    with the fine print that says what it gives up, because a dismissal the
+    user cannot interpret is worse than the question.
+
+    The two actions are deliberately different elements: one navigates and is a
+    link, the other acts on this page and is a button.
+    """
+    actions = [
+        dmc.Anchor(
+            SETUP_CARD_OPEN_SETTINGS_LABEL,
+            href="/settings",
+            refresh=False,
+            className=SETUP_CARD_CTA_CLASS,
+            underline="never",
+        )
+    ]
+    if offer_skip:
+        actions.append(
+            dmc.Button(
+                SETUP_CARD_SKIP_LABEL,
+                id=SETUP_CARD_SKIP_ID,
+                # Secondary to the one action that finishes the setup.
+                variant="subtle",
+            )
+        )
+    children = [
+        dmc.Text(title, className="setup-card-title"),
+        dmc.Text(body),
+        dmc.Group(actions, gap="sm"),
+    ]
+    if offer_skip:
+        children.append(
+            dmc.Text(SETUP_CARD_SKIP_FINE_PRINT, className="setup-card-fine-print")
+        )
+    return dmc.Paper(
+        dmc.Stack(children, gap="xs"),
+        className="setup-card",
+        withBorder=True,
+    )
+
+
+def _setup_card_children() -> list:
+    """Ask, once, for whatever setup the app could not do on the user's behalf.
+
+    Read from the stored view rather than the pinned accessors, and keyed on
+    key *absence*: the card is the "never asked" surface, so a key that exists
+    -- with any value, ``""`` included -- retires it permanently. A degraded
+    setting that does exist is explained where it bites instead, by the hints
+    above and beside the values it affects.
+
+    The missing stats directory wins when both are missing: without it the app
+    has nothing to plot, so it is not dismissible and the identity ask can wait
+    for a page that shows something.
+
+    Nothing renders while a saved stats-directory change is waiting on a
+    restart. The user is mid-setup, the restart hint owns that moment, and
+    stacking the identity ask on top of it would be two banners for one
+    unfinished action. The card comes back after the restart if identity is
+    still unasked.
+    """
+    if is_stats_dir_change_pending():
+        return []
+    settings = get_settings()
+    if STATS_DIR_KEY not in settings:
+        return [
+            _setup_card(
+                SETUP_CARD_STATS_DIR_TITLE,
+                SETUP_CARD_STATS_DIR_BODY,
+                offer_skip=False,
+            )
+        ]
+    if KOVAAKS_USERNAME_KEY not in settings:
+        return [
+            _setup_card(
+                SETUP_CARD_IDENTITY_TITLE,
+                SETUP_CARD_IDENTITY_BODY,
+                offer_skip=True,
+            )
+        ]
+    return []
+
+
+@callback(
+    Output(SETUP_CARD_ID, "children"),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
+    # ``allow_optional``: Skip renders only in the identity state, while the
+    # container it writes to is always mounted. Without it, every other state
+    # of the page -- the stats-folder card, and every configured install --
+    # logs "ID not found in layout" for this input on each load.
+    Input(SETUP_CARD_SKIP_ID, "n_clicks", allow_optional=True),
+    prevent_initial_call=True,
+)
+def skip_identity_setup(n_clicks):
+    """Record the declined identity ask and take the card away.
+
+    The write goes through the settings service's decline operation rather than
+    a read-merge-write here: this callback's page was rendered at some earlier
+    moment, and a settings save made since must not be undone by a card click.
+
+    Nothing else follows from it. The warmup worker is not started -- there is
+    no username to warm anything for -- and nothing pins, because the identity
+    pin freezes only on a read that sees a configured username, so the click
+    produces no restart notice either.
+
+    Guard on ``n_clicks`` and the trigger: under DashProxy a callback can fire
+    once on page load with nothing having triggered it, and a page load must
+    never answer a question the user has not been asked yet.
+
+    A settings file stamped by a newer build refuses the write. The card then
+    has to stay up -- taking it away would claim a decline that was never
+    recorded, and it would be back on the next load anyway -- so the toast is
+    what explains why the click appeared to do nothing.
+    """
+    if not n_clicks or ctx.triggered_id != SETUP_CARD_SKIP_ID:
+        return no_update, no_update
+    try:
+        decline_identity()
+    except UnsupportedSchemaError:
+        logger.warning("Refused to record the declined identity ask")
+        notification = toast(
+            "setup-card-skip-refused-notification",
+            SETUP_CARD_SKIP_REFUSED_TITLE,
+            SETUP_CARD_SKIP_REFUSED_MESSAGE,
+            color="red",
+            icon=local_icon("material-symbols:warning-outline"),
+        )
+        return no_update, [notification]
+    return [], no_update
 
 
 def _home_initial_selection(
@@ -1489,6 +1675,7 @@ def layout(
                 n_intervals=0,
             ),
             *_stats_dir_hint(),
+            dmc.Box(id=SETUP_CARD_ID, children=_setup_card_children()),
             dmc.Grid(
                 children=[
                     dmc.GridCol(

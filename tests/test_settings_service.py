@@ -628,3 +628,99 @@ def test_a_save_before_any_read_still_refuses_a_future_state_file(settings_path)
 
     with pytest.raises(store_schema.UnsupportedSchemaError):
         settings.save_settings({"kovaaks_username": "MingoDynasty"})
+
+
+def test_declining_identity_records_an_empty_username(settings_path):
+    settings.save_settings({})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {"kovaaks_username": ""}
+    assert settings.get_kovaaks_username() is None
+    assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+        "schema_version": 1,
+        "kovaaks_username": "",
+    }
+
+
+def test_declining_identity_leaves_an_absent_stats_directory_absent(settings_path):
+    """The bootstrap has to keep looking on later boots, so it stays unwritten."""
+    settings.save_settings({"steam_id": "111"})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {"kovaaks_username": "", "steam_id": "111"}
+
+
+def test_declining_identity_preserves_a_save_made_since_the_page_rendered(
+    settings_path,
+    tmp_path,
+):
+    """The decline re-reads under the lock instead of trusting a stale view."""
+    settings.save_settings({"stats_dir": "old-directory"})
+    # What a card render read, moments before the user clicked Skip.
+    stale = settings.get_settings()
+    settings.save_settings(
+        {"stats_dir": str(tmp_path), "steam_id": "111", "kovaaks_username": ""}
+    )
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {
+        "stats_dir": str(tmp_path),
+        "steam_id": "111",
+        "kovaaks_username": "",
+    }
+    assert stale["stats_dir"] == "old-directory"
+
+
+@pytest.mark.parametrize("saved", ["MingoDynasty", ""])
+def test_declining_identity_never_overwrites_an_answered_question(
+    settings_path,
+    saved,
+):
+    """A stale tab's Skip must not discard a username saved from another one."""
+    settings.save_settings({"stats_dir": "somewhere"})
+    # What the card render read, before the other tab saved.
+    settings.get_settings()
+    settings.save_settings({"stats_dir": "somewhere", "kovaaks_username": saved})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {
+        "stats_dir": "somewhere",
+        "kovaaks_username": saved,
+    }
+
+
+def test_declining_identity_does_not_disturb_the_replace_all_save(settings_path):
+    """Save keeps its contract: the next one still writes the file whole."""
+    settings.save_settings({"stats_dir": "somewhere", "steam_id": "111"})
+    settings.decline_identity()
+
+    settings.save_settings({"kovaaks_username": "First"})
+
+    assert settings.get_settings() == {"kovaaks_username": "First"}
+
+
+def test_declining_identity_takes_the_same_write_guard_as_a_save(settings_path):
+    """The decline is user-initiated, so it owns an unusable file too."""
+    _write_raw(settings_path, "not json")
+
+    settings.decline_identity()
+
+    backup = settings_path.parent / "settings.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+    assert settings.get_settings() == {"kovaaks_username": ""}
+
+
+def test_a_newer_store_refuses_the_decline_and_keeps_its_bytes(settings_path):
+    """A second writer must not be a hole in the newer-schema refusal."""
+    stored = json.dumps({"schema_version": 2, "kovaaks_username": "FromTheFuture"})
+    _write_raw(settings_path, stored)
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        settings.decline_identity()
+
+    assert settings_path.read_text(encoding="utf-8") == stored
+    assert not list(settings_path.parent.glob("*.bak"))

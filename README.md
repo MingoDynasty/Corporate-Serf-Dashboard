@@ -51,7 +51,10 @@ through Steam, and remembers what it finds. If it comes up empty — KovaaK's
 installed somewhere unusual, or not installed yet — the dashboard still starts;
 it simply has no runs to show and says so on the Scenario Performance page
 until you point it at the folder on the Settings page (see
-[Configuration](#configuration)).
+[Configuration](#configuration)). That same page offers the one thing the
+first start cannot work out for itself — your KovaaK's account, which turns
+leaderboard positions and percentiles on. Skipping the offer leaves those
+features off and the dashboard does not ask again.
 
 **Each launch checks for a new release and updates itself** before starting, so
 you stay current without doing anything. If that check fails — offline, GitHub
@@ -158,10 +161,10 @@ leaderboards. The stats folder is usually filled in for you on the first start
 cases it could not, and for turning the leaderboard features on. If you have
 KovaaK's in more than one Steam library, the stats folder box suggests each one
 it found, so picking the right copy is a click rather than a hunt through
-Explorer. For the username and Steam ID, **Detect** checks the Steam accounts
-on this machine against KovaaK's and fills in the one it can prove is yours —
-or lists what it found, for you to choose from, when it cannot be sure of
-exactly one. Nothing detected is kept until you press Save.
+Explorer. For the username and Steam ID, **Detect my accounts** checks the
+Steam accounts on this machine against KovaaK's and fills in the one it can
+prove is yours — or lists what it found, for you to choose from, when it
+cannot be sure of exactly one. Nothing detected is kept until you press Save.
 
 The page writes `data/settings.json`, the app-owned file beside `config.toml`
 (installed: `%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json`). You
