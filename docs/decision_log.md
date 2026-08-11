@@ -138,6 +138,19 @@ destroying the stored identity. Between update and script the app boots loud
 but inert. **Compatibility floor:** once stamped files exist, pre-stamp
 releases are unsafe rollback targets, by that same bootstrap-wipe mechanism.
 
+The script resolves the *state root* itself rather than reading the module
+constants the services bind at import, because on an installed copy those bind
+to the wrong tree: the launcher exports `CSD_STATE_DIR` only around the app
+process, so a manual command inherits nothing, and the code lives in
+`versions/<tag>/` while the durable state lives at the install root. Resolution
+order is `--state-dir`, then `CSD_STATE_DIR`, then the install root inferred
+from the script's own location when it sits in a `versions/<tag>/scripts` tree,
+then the working directory; the chosen root and the rule that chose it are
+printed before any file is touched. The installed command runs the release's
+own `versions/<tag>/.venv/Scripts/python.exe` by absolute path, because a
+standard install deliberately puts neither uv nor Python on `PATH` (see the
+script's docstring for the exact snippet).
+
 Note for the first release that actually *migrates* data: the launcher's staged
 trial run executes load-time migrations before `/health` is consulted, so that
 PR has to consider the trial window — for example by migrating only after
