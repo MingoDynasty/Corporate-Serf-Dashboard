@@ -76,6 +76,9 @@ def _warmup_snapshot(
 
 def test_playlists_overview_page_loads_rows(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-mounted")
+    # A configured username is what leaves the status slot empty: percentiles
+    # are available, so the page has nothing to say about them.
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     expected_rows = [{"name": "Voltaic Benchmarks", "code": "KovaaKsTestCode"}]
     seen_include_hidden = []
 
@@ -242,6 +245,7 @@ def test_warmup_status_formats_eta_pause_and_fatal_state(monkeypatch):
 
 def test_interval_rebuild_does_not_record_interactive_activity(monkeypatch):
     _trigger(monkeypatch, "playlists-overview-warmup-interval")
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     seen_record_activity = []
 
     def fake_build(include_hidden=False, *, record_activity=True):
@@ -333,6 +337,81 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
     rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
     assert rows == []
+    assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
+
+
+def _assert_percentiles_unavailable_status(status):
+    """Pin the unset-username status line, copy and link alike."""
+    assert status[0] == "Percentiles unavailable. Set your KovaaK's username in "
+    anchor = next(child for child in status if isinstance(child, dmc.Anchor))
+    assert anchor.href == "/settings"
+    assert anchor.children == "Settings"
+    assert anchor.refresh is False
+    assert status[2] == "."
+
+
+def test_playlists_overview_without_a_username_explains_the_percentiles(monkeypatch):
+    # Every percentile cell reads N/A while the username is unset, and nothing
+    # else on the page says why. The absent-key case: the fixture store holds
+    # no username key at all.
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False, *, record_activity=True: [
+            {"code": "KovaaKsTestCode"}
+        ],
+    )
+
+    rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
+
+    assert rows == [{"code": "KovaaKsTestCode"}]
+    _assert_percentiles_unavailable_status(status)
+
+
+def test_playlists_overview_treats_an_empty_username_as_unset(monkeypatch):
+    # A deliberate empty value is the same degraded state as an absent key
+    # everywhere else in the app, so it reads the same here.
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    settings_service.save_settings({"kovaaks_username": ""})
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False, *, record_activity=True: [
+            {"code": "KovaaKsTestCode"}
+        ],
+    )
+
+    _rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
+
+    _assert_percentiles_unavailable_status(status)
+
+
+def test_playlists_overview_empty_grid_messages_outrank_percentiles(monkeypatch):
+    # The percentile line only matters when there are rows whose percentiles
+    # are empty. With no rows, the message describing the empty grid wins even
+    # though the username is unset.
+    _trigger(monkeypatch, "playlists-overview-mounted")
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False, *, record_activity=True: [],
+    )
+
+    _rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
+
+    assert status == "No playlists are loaded."
+
+    monkeypatch.setattr(
+        playlists,
+        "build_playlist_overview_rows",
+        lambda include_hidden=False, *, record_activity=True: (
+            [{"code": "KovaaKsTestCode", "hidden": True}] if include_hidden else []
+        ),
+    )
+
+    _rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
+
     assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
 
 
@@ -937,6 +1016,7 @@ def test_import_playlist_reports_a_failed_visibility_write(monkeypatch):
 
 def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
     _trigger(monkeypatch, "playlists-rows-refresh")
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
         playlists,
         "build_playlist_overview_rows",

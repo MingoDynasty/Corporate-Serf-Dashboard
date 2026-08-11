@@ -60,6 +60,10 @@ benchmark tier) — see the
   KovaaK's username in Settings", with Settings linked — so the fill's red
   summary toast cannot fire over a pass that fetched nothing
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  The playlists overview, whose percentile columns empty for the same reason,
+  states it in its own status line as well: "Percentiles unavailable. Set your
+  KovaaK's username in Settings.", again with Settings linked, and only when
+  the grid has rows to explain.
   A username that is configured but wrong is a separate, still-open case: it
   is knowable only per result and still produces the generic failure reporting.
 

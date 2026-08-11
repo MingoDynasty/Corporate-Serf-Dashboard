@@ -1,6 +1,6 @@
 # Initial Setup Flow
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-11
 
 ## TL;DR
