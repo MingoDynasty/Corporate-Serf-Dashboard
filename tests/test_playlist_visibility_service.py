@@ -3,6 +3,7 @@ import json
 import pytest
 
 from source.kovaaks import playlist_visibility_service as visibility
+from source.utilities import store_schema
 
 
 def _use_tmp_visibility(monkeypatch, tmp_path, user_root_codes=frozenset()):
@@ -163,3 +164,114 @@ def test_visible_selector_options_filter_hidden_codes(monkeypatch):
     assert visibility.get_visible_playlist_selector_options() == [
         {"label": "Shown", "value": "ShownCode"}
     ]
+
+
+# --- schema_version: the four read states, and what writes may do in each ---
+
+
+def _seed(user_root_codes=()):
+    return set(visibility.DEFAULT_VISIBLE_CODES) | set(user_root_codes)
+
+
+def test_a_stamped_write_round_trips(monkeypatch, tmp_path):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    hidden_code = sorted(visibility.DEFAULT_VISIBLE_CODES)[0]
+
+    visibility.hide_playlist(hidden_code)
+
+    payload = json.loads(visibility_path.read_text(encoding="utf-8"))
+    assert payload["schema_version"] == 1
+    assert payload["shown_playlists"] == sorted(_seed() - {hidden_code})
+    assert visibility.get_visibility_store_message() == ""
+
+
+def test_an_unstamped_file_falls_back_to_the_seed_and_reports_it(
+    monkeypatch,
+    tmp_path,
+):
+    """No grandfather rule, and the fallback must not look like a first run."""
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_raw_visibility(
+        visibility_path, json.dumps({"shown_playlists": ["KovaaKsSomething"]})
+    )
+
+    assert visibility.get_shown_playlist_codes() == _seed()
+    assert '"schema_version": 1' in visibility.get_visibility_store_message()
+
+
+@pytest.mark.parametrize(
+    "marker",
+    [True, "1", 0, -1],
+    ids=["bool", "string", "zero", "negative"],
+)
+def test_a_marker_that_is_not_a_positive_integer_falls_back_to_the_seed(
+    monkeypatch,
+    tmp_path,
+    marker,
+):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_raw_visibility(
+        visibility_path, json.dumps({"schema_version": marker, "shown_playlists": []})
+    )
+
+    assert visibility.get_shown_playlist_codes() == _seed()
+    # Not the future state: a show/hide must still be able to own the file.
+    visibility.hide_playlist(sorted(visibility.DEFAULT_VISIBLE_CODES)[0])
+    assert visibility.get_visibility_store_message() == ""
+
+
+def test_a_newer_stamp_falls_back_to_the_seed_and_refuses_writes(
+    monkeypatch,
+    tmp_path,
+):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_raw_visibility(
+        visibility_path, json.dumps({"schema_version": 2, "shown_playlists": []})
+    )
+
+    assert visibility.get_shown_playlist_codes() == _seed()
+    assert "newer version of this app" in visibility.get_visibility_store_message()
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        visibility.hide_playlist(sorted(visibility.DEFAULT_VISIBLE_CODES)[0])
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        visibility.show_playlist("KovaaKsBrandNewCode")
+
+    assert json.loads(visibility_path.read_text(encoding="utf-8")) == {
+        "schema_version": 2,
+        "shown_playlists": [],
+    }
+
+
+def test_an_unknown_key_under_a_supported_stamp_names_the_key(monkeypatch, tmp_path):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_visibility(visibility_path, {"shown_playlists": [], "shown_playlist": []})
+
+    assert visibility.get_shown_playlist_codes() == _seed()
+    assert '"shown_playlist"' in visibility.get_visibility_store_message()
+
+
+def test_an_error_state_read_never_touches_the_file(monkeypatch, tmp_path):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_raw_visibility(visibility_path, "not json")
+
+    assert visibility.get_shown_playlist_codes() == _seed()
+
+    assert visibility_path.read_text(encoding="utf-8") == "not json"
+    assert [path.name for path in visibility_path.parent.iterdir()] == [
+        visibility_path.name
+    ]
+
+
+def test_a_show_over_an_error_state_file_backs_it_up_then_owns_it(
+    monkeypatch,
+    tmp_path,
+):
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_raw_visibility(visibility_path, "not json")
+
+    visibility.show_playlist("KovaaKsBrandNewCode")
+
+    backup = visibility_path.parent / "playlist_visibility.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+    assert visibility.is_playlist_shown("KovaaKsBrandNewCode")

@@ -4,6 +4,7 @@ import logging
 import pytest
 
 from source.config import settings_service as settings
+from source.utilities import atomic_write, store_schema
 
 
 @pytest.fixture
@@ -417,3 +418,188 @@ def test_a_first_time_identity_set_is_not_pending(settings_path):
     settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
 
     assert settings.is_restart_pending() is False
+
+
+# --- schema_version: the four read states, and what writes may do in each ---
+
+
+def test_a_supported_stamp_never_leaks_into_the_domain_values(settings_path):
+    """The stamp is storage, not a setting: nothing downstream should see it."""
+    _write(settings_path, {"kovaaks_username": "MingoDynasty"})
+
+    assert settings.get_settings() == {"kovaaks_username": "MingoDynasty"}
+    assert settings.get_settings_store_state() is store_schema.StoreState.SUPPORTED
+    assert settings.get_settings_store_message() == ""
+
+
+def test_a_missing_file_is_its_own_state_not_an_error(settings_path):
+    assert settings.get_settings_store_state() is store_schema.StoreState.MISSING
+    assert settings.get_settings_store_message() == ""
+
+
+def test_an_unstamped_file_is_an_error_state_naming_the_fix(settings_path):
+    """No grandfather rule: a well-formed legacy file is not implicitly v1."""
+    _write_raw(settings_path, json.dumps({"kovaaks_username": "MingoDynasty"}))
+
+    assert settings.get_settings() == {}
+    assert settings.get_settings_store_state() is store_schema.StoreState.ERROR
+    assert '"schema_version": 1' in settings.get_settings_store_message()
+
+
+@pytest.mark.parametrize(
+    "marker",
+    [True, "1", 1.0, None, 0, -1],
+    ids=["bool", "string", "float", "null", "zero", "negative"],
+)
+def test_a_marker_that_is_not_a_positive_integer_is_an_error_state(
+    settings_path,
+    marker,
+):
+    """Including 0 and negatives: garbage is not the future, or writes strand."""
+    _write_raw(
+        settings_path,
+        json.dumps({"schema_version": marker, "kovaaks_username": "MingoDynasty"}),
+    )
+
+    assert settings.get_settings() == {}
+    assert settings.get_settings_store_state() is store_schema.StoreState.ERROR
+
+
+def test_a_newer_stamp_is_the_future_state(settings_path):
+    _write_raw(
+        settings_path,
+        json.dumps({"schema_version": 2, "kovaaks_username": "MingoDynasty"}),
+    )
+
+    assert settings.get_settings() == {}
+    assert settings.get_settings_store_state() is store_schema.StoreState.FUTURE
+    assert "newer version of this app" in settings.get_settings_store_message()
+
+
+def test_a_supported_stamp_does_not_vouch_for_the_payload(settings_path):
+    _write(settings_path, {"kovaaks_username": 12345})
+
+    assert settings.get_settings() == {}
+    assert settings.get_settings_store_state() is store_schema.StoreState.ERROR
+
+
+def test_an_unknown_key_under_a_supported_stamp_is_an_error_naming_the_key(
+    settings_path,
+):
+    """Within a version the key set is fixed, so a stray key is a hand-edit typo."""
+    _write(settings_path, {"kovaaks_username": "MingoDynasty", "kovaaks_usernam": "x"})
+
+    assert settings.get_settings() == {}
+    assert '"kovaaks_usernam"' in settings.get_settings_store_message()
+
+
+def test_an_error_state_read_never_touches_the_file(settings_path):
+    _write_raw(settings_path, "not json")
+
+    assert settings.get_settings() == {}
+
+    assert settings_path.read_text(encoding="utf-8") == "not json"
+    assert [path.name for path in settings_path.parent.iterdir()] == [
+        settings_path.name
+    ]
+
+
+def test_a_save_over_an_error_state_file_backs_it_up_then_owns_it(settings_path):
+    """Self-service recovery: the settings page can always rewrite the store."""
+    _write_raw(settings_path, "not json")
+
+    settings.save_settings({"kovaaks_username": "MingoDynasty"})
+
+    assert settings.get_settings() == {"kovaaks_username": "MingoDynasty"}
+    backups = sorted(settings_path.parent.glob("*.bak"))
+    assert [path.name for path in backups] == ["settings.json.corrupt-1.bak"]
+    assert backups[0].read_text(encoding="utf-8") == "not json"
+
+
+def test_a_save_before_any_read_still_backs_up_an_error_state_file(settings_path):
+    """The guard has to read for itself; a writer may be the first caller."""
+    _write_raw(settings_path, "not json")
+    settings.clear_settings_cache()
+
+    settings.save_settings({"steam_id": "76561197986713986"})
+
+    assert (settings_path.parent / "settings.json.corrupt-1.bak").exists()
+
+
+def test_a_backup_never_replaces_an_earlier_backup(settings_path):
+    _write_raw(settings_path, "first corruption")
+    settings.save_settings({"kovaaks_username": "First"})
+    _write_raw(settings_path, "second corruption")
+    settings.clear_settings_cache()
+
+    settings.save_settings({"kovaaks_username": "Second"})
+
+    directory = settings_path.parent
+    assert (directory / "settings.json.corrupt-1.bak").read_text(
+        encoding="utf-8"
+    ) == "first corruption"
+    assert (directory / "settings.json.corrupt-2.bak").read_text(
+        encoding="utf-8"
+    ) == "second corruption"
+
+
+def test_a_failed_replace_after_a_backup_leaves_the_original_in_place(
+    settings_path,
+    monkeypatch,
+):
+    """A copy, not a move: the incumbent survives a write that never lands."""
+    _write_raw(settings_path, "not json")
+
+    def failing_replace(_source, _destination):
+        raise PermissionError("locked by another process")
+
+    monkeypatch.setattr(atomic_write.os, "replace", failing_replace)
+    monkeypatch.setattr(atomic_write.time, "sleep", lambda _delay: None)
+
+    with pytest.raises(PermissionError):
+        settings.save_settings({"kovaaks_username": "MingoDynasty"})
+
+    assert settings_path.read_text(encoding="utf-8") == "not json"
+    assert (settings_path.parent / "settings.json.corrupt-1.bak").exists()
+    assert not list(settings_path.parent.glob(".*.tmp"))
+
+
+def test_a_write_is_refused_when_the_incumbent_cannot_be_copied_aside(
+    settings_path,
+    monkeypatch,
+):
+    _write_raw(settings_path, "not json")
+
+    def refuse_to_copy(_path):
+        raise PermissionError("cannot read the incumbent")
+
+    monkeypatch.setattr(settings, "back_up_unusable_store", refuse_to_copy)
+
+    with pytest.raises(PermissionError):
+        settings.save_settings({"kovaaks_username": "MingoDynasty"})
+
+    assert settings_path.read_text(encoding="utf-8") == "not json"
+
+
+def test_a_future_state_file_refuses_every_save(settings_path):
+    _write_raw(
+        settings_path,
+        json.dumps({"schema_version": 2, "kovaaks_username": "FromTheFuture"}),
+    )
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        settings.save_settings({"kovaaks_username": "MingoDynasty"})
+
+    assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+        "schema_version": 2,
+        "kovaaks_username": "FromTheFuture",
+    }
+    assert not list(settings_path.parent.glob("*.bak"))
+
+
+def test_a_save_before_any_read_still_refuses_a_future_state_file(settings_path):
+    _write_raw(settings_path, json.dumps({"schema_version": 2}))
+    settings.clear_settings_cache()
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        settings.save_settings({"kovaaks_username": "MingoDynasty"})

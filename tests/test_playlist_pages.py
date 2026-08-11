@@ -12,6 +12,7 @@ from source.config import settings_service
 from source.kovaaks import data_service, playlist_scenarios_service
 from source.kovaaks.data_models import PlaylistData, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
+from source.utilities.store_schema import UnsupportedSchemaError
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -1883,3 +1884,96 @@ def test_playlist_scenarios_scenario_column_fills_remaining_width():
     assert column["cellRenderer"] == "ScenarioLink"
     assert "cellClass" not in column
     assert "scenario" not in playlist_scenarios.AUTO_SIZE_COLUMN_KEYS
+
+
+# --- schema_version: the visibility store's page-level surfaces ---
+
+
+def test_render_visibility_alert_hidden_when_the_store_is_usable(monkeypatch):
+    monkeypatch.setattr(playlists, "get_visibility_store_message", lambda: "")
+
+    class_name, text = playlists.render_visibility_alert(True, 0)
+
+    assert class_name == playlists.VISIBILITY_ALERT_HIDDEN_CLASS
+    assert text == ""
+
+
+def test_render_visibility_alert_shows_the_store_message(monkeypatch):
+    """The seed fallback looks exactly like a first run; only this says otherwise."""
+    monkeypatch.setattr(
+        playlists,
+        "get_visibility_store_message",
+        lambda: "playlist_visibility.json is not valid JSON.",
+    )
+
+    class_name, text = playlists.render_visibility_alert(True, 1)
+
+    assert class_name == ""
+    assert text == "playlist_visibility.json is not valid JSON."
+
+
+def test_a_refused_visibility_toggle_reports_and_leaves_the_rows_alone(monkeypatch):
+    """Nothing was written, so a row rebuild would only redraw the old state."""
+    _trigger(monkeypatch, "playlists-overview-grid")
+
+    def refuse(_code):
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    monkeypatch.setattr(playlists, "toggle_playlist_visibility", refuse)
+    monkeypatch.setattr(
+        playlists,
+        "enqueue_playlist_percentile_warmup",
+        lambda _code: pytest.fail("a refused toggle must not queue warmup work"),
+    )
+
+    notifications, rows_refresh = playlists.update_playlist_visibility(
+        {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4
+    )
+
+    assert rows_refresh is no_update
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["title"] == playlists.VISIBILITY_REFUSED_TITLE
+    assert "newer version of this app" in notifications[0]["message"]
+
+
+def test_an_import_still_lands_when_the_visibility_write_is_refused(monkeypatch):
+    """The playlist file is already on disk, so the toast reports the split."""
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(
+        playlists, "load_playlist_from_code", lambda _code: (None, "NewCode")
+    )
+    monkeypatch.setattr(playlists, "get_playlist_display_label", lambda _code: "New")
+    monkeypatch.setattr(playlists, "enqueue_playlist_percentile_warmup", lambda _c: 1)
+
+    def refuse(_code):
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    monkeypatch.setattr(playlists, "show_playlist", refuse)
+
+    notifications, rows_refresh, opened, value, error = playlists.import_playlist(
+        1, "NewCode", 2
+    )
+
+    assert notifications[0]["color"] == "orange"
+    assert notifications[0]["title"] == "Playlist imported — not shown"
+    assert rows_refresh == 3
+    assert (opened, value, error) == (False, "", None)
+
+
+def test_a_delete_still_reports_when_the_visibility_write_is_refused(monkeypatch):
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: None)
+    monkeypatch.setattr(playlists, "get_playlist_display_label", lambda _code: "User")
+
+    def refuse(_code):
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    monkeypatch.setattr(playlists, "hide_playlist", refuse)
+
+    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
+        1, "UserCode", 4
+    )
+
+    assert notifications[0]["color"] == "green"
+    assert notifications[0]["title"] == "Playlist deleted"
+    assert rows_refresh == 5
+    assert opened is False

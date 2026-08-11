@@ -997,3 +997,275 @@ def test_committed_bundled_playlists_all_carry_leaderboard_ids():
             missing_leaderboard_ids.append(relative)
 
     assert not missing_leaderboard_ids
+
+
+# --- schema_version: user-root reads, and the import destination point-check ---
+
+
+def _stamped(playlist: PlaylistData, version) -> str:
+    envelope = json.loads(playlist.model_dump_json(exclude_none=True))
+    return json.dumps({"schema_version": version, **envelope}, indent=2)
+
+
+def _search_response(name: str, code: str, scenario: str = "Imported Scenario"):
+    return SimpleNamespace(
+        data=[
+            SimpleNamespace(
+                playlistName=name,
+                playlistCode=code,
+                scenarioList=[SimpleNamespace(scenarioName=scenario)],
+            )
+        ]
+    )
+
+
+def test_an_import_writes_a_stamped_envelope_without_touching_the_model(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Stamped", "StampedCode"),
+    )
+
+    assert data_service.load_playlist_from_code("StampedCode") == (None, "StampedCode")
+
+    payload = json.loads(
+        (user_root / "Stamped [StampedCode].json").read_text(encoding="utf-8")
+    )
+    assert payload["schema_version"] == 1
+    # The stamp is storage, not domain data: it never reaches PlaylistData.
+    stored = data_service.playlist_database["StampedCode"]
+    assert not hasattr(stored, "schema_version")
+    assert stored.model_dump(exclude_none=True) == {
+        key: value for key, value in payload.items() if key != "schema_version"
+    }
+
+
+def test_an_unstamped_user_playlist_is_skipped_with_an_actionable_warning(
+    monkeypatch,
+    tmp_path,
+):
+    """No grandfather rule, and startup never rewrites what it cannot use."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    legacy = user_root / "legacy.json"
+    _write_playlist(legacy, _playlist("Legacy", "LegacyCode"))
+    before = legacy.read_text(encoding="utf-8")
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {}
+    warnings = data_service.drain_startup_playlist_warnings()
+    assert len(warnings) == 1
+    assert '"schema_version": 1' in warnings[0]
+    assert legacy.read_text(encoding="utf-8") == before
+
+
+@pytest.mark.parametrize(
+    "version",
+    [True, "1", 0, -1],
+    ids=["bool", "string", "zero", "negative"],
+)
+def test_a_user_playlist_stamp_that_is_not_a_positive_integer_is_skipped(
+    monkeypatch,
+    tmp_path,
+    version,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_raw_playlist(
+        user_root / "bad-stamp.json", _stamped(_playlist("Bad", "BadCode"), version)
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {}
+    assert len(data_service.drain_startup_playlist_warnings()) == 1
+
+
+def test_a_newer_stamped_user_playlist_is_skipped_and_says_so(monkeypatch, tmp_path):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_raw_playlist(
+        user_root / "future.json", _stamped(_playlist("Future", "FutureCode"), 2)
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {}
+    warnings = data_service.drain_startup_playlist_warnings()
+    assert "newer version of this app" in warnings[0]
+
+
+def test_a_stamped_user_playlist_with_an_invalid_payload_names_the_code_fix(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_raw_playlist(
+        user_root / "codeless.json",
+        json.dumps(
+            {"schema_version": 1, "name": "Codeless", "scenarios": [{"name": "S"}]}
+        ),
+    )
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {}
+    assert "code" in data_service.drain_startup_playlist_warnings()[0]
+
+
+def test_bundled_playlists_stay_unstamped_and_load(monkeypatch, tmp_path):
+    """The corpus ships with the code that reads it, so it carries no stamp."""
+    bundled_root, _user_root = _configure_roots(monkeypatch, tmp_path)
+    bundled = _playlist("Bundled", "BundledCode")
+    _write_playlist(bundled_root / "bundled.json", bundled)
+
+    data_service.load_playlists()
+
+    assert data_service.playlist_database == {"BundledCode": bundled}
+    assert data_service.drain_startup_playlist_warnings() == []
+
+
+def test_import_refuses_when_a_newer_file_holds_the_destination_path(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    destination = user_root / "Blocked [BlockedCode].json"
+    _write_raw_playlist(destination, _stamped(_playlist("Blocked", "BlockedCode"), 2))
+    before = destination.read_text(encoding="utf-8")
+    data_service.load_playlists()
+    data_service.drain_startup_playlist_warnings()
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Blocked", "BlockedCode"),
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("BlockedCode")
+
+    assert imported_code is None
+    assert "newer version of this app" in message
+    assert destination.read_text(encoding="utf-8") == before
+    assert data_service.playlist_database == {}
+    assert not list(user_root.glob(".*.tmp"))
+
+
+@pytest.mark.parametrize(
+    "incumbent",
+    ["not json", '{"name": "Legacy", "code": "BlockedCode", "scenarios": []}'],
+    ids=["corrupt", "unstamped"],
+)
+def test_import_copies_an_unusable_incumbent_aside_then_replaces_it(
+    monkeypatch,
+    tmp_path,
+    incumbent,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    destination = user_root / "Blocked [BlockedCode].json"
+    _write_raw_playlist(destination, incumbent)
+    data_service.load_playlists()
+    data_service.drain_startup_playlist_warnings()
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Blocked", "BlockedCode"),
+    )
+
+    assert data_service.load_playlist_from_code("BlockedCode") == (
+        None,
+        "BlockedCode",
+    )
+
+    backup = user_root / "Blocked [BlockedCode].json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == incumbent
+    assert json.loads(destination.read_text(encoding="utf-8"))["schema_version"] == 1
+
+
+def test_import_copies_aside_a_stamped_incumbent_whose_payload_is_invalid(
+    monkeypatch,
+    tmp_path,
+):
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    destination = user_root / "Blocked [BlockedCode].json"
+    incumbent = json.dumps({"schema_version": 1, "name": "Blocked", "scenarios": []})
+    _write_raw_playlist(destination, incumbent)
+    data_service.load_playlists()
+    data_service.drain_startup_playlist_warnings()
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Blocked", "BlockedCode"),
+    )
+
+    assert data_service.load_playlist_from_code("BlockedCode") == (
+        None,
+        "BlockedCode",
+    )
+
+    backup = user_root / "Blocked [BlockedCode].json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == incumbent
+
+
+def test_import_refuses_a_filename_collision_with_a_healthy_playlist(
+    monkeypatch,
+    tmp_path,
+):
+    """Two names that sanitize alike land on one path; the healthy file wins.
+
+    The incumbent is a usable playlist under a different code, so the
+    duplicate-code check upstream cannot see the conflict: only asking the file
+    itself catches it, and before the point-check the import overwrote it.
+    """
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    incumbent = _playlist("Squad Alpha", "IncumbentCode")
+    destination = data_service.get_playlist_file_path("Squad Alpha", "IncumbentCode")
+    _write_user_playlist(destination, incumbent)
+    data_service.load_playlists()
+    assert data_service.playlist_database == {"IncumbentCode": incumbent}
+    before = destination.read_text(encoding="utf-8")
+    # A different playlist whose name sanitizes onto the same filename.
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Squad: Alpha", "OtherCode"),
+    )
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_file_path",
+        lambda _name, _code: destination,
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("OtherCode")
+
+    assert imported_code is None
+    assert "already holds" in message
+    assert destination.read_text(encoding="utf-8") == before
+    assert not list(user_root.glob("*.bak"))
+    assert not list(user_root.glob(".*.tmp"))
+
+
+def test_the_duplicate_code_refusal_still_runs_before_the_point_check(
+    monkeypatch,
+    tmp_path,
+):
+    """A loaded duplicate is refused upstream; the file is never even opened."""
+    _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
+    _write_user_playlist(user_root / "loaded.json", _playlist("Loaded", "LoadedCode"))
+    data_service.load_playlists()
+    monkeypatch.setattr(
+        data_service,
+        "get_playlist_data",
+        lambda _code: _search_response("Loaded", "LoadedCode"),
+    )
+    monkeypatch.setattr(
+        data_service,
+        "write_playlist_data_to_file",
+        lambda _playlist: pytest.fail("a duplicate code must never reach the writer"),
+    )
+
+    message, imported_code = data_service.load_playlist_from_code("LoadedCode")
+
+    assert imported_code == "LoadedCode"
+    assert "already exists" in message

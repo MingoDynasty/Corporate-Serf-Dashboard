@@ -1,5 +1,6 @@
 """The settings page: form rendering, the save flow, and the restart notice."""
 
+import json
 from collections import deque
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -732,3 +733,87 @@ def test_a_utc_stamp_is_shown_in_local_time():
 def test_an_unreadable_last_seen_stamp_is_shown_as_it_arrived():
     """A decorative field must not cost the user a candidate they could pick."""
     assert settings_page._format_last_seen("last tuesday") == "last tuesday"
+
+
+# --- schema_version: what the page says when the store cannot be used ---
+
+
+def _write_store(text):
+    """Put arbitrary text in the store the fixture pointed the service at."""
+    path = settings_service.SETTINGS_FILE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    settings_service.clear_settings_cache()
+
+
+def test_a_usable_store_hides_the_alert(tmp_path):
+    settings_service.save_settings({"stats_dir": str(tmp_path)})
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.children == ""
+    assert alert.className == settings_page.STORE_ALERT_HIDDEN_CLASS
+
+
+def test_a_missing_store_hides_the_alert():
+    """A first run is empty fields and nothing else: there is nothing to warn about."""
+    settings_service.SETTINGS_FILE_PATH.unlink(missing_ok=True)
+    settings_service.clear_settings_cache()
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.className == settings_page.STORE_ALERT_HIDDEN_CLASS
+
+
+def test_an_unusable_store_is_named_beside_the_empty_form():
+    """Without this the page renders a blank form, exactly like a first run."""
+    _write_store(json.dumps({"kovaaks_username": "MingoDynasty"}))
+
+    page = settings_page.layout()
+
+    alert = _component_by_id(page, "app-settings-store-alert")
+    assert alert.className == settings_page.STORE_ALERT_CLASS
+    assert '"schema_version": 1' in alert.children
+    assert _component_by_id(page, "app-settings-username").value == ""
+
+
+def test_a_newer_store_says_the_data_is_intact():
+    _write_store(json.dumps({"schema_version": 2, "kovaaks_username": "Future"}))
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.className == settings_page.STORE_ALERT_CLASS
+    assert "newer version of this app" in alert.children
+
+
+def test_a_save_against_a_newer_store_is_refused_distinctly(clicked, quiet_warmup):
+    """A refusal is not an I/O failure: the remedy is updating, not retrying."""
+    _write_store(json.dumps({"schema_version": 2, "kovaaks_username": "Future"}))
+
+    _dir_error, _id_error, status, status_class, notice, notice_class = _save(
+        username="MingoDynasty"
+    )
+
+    assert status == settings_page.SAVE_REFUSED_STATUS
+    assert status != settings_page.SAVE_FAILED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
+    assert (notice, notice_class) == (no_update, no_update)
+    assert json.loads(
+        settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8")
+    ) == {"schema_version": 2, "kovaaks_username": "Future"}
+    assert quiet_warmup == []
+
+
+def test_a_save_against_an_unusable_store_recovers_it(clicked):
+    """Self-service repair: the page can always rewrite a file it cannot read."""
+    _write_store("not json")
+
+    _dir_error, _id_error, status, status_class, *_ = _save(username="MingoDynasty")
+
+    assert status == settings_page.SAVED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_CLASS
+    assert settings_service.get_settings()["kovaaks_username"] == "MingoDynasty"
+    assert (
+        _component_by_id(settings_page.layout(), "app-settings-store-alert").className
+        == settings_page.STORE_ALERT_HIDDEN_CLASS
+    )
