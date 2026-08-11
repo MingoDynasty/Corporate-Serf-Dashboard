@@ -74,9 +74,12 @@ STEAM_ID_ERROR = "Enter a 17-digit SteamID64 — it starts with 7656119."
 STEAM_ID64_BASE = 76561197960265728
 STEAM_ID64_DIGITS = 17
 
+# No "Saved." prefix: the notice is not a save confirmation. ``layout`` builds
+# it on every visit while a restart is pending, so a user returning a day later
+# without having saved anything would be told they just had.
 RESTART_NOTICE = (
-    "Saved. Restart the dashboard to apply — this app is still running on the "
-    "settings it started with."
+    "Restart the app to apply. This app is still running on the settings it "
+    "started with."
 )
 SAVED_STATUS = "Settings saved."
 SAVE_FAILED_STATUS = (
