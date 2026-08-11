@@ -215,6 +215,32 @@ def save_settings(values: Mapping[str, str]) -> None:
         _settings_cache["value"] = settings
 
 
+def decline_identity() -> None:
+    """Record that the identity ask was put to the user and declined.
+
+    The store's second runtime write path, and deliberately its narrowest: it
+    can only set ``kovaaks_username`` to the empty string -- the shipped
+    "unset" value -- and never records anything the user typed. The settings
+    page's Save stays the only runtime writer of *values*.
+
+    The read-modify-write happens under the module lock rather than in the
+    caller, which makes "alters no other key" an invariant of the operation. A
+    page that read the settings to render a card and handed the snapshot back
+    would restore that snapshot over whatever the settings page saved in
+    between; re-reading here means a newer ``stats_dir`` or ``steam_id``
+    survives the decline.
+
+    Absent keys stay absent, so declining an identity never configures a stats
+    directory the user has not set -- the startup bootstrap keeps looking for
+    one on later boots.
+    """
+    with _SETTINGS_LOCK:
+        settings = get_settings()
+        settings[KOVAAKS_USERNAME_KEY] = ""
+        _write_settings_to_disk(settings)
+        _settings_cache["value"] = settings
+
+
 def is_stats_dir_change_pending() -> bool:
     """Say whether the stored stats directory differs from this process's pin.
 

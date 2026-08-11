@@ -411,3 +411,56 @@ def test_a_first_time_identity_set_is_not_pending(settings_path):
     settings.save_settings({"kovaaks_username": "First", "steam_id": "111"})
 
     assert settings.is_restart_pending() is False
+
+
+def test_declining_identity_records_an_empty_username(settings_path):
+    settings.save_settings({})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {"kovaaks_username": ""}
+    assert settings.get_kovaaks_username() is None
+    assert json.loads(settings_path.read_text(encoding="utf-8")) == {
+        "kovaaks_username": ""
+    }
+
+
+def test_declining_identity_leaves_an_absent_stats_directory_absent(settings_path):
+    """The bootstrap has to keep looking on later boots, so it stays unwritten."""
+    settings.save_settings({"steam_id": "111"})
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {"kovaaks_username": "", "steam_id": "111"}
+
+
+def test_declining_identity_preserves_a_save_made_since_the_page_rendered(
+    settings_path,
+    tmp_path,
+):
+    """The decline re-reads under the lock instead of trusting a stale view."""
+    settings.save_settings({"stats_dir": "old-directory"})
+    # What a card render read, moments before the user clicked Skip.
+    stale = settings.get_settings()
+    settings.save_settings(
+        {"stats_dir": str(tmp_path), "steam_id": "111", "kovaaks_username": ""}
+    )
+
+    settings.decline_identity()
+
+    assert settings.get_settings() == {
+        "stats_dir": str(tmp_path),
+        "steam_id": "111",
+        "kovaaks_username": "",
+    }
+    assert stale["stats_dir"] == "old-directory"
+
+
+def test_declining_identity_does_not_disturb_the_replace_all_save(settings_path):
+    """Save keeps its contract: the next one still writes the file whole."""
+    settings.save_settings({"stats_dir": "somewhere", "steam_id": "111"})
+    settings.decline_identity()
+
+    settings.save_settings({"kovaaks_username": "First"})
+
+    assert settings.get_settings() == {"kovaaks_username": "First"}
