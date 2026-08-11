@@ -16,21 +16,20 @@ it never detects, never writes paths, and never blocks the app.
 
 ## Decisions needed
 
-The core design was settled with the maintainer in the 2026-08-11 design
-session and is recorded under "Ratified decisions" below — review it as
-settled unless something there is unsound. Two choices remain open:
+None open. The core design was settled with the maintainer in the
+2026-08-11 design session and is recorded under "Ratified decisions" below;
+the two decisions this proposal opened with were ratified by the maintainer
+during review, so both delivery-plan PRs are unblocked:
 
-- **D1 — State B card title.** Status: Open. The ratified copy covers the
-  card bodies and actions; the title above the stats-folder body was drafted
-  by the agent, not the maintainer. Recommended: "Finish setting up".
-  Consequence of choosing differently: copy only; no mechanism changes. The
-  card PR gates on this flipping to Ratified.
+- **D1 — State B card title.** Status: Ratified (2026-08-11). The title is
+  "Finish setting up". Rejected alternative: a more technical title naming
+  the stats-folder failure, which would repeat the body without improving
+  the action.
 - **D2 — Ship the playlist-overview status line first, as its own PR.**
-  Status: Open. Recommended: yes — it is a small, independently valuable fix
-  that should not wait on (or complicate) review of the card. Consequence of
-  choosing differently: folding it into the card PR couples a one-line
-  uncontroversial change to the larger review; dropping it leaves the
-  overview grid silent about why every percentile reads N/A.
+  Status: Ratified (2026-08-11). The status line ships as PR 1. Rejected
+  alternatives: folding it into the card PR, which couples an
+  uncontroversial one-line fix to the larger review, and dropping it, which
+  leaves the overview grid silent about why every percentile reads N/A.
 
 ## Problem
 
@@ -108,8 +107,9 @@ Settled with the maintainer; reviewers should treat these as fixed.
    State A title "Add your KovaaK's account", body "See your leaderboard
    position and percentiles for every scenario.", buttons "Open Settings"
    and "Skip", fine print "Skipping username disables rank lookups. You can
-   set it anytime in Settings." State B body "No KovaaK's stats folder was
-   found, so the dashboard can't read your runs yet. Set it in Settings."
+   set it anytime in Settings." State B title "Finish setting up" (D1),
+   body "No KovaaK's stats folder was found, so the dashboard can't read
+   your runs yet. Set it in Settings."
 6. **Alternatives rejected:** a blocking wizard (heavier than the problem;
    modals are also unverifiable in the automated browser pane); a per-setting
    row checklist (scales poorly if settings grow); a dedicated
@@ -124,10 +124,10 @@ The card renders from the landing page's layout using the stored settings
 view (`get_settings()`), the same view the Settings page renders from — not
 the process-pinned accessors. Two independent conditions:
 
-- `stats_dir` key absent → **State B**: title (D1), the State B body, one
-  "Open Settings" button. No Skip — the app is useless without the folder,
-  so this state is not dismissible. State B wins whenever both keys are
-  absent.
+- `stats_dir` key absent → **State B**: the "Finish setting up" title, the
+  State B body, one "Open Settings" button. No Skip — the app is useless
+  without the folder, so this state is not dismissible. State B wins
+  whenever both keys are absent.
 - `stats_dir` key present, `kovaaks_username` key absent → **State A**: the
   identity ask with "Open Settings", "Skip", and the fine print.
 - Both keys present → no card, permanently.
@@ -207,12 +207,12 @@ schema, `save_settings`, `api_service`, or the warmup worker.
 ## Delivery plan
 
 - **PR 1 — overview status line.** The companion fix alone: one status-line
-  branch on the playlists overview plus its test. No dependencies. Gates on
-  D2.
+  branch on the playlists overview plus its test. No dependencies. D2
+  ratified 2026-08-11.
 - **PR 2 — the setup card.** Card states, hint-branch narrowing, the
   identity-decline service operation with its writer-narrowing decision-log
   entry, and their tests. No hard dependency on PR 1; soft-ordered after
-  it. Gates on D1.
+  it. D1 ratified 2026-08-11.
 
 ## Out of scope
 
