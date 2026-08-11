@@ -189,6 +189,8 @@ def _store_alert() -> tuple[str, str]:
     Output("app-settings-steam-id", "error"),
     Output("app-settings-save-status", "children"),
     Output("app-settings-save-status", "className"),
+    Output("app-settings-store-alert", "children"),
+    Output("app-settings-store-alert", "className"),
     Output("app-settings-restart-notice", "children"),
     Output("app-settings-restart-notice", "className"),
     Input("app-settings-save-button", "n_clicks"),
@@ -206,12 +208,18 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
     distinction the ``stats_dir`` bootstrap will rely on, and cold-starts the
     warmup worker that boot skipped when there was no username to serve.
 
+    The store alert is re-derived here for the same reason as the restart
+    notice: Dash does not rebuild the layout after a callback, so a save that
+    repairs an unusable store would otherwise sit under the warning that said
+    it was unusable until the user navigated away. Every branch that leaves the
+    store untouched leaves the alert untouched too.
+
     Guard on ``n_clicks``: under DashProxy a callback can still fire once on
     initial page load despite ``prevent_initial_call``, and this one writes to
     disk.
     """
     if not n_clicks or ctx.triggered_id != "app-settings-save-button":
-        return no_update, no_update, no_update, no_update, no_update, no_update
+        return (no_update,) * 8
 
     stats_dir = (stats_dir or "").strip()
     username = (username or "").strip()
@@ -224,6 +232,8 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
             steam_id_error,
             "",
             SAVE_STATUS_CLASS,
+            no_update,
+            no_update,
             no_update,
             no_update,
         )
@@ -248,7 +258,10 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
             None,
             SAVE_FAILED_STATUS,
             SAVE_STATUS_FAILED_CLASS,
-            # The store is untouched, so what the notice says is still true.
+            # The store is untouched, so what the alert and the notice say is
+            # still true.
+            no_update,
+            no_update,
             no_update,
             no_update,
         )
@@ -267,6 +280,8 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
             SAVE_STATUS_FAILED_CLASS,
             no_update,
             no_update,
+            no_update,
+            no_update,
         )
     logger.info("Saved user settings from the settings page")
     if username:
@@ -274,8 +289,18 @@ def save_user_settings(n_clicks, stats_dir, username, steam_id):
         # first time an identity exists and is a no-op once one is running.
         start_percentile_warmup_worker()
 
+    alert, alert_class = _store_alert()
     notice, notice_class = _restart_notice()
-    return None, None, SAVED_STATUS, SAVE_STATUS_CLASS, notice, notice_class
+    return (
+        None,
+        None,
+        SAVED_STATUS,
+        SAVE_STATUS_CLASS,
+        alert,
+        alert_class,
+        notice,
+        notice_class,
+    )
 
 
 def _format_last_seen(last_access: str) -> str:

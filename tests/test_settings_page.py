@@ -238,7 +238,7 @@ def test_an_untouched_page_saves_nothing(quiet_warmup, tmp_path):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
     assert (
-        _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (no_update,) * 6
+        _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (no_update,) * 8
     )
     assert settings_service.get_settings() == {"kovaaks_username": "MingoDynasty"}
     assert quiet_warmup == []
@@ -253,7 +253,7 @@ def test_a_save_triggered_by_anything_else_writes_nothing(monkeypatch, tmp_path)
 
 
 def test_a_valid_save_writes_all_three_keys(clicked, quiet_warmup, tmp_path):
-    stats_dir_error, steam_id_error, status, status_class, _notice, _class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=f"  {tmp_path}  ",
         username="  MingoDynasty  ",
         steam_id="76561197986713986",
@@ -311,7 +311,7 @@ def test_steam_id_accepts_only_a_steam_id64(clicked, steam_id, expected_error):
 def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
     settings_service.save_settings({"kovaaks_username": "Stored"})
 
-    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=str(tmp_path / "no-such-directory"),
         username="MingoDynasty",
     )
@@ -321,7 +321,8 @@ def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
     # A refusal clears any status a previous save left behind.
     assert status == ""
     assert status_class == settings_page.SAVE_STATUS_CLASS
-    assert (notice, notice_class) == (no_update, no_update)
+    # Nothing was written, so neither the store alert nor the notice moves.
+    assert _rest == [no_update] * 4
     # All-or-nothing: the valid username in the same submit is not written.
     assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
     assert quiet_warmup == []
@@ -360,7 +361,7 @@ def test_a_failed_write_says_so_instead_of_failing_the_request(
     settings_service.save_settings({"kovaaks_username": "Stored"})
     monkeypatch.setattr(settings_page, "save_settings", refuse_to_write)
 
-    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=str(tmp_path),
         username="MingoDynasty",
     )
@@ -368,8 +369,8 @@ def test_a_failed_write_says_so_instead_of_failing_the_request(
     assert (stats_dir_error, steam_id_error) == (None, None)
     assert status == settings_page.SAVE_FAILED_STATUS
     assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
-    # The store is untouched, so the notice still describes the process.
-    assert (notice, notice_class) == (no_update, no_update)
+    # The store is untouched, so the alert and the notice still describe it.
+    assert _rest == [no_update] * 4
     assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
     assert quiet_warmup == []
 
@@ -790,14 +791,23 @@ def test_a_save_against_a_newer_store_is_refused_distinctly(clicked, quiet_warmu
     """A refusal is not an I/O failure: the remedy is updating, not retrying."""
     _write_store(json.dumps({"schema_version": 2, "kovaaks_username": "Future"}))
 
-    _dir_error, _id_error, status, status_class, notice, notice_class = _save(
-        username="MingoDynasty"
-    )
+    (
+        _dir_error,
+        _id_error,
+        status,
+        status_class,
+        alert,
+        alert_class,
+        notice,
+        notice_class,
+    ) = _save(username="MingoDynasty")
 
     assert status == settings_page.SAVE_REFUSED_STATUS
     assert status != settings_page.SAVE_FAILED_STATUS
     assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
     assert (notice, notice_class) == (no_update, no_update)
+    # Nothing was written, so the alert still describes the file on disk.
+    assert (alert, alert_class) == (no_update, no_update)
     assert json.loads(
         settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8")
     ) == {"schema_version": 2, "kovaaks_username": "Future"}
@@ -817,3 +827,22 @@ def test_a_save_against_an_unusable_store_recovers_it(clicked):
         _component_by_id(settings_page.layout(), "app-settings-store-alert").className
         == settings_page.STORE_ALERT_HIDDEN_CLASS
     )
+
+
+def test_a_recovery_save_clears_the_alert_without_a_reload(clicked):
+    """Dash never rebuilds the layout after a callback, so the save must.
+
+    Otherwise "Settings saved." renders directly under a warning saying the
+    settings are not being used, until the user navigates away.
+    """
+    _write_store("not json")
+    # The page was rendered while the store was unusable: the alert is visible.
+    assert (
+        _component_by_id(settings_page.layout(), "app-settings-store-alert").className
+        == settings_page.STORE_ALERT_CLASS
+    )
+
+    *_, alert, alert_class, _notice, _notice_class = _save(username="MingoDynasty")
+
+    assert alert == ""
+    assert alert_class == settings_page.STORE_ALERT_HIDDEN_CLASS
