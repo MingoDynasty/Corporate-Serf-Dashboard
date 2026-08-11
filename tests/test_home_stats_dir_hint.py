@@ -1,4 +1,9 @@
-"""Home says so, and lists no scenarios, when no stats directory is pinned."""
+"""Home says so, and lists no scenarios, when no stats directory is pinned.
+
+The hint speaks for a ``stats_dir`` key that exists and cannot be used. A key
+that was never written is the setup card's case (``test_home_setup_card.py``),
+so the two surfaces never explain the same condition twice.
+"""
 
 import dash
 import dash_mantine_components as dmc
@@ -52,14 +57,12 @@ def test_hint_is_absent_while_the_pinned_directory_is_usable(monkeypatch):
     assert _component_by_id(page, "scenario-dropdown-selection").data == ["All"]
 
 
-@pytest.mark.parametrize("stored", [None, "", "no-such-stats-dir"])
+@pytest.mark.parametrize("stored", ["", "no-such-stats-dir"])
 def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     monkeypatch,
     stored,
 ):
-    settings_service.save_settings(
-        {} if stored is None else {settings_service.STATS_DIR_KEY: stored}
-    )
+    settings_service.save_settings({settings_service.STATS_DIR_KEY: stored})
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
         home,
@@ -77,6 +80,23 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     assert isinstance(link, dmc.Anchor)
     assert link.children == "Settings"
     assert link.href == "/settings"
+    assert _component_by_id(page, "scenario-dropdown-selection").data == []
+
+
+def test_hint_cedes_the_never_configured_case_to_the_setup_card(monkeypatch):
+    """One condition, one surface: an absent key has never been asked about."""
+    settings_service.save_settings({})
+    settings_service.resolve_stats_dir()
+    monkeypatch.setattr(
+        home,
+        "get_unique_scenarios",
+        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+    )
+
+    page = home.layout()
+
+    assert _component_by_id(page, "stats-dir-hint") is None
+    assert _component_by_id(page, home.SETUP_CARD_ID).children != []
     assert _component_by_id(page, "scenario-dropdown-selection").data == []
 
 
@@ -99,13 +119,24 @@ def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path
 
 
 def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
-    """A restart cannot configure a directory the user never set."""
-    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "First"})
+    """A restart cannot repair a directory whose stored path does not exist."""
+    settings_service.save_settings(
+        {
+            settings_service.STATS_DIR_KEY: "no-such-stats-dir",
+            settings_service.KOVAAKS_USERNAME_KEY: "First",
+        }
+    )
     settings_service.resolve_stats_dir()
     # Freeze the identity pin, as a boot-time consumer would.
     settings_service.get_identity()
-    settings_service.save_settings({settings_service.KOVAAKS_USERNAME_KEY: "Second"})
+    settings_service.save_settings(
+        {
+            settings_service.STATS_DIR_KEY: "no-such-stats-dir",
+            settings_service.KOVAAKS_USERNAME_KEY: "Second",
+        }
+    )
     assert settings_service.is_restart_pending() is True
+    assert settings_service.is_stats_dir_change_pending() is False
     monkeypatch.setattr(
         home,
         "get_unique_scenarios",

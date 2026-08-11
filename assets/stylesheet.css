@@ -227,6 +227,27 @@
     padding-bottom: 0.5rem;
 }
 
+/* The first-run setup card at the top of Scenario Performance. It asks for
+   what the app could not configure on its own, so it reads as one bounded
+   block rather than page furniture: narrow enough that the eye takes it in at
+   once, and spaced off the controls below it. */
+.setup-card {
+    margin-bottom: var(--mantine-spacing-md);
+    max-width: 32rem;
+    padding: var(--mantine-spacing-md);
+}
+
+.setup-card-title {
+    font-weight: 600;
+}
+
+/* What Skip costs. Dimmed and smaller: it qualifies the buttons above it
+   rather than competing with them for the first read. */
+.setup-card-fine-print {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-xs);
+}
+
 /* Trailing explanation for the Home Position value: why it reads N/A, or why
    it is a cached number rather than current truth. Dimmed and smaller so the
    position itself stays the thing the eye lands on. */
