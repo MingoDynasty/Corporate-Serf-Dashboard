@@ -1,5 +1,6 @@
 """The settings page: form rendering, the save flow, and the restart notice."""
 
+import json
 from collections import deque
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -258,7 +259,7 @@ def test_an_untouched_page_saves_nothing(quiet_warmup, tmp_path):
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
 
     assert (
-        _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (no_update,) * 6
+        _save(stats_dir=str(tmp_path), username="", n_clicks=None) == (no_update,) * 8
     )
     assert settings_service.get_settings() == {"kovaaks_username": "MingoDynasty"}
     assert quiet_warmup == []
@@ -273,7 +274,7 @@ def test_a_save_triggered_by_anything_else_writes_nothing(monkeypatch, tmp_path)
 
 
 def test_a_valid_save_writes_all_three_keys(clicked, quiet_warmup, tmp_path):
-    stats_dir_error, steam_id_error, status, status_class, _notice, _class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=f"  {tmp_path}  ",
         username="  MingoDynasty  ",
         steam_id="76561197986713986",
@@ -331,7 +332,7 @@ def test_steam_id_accepts_only_a_steam_id64(clicked, steam_id, expected_error):
 def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
     settings_service.save_settings({"kovaaks_username": "Stored"})
 
-    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=str(tmp_path / "no-such-directory"),
         username="MingoDynasty",
     )
@@ -341,7 +342,8 @@ def test_a_missing_stats_directory_is_refused(clicked, quiet_warmup, tmp_path):
     # A refusal clears any status a previous save left behind.
     assert status == ""
     assert status_class == settings_page.SAVE_STATUS_CLASS
-    assert (notice, notice_class) == (no_update, no_update)
+    # Nothing was written, so neither the store alert nor the notice moves.
+    assert _rest == [no_update] * 4
     # All-or-nothing: the valid username in the same submit is not written.
     assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
     assert quiet_warmup == []
@@ -380,7 +382,7 @@ def test_a_failed_write_says_so_instead_of_failing_the_request(
     settings_service.save_settings({"kovaaks_username": "Stored"})
     monkeypatch.setattr(settings_page, "save_settings", refuse_to_write)
 
-    stats_dir_error, steam_id_error, status, status_class, notice, notice_class = _save(
+    stats_dir_error, steam_id_error, status, status_class, *_rest = _save(
         stats_dir=str(tmp_path),
         username="MingoDynasty",
     )
@@ -388,8 +390,8 @@ def test_a_failed_write_says_so_instead_of_failing_the_request(
     assert (stats_dir_error, steam_id_error) == (None, None)
     assert status == settings_page.SAVE_FAILED_STATUS
     assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
-    # The store is untouched, so the notice still describes the process.
-    assert (notice, notice_class) == (no_update, no_update)
+    # The store is untouched, so the alert and the notice still describe it.
+    assert _rest == [no_update] * 4
     assert settings_service.get_settings() == {"kovaaks_username": "Stored"}
     assert quiet_warmup == []
 
@@ -769,3 +771,115 @@ def test_a_utc_stamp_is_shown_in_local_time():
 def test_an_unreadable_last_seen_stamp_is_shown_as_it_arrived():
     """A decorative field must not cost the user a candidate they could pick."""
     assert settings_page._format_last_seen("last tuesday") == "last tuesday"
+
+
+# --- schema_version: what the page says when the store cannot be used ---
+
+
+def _write_store(text):
+    """Put arbitrary text in the store the fixture pointed the service at."""
+    path = settings_service.SETTINGS_FILE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    settings_service.clear_settings_cache()
+
+
+def test_a_usable_store_hides_the_alert(tmp_path):
+    settings_service.save_settings({"stats_dir": str(tmp_path)})
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.children == ""
+    assert alert.className == settings_page.STORE_ALERT_HIDDEN_CLASS
+
+
+def test_a_missing_store_hides_the_alert():
+    """A first run is empty fields and nothing else: there is nothing to warn about."""
+    settings_service.SETTINGS_FILE_PATH.unlink(missing_ok=True)
+    settings_service.clear_settings_cache()
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.className == settings_page.STORE_ALERT_HIDDEN_CLASS
+
+
+def test_an_unusable_store_is_named_beside_the_empty_form():
+    """Without this the page renders a blank form, exactly like a first run."""
+    _write_store(json.dumps({"kovaaks_username": "MingoDynasty"}))
+
+    page = settings_page.layout()
+
+    alert = _component_by_id(page, "app-settings-store-alert")
+    assert alert.className == settings_page.STORE_ALERT_CLASS
+    assert '"schema_version": 1' in alert.children
+    assert _component_by_id(page, "app-settings-username").value == ""
+
+
+def test_a_newer_store_says_the_data_is_intact():
+    _write_store(json.dumps({"schema_version": 2, "kovaaks_username": "Future"}))
+
+    alert = _component_by_id(settings_page.layout(), "app-settings-store-alert")
+
+    assert alert.className == settings_page.STORE_ALERT_CLASS
+    assert "newer version of this app" in alert.children
+
+
+def test_a_save_against_a_newer_store_is_refused_distinctly(clicked, quiet_warmup):
+    """A refusal is not an I/O failure: the remedy is updating, not retrying."""
+    _write_store(json.dumps({"schema_version": 2, "kovaaks_username": "Future"}))
+
+    (
+        _dir_error,
+        _id_error,
+        status,
+        status_class,
+        alert,
+        alert_class,
+        notice,
+        notice_class,
+    ) = _save(username="MingoDynasty")
+
+    assert status == settings_page.SAVE_REFUSED_STATUS
+    assert status != settings_page.SAVE_FAILED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_FAILED_CLASS
+    assert (notice, notice_class) == (no_update, no_update)
+    # Nothing was written, so the alert still describes the file on disk.
+    assert (alert, alert_class) == (no_update, no_update)
+    assert json.loads(
+        settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8")
+    ) == {"schema_version": 2, "kovaaks_username": "Future"}
+    assert quiet_warmup == []
+
+
+def test_a_save_against_an_unusable_store_recovers_it(clicked):
+    """Self-service repair: the page can always rewrite a file it cannot read."""
+    _write_store("not json")
+
+    _dir_error, _id_error, status, status_class, *_ = _save(username="MingoDynasty")
+
+    assert status == settings_page.SAVED_STATUS
+    assert status_class == settings_page.SAVE_STATUS_CLASS
+    assert settings_service.get_settings()["kovaaks_username"] == "MingoDynasty"
+    assert (
+        _component_by_id(settings_page.layout(), "app-settings-store-alert").className
+        == settings_page.STORE_ALERT_HIDDEN_CLASS
+    )
+
+
+def test_a_recovery_save_clears_the_alert_without_a_reload(clicked):
+    """Dash never rebuilds the layout after a callback, so the save must.
+
+    Otherwise "Settings saved." renders directly under a warning saying the
+    settings are not being used, until the user navigates away.
+    """
+    _write_store("not json")
+    # The page was rendered while the store was unusable: the alert is visible.
+    assert (
+        _component_by_id(settings_page.layout(), "app-settings-store-alert").className
+        == settings_page.STORE_ALERT_CLASS
+    )
+
+    *_, alert, alert_class, _notice, _notice_class = _save(username="MingoDynasty")
+
+    assert alert == ""
+    assert alert_class == settings_page.STORE_ALERT_HIDDEN_CLASS

@@ -6,24 +6,38 @@ only removes them from selector option lists and (by default) the overview.
 The store is a plain show-list: a playlist is visible iff its code is in the
 persisted ``shown_playlists`` list (see the 2026-07-11 playlist-overview entry
 in ``docs/decision_log.md``).
+
+The file carries a ``schema_version`` stamp. A file this build cannot use --
+malformed, unstamped, or stamped by a newer build -- reads as the first-run
+seed and surfaces a warning on the Playlists page rather than hiding
+everything. A user-initiated show/hide owns an unusable file, copying it aside
+first; a file from a newer build refuses every write.
 """
 
 import json
 import logging
-import os
 import threading
 
 from source.kovaaks.data_service import (
     get_playlist_selector_options,
     get_user_root_playlist_codes,
 )
-from source.utilities.atomic_write import replace_with_retry
+from source.utilities.atomic_write import atomic_write_text
 from source.utilities.paths import state_dir
+from source.utilities.store_schema import (
+    SHOWN_PLAYLISTS_KEY,
+    StoreDocument,
+    StoreState,
+    UnsupportedSchemaError,
+    back_up_unusable_store,
+    read_store_document,
+    stamped_payload,
+    validate_visibility_v1,
+)
 
 logger = logging.getLogger(__name__)
 
 VISIBILITY_FILE_PATH = state_dir() / "data" / "playlist_visibility.json"
-_SHOWN_PLAYLISTS_KEY = "shown_playlists"
 
 # First-run visible set: the bundled Voltaic + Viscose benchmarks. A
 # hard-coded seed rather than a config.toml option — after first run the UI
@@ -46,9 +60,9 @@ DEFAULT_VISIBLE_CODES = frozenset(
 )
 
 _VISIBILITY_LOCK = threading.RLock()
-# Cached shown set under a single key; None means not yet read from disk.
-# Mutated in place so no module-global rebinding is needed.
-_shown_cache: dict[str, set[str] | None] = {"value": None}
+# The store's last read result under a single key; None means not yet read from
+# disk. Mutated in place so no module-global rebinding is needed.
+_shown_cache: dict[str, StoreDocument | None] = {"value": None}
 
 
 def clear_visibility_cache() -> None:
@@ -64,67 +78,63 @@ def _seed_shown_codes() -> set[str]:
     return set(DEFAULT_VISIBLE_CODES) | get_user_root_playlist_codes()
 
 
-def _read_shown_from_disk() -> set[str] | None:
-    """Read the persisted shown set; None means absent or unusable."""
-    try:
-        raw = VISIBILITY_FILE_PATH.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        return None
-    except OSError, UnicodeDecodeError:
-        logger.warning(
-            "Failed to read %s; falling back to the first-run visibility seed.",
-            VISIBILITY_FILE_PATH,
-            exc_info=True,
-        )
-        return None
-    try:
-        payload = json.loads(raw)
-        shown = payload[_SHOWN_PLAYLISTS_KEY]
-        if not isinstance(shown, list) or not all(
-            isinstance(code, str) for code in shown
-        ):
-            raise TypeError(f"{_SHOWN_PLAYLISTS_KEY} must be a list of strings")
-    except json.JSONDecodeError, KeyError, TypeError:
-        logger.warning(
-            "Invalid visibility file %s; falling back to the first-run "
-            "visibility seed. The file is rewritten on the next show/hide.",
-            VISIBILITY_FILE_PATH,
-            exc_info=True,
-        )
-        return None
-    return set(shown)
+def _visibility_document() -> StoreDocument:
+    """Get the store's read result, hitting disk at most once per cache life."""
+    with _VISIBILITY_LOCK:
+        document = _shown_cache["value"]
+        if document is None:
+            document = read_store_document(
+                VISIBILITY_FILE_PATH,
+                encoding="utf-8",
+                validate=validate_visibility_v1,
+            )
+            _shown_cache["value"] = document
+        return document
 
 
 def _write_shown_to_disk(shown: set[str]) -> None:
-    payload = json.dumps({_SHOWN_PLAYLISTS_KEY: sorted(shown)}, indent=2)
-    VISIBILITY_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    temp_file = VISIBILITY_FILE_PATH.with_name(
-        f".{VISIBILITY_FILE_PATH.name}.{os.getpid()}.{threading.get_ident()}.tmp"
+    payload = json.dumps(
+        stamped_payload({SHOWN_PLAYLISTS_KEY: sorted(shown)}), indent=2
     )
-    try:
-        with open(temp_file, "w", encoding="utf-8") as file:
-            file.write(payload)
-            file.write("\n")
-            file.flush()
-            os.fsync(file.fileno())
-        replace_with_retry(temp_file, VISIBILITY_FILE_PATH, logger=logger)
-    finally:
-        temp_file.unlink(missing_ok=True)
+    VISIBILITY_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    atomic_write_text(VISIBILITY_FILE_PATH, payload + "\n", logger=logger)
+
+
+def _guard_visibility_write() -> None:
+    """Refuse a write over a newer schema; preserve an unusable file first."""
+    document = _visibility_document()
+    if document.state is StoreState.FUTURE:
+        raise UnsupportedSchemaError(document.message)
+    if document.state is StoreState.ERROR:
+        back_up_unusable_store(VISIBILITY_FILE_PATH)
+
+
+def get_visibility_store_message() -> str:
+    """Get the actionable message for an unusable store, or an empty string.
+
+    The Playlists page shows this: a store falling back to the seed looks
+    exactly like a first run, so without it the fallback is invisible.
+    """
+    return _visibility_document().message
 
 
 def get_shown_playlist_codes() -> set[str]:
     """Get the codes of playlists the user has chosen to see.
 
-    A missing (or unusable) visibility file yields the first-run seed
-    without writing anything — the file materializes on the first show/hide.
-    An existing file is authoritative, including an empty list (everything
-    hidden on purpose).
+    A missing visibility file yields the first-run seed without writing
+    anything — the file materializes on the first show/hide. So does a file
+    this build cannot use: reading an unusable store as "nothing is shown"
+    would empty every selector, which is indistinguishable from data loss,
+    whereas the seed is the same inert default a first run gets. What tells
+    the two apart is the warning ``get_visibility_store_message`` carries.
+    A usable file is authoritative, including an empty list (everything hidden
+    on purpose).
     """
     with _VISIBILITY_LOCK:
-        if _shown_cache["value"] is None:
-            _shown_cache["value"] = _read_shown_from_disk()
-        shown = _shown_cache["value"]
-        return set(shown) if shown is not None else _seed_shown_codes()
+        document = _visibility_document()
+        if document.state is not StoreState.SUPPORTED:
+            return _seed_shown_codes()
+        return set(document.value)
 
 
 def is_playlist_shown(playlist_code: str) -> bool:
@@ -139,8 +149,9 @@ def show_playlist(playlist_code: str) -> None:
         if playlist_code in shown:
             return
         shown.add(playlist_code)
+        _guard_visibility_write()
         _write_shown_to_disk(shown)
-        _shown_cache["value"] = shown
+        _shown_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=shown)
 
 
 def hide_playlist(playlist_code: str) -> None:
@@ -150,8 +161,9 @@ def hide_playlist(playlist_code: str) -> None:
         if playlist_code not in shown:
             return
         shown.discard(playlist_code)
+        _guard_visibility_write()
         _write_shown_to_disk(shown)
-        _shown_cache["value"] = shown
+        _shown_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=shown)
 
 
 def toggle_playlist_visibility(playlist_code: str) -> bool:

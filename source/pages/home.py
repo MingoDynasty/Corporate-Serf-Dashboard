@@ -67,6 +67,7 @@ from source.utilities.notifications import (
     toast,
     upsert_toast,
 )
+from source.utilities.store_schema import UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -154,6 +155,14 @@ SETUP_CARD_STATS_DIR_BODY = (
 )
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
+# Shown when Skip cannot be recorded because the settings file belongs to a
+# newer build. The card has to stay up (nothing was written), so the toast is
+# what explains why the click appeared to do nothing.
+SETUP_CARD_SKIP_REFUSED_TITLE = "Skip was not saved"
+SETUP_CARD_SKIP_REFUSED_MESSAGE = (
+    "The settings file was written by a newer version of this app. Update the "
+    "app to change settings."
+)
 # The primary action navigates, so it ships as one link wearing the button's
 # styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
 # ``<button>`` inside a focusable ``<a>``: two tab stops with the same name,
@@ -1431,6 +1440,7 @@ def _setup_card_children() -> list:
 
 @callback(
     Output(SETUP_CARD_ID, "children"),
+    Output("notification-container", "sendNotifications", allow_duplicate=True),
     # ``allow_optional``: Skip renders only in the identity state, while the
     # container it writes to is always mounted. Without it, every other state
     # of the page -- the stats-folder card, and every configured install --
@@ -1453,11 +1463,27 @@ def skip_identity_setup(n_clicks):
     Guard on ``n_clicks`` and the trigger: under DashProxy a callback can fire
     once on page load with nothing having triggered it, and a page load must
     never answer a question the user has not been asked yet.
+
+    A settings file stamped by a newer build refuses the write. The card then
+    has to stay up -- taking it away would claim a decline that was never
+    recorded, and it would be back on the next load anyway -- so the toast is
+    what explains why the click appeared to do nothing.
     """
     if not n_clicks or ctx.triggered_id != SETUP_CARD_SKIP_ID:
-        return no_update
-    decline_identity()
-    return []
+        return no_update, no_update
+    try:
+        decline_identity()
+    except UnsupportedSchemaError:
+        logger.warning("Refused to record the declined identity ask")
+        notification = toast(
+            "setup-card-skip-refused-notification",
+            SETUP_CARD_SKIP_REFUSED_TITLE,
+            SETUP_CARD_SKIP_REFUSED_MESSAGE,
+            color="red",
+            icon=local_icon("material-symbols:warning-outline"),
+        )
+        return no_update, [notification]
+    return [], no_update
 
 
 def _home_initial_selection(

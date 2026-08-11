@@ -321,6 +321,12 @@ a.playlist-scenario-link-cell:hover {
     display: none;
 }
 
+/* The overview's visibility-store alert, revealed the same way by
+   render_visibility_alert when the show-list file cannot be used. */
+.playlists-visibility-alert-hidden {
+    display: none;
+}
+
 /* The settings page's save status. Neutral by default; the save callback adds
    the failed modifier when the write itself did not land, which is the one
    outcome the user cannot see from the form alone. */
@@ -342,6 +348,13 @@ a.playlist-scenario-link-cell:hover {
 }
 
 .app-settings-restart-notice-hidden {
+    display: none;
+}
+
+/* The settings page's store alert: shown only when data/settings.json is one
+   this build cannot use, so the empty form is not mistaken for a first run.
+   Ships hidden; the layout drops the modifier when there is something to say. */
+.app-settings-store-alert-hidden {
     display: none;
 }
 

@@ -161,6 +161,25 @@ state, not a field grafted onto someone else's schema.
   holds the playlist show-list (`playlist_visibility_service.py`): written
   atomically on each show/hide, read once and cached in-process, absent until
   the first show/hide (reads fall back to the first-run seed).
+- **Schema stamps** — the three durable stores above (settings, visibility, and
+  each user playlist under `data/playlists/`) carry a top-level integer
+  `"schema_version"`. The read machine lives once in
+  `utilities/store_schema.py` and has four states per store: *missing* is the
+  first-run default; *error* (unreadable, not JSON, no stamp, a malformed or
+  non-positive stamp, or a supported stamp whose payload fails validation)
+  preserves the bytes, reads as the first-run default, and reports an
+  actionable message; *supported* reads normally; *future* (a stamp above the
+  highest supported) reads nothing and refuses every write with
+  `UnsupportedSchemaError`. There is no missing-means-v1 grandfather rule.
+  Automatic writers (`bootstrap_stats_dir`) decline in the error and future
+  states; user-initiated saves own an error-state file after copying it to an
+  adjacent `<name>.corrupt-<n>.bak`. The error and future states surface in the
+  UI — an alert on the settings page, one on the Playlists page for visibility,
+  and the startup warning queue for playlist files. The bundled corpus is
+  exempt (it ships with its reader), and `data/cache/` is deliberately
+  unstamped. `scripts/stamp_schema_version.py` is the one-time conversion for
+  installs created before the stamp; rationale and the run ordering are in
+  `docs/decision_log.md`.
 
 ## Module map
 
@@ -406,7 +425,9 @@ flowchart LR
 - `playlist_visibility_service.py` — per-code show/hide visibility (plain
   show-list persisted at `data/playlist_visibility.json`, atomic writes under a
   module lock). A missing file yields the first-run seed (bundled defaults plus
-  user-root codes) without writing. `get_visible_playlist_selector_options()`
+  user-root codes) without writing, and so does a file this build cannot use —
+  `get_visibility_store_message()` is what tells those two apart, and the
+  Playlists page renders it. `get_visible_playlist_selector_options()`
   is the single visibility filter every playlist option list consumes (Scenario
   Performance filter, Journey picker, overview).
 - `data_models.py` — internal models (`RunData`, `ScenarioStats`, `PlaylistData`,
@@ -491,7 +512,12 @@ flowchart LR
   duration so a replacement under a reused id starts a full lifetime, keyed off
   the per-client `TOAST_LIFETIME_STORE_ID` counter),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
-  `atomic_write` (Windows-lock-tolerant `os.replace` with retry),
+  `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
+  `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
+  performs, with an optional `before_replace` hook the playlist writer uses for
+  its destination point-check),
+  `store_schema` (the `schema_version` marker, the four-state read machine, the
+  per-store v1 validators, and `back_up_unusable_store()` — see State above),
   `paths` (`state_dir()` / `package_root()` — see State above — plus
   `log_dir()`, the one construction of `data/logs`, because `app.py` writes
   there and the settings page displays it and pages cannot import `app`).

@@ -16,6 +16,7 @@ from dash._callback import GLOBAL_CALLBACK_MAP
 
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
+from source.utilities.store_schema import UnsupportedSchemaError
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -180,7 +181,10 @@ def test_skip_records_the_decline_and_takes_the_card_away(monkeypatch, stats_dir
     )
     _store(**{STATS_DIR_KEY: str(stats_dir), STEAM_ID_KEY: "76561197986713986"})
 
-    assert home.skip_identity_setup(1) == []
+    card, notifications = home.skip_identity_setup(1)
+
+    assert card == []
+    assert notifications is no_update
 
     assert settings_service.get_settings() == {
         STATS_DIR_KEY: str(stats_dir),
@@ -257,7 +261,13 @@ def test_the_skip_input_is_optional():
     A non-optional input missing from the layout logs "ID not found in layout"
     on every load of every other state of the page.
     """
-    spec = GLOBAL_CALLBACK_MAP[f"{home.SETUP_CARD_ID}.children"]
+    # Keyed by the joined output spec, so it is found by the output it writes
+    # rather than by a literal key that moves whenever an output is added.
+    spec = next(
+        spec
+        for key, spec in GLOBAL_CALLBACK_MAP.items()
+        if f"{home.SETUP_CARD_ID}.children" in key
+    )
 
     assert spec["inputs"] == [
         {
@@ -281,4 +291,22 @@ def test_a_skip_nobody_clicked_declines_nothing(monkeypatch, n_clicks, triggered
         lambda: pytest.fail("a page load answered the identity ask"),
     )
 
-    assert home.skip_identity_setup(n_clicks) is no_update
+    assert home.skip_identity_setup(n_clicks) == (no_update, no_update)
+
+
+def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
+    """Taking the card away would claim a decline that was never recorded."""
+    monkeypatch.setattr(
+        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+    )
+
+    def refuse():
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    monkeypatch.setattr(home, "decline_identity", refuse)
+
+    card, notifications = home.skip_identity_setup(1)
+
+    assert card is no_update
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE

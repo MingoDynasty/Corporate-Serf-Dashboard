@@ -14,6 +14,7 @@ import pytest
 
 from source.config import settings_service
 from source.config import stats_dir_detection as detection
+from source.utilities import store_schema
 
 STATS_SUBPATH = Path("steamapps/common/FPSAimTrainer/FPSAimTrainer/stats")
 
@@ -356,4 +357,57 @@ def test_the_bootstrap_write_is_visible_to_the_boot_pin(detected, tmp_path):
     assert settings_service.get_usable_stats_dir() == str(stats_dir)
     assert json.loads(
         settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8")
-    ) == {"stats_dir": str(stats_dir)}
+    ) == {"schema_version": 1, "stats_dir": str(stats_dir)}
+
+
+def _corrupt_the_store(text):
+    """Leave text the settings reader cannot use where the store belongs."""
+    settings_service.SETTINGS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    settings_service.SETTINGS_FILE_PATH.write_text(text, encoding="utf-8")
+    settings_service.clear_settings_cache()
+
+
+def test_an_unusable_store_is_never_detected_over(detected, tmp_path, caplog):
+    """It reads as no keys, so writing would erase an identity that is really there."""
+    legacy = json.dumps({"kovaaks_username": "MingoDynasty"})
+    _corrupt_the_store(legacy)
+    calls = detected(_library(tmp_path / "Steam") / STATS_SUBPATH)
+
+    with caplog.at_level(logging.WARNING):
+        detection.bootstrap_stats_dir()
+
+    assert calls == []
+    assert settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8") == legacy
+    assert "not writing to the settings file" in caplog.text
+
+
+def test_a_newer_store_is_never_detected_over(detected, tmp_path, caplog):
+    stored = json.dumps({"schema_version": 2, "kovaaks_username": "Future"})
+    _corrupt_the_store(stored)
+    calls = detected(_library(tmp_path / "Steam") / STATS_SUBPATH)
+
+    with caplog.at_level(logging.WARNING):
+        detection.bootstrap_stats_dir()
+
+    assert calls == []
+    assert settings_service.SETTINGS_FILE_PATH.read_text(encoding="utf-8") == stored
+    assert "newer version of this app" in caplog.text
+
+
+def test_a_refused_write_leaves_the_store_alone(
+    detected, monkeypatch, tmp_path, caplog
+):
+    """The state check and the save take the lock separately, so this is reachable."""
+    settings_service.save_settings({})
+    detected(_library(tmp_path / "Steam") / STATS_SUBPATH)
+
+    def refuse_to_write(_values):
+        raise store_schema.UnsupportedSchemaError("written by a newer version")
+
+    monkeypatch.setattr(detection, "save_settings", refuse_to_write)
+
+    with caplog.at_level(logging.WARNING):
+        detection.bootstrap_stats_dir()
+
+    assert settings_service.get_settings() == {}
+    assert "Refused to store the detected stats directory" in caplog.text
