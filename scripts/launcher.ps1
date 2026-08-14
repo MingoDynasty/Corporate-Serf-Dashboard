@@ -40,6 +40,7 @@ $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $UpdateCheckTimeoutSec = 5
 $HealthTimeoutSec = 120
 $DefaultPort = 8050
+$DefaultHost = '127.0.0.1'
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -81,13 +82,16 @@ function Write-Manifest([string]$Tag, [string]$Sha, [string]$CommitDate, [string
     Write-FileAtomic -Path (Join-Path $InstallRoot 'install.json') -Content (($manifest | ConvertTo-Json) + "`n")
 }
 
-function Get-ConfiguredPort {
+function Get-ConfiguredEndpoint {
     # One parsing contract with the app: config.toml is user-owned, and TOML
     # integer forms or pydantic coercions a regex would misread (8_051,
     # 0x1F73, "8051") must resolve to the port the server actually binds --
     # a divergence here polls the wrong port and kills a healthy app. Ask
-    # the installed app's own loader; fall back to the default when anything
+    # the installed app's own loader; fall back to the defaults when anything
     # is unreadable, the same recovery as a missing config.
+    #
+    # Port and host come back on one line so that the "last line wins" parse
+    # stays robust against a config warning the loader may log first.
     try {
         $manifest = [System.IO.File]::ReadAllText((Join-Path $InstallRoot 'install.json')) | ConvertFrom-Json
         $tag = [string]$manifest.tag
@@ -97,17 +101,50 @@ function Get-ConfiguredPort {
         $python = Join-Path $InstallRoot "versions\$tag\.venv\Scripts\python.exe"
         $env:CSD_STATE_DIR = $InstallRoot
         try {
-            $portText = @(& $python -c 'from source.config.config_service import load_config; print(load_config().port)' 2>&1)
+            $endpointText = @(& $python -c 'from source.config.config_service import load_config; c = load_config(); print(f"{c.port} {c.host}")' 2>&1)
         } finally {
             Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
         }
-        if ($LASTEXITCODE -eq 0) { return [int]$portText[-1] }
+        if ($LASTEXITCODE -eq 0) {
+            $fields = ([string]$endpointText[-1]).Trim() -split '\s+', 2
+            if ($fields.Count -eq 2) {
+                return @{ Port = [int]$fields[0]; Host = $fields[1] }
+            }
+        }
     } catch { }
-    return $DefaultPort
+    return @{ Port = $DefaultPort; Host = $DefaultHost }
 }
 
-function Open-Dashboard([int]$Port) {
-    Start-Process "http://localhost:$Port/"
+function Format-UrlHost([string]$Address) {
+    # IPv6 literals need brackets inside a URL; IPv4 and names must not have
+    # them. A colon is only ever present in an IPv6 literal here.
+    if ($Address.Contains(':')) { return "[$Address]" }
+    return $Address
+}
+
+function Get-ProbeAddress([string]$BindHost) {
+    # Machine-to-machine, so deliberately resolver-free. A wildcard bind
+    # serves every address of its family, so probe that family's loopback;
+    # any other host is served at exactly the address it names.
+    if ($BindHost -eq '0.0.0.0') { return '127.0.0.1' }
+    if ($BindHost -eq '::') { return '[::1]' }
+    return (Format-UrlHost $BindHost)
+}
+
+function Get-BrowserAddress([string]$BindHost) {
+    # Human-facing, so `localhost` wherever it actually reaches the app: both
+    # wildcards serve their family's loopback, which is what localhost
+    # resolves to. A single named address is not reachable as localhost, so
+    # the URL has to carry the address itself.
+    if ($BindHost -eq '0.0.0.0' -or $BindHost -eq '::' -or
+        $BindHost -eq '127.0.0.1' -or $BindHost -eq '::1') {
+        return 'localhost'
+    }
+    return (Format-UrlHost $BindHost)
+}
+
+function Open-Dashboard([int]$Port, [string]$Address) {
+    Start-Process "http://${Address}:$Port/"
 }
 
 function Get-LatestTag {
@@ -252,7 +289,7 @@ function Stop-AppProcess($Process) {
     }
 }
 
-function Wait-AppReady($Process, [int]$Port, [string]$ExpectedSha, [string]$Token) {
+function Wait-AppReady($Process, [int]$Port, [string]$ExpectedSha, [string]$Token, [string]$Address) {
     # A bare HTTP 200 is not proof of life: an already-running instance or an
     # unrelated service on the port can answer. Promotion requires the child
     # still alive AND the response carrying the expected full SHA and launch
@@ -261,7 +298,7 @@ function Wait-AppReady($Process, [int]$Port, [string]$ExpectedSha, [string]$Toke
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($Process.HasExited) { return 'exited' }
         try {
-            $health = Invoke-RestMethod -UseBasicParsing -TimeoutSec 2 -Uri "http://127.0.0.1:$Port/health"
+            $health = Invoke-RestMethod -UseBasicParsing -TimeoutSec 2 -Uri "http://${Address}:$Port/health"
             if ([string]$health.sha -eq $ExpectedSha -and [string]$health.launch_token -eq $Token) {
                 return 'ready'
             }
@@ -371,7 +408,8 @@ try {
 }
 if (-not $mutexAcquired) {
     Write-Host 'Corporate Serf Dashboard is already running; opening it in the browser.'
-    Open-Dashboard (Get-ConfiguredPort)
+    $running = Get-ConfiguredEndpoint
+    Open-Dashboard $running.Port (Get-BrowserAddress $running.Host)
     exit 0
 }
 
@@ -394,7 +432,12 @@ try {
     $policy = [string]$manifest.update_policy
     $pinnedTag = [string]$manifest.pinned_tag
     if ($policy -eq 'pinned' -and $pinnedTag) { $runTag = $pinnedTag }
-    $port = Get-ConfiguredPort
+    $endpoint = Get-ConfiguredEndpoint
+    $port = $endpoint.Port
+    # The app binds $endpoint.Host; these are where that bind is reachable
+    # from this machine, for the readiness probe and for the browser.
+    $probeAddress = Get-ProbeAddress $endpoint.Host
+    $browserAddress = Get-BrowserAddress $endpoint.Host
 
     $appProcess = $null
 
@@ -439,13 +482,13 @@ try {
                     $token = [guid]::NewGuid().ToString('N')
                     Write-Host "Starting $latestTag (pending activation) ..."
                     $pending = Start-AppVersion $newDir $token
-                    $state = Wait-AppReady $pending $port ([string]$release.sha) $token
+                    $state = Wait-AppReady $pending $port ([string]$release.sha) $token $probeAddress
                     if ($state -eq 'ready') {
                         Write-Manifest -Tag ([string]$release.tag) -Sha ([string]$release.sha) `
                             -CommitDate ([string]$release.commit_date) -Policy 'latest' -PinnedTag ''
                         $appProcess = $pending   # promoted: from here on, never kill it
                         Write-Host "Updated to $latestTag."
-                        Open-Dashboard $port
+                        Open-Dashboard $port $browserAddress
                         Remove-PrunedVersions -ActiveTag $latestTag -PreviousTag $runTag
                         Update-Bootstrap $newDir
                     } else {
@@ -480,7 +523,7 @@ try {
         } catch {
             Stop-Fatal "cannot start version ${runTag}: $($_.Exception.Message)"
         }
-        $state = Wait-AppReady $current $port $runSha $token
+        $state = Wait-AppReady $current $port $runSha $token $probeAddress
         if ($state -ne 'ready') {
             Stop-AppProcess $current
             Show-AppFailure "the dashboard failed to start ($state)."
@@ -488,7 +531,7 @@ try {
         }
         $appProcess = $current
         try {
-            Open-Dashboard $port
+            Open-Dashboard $port $browserAddress
             Remove-PrunedVersions -ActiveTag $runTag -PreviousTag ''
             Update-Bootstrap $versionDir
         } catch {
@@ -500,7 +543,7 @@ try {
     }
 
     # Hold the mutex for the launcher+app lifetime.
-    Write-Host "Dashboard running at http://localhost:$port/ -- close this window (or press Ctrl+C) to stop it."
+    Write-Host "Dashboard running at http://${browserAddress}:$port/ -- close this window (or press Ctrl+C) to stop it."
     $appProcess.WaitForExit()
     exit $appProcess.ExitCode
 } catch {
