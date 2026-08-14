@@ -49,11 +49,28 @@ value should do silently.
 
 Verified consequence of `0.0.0.0`: nothing answers on `::1`, so a client that
 insists on IPv6 loopback is refused; `localhost` and `127.0.0.1` both connect,
-because resolvers and browsers fall back to the IPv4 address. The launcher's
-deliberately resolver-free `/health` probe on `127.0.0.1` is therefore
-unaffected by the wildcard. Setting `host` to a **single LAN address** does
-break that probe, since `127.0.0.1` then has no listener; the launcher path is
-untested under that configuration and the wildcard is the documented choice.
+because resolvers and browsers fall back to the IPv4 address.
+
+**The launcher derives its addresses from `host`.** A fixed `127.0.0.1` probe
+would have made a single-address bind unlaunchable from the installed
+shortcut: no listener on `127.0.0.1` means `Wait-AppReady` times out and kills
+a perfectly healthy server. `scripts/launcher.ps1` therefore reads `host`
+alongside `port` — through the same "ask the app's own loader" contract, so
+there is still no second TOML parser — and maps it to two destinations. The
+`/health` probe stays resolver-free per the
+[2026-08-09 entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001):
+`0.0.0.0` probes `127.0.0.1`, `::` probes `[::1]` (Windows sets
+`IPV6_V6ONLY`, so the IPv6 wildcard serves no IPv4 face), and any other host
+is probed at the literal address it names. The browser URL stays human-facing:
+`localhost` for both wildcards and both loopback addresses, and the address
+itself only when `localhost` could not reach it. IPv6 literals are bracketed
+for both.
+
+Failure taxonomy: a bind that fails with `EADDRNOTAVAIL` reports the **host**,
+not the port. A mistyped LAN address or one lost to a DHCP change resolves
+fine but belongs to no local interface, and no port is free on an address this
+machine does not have — so the port-taken message would send the user after
+the wrong setting. A host that does not resolve at all reports the same way.
 
 Relationship to prior entries: nothing is superseded. The exclusive-bind
 decision stands unchanged — the app still creates and binds its own sockets,
