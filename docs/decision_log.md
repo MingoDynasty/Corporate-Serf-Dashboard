@@ -13,6 +13,61 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-14: The Listen Address Is Configurable, Loopback By Default
+
+Status: Accepted
+
+The app now reads a `host` setting from `config.toml`, and still serves this
+machine only unless that setting says otherwise. Setting it to `0.0.0.0` lets
+other devices on the same network open the dashboard, which is the only way to
+reach it from a phone or a second PC. The app has no login, so every device
+that can reach the chosen address can read the run data and change the
+settings. An install that does not set `host` behaves exactly as it did
+before.
+
+Decision: `ConfigData` gains `host: str = "127.0.0.1"`, and both server paths
+honor it — `bind_server_socket(port, host)` for the waitress path, and the
+`config.debug` Flask path via `app.run(host=config.host, ...)`. On the default
+host the bind is byte-for-byte the previous behavior: both loopback faces,
+`SO_EXCLUSIVEADDRUSE`, two-bucket failure semantics. A non-default host is
+bound **alone**, with no `::1` companion. The address family comes from
+`getaddrinfo`, so `::` binds as IPv6 rather than failing as a malformed IPv4
+literal, and a host that does not resolve exits with a message naming the host
+and `config.toml` instead of a bare `gaierror` traceback.
+
+Why loopback remains the default: there is no authentication anywhere in the
+app. Settings are writable from the UI, so a reachable instance is not
+read-only exposure. Defaulting to the LAN would hand that to every device on
+whatever network the machine joins next, including untrusted ones.
+
+Why a non-default host is bound alone: the `::1` companion in the
+[2026-07-19 exclusive-bind entry](#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)
+and its 2026-07-20 addendum exists to stop `localhost` resolving to a face the
+app does not hold. A user naming one address outright has no such ambiguity to
+close, and binding a speculative second address is not something a config
+value should do silently.
+
+Verified consequence of `0.0.0.0`: nothing answers on `::1`, so a client that
+insists on IPv6 loopback is refused; `localhost` and `127.0.0.1` both connect,
+because resolvers and browsers fall back to the IPv4 address. The launcher's
+deliberately resolver-free `/health` probe on `127.0.0.1` is therefore
+unaffected by the wildcard. Setting `host` to a **single LAN address** does
+break that probe, since `127.0.0.1` then has no listener; the launcher path is
+untested under that configuration and the wildcard is the documented choice.
+
+Relationship to prior entries: nothing is superseded. The exclusive-bind
+decision stands unchanged — the app still creates and binds its own sockets,
+still sets `SO_EXCLUSIVEADDRUSE`, and still exits rather than half-serving a
+port. What changes is only which address it claims. The
+[2026-08-09 human-facing-URL entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001)
+reasoning that "whichever face the resolver hands `localhost` is ours" is
+narrowed to the default host, and holds there.
+
+Out of scope: authentication, TLS, and any in-app affordance for turning LAN
+access on. On Windows a bind is also not sufficient by itself — an inbound
+firewall rule is required, which is the operator's business and is documented
+in `README.md` rather than automated.
+
 ## 2026-08-11: Durable JSON Stores Carry A schema_version Stamp
 
 Status: Accepted
