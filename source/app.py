@@ -191,6 +191,21 @@ def _exit_port_taken(
     raise SystemExit(1) from None
 
 
+def _exit_bad_host(host: str, why: str) -> NoReturn:
+    """Exit naming the host setting, for a host this machine cannot serve.
+
+    Kept distinct from the port-taken exit: an address this machine does not
+    hold is not fixed by freeing or changing the port, so pointing the user at
+    the port would send them down a dead end.
+    """
+    _log_startup_error(
+        f'Startup error: the configured host "{host}" {why} Set host in '
+        f"{config_file_path()} to an address this machine holds, or remove it "
+        "to serve this machine only."
+    )
+    raise SystemExit(1) from None
+
+
 def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.socket]:
     """
     Bind the app's listening sockets, or exit with an actionable error.
@@ -236,19 +251,20 @@ def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.sock
             host, port, type=socket.SOCK_STREAM, flags=socket.AI_PASSIVE
         )[0][0]
     except OSError:
-        _log_startup_error(
-            f'Startup error: host "{host}" in {config_file_path()} is not an '
-            "address this machine can serve on."
-        )
-        raise SystemExit(1) from None
+        _exit_bad_host(host, "could not be resolved.")
 
-    # Every OSError the first bind can raise is treated as "port taken". Socket
-    # creation and the SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on
-    # a fresh socket, so folding them into this bucket rather than splitting
-    # hairs keeps the taxonomy to the two cases that actually happen.
+    # Two buckets, keyed on errno. EADDRNOTAVAIL means the address resolved but
+    # no interface here holds it -- a mistyped LAN address, or one this machine
+    # has since lost via DHCP -- which changing the port cannot fix. Everything
+    # else is treated as "port taken": socket creation and the
+    # SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on a fresh socket,
+    # so folding them in rather than splitting hairs keeps the taxonomy to the
+    # cases that actually happen.
     try:
         primary = _bind_face(family, host, port)
-    except OSError:
+    except OSError as error:
+        if error.errno == errno.EADDRNOTAVAIL:
+            _exit_bad_host(host, "is not an address this machine holds.")
         _exit_port_taken(port, [], host)
     sockets = [primary]
     # Port 0 asks the OS to choose one. Both faces have to answer on the same

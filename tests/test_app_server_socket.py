@@ -207,9 +207,12 @@ def test_a_host_this_machine_cannot_serve_is_refused(tmp_path: Path) -> None:
 
     assert "bind unexpectedly succeeded" not in result.stdout
     assert result.returncode == 1, result.stderr
-    # The port-taken wording names the one address that was asked for, rather
-    # than the two loopback faces the default binds.
     assert "203.0.113.1" in result.stderr, result.stderr
+    assert "is not an address this machine holds" in result.stderr, result.stderr
+    # The failure is the host, not the port: recommending a port change would
+    # send the user down a dead end, since no port is free on an address this
+    # machine does not have.
+    assert "already in use" not in result.stderr, result.stderr
     assert "127.0.0.1" not in result.stderr, result.stderr
 
 
