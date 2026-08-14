@@ -47,6 +47,46 @@ print(len(sockets), sockets[0].family == socket.AF_INET)
 """
 
 
+# A non-default host is one explicit address, bound alone: no ``::1``
+# companion, because the localhost ambiguity that companion exists to close
+# does not arise for an address the user named outright.
+CUSTOM_HOST_SNIPPET = """
+from source.app import bind_server_socket
+
+socks = bind_server_socket(0, "0.0.0.0")
+print(len(socks), [s.getsockname()[0] for s in socks], [s.family.name for s in socks])
+"""
+
+# A host that resolves but is not one of this machine's addresses -- the
+# typo'd LAN address. TEST-NET-3 (RFC 5737) is reserved, so it is never
+# assigned to a real interface here. No DNS lookup is involved.
+UNAVAILABLE_HOST_SNIPPET = """
+from source.app import bind_server_socket
+
+bind_server_socket(0, "203.0.113.1")
+print("bind unexpectedly succeeded")
+"""
+
+# A host that does not resolve at all. ``getaddrinfo`` is patched rather than
+# given a bogus name, so the test never depends on a resolver's NXDOMAIN
+# behavior.
+UNRESOLVABLE_HOST_SNIPPET = """
+import socket
+
+from source.app import bind_server_socket
+
+
+def no_such_host(*args, **kwargs):
+    raise socket.gaierror("name or service not known")
+
+
+socket.getaddrinfo = no_such_host
+
+bind_server_socket(0, "nope.example")
+print("bind unexpectedly succeeded")
+"""
+
+
 def _one_face_snippet(family: str, address: str) -> str:
     """Squat one loopback face, then ask the app for that port.
 
@@ -153,3 +193,30 @@ def test_a_machine_without_ipv6_is_served_on_ipv4_alone(tmp_path: Path) -> None:
 
     assert result.returncode == 0, result.stderr
     assert "1 True" in result.stdout
+
+
+def test_a_non_default_host_is_bound_alone(tmp_path: Path) -> None:
+    result = _run_in_app(CUSTOM_HOST_SNIPPET, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "1 ['0.0.0.0'] ['AF_INET']", result.stdout
+
+
+def test_a_host_this_machine_cannot_serve_is_refused(tmp_path: Path) -> None:
+    result = _run_in_app(UNAVAILABLE_HOST_SNIPPET, tmp_path)
+
+    assert "bind unexpectedly succeeded" not in result.stdout
+    assert result.returncode == 1, result.stderr
+    # The port-taken wording names the one address that was asked for, rather
+    # than the two loopback faces the default binds.
+    assert "203.0.113.1" in result.stderr, result.stderr
+    assert "127.0.0.1" not in result.stderr, result.stderr
+
+
+def test_a_host_that_does_not_resolve_is_refused(tmp_path: Path) -> None:
+    result = _run_in_app(UNRESOLVABLE_HOST_SNIPPET, tmp_path)
+
+    assert "bind unexpectedly succeeded" not in result.stdout
+    assert result.returncode == 1, result.stderr
+    assert "nope.example" in result.stderr, result.stderr
+    assert "config.toml" in result.stderr, result.stderr

@@ -30,6 +30,10 @@ class ConfigData:
     """Dataclass models configuration for this app."""
 
     port: int
+    # Loopback by default: the app has no authentication, so serving an
+    # address other than this one exposes the run data and the settings to
+    # every device that can reach it.
+    host: str = "127.0.0.1"
     polling_interval: int = 1000
     sens_round_decimal_places: int = 1
     debug: bool = False

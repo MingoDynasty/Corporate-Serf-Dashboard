@@ -151,8 +151,12 @@ app.layout = layout()  # layout logic encapsulated in another file
 register_health_endpoint(app.server)
 
 
-def _bind_loopback_face(family: int, address: str, port: int) -> socket.socket:
-    """Bind one loopback address exclusively, returned bound but not listening."""
+# The address the app serves unless `host` in config.toml says otherwise.
+LOOPBACK_HOST = "127.0.0.1"
+
+
+def _bind_face(family: int, address: str, port: int) -> socket.socket:
+    """Bind one address exclusively, returned bound but not listening."""
     sock = socket.socket(family, socket.SOCK_STREAM)
     if hasattr(socket, "SO_EXCLUSIVEADDRUSE"):
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
@@ -166,28 +170,46 @@ def _bind_loopback_face(family: int, address: str, port: int) -> socket.socket:
     return sock
 
 
-def _exit_port_taken(port: int, claimed: list[socket.socket]) -> NoReturn:
+def _exit_port_taken(
+    port: int, claimed: list[socket.socket], host: str = LOOPBACK_HOST
+) -> NoReturn:
     """Release any bound faces and exit with an actionable message."""
     for sock in claimed:
         sock.close()
+    where = (
+        "on both loopback addresses, 127.0.0.1 and [::1]"
+        if host == LOOPBACK_HOST
+        else f"on {host}"
+    )
     _log_startup_error(
         f"Startup error: port {port} is already in use -- most likely "
         "another copy of the dashboard is already running, or another "
         "program has taken the port (Steam uses 8080). The port must be free "
-        "on both loopback addresses, 127.0.0.1 and [::1]. Close that program, "
+        f"{where}. Close that program, "
         f"or set a different port in {config_file_path()}."
     )
     raise SystemExit(1) from None
 
 
-def bind_server_socket(port: int) -> list[socket.socket]:
+def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.socket]:
     """
     Bind the app's listening sockets, or exit with an actionable error.
 
-    Both loopback faces are bound -- ``127.0.0.1`` and ``::1`` -- because
-    Windows may resolve ``localhost`` to ``::1`` first. Binding IPv4 alone
-    leaves the IPv6 face free for an unrelated process to squat on, and the
-    browser then silently reaches that stranger instead of the dashboard.
+    A ``host`` other than the default is an explicit choice of one address --
+    ``0.0.0.0`` to serve every IPv4 interface, or a single LAN address -- and
+    is bound alone, since the ``::1`` companion below exists only to close a
+    ``localhost`` ambiguity that a specific address does not have. Under
+    ``0.0.0.0`` nothing answers on ``::1``: a client that insists on IPv6
+    loopback is refused, while ``localhost`` still connects because resolvers
+    and browsers fall back to the IPv4 address. The app has no
+    authentication, so every device that can reach the chosen address can read
+    the run data and change the settings.
+
+    On the default host both loopback faces are bound -- ``127.0.0.1`` and
+    ``::1`` -- because Windows may resolve ``localhost`` to ``::1`` first.
+    Binding IPv4 alone leaves the IPv6 face free for an unrelated process to
+    squat on, and the browser then silently reaches that stranger instead of
+    the dashboard.
     Claiming ``::1`` ourselves means ``localhost`` either reaches us (a
     specific bind wins over someone else's wildcard ``::`` listener) or the
     app exits loudly, never the middle case where it is quietly shadowed.
@@ -206,21 +228,38 @@ def bind_server_socket(port: int) -> list[socket.socket]:
     Sockets are returned bound but not listening: waitress calls ``listen()``
     itself for each socket handed to it via ``sockets=``.
     """
-    # Every OSError the IPv4 bind can raise is treated as "port taken". Socket
+    # Resolve the host to its address family so that an IPv6 host (``::`` for
+    # every interface) binds as IPv6 rather than failing as a malformed IPv4
+    # address. A typo in the config lands here, not in a bare traceback.
+    try:
+        family = socket.getaddrinfo(
+            host, port, type=socket.SOCK_STREAM, flags=socket.AI_PASSIVE
+        )[0][0]
+    except OSError:
+        _log_startup_error(
+            f'Startup error: host "{host}" in {config_file_path()} is not an '
+            "address this machine can serve on."
+        )
+        raise SystemExit(1) from None
+
+    # Every OSError the first bind can raise is treated as "port taken". Socket
     # creation and the SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on
     # a fresh socket, so folding them into this bucket rather than splitting
     # hairs keeps the taxonomy to the two cases that actually happen.
     try:
-        ipv4 = _bind_loopback_face(socket.AF_INET, "127.0.0.1", port)
+        primary = _bind_face(family, host, port)
     except OSError:
-        _exit_port_taken(port, [])
-    sockets = [ipv4]
+        _exit_port_taken(port, [], host)
+    sockets = [primary]
     # Port 0 asks the OS to choose one. Both faces have to answer on the same
     # port, so the second bind asks for the port the first one was given.
-    port = ipv4.getsockname()[1]
+    port = primary.getsockname()[1]
+
+    if host != LOOPBACK_HOST:
+        return sockets
 
     try:
-        sockets.append(_bind_loopback_face(socket.AF_INET6, "::1", port))
+        sockets.append(_bind_face(socket.AF_INET6, "::1", port))
     except OSError as error:
         # Two buckets, keyed on errno: an IPv6-absence error (the family is
         # unsupported, or ::1 does not exist here) degrades to IPv4-only
@@ -323,14 +362,18 @@ def main() -> None:
             app.run(
                 debug=True,
                 use_reloader=False,
-                host="localhost",
+                host=config.host,
                 port=config.port,
             )
         else:
             # Each Home poll tick bursts several callback POSTs at once;
             # Waitress's default 4 threads left no headroom (task queue depth
             # warnings with a single open tab).
-            serve(app.server, sockets=bind_server_socket(config.port), threads=8)
+            serve(
+                app.server,
+                sockets=bind_server_socket(config.port, config.host),
+                threads=8,
+            )
     finally:
         if observer is not None:
             observer.stop()

@@ -43,7 +43,7 @@ from source.config import stats_dir_detection
 
 stats_dir_detection.detect_stats_dir = lambda: {detected!r}
 
-app.bind_server_socket = lambda port: []
+app.bind_server_socket = lambda port, host="127.0.0.1": []
 app.serve = lambda *args, **kwargs: None
 
 app.main()
