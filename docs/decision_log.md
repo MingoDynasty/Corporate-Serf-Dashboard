@@ -61,10 +61,15 @@ there is still no second TOML parser — and maps it to two destinations. The
 [2026-08-09 entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001):
 `0.0.0.0` probes `127.0.0.1`, `::` probes `[::1]` (Windows sets
 `IPV6_V6ONLY`, so the IPv6 wildcard serves no IPv4 face), and any other host
-is probed at the literal address it names. The browser URL stays human-facing:
-`localhost` for both wildcards and both loopback addresses, and the address
-itself only when `localhost` could not reach it. IPv6 literals are bracketed
-for both.
+is probed at the literal address it names. The browser URL says `localhost`
+only on the **default** host, where the app holds both loopback faces and
+whichever one the resolver picks is therefore ours. Under any other host the
+app owns at most one face and an unrelated process can hold the other:
+verified on Windows, an app bound to `0.0.0.0` alongside a stranger holding
+`::1` sends `localhost` to the stranger, after the launcher's own IPv4 health
+check has already passed. Every non-default host therefore opens at the same
+literal address the readiness probe proved reachable. IPv6 literals are
+bracketed for both.
 
 Failure taxonomy: a bind that fails with `EADDRNOTAVAIL` reports the **host**,
 not the port. A mistyped LAN address or one lost to a DHCP change resolves

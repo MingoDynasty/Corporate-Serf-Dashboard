@@ -132,15 +132,16 @@ function Get-ProbeAddress([string]$BindHost) {
 }
 
 function Get-BrowserAddress([string]$BindHost) {
-    # Human-facing, so `localhost` wherever it actually reaches the app: both
-    # wildcards serve their family's loopback, which is what localhost
-    # resolves to. A single named address is not reachable as localhost, so
-    # the URL has to carry the address itself.
-    if ($BindHost -eq '0.0.0.0' -or $BindHost -eq '::' -or
-        $BindHost -eq '127.0.0.1' -or $BindHost -eq '::1') {
-        return 'localhost'
-    }
-    return (Format-UrlHost $BindHost)
+    # `localhost` only on the default host, where the app holds BOTH loopback
+    # faces -- so whichever one the resolver picks is ours. Under any other
+    # host the app owns at most one face, and an unrelated process can hold
+    # the other: an app on 0.0.0.0 plus a stranger on ::1 sends `localhost` to
+    # the stranger, after the launcher's own IPv4 health check has already
+    # passed. That is the wrong-face ambiguity the dual-loopback bind exists
+    # to prevent, so every other host opens at the same literal address the
+    # readiness probe already proved reachable.
+    if ($BindHost -eq $DefaultHost) { return 'localhost' }
+    return (Get-ProbeAddress $BindHost)
 }
 
 function Open-Dashboard([int]$Port, [string]$Address) {
