@@ -14,7 +14,9 @@ curated swatches and a custom picker.
 
 ## Decisions needed
 
-### 1. Which point customization belongs in the first version?
+### D1 — Which point customization belongs in the first version?
+
+Status: Open
 
 **Recommendation: size and color only.** They answer the two direct user goals:
 make points easier to see and choose a personally readable color. Opacity,
@@ -25,7 +27,9 @@ Adding more properties now would turn a focused visibility feature into the
 start of a general Plotly editor. Choosing a narrower palette-only feature would
 reduce complexity further, but would leave point visibility unaddressed.
 
-### 2. How much size choice should the control expose?
+### D2 — How much size choice should the control expose?
+
+Status: Open
 
 **Recommendation: three named presets: Small, Default, and Large.** Three stops
 express the meaningful trade-off between density and visibility without implying
@@ -37,7 +41,9 @@ control whose neighboring values may be hard to distinguish. A continuous
 slider would provide maximum control, but would elevate rendering precision into
 a product concept and make the default harder to recognize and restore.
 
-### 3. How should point color be selected?
+### D3 — How should point color be selected?
+
+Status: Open
 
 **Recommendation: Automatic plus curated swatches and an integrated custom
 picker.** Automatic preserves the chart's existing generated appearance.
@@ -49,9 +55,25 @@ but would weaken the personalization goal. A picker-only control would be
 flexible but make every user solve color selection from scratch and make the
 safe choices harder to find.
 
-These are current recommendations, not ratified decisions. Proposal review is
-expected to challenge the scope, preset count, interaction model, or any other
-choice where a better product direction is available.
+### D4 — Where should this work sit on the roadmap?
+
+Status: Ratified (2026-08-15)
+
+**Decision: Upcoming as a small pre-launch item that does not displace Run
+history and sessions.** The feature is small enough to ship before public launch
+and has a bounded single implementation PR. Keeping Run history first and
+explicitly naming this as parallel work preserves the roadmap's current
+depth-first priority.
+
+Future was rejected because it would understate the feature's readiness and the
+maintainer's intent to ship it before launch. Giving it equal prominence with or
+placing it ahead of Run history was rejected because this is parallel polish,
+not a replacement for the next declared milestone.
+
+D1–D3 remain open recommendations. D4 records the maintainer's roadmap ruling;
+proposal review is still expected to challenge the scope, preset count,
+interaction model, or any other open choice where a better product direction is
+available.
 
 ## Problem
 
@@ -87,14 +109,25 @@ The interface keeps three levels:
 3. Additional or advanced controls only after a real workflow demonstrates the
    need.
 
+### Alternative considered: improve the default for everyone
+
+A slightly larger universal marker or a size that adapts to point count could
+reduce density and visibility problems without adding controls. The current
+recommendation does not use that as the whole solution because no universal
+default satisfies personal color preference, while adaptive sizing makes the
+same data look different as its point count changes and adds behavior that is
+harder to predict and test. Rendered evidence may still improve the Automatic
+size during implementation, but a better default does not replace the proposed
+personalization.
+
 ### Inspector organization
 
-Add one **Run data points** group to the existing Chart options inspector. It
+Add one **Run Data Points** group to the existing Chart options inspector. It
 contains Point size followed by Point color. It does not add another disclosure
 layer or change the inspector width.
 
 The group appears after Overlays and before Score Threshold. Overlays determine
-which reference information is present, Run data points controls the primary
+which reference information is present, Run Data Points controls the primary
 marks, and Score Threshold keeps its existing goal and notification controls
 together.
 
@@ -168,6 +201,15 @@ semantic point categories. If a visual-object group would exceed roughly three
 controls, revisit presets or a deliberately designed advanced mode instead of
 continuing to append properties to the inspector.
 
+## Delivery plan
+
+Ship the feature in one implementation PR after D1–D3 are ratified. That PR adds
+both inspector controls and their browser persistence, applies appearance after
+the cached figure is themed, covers both graph modes and fallback states, and
+performs the proposal-shipping documentation cleanup. There is no hard technical
+dependency on other in-flight work; roadmap ordering governs priority rather
+than code sequencing.
+
 ## Out of scope
 
 - point opacity, marker symbols, borders, and outlines;
@@ -187,7 +229,7 @@ Automated coverage should prove:
 - a valid custom color sets only the raw-run marker color in both graph modes;
 - invalid or cleared values fall back to the unmodified base trace;
 - changing appearance does not invoke scenario-data or notification work;
-- both inputs are mounted in the Run data points group with their intended
+- both inputs are mounted in the Run Data Points group with their intended
   defaults and browser persistence;
 - placeholder and no-data figures tolerate every persisted preference; and
 - light and dark theme changes preserve explicit preferences while Automatic
