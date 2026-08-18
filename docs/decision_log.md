@@ -83,11 +83,12 @@ check has already passed. Every non-default host therefore opens at the same
 literal address the readiness probe proved reachable. IPv6 literals are
 bracketed for both.
 
-Failure taxonomy: a bind that fails with `EADDRNOTAVAIL` reports the **host**,
-not the port. A mistyped LAN address or one lost to a DHCP change resolves
-fine but belongs to no local interface, and no port is free on an address this
-machine does not have — so the port-taken message would send the user after
-the wrong setting. A host that does not resolve at all reports the same way.
+Failure taxonomy — two buckets, not three. A host that is not an IP literal is
+rejected before any bind, naming the setting. A well-formed literal that no
+local interface holds — a mistyped LAN address, or one lost to a DHCP change —
+fails the bind with `EADDRNOTAVAIL`, and that reports the **host**, not the
+port: no port is free on an address this machine does not have, so the
+port-taken message would send the user after the wrong setting.
 
 Relationship to prior entries: nothing is superseded. The exclusive-bind
 decision stands unchanged — the app still creates and binds its own sockets,
