@@ -16,9 +16,9 @@ curated swatches and a custom picker.
 
 ### D1 — Which point customization belongs in the first version?
 
-Status: Open
+Status: Ratified (2026-08-17)
 
-**Recommendation: size and color only.** They answer the two direct user goals:
+**Decision: size and color only.** They answer the two direct user goals:
 make points easier to see and choose a personally readable color. Opacity,
 symbol, borders, hover styling, and styling for other chart elements remain out
 of scope.
@@ -29,9 +29,9 @@ reduce complexity further, but would leave point visibility unaddressed.
 
 ### D2 — How much size choice should the control expose?
 
-Status: Open
+Status: Ratified (2026-08-17)
 
-**Recommendation: three named presets: Small, Default, and Large.** Three stops
+**Decision: three named presets: Small, Default, and Large.** Three stops
 express the meaningful trade-off between density and visibility without implying
 that a precise pixel diameter is analytically important. Default preserves the
 current Plotly appearance instead of hard-coding its present effective size.
@@ -45,15 +45,24 @@ a product concept and make the default harder to recognize and restore.
 
 Status: Open
 
-**Recommendation: Automatic plus curated swatches and an integrated custom
-picker.** Automatic preserves the chart's existing generated appearance.
-Swatches make common, graph-readable choices fast, while the picker and hex
-input avoid arbitrarily preventing a color a person finds easier to see.
+**Current recommendation: Automatic plus eight curated, dual-theme swatches and
+an integrated custom picker.** Automatic preserves the chart's existing
+generated appearance. Swatches make common, graph-readable choices fast, while
+the picker and hex input avoid arbitrarily preventing a color a person finds
+easier to see.
 
 A palette-only control would guarantee a smaller and more governable choice set,
 but would weaken the personalization goal. A picker-only control would be
 flexible but make every user solve color selection from scratch and make the
 safe choices harder to find.
+
+Within D3, the newly surfaced palette choice is the curated count. Eight keeps
+one compact set of distinct color families; ten adds indigo and violet for finer
+blue-to-purple choice at the cost of two more neighboring options. The 14-color
+DMC example is not recommended because it is a component demonstration rather
+than a palette curated for these chart backgrounds, and several values fail the
+proposal's contrast target. The current preference for eight is deliberately
+open to the maintainer's ruling.
 
 ### D4 — Where should this work sit on the roadmap?
 
@@ -70,10 +79,9 @@ maintainer's intent to ship it before launch. Giving it equal prominence with or
 placing it ahead of Run history was rejected because this is parallel polish,
 not a replacement for the next declared milestone.
 
-D1–D3 remain open recommendations. D4 records the maintainer's roadmap ruling;
-proposal review is still expected to challenge the scope, preset count,
-interaction model, or any other open choice where a better product direction is
-available.
+D1, D2, and D4 record maintainer rulings. D3 remains open, including the curated
+color count; proposal review is still expected to challenge its interaction,
+palette, or any other open choice where a better product direction is available.
 
 ## Problem
 
@@ -149,19 +157,47 @@ Use the installed Dash Mantine Components `ColorInput` with a visible **Point
 color** label. An empty value represents Automatic and the field displays that
 word when no override is active. Opening it provides:
 
-- eight curated mid-tone swatches covering blue, cyan, teal, green, orange,
-  red, grape or purple, and pink;
+- the curated swatch set selected by D3;
 - the component's integrated color picker; and
 - a hexadecimal text input.
+
+The current eight-swatch candidate uses per-family shades selected against both
+real plot backgrounds rather than taking one shade index across every Mantine
+family:
+
+| Family | Hex | Contrast on light | Contrast on dark |
+|---|---|---:|---:|
+| blue-7 | `#1c7ed6` | 4.20:1 | 3.70:1 |
+| cyan-8 | `#0c8599` | 4.35:1 | 3.57:1 |
+| teal-8 | `#099268` | 3.95:1 | 3.93:1 |
+| green-9 | `#2b8a3e` | 4.37:1 | 3.55:1 |
+| orange-9 | `#d9480f` | 4.30:1 | 3.61:1 |
+| red-7 | `#f03e3e` | 3.84:1 | 4.04:1 |
+| grape-6 | `#be4bdb` | 4.02:1 | 3.86:1 |
+| pink-6 | `#e64980` | 3.73:1 | 4.16:1 |
+
+If D3 selects ten, add indigo-5 (`#5c7cfa`, 3.67:1 / 4.23:1) and
+violet-5 (`#845ef7`, 4.26:1 / 3.64:1). With eight, set
+`swatchesPerRow=8` explicitly rather than inheriting the component's default of
+seven; validate the real popover before treating the single-row layout as final.
+
+For the current themes, omit yellow because no Mantine yellow shade reaches 3:1
+on both backgrounds. Omit lime because green already covers that family and only
+the deepest lime shade passes, adding a weakly differentiated choice. Omit gray
+because it collides with grid lines, and dark because it disappears against the
+dark plot. These are v1 curation choices under the current themes, not permanent
+bans; re-audit them if the chart backgrounds change.
 
 A nearby **Use automatic** action clears an explicit value. The control uses
 hex rather than alpha-enabled color formats, so opacity does not enter this
 feature indirectly. The eyedropper is omitted in the first version.
 
-Final swatch values are mechanical choices. Check them against both light and
-dark plot backgrounds, targeting at least 3:1 graphical contrast. An arbitrary
-custom color cannot carry that guarantee, so the graph updates immediately and
-Automatic remains an obvious, keyboard-accessible recovery path.
+Contrast is an eligibility screen, not a substitute for rendering small points
+in representative charts. Treat the candidate values as implementation starting
+points and validate them in both themes, targeting at least 3:1 graphical
+contrast. An arbitrary custom color cannot carry that guarantee, so the graph
+updates immediately and Automatic remains an obvious, keyboard-accessible
+recovery path.
 
 ### Application and persistence
 
@@ -203,7 +239,7 @@ continuing to append properties to the inspector.
 
 ## Delivery plan
 
-Ship the feature in one implementation PR after D1–D3 are ratified. That PR adds
+Ship the feature in one implementation PR after D3 is ratified. That PR adds
 both inspector controls and their browser persistence, applies appearance after
 the cached figure is themed, covers both graph modes and fallback states, and
 performs the proposal-shipping documentation cleanup. There is no hard technical
