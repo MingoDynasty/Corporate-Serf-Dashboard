@@ -8,9 +8,9 @@ Date: 2026-08-13
 Scenario Performance's raw run points can be difficult to read when a chart is
 unusually dense or when someone needs stronger visual prominence. This proposal
 adds browser-persisted point-size and point-color controls to Chart options while
-leaving every other chart element opinionated and consistent. The current
-recommendation uses three size presets and an Automatic-first color input with
-curated swatches and a custom picker.
+leaving every other chart element opinionated and consistent. The ratified design
+uses three size presets and an Automatic-first color input with eight curated,
+dual-theme swatches and a custom picker.
 
 ## Decisions needed
 
@@ -43,26 +43,24 @@ a product concept and make the default harder to recognize and restore.
 
 ### D3 — How should point color be selected?
 
-Status: Open
+Status: Ratified (2026-08-17)
 
-**Current recommendation: Automatic plus eight curated, dual-theme swatches and
-an integrated custom picker.** Automatic preserves the chart's existing
-generated appearance. Swatches make common, graph-readable choices fast, while
-the picker and hex input avoid arbitrarily preventing a color a person finds
-easier to see.
+**Decision: Automatic plus eight curated, dual-theme swatches and an integrated
+custom picker.** Automatic preserves the chart's existing generated appearance.
+Swatches make common, graph-readable choices fast, while the picker and hex input
+avoid arbitrarily preventing a color a person finds easier to see.
 
 A palette-only control would guarantee a smaller and more governable choice set,
 but would weaken the personalization goal. A picker-only control would be
 flexible but make every user solve color selection from scratch and make the
 safe choices harder to find.
 
-Within D3, the newly surfaced palette choice is the curated count. Eight keeps
-one compact set of distinct color families; ten adds indigo and violet for finer
-blue-to-purple choice at the cost of two more neighboring options. The 14-color
-DMC example is not recommended because it is a component demonstration rather
-than a palette curated for these chart backgrounds, and several values fail the
-proposal's contrast target. The current preference for eight is deliberately
-open to the maintainer's ruling.
+Eight keeps one compact set of distinct color families. Ten was rejected because
+adding indigo and violet would provide finer blue-to-purple choice at the cost of
+two more neighboring options that the custom picker already covers. The 14-color
+DMC example was rejected because it is a component demonstration rather than a
+palette curated for these chart backgrounds, and several values fail the
+proposal's contrast target.
 
 ### D4 — Where should this work sit on the roadmap?
 
@@ -79,9 +77,9 @@ maintainer's intent to ship it before launch. Giving it equal prominence with or
 placing it ahead of Run history was rejected because this is parallel polish,
 not a replacement for the next declared milestone.
 
-D1, D2, and D4 record maintainer rulings. D3 remains open, including the curated
-color count; proposal review is still expected to challenge its interaction,
-palette, or any other open choice where a better product direction is available.
+D1–D4 record maintainer rulings. No product decisions remain open; review may
+still challenge errors or mechanical guidance without treating the ratified
+choices as open by default.
 
 ## Problem
 
@@ -120,12 +118,12 @@ The interface keeps three levels:
 ### Alternative considered: improve the default for everyone
 
 A slightly larger universal marker or a size that adapts to point count could
-reduce density and visibility problems without adding controls. The current
-recommendation does not use that as the whole solution because no universal
-default satisfies personal color preference, while adaptive sizing makes the
-same data look different as its point count changes and adds behavior that is
-harder to predict and test. Rendered evidence may still improve the Automatic
-size during implementation, but a better default does not replace the proposed
+reduce density and visibility problems without adding controls. The design does
+not use that as the whole solution because no universal default satisfies
+personal color preference, while adaptive sizing makes the same data look
+different as its point count changes and adds behavior that is harder to predict
+and test. Rendered evidence may still improve the Automatic size during
+implementation, but a better default does not replace the proposed
 personalization.
 
 ### Inspector organization
@@ -157,13 +155,13 @@ Use the installed Dash Mantine Components `ColorInput` with a visible **Point
 color** label. An empty value represents Automatic and the field displays that
 word when no override is active. Opening it provides:
 
-- the curated swatch set selected by D3;
+- eight curated swatches from the dual-theme set below;
 - the component's integrated color picker; and
 - a hexadecimal text input.
 
-The current eight-swatch candidate uses per-family shades selected against both
-real plot backgrounds rather than taking one shade index across every Mantine
-family:
+The eight-swatch implementation baseline uses per-family shades selected against
+both real plot backgrounds rather than taking one shade index across every
+Mantine family:
 
 | Family | Hex | Contrast on light | Contrast on dark |
 |---|---|---:|---:|
@@ -176,8 +174,8 @@ family:
 | grape-6 | `#be4bdb` | 4.02:1 | 3.86:1 |
 | pink-6 | `#e64980` | 3.73:1 | 4.16:1 |
 
-If D3 selects ten, add indigo-5 (`#5c7cfa`, 3.67:1 / 4.23:1) and
-violet-5 (`#845ef7`, 4.26:1 / 3.64:1). With eight, set
+The rejected ten-swatch alternative would add indigo-5 (`#5c7cfa`, 3.67:1 /
+4.23:1) and violet-5 (`#845ef7`, 4.26:1 / 3.64:1). Set
 `swatchesPerRow=8` explicitly rather than inheriting the component's default of
 seven; validate the real popover before treating the single-row layout as final.
 
@@ -239,12 +237,12 @@ continuing to append properties to the inspector.
 
 ## Delivery plan
 
-Ship the feature in one implementation PR after D3 is ratified. That PR adds
-both inspector controls and their browser persistence, applies appearance after
-the cached figure is themed, covers both graph modes and fallback states, and
-performs the proposal-shipping documentation cleanup. There is no hard technical
-dependency on other in-flight work; roadmap ordering governs priority rather
-than code sequencing.
+Ship the feature in one implementation PR. That PR adds both inspector controls
+and their browser persistence, applies appearance after the cached figure is
+themed, covers both graph modes and fallback states, and performs the
+proposal-shipping documentation cleanup. There is no hard technical dependency
+on other in-flight work; roadmap ordering governs priority rather than code
+sequencing.
 
 ## Out of scope
 
