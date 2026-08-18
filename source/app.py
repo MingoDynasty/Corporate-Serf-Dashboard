@@ -3,6 +3,7 @@ Entrypoint to the Corporate Serf Dashboard app.
 """
 
 import errno
+import ipaddress
 import json
 import logging
 import socket
@@ -20,6 +21,7 @@ from watchdog.observers.api import BaseObserver
 
 from source.app_shell import APP_INDEX_STRING, layout
 from source.config.config_service import (
+    DEFAULT_HOST,
     config_file_path,
     get_config,
 )
@@ -151,10 +153,6 @@ app.layout = layout()  # layout logic encapsulated in another file
 register_health_endpoint(app.server)
 
 
-# The address the app serves unless `host` in config.toml says otherwise.
-LOOPBACK_HOST = "127.0.0.1"
-
-
 def _bind_face(family: int, address: str, port: int) -> socket.socket:
     """Bind one address exclusively, returned bound but not listening."""
     sock = socket.socket(family, socket.SOCK_STREAM)
@@ -171,14 +169,14 @@ def _bind_face(family: int, address: str, port: int) -> socket.socket:
 
 
 def _exit_port_taken(
-    port: int, claimed: list[socket.socket], host: str = LOOPBACK_HOST
+    port: int, claimed: list[socket.socket], host: str = DEFAULT_HOST
 ) -> NoReturn:
     """Release any bound faces and exit with an actionable message."""
     for sock in claimed:
         sock.close()
     where = (
         "on both loopback addresses, 127.0.0.1 and [::1]"
-        if host == LOOPBACK_HOST
+        if host == DEFAULT_HOST
         else f"on {host}"
     )
     _log_startup_error(
@@ -206,14 +204,39 @@ def _exit_bad_host(host: str, why: str) -> NoReturn:
     raise SystemExit(1) from None
 
 
-def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.socket]:
+def host_address_family(host: str) -> int:
+    """Validate ``host`` as an IP literal and return its address family.
+
+    Literals only, deliberately: a *name* would be resolved, and resolution
+    picks one face of whatever it resolves to. ``localhost`` would bind
+    ``::1`` alone here and ``127.0.0.1`` alone on a resolver that orders IPv4
+    first -- one loopback face held, the other left free for an unrelated
+    process to squat on, which is the ambiguity the dual-face default bind
+    exists to close. The empty string is the same trap wearing a different
+    hat: ``getaddrinfo("", ...)`` yields ``AF_INET6``, so ``host = ""`` -- the
+    natural way to write "unset" by hand -- would publish the app on ``::``,
+    every IPv6 interface included, with none of the warnings that gate an
+    explicit ``0.0.0.0``.
+
+    Rejecting names costs nothing the documentation promised: ``README.md``,
+    ``example.toml``, and the decision log all specify literals.
+    """
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        _exit_bad_host(host, "is not an IP address.")
+    return socket.AF_INET6 if address.version == 6 else socket.AF_INET
+
+
+def bind_server_socket(port: int, host: str = DEFAULT_HOST) -> list[socket.socket]:
     """
     Bind the app's listening sockets, or exit with an actionable error.
 
     A ``host`` other than the default is an explicit choice of one address --
     ``0.0.0.0`` to serve every IPv4 interface, or a single LAN address -- and
-    is bound alone, since the ``::1`` companion below exists only to close a
-    ``localhost`` ambiguity that a specific address does not have. Under
+    is bound alone (it must be an IP literal; see ``host_address_family``),
+    since the ``::1`` companion below exists only to close a ``localhost``
+    ambiguity that a specific address does not have. Under
     ``0.0.0.0`` nothing answers on ``::1``: a client that insists on IPv6
     loopback is refused, while ``localhost`` still connects because resolvers
     and browsers fall back to the IPv4 address. The app has no
@@ -243,18 +266,10 @@ def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.sock
     Sockets are returned bound but not listening: waitress calls ``listen()``
     itself for each socket handed to it via ``sockets=``.
     """
-    # Resolve the host to its address family so that an IPv6 host (``::`` for
-    # every interface) binds as IPv6 rather than failing as a malformed IPv4
-    # address. A typo in the config lands here, not in a bare traceback.
-    try:
-        family = socket.getaddrinfo(
-            host, port, type=socket.SOCK_STREAM, flags=socket.AI_PASSIVE
-        )[0][0]
-    except OSError:
-        _exit_bad_host(host, "could not be resolved.")
+    family = host_address_family(host)
 
-    # Two buckets, keyed on errno. EADDRNOTAVAIL means the address resolved but
-    # no interface here holds it -- a mistyped LAN address, or one this machine
+    # Two buckets, keyed on errno. EADDRNOTAVAIL means the literal is well
+    # formed but no interface here holds it -- a mistyped LAN address, or one this machine
     # has since lost via DHCP -- which changing the port cannot fix. Everything
     # else is treated as "port taken": socket creation and the
     # SO_EXCLUSIVEADDRUSE setsockopt essentially cannot fail on a fresh socket,
@@ -271,7 +286,7 @@ def bind_server_socket(port: int, host: str = LOOPBACK_HOST) -> list[socket.sock
     # port, so the second bind asks for the port the first one was given.
     port = primary.getsockname()[1]
 
-    if host != LOOPBACK_HOST:
+    if host != DEFAULT_HOST:
         return sockets
 
     try:
@@ -375,6 +390,22 @@ def main() -> None:
         # Run the Dash app. `app.run()` uses Flask's development server even when
         # debug is disabled, so switch to Waitress for non-debug runs.
         if config.debug:
+            # This path never reaches bind_server_socket, so validate the host
+            # here too -- otherwise a bad literal is a raw traceback on one
+            # server path and an actionable message on the other.
+            host_address_family(config.host)
+            if config.host != DEFAULT_HOST:
+                # Flask sets use_debugger from debug, and Dash forwards host
+                # straight through, so this combination puts the Werkzeug
+                # console on that network. It is PIN-gated, and debug is
+                # documented dev-only, so this warns rather than refuses.
+                logger.warning(
+                    "debug is on and host is %s, so the interactive debugger "
+                    "is reachable from that network, not just this machine. "
+                    "Turn debug off in %s unless you meant this.",
+                    config.host,
+                    config_file_path(),
+                )
             app.run(
                 debug=True,
                 use_reloader=False,

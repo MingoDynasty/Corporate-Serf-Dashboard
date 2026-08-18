@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 from source.utilities.paths import STATE_DIR_ENV_VAR
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -67,22 +69,23 @@ bind_server_socket(0, "203.0.113.1")
 print("bind unexpectedly succeeded")
 """
 
-# A host that does not resolve at all. ``getaddrinfo`` is patched rather than
-# given a bogus name, so the test never depends on a resolver's NXDOMAIN
-# behavior.
-UNRESOLVABLE_HOST_SNIPPET = """
-import socket
-
+# The IPv6 wildcard: the case the address-family step exists for. A hardcoded
+# AF_INET would fail here, where 0.0.0.0 alone would not notice the
+# difference.
+IPV6_WILDCARD_SNIPPET = """
 from source.app import bind_server_socket
 
+socks = bind_server_socket(0, "::")
+print(len(socks), [s.family.name for s in socks])
+"""
 
-def no_such_host(*args, **kwargs):
-    raise socket.gaierror("name or service not known")
 
+def _rejected_host_snippet(host: str) -> str:
+    """Ask the app for a host that is not an IP literal."""
+    return f"""
+from source.app import bind_server_socket
 
-socket.getaddrinfo = no_such_host
-
-bind_server_socket(0, "nope.example")
+bind_server_socket(0, {host!r})
 print("bind unexpectedly succeeded")
 """
 
@@ -216,10 +219,32 @@ def test_a_host_this_machine_cannot_serve_is_refused(tmp_path: Path) -> None:
     assert "127.0.0.1" not in result.stderr, result.stderr
 
 
-def test_a_host_that_does_not_resolve_is_refused(tmp_path: Path) -> None:
-    result = _run_in_app(UNRESOLVABLE_HOST_SNIPPET, tmp_path)
+def test_the_ipv6_wildcard_binds_as_ipv6(tmp_path: Path) -> None:
+    result = _run_in_app(IPV6_WILDCARD_SNIPPET, tmp_path)
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "1 ['AF_INET6']", result.stdout
+
+
+@pytest.mark.parametrize(
+    "host",
+    [
+        # "unset", written by hand. getaddrinfo would have made this the IPv6
+        # wildcard -- every IPv6 interface, with none of the warnings that
+        # gate an explicit 0.0.0.0.
+        "",
+        # "the default, spelled out". A name resolves to one face, leaving the
+        # other free for an unrelated process to squat on.
+        "localhost",
+        "example.invalid",
+        "127.0.0.1 ",
+        "999.999.999.999",
+    ],
+)
+def test_a_host_that_is_not_an_ip_literal_is_refused(host: str, tmp_path: Path) -> None:
+    result = _run_in_app(_rejected_host_snippet(host), tmp_path)
 
     assert "bind unexpectedly succeeded" not in result.stdout
     assert result.returncode == 1, result.stderr
-    assert "nope.example" in result.stderr, result.stderr
+    assert "is not an IP address" in result.stderr, result.stderr
     assert "config.toml" in result.stderr, result.stderr

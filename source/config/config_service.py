@@ -19,6 +19,11 @@ logger = logging.getLogger(__name__)
 
 CONFIG_FILE = "config.toml"
 
+# The address the app serves unless `host` in config.toml says otherwise.
+# Shared with source.app, which keys the dual-loopback bind on it: the two
+# must agree or an unset `host` stops taking the both-faces path.
+DEFAULT_HOST = "127.0.0.1"
+
 
 def config_file_path() -> Path:
     """Return the path to the app's config file inside the state root."""
@@ -32,8 +37,9 @@ class ConfigData:
     port: int
     # Loopback by default: the app has no authentication, so serving an
     # address other than this one exposes the run data and the settings to
-    # every device that can reach it.
-    host: str = "127.0.0.1"
+    # every device that can reach it. Must be an IP literal, not a name --
+    # source.app rejects anything else.
+    host: str = DEFAULT_HOST
     polling_interval: int = 1000
     sens_round_decimal_places: int = 1
     debug: bool = False
