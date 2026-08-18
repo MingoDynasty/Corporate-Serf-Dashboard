@@ -25,7 +25,11 @@ def register_health_endpoint(server: Flask) -> None:
     ignored (see ``build_info``) — it identifies itself from its stamp and
     reports ``tag: None``.
 
-    No authentication: the app serves localhost only.
+    No authentication: the endpoint reports build identity only, and is
+    reachable by anything that can reach the configured ``host`` (see the
+    2026-08-14 decision-log entry, which made the listen address a
+    setting). Keep it that way -- nothing here may become sensitive
+    without an auth story to go with it.
     """
 
     @server.route("/health")

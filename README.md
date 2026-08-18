@@ -149,10 +149,19 @@ edit:
   first install. Updates never touch it.
 - **From source:** copy `example.toml` to `config.toml` in your checkout.
 
-`example.toml` documents every setting; one is worth knowing about:
+`example.toml` documents every setting; two are worth knowing about:
 
 - `port` — change this if something else on your machine already uses 8050. The
   dashboard says so at startup rather than failing mysteriously.
+- `host` — the address the dashboard listens on. The default, `127.0.0.1`,
+  serves this machine only. Set it to `0.0.0.0` to also open the dashboard from
+  a phone or another PC on your network, at `http://<this-machine's-IP>:8050/`.
+  It has to be an IP address rather than a name, so `localhost` and an empty
+  value are both refused with an error naming the setting.
+  On Windows you will also need an inbound firewall rule for the port; a bind
+  alone is not enough. **The dashboard has no login,** so anything that can
+  reach that address can read your stats and change your settings — only do
+  this on a network you trust.
 
 Everything else you might want to change lives on the dashboard's own
 **Settings** page: where your KovaaK's stats live, and who you are on the
