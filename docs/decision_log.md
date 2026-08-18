@@ -30,10 +30,22 @@ honor it — `bind_server_socket(port, host)` for the waitress path, and the
 `config.debug` Flask path via `app.run(host=config.host, ...)`. On the default
 host the bind is byte-for-byte the previous behavior: both loopback faces,
 `SO_EXCLUSIVEADDRUSE`, two-bucket failure semantics. A non-default host is
-bound **alone**, with no `::1` companion. The address family comes from
-`getaddrinfo`, so `::` binds as IPv6 rather than failing as a malformed IPv4
-literal, and a host that does not resolve exits with a message naming the host
-and `config.toml` instead of a bare `gaierror` traceback.
+bound **alone**, with no `::1` companion.
+
+**`host` must be an IP literal**, never a name; the address family is taken
+from the literal, so `::` binds as IPv6 rather than failing as a malformed
+IPv4 address. Resolution is what makes a name dangerous here: it picks one
+face of whatever it resolves to, so `localhost` would bind `::1` alone on
+this machine and `127.0.0.1` alone where the resolver orders IPv4 first,
+holding one loopback face and leaving the other free to squat — the very
+ambiguity the default's dual-face bind exists to close, reintroduced through
+the most natural spelling of "same as the default". The empty string is the
+same trap in different clothing: `getaddrinfo("", ...)` yields `AF_INET6`, so
+`host = ""` — the natural way to hand-write "unset" — would publish the app
+on `::`, every IPv6 interface included, with none of the warnings that gate an
+explicit `0.0.0.0`. Both exit naming the setting. This costs nothing the
+documentation promised: `README.md`, `example.toml`, and this entry all
+specify literals.
 
 Why loopback remains the default: there is no authentication anywhere in the
 app. Settings are writable from the UI, so a reachable instance is not
@@ -84,6 +96,15 @@ port. What changes is only which address it claims. The
 [2026-08-09 human-facing-URL entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001)
 reasoning that "whichever face the resolver hands `localhost` is ours" is
 narrowed to the default host, and holds there.
+
+`debug` and `host` interact, and nothing enforces it. Flask sets
+`use_debugger` from `debug` and Dash forwards `host` straight through, so
+`debug = true` with a non-default host puts the PIN-gated Werkzeug console on
+that network — an execution surface, not just the read-and-change-settings
+ceiling the rest of this entry reasons about. The combination warns at startup
+and is called out beside `debug` in `example.toml`, but is not refused:
+`debug` is documented dev-only and both are the operator's own settings.
+Refusing it outright stays available if that judgment turns out wrong.
 
 Out of scope: authentication, TLS, and any in-app affordance for turning LAN
 access on. On Windows a bind is also not sufficient by itself — an inbound

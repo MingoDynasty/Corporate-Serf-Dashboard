@@ -273,6 +273,16 @@ list in the roadmap.)
   evidence — and they will only do that if what they are handing over, and to
   whom, is stated honestly rather than buried.
 
+**The dashboard can be opened from another device.** By default the app serves
+only the machine it runs on. One setting in `config.toml` widens that to the
+whole network, so the dashboard opens on a phone or a second PC at that
+machine's address. The setting is off by default and says plainly what turning
+it on costs: the app has no login, so anything that can reach the address can
+read the run data and change the settings. *Problem solved:* the stats live on
+the gaming PC, but that is often the worst place to read them — mid-session,
+between runs, the useful screen is the one already in your hand. Without this
+the only way to see a scenario's history was to stop playing and alt-tab.
+
 ## Where it's going
 
 Sequencing and design state live in the [roadmap](./roadmap.md). The unsolved
