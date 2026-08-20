@@ -84,6 +84,11 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
+- **Scenario Performance point customization** — a small pre-launch polish item
+  that lets people make raw run points easier to see without turning Chart
+  options into a general style editor. It is parallel work and does not displace
+  Run history and sessions. Design in
+  [`scenario_point_customization_proposal.md`](./scenario_point_customization_proposal.md).
 
 ---
 

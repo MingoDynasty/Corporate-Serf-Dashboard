@@ -141,6 +141,30 @@ both by layering:
   `tests/test_docs.py` gates only the presence and order of the leading
   proposal sections, never prose quality or full Markdown rendering.
 
+### Initial proposal review posture
+
+An initial proposal is **opinionated but unratified by default**. Its author
+should make clear recommendations so the trade-offs are concrete, while
+describing open choices as the current preferred direction rather than settled
+decisions. If the maintainer has already ruled on one or more choices, preserve
+those as ratified decisions and distinguish them from everything still open.
+Use "recommend", "propose", and "current preference" for choices still under
+review; reserve "must" for existing constraints and invariants. A PR being
+ready for review means the proposal is coherent and evidence-backed, not that
+its open product decisions have already been accepted.
+
+The first review is an early co-design pass, not a final gate. The PR body must
+state the proposal's ratification status: identify any choices the maintainer
+already ruled on and say that everything else remains open; when no prior ruling
+exists, say that nothing is ratified. Invite the reviewer to challenge any open
+choice, including recommendations outside **Decisions needed**. The reviewer
+should form an independent product position on those open choices before
+comparing it with the proposal, then report agreements, disagreements, better
+alternatives, and missing considerations. **Decisions needed** still contains
+only maintainer product or workflow judgment and costly-to-reverse trade-offs;
+mechanical, reversible, and evidence-resolvable details remain the author's
+responsibility even though reviewers may challenge them.
+
 ### Proposal template
 
 ```markdown
