@@ -89,6 +89,11 @@ sequence.
   options into a general style editor. It is parallel work and does not displace
   Run history and sessions. Design in
   [`scenario_point_customization_proposal.md`](./scenario_point_customization_proposal.md).
+- **Run notifications master switch** — a small parallel item adding the one
+  thing run toasts can't do today: turn off. One Chart options switch silences
+  the per-run toast family, and the misleading copy on the existing
+  score-threshold switch gets corrected alongside it. Design in
+  [`run_notifications_switch_proposal.md`](./run_notifications_switch_proposal.md).
 
 ---
 
