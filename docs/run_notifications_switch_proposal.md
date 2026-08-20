@@ -34,8 +34,11 @@ UI copy is a maintainer decision. Recommended wording (app copy, so short
 sentences and no em dashes):
 
 - New inspector group **Notifications**, holding the master switch.
-- Master switch label **Run Notifications**; help text: "Shows a toast after
-  each new run. Turn this off to update the chart silently."
+- Master switch label **Run Notifications**; help text: "Controls all
+  notifications about new runs. Turn this off to update the chart silently."
+  The wording describes a gate, not a guarantee: even with the switch on, a
+  run that earns neither a verdict nor a placement says nothing, so copy
+  promising a toast per run would make correct behavior look broken.
 - The existing switch renamed **Score Threshold Verdict**; help text: "Judges
   each new run against the score threshold. The run notification then reports
   pass or fail." It stays in the Score Threshold group, beside the percentage
@@ -89,10 +92,14 @@ Default on because current behavior stays the default; a toggle nobody flips
 changes nothing.
 
 **The wiring.** One new `Input` on `generate_graph`; the flag threads into
-`_build_run_event_notification`, which returns `None` first thing when the
-switch is off. Gating inside that function keeps it the single place run
-toasts are born — the live and backlog paths both flow through it — and keeps
-the guard a pure-function behavior the existing test style covers directly.
+`_build_run_event_notification`. Under D1's recommended ruling (the switch
+silences the digest too), that function returns `None` first thing when the
+switch is off — it is the single place run toasts are born, the live and
+backlog paths both flow through it, and the guard stays a pure-function
+behavior the existing test style covers directly. If D1 is instead ruled no,
+the guard moves onto the live-run branch only and the backlog digest keeps
+firing; the wiring cost of either ruling is the same, so this paragraph is a
+recommendation contingent on D1, not settled guidance.
 
 **What off means.** Only the toast is suppressed. The plot still updates,
 scenario auto-switch still follows a new run, and every other toast family is
@@ -123,12 +130,12 @@ comment they resolve is removed.
 ## Delivery plan
 
 One implementation PR: the switch, the wiring and guard, the copy correction,
-tests, and the proposal-shipping documentation cleanup (decision-log
-distillation if the maintainer wants one, the architecture.md inspector
-sentence, the README run-notifications bullet, product.md, roadmap). No hard
-dependency on other in-flight work; the point customization implementation PR
-is a soft ordering dependency only, through the shared inspector layout
-function.
+tests, and the full proposal-shipping checklist from AGENTS.md — distilling
+the durable decisions into the decision log, updating the architecture.md
+inspector sentence and the README run-notifications bullet, product.md, and
+the roadmap, and deleting this file. No hard dependency on other in-flight
+work; the point customization implementation PR is a soft ordering dependency
+only, through the shared inspector layout function.
 
 ## Out of scope
 
@@ -153,8 +160,10 @@ function.
 
 - Unit tests beside the existing ones in `tests/test_home_run_events.py`:
   with the switch off, `_build_run_event_notification` returns `None` for all
-  three shapes — live threshold verdict, live placement, and backlog digest;
-  with it on, the existing tests already pin current behavior.
+  three shapes — live threshold verdict, live placement, and backlog digest
+  (the digest case assumes D1's recommended ruling; a no ruling flips its
+  expectation to a digest that still fires); with it on, the existing tests
+  already pin current behavior.
 - A callback-level case: `generate_graph` sends no notification and leaves
   the toast-lifetime counter untouched when run events fire with the switch
   off.
