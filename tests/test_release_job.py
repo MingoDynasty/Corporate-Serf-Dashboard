@@ -422,6 +422,33 @@ def test_empty_excluded_directory_entry_blocks_publication(
     assert any(f"carries excluded tree {excluded}" in problem for problem in problems)
 
 
+@pytest.mark.parametrize(
+    "required", [e for e in REQUIRED_ARCHIVE_ENTRIES if e.endswith("/")]
+)
+def test_bare_required_directory_entry_blocks_publication(
+    tmp_path: Path, required: str
+) -> None:
+    # An archive holding the directory entry but none of its files is empty,
+    # not present. A `/**` export-ignore rule produces exactly this shape.
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), drop=required, extra=[required]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"missing required entry {required}" in problem for problem in problems)
+
+
+def test_readme_doc_targets_are_all_required() -> None:
+    # A README link into docs/ that the contract does not name could be pruned
+    # from the archive alone: checkout-level doc tests would stay green while
+    # the shipped README's link breaks, permanently.
+    root = Path(__file__).resolve().parent.parent
+    readme = (root / "README.md").read_text(encoding="utf-8")
+    targets = {match.group(1) for match in re.finditer(r"\]\((docs/[^)\s]+)", readme)}
+    assert targets, "expected the README to link into docs/"
+    assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
+
+
 def test_contract_entries_exist_in_the_repository() -> None:
     # The contract is only as good as its spelling: a required entry naming a
     # path that no longer exists would pass forever.

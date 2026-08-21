@@ -78,12 +78,22 @@ Consequences and constraints:
   move that drops an install-critical path is undetected until someone's
   install fails, and immutability makes the bad asset permanent.
 - **Name the file when something opens it by name.** A directory entry in the
-  required set only asserts that the tree is non-empty, so it still passes
-  after the one member that mattered is renamed away. `source/app.py`,
-  `scripts/launch_bootstrap.ps1`, and `scripts/launcher.ps1` are therefore
-  required individually, because the launcher, the installer, and the
-  bootstrap each open them by name and abort without them. Directory entries
-  stay only where no single member is the dependency.
+  required set only asserts that the tree holds at least one file, so it still
+  passes after the one member that mattered is renamed away. Required
+  individually for that reason: `source/app.py`, `scripts/launch_bootstrap.ps1`,
+  and `scripts/launcher.ps1`, which the launcher, the installer, and the
+  bootstrap each open by name and abort without; and `docs/example.png`,
+  `docs/architecture.md`, `docs/product.md`, and `docs/roadmap.md`, which are
+  every relative target the shipped README opens. A test cross-checks that
+  README target set against the contract, so a new link into `docs/` cannot
+  quietly fall outside it. Only `assets/` and `resources/` remain directory
+  entries, where no single member is the dependency.
+- **A tree holding only its own directory entry is empty, not present.**
+  `git archive` emits an entry for each directory, and a `/**` export-ignore
+  rule leaves that entry behind after removing every file under it, so a
+  prefix match alone would accept an empty required tree. The check requires a
+  child path, and a regression test covers each required directory in that
+  shape.
 - **`export-ignore` is narrow, and `docs/` stays.** `/tests`, `/.idea`, and
   `/.github` are pruned. `docs/` ships because the shipped README embeds
   `docs/example.png` and links `docs/*.md`, so dropping it breaks the zip's own

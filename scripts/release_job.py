@@ -44,7 +44,7 @@ _BLOCKED_SUFFIX = ".md"
 # it.
 #
 # A path that some component opens by name is listed by name. A directory
-# entry is only ever a "this tree must be non-empty" check, so it would still
+# entry only asserts that the tree holds at least one file, so it would still
 # pass after the one file that mattered was renamed away -- use it only where
 # no single member is the dependency.
 REQUIRED_ARCHIVE_ENTRIES = (
@@ -53,7 +53,10 @@ REQUIRED_ARCHIVE_ENTRIES = (
     "resources/",  # the bundled benchmark library, scanned in full at startup
     "scripts/launch_bootstrap.ps1",  # install.ps1 copies it to launch.ps1
     "scripts/launcher.ps1",  # what that bootstrap then runs
-    "docs/",  # the shipped README links relatively into it
+    "docs/example.png",  # the shipped README embeds it
+    "docs/architecture.md",  # the shipped README links it
+    "docs/product.md",  # the shipped README links it
+    "docs/roadmap.md",  # the shipped README links it
     "install.ps1",  # the manual-install entry point README documents
     "pyproject.toml",  # dependency and uv pins the installer syncs against
     "uv.lock",  # the locked resolution `uv sync --locked` requires
@@ -243,8 +246,12 @@ def _contents_problems(archive_name: str, names: Sequence[str], tag: str) -> lis
     problems: list[str] = []
     for entry in REQUIRED_ARCHIVE_ENTRIES:
         wanted = f"{prefix}{entry}"
+        # `name != wanted` matters for a directory: git archive emits an entry
+        # for the directory itself, and a `/**` export-ignore rule leaves that
+        # entry behind after removing every file under it. A tree that holds
+        # only its own directory entry is empty, not present.
         present = (
-            any(name.startswith(wanted) for name in names)
+            any(name.startswith(wanted) and name != wanted for name in names)
             if entry.endswith("/")
             else wanted in names
         )
