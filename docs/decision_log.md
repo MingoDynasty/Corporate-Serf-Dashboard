@@ -13,6 +13,96 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-21: Release Integrity Rests On GitHub Digests And An Enforced Archive Contract
+
+Status: Accepted
+
+The first thing a new visitor asks about a downloadable Windows app is whether
+it is safe to run, and the release page is where that gets answered. This
+project relies on the SHA-256 digest GitHub publishes for every uploaded asset,
+together with releases that can never be changed, rather than shipping a
+checksum file of its own. The release page now opens with a short header saying
+what those guarantees are and which download to take, and CI now proves
+byte-for-byte that the uploaded assets are the ones it built. The release zip
+also stopped carrying development-only files that an installed copy cannot use,
+and a new pre-publish check fails the draft if the zip ever loses a file an
+install needs.
+
+Decision: no custom `SHA256SUMS.txt`, no hash duplicated into the release
+notes, and no launcher-side hash verification at launch. Integrity rests on
+GitHub's per-asset digests plus immutable releases, which this repo already has
+enabled — see
+[Releases And Their Assets Are Immutable](#2026-07-19-releases-and-their-assets-are-immutable),
+which this entry extends rather than restates. Alongside that: the release page
+gets a curated header, `.gitattributes` prunes development-only trees from the
+archive, and `validate_release` enforces an archive contents contract before
+publication.
+
+Why: at this audience size the marginal security of a project-published hash
+over a platform-published one is zero, and both are downloaded over the same
+HTTPS connection from the same host. GitHub's digests are visible on the
+release page, are computed by GitHub on receipt, and cannot change afterward
+because the release is immutable. Both of our assets additionally carry a
+GitHub-signed release attestation, retrievable at
+`repos/.../attestations/sha256:<digest>` — supporting evidence for this
+decision, deliberately not surfaced in user-facing copy, because attestation
+commands are not something a general user should be asked to run.
+
+Rejected alternatives:
+
+- **A custom `SHA256SUMS.txt` asset.** Redundant with digests GitHub already
+  publishes and signs, and it would be permanent release machinery — generated,
+  validated, and maintained on every release — bought for no added security.
+  It also invites the copy failure this entry avoids: a hash pasted into the
+  notes reads as proof of trustworthiness rather than of byte integrity.
+- **Launcher-side hash verification at launch.** It touches the frozen update
+  contract, the named-asset/source-archive fallback, and failure behavior all
+  at once. The launcher already validates `release.json`'s identity fields and
+  health-gates promotion on the SHA carried in `version.txt`, so the marginal
+  gain is small. Deferred until evidence demands it, consistent with the
+  deferral already recorded in the 2026-07-19 immutability entry.
+
+Consequences and constraints:
+
+- **Digests cover uploaded assets only.** Every release page also shows
+  GitHub's auto-generated "Source code (zip / tar.gz)" downloads, which have no
+  digest. Copy must never claim digests for "every download", and must never
+  say "verified safe" or "secure download" — a digest proves byte integrity,
+  not trustworthiness.
+- **The archive is a contract, and it is enforced.** `validate_release` rejects
+  the draft unless the zip carries every entry in `REQUIRED_ARCHIVE_ENTRIES`
+  and none of `EXCLUDED_ARCHIVE_TREES`. The required set covers installation,
+  runtime, legal, and self-documentation needs rather than only files read by
+  code, and it is deliberately not a snapshot of the whole tree: each entry is
+  listed with what reads it. Without this, a `.gitattributes` edit or a file
+  move that drops an install-critical path is undetected until someone's
+  install fails, and immutability makes the bad asset permanent.
+- **`export-ignore` is narrow, and `docs/` stays.** `/tests`, `/.idea`, and
+  `/.github` are pruned. `docs/` ships because the shipped README embeds
+  `docs/example.png` and links `docs/*.md`, so dropping it breaks the zip's own
+  front page for the manual-install reader. `resources/`, `scripts/`,
+  `install.ps1`, and `version.txt` must ship for the app, the installer, the
+  launcher, and build identity respectively.
+- **Use the anchored directory form.** Tested on git 2.55: `/tests`, `tests`,
+  and `tests/` all prune the directory entirely, while `/tests/**` removes the
+  files and leaves an empty `tests/` directory entry in the zip. The contract
+  treats an empty excluded directory as still shipped, so the two rules agree.
+- **`export-ignore` also prunes GitHub's source archive.** The
+  `archive/<sha>.zip` download changes the same way. That is intended, and it
+  matters because that archive is the launcher's documented fallback when the
+  named asset is missing, and because the CI stamp job downloads it.
+- **The digest check is a build-versus-upload comparison, not a size check.**
+  It recomputes SHA-256 locally and requires equality, treats a null or missing
+  digest as a failure rather than a skip, and requires the release to carry
+  exactly the versioned zip and `release.json` — a resumed draft keeps any
+  asset `--clobber` never replaced. It subsumes the size comparison it
+  replaced.
+- **Blocking a release and shipping a file are separate lists.**
+  `_BLOCKED_DIRECTORIES` in `scripts/release_job.py` decides whether a push cuts
+  a release; `.gitattributes` decides what the zip carries. `docs/` is on the
+  first and not the second — see
+  [PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once](#2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once).
+
 ## 2026-08-14: The Listen Address Is Configurable, Loopback By Default
 
 Status: Accepted
@@ -872,10 +962,13 @@ Consequences and constraints:
   `pyproject.toml` and not a configured project tool, but it stays in the lock
   under `datamodel-code-generator` and is installed in `.venv` — see
   [Consolidate Formatting And Linting On Ruff](#2026-07-03-consolidate-formatting-and-linting-on-ruff).
-- **Blocking is about triggering, not shipping.** `.gitattributes` sets no
-  `export-ignore`, so `.idea/` still travels inside the release zip. That
-  matches `docs/` and `tests/`, which are likewise blocked from triggering a
-  release while still shipping.
+- **Blocking is about triggering, not shipping.** The two lists are separate:
+  `_BLOCKED_DIRECTORIES` decides whether a push cuts a release, while
+  `.gitattributes` decides what the release zip carries. `.idea/` is now on
+  both — it neither triggers a release nor ships in one, per
+  [Release Integrity Rests On GitHub Digests And An Enforced Archive Contract](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract).
+  `docs/` still shows the split as it was: blocked from triggering, but
+  shipped, because the zip's own README links into it.
 
 ## 2026-08-03: Home's Controls Row Measures The Content Area, Not The Window
 
