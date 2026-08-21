@@ -2,11 +2,14 @@ import io
 import json
 import re
 import zipfile
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
 
 from scripts.release_job import (
+    EXCLUDED_ARCHIVE_TREES,
+    REQUIRED_ARCHIVE_ENTRIES,
     archive_prefix,
     build_release_metadata,
     main,
@@ -33,10 +36,35 @@ def _stamp(sha: str = SHA, commit_date: str = COMMIT_DATE) -> str:
     )
 
 
-def _write_archive(path: Path, stamp: str, tag: str = TAG) -> Path:
+def _conforming_entries(stamp: str) -> dict[str, str]:
+    """The smallest set of members that satisfies the archive contract."""
+    entries = {"version.txt": stamp}
+    for entry in REQUIRED_ARCHIVE_ENTRIES:
+        if entry == "version.txt":
+            continue
+        entries[f"{entry}placeholder" if entry.endswith("/") else entry] = "x\n"
+    return entries
+
+
+def _write_archive(
+    path: Path,
+    stamp: str,
+    tag: str = TAG,
+    *,
+    drop: str | None = None,
+    extra: Sequence[str] = (),
+) -> Path:
+    """Write a conforming archive, minus `drop`, plus any `extra` members."""
+    entries = {
+        name: body
+        for name, body in _conforming_entries(stamp).items()
+        if drop is None or not name.startswith(drop)
+    }
     with zipfile.ZipFile(path, "w") as bundle:
-        bundle.writestr(f"{archive_prefix(tag)}version.txt", stamp)
-        bundle.writestr(f"{archive_prefix(tag)}source/app.py", "print('hi')\n")
+        for name, body in entries.items():
+            bundle.writestr(f"{archive_prefix(tag)}{name}", body)
+        for name in extra:
+            bundle.writestr(f"{archive_prefix(tag)}{name}", "")
     return path
 
 
@@ -352,6 +380,57 @@ def test_unreadable_metadata_blocks_publication(tmp_path: Path) -> None:
     metadata.write_text("{not json", encoding="utf-8")
     problems = _problems(archive, metadata)
     assert any("could not be read as JSON" in problem for problem in problems)
+
+
+# --- archive contract -------------------------------------------------------
+
+
+@pytest.mark.parametrize("required", REQUIRED_ARCHIVE_ENTRIES)
+def test_missing_required_entry_blocks_publication(
+    tmp_path: Path, required: str
+) -> None:
+    # A `.gitattributes` edit or a file move that drops an install-critical
+    # path must fail the draft: publication is irreversible.
+    archive = _write_archive(tmp_path / source_asset_name(TAG), _stamp(), drop=required)
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"missing required entry {required}" in problem for problem in problems)
+
+
+@pytest.mark.parametrize("excluded", EXCLUDED_ARCHIVE_TREES)
+def test_excluded_tree_blocks_publication(tmp_path: Path, excluded: str) -> None:
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), extra=[f"{excluded}thing.txt"]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"carries excluded tree {excluded}" in problem for problem in problems)
+
+
+@pytest.mark.parametrize("excluded", EXCLUDED_ARCHIVE_TREES)
+def test_empty_excluded_directory_entry_blocks_publication(
+    tmp_path: Path, excluded: str
+) -> None:
+    # git archive emits directory entries, and the `/tests/**` pattern form
+    # leaves the directory behind after removing its files. An empty tree is
+    # still a shipped tree.
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), extra=[excluded]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"carries excluded tree {excluded}" in problem for problem in problems)
+
+
+def test_contract_entries_exist_in_the_repository() -> None:
+    # The contract is only as good as its spelling: a required entry naming a
+    # path that no longer exists would pass forever.
+    root = Path(__file__).resolve().parent.parent
+    for entry in REQUIRED_ARCHIVE_ENTRIES:
+        target = root / entry
+        assert target.is_dir() if entry.endswith("/") else target.is_file(), entry
+    for tree in EXCLUDED_ARCHIVE_TREES:
+        assert (root / tree).is_dir(), tree
 
 
 # --- command line ---------------------------------------------------------

@@ -36,6 +36,33 @@ _BLOCKED_DIRECTORIES = ("docs/", "tests/", ".github/", ".idea/")
 _BLOCKED_FILES = (".gitignore", ".pre-commit-config.yaml")
 _BLOCKED_SUFFIX = ".md"
 
+# What the release zip must carry, and what it must not. Publication is
+# irreversible, so a `.gitattributes` edit or a file move that silently drops
+# an install-critical path has to fail the draft rather than surface as
+# someone's broken install. Trailing slashes mark directories. Deliberately
+# not a snapshot of today's tree: every entry is here because something reads
+# it.
+REQUIRED_ARCHIVE_ENTRIES = (
+    "source/",  # the application itself
+    "assets/",  # Dash's static asset directory, served at runtime
+    "resources/",  # the bundled benchmark library, scanned in full at startup
+    "scripts/",  # install.ps1 reads scripts/launch_bootstrap.ps1; launcher.ps1
+    "docs/",  # the shipped README links relatively into it
+    "install.ps1",  # the manual-install entry point README documents
+    "pyproject.toml",  # dependency and uv pins the installer syncs against
+    "uv.lock",  # the locked resolution `uv sync --locked` requires
+    ".python-version",  # the interpreter the installer provisions
+    "version.txt",  # the export-subst build identity
+    "example.toml",  # the template config.toml is copied from
+    "LICENSE",  # the terms the copy is distributed under
+    "README.md",  # the zip's own front page
+)
+
+# Development-only trees pruned by `.gitattributes`. They must be absent
+# outright: git archive emits directory entries, so a pattern that drops the
+# files but keeps an empty directory has not done the job.
+EXCLUDED_ARCHIVE_TREES = ("tests/", ".idea/", ".github/")
+
 _TAG_PATTERN = re.compile(r"^v(?P<date>\d{4}\.\d{2}\.\d{2})(?:\.(?P<serial>\d+))?$")
 _DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _EXACT_PIN_PATTERN = re.compile(r"^==\s*(?P<version>[0-9][^\s,;]*)$")
@@ -185,16 +212,44 @@ def _stamp_problems(stamp: str, sha: str, commit_date: str) -> list[str]:
     return problems
 
 
-def _read_stamp(archive: Path, tag: str) -> tuple[str | None, list[str]]:
-    """Read `version.txt` out of the built archive."""
+def _read_archive(
+    archive: Path, tag: str
+) -> tuple[str | None, list[str] | None, list[str]]:
+    """Read the build stamp and the entry list out of the built archive.
+
+    A `None` entry list means the zip could not be opened at all, which is a
+    different failure from a zip that opened and turned out to be wrong.
+    """
     member = f"{archive_prefix(tag)}version.txt"
     try:
         with zipfile.ZipFile(archive) as bundle:
-            if member not in bundle.namelist():
-                return None, [f"{archive.name} has no {member}"]
-            return bundle.read(member).decode("utf-8"), []
+            names = bundle.namelist()
+            if member not in names:
+                return None, names, [f"{archive.name} has no {member}"]
+            return bundle.read(member).decode("utf-8"), names, []
     except (OSError, zipfile.BadZipFile, UnicodeDecodeError) as error:
-        return None, [f"{archive.name} could not be read as a zip: {error}"]
+        return None, None, [f"{archive.name} could not be read as a zip: {error}"]
+
+
+def _contents_problems(archive_name: str, names: Sequence[str], tag: str) -> list[str]:
+    """Check the built archive against the required/excluded entry contract."""
+    prefix = archive_prefix(tag)
+    problems: list[str] = []
+    for entry in REQUIRED_ARCHIVE_ENTRIES:
+        wanted = f"{prefix}{entry}"
+        present = (
+            any(name.startswith(wanted) for name in names)
+            if entry.endswith("/")
+            else wanted in names
+        )
+        if not present:
+            problems.append(f"{archive_name} is missing required entry {entry}")
+    problems.extend(
+        f"{archive_name} carries excluded tree {tree}"
+        for tree in EXCLUDED_ARCHIVE_TREES
+        if any(name.startswith(f"{prefix}{tree}") for name in names)
+    )
+    return problems
 
 
 def _metadata_problems(metadata_path: Path, expected: dict[str, object]) -> list[str]:
@@ -243,8 +298,10 @@ def validate_release(
         problems.append(
             f"archive is named {archive.name}, expected {source_asset_name(tag)}"
         )
-    stamp, stamp_problems = _read_stamp(archive, tag)
-    problems.extend(stamp_problems)
+    stamp, names, archive_problems = _read_archive(archive, tag)
+    problems.extend(archive_problems)
+    if names is not None:
+        problems.extend(_contents_problems(archive.name, names, tag))
     if stamp is not None:
         problems.extend(_stamp_problems(stamp, sha, commit_date))
     expected = build_release_metadata(
