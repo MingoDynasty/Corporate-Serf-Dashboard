@@ -187,10 +187,14 @@
     gap: calc(var(--mantine-spacing-xs) / 2);
 }
 
-/* Matches the size and weight Mantine gives every input label beside it. */
+/* Matches the field labels beside it: Mantine's own label size, and the bold
+   this stylesheet gives every `.mantine-InputWrapper-label` app-wide. A
+   segmented control has no label slot to inherit that rule, so it is restated
+   here -- stock Mantine's 500 would leave Point size lighter than the Point
+   color label directly under it. */
 .chart-options-field-label {
     font-size: var(--mantine-font-size-sm);
-    font-weight: 500;
+    font-weight: bold;
 }
 
 /* The disclosure chevron points down when the panel is closed and up when it
