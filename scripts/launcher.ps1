@@ -318,7 +318,7 @@ function Wait-AppReady($Process, [int]$Port, [string]$ExpectedSha, [string]$Toke
         $now = [DateTime]::UtcNow
         if ($now -ge $nextHeartbeat) {
             $elapsed = [int][Math]::Round(($now - $started).TotalSeconds)
-            Write-Host "Still starting Corporate Serf Dashboard. $elapsed seconds elapsed."
+            Write-Host "Still starting Corporate Serf Dashboard... $elapsed seconds elapsed."
             $heartbeatShown = $true
             $nextHeartbeat = $now.AddSeconds($heartbeatSec)
         }
