@@ -42,11 +42,17 @@ _BLOCKED_SUFFIX = ".md"
 # someone's broken install. Trailing slashes mark directories. Deliberately
 # not a snapshot of today's tree: every entry is here because something reads
 # it.
+#
+# A path that some component opens by name is listed by name. A directory
+# entry is only ever a "this tree must be non-empty" check, so it would still
+# pass after the one file that mattered was renamed away -- use it only where
+# no single member is the dependency.
 REQUIRED_ARCHIVE_ENTRIES = (
-    "source/",  # the application itself
+    "source/app.py",  # what launcher.ps1 hands the interpreter
     "assets/",  # Dash's static asset directory, served at runtime
     "resources/",  # the bundled benchmark library, scanned in full at startup
-    "scripts/",  # install.ps1 reads scripts/launch_bootstrap.ps1; launcher.ps1
+    "scripts/launch_bootstrap.ps1",  # install.ps1 copies it to launch.ps1
+    "scripts/launcher.ps1",  # what that bootstrap then runs
     "docs/",  # the shipped README links relatively into it
     "install.ps1",  # the manual-install entry point README documents
     "pyproject.toml",  # dependency and uv pins the installer syncs against

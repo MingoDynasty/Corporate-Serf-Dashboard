@@ -77,6 +77,13 @@ Consequences and constraints:
   listed with what reads it. Without this, a `.gitattributes` edit or a file
   move that drops an install-critical path is undetected until someone's
   install fails, and immutability makes the bad asset permanent.
+- **Name the file when something opens it by name.** A directory entry in the
+  required set only asserts that the tree is non-empty, so it still passes
+  after the one member that mattered is renamed away. `source/app.py`,
+  `scripts/launch_bootstrap.ps1`, and `scripts/launcher.ps1` are therefore
+  required individually, because the launcher, the installer, and the
+  bootstrap each open them by name and abort without them. Directory entries
+  stay only where no single member is the dependency.
 - **`export-ignore` is narrow, and `docs/` stays.** `/tests`, `/.idea`, and
   `/.github` are pruned. `docs/` ships because the shipped README embeds
   `docs/example.png` and links `docs/*.md`, so dropping it breaks the zip's own
