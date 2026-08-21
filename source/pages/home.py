@@ -102,7 +102,12 @@ SETTINGS_HELP_TEXT = {
         "the run against the personal best it was chasing."
     ),
     "score-threshold-notification": (
-        "Notifies after each new run whether it reached the score threshold."
+        "Adds a pass or fail verdict to run notifications when the run can be "
+        "judged against the score threshold. Needs Run Notifications turned on."
+    ),
+    "run-notification": (
+        "Controls the threshold, placement, and catch-up notifications for "
+        "your runs. Turn this off to update the chart silently."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "
@@ -982,14 +987,21 @@ def _build_backlog_notification(
     )
 
 
-def _build_run_event_notification(
+def _build_run_event_notification(  # noqa: PLR0913
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
     score_threshold_percentage: float | str | None,
     score_threshold_notification_switch: bool,
+    run_notification_switch: bool,
 ) -> dict[str, object] | None:
-    """Build the at-most-one toast a batch of run events earned."""
+    """Build the at-most-one toast a batch of run events earned.
+
+    The master switch is checked first, and so gates the whole family: the
+    live toast and the backlog digest are both born here.
+    """
+    if not run_notification_switch:
+        return None
     if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
         return None
 
@@ -1128,6 +1140,10 @@ def _build_scenario_figure(  # noqa: PLR0913
     Input("score-threshold-overlay-switch", "checked"),
     Input("score-threshold-percentage", "value"),
     Input("score-threshold-notification-switch", "checked"),
+    # State, not Input: this preference only decides whether a run event that
+    # already triggered the callback gets to toast. Flipping it must not
+    # rebuild the plot or reread the scenario's runs.
+    State("run-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
     State(TOAST_LIFETIME_STORE_ID, "data"),
 )
@@ -1144,6 +1160,7 @@ def generate_graph(  # noqa: PLR0913
     score_threshold_overlay_switch,
     score_threshold_percentage,
     score_threshold_notification_switch,
+    run_notification_switch,
     selected_playlist,
     toast_lifetime_sequence,
 ):
@@ -1157,6 +1174,8 @@ def generate_graph(  # noqa: PLR0913
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
     :param show_all_ranks_switch: show all ranks switch. True=draw the full
         ladder instead of the ranks bracketing the plotted scores.
+    :param run_notification_switch: run notifications master switch.
+        False=this run's toast is not built at all.
     :param selected_playlist: user-selected playlist code.
     :param toast_lifetime_sequence: this client's run-verdict emission counter.
     :return: Figure serialized to JSON, Notification, next emission counter
@@ -1217,6 +1236,7 @@ def generate_graph(  # noqa: PLR0913
                 top_n_scores,
                 score_threshold_percentage,
                 score_threshold_notification_switch,
+                run_notification_switch,
             )
             if run_verdict is not None:
                 notifications = upsert_toast(run_verdict, toast_lifetime_sequence)
@@ -1705,18 +1725,30 @@ def _chart_options_panel() -> dmc.Box:
                         # label and strand its help icon on the line above.
                         w="100%",
                     ),
-                    # The modal's wording, kept for now (2026-08-08): it reads
-                    # as though it gates run notifications wholesale, when
-                    # since the notification redesign it decides only whether
-                    # a run is judged against the threshold -- placement
-                    # toasts fire either way. Revisit with the rest of the
-                    # group's copy.
+                    # Stays in this group, beside the percentage it judges
+                    # against, even though the master switch it depends on
+                    # lives in Notifications.
                     dmc.Switch(
                         id="score-threshold-notification-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Score Threshold Notification",
+                            "Score Threshold Verdict",
                             SETTINGS_HELP_TEXT["score-threshold-notification"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                ],
+            ),
+            _chart_options_group(
+                "Notifications",
+                [
+                    dmc.Switch(
+                        id="run-notification-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Run Notifications",
+                            SETTINGS_HELP_TEXT["run-notification"],
                         ),
                         checked=True,
                         persistence=True,
