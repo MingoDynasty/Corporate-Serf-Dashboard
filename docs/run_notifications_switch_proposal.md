@@ -23,8 +23,11 @@ family as the live run toast: it shares the run-verdict toast id, it is built
 by the same function, and it reports the same kind of event. A person turning
 run notifications off is saying "do not toast me about runs"; a digest that
 survives the off switch would read as a bug, not a feature. The consequence
-is that the off switch is complete: with it off, no toast about a run ever
-appears, whether the run landed live or while the page was closed.
+is that the off switch is complete for the family it gates: with it off, no
+threshold, placement, or catch-up notification appears, whether the run
+landed live or while the page was closed. The separate red toast for a run
+file that could not be imported is error feedback, not run feedback, and
+stays on.
 
 Letting the digest survive the off switch was rejected. It would preserve a
 rare catch-up toast at the cost of a switch that is not quite off, and the
