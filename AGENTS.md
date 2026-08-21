@@ -173,6 +173,10 @@ block in Design, and the co-design review must explicitly address that block
 receives the block verbatim; a divergence is flagged in the PR description,
 never applied silently, and any string the proposal did not foresee is listed
 under "New copy" in the PR body so the reviewer checks it with the same eyes.
+The rule applies to proposals opened or materially edited after it landed. A
+proposal already in flight keeps its strings where they are, and its kickoff
+prompt gathers them into the Copy block the implementer receives — the same
+no-backfill convention the layer-1 summaries follow.
 
 ### Proposal template
 
