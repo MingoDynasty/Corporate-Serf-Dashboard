@@ -31,41 +31,13 @@ rare catch-up toast at the cost of a switch that is not quite off, and the
 planned run history work is the better durable place to catch up on runs
 that landed while the page was away.
 
-### D2 — Labels and help text
-
-Status: Open
-
-UI copy is a maintainer decision. Recommended wording (app copy, so short
-sentences and no em dashes):
-
-- New inspector group **Notifications**, holding the master switch.
-- Master switch label **Run Notifications**; help text: "Controls the
-  threshold, placement, and catch-up notifications for your runs. Turn this
-  off to update the chart silently." The wording names the three toast shapes
-  it gates rather than "all notifications", so it cannot be read to cover the
-  run-import failure toast, which stays on; and it describes a gate, not a
-  guarantee: even with the switch on, a run that earns neither a verdict nor a
-  placement says nothing.
-- The existing switch renamed **Score Threshold Verdict**; help text: "Adds a
-  pass or fail verdict to run notifications when the run can be judged
-  against the score threshold. Needs Run Notifications turned on." The first
-  sentence stays true when a run has no usable personal best (it is not
-  judged, and the copy only promises judging when it can be); the second
-  borrows the dependency phrasing the inspector already uses for Show all
-  ranks. It stays in the Score Threshold group, beside the percentage it
-  depends on.
-
-"Verdict" is already the app's word for what titles a run toast; the README
-and the code both use it. The consequence of choosing different wording is
-copy only — the wiring is identical.
-
----
-
 Also ratified by the maintainer in conversation (2026-08-20): the feature
 itself (a user-facing switch that can turn run toasts off), bundling the
 threshold-switch copy correction into the same implementation PR, and
-deferring app-wide notifications entirely (see Out of scope). D2 and the
-mechanical guidance below remain open to review challenge.
+deferring app-wide notifications entirely (see Out of scope). No product
+decisions remain open. The copy and the mechanical guidance in Design are
+author-owned and open to review challenge; the copy is gathered in one block
+there so the maintainer's redline pass has a single place to look.
 
 ## Problem
 
@@ -133,8 +105,32 @@ inserts its Run Data Points group between Overlays and Score Threshold; the
 two changes add distinct groups, so whichever implementation PR merges second
 rebases over a trivial textual conflict with no semantic interaction.
 
-**Copy correction.** The two strings in D2 change, and the 2026-08-08 code
-comment they resolve is removed.
+**Copy.** Every user-facing string this change adds or edits, in one place.
+All of it follows the house copy rules: short sentences, a period on anything
+with a subject and a verb, no em dashes.
+
+- New inspector group **Notifications**, holding the master switch.
+- Master switch label **Run Notifications**; help text: "Controls the
+  threshold, placement, and catch-up notifications for your runs. Turn this
+  off to update the chart silently." The wording names the three toast shapes
+  it gates rather than "all notifications", so it cannot be read to cover the
+  run-import failure toast, which stays on; and it describes a gate, not a
+  guarantee: even with the switch on, a run that earns neither a verdict nor a
+  placement says nothing.
+- The existing switch renamed **Score Threshold Verdict**; help text: "Adds a
+  pass or fail verdict to run notifications when the run can be judged
+  against the score threshold. Needs Run Notifications turned on." The first
+  sentence stays true when a run has no usable personal best (it is not
+  judged, and the copy only promises judging when it can be); the second
+  borrows the dependency phrasing the inspector already uses for Show all
+  ranks. It stays in the Score Threshold group, beside the percentage it
+  depends on.
+
+"Verdict" is already the app's word for what titles a run toast; the README
+and the code both use it. The 2026-08-08 code comment these strings resolve
+is removed with them. The toast bodies themselves are untouched here: their
+em dashes are inventoried by the pending all-messaging review and are fixed
+there, not folded into this change.
 
 ## Delivery plan
 
@@ -161,8 +157,8 @@ only, through the shared inspector layout function.
 - **Per-family notification preferences.** No toggles for import failures,
   rank-refresh feedback, or other toast families.
 - **The wider copy sweep.** The deferred all-messaging review of shipped
-  strings stays deferred; only the two strings named in D2 change.
-- **Toast content and mechanics.** No change to toast wording beyond D2, ids,
+  strings stays deferred; only the strings in the Design Copy block change.
+- **Toast content and mechanics.** No change to toast wording, ids,
   replacement semantics, or lifetimes.
 
 ## Testing
