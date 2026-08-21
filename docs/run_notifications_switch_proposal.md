@@ -5,12 +5,12 @@ Date: 2026-08-20
 
 ## TL;DR
 
-Every run the app notices produces a toast, and there is no way to turn that
-off. The one notification switch that exists controls only whether a run is
-judged against the score threshold, and its wording wrongly suggests it
-silences run toasts entirely. This proposal adds a single master switch to
-Chart options that turns all run toasts off, and corrects the misleading
-wording on the existing switch.
+The toasts the app shows about your runs cannot be turned off. The one
+notification switch that exists controls only whether a run is judged against
+the score threshold, and its wording wrongly suggests it silences run toasts
+entirely. This proposal adds a single master switch to Chart options that
+turns run toasts off, and corrects the misleading wording on the existing
+switch.
 
 ## Decisions needed
 
@@ -34,15 +34,21 @@ UI copy is a maintainer decision. Recommended wording (app copy, so short
 sentences and no em dashes):
 
 - New inspector group **Notifications**, holding the master switch.
-- Master switch label **Run Notifications**; help text: "Controls all
-  notifications about new runs. Turn this off to update the chart silently."
-  The wording describes a gate, not a guarantee: even with the switch on, a
-  run that earns neither a verdict nor a placement says nothing, so copy
-  promising a toast per run would make correct behavior look broken.
-- The existing switch renamed **Score Threshold Verdict**; help text: "Judges
-  each new run against the score threshold. The run notification then reports
-  pass or fail." It stays in the Score Threshold group, beside the percentage
-  it depends on.
+- Master switch label **Run Notifications**; help text: "Controls the
+  threshold, placement, and catch-up notifications for your runs. Turn this
+  off to update the chart silently." The wording names the three toast shapes
+  it gates rather than "all notifications", so it cannot be read to cover the
+  run-import failure toast, which stays on; and it describes a gate, not a
+  guarantee: even with the switch on, a run that earns neither a verdict nor a
+  placement says nothing. "Catch-up" follows D1; a no ruling drops that word.
+- The existing switch renamed **Score Threshold Verdict**; help text: "Adds a
+  pass or fail verdict to run notifications when the run can be judged
+  against the score threshold. Needs Run Notifications turned on." The first
+  sentence stays true when a run has no usable personal best (it is not
+  judged, and the copy only promises judging when it can be); the second
+  borrows the dependency phrasing the inspector already uses for Show all
+  ranks. It stays in the Score Threshold group, beside the percentage it
+  depends on.
 
 "Verdict" is already the app's word for what titles a run toast; the README
 and the code both use it. The consequence of choosing different wording is
@@ -91,15 +97,17 @@ options inspector, default on, `persistence=True` like every sibling control.
 Default on because current behavior stays the default; a toggle nobody flips
 changes nothing.
 
-**The wiring.** One new `Input` on `generate_graph`; the flag threads into
-`_build_run_event_notification`. Under D1's recommended ruling (the switch
-silences the digest too), that function returns `None` first thing when the
-switch is off — it is the single place run toasts are born, the live and
-backlog paths both flow through it, and the guard stays a pure-function
-behavior the existing test style covers directly. If D1 is instead ruled no,
-the guard moves onto the live-run branch only and the backlog digest keeps
-firing; the wiring cost of either ruling is the same, so this paragraph is a
-recommendation contingent on D1, not settled guidance.
+**The wiring.** The switch joins `generate_graph` as `State`, not `Input`:
+its value matters only when run events trigger the callback, and flipping a
+notification preference should not rebuild the graph or reread scenario data.
+The flag threads into `_build_run_event_notification`. Under D1's recommended
+ruling (the switch silences the digest too), that function returns `None`
+first thing when the switch is off — it is the single place run toasts are
+born, the live and backlog paths both flow through it, and the guard stays a
+pure-function behavior the existing test style covers directly. If D1 is
+instead ruled no, the guard moves onto the live-run branch only and the
+backlog digest keeps firing; the wiring cost of either ruling is the same, so
+this paragraph is a recommendation contingent on D1, not settled guidance.
 
 **What off means.** Only the toast is suppressed. The plot still updates,
 scenario auto-switch still follows a new run, and every other toast family is
