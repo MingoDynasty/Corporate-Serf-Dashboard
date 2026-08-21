@@ -295,15 +295,33 @@ function Wait-AppReady($Process, [int]$Port, [string]$ExpectedSha, [string]$Toke
     # unrelated service on the port can answer. Promotion requires the child
     # still alive AND the response carrying the expected full SHA and launch
     # token. Deliberately no tag check: an unpromoted build reports tag null.
-    $deadline = [DateTime]::UtcNow.AddSeconds($HealthTimeoutSec)
+    # A start this quick needs no narration, so the console stays silent until
+    # the wait passes the gate; from there an elapsed counter distinguishes a
+    # slow first-run scan from a hang.
+    $heartbeatSec = 5
+    $started = [DateTime]::UtcNow
+    $deadline = $started.AddSeconds($HealthTimeoutSec)
+    $nextHeartbeat = $started.AddSeconds($heartbeatSec)
+    $heartbeatShown = $false
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($Process.HasExited) { return 'exited' }
         try {
             $health = Invoke-RestMethod -UseBasicParsing -TimeoutSec 2 -Uri "http://${Address}:$Port/health"
             if ([string]$health.sha -eq $ExpectedSha -and [string]$health.launch_token -eq $Token) {
+                if ($heartbeatShown) {
+                    $elapsed = [int][Math]::Round(([DateTime]::UtcNow - $started).TotalSeconds)
+                    Write-Host "Corporate Serf Dashboard is ready after $elapsed seconds."
+                }
                 return 'ready'
             }
         } catch { }
+        $now = [DateTime]::UtcNow
+        if ($now -ge $nextHeartbeat) {
+            $elapsed = [int][Math]::Round(($now - $started).TotalSeconds)
+            Write-Host "Still starting Corporate Serf Dashboard. $elapsed seconds elapsed."
+            $heartbeatShown = $true
+            $nextHeartbeat = $now.AddSeconds($heartbeatSec)
+        }
         Start-Sleep -Milliseconds 500
     }
     return 'timeout'
