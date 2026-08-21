@@ -87,7 +87,7 @@ Rejected alternatives:
   guard sits at toast production wherever that later runs, and Dash
   persistence survives a same-id component move.
 
-Shipped in PR #243; design discussion in #240. Distilled from
+Shipped in PR #245; design discussion in #240. Distilled from
 `docs/run_notifications_switch_proposal.md`, now deleted.
 
 ## 2026-08-21: Release Integrity Rests On GitHub Digests And An Enforced Archive Contract
