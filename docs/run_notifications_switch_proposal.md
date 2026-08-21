@@ -16,15 +16,20 @@ switch.
 
 ### D1 — Does the master switch silence the backlog digest too?
 
-Status: Open
+Status: Ratified (2026-08-20)
 
-**Recommendation: yes.** The "While you were away" digest is the same
-notification family as the live run toast: it shares the run-verdict toast id,
-it is built by the same function, and it reports the same kind of event. A
-person turning run notifications off is saying "do not toast me about runs";
-a digest that survives the off switch would read as a bug, not a feature.
-Choosing differently would preserve a rare catch-up toast at the cost of an
-off switch that is not quite off.
+**Decision: yes.** The "While you were away" digest is the same notification
+family as the live run toast: it shares the run-verdict toast id, it is built
+by the same function, and it reports the same kind of event. A person turning
+run notifications off is saying "do not toast me about runs"; a digest that
+survives the off switch would read as a bug, not a feature. The consequence
+is that the off switch is complete: with it off, no toast about a run ever
+appears, whether the run landed live or while the page was closed.
+
+Letting the digest survive the off switch was rejected. It would preserve a
+rare catch-up toast at the cost of a switch that is not quite off, and the
+planned run history work is the better durable place to catch up on runs
+that landed while the page was away.
 
 ### D2 — Labels and help text
 
@@ -40,7 +45,7 @@ sentences and no em dashes):
   it gates rather than "all notifications", so it cannot be read to cover the
   run-import failure toast, which stays on; and it describes a gate, not a
   guarantee: even with the switch on, a run that earns neither a verdict nor a
-  placement says nothing. "Catch-up" follows D1; a no ruling drops that word.
+  placement says nothing.
 - The existing switch renamed **Score Threshold Verdict**; help text: "Adds a
   pass or fail verdict to run notifications when the run can be judged
   against the score threshold. Needs Run Notifications turned on." The first
@@ -56,12 +61,11 @@ copy only — the wiring is identical.
 
 ---
 
-Ratified by the maintainer in conversation (2026-08-20): the feature itself
-(a user-facing switch that can turn run toasts off), bundling the
+Also ratified by the maintainer in conversation (2026-08-20): the feature
+itself (a user-facing switch that can turn run toasts off), bundling the
 threshold-switch copy correction into the same implementation PR, and
-deferring app-wide notifications entirely (see Out of scope). Everything
-else, including the recommendations above and the mechanical guidance below,
-is open to review challenge.
+deferring app-wide notifications entirely (see Out of scope). D2 and the
+mechanical guidance below remain open to review challenge.
 
 ## Problem
 
@@ -100,14 +104,11 @@ changes nothing.
 **The wiring.** The switch joins `generate_graph` as `State`, not `Input`:
 its value matters only when run events trigger the callback, and flipping a
 notification preference should not rebuild the graph or reread scenario data.
-The flag threads into `_build_run_event_notification`. Under D1's recommended
-ruling (the switch silences the digest too), that function returns `None`
-first thing when the switch is off — it is the single place run toasts are
-born, the live and backlog paths both flow through it, and the guard stays a
-pure-function behavior the existing test style covers directly. If D1 is
-instead ruled no, the guard moves onto the live-run branch only and the
-backlog digest keeps firing; the wiring cost of either ruling is the same, so
-this paragraph is a recommendation contingent on D1, not settled guidance.
+The flag threads into `_build_run_event_notification`, which returns `None`
+first thing when the switch is off. That function is the single place run
+toasts are born — the live and backlog paths both flow through it, which is
+what makes D1's ruling one guard rather than two — and the guard stays a
+pure-function behavior the existing test style covers directly.
 
 **What off means.** Only the toast is suppressed. The plot still updates,
 scenario auto-switch still follows a new run, and every other toast family is
@@ -168,10 +169,8 @@ only, through the shared inspector layout function.
 
 - Unit tests beside the existing ones in `tests/test_home_run_events.py`:
   with the switch off, `_build_run_event_notification` returns `None` for all
-  three shapes — live threshold verdict, live placement, and backlog digest
-  (the digest case assumes D1's recommended ruling; a no ruling flips its
-  expectation to a digest that still fires); with it on, the existing tests
-  already pin current behavior.
+  three shapes — live threshold verdict, live placement, and backlog digest;
+  with it on, the existing tests already pin current behavior.
 - A callback-level case: `generate_graph` sends no notification and leaves
   the toast-lifetime counter untouched when run events fire with the switch
   off.
