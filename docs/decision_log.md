@@ -38,7 +38,7 @@ look first" table carries the same pointer.
 The pass: five specs, five PRs, each authored by a Fable session and reviewed
 by a fresh Fable session plus Codex, in dependency order —
 
-- `notifications.md` (this PR; also carries this entry and the rule change),
+- `notifications.md` (PR #249; also carries this entry and the rule change),
 - `settings.md` (after notifications: its in-place statuses cite the routing
   policy),
 - `scenario_performance.md` (after settings: the Chart options switches'
