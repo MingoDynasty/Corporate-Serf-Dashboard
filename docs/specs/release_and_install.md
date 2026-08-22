@@ -144,7 +144,8 @@ lines quoted here are plain console output, not app notifications.
   `config.toml` and `data/` are never touched ("Keeping the existing
   config.toml."). The file is then round-tripped through the installed
   app's own `load_config()` with `CSD_STATE_DIR` set to the root, and a
-  failure stops the install before the manifest or shortcut exist
+  failure stops the install before the manifest or shortcut are written
+  or replaced
   ([2026-07-19](../decision_log.md#2026-07-19-the-installer-brings-its-own-toolchain-app-locally),
   port:
   [2026-07-19](../decision_log.md#2026-07-19-default-port-is-8050-not-8080)).
@@ -310,8 +311,8 @@ lines quoted here are plain console output, not app notifications.
 - Identity surfaces as the startup log line `Build <short sha> (<date>),
   <label>` in `debug.log`, in `/health`, and on the Settings page as
   "Version <label>" and "Commit <short sha> (<date>)"; the Dash app title
-  carries the tag only when one is known. The Settings section is the
-  settings spec's
+  carries the tag only when one is known. The Settings page section's own
+  rules are set by
   ([2026-08-02](../decision_log.md#2026-08-02-the-settings-page-owns-version-display)).
 
 ## State root
@@ -321,8 +322,7 @@ lines quoted here are plain console output, not app notifications.
   around the endpoint read and for the app process, and clears it after
   each. In an installed copy the state root is therefore the install root:
   `config.toml`, `install.json`, and `data/` sit beside `versions/`. Unset
-  means the working directory, and what the root holds is the settings
-  spec's
+  means the working directory; what the root holds is set by
   ([2026-07-19](../decision_log.md#2026-07-19-all-mutable-state-lives-under-an-explicit-state-root)).
 
 ## Schema migration shipping
@@ -333,6 +333,5 @@ lines quoted here are plain console output, not app notifications.
   with the release's own `.venv\Scripts\python.exe`, relaunch. It resolves
   the state root from `--state-dir`, then `CSD_STATE_DIR`, then the install
   root inferred from a `versions/<tag>/scripts` shape with `install.json`
-  above it, then the working directory. The store contract is the settings
-  spec's
+  above it, then the working directory. The store contract is set by
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
