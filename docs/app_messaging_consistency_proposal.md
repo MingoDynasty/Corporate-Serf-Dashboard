@@ -14,8 +14,9 @@ implementation PR so the app reads as if one person wrote it.
 
 ## Decisions needed
 
-Four product rulings. Everything else in this proposal is author-owned copy,
-gathered in the Design section's Copy block for the maintainer's redline pass.
+Four product rulings and one workflow ruling. Everything else in this
+proposal is author-owned copy, gathered in the Design section's Copy block
+for the maintainer's redline pass.
 
 ### D1 — Shape of the Scenario Stats Position hint
 
@@ -125,10 +126,36 @@ has a personality, and the product's name suggests it wants one.
 grinding..." becomes "Keep grinding…" with the single ellipsis character, so
 the app has one ellipsis form. The other two are already correct sentences.
 
+Decide this with the launch visual in mind, not only the running app: the
+launch prep notes want the announcement post to lead with a clip of a run
+landing and its notification, so whichever way D4 goes, a run toast is the
+first copy a cold reader sees.
+
 Choosing differently: dropping them makes the run toasts strictly factual.
 That is cleaner but colder, and the 2026-08-03 notification policy already
 files run toasts under "achievement / coaching", so the flourishes are in
 policy.
+
+### D5 — Does the sweep gate the launch post?
+
+Status: Open
+
+The launch prep notes plan an announcement post led by a clip of a new run
+updating the chart and its notification, with the leaderboard standing in
+view. Both surfaces carry strings this proposal changes: the run-toast body
+is an em-dash site, and the Position hint is D1. The same notes record that
+"was this AI-written" was the first community question on a comparable
+launch, and the no-em-dash ruling exists because the old copy reads that way.
+
+**Recommendation: yes.** The implementation PR lands before the release the
+post promotes, and the launch prep notes' pre-post checklist carries it as an
+item. The cost is one more PR in front of the post; the sweep is a day of
+mechanical work once the Copy block is ratified.
+
+Choosing differently: the post's visual shows the old copy, and the rules
+govern only strings written after launch. The app would be answering the
+authorship question beside a screenshot of the copy the rule was written
+against.
 
 ## Problem
 
@@ -190,7 +217,10 @@ Why now: the no-em-dash ruling explicitly deferred the shipped-copy sweep to
 it touched, and the last three feature PRs have each shipped copy in the new
 style beside old copy in the old one. The longer the sweep waits, the more
 the review tail of every PR spends on per-line style questions that one
-ruling would settle.
+ruling would settle. There is also a concrete deadline: the launch prep notes
+plan an announcement post whose lead visual is a run toast beside the
+Scenario Stats block, so the promoted release is the copy a cold reader
+judges the app by (D5).
 
 ## Design
 
@@ -500,6 +530,12 @@ review territory, not a gate.
 - The Aim Training Journey page beyond its banner and one label; its polish
   is a separate roadmap item.
 - Any new string. This is a sweep; it adds no surface.
+- Network and privacy wording. Checked 2026-08-21 against the launch prep
+  notes' enumeration of what the app talks to: every in-app string that makes
+  a network claim (the username description, the setup card's fine print, the
+  Detect hint, the Refresh tooltip, the import help) agrees with it, and none
+  carries the enumeration itself. The "What it talks to" statement stays a
+  README job, and its same-PR maintenance rule does not reach app copy.
 
 ## Testing
 
@@ -519,7 +555,7 @@ review territory, not a gate.
 
 ## Delivery plan
 
-1. **This PR**: the proposal. Nothing ships until D1 to D4 are ruled and the
+1. **This PR**: the proposal. Nothing ships until D1 to D5 are ruled and the
    Copy block has had its redline pass.
 2. **One implementation PR**, after ratification, from a kickoff prompt that
    hands the implementer the ratified Copy block verbatim. One PR rather than
@@ -533,4 +569,6 @@ review territory, not a gate.
    strings change, the `tech_debt.md` edit for the refresh-toast title, a
    `product.md` line, and the deletion of this file. No capability spec
    covers app copy and this does not justify creating one. No hard
-   dependency on other in-flight work.
+   dependency on other in-flight work. Under D5 it is sequenced before the
+   release the announcement post promotes, and the shipping PR ticks the
+   matching item off the launch prep notes' pre-post checklist.
