@@ -13,6 +13,53 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-21: The Empty Point Color Is Called Default And Previews The Generated Color
+
+Status: Accepted
+
+The Point color field's empty state now reads Default instead of Automatic,
+and its reset button reads Use default. Automatic suggested a Manual mode that
+never existed, and Default is the word the Point size control beside it
+already uses. The small preview swatch beside an empty field used to be plain
+white while the graph drew the points in an indigo blue; it now shows the
+color the graph actually uses.
+
+Decision: the first change is copy only. The stored value is unchanged: an
+empty `point-color` still means the generated color, under the same persisted
+id, so nothing a browser already saved is discarded. `POINT_COLOR_AUTOMATIC`
+became `POINT_COLOR_DEFAULT`, and the reset button's id `point-color-default`.
+
+**Where the generated color comes from.** The 2026-08-20 entry says an empty
+color keeps whatever Plotly and the Mantine template give it. Verified now:
+the Mantine template's colorway never reaches the run points. `px.scatter`
+writes the first colorway entry of Plotly's default template, `#636efa`, into
+the trace's `marker.color` when the figure is generated, and the
+`update_layout(template=...)` applied afterwards never overrides a property
+the trace already sets. The points are therefore `#636efa` in both themes,
+where `mantine_light` and `mantine_dark` would have given `#228be6` and
+`#1971c2`. `plot_service.RUN_DATA_POINT_DEFAULT_COLOR` pins the value, and
+`tests/test_home_point_appearance.py` holds it to what generation actually
+produces in both graph modes and both themes, so a change to the default
+template or to figure generation fails loudly instead of desynchronizing the
+swatch.
+
+**How the swatch shows it.** Mantine's `ColorInput` renders its preview as a
+`ColorSwatch` whose color is the value when valid and a hardcoded `#fff`
+otherwise, as an inline style. Home sets `--point-color-default` on the field
+from the constant, and a stylesheet rule scoped to
+`.point-color-field:has(input:placeholder-shown)` repaints the swatch's color
+overlay from it with `!important`, the only way past an inline style. A typed
+or picked color hides the placeholder, and the rule with it, so Mantine's own
+preview of that color takes over. Alternatives rejected: **storing `#636efa`
+as the layout value**, which moves a persisted default (discarding stored
+values) and turns the generated color into a chosen one; **replacing the
+preview through `leftSection`** with a swatch kept in sync by a callback, a
+round trip per keystroke to do what one CSS rule does.
+
+Not changed: the generated color itself. Making the points follow the Mantine
+colorway would be a visible change to every chart and a separate product
+decision.
+
 ## 2026-08-20: Run Points Get A Size Preset And A Color, And The Chart Stops There
 
 Status: Accepted
@@ -126,6 +173,8 @@ Design in [#238](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/2
 implementation in [#241](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/241).
 The panel this group joined is the
 [2026-08-09 chart options entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph).
+The Automatic wording and the empty field's white preview swatch were revised
+the next day; see the [2026-08-21 entry](#2026-08-21-the-empty-point-color-is-called-default-and-previews-the-generated-color).
 
 ## 2026-08-14: The Listen Address Is Configurable, Loopback By Default
 
