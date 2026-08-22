@@ -562,6 +562,7 @@ flowchart LR
 
 | To change... | Start in |
 | --- | --- |
+| What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
 | The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |

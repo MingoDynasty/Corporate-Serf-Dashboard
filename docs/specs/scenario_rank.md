@@ -168,9 +168,11 @@ benchmark tier) — see the
   refresh Timer) moves the cache on, the interval reads a different value and
   the hint is retired rather than left contradicting a position that has
   since arrived.
-- Manual Refresh answers with a toast whatever happens — the user asked for
-  it — and all four outcomes come off the callback's own notification
-  output. A hard failure (an `error_message` result or a raised exception) is
+- With a scenario selected, Manual Refresh answers with a toast whatever
+  happens — the user asked for it — and all four outcomes come off the
+  callback's own notification output; with none selected the click sets the
+  field to `N/A` and toasts nothing. A hard failure (an `error_message`
+  result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
   position unchanged." is true whether a cached position was on screen or
@@ -186,7 +188,9 @@ benchmark tier) — see the
   Only a genuinely fresh result gets the green confirmation, titled "Position
   refreshed". The green confirmation and the blue unset-username notice both
   keep a fresh id per click so back-to-back refreshes each answer; they are
-  the two instances of the same named exception to the stable-id rule
+  the two instances of the same named exception to the stable-id rule. The
+  red and yellow outcomes keep their stable ids, so a repeat of the same
+  failure while its toast is still up is deduped and shows nothing new
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
