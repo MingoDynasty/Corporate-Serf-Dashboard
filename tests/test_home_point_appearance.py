@@ -8,7 +8,9 @@ fallbacks that keep an unrecognized preference from breaking the graph.
 """
 
 import json
+import re
 from datetime import datetime
+from pathlib import Path
 
 import dash
 import dash_mantine_components as dmc
@@ -27,9 +29,11 @@ from source.plot.plot_service import (  # noqa: E402
     apply_light_dark_mode,
     generate_sensitivity_plot,
     generate_time_plot,
+    generated_point_color,
 )
 
 APPEARANCE_INPUT_IDS = {home.POINT_SIZE_INPUT_ID, home.POINT_COLOR_INPUT_ID}
+STYLESHEET = Path(__file__).resolve().parents[1] / "assets" / "stylesheet.css"
 
 
 def _walk_components(component):
@@ -95,7 +99,10 @@ def test_run_data_points_group_sits_between_overlays_and_score_threshold(compone
         if isinstance(component, dmc.Title)
     ]
 
-    assert titles == ["Overlays", "Run Data Points", "Score Threshold"]
+    # A trailing Notifications group now follows Score Threshold, so this pins
+    # the order these three hold at the front of the panel rather than the
+    # panel's entire group list.
+    assert titles[:3] == ["Overlays", "Run Data Points", "Score Threshold"]
 
 
 def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
@@ -114,8 +121,61 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
 
     assert color.value == ""
     assert color.label == "Point color"
-    assert color.placeholder == "Automatic"
+    assert color.placeholder == "Default"
     assert color.persistence is True
+
+    assert components[home.POINT_COLOR_DEFAULT_ID].children == "Use default"
+
+
+def test_empty_point_color_field_previews_the_generated_color(components):
+    # Mantine paints the preview of an empty ColorInput white, so the field
+    # carries each theme's generated color as a custom property and the
+    # stylesheet repaints the swatch from the active theme's while the
+    # placeholder shows. The Python side names the hooks; this holds the CSS
+    # to the same names.
+    field = next(
+        component
+        for component in _walk_components(components[home.CHART_OPTIONS_PANEL_ID])
+        if home.POINT_COLOR_FIELD_CLASS in getattr(component, "className", "")
+    )
+
+    assert home.POINT_COLOR_INPUT_ID in [
+        getattr(child, "id", None) for child in field.children
+    ]
+    assert field.style == {
+        "--point-color-default-light": generated_point_color("light"),
+        "--point-color-default-dark": generated_point_color("dark"),
+    }
+
+    css = re.sub(r"\s+", " ", STYLESHEET.read_text(encoding="utf-8"))
+    swatch = (
+        f".{home.POINT_COLOR_FIELD_CLASS}:has(input:placeholder-shown)"
+        " .mantine-ColorInput-colorPreview .mantine-ColorSwatch-colorOverlay"
+    )
+    assert (
+        f"{swatch} {{ background-color: var(--point-color-default-light) !important; }}"
+        in css
+    )
+    assert (
+        f':root[data-mantine-color-scheme="dark"] {swatch}'
+        " { background-color: var(--point-color-default-dark) !important; }"
+    ) in css
+
+
+def test_generated_run_points_take_the_theme_template_colorway(cached_plot):
+    # The run trace is the figure's first and carries no color of its own, so
+    # Plotly draws it in the first colorway entry of whichever template the
+    # theme applies. That entry is what the empty field previews, per theme.
+    figure = go.Figure(json.loads(cached_plot))
+    assert figure.data[0].name == RUN_DATA_POINT_TRACE_NAME
+    assert figure.data[0].marker.color is None
+
+    expected = {"light": "#228be6", "dark": "#1971c2"}
+    for color_scheme in ("light", "dark"):
+        themed = home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
+        assert _run_trace(themed).marker.color is None
+        assert themed.layout.template.layout.colorway[0] == expected[color_scheme]
+        assert generated_point_color(color_scheme) == expected[color_scheme]
 
 
 def test_point_color_offers_the_curated_swatches_on_one_row(components):
@@ -137,7 +197,7 @@ def test_point_color_offers_the_curated_swatches_on_one_row(components):
     # Hex keeps alpha out of the feature; the eyedropper waits for a v2.
     assert color.format == "hex"
     assert color.withEyeDropper is False
-    # The open dropdown covers Use automatic, and picking a swatch is a
+    # The open dropdown covers Use default, and picking a swatch is a
     # finished choice.
     assert color.closeOnColorSwatchClick is True
 
@@ -152,7 +212,9 @@ def test_point_size_is_named_by_its_own_visible_label(components):
     assert size["aria-labelledby"] == home.POINT_SIZE_LABEL_ID
 
 
-def test_default_and_automatic_leave_the_cached_figure_untouched(cached_plot):
+def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
+    cached_plot,
+):
     styled = home.apply_graph_appearance("light", cached_plot, "Default", "").to_json()
     themed_only = apply_light_dark_mode(
         go.Figure(json.loads(cached_plot)), "light"
@@ -206,7 +268,7 @@ def test_placeholder_and_empty_figures_tolerate_every_persisted_preference():
                 )
 
 
-def test_theme_switches_keep_an_explicit_color_and_leave_automatic_generated(
+def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
     cached_plot,
 ):
     for color_scheme in ("light", "dark"):
@@ -216,19 +278,20 @@ def test_theme_switches_keep_an_explicit_color_and_leave_automatic_generated(
         assert explicit.marker.color == "#099268"
         assert explicit.marker.size == POINT_SIZE_PRESET_PX["Small"]
 
-    # Automatic keeps whatever the cached figure gives it, so the two themes
-    # differ only where the base figure does.
-    automatic = [
+    # Default leaves the trace's own color alone (none, so the theme template
+    # colors it at render), so the two themes differ only where the base
+    # figure does.
+    default = [
         _run_trace(
             home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
         ).marker.color
         for color_scheme in ("light", "dark")
     ]
     base_color = _run_trace(go.Figure(json.loads(cached_plot))).marker.color
-    assert automatic == [base_color, base_color]
+    assert default == [base_color, base_color]
 
 
-def test_use_automatic_clears_the_color_and_ignores_a_phantom_click():
+def test_use_default_clears_the_color_and_ignores_a_phantom_click():
     assert home.clear_point_color(1) == ""
     # Under DashProxy a callback can fire once on page load with no click.
     assert home.clear_point_color(None) is dash.no_update

@@ -16,7 +16,8 @@ notifications update automatically in the background.
   browser.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
-  it rather than stacking a second one beside it, and a run that earns neither says nothing.
+  it rather than stacking a second one beside it, and a run that earns neither says nothing. One
+  Chart options switch turns the whole family off, leaving the chart to update silently.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.

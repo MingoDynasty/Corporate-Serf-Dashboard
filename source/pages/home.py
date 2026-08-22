@@ -64,6 +64,7 @@ from source.plot.plot_service import (
     generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
+    generated_point_color,
 )
 from source.utilities.notifications import (
     TOAST_LIFETIME_STORE_ID,
@@ -102,7 +103,12 @@ SETTINGS_HELP_TEXT = {
         "the run against the personal best it was chasing."
     ),
     "score-threshold-notification": (
-        "Notifies after each new run whether it reached the score threshold."
+        "Adds a pass or fail verdict to run notifications when the run can be "
+        "judged against the score threshold. Needs Run Notifications turned on."
+    ),
+    "run-notification": (
+        "Controls the threshold, placement, and catch-up notifications for "
+        "your runs. Turn this off to update the chart silently."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "
@@ -149,8 +155,18 @@ CHART_OPTIONS_FIELD_LABEL_CLASS = "chart-options-field-label"
 POINT_SIZE_INPUT_ID = "point-size"
 POINT_SIZE_LABEL_ID = "point-size-label"
 POINT_COLOR_INPUT_ID = "point-color"
-POINT_COLOR_AUTOMATIC_ID = "point-color-automatic"
-POINT_COLOR_AUTOMATIC = ""
+POINT_COLOR_DEFAULT_ID = "point-color-default"
+POINT_COLOR_DEFAULT = ""
+# The empty field previews the generated point color. Mantine paints the
+# preview of an empty ColorInput white, so the stylesheet repaints it from
+# these custom properties while the placeholder shows, one per color scheme
+# because the graph's templates differ; the values come from plot_service so
+# the swatch and the graph cannot disagree.
+POINT_COLOR_FIELD_CLASS = "point-color-field"
+POINT_COLOR_DEFAULT_CSS_VARIABLES = {
+    "light": "--point-color-default-light",
+    "dark": "--point-color-default-dark",
+}
 # Eight color families, one shade each, chosen per family against both real
 # plot backgrounds (#ffffff light, #242424 dark) rather than by taking one
 # Mantine shade index across the board. Yellow, lime, gray, and dark are
@@ -982,14 +998,21 @@ def _build_backlog_notification(
     )
 
 
-def _build_run_event_notification(
+def _build_run_event_notification(  # noqa: PLR0913
     run_events: RunEventsPayload | None,
     selected_scenario: str,
     top_n_scores: int,
     score_threshold_percentage: float | str | None,
     score_threshold_notification_switch: bool,
+    run_notification_switch: bool,
 ) -> dict[str, object] | None:
-    """Build the at-most-one toast a batch of run events earned."""
+    """Build the at-most-one toast a batch of run events earned.
+
+    The master switch is checked first, and so gates the whole family: the
+    live toast and the backlog digest are both born here.
+    """
+    if not run_notification_switch:
+        return None
     if run_events is None or run_events["latest"]["scenario_name"] != selected_scenario:
         return None
 
@@ -1128,6 +1151,10 @@ def _build_scenario_figure(  # noqa: PLR0913
     Input("score-threshold-overlay-switch", "checked"),
     Input("score-threshold-percentage", "value"),
     Input("score-threshold-notification-switch", "checked"),
+    # State, not Input: this preference only decides whether a run event that
+    # already triggered the callback gets to toast. Flipping it must not
+    # rebuild the plot or reread the scenario's runs.
+    State("run-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
     State(TOAST_LIFETIME_STORE_ID, "data"),
 )
@@ -1144,6 +1171,7 @@ def generate_graph(  # noqa: PLR0913
     score_threshold_overlay_switch,
     score_threshold_percentage,
     score_threshold_notification_switch,
+    run_notification_switch,
     selected_playlist,
     toast_lifetime_sequence,
 ):
@@ -1157,6 +1185,8 @@ def generate_graph(  # noqa: PLR0913
     :param rank_overlay_switch: rank overlay switch. True=show rank overlay.
     :param show_all_ranks_switch: show all ranks switch. True=draw the full
         ladder instead of the ranks bracketing the plotted scores.
+    :param run_notification_switch: run notifications master switch.
+        False=this run's toast is not built at all.
     :param selected_playlist: user-selected playlist code.
     :param toast_lifetime_sequence: this client's run-verdict emission counter.
     :return: Figure serialized to JSON, Notification, next emission counter
@@ -1217,6 +1247,7 @@ def generate_graph(  # noqa: PLR0913
                 top_n_scores,
                 score_threshold_percentage,
                 score_threshold_notification_switch,
+                run_notification_switch,
             )
             if run_verdict is not None:
                 notifications = upsert_toast(run_verdict, toast_lifetime_sequence)
@@ -1241,7 +1272,7 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     :param color_scheme: active Mantine color scheme.
     :param plot_json: json object with plotted data.
     :param point_size: selected point size preset.
-    :param point_color: explicit point color, or empty for Automatic.
+    :param point_color: explicit point color, or empty for Default.
     :return: Figure with theme and point preferences applied.
     """
     if not plot_json:
@@ -1252,18 +1283,18 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
 
 @callback(
     Output(POINT_COLOR_INPUT_ID, "value"),
-    Input(POINT_COLOR_AUTOMATIC_ID, "n_clicks"),
+    Input(POINT_COLOR_DEFAULT_ID, "n_clicks"),
     prevent_initial_call=True,
 )
 def clear_point_color(n_clicks):
     """
-    Returns the point color to Automatic.
-    :param n_clicks: clicks on the Use automatic action.
-    :return: the empty value that means Automatic.
+    Returns the point color to Default.
+    :param n_clicks: clicks on the Use default action.
+    :return: the empty value that means Default.
     """
     if not n_clicks:
         return no_update
-    return POINT_COLOR_AUTOMATIC
+    return POINT_COLOR_DEFAULT
 
 
 def _build_startup_playlist_warning_notifications(
@@ -1634,14 +1665,18 @@ def _chart_options_panel() -> dmc.Box:
                         ],
                     ),
                     dmc.Box(
-                        className=CHART_OPTIONS_FIELD_CLASS,
+                        className=f"{CHART_OPTIONS_FIELD_CLASS} {POINT_COLOR_FIELD_CLASS}",
+                        style={
+                            variable: generated_point_color(scheme)
+                            for scheme, variable in POINT_COLOR_DEFAULT_CSS_VARIABLES.items()
+                        },
                         children=[
                             dmc.ColorInput(
                                 id=POINT_COLOR_INPUT_ID,
                                 label="Point color",
-                                value=POINT_COLOR_AUTOMATIC,
-                                # An empty field is Automatic, and says so.
-                                placeholder="Automatic",
+                                value=POINT_COLOR_DEFAULT,
+                                # An empty field is Default, and says so.
+                                placeholder="Default",
                                 format="hex",
                                 swatches=POINT_COLOR_SWATCHES,
                                 # The component defaults to seven per row,
@@ -1650,7 +1685,7 @@ def _chart_options_panel() -> dmc.Box:
                                 swatchesPerRow=len(POINT_COLOR_SWATCHES),
                                 withEyeDropper=False,
                                 # Picking a swatch is a finished choice, and
-                                # the dropdown covers Use automatic while it
+                                # the dropdown covers Use default while it
                                 # is open.
                                 closeOnColorSwatchClick=True,
                                 persistence=True,
@@ -1658,13 +1693,13 @@ def _chart_options_panel() -> dmc.Box:
                                 size="sm",
                                 w="100%",
                             ),
-                            # The only way back to Automatic: the field has no
+                            # The only way back to Default: the field has no
                             # clear affordance of its own, and re-typing an
                             # empty hex value is not one.
                             dmc.Group(
                                 dmc.Button(
-                                    "Use automatic",
-                                    id=POINT_COLOR_AUTOMATIC_ID,
+                                    "Use default",
+                                    id=POINT_COLOR_DEFAULT_ID,
                                     variant="subtle",
                                     size="compact-xs",
                                 ),
@@ -1705,18 +1740,30 @@ def _chart_options_panel() -> dmc.Box:
                         # label and strand its help icon on the line above.
                         w="100%",
                     ),
-                    # The modal's wording, kept for now (2026-08-08): it reads
-                    # as though it gates run notifications wholesale, when
-                    # since the notification redesign it decides only whether
-                    # a run is judged against the threshold -- placement
-                    # toasts fire either way. Revisit with the rest of the
-                    # group's copy.
+                    # Stays in this group, beside the percentage it judges
+                    # against, even though the master switch it depends on
+                    # lives in Notifications.
                     dmc.Switch(
                         id="score-threshold-notification-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Score Threshold Notification",
+                            "Score Threshold Verdict",
                             SETTINGS_HELP_TEXT["score-threshold-notification"],
+                        ),
+                        checked=True,
+                        persistence=True,
+                    ),
+                ],
+            ),
+            _chart_options_group(
+                "Notifications",
+                [
+                    dmc.Switch(
+                        id="run-notification-switch",
+                        labelPosition="right",
+                        label=_settings_help_label(
+                            "Run Notifications",
+                            SETTINGS_HELP_TEXT["run-notification"],
                         ),
                         checked=True,
                         persistence=True,

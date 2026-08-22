@@ -47,11 +47,16 @@ list in the roadmap.)
   not open, the next visit rebuilds once from final state and gives one
   scenario-named summary instead of replaying stale toasts and selections —
   and the next run you play replaces that catch-up digest, which is by then
-  the staler news.
+  the staler news. The whole family can be turned off with one Chart options
+  switch, Run Notifications: with it off the chart still updates and nothing
+  toasts about a run, though a run file that failed to import still says so.
+  The threshold switch beside the percentage decides only whether a run is
+  judged, never whether it toasts.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
   pile of toasts accumulating over a session or a noisy catch-up sequence
-  after time away.
+  after time away — and, for a session where any interruption is one too many,
+  a way to silence the feedback without giving up the plot.
 - **Quiet by default.** Toasts are reserved for what you did, what you
   achieved, and failures you would act on. A condition that stays true — no
   username configured, a leaderboard lookup that failed, a scenario with no

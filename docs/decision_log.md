@@ -13,6 +13,311 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-21: The Empty Point Color Is Called Default, And The Points Follow The Theme
+
+Status: Accepted
+
+The Point color field's empty state now reads Default instead of Automatic,
+and its reset button reads Use default. Automatic suggested a Manual mode that
+never existed, and Default is the word the Point size control beside it
+already uses. The run points with no color chosen used to be the same indigo
+in both themes; they now take the theme's own blue, a little deeper in dark
+mode. The small preview swatch beside an empty field used to be plain white;
+it now shows the color the graph is using in the current theme.
+
+Decision: the first change is copy only. The stored value is unchanged: an
+empty `point-color` still means the generated color, under the same persisted
+id, so nothing a browser already saved is discarded. `POINT_COLOR_AUTOMATIC`
+became `POINT_COLOR_DEFAULT`, and the reset button's id `point-color-default`.
+
+**The run points take the theme template's colorway.** The 2026-08-20 entry
+says an empty color keeps whatever Plotly and the Mantine template give it.
+Until now the Mantine template's colorway never reached the run points:
+`px.scatter` writes the first colorway entry of Plotly's default template,
+`#636efa`, into the trace's `marker.color` when the figure is generated, and
+the `update_layout(template=...)` applied afterwards never overrides a
+property the trace already sets, so the points were `#636efa` in both themes.
+The generator now clears that baked color (`marker_color=None`), so the run
+trace carries no color of its own and Plotly draws it in the first colorway
+entry of whichever template the theme applies: `#228be6` (blue-6) under
+`mantine_light`, `#1971c2` (blue-7) under `mantine_dark`. First entry because
+the run trace is the figure's first trace; colorway assignment is by index in
+Plotly, and that ordering is pinned by test. `plot_service.generated_point_color`
+reads the same entry for a scheme, and is the single source for the preview.
+
+**How the swatch shows it.** Mantine's `ColorInput` renders its preview as a
+`ColorSwatch` whose color is the value when valid and a hardcoded `#fff`
+otherwise, as an inline style. Home sets `--point-color-default-light` and
+`--point-color-default-dark` on the field from `generated_point_color`, and
+two stylesheet rules scoped to `.point-color-field:has(input:placeholder-shown)`
+(the second under `:root[data-mantine-color-scheme="dark"]`) repaint the
+swatch's color overlay from the active one with `!important`, the only way
+past an inline style. A typed or picked color hides the placeholder, and the
+rules with it, so Mantine's own preview of that color takes over. Alternatives
+rejected: **keeping the baked `#636efa` and previewing it as a constant**,
+which leaves the theme template decorative for the primary data mark;
+**storing a hex as the layout value**, which moves a persisted default
+(discarding stored values) and turns the generated color into a chosen one;
+**replacing the preview through `leftSection`** with a swatch kept in sync by
+a callback, a round trip per keystroke to do what two CSS rules do.
+
+Not changed: the Average Score line, which `px.line` bakes in the same
+`#636efa` and which now sits beside blue points. Clearing its color would hand
+it the colorway's second entry (red) rather than the points' color. Ruled
+2026-08-22: the line gets a user setting of its own in a later PR, not a
+colorway change here.
+
+## 2026-08-21: Run Notifications Have A Master Switch, And The Threshold Switch Is Renamed
+
+Status: Accepted
+
+Run toasts can now be turned off. Chart options carries a Run Notifications
+switch, on by default, and turning it off silences the toasts that report how
+a run went while the chart keeps updating in the background. A run file that
+fails to import still says so, and nothing else about the toasts changed. The
+switch that used to be labelled "Score Threshold Notification" never gated
+toasts at all, only whether a run was judged, so it is renamed "Score
+Threshold Verdict" and its help text now says what it actually does.
+
+Decision: a `dmc.Switch` with id `run-notification-switch`, `checked=True` and
+`persistence=True`, in a new **Notifications** group at the end of the Chart
+options inspector.
+
+**What the switch gates.** All three shapes `_build_run_event_notification`
+produces: the threshold verdict, the top-N placement, and the "While you were
+away" catch-up digest. They share one toast id and one producing function, so
+the gate is a single early return at the top of that function rather than a
+check per shape. The digest is deliberately inside the gate: it is the same
+family reporting the same events, and a digest that survived the off switch
+would read as a bug rather than a feature. The catch-up case that survives it
+is the planned run history, not a toast.
+
+**What it does not gate.** The red run-import failure toast
+(`run-import-failure`, its own interval callback) is error feedback rather
+than run feedback and stays on; the master switch's help text names the three
+shapes it covers instead of saying "all notifications", so it cannot be read
+to promise otherwise. With the switch off the plot still updates, scenario
+auto-switch still follows a new run, and the rank-refresh, Steam-mismatch, and
+playlist toast families are untouched.
+
+**The threshold switch is the verdict sub-toggle, not a second master.** Four
+combinations, all defined: master off is silence whatever the threshold switch
+says; master on with threshold on is the behavior that shipped in the
+[notification redesign](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy);
+master on with threshold off is that redesign's judging-off behavior, meaning
+placement toasts and neutral digests only. Its id, default, and persistence
+are unchanged — renaming the id would orphan every value a browser has already
+stored under it — so only its label, its help text, and the dated code comment
+beside it move. That comment, and the "knowingly imprecise" consequence
+recorded in the
+[Chart options rename entry](#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options),
+are resolved here: this is the later copy pass that entry deferred, for the
+two strings it touches and no others.
+
+**`State`, not `Input`.** The switch's value matters only when
+`run-events.data` triggers `generate_graph`. Wired as an `Input` it would
+rebuild the plot and reread the scenario's runs every time someone flipped a
+notification preference. The existing threshold switch has the same
+State-worthy property but stays an `Input`; changing it is a behavior change
+with its own review.
+
+**Storage is browser-local Dash persistence**, like every other Chart options
+control. `data/settings.json` was rejected: it is scoped to the stats
+directory and the KovaaK's identity behind a Save model, which is the wrong
+interaction for a switch that should take effect the moment it is flipped.
+`config.toml` was rejected: it holds human-owned boot facts.
+
+Rejected alternatives:
+
+- **The digest surviving the off switch.** It would preserve a rare catch-up
+  toast at the price of a switch that is not quite off.
+- **Per-family toggles** for import failures or rank-refresh feedback. Each of
+  those is error or action feedback, and nothing asked for them.
+- **App-wide notification production**, deliberately deferred rather than
+  dropped. Run toasts are produced only on Scenario Performance because the
+  producing interval, store, and preferences are mounted in that page's
+  layout. Making production app-wide is a redesign of the queue-to-UI flow
+  with its own product questions, and this change forecloses none of it: the
+  guard sits at toast production wherever that later runs, and Dash
+  persistence survives a same-id component move.
+
+Shipped in PR #245; design discussion in #240. Distilled from
+`docs/run_notifications_switch_proposal.md`, now deleted.
+
+## 2026-08-21: Release Integrity Rests On GitHub Digests And An Enforced Archive Contract
+
+Status: Accepted
+
+The first thing a new visitor asks about a downloadable Windows app is whether
+it is safe to run, and the release page is where that gets answered. This
+project relies on the SHA-256 digest GitHub publishes for every uploaded asset,
+together with releases that can never be changed, rather than shipping a
+checksum file of its own. The release page now opens with a short header saying
+what those guarantees are and which download to take, and CI now proves
+byte-for-byte that the uploaded assets are the ones it built. The release zip
+also stopped carrying development-only files that an installed copy cannot use,
+and a new pre-publish check fails the draft if the zip ever loses a file an
+install needs.
+
+Decision: no custom `SHA256SUMS.txt`, no hash duplicated into the release
+notes, and no launcher-side hash verification at launch. Integrity rests on
+GitHub's per-asset digests plus immutable releases, which this repo already has
+enabled — see
+[Releases And Their Assets Are Immutable](#2026-07-19-releases-and-their-assets-are-immutable),
+which this entry extends rather than restates. Alongside that: the release page
+gets a curated header, `.gitattributes` prunes development-only trees from the
+archive, and `validate_release` enforces an archive contents contract before
+publication.
+
+Why: at this audience size the marginal security of a project-published hash
+over a platform-published one is zero, and both are downloaded over the same
+HTTPS connection from the same host. GitHub's digests are visible on the
+release page, are computed by GitHub on receipt, and cannot change afterward
+because the release is immutable. Both of our assets additionally carry a
+GitHub-signed release attestation, retrievable at
+`repos/.../attestations/sha256:<digest>` — supporting evidence for this
+decision, deliberately not surfaced in user-facing copy, because attestation
+commands are not something a general user should be asked to run.
+
+Rejected alternatives:
+
+- **A custom `SHA256SUMS.txt` asset.** Redundant with digests GitHub already
+  publishes and signs, and it would be permanent release machinery — generated,
+  validated, and maintained on every release — bought for no added security.
+  It also invites the copy failure this entry avoids: a hash pasted into the
+  notes reads as proof of trustworthiness rather than of byte integrity.
+- **Launcher-side hash verification at launch.** It touches the frozen update
+  contract, the named-asset/source-archive fallback, and failure behavior all
+  at once. The launcher already validates `release.json`'s identity fields and
+  health-gates promotion on the SHA carried in `version.txt`, so the marginal
+  gain is small. Deferred until evidence demands it, consistent with the
+  deferral already recorded in the 2026-07-19 immutability entry.
+
+Consequences and constraints:
+
+- **Digests cover uploaded assets only.** Every release page also shows
+  GitHub's auto-generated "Source code (zip / tar.gz)" downloads, which have no
+  digest. Copy must never claim digests for "every download", and must never
+  say "verified safe" or "secure download" — a digest proves byte integrity,
+  not trustworthiness.
+- **The archive is a contract, and it is enforced.** `validate_release` rejects
+  the draft unless the zip carries every entry in `REQUIRED_ARCHIVE_ENTRIES`
+  and none of `EXCLUDED_ARCHIVE_TREES`. The required set covers installation,
+  runtime, legal, and self-documentation needs rather than only files read by
+  code, and it is deliberately not a snapshot of the whole tree: each entry is
+  listed with what reads it. Without this, a `.gitattributes` edit or a file
+  move that drops an install-critical path is undetected until someone's
+  install fails, and immutability makes the bad asset permanent.
+- **Name the file when something opens it by name.** A directory entry in the
+  required set only asserts that the tree holds at least one file, so it still
+  passes after the one member that mattered is renamed away. Required
+  individually for that reason: `source/app.py`, `scripts/launch_bootstrap.ps1`,
+  and `scripts/launcher.ps1`, which the launcher, the installer, and the
+  bootstrap each open by name and abort without; and `docs/example.png`,
+  `docs/architecture.md`, `docs/product.md`, and `docs/roadmap.md`, which are
+  every relative target the shipped README opens. A test cross-checks that
+  README target set against the contract, so a new link into `docs/` cannot
+  quietly fall outside it. Only `assets/` and `resources/` remain directory
+  entries, where no single member is the dependency.
+- **A tree holding only its own directory entry is empty, not present.**
+  `git archive` emits an entry for each directory, and a `/**` export-ignore
+  rule leaves that entry behind after removing every file under it, so a
+  prefix match alone would accept an empty required tree. The check requires a
+  child path, and a regression test covers each required directory in that
+  shape.
+- **`export-ignore` is narrow, and `docs/` stays.** `/tests`, `/.idea`, and
+  `/.github` are pruned. `docs/` ships because the shipped README embeds
+  `docs/example.png` and links `docs/*.md`, so dropping it breaks the zip's own
+  front page for the manual-install reader. `resources/`, `scripts/`,
+  `install.ps1`, and `version.txt` must ship for the app, the installer, the
+  launcher, and build identity respectively.
+- **Use the anchored directory form.** Tested on git 2.55: `/tests`, `tests`,
+  and `tests/` all prune the directory entirely, while `/tests/**` removes the
+  files and leaves an empty `tests/` directory entry in the zip. The contract
+  treats an empty excluded directory as still shipped, so the two rules agree.
+- **`export-ignore` also prunes GitHub's source archive.** The
+  `archive/<sha>.zip` download changes the same way. That is intended, and it
+  matters because that archive is the launcher's documented fallback when the
+  named asset is missing, and because the CI stamp job downloads it.
+- **The digest check is a build-versus-upload comparison, not a size check.**
+  It recomputes SHA-256 locally and requires equality, treats a null or missing
+  digest as a failure rather than a skip, and requires the release to carry
+  exactly the versioned zip and `release.json` — a resumed draft keeps any
+  asset `--clobber` never replaced. It subsumes the size comparison it
+  replaced.
+- **Blocking a release and shipping a file are separate lists.**
+  `_BLOCKED_DIRECTORIES` in `scripts/release_job.py` decides whether a push cuts
+  a release; `.gitattributes` decides what the zip carries. `docs/` is on the
+  first and not the second — see
+  [PyCharm Config Stays Tracked And Its Upgrade Churn Is Committed Once](#2026-08-08-pycharm-config-stays-tracked-and-its-upgrade-churn-is-committed-once).
+
+## 2026-08-21: The Launcher Narrates A Slow Start And Keeps Its 120-Second Ceiling
+
+Status: Accepted
+
+The launcher used to print one "Starting" line and then nothing while it
+waited for the app, so a slow first start looked exactly like a hang. It now
+stays quiet for the first few seconds and, if the app is still not up, prints
+how many seconds have passed, repeating every few seconds until the app
+answers or the wait gives up. A start that finishes quickly prints nothing
+new. The two-minute limit on the wait is unchanged, on purpose.
+
+Decision: the heartbeat lives inside `Wait-AppReady` in `scripts/launcher.ps1`,
+so both call sites get it: the normal start and pending-update activation.
+The output contract, ratified 2026-08-20 and shipped in PR #243:
+
+- Ready before the ~5 s gate: nothing new. The fast path's console output is
+  byte-identical to what it was before.
+- Still waiting at the gate: `Still starting Corporate Serf Dashboard ... N
+  seconds elapsed.`, then another line every ~5 s.
+- Ready after at least one heartbeat: `Corporate Serf Dashboard is ready
+  after N seconds.` No heartbeat shown means no completion line. The
+  `exited` and `timeout` outcomes never print a completion line; their
+  callers report the failure as before.
+- The `Dashboard running at http://...` line is unchanged, and still prints
+  on every successful launch by either startup path, once the app is ready.
+  It was never reached on a failed start: a normal start that returns
+  `timeout` or `exited` stops at `Stop-Fatal` before it.
+- No reassurance or explanation sentences. The elapsed counter is the whole
+  feature. Gate and interval are implementer-tunable around ~5 s; both are
+  5 s today.
+
+Why the gate is ~5 s: 14 installed starts measured 2026-08-20 on the
+development machine ranged 0.12–5.62 s, median 2.18 s. The samples are
+warm-biased and single-machine. A slow-but-healthy warm start may therefore
+occasionally show a single heartbeat line; that is accepted, do not tune it
+away. Why this copy: it echoes the launcher's own vocabulary ("Corporate Serf
+Dashboard", the existing "Starting ... " lines). Never "the dashboard" for
+the thing being started; a prior ruling found it reads as the browser.
+
+The cadence is a floor, not a schedule. Loop granularity is an in-flight
+health probe's two-second timeout plus the half-second sleep, so a heartbeat
+can land up to ~2.5 s after its nominal time and the timeout outcome can
+overshoot the ceiling by about as much. On a machine where a closed loopback
+port is slow to refuse, every pre-listen probe burns its full timeout, which
+is why the PR's transcripts show 7/12 s rather than 5/10 s. The probe itself
+is unchanged. Its address stays governed by the
+[2026-08-14 configurable-listen-address entry](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+`Get-ProbeAddress` sends a wildcard bind to its own family's loopback and
+every other configured host to that host's literal URL form. The gate on
+the full SHA and launch token, and process exit detected at the next loop
+check rather than at the ceiling, are likewise unchanged.
+
+Why `$HealthTimeoutSec` stays at 120: the ceiling's job is failure
+declaration, and timeout is destructive. On the normal start the child is
+killed and the launcher exits with a fatal "check config / reinstall"
+message; on the update path the pending version is killed and the previous
+one is started instead. A false timeout on a genuinely slow cold start turns
+"slow" into "broken" on exactly the first-run path the heartbeat exists to
+protect, and the warm-biased measurements above say nothing about the
+cold-start tail. Revisit only with clean-machine cold-start evidence, and
+then size the ceiling at two to three times the worst observed start.
+
+Alternatives rejected: reassurance copy such as "the first start can take
+longer" (words without information; the counter already says it), and
+retuning the ceiling alongside the heartbeat (no evidence to size it, and
+the failure mode of guessing low is the one described above).
+
 ## 2026-08-20: Run Points Get A Size Preset And A Color, And The Chart Stops There
 
 Status: Accepted
@@ -126,6 +431,9 @@ Design in [#238](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/2
 implementation in [#241](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/241).
 The panel this group joined is the
 [2026-08-09 chart options entry](#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph).
+The Automatic wording, the generated color, and the empty field's white
+preview swatch were revised the next day; see the
+[2026-08-21 entry](#2026-08-21-the-empty-point-color-is-called-default-and-the-points-follow-the-theme).
 
 ## 2026-08-14: The Listen Address Is Configurable, Loopback By Default
 
@@ -868,7 +1176,9 @@ Consequences and constraints:
   toasts fire regardless. The maintainer accepted the wording and deferred the
   fix to a later copy pass; a dated comment at the control in
   `source/pages/home.py` records it. The help tooltip is accurate as written and
-  is unchanged.
+  is unchanged. That copy pass has since happened: the control is now "Score
+  Threshold Verdict"
+  ([2026-08-21](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
 - **The route restructure is deferred, not dropped.** Reserving `/` for a future
   Overview page and giving this page a durable `/scenario` route waits until an
   Overview has concrete plans.
@@ -986,10 +1296,13 @@ Consequences and constraints:
   `pyproject.toml` and not a configured project tool, but it stays in the lock
   under `datamodel-code-generator` and is installed in `.venv` — see
   [Consolidate Formatting And Linting On Ruff](#2026-07-03-consolidate-formatting-and-linting-on-ruff).
-- **Blocking is about triggering, not shipping.** `.gitattributes` sets no
-  `export-ignore`, so `.idea/` still travels inside the release zip. That
-  matches `docs/` and `tests/`, which are likewise blocked from triggering a
-  release while still shipping.
+- **Blocking is about triggering, not shipping.** The two lists are separate:
+  `_BLOCKED_DIRECTORIES` decides whether a push cuts a release, while
+  `.gitattributes` decides what the release zip carries. `.idea/` is now on
+  both — it neither triggers a release nor ships in one, per
+  [Release Integrity Rests On GitHub Digests And An Enforced Archive Contract](#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract).
+  `docs/` still shows the split as it was: blocked from triggering, but
+  shipped, because the zip's own README links into it.
 
 ## 2026-08-03: Home's Controls Row Measures The Content Area, Not The Window
 

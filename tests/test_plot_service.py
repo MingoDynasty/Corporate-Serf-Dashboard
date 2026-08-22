@@ -246,7 +246,7 @@ def _point_figure() -> go.Figure:
     )
 
 
-def test_apply_point_appearance_leaves_the_figure_alone_for_default_automatic() -> None:
+def test_apply_point_appearance_leaves_the_figure_alone_for_the_defaults() -> None:
     figure = _point_figure()
     before = figure.to_json()
 
@@ -278,7 +278,7 @@ def test_apply_point_appearance_ignores_values_it_does_not_recognize() -> None:
     assert figure.data[1].marker.size is None
     assert figure.data[1].marker.color is None
 
-    # A cleared dmc input sends "", never None -- both mean Automatic.
+    # A cleared dmc input sends "", never None -- both mean Default.
     figure = apply_point_appearance(_point_figure(), None, "")
     assert figure.data[1].marker.color is None
 
