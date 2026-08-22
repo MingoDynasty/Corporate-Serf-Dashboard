@@ -81,6 +81,12 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
+- **App messaging consistency** — a one-time sweep of every string the app
+  shows, so the same condition reads the same way on every page: one set of
+  copy rules (punctuation, casing, no em dashes, one vocabulary), every
+  changed string listed up front, and a test that keeps the em dash out for
+  good. No new surface, no behavior change. Design in
+  [`app_messaging_consistency_proposal.md`](./app_messaging_consistency_proposal.md).
 
 ---
 
