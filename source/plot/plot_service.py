@@ -37,7 +37,7 @@ POINT_SIZE_PRESET_PX = {"Small": 4, "Large": 10}
 
 # ColorInput is set to hex, so this is the whole shape a stored value can
 # legitimately have. Anything else -- a cleared field's "", a hand-typed
-# fragment, a value from an older format -- means Automatic.
+# fragment, a value from an older format -- means Default.
 _HEX_COLOR_PATTERN = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})")
 
 
@@ -405,7 +405,7 @@ def apply_point_appearance(
     from a version that named its traces differently.
     :param figure: themed figure to restyle in place.
     :param point_size: a value from ``POINT_SIZE_OPTIONS``, or anything else.
-    :param point_color: a hex color string, or anything else for Automatic.
+    :param point_color: a hex color string, or anything else for Default.
     :return: the same figure, restyled where the preferences applied.
     """
     marker: dict[str, int | str] = {}

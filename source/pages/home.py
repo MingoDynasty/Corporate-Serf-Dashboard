@@ -149,8 +149,8 @@ CHART_OPTIONS_FIELD_LABEL_CLASS = "chart-options-field-label"
 POINT_SIZE_INPUT_ID = "point-size"
 POINT_SIZE_LABEL_ID = "point-size-label"
 POINT_COLOR_INPUT_ID = "point-color"
-POINT_COLOR_AUTOMATIC_ID = "point-color-automatic"
-POINT_COLOR_AUTOMATIC = ""
+POINT_COLOR_DEFAULT_ID = "point-color-default"
+POINT_COLOR_DEFAULT = ""
 # Eight color families, one shade each, chosen per family against both real
 # plot backgrounds (#ffffff light, #242424 dark) rather than by taking one
 # Mantine shade index across the board. Yellow, lime, gray, and dark are
@@ -1241,7 +1241,7 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
     :param color_scheme: active Mantine color scheme.
     :param plot_json: json object with plotted data.
     :param point_size: selected point size preset.
-    :param point_color: explicit point color, or empty for Automatic.
+    :param point_color: explicit point color, or empty for Default.
     :return: Figure with theme and point preferences applied.
     """
     if not plot_json:
@@ -1252,18 +1252,18 @@ def apply_graph_appearance(color_scheme, plot_json, point_size, point_color):
 
 @callback(
     Output(POINT_COLOR_INPUT_ID, "value"),
-    Input(POINT_COLOR_AUTOMATIC_ID, "n_clicks"),
+    Input(POINT_COLOR_DEFAULT_ID, "n_clicks"),
     prevent_initial_call=True,
 )
 def clear_point_color(n_clicks):
     """
-    Returns the point color to Automatic.
-    :param n_clicks: clicks on the Use automatic action.
-    :return: the empty value that means Automatic.
+    Returns the point color to Default.
+    :param n_clicks: clicks on the Use default action.
+    :return: the empty value that means Default.
     """
     if not n_clicks:
         return no_update
-    return POINT_COLOR_AUTOMATIC
+    return POINT_COLOR_DEFAULT
 
 
 def _build_startup_playlist_warning_notifications(
@@ -1639,9 +1639,9 @@ def _chart_options_panel() -> dmc.Box:
                             dmc.ColorInput(
                                 id=POINT_COLOR_INPUT_ID,
                                 label="Point color",
-                                value=POINT_COLOR_AUTOMATIC,
-                                # An empty field is Automatic, and says so.
-                                placeholder="Automatic",
+                                value=POINT_COLOR_DEFAULT,
+                                # An empty field is Default, and says so.
+                                placeholder="Default",
                                 format="hex",
                                 swatches=POINT_COLOR_SWATCHES,
                                 # The component defaults to seven per row,
@@ -1650,7 +1650,7 @@ def _chart_options_panel() -> dmc.Box:
                                 swatchesPerRow=len(POINT_COLOR_SWATCHES),
                                 withEyeDropper=False,
                                 # Picking a swatch is a finished choice, and
-                                # the dropdown covers Use automatic while it
+                                # the dropdown covers Use default while it
                                 # is open.
                                 closeOnColorSwatchClick=True,
                                 persistence=True,
@@ -1658,13 +1658,13 @@ def _chart_options_panel() -> dmc.Box:
                                 size="sm",
                                 w="100%",
                             ),
-                            # The only way back to Automatic: the field has no
+                            # The only way back to Default: the field has no
                             # clear affordance of its own, and re-typing an
                             # empty hex value is not one.
                             dmc.Group(
                                 dmc.Button(
-                                    "Use automatic",
-                                    id=POINT_COLOR_AUTOMATIC_ID,
+                                    "Use default",
+                                    id=POINT_COLOR_DEFAULT_ID,
                                     variant="subtle",
                                     size="compact-xs",
                                 ),

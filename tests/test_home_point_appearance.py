@@ -114,7 +114,7 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
 
     assert color.value == ""
     assert color.label == "Point color"
-    assert color.placeholder == "Automatic"
+    assert color.placeholder == "Default"
     assert color.persistence is True
 
 
@@ -137,7 +137,7 @@ def test_point_color_offers_the_curated_swatches_on_one_row(components):
     # Hex keeps alpha out of the feature; the eyedropper waits for a v2.
     assert color.format == "hex"
     assert color.withEyeDropper is False
-    # The open dropdown covers Use automatic, and picking a swatch is a
+    # The open dropdown covers Use default, and picking a swatch is a
     # finished choice.
     assert color.closeOnColorSwatchClick is True
 
@@ -152,7 +152,9 @@ def test_point_size_is_named_by_its_own_visible_label(components):
     assert size["aria-labelledby"] == home.POINT_SIZE_LABEL_ID
 
 
-def test_default_and_automatic_leave_the_cached_figure_untouched(cached_plot):
+def test_default_size_and_empty_color_leave_the_cached_figure_untouched(
+    cached_plot,
+):
     styled = home.apply_graph_appearance("light", cached_plot, "Default", "").to_json()
     themed_only = apply_light_dark_mode(
         go.Figure(json.loads(cached_plot)), "light"
@@ -206,7 +208,7 @@ def test_placeholder_and_empty_figures_tolerate_every_persisted_preference():
                 )
 
 
-def test_theme_switches_keep_an_explicit_color_and_leave_automatic_generated(
+def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
     cached_plot,
 ):
     for color_scheme in ("light", "dark"):
@@ -216,19 +218,19 @@ def test_theme_switches_keep_an_explicit_color_and_leave_automatic_generated(
         assert explicit.marker.color == "#099268"
         assert explicit.marker.size == POINT_SIZE_PRESET_PX["Small"]
 
-    # Automatic keeps whatever the cached figure gives it, so the two themes
+    # Default keeps whatever the cached figure gives it, so the two themes
     # differ only where the base figure does.
-    automatic = [
+    default = [
         _run_trace(
             home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
         ).marker.color
         for color_scheme in ("light", "dark")
     ]
     base_color = _run_trace(go.Figure(json.loads(cached_plot))).marker.color
-    assert automatic == [base_color, base_color]
+    assert default == [base_color, base_color]
 
 
-def test_use_automatic_clears_the_color_and_ignores_a_phantom_click():
+def test_use_default_clears_the_color_and_ignores_a_phantom_click():
     assert home.clear_point_color(1) == ""
     # Under DashProxy a callback can fire once on page load with no click.
     assert home.clear_point_color(None) is dash.no_update

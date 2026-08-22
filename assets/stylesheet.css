@@ -179,7 +179,7 @@
 /* A labelled field inside the inspector, for controls Mantine does not give
    a label slot of its own (the point-size segmented control) and for the
    action that belongs to the field above it rather than to the group (Use
-   automatic). Tighter than the group's own gap, so the pair reads as one
+   default). Tighter than the group's own gap, so the pair reads as one
    control rather than as two. */
 .chart-options-field {
     display: flex;
