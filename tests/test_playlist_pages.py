@@ -6,6 +6,7 @@ import dash
 import dash_mantine_components as dmc
 import pytest
 from dash import dcc, no_update
+from dash._callback import GLOBAL_CALLBACK_MAP
 from dash.exceptions import PreventUpdate
 
 from source.config import settings_service
@@ -1661,7 +1662,7 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
 
 def test_playlist_scenarios_without_a_username_registers_no_fill(monkeypatch):
     # The real service, not a fake: an empty registry is what guarantees no
-    # later interval drain can fire the summary toast.
+    # later interval drain finds fill work to do.
     playlist = PlaylistData(
         name="Voltaic Benchmarks",
         code="KovaaKsTestCode",
@@ -1714,10 +1715,10 @@ def test_playlist_fill_drain_guards_phantom_initial_call(monkeypatch):
 
     result = playlist_scenarios.drain_playlist_scenario_rows(0, None)
 
-    assert result == (no_update, no_update, no_update)
+    assert result == (no_update, no_update)
 
 
-def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
+def test_playlist_fill_terminal_tick_applies_updates_and_status_reasserts(
     monkeypatch,
 ):
     consuming = _fill_drain(
@@ -1725,6 +1726,8 @@ def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
         unknown=1,
         stale=1,
     )
+    # consuming_terminal is a service-side flag the page no longer reads --
+    # kept here only so the fixture matches what a later tick really returns.
     post_consumption = _fill_drain(
         consuming=False,
         unknown=1,
@@ -1744,29 +1747,26 @@ def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
     assert first[1] == (
         "1 of 3 positions unavailable · 1 from cache — KovaaK's unreachable"
     )
-    assert first[2][0]["color"] == "red"
-    assert first[2][0]["title"] == "Position update incomplete"
-    assert first[2][0]["message"] == (
-        "Couldn't update 1 of 3 positions; 1 more served from cache"
-    )
     assert second[0] is no_update
     assert second[1] == first[1]
-    assert second[2] is no_update
 
 
-def test_playlist_fill_stale_only_is_yellow_and_clean_is_silent():
-    stale = playlist_scenarios._fill_summary_notification(_fill_drain(stale=2))
-    clean = playlist_scenarios._fill_summary_notification(_fill_drain())
+def test_playlist_fill_drain_declares_no_notification_output():
+    """The fill reports degradation in the status line, never a toast.
 
-    assert stale[0]["color"] == "yellow"
-    assert stale[0]["title"] == "Positions served from cache"
-    assert stale[0]["message"] == (
-        "2 of 3 positions served from cache — KovaaK's was unreachable"
+    Keyed by an output this callback writes, so it survives the dependency
+    list growing around it.
+    """
+    spec = next(
+        spec
+        for key, spec in GLOBAL_CALLBACK_MAP.items()
+        if "playlist-scenarios-grid.rowTransaction" in key
     )
-    assert clean is no_update
+
+    assert "notification-container" not in {dep.component_id for dep in spec["output"]}
 
 
-def test_playlist_fill_cancelled_tick_finalizes_without_toast(monkeypatch):
+def test_playlist_fill_cancelled_tick_finalizes_the_status(monkeypatch):
     cancelled = _fill_drain(
         terminal="cancelled",
         updates=[
@@ -1786,13 +1786,12 @@ def test_playlist_fill_cancelled_tick_finalizes_without_toast(monkeypatch):
         lambda _token: cancelled,
     )
 
-    transaction, status, notification = playlist_scenarios.drain_playlist_scenario_rows(
+    transaction, status = playlist_scenarios.drain_playlist_scenario_rows(
         1, "generation-1"
     )
 
     assert transaction == {"update": cancelled.updates}
     assert status == "Update interrupted · 1 of 3 refreshed"
-    assert notification is no_update
 
 
 def test_playlist_scenarios_table_includes_local_stat_columns():

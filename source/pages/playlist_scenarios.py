@@ -15,7 +15,6 @@ from dash import (
     no_update,
 )
 
-from source.components.local_icon import local_icon
 from source.config.settings_service import get_kovaaks_username
 from source.kovaaks.data_service import (
     get_playlist_by_code,
@@ -29,7 +28,6 @@ from source.kovaaks.playlist_scenarios_service import (
     start_playlist_scenario_fill,
 )
 from source.pages.page_title import page_title
-from source.utilities.notifications import toast
 
 
 def _page_title(playlist_code=None, **_kwargs):
@@ -238,8 +236,8 @@ def load_playlist_scenario_rows(playlist_code):
     rows = build_playlist_scenario_rank_rows(playlist_code, generation_token)
     if not get_kovaaks_username():
         # Without a username every per-scenario lookup short-circuits offline
-        # to UNKNOWN, so phase 2 would fetch nothing and end in a red "couldn't
-        # update N of N" toast. That is persistent configuration state, not a
+        # to UNKNOWN, so phase 2 would fetch nothing and settle every position
+        # as unavailable. That is persistent configuration state, not a
         # failure: skip the fill and say so in place instead. Nothing on screen
         # can contradict the line -- the service's no-username guard fires
         # before any cache read, so every position cell renders N/A.
@@ -298,57 +296,26 @@ def _settled_fill_status(fill: PlaylistScenarioFillDrain) -> str:
     return ""
 
 
-def _fill_summary_notification(fill: PlaylistScenarioFillDrain):
-    if fill.terminal != "complete" or not fill.consuming_terminal:
-        return no_update
-    if fill.unknown_count:
-        title = "Position update incomplete"
-        message = f"Couldn't update {fill.unknown_count} of {fill.total} positions"
-        if fill.stale_count:
-            message += f"; {fill.stale_count} more served from cache"
-        color = "red"
-    elif fill.stale_count:
-        title = "Positions served from cache"
-        message = (
-            f"{fill.stale_count} of {fill.total} positions served from cache — "
-            "KovaaK's was unreachable"
-        )
-        color = "yellow"
-    else:
-        return no_update
-    return [
-        toast(
-            f"playlist-progressive-fill-{fill.generation_token}",
-            title,
-            message,
-            color=color,
-            icon=local_icon("material-symbols:warning-outline"),
-        )
-    ]
-
-
 @callback(
     Output("playlist-scenarios-grid", "rowTransaction"),
     Output("playlist-scenarios-status", "children", allow_duplicate=True),
-    Output("notification-container", "sendNotifications", allow_duplicate=True),
     Input("playlist-scenarios-fill-interval", "n_intervals"),
     State("playlist-scenarios-generation", "data"),
     prevent_initial_call=True,
 )
 def drain_playlist_scenario_rows(_n_intervals, generation_token):
-    """Apply streamed rows and run terminal one-shots exactly once."""
+    """Apply streamed rows and settle the status when the fill ends."""
     # DashProxy can phantom-fire allow_duplicate callbacks on initial load.
     if not generation_token:
-        return no_update, no_update, no_update
+        return no_update, no_update
     fill = drain_playlist_scenario_fill(generation_token)
     if fill is None:
-        return no_update, no_update, no_update
+        return no_update, no_update
 
     transaction = {"update": fill.updates} if fill.updates else no_update
     if fill.terminal is None:
-        status = _live_fill_status(fill.done_count, fill.total)
-        return transaction, status, no_update
-    return transaction, _settled_fill_status(fill), _fill_summary_notification(fill)
+        return transaction, _live_fill_status(fill.done_count, fill.total)
+    return transaction, _settled_fill_status(fill)
 
 
 clientside_callback(

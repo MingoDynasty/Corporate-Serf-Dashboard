@@ -68,8 +68,8 @@ benchmark tier) — see the
   persistent configuration state rather than a failure. The playlist
   scenarios page skips its progressive position
   fill entirely and says so in place — "Positions unavailable — set your
-  KovaaK's username in Settings", with Settings linked — so the fill's red
-  summary toast cannot fire over a pass that fetched nothing
+  KovaaK's username in Settings", with Settings linked — so no lookup runs
+  over a pass that would fetch nothing
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
   The playlists overview, whose percentile columns empty for the same reason,
   states it in its own status line as well: "Percentiles unavailable. Set your
