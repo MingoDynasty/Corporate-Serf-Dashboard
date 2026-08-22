@@ -233,7 +233,12 @@ jobs:
                       fi
                       echo "Resuming the existing draft for $TAG"
                   elif grep -qi 'release not found' view-error.txt; then
-                      gh release create "$TAG" --draft --title "$TAG" --generate-notes
+                      # The curated header is prepended to the generated
+                      # changelog: the release page is where a first-time
+                      # visitor asks whether the download is safe to run.
+                      gh release create "$TAG" --draft --title "$TAG" \
+                          --notes-file .github/release-notes-header.md \
+                          --generate-notes
                   else
                       cat view-error.txt >&2
                       echo "::error::could not determine whether $TAG already has a release"
@@ -263,19 +268,39 @@ jobs:
                       python scripts/release_job.py validate \
                       --archive "$ASSET" --metadata release.json \
                       --tag "$TAG" --sha "$GITHUB_SHA" --commit-date "$COMMIT_DATE"
-                  # Confirm the upload landed intact, since a truncated asset
-                  # would be unrepairable once the release is published.
+                  # Confirm the upload landed intact. GitHub's per-asset
+                  # digest proves what GitHub received, not that it matches
+                  # what this job built, and the size comparison this replaces
+                  # passed any equal-size corruption. Compare byte-exactly:
+                  # a published asset can never be replaced.
                   gh release view "$TAG" --json assets \
-                      --jq '.assets[] | "\(.name) \(.size)"' > uploaded-assets.txt
+                      --jq '.assets[] | [.name, .state, (.digest // "")] | @tsv' \
+                      > uploaded-assets.txt
                   cat uploaded-assets.txt
-                  for name in "$ASSET" release.json; do
-                      uploaded=$(awk -v n="$name" '$1 == n { print $2 }' uploaded-assets.txt)
-                      expected=$(stat -c %s "$name")
-                      if [ "$uploaded" != "$expected" ]; then
-                          echo "::error::$name is '$uploaded' bytes on the release, expected $expected"
+                  # A resumed draft keeps whatever --clobber never replaced, so
+                  # the release must carry these two assets and nothing else.
+                  uploaded_names=$(cut -f1 uploaded-assets.txt | sort)
+                  expected_names=$(printf '%s\n' "$ASSET" release.json | sort)
+                  if [ "$uploaded_names" != "$expected_names" ]; then
+                      echo "::error::release assets are not exactly $ASSET and release.json"
+                      exit 1
+                  fi
+                  while IFS=$'\t' read -r name state digest; do
+                      if [ "$state" != "uploaded" ]; then
+                          echo "::error::$name is in state '$state', expected 'uploaded'"
                           exit 1
                       fi
-                  done
+                      # A missing digest is a failure, never a skip.
+                      if [ -z "$digest" ] || [ "$digest" = "null" ]; then
+                          echo "::error::$name carries no digest on the release"
+                          exit 1
+                      fi
+                      built="sha256:$(sha256sum "$name" | cut -d ' ' -f 1)"
+                      if [ "$digest" != "$built" ]; then
+                          echo "::error::$name digest is '$digest', expected '$built'"
+                          exit 1
+                      fi
+                  done < uploaded-assets.txt
 
             - name: Publish release
               if: steps.draft.outputs.already_published != 'true'

@@ -2,11 +2,14 @@ import io
 import json
 import re
 import zipfile
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
 
 from scripts.release_job import (
+    EXCLUDED_ARCHIVE_TREES,
+    REQUIRED_ARCHIVE_ENTRIES,
     archive_prefix,
     build_release_metadata,
     main,
@@ -33,10 +36,35 @@ def _stamp(sha: str = SHA, commit_date: str = COMMIT_DATE) -> str:
     )
 
 
-def _write_archive(path: Path, stamp: str, tag: str = TAG) -> Path:
+def _conforming_entries(stamp: str) -> dict[str, str]:
+    """The smallest set of members that satisfies the archive contract."""
+    entries = {"version.txt": stamp}
+    for entry in REQUIRED_ARCHIVE_ENTRIES:
+        if entry == "version.txt":
+            continue
+        entries[f"{entry}placeholder" if entry.endswith("/") else entry] = "x\n"
+    return entries
+
+
+def _write_archive(
+    path: Path,
+    stamp: str,
+    tag: str = TAG,
+    *,
+    drop: str | None = None,
+    extra: Sequence[str] = (),
+) -> Path:
+    """Write a conforming archive, minus `drop`, plus any `extra` members."""
+    entries = {
+        name: body
+        for name, body in _conforming_entries(stamp).items()
+        if drop is None or not name.startswith(drop)
+    }
     with zipfile.ZipFile(path, "w") as bundle:
-        bundle.writestr(f"{archive_prefix(tag)}version.txt", stamp)
-        bundle.writestr(f"{archive_prefix(tag)}source/app.py", "print('hi')\n")
+        for name, body in entries.items():
+            bundle.writestr(f"{archive_prefix(tag)}{name}", body)
+        for name in extra:
+            bundle.writestr(f"{archive_prefix(tag)}{name}", "")
     return path
 
 
@@ -352,6 +380,99 @@ def test_unreadable_metadata_blocks_publication(tmp_path: Path) -> None:
     metadata.write_text("{not json", encoding="utf-8")
     problems = _problems(archive, metadata)
     assert any("could not be read as JSON" in problem for problem in problems)
+
+
+# --- archive contract -------------------------------------------------------
+
+
+@pytest.mark.parametrize("required", REQUIRED_ARCHIVE_ENTRIES)
+def test_missing_required_entry_blocks_publication(
+    tmp_path: Path, required: str
+) -> None:
+    # A `.gitattributes` edit or a file move that drops an install-critical
+    # path must fail the draft: publication is irreversible.
+    archive = _write_archive(tmp_path / source_asset_name(TAG), _stamp(), drop=required)
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"missing required entry {required}" in problem for problem in problems)
+
+
+@pytest.mark.parametrize("excluded", EXCLUDED_ARCHIVE_TREES)
+def test_excluded_tree_blocks_publication(tmp_path: Path, excluded: str) -> None:
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), extra=[f"{excluded}thing.txt"]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"carries excluded tree {excluded}" in problem for problem in problems)
+
+
+@pytest.mark.parametrize("excluded", EXCLUDED_ARCHIVE_TREES)
+def test_empty_excluded_directory_entry_blocks_publication(
+    tmp_path: Path, excluded: str
+) -> None:
+    # git archive emits directory entries, and the `/tests/**` pattern form
+    # leaves the directory behind after removing its files. An empty tree is
+    # still a shipped tree.
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), extra=[excluded]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"carries excluded tree {excluded}" in problem for problem in problems)
+
+
+@pytest.mark.parametrize(
+    "required", [e for e in REQUIRED_ARCHIVE_ENTRIES if e.endswith("/")]
+)
+def test_bare_required_directory_entry_blocks_publication(
+    tmp_path: Path, required: str
+) -> None:
+    # An archive holding the directory entry but none of its files is empty,
+    # not present. A `/**` export-ignore rule produces exactly this shape.
+    archive = _write_archive(
+        tmp_path / source_asset_name(TAG), _stamp(), drop=required, extra=[required]
+    )
+    metadata = _write_metadata(tmp_path / "release.json")
+    problems = _problems(archive, metadata)
+    assert any(f"missing required entry {required}" in problem for problem in problems)
+
+
+#: Relative links into `docs/` in a Markdown document. `#` is excluded so an
+#: anchored link yields the file path: the archive carries files, and
+#: `docs/architecture.md#layout` is a target no contract entry could satisfy.
+_README_DOC_LINK = re.compile(r"\]\((docs/[^)\s#]+)")
+
+
+def _readme_doc_targets(markdown: str) -> set[str]:
+    return {match.group(1) for match in _README_DOC_LINK.finditer(markdown)}
+
+
+def test_anchored_readme_links_contribute_their_file_path() -> None:
+    assert _readme_doc_targets("[layout](docs/architecture.md#layout)") == {
+        "docs/architecture.md"
+    }
+
+
+def test_readme_doc_targets_are_all_required() -> None:
+    # A README link into docs/ that the contract does not name could be pruned
+    # from the archive alone: checkout-level doc tests would stay green while
+    # the shipped README's link breaks, permanently.
+    root = Path(__file__).resolve().parent.parent
+    targets = _readme_doc_targets((root / "README.md").read_text(encoding="utf-8"))
+    assert targets, "expected the README to link into docs/"
+    assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
+
+
+def test_contract_entries_exist_in_the_repository() -> None:
+    # The contract is only as good as its spelling: a required entry naming a
+    # path that no longer exists would pass forever.
+    root = Path(__file__).resolve().parent.parent
+    for entry in REQUIRED_ARCHIVE_ENTRIES:
+        target = root / entry
+        assert target.is_dir() if entry.endswith("/") else target.is_file(), entry
+    for tree in EXCLUDED_ARCHIVE_TREES:
+        assert (root / tree).is_dir(), tree
 
 
 # --- command line ---------------------------------------------------------
