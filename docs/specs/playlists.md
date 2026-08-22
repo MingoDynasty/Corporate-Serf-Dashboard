@@ -232,18 +232,19 @@ section and [product.md](../product.md). Leaderboard placement is worded
   Those warnings drain only when the Scenario Performance page mounts, as
   persistent yellow toasts titled "Playlist not loaded"; a session that
   starts on `/playlists` sees them after its first visit there.
-- A user file whose code a bundled benchmark serves is recorded and never
+- - A user file whose code a bundled benchmark serves is recorded and never
   deleted at startup; the overview offers an in-app cleanup instead
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
   The yellow alert is titled "Leftover playlist files" and reads "1 leftover
   playlist file in data/playlists is superseded by bundled benchmarks." or
   "{N} leftover playlist files in data/playlists are superseded by bundled
   benchmarks.", with a "Delete leftover files" button. The "Delete Leftover
-  Files" modal asks "Delete 1 leftover playlist file from data/playlists?
-  They are superseded by bundled benchmarks and hold no data." or "Delete
-  {N} leftover playlist files from data/playlists? They are superseded by
-  bundled benchmarks and hold no data." with a "Delete" button. Cleanup tolerates files already gone, keeps
-  any that fail, and toasts "Leftover files deleted" or red "Cleanup failed".
+  Files" modal asks "Delete 1 leftover playlist file from data/playlists? They
+  are superseded by bundled benchmarks and hold no data." or "Delete {N}
+  leftover playlist files from data/playlists? They are superseded by bundled
+  benchmarks and hold no data." with a "Delete" button. Cleanup tolerates
+  files already gone, keeps any that fail, and toasts "Leftover files deleted"
+  or red "Cleanup failed".
 - User files are stamped and read through the store state machine (unusable
   or newer files skipped with an actionable warning); bundled files are
   unstamped by design
@@ -281,27 +282,27 @@ section and [product.md](../product.md). Leaderboard placement is worded
 
 ## The percentile warmup worker
 
-- One app-lifetime daemon starts after startup (whether or not local runs
+- - One app-lifetime daemon starts after startup (whether or not local runs
   were ingested), or on the first username save. The queue holds played
   scenarios from visible playlists, each once, grouped to finish recently
-  played playlists first; the worker is sequential, sleeps two seconds
-  between items, blocks on a condition variable when idle, waits for an
-  interactive quiet window, and backs off on outages, waking early on a
-  real network success. Unhide and import prepend the playlist's played scenarios and
-  wake it; hide and delete cancel nothing. Every dequeue rechecks cache
-  freshness and a session outcome map. UNRANKED is cached only after one
-  positive username validation per session. `percentile_warmup_enabled =
-  false` or an empty username skips the worker
+  played playlists first; the worker is sequential, sleeps two seconds between
+  items, blocks on a condition variable when idle, waits for an interactive
+  quiet window, and backs off on outages, waking early on a real network
+  success. Unhide and import prepend the playlist's played scenarios and wake
+  it; hide and delete cancel nothing. Every dequeue rechecks cache freshness
+  and a session outcome map. UNRANKED is cached only after one positive
+  username validation per session. `percentile_warmup_enabled = false` or an
+  empty username skips the worker
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
   Within each playlist, scenarios lacking a displayable percentile queue
-  first, then most recently played; the prepend uses the same order. The
-  quiet window is five seconds; the backoff ladder runs 30 s to 30 min.
-  Connection errors, 5xx, and post-retry 429 re-queue and trip the backoff;
-  a read timeout and an exhausted third transient attempt are terminal for
-  the session and also trip it; other permanent failures are terminal
-  without it. The three-attempt budget is per scenario name, with one shared
-  budget for username validation. `percentile_warmup_enabled` defaults to
-  true. A restart re-enqueues everything and skips fresh items at dequeue.
+  first, then most recently played; the prepend uses the same order. The quiet
+  window is five seconds; the backoff ladder runs 30 s to 30 min. Connection
+  errors, 5xx, and post-retry 429 re-queue and trip the backoff; a read
+  timeout and an exhausted third transient attempt are terminal for the
+  session and also trip it; other permanent failures are terminal without it.
+  The three-attempt budget is per scenario name, with one shared budget for
+  username validation. `percentile_warmup_enabled` defaults to true. A restart
+  re-enqueues everything and skips fresh items at dequeue.
 - An unknown username stops the queue for the session, whether confirmed by
   the API or by a fresh cached marker; the overview's status line and a
   WARNING log carry it, with no toast
