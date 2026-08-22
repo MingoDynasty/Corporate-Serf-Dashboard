@@ -90,7 +90,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
   scenarios have data — open the playlist to fetch now"; a Lowest value
   shows "Lowest: {scenario}" on hover.
 - The warmup status line has three renderings: "Updating percentile data: N
-  remaining", the same with " (~<duration>)" once a pace sample exists
+  remaining", the same with " (~{duration})" once a pace sample exists
   (smallest form "<1 min"), and "Updating percentile data: N remaining ·
   paused; retrying at H:MM AM/PM" (12-hour local time, never with the ETA)
   in backoff; "Percentile update stopped: {reason}" after a fatal stop. A
@@ -239,9 +239,10 @@ section and [product.md](../product.md). Leaderboard placement is worded
   playlist file in data/playlists is superseded by bundled benchmarks." or
   "{N} leftover playlist files in data/playlists are superseded by bundled
   benchmarks.", with a "Delete leftover files" button. The "Delete Leftover
-  Files" modal asks "Delete {N} leftover playlist file(s) from
-  data/playlists? They are superseded by bundled benchmarks and hold no
-  data." with a "Delete" button. Cleanup tolerates files already gone, keeps
+  Files" modal asks "Delete 1 leftover playlist file from data/playlists?
+  They are superseded by bundled benchmarks and hold no data." or "Delete
+  {N} leftover playlist files from data/playlists? They are superseded by
+  bundled benchmarks and hold no data." with a "Delete" button. Cleanup tolerates files already gone, keeps
   any that fail, and toasts "Leftover files deleted" or red "Cleanup failed".
 - User files are stamped and read through the store state machine (unusable
   or newer files skipped with an actionable warning); bundled files are
@@ -285,8 +286,8 @@ section and [product.md](../product.md). Leaderboard placement is worded
   scenarios from visible playlists, each once, grouped to finish recently
   played playlists first; the worker is sequential, sleeps two seconds
   between items, blocks on a condition variable when idle, waits for an
-  interactive quiet window, and backs off on outages until a real network
-  success. Unhide and import prepend the playlist's played scenarios and
+  interactive quiet window, and backs off on outages, waking early on a
+  real network success. Unhide and import prepend the playlist's played scenarios and
   wake it; hide and delete cancel nothing. Every dequeue rechecks cache
   freshness and a session outcome map. UNRANKED is cached only after one
   positive username validation per session. `percentile_warmup_enabled =
