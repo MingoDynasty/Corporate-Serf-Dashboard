@@ -77,7 +77,7 @@ list in the roadmap.)
   configuration state with an anonymous "Position refresh failed". Both now
   name the actual condition and point at where to fix it. That red playlist
   toast is gone for every cause, not just a missing username (PR #253): a
-  position update that comes back short now says so in the line under the
+  position update that comes back short now says so in the line above the
   table and nowhere else, because a toast repeating a count already on screen
   is an interruption that buys nothing. (A username that is set but wrong is
   still not named anywhere: the table reports the positions as unavailable

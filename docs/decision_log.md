@@ -19,9 +19,9 @@ Status: Accepted
 
 Opening a playlist used to end a degraded position update with a red or
 yellow toast that repeated a count the page's own status line already showed.
-The toast is gone. The status line under the grid is now the only place the
-fill reports that positions were unavailable or served from cache, and a
-clean fill still clears it and stays silent. Nothing else about the update
+The toast is gone. The status line above the grid, beside the filter box, is
+now the only place the fill reports that positions were unavailable or served
+from cache, and a clean fill still clears it and stays silent. Nothing else about the update
 changes.
 
 Decision: the progressive fill on `/playlists/<code>` states degradation in
@@ -38,7 +38,8 @@ A degraded fill is an automatic failure during passive navigation, which that
 entry routes to in-place state with no toast, and its second litmus — already
 visible somewhere? then nothing — is answered by the status line, which
 carries the same counts ("1 of 3 positions unavailable · 1 from cache —
-KovaaK's unreachable") directly under the grid the user is already reading.
+KovaaK's unreachable") in the filter row directly above the grid the user is
+already reading.
 
 Rejected: ratifying the toast as a third named exception to the
 persistent-condition rule, beside the Steam-ID mismatch and the startup
@@ -1025,7 +1026,12 @@ pages cannot import `app`, and the literal should exist once.
 
 ## 2026-08-09: An Unset Username Is Stated In Place, Never Reported As A Failure
 
-Status: Accepted
+Status: Accepted; the configured-but-wrong-username case the Scope note below
+defers is now half settled by the 2026-08-22
+["The Playlist Fill Reports Degradation In Place Only"](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
+entry, which deleted the playlist fill's aggregate toast — and with it
+`_fill_summary_notification`, described below as untouched. Only the Refresh
+half of "both generic red toasts" still fires. Everything else here stands.
 
 With no KovaaK's username configured, opening a playlist used to run a
 position update that fetched nothing and then popped a red "Position update
