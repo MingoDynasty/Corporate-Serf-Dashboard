@@ -87,6 +87,12 @@ sequence.
   the per-run toast family, and the misleading copy on the existing
   score-threshold switch gets corrected alongside it. Design in
   [`run_notifications_switch_proposal.md`](./run_notifications_switch_proposal.md).
+- **Personal best celebration** — confetti and a "New personal best" toast
+  when a run beats a scenario's personal best, on every page and for every
+  scenario, with a Settings-page control to pick the style or turn it off.
+  The motivation layer the per-run verdict toast can't provide: the one
+  moment every run is chasing currently passes in silence. Design in
+  [`pb_celebration_proposal.md`](./pb_celebration_proposal.md).
 
 ---
 
