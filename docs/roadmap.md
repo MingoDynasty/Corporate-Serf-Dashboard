@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Run notifications master switch** — run toasts can now be turned off. One
+  Chart options switch, Run Notifications, silences the whole per-run toast
+  family: the threshold verdict, the placement, and the catch-up digest after
+  time away. The chart keeps updating either way, and a run file that failed
+  to import still says so. The switch that used to read "Score Threshold
+  Notification" never gated toasts at all, so it is now "Score Threshold
+  Verdict" and says what it does. (PR #245; design in #240) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Scenario Performance point customization** — the raw run points can now be
   made smaller, larger, or a color of your choosing, from a Run Data Points
   group in Chart options. Eight curated swatches read on both the light and the
@@ -62,15 +70,6 @@ sequence.
   "Settings". No preference changed what it does or where it is stored. (PRs
   #209, #215; design in #206) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Notification system redesign** — the app is quiet during normal play. The
-  wall of red error toasts about an unconfigured username is gone: persistent
-  conditions now explain themselves in place, beside the value they affect,
-  and passive navigation never interrupts. Each run produces at most one
-  toast, whose title states the verdict — a threshold pass or miss, or the
-  placement it earned — and playing again replaces it instead of stacking a
-  second one beside it. The no-information "Graph updated!" toast is gone
-  too. (PRs #194, #196, #198, #200; design in #82, #195) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -82,11 +81,6 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
-- **Run notifications master switch** — a small parallel item adding the one
-  thing run toasts can't do today: turn off. One Chart options switch silences
-  the per-run toast family, and the misleading copy on the existing
-  score-threshold switch gets corrected alongside it. Design in
-  [`run_notifications_switch_proposal.md`](./run_notifications_switch_proposal.md).
 
 ---
 
