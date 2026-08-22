@@ -28,6 +28,13 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Scenario Performance point customization** — the raw run points can now be
+  made smaller, larger, or a color of your choosing, from a Run Data Points
+  group in Chart options. Eight curated swatches read on both the light and the
+  dark chart; a picker and a hex field cover everything else; Automatic and
+  Default keep the chart exactly as it was. Nothing else about the chart became
+  customizable, which is the point. (PR #241; design in #238) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Initial setup flow** — a fresh install now says what it could not set up
   for itself. The Scenario Performance page carries a small setup card while
   something has never been asked about: no KovaaK's stats folder was found, or
@@ -64,15 +71,6 @@ sequence.
   second one beside it. The no-information "Graph updated!" toast is gone
   too. (PRs #194, #196, #198, #200; design in #82, #195) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Settings detection** — the Settings page now offers what the machine
-  already knows. The stats-folder box suggests every Steam library holding a
-  KovaaK's stats folder, so a wrong first-start pick is a click to repair
-  instead of a path dug out of Explorer by hand; a Detect button checks this
-  machine's Steam accounts against KovaaK's and fills in the one it can prove
-  is yours, offering a choice when it cannot prove exactly one. Detection only
-  ever fills the form — Save is still what writes. (PRs #189, #191, #193;
-  design in #186) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -84,11 +82,6 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
-- **Scenario Performance point customization** — a small pre-launch polish item
-  that lets people make raw run points easier to see without turning Chart
-  options into a general style editor. It is parallel work and does not displace
-  Run history and sessions. Design in
-  [`scenario_point_customization_proposal.md`](./scenario_point_customization_proposal.md).
 - **Run notifications master switch** — a small parallel item adding the one
   thing run toasts can't do today: turn off. One Chart options switch silences
   the per-run toast family, and the misleading copy on the existing
