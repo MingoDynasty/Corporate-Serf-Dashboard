@@ -17,9 +17,9 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 
 Status: Accepted
 
-Every shipped capability with a durable behavior contract now has a spec
-that states what the app does today, and the missing ones are being written
-in one deliberate pass instead of waiting for a change to touch each
+Every shipped capability with a durable behavior contract must have a spec
+that states what the app does today, and the four still missing are being
+written in one deliberate pass instead of waiting for a change to touch each
 capability. A new capability brings its spec in the PR that ships it, and a
 change to specified behavior updates the spec in the same PR. The specs are
 how a reader finds the decision behind a behavior, so the log still keeps no
@@ -27,10 +27,14 @@ topic index.
 
 Decision: the "do not backfill specs ahead of need" rule in `AGENTS.md` is
 replaced by a standing criterion — **every shipped capability with a durable
-behavior contract has a spec under `docs/specs/`**. A new capability gets its
-spec in the shipping PR; a PR that changes specified behavior updates the
-spec in the same PR (the "Shipping a proposal" checklist's step 2 now says
-the same thing). The `AGENTS.md` "Scenario Rank Feature" pointer becomes a
+behavior contract must have a spec under `docs/specs/`**. A new capability
+gets its spec in the shipping PR; a PR that changes specified behavior
+updates the spec in the same PR (the "Shipping a proposal" checklist's step 2
+now says the same thing). The criterion is a requirement, not a description
+of the tree: when this entry landed the directory held two specs, and the
+four the pass names below are in flight as their own PRs, so the layer is
+complete only once those merge. The `AGENTS.md` "Scenario Rank Feature"
+pointer becomes a
 "Capability Specs" section pointing at the directory, which lists itself, so
 no per-spec list is touched by every spec PR; `architecture.md`'s "Where to
 look first" table carries the same pointer.

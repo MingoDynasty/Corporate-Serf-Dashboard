@@ -97,9 +97,9 @@ Codex <codex@local>
   entry for it), and opening with a layer-1 summary (see "Doc style — two
   readers, two layers"). `docs/decision_log.md` stays the chronological
   change history. Every shipped capability with a durable behavior contract
-  has a spec: a new capability gets its spec in the PR that ships it, and a
-  PR that changes specified behavior updates the spec in the same PR (this
-  is step 2 of "Shipping a proposal" below).
+  must have a spec: a new capability gets its spec in the PR that ships it,
+  and a PR that changes specified behavior updates the spec in the same PR
+  (this is step 2 of "Shipping a proposal" below).
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
