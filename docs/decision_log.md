@@ -13,18 +13,17 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
-## 2026-08-22: The Capability Spec Layer Is Completed In One Pass
+## 2026-08-22: The Capability Spec Layer Is Written In One Pass
 
 Status: Accepted
 
 Every shipped capability with a durable behavior contract must have a spec
 that states what the app does today, and the four still missing are being
 written in one deliberate pass instead of waiting for a change to touch each
-capability. The title names that choice of one pass over on-demand writing,
-not a finished layer. A new capability brings its spec in the PR that ships
-it, and a change to specified behavior updates the spec in the same PR. The
-specs are how a reader finds the decision behind a behavior, so the log
-still keeps no topic index.
+capability. A new capability brings its spec in the PR that ships it, and a
+change to specified behavior updates the spec in the same PR. The specs are
+how a reader finds the decision behind a behavior, so the log still keeps no
+topic index.
 
 Decision: the "do not backfill specs ahead of need" rule in `AGENTS.md` is
 replaced by a standing criterion — **every shipped capability with a durable
