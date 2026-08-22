@@ -95,7 +95,10 @@ def test_run_data_points_group_sits_between_overlays_and_score_threshold(compone
         if isinstance(component, dmc.Title)
     ]
 
-    assert titles == ["Overlays", "Run Data Points", "Score Threshold"]
+    # A trailing Notifications group now follows Score Threshold, so this pins
+    # the order these three hold at the front of the panel rather than the
+    # panel's entire group list.
+    assert titles[:3] == ["Overlays", "Run Data Points", "Score Threshold"]
 
 
 def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
