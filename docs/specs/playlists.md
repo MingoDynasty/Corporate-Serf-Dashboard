@@ -232,7 +232,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
   Those warnings drain only when the Scenario Performance page mounts, as
   persistent yellow toasts titled "Playlist not loaded"; a session that
   starts on `/playlists` sees them after its first visit there.
-- - A user file whose code a bundled benchmark serves is recorded and never
+- A user file whose code a bundled benchmark serves is recorded and never
   deleted at startup; the overview offers an in-app cleanup instead
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
   The yellow alert is titled "Leftover playlist files" and reads "1 leftover
@@ -282,7 +282,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
 
 ## The percentile warmup worker
 
-- - One app-lifetime daemon starts after startup (whether or not local runs
+- One app-lifetime daemon starts after startup (whether or not local runs
   were ingested), or on the first username save. The queue holds played
   scenarios from visible playlists, each once, grouped to finish recently
   played playlists first; the worker is sequential, sleeps two seconds between
