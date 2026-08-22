@@ -3,6 +3,7 @@ This module handles functions around plots.
 """
 
 import logging
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime
@@ -19,6 +20,25 @@ from source.utilities.utilities import format_absolute_timestamp, format_decimal
 logger = logging.getLogger(__name__)
 
 _K = TypeVar("_K")
+
+# The raw-run scatter's trace name. It is the handle the Run Data Points
+# preferences select on: index 0 is an implementation detail of how the
+# combined figure is assembled, while the name is what the legend, the hover
+# template, and the appearance callback all already agree on.
+RUN_DATA_POINT_TRACE_NAME = "Run Data Point"
+
+POINT_SIZE_DEFAULT = "Default"
+# The size presets a reader chooses between. Default is deliberately absent
+# from the pixel map below: it means "leave marker.size alone", so the graph
+# keeps whatever Plotly and the Mantine template give it and future template
+# changes flow through without migrating a stored pixel count.
+POINT_SIZE_OPTIONS = ("Small", POINT_SIZE_DEFAULT, "Large")
+POINT_SIZE_PRESET_PX = {"Small": 4, "Large": 10}
+
+# ColorInput is set to hex, so this is the whole shape a stored value can
+# legitimately have. Anything else -- a cleared field's "", a hand-typed
+# fragment, a value from an older format -- means Automatic.
+_HEX_COLOR_PATTERN = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})")
 
 
 def generate_placeholder_plot() -> go.Figure:
@@ -278,7 +298,7 @@ def _generate_xy_plot(  # noqa: PLR0913
             "yanchor": "bottom",
         },
     )
-    figure_combined["data"][0]["name"] = "Run Data Point"
+    figure_combined["data"][0]["name"] = RUN_DATA_POINT_TRACE_NAME
     figure_combined["data"][0]["showlegend"] = True
     figure_combined["data"][1]["name"] = "Average Score"
     figure_combined["data"][1]["showlegend"] = True
@@ -368,6 +388,37 @@ def apply_light_dark_mode(figure: go.Figure, color_scheme: str) -> go.Figure:
     """
     template = "mantine_dark" if color_scheme == "dark" else "mantine_light"
     figure.update_layout(template=template)
+    return figure
+
+
+def apply_point_appearance(
+    figure: go.Figure,
+    point_size: str | None,
+    point_color: str | None,
+) -> go.Figure:
+    """Apply the Run Data Points preferences to the raw-run scatter trace.
+
+    Runs after the theme template, so an explicit color wins over the
+    colorway the template just applied. Everything unrecognized falls through
+    to the generated appearance: the Default size, an empty or malformed
+    color, a figure whose traces are the empty state's (none), and a figure
+    from a version that named its traces differently.
+    :param figure: themed figure to restyle in place.
+    :param point_size: a value from ``POINT_SIZE_OPTIONS``, or anything else.
+    :param point_color: a hex color string, or anything else for Automatic.
+    :return: the same figure, restyled where the preferences applied.
+    """
+    marker: dict[str, int | str] = {}
+    size = POINT_SIZE_PRESET_PX.get(point_size or "")
+    if size is not None:
+        marker["size"] = size
+    if isinstance(point_color, str) and _HEX_COLOR_PATTERN.fullmatch(point_color):
+        marker["color"] = point_color
+    if not marker:
+        return figure
+    # Merges into whatever marker the trace already carries, and selects
+    # nothing at all on figures without a raw-run trace.
+    figure.update_traces(marker=marker, selector={"name": RUN_DATA_POINT_TRACE_NAME})
     return figure
 
 
