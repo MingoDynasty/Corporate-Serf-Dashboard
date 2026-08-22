@@ -1,1 +1,10 @@
 version.txt export-subst
+
+# Development-only trees are pruned from `git archive`, so they ship in
+# neither the release zip nor GitHub's auto-generated source archive. Use the
+# anchored directory form: the `/tests/**` form drops the files but leaves an
+# empty `tests/` directory entry behind. `docs/` deliberately stays, because
+# the shipped README links relatively into it.
+/tests export-ignore
+/.idea export-ignore
+/.github export-ignore
