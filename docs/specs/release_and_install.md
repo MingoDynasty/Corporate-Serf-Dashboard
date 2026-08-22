@@ -67,7 +67,8 @@ lines quoted here are plain console output, not app notifications.
   under an `export-subst` attribute; `git archive` expands them, so the zip
   and GitHub's own source archive both carry the full SHA and commit date
   ([2026-07-19](../decision_log.md#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp)).
-  The `test` job separately downloads GitHub's archive of the pushed commit
+  The `test` job separately downloads GitHub's archive of the commit under
+  test (the PR head on a pull request)
   and fails if the stamp is unexpanded or names another SHA.
 - `validate_release` refuses the draft when: the archive is not named
   `source_asset_name(tag)`; it lacks `<prefix>version.txt`; the stamp is
@@ -98,11 +99,13 @@ lines quoted here are plain console output, not app notifications.
   in the anchored directory form, so neither the release zip nor GitHub's
   source archive carries them, not even as empty directories. `docs/` ships
   ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
-- A fresh install therefore holds, under `versions/<tag>/`: `source/`,
+- A fresh install therefore holds, under `versions/<tag>/`, every tracked
+  path outside those three trees, agent tooling (`.claude/`, `AGENTS.md`,
+  `CLAUDE.md`) included. The contract guarantees at least `source/`,
   `assets/`, `resources/`, `scripts/`, `docs/`, `install.ps1`,
   `pyproject.toml`, `uv.lock`, `.python-version`, `version.txt`,
-  `example.toml`, `LICENSE`, `README.md`, plus the staged `release.json` and
-  the synced `.venv/`
+  `example.toml`, `LICENSE`, and `README.md`; the staged `release.json` and
+  the synced `.venv/` sit beside them
   ([2026-08-21](../decision_log.md#2026-08-21-release-integrity-rests-on-github-digests-and-an-enforced-archive-contract)).
 
 ## Installing
@@ -134,9 +137,9 @@ lines quoted here are plain console output, not app notifications.
   required, its name discovered after extraction; the extracted
   `version.txt` must contain the release's `sha`; then it is moved to
   `versions\<tag>\`, `release.json` is written beside it byte-for-byte, and
-  `uv sync --locked --no-dev --managed-python` runs there. A reinstall over
-  the running tag parks the old directory under `tmp\` first and restores
-  it if the sync fails
+  `uv sync --locked --no-dev --managed-python` runs there. A reinstall onto
+  a tag whose directory already exists parks that directory under `tmp\`
+  first and restores it if the replacement fails before its sync completes
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract),
   [2026-07-19](../decision_log.md#2026-07-19-build-identity-comes-from-the-manifest-corroborated-by-the-stamp)).
 - Installs ask no questions. With no `config.toml` at the root, the installer
@@ -224,8 +227,8 @@ lines quoted here are plain console output, not app notifications.
 - Normal start prints "Starting Corporate Serf Dashboard <tag> ...". A
   non-ready outcome kills the child tree, `Show-AppFailure` prints
   "WARNING: the dashboard failed to start (<state>)." plus the last 15
-  lines of `launcher-app-stderr.log` between "--- app error output ---"
-  rules, and `Stop-Fatal` prints "ERROR: version <tag> did not become ready
+  lines of `launcher-app-stderr.log` under an "--- app error output ---"
+  rule, and `Stop-Fatal` prints "ERROR: version <tag> did not become ready
   on port <port>. A readiness failure can be config-caused: check
   config.toml in <root> and the app error output above.", the reinstall
   one-liner, and "Press Enter to close"
@@ -242,14 +245,16 @@ lines quoted here are plain console output, not app notifications.
 
 ## Updating
 
-- Under the `latest` policy the launcher queries `releases/latest` with a
+- Under any policy other than `pinned` (the scripts write only `latest`)
+  the launcher queries `releases/latest` with a
   5 s timeout; any failure prints "Update check failed (<reason>); starting
   the installed version." and runs the installed version. A `pinned`
   policy skips the check entirely; re-running the installer without `-Tag`
   rewrites the policy to `latest`
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
 - A different tag prints "Update available: <old> -> <new>" and fetches its
-  `release.json`. A `schema_version` other than 1, a parse failure, or a
+  `release.json`. A failed fetch of `release.json`, a `schema_version`
+  other than 1, a parse failure, or a
   missing field prints a yellow banner: "A new release (<tag>) exists, but
   this installed launcher cannot understand it (<reason>).", "Starting the
   installed version instead. Updating requires reinstalling:", the
@@ -311,16 +316,18 @@ lines quoted here are plain console output, not app notifications.
 - Identity surfaces as the startup log line `Build <short sha> (<date>),
   <label>` in `debug.log`, in `/health`, and on the Settings page as
   "Version <label>" and "Commit <short sha> (<date>)"; the Dash app title
-  carries the tag only when one is known. The Settings page section's own
+  carries the tag only when one is known; opt-in, `show_version_in_title`
+  prefixes every tab title with the label. The Settings page section's own
   rules are set by
   ([2026-08-02](../decision_log.md#2026-08-02-the-settings-page-owns-version-display)).
 
 ## State root
 
 - The installer sets `CSD_STATE_DIR` to the install root around its
-  `load_config()` round-trip; the launcher sets it to the install root
-  around the endpoint read and for the app process, and clears it after
-  each. In an installed copy the state root is therefore the install root:
+  `load_config()` round-trip, clearing it afterward; the launcher sets it
+  to the install root around the endpoint read, clearing it afterward, and
+  again when it starts the app process, where it is left set (only the
+  launch token is cleared). In an installed copy the state root is therefore the install root:
   `config.toml`, `install.json`, and `data/` sit beside `versions/`. Unset
   means the working directory; what the root holds is set by
   ([2026-07-19](../decision_log.md#2026-07-19-all-mutable-state-lives-under-an-explicit-state-root)).
