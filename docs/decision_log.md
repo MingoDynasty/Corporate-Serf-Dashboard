@@ -3011,7 +3011,11 @@ Constraints:
 
 ## 2026-07-12: Rank-Fetch Failure Degrades To The Last Cached Rank
 
-Status: Accepted
+Status: Superseded in part, for the passive red/yellow toasts of the
+three-tier toast model in Constraints below, by the
+[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+(passive renders state the condition in place; manual Refresh keeps all
+three tiers). The fallback semantics are unchanged and remain Accepted.
 
 Decision: When `get_scenario_rank_info` has resolved a leaderboard but the
 live rank fetch fails — either an unreachable endpoint (`RequestException`) or
