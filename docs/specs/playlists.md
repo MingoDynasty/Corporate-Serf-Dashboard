@@ -81,10 +81,10 @@ section and [product.md](../product.md). Leaderboard placement is worded
   resolved all-UNRANKED playlist reads `N/A`. Lowest shows "Lowest:
   {scenario}" on hover. The warmup status line reads "Updating percentile
   data: N remaining" while work exists, with " (~ETA)" appended once a pace
-  sample exists, "… · paused; retrying at H:MM AM" in backoff, and "Percentile update stopped: {reason}" after a
-  fatal stop; a one-second interval rebuilds rows without recording
-  interactive activity, disables after one idle rebuild, and re-arms on the
-  worker's enqueue generation
+  sample exists, "… · paused; retrying at H:MM AM" in backoff, and "Percentile
+  update stopped: {reason}" after a fatal stop; a one-second interval rebuilds
+  rows without recording interactive activity, disables after one idle
+  rebuild, and re-arms on the worker's enqueue generation
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
 - Visibility is a per-code show-list in `data/playlist_visibility.json`,
   uniform for bundled and user playlists. A missing or unusable file yields
