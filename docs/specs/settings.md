@@ -23,8 +23,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 
 ## The configuration file
 
-- `config.toml` in the state root is human-owned and app-read-only: nothing in
-  the app, the installer included, ever writes it
+- `config.toml` in the state root is written once by the installer at first
+  install and is human-owned and app-read-only from then on: the app never
+  writes it, and an update never touches it
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
   `ConfigData` holds `port` (required, no default), `host` (`"127.0.0.1"`),
   `polling_interval` (`1000` ms), `sens_round_decimal_places` (`1`), `debug`
@@ -194,7 +195,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   digits at or above `76561197960265728` ("Enter a 17-digit SteamID64 — it
   starts with 7656119."), the username has no rule. Any field error writes
   nothing; values are stripped; a successful save writes every key, says
-  "Settings saved.", and starts the warmup worker when a username is present
+  "Settings saved.", and, when a username is present and
+  `percentile_warmup_enabled` is on, starts the warmup worker if none is
+  running
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
 - Save outcomes are in-place statuses, never toasts: an I/O failure says
   "Could not save settings — nothing was written. See data/logs/debug.log."
