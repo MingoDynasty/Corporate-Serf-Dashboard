@@ -56,7 +56,8 @@ their full behavior.
   failures, startup playlist warnings — reach the screen only while that
   page is mounted: the first two on its next poll tick, the warnings on a
   one-shot interval after mount. The playlist fill's channel is drained by
-  the playlist scenarios page; the playlists spec owns it.
+  the playlist scenarios page and carries grid rows, never notifications; the
+  playlists spec owns it.
 
 ## Routing policy
 
@@ -109,17 +110,16 @@ their full behavior.
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - A local validation problem is an inline field error, not a toast: an empty
   playlist import code sets "Enter a playlist code." on the field.
-- The playlist scenarios page's progressive fill ends with at most one
-  aggregate toast per fill — red when positions could not be updated, yellow
-  when some were served from cache, nothing when clean
-  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
-  That toast fires on an automatic failure during navigation that the page's
-  status line also states, and whether it conforms to the routing order
-  above is an open ruling: the policy entry does not name it, and the
-  configured-but-wrong username case it still reports is recorded as
-  deferred
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
-  The playlists spec owns the toast.
+- The playlist scenarios page's progressive fill reports degradation in the
+  page's own status line and toasts nothing, whatever the outcome: positions
+  that could not be updated, positions served from cache, a cancelled fill,
+  and a clean one all settle in place. It is an automatic failure during
+  passive navigation with an in-place home, so the routing order above sends
+  it there
+  ([2026-08-22](../decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only),
+  superseding the aggregate-toast clause of
+  [2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  The playlists spec owns the status line.
 
 ## Run notifications
 
@@ -282,4 +282,3 @@ unless noted.
 | `superseded-cleanup-successful-notification` | "Leftover files deleted" | green | `confirm_delete_superseded`; playlists spec |
 | `superseded-cleanup-failed-notification` | "Cleanup failed" | red | `confirm_delete_superseded`; playlists spec |
 | `visibility-refused-notification` | "Show and hide are unavailable" | red | `update_playlist_visibility`; playlists spec ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)) |
-| `playlist-progressive-fill-{generation}` | "Position update incomplete" / "Positions served from cache" | red / yellow | `drain_playlist_scenario_rows`; playlists spec |
