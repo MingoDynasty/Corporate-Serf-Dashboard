@@ -36,8 +36,10 @@ The output contract, ratified 2026-08-20 and shipped in PR #243:
   after N seconds.` No heartbeat shown means no completion line. The
   `exited` and `timeout` outcomes never print a completion line; their
   callers report the failure as before.
-- The `Dashboard running at http://...` line is unaffected and still prints
-  in every case.
+- The `Dashboard running at http://...` line is unchanged, and still prints
+  on every successful launch by either startup path, once the app is ready.
+  It was never reached on a failed start: a normal start that returns
+  `timeout` or `exited` stops at `Stop-Fatal` before it.
 - No reassurance or explanation sentences. The elapsed counter is the whole
   feature. Gate and interval are implementer-tunable around ~5 s; both are
   5 s today.
@@ -56,10 +58,12 @@ can land up to ~2.5 s after its nominal time and the timeout outcome can
 overshoot the ceiling by about as much. On a machine where a closed loopback
 port is slow to refuse, every pre-listen probe burns its full timeout, which
 is why the PR's transcripts show 7/12 s rather than 5/10 s. The probe itself
-is unchanged: `127.0.0.1` per the
-[2026-08-09 entry](#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001),
-gated on the full SHA and launch token, with process exit detected at the
-next loop check rather than at the ceiling.
+is unchanged. Its address stays governed by the
+[2026-08-14 configurable-listen-address entry](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+`Get-ProbeAddress` sends a wildcard bind to its own family's loopback and
+every other configured host to that host's literal URL form. The gate on
+the full SHA and launch token, and process exit detected at the next loop
+check rather than at the ceiling, are likewise unchanged.
 
 Why `$HealthTimeoutSec` stays at 120: the ceiling's job is failure
 declaration, and timeout is destructive. On the normal start the child is
