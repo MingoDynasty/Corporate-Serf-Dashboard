@@ -18,12 +18,12 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 Status: Accepted
 
 Run toasts can now be turned off. Chart options carries a Run Notifications
-switch, on by default, and turning it off silences every notification the app
-raises about a run while the chart keeps updating in the background. The
+switch, on by default, and turning it off silences the toasts that report how
+a run went while the chart keeps updating in the background. A run file that
+fails to import still says so, and nothing else about the toasts changed. The
 switch that used to be labelled "Score Threshold Notification" never gated
 toasts at all, only whether a run was judged, so it is renamed "Score
-Threshold Verdict" and its help text now says what it actually does. Nothing
-else about the toasts changed.
+Threshold Verdict" and its help text now says what it actually does.
 
 Decision: a `dmc.Switch` with id `run-notification-switch`, `checked=True` and
 `persistence=True`, in a new **Notifications** group at the end of the Chart
