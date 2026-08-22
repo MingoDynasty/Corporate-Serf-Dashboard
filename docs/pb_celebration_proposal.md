@@ -47,14 +47,14 @@ persistence rather than `data/settings.json`, for the reasons in Design
 addition a real migration with a rollback cost, which a cosmetic preference
 should not be the thing to trigger.
 
-This departs from the placement rule the point customization entry and the
-run notifications proposal both state, that the inspector owns
-browser-persisted presentation preferences. The departure is deliberate and
-narrow: that rule governs preferences about the chart; this preference is
-about the app. The Settings page section is also the first browser-persisted
-control on that page, beside a form whose three fields are written to disk
-behind Save. The section is visibly separate and its control applies
-instantly, so the form's contract is untouched.
+This departs from the placement rule the point customization and master
+switch decision-log entries (2026-08-20 and 2026-08-21) both state, that the
+inspector owns browser-persisted presentation preferences. The departure is
+deliberate and narrow: that rule governs preferences about the chart; this
+preference is about the app. The Settings page section is also the first
+browser-persisted control on that page, beside a form whose three fields are
+written to disk behind Save. The section is visibly separate and its control
+applies instantly, so the form's contract is untouched.
 
 Choosing the inspector instead keeps the placement rule intact and is
 marginally cheaper. Choosing `data/settings.json` instead is the
@@ -140,10 +140,13 @@ runs stay silent. The toast travels with the animation because it is the
 part that carries information (which scenario, what score, by how much); on
 a page other than Scenario Performance, confetti without it is a burst with
 no explanation, and under reduced motion the toast is the whole celebration.
-The master switch's ratified help text enumerates the three shapes it gates,
+The master switch's shipped help text enumerates the three shapes it gates,
 so a fourth family outside that list breaks no promise, and a user in the
 off-plus-style state has asked for two things at once: no narration of
-routine runs, and a celebration of personal bests.
+routine runs, and a celebration of personal bests. `product.md` currently
+summarizes the switch as "with it off the chart still updates and nothing
+toasts about a run"; the lean amends that sentence to except the
+celebration toast, in the same edit D4 makes to the paragraph.
 
 Choosing to let the master switch silence the celebration toast (or the
 whole celebration) reads the master-switch proposal's "do not toast me about
@@ -173,9 +176,9 @@ per-sensitivity placement, not the scenario-wide achievement.
 The producer side is also page-bound. `message_queue` is drained by an
 interval mounted in the Scenario Performance layout and filtered to the
 selected scenario, so any feature built on it is blind on every other page
-and for every other scenario. The run notifications master switch proposal
-deferred making run toasts app-wide because judging a run against the
-selected scenario's threshold does not generalize. A celebration has no such
+and for every other scenario. The master switch decision-log entry
+(2026-08-21) deferred making run toasts app-wide because judging a run
+against the selected scenario's threshold does not generalize. A celebration has no such
 dependency: it needs "a personal best happened, in this scenario, with this
 score", which the watchdog already knows.
 
@@ -208,7 +211,8 @@ Repository, at `main` as of 2026-08-21:
   older build, so a rollback after the bump would run with no settings.
 - The Settings page is a Save-all-at-once form for those three keys with a
   restart-pending notice; nothing on it uses Dash persistence. The Scenario
-  Performance inspector has twelve browser-persisted controls.
+  Performance inspector has thirteen browser-persisted controls, the Run
+  Notifications master switch (PR #245) among them.
 - Browser persistence is per origin; the 2026-07 URL-unification entry in
   the decision log records the app once accumulating disjoint toggle state
   across `localhost` and `127.0.0.1`.
@@ -412,16 +416,16 @@ paragraph and a new inventory entry, `architecture.md` (the new channel in
 the sanctioned-channels list, the shell's interval and stores, the asset
 file), the README, the roadmap, and deletion of this file.
 
-Dependencies: none hard. Soft: the run notifications master switch
-implementation PR edits `_build_run_event_notification` and the inspector;
-whichever lands second rebases over a small conflict with no semantic
-interaction, since that switch and this setting gate different families.
+Dependencies: none. The run notifications master switch (PR #245) has
+landed; its guard sits at the top of `_build_run_event_notification`, and
+the personal best yield rule slots in beside it as a second independent
+early return.
 
 ## Out of scope
 
 - **App-wide run toasts.** Verdict, placement, and digest toasts stay on
-  Scenario Performance; the deferral in the run notifications proposal
-  stands. This proposal adds one app-wide family, not a general producer.
+  Scenario Performance; the deferral recorded in the master switch
+  decision-log entry stands. This proposal adds one app-wide family, not a general producer.
 - **Per-sensitivity personal bests.** The celebration is scenario-wide, like
   the watchdog's flag. A per-sensitivity best is already the placement
   toast's job.
