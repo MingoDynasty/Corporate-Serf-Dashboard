@@ -26,6 +26,14 @@ _K = TypeVar("_K")
 # combined figure is assembled, while the name is what the legend, the hover
 # template, and the appearance callback all already agree on.
 RUN_DATA_POINT_TRACE_NAME = "Run Data Point"
+# The color the run points have when no point color is chosen. It is not
+# ours to pick: ``px.scatter`` writes the first colorway entry of Plotly's
+# default template into the trace when the figure is generated, and a
+# template applied later (the Mantine light and dark ones) never overrides a
+# property the trace already sets, so the points are this color in both
+# themes. The value is pinned here only so the empty Point color field can
+# preview it; tests hold it to what generation actually produces.
+RUN_DATA_POINT_DEFAULT_COLOR = "#636efa"
 
 POINT_SIZE_DEFAULT = "Default"
 # The size presets a reader chooses between. Default is deliberately absent

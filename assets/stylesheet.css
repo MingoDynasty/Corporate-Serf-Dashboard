@@ -197,6 +197,20 @@
     font-weight: bold;
 }
 
+/* An empty Point color field means the generated color, so its preview swatch
+   shows that color rather than Mantine's stand-in. ColorInput paints the
+   preview of an empty value white, as an inline style, which is what the
+   !important is for. The color itself comes from --point-color-default, which
+   Home sets on the field from plot_service.RUN_DATA_POINT_DEFAULT_COLOR, so
+   the swatch cannot drift from the graph. A typed or picked color hides the
+   placeholder, and with it this rule: Mantine's own preview of that color
+   takes over. */
+.point-color-field:has(input:placeholder-shown)
+    .mantine-ColorInput-colorPreview
+    .mantine-ColorSwatch-colorOverlay {
+    background-color: var(--point-color-default) !important;
+}
+
 /* The disclosure chevron points down when the panel is closed and up when it
    is open. aria-expanded is the state the toggle callback writes, so the
    rotation rides on it rather than on a second class. */
