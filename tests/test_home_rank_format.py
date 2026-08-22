@@ -94,6 +94,7 @@ CHART_OPTIONS_INPUT_DEFAULTS = {
     "score-threshold-overlay-switch": ("checked", True),
     "score-threshold-percentage": ("value", 95),
     "score-threshold-notification-switch": ("checked", True),
+    "run-notification-switch": ("checked", True),
 }
 COLLAPSED_PANEL_CLASS = (
     f"{home.CHART_OPTIONS_PANEL_CLASS} {home.CHART_OPTIONS_PANEL_HIDDEN_CLASS}"
@@ -279,7 +280,7 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     assert titles["Scenario Stats"].order == 2
     assert titles["Scenario Stats"].size == "h6"
     # The inspector's groups sit under the page's h2 sections.
-    for group in ("Overlays", "Run Data Points", "Score Threshold"):
+    for group in ("Overlays", "Run Data Points", "Score Threshold", "Notifications"):
         assert titles[group].order == 3
         assert titles[group].size == "h6"
 
@@ -295,6 +296,7 @@ def test_chart_options_controls_have_help_tooltips(monkeypatch):
         "score-threshold-overlay-switch": "score-threshold-overlay",
         "score-threshold-percentage": "score-threshold-percentage",
         "score-threshold-notification-switch": "score-threshold-notification",
+        "run-notification-switch": "run-notification",
         "top_n_scores": "top-n-scores",
     }
 
@@ -354,8 +356,32 @@ def test_chart_options_inputs_are_grouped_by_the_concept_they_share(monkeypatch)
         "high-score-overlay-switch": "PB Score",
         "score-threshold-overlay-switch": "Score Threshold Overlay",
         "score-threshold-percentage": "Score Threshold Percentage",
-        "score-threshold-notification-switch": "Score Threshold Notification",
+        "score-threshold-notification-switch": "Score Threshold Verdict",
+        "run-notification-switch": "Run Notifications",
     }
+
+
+def test_the_notifications_group_holds_the_master_switch_last(monkeypatch):
+    """Ordered relative to Score Threshold, not pinned to a group count.
+
+    Groups are added to this panel by parallel work; what this change owns is
+    that Notifications is the trailing group and holds the master switch.
+    """
+    components = _layout_components(monkeypatch)
+    panel = components[home.CHART_OPTIONS_PANEL_ID]
+
+    groups = [
+        (
+            group.children[0].children,
+            [getattr(control, "id", None) for control in group.children[1:]],
+        )
+        for group in panel.children
+    ]
+    titles = [title for title, _control_ids in groups]
+
+    assert titles[-1] == "Notifications"
+    assert titles.index("Score Threshold") < titles.index("Notifications")
+    assert groups[-1][1] == ["run-notification-switch"]
 
 
 def test_chart_options_panel_starts_collapsed_with_its_controls_mounted(monkeypatch):

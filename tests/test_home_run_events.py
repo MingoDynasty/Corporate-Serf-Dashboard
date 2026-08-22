@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import dash
 import plotly.graph_objects as go
 from dash import no_update
+from dash._callback import GLOBAL_CALLBACK_MAP
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -201,6 +202,7 @@ def _notification(
     top_n_scores: int = 5,
     score_threshold_percentage: float | str | None = 100.0,
     score_threshold_notification_switch: bool = True,
+    run_notification_switch: bool = True,
 ) -> dict[str, object] | None:
     return home._build_run_event_notification(
         payload,
@@ -208,6 +210,7 @@ def _notification(
         top_n_scores,
         score_threshold_percentage,
         score_threshold_notification_switch,
+        run_notification_switch,
     )
 
 
@@ -394,9 +397,40 @@ def test_notifications_ignore_payload_for_another_scenario():
             5,
             100.0,
             True,
+            True,
         )
         is None
     )
+
+
+def test_the_master_switch_silences_the_whole_run_toast_family():
+    # One guard, three shapes. Each payload earns a toast with the switch on,
+    # so the off assertions cannot pass vacuously.
+    shapes = (
+        _payload(score=830.0, previous_high_score=800.0),  # threshold verdict
+        _payload(previous_high_score=None),  # top-N placement
+        _payload(count=3),  # "While you were away" digest
+    )
+
+    for payload in shapes:
+        assert _notification(payload) is not None
+        assert _notification(payload, run_notification_switch=False) is None
+
+
+def test_the_run_notification_switch_is_state_not_input():
+    """Flipping the preference must not rebuild the plot.
+
+    Keyed by an output this callback writes, so it survives the dependency
+    list growing around it.
+    """
+    spec = next(
+        spec for key, spec in GLOBAL_CALLBACK_MAP.items() if "cached-plot.data" in key
+    )
+
+    assert "run-notification-switch" not in {dep["id"] for dep in spec["inputs"]}
+    assert ("run-notification-switch", "checked") in {
+        (dep["id"], dep["property"]) for dep in spec["state"]
+    }
 
 
 def test_generate_graph_returns_empty_state_before_scenario_selection():
@@ -411,6 +445,7 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
         False,
         False,
         95,
+        True,
         True,
         None,
         0,
@@ -449,6 +484,7 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
         True,
         95,
         True,
+        True,
         None,
         0,
     )
@@ -482,6 +518,7 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
         True,
         True,
         95,
+        True,
         True,
         None,
         0,
@@ -524,6 +561,7 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         False,
         False,
         95,
+        True,
         True,
         None,
         0,
@@ -572,6 +610,7 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
             True,
             empty_percentage,
             True,
+            True,
             None,
             sequence,
         )
@@ -584,3 +623,51 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         ]
         assert notifications[0]["title"] == "New 2nd-best score"
         assert lifetime_sequence == sequence + 1
+
+
+def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatch):
+    # The run that would otherwise headline "Threshold passed" updates the plot
+    # and nothing else -- no toast, and no bump of the lifetime counter that
+    # would let a later toast replace one that was never shown.
+    monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
+    monkeypatch.setattr(
+        home,
+        "get_time_vs_runs",
+        lambda *_args: {"2026-07-06": [object()]},
+    )
+    monkeypatch.setattr(
+        home,
+        "generate_time_plot",
+        lambda *_args: go.Figure(),
+    )
+    monkeypatch.setattr(home, "get_high_score", lambda _scenario: 830.0)
+
+    def fail_if_called(*_args):
+        raise AssertionError("a silenced run must not reach the toast sender")
+
+    monkeypatch.setattr(home, "upsert_toast", fail_if_called)
+    monkeypatch.setattr(
+        home,
+        "ctx",
+        SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
+    )
+
+    _plot, notifications, lifetime_sequence = home.generate_graph(
+        _payload(score=830.0, previous_high_score=800.0),
+        "Scenario A",
+        5,
+        "2026-07-01",
+        "score_vs_time",
+        False,
+        False,
+        False,
+        False,
+        95,
+        True,
+        False,
+        None,
+        0,
+    )
+
+    assert notifications == []
+    assert lifetime_sequence is no_update

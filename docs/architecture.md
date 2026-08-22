@@ -283,15 +283,29 @@ flowchart LR
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
-  overlay, run-point, and score-threshold preferences, so every adjustment
-  shows on the live chart; `toggle_chart_options` writes its open state as a
-  CSS class, which hides the controls without unmounting them. The overlay and
-  threshold controls are inputs to `generate_graph`, which rebuilds the figure;
-  the *Run Data Points* size and color are inputs to `apply_graph_appearance`
-  instead, the cheap callback that themes the cached figure and then hands it
-  to `plot_service.apply_point_appearance` — appearance never reruns the data
-  read, the overlays, or the notification logic. It starts closed on every
-  visit and is never persisted. The CSS (`assets/stylesheet.css`) owns two
+  overlay, run-point, score-threshold, and run-notification preferences. The
+  panel itself starts closed on every visit and its open state is never
+  persisted; `toggle_chart_options` writes that open state as a CSS class,
+  which hides the controls without unmounting them. Each control's own value
+  is browser-persisted (`persistence=True`) independently of the panel. Most
+  of those controls show their change on the live chart: the overlay switches,
+  the score-threshold overlay, and its percentage are inputs to
+  `generate_graph`, which rebuilds the figure; the *Run Data Points* size and
+  color are inputs to `apply_graph_appearance` instead, the cheap callback
+  that themes the cached figure and then hands it to
+  `plot_service.apply_point_appearance` — appearance never reruns the data
+  read, the overlays, or the notification logic.
+  The two notification controls draw nothing at all, and they differ in what
+  flipping them costs. *Score Threshold Verdict* is an `Input` on
+  `generate_graph`, so it re-runs the whole callback and rebuilds a figure
+  identical to the one on screen; it earns no toast on its own trigger
+  because `_run_events_were_triggered` gates that on `run-events`. It has the
+  same State-worthy property as the master switch but stays an `Input`
+  deliberately, as an out-of-scope behavior change
+  ([2026-08-21](decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+  The *Run Notifications* master switch is the cheaper shape: it defaults to
+  on and is a `State`, read only when a run event fires, so flipping it does
+  not re-run the callback at all. The CSS (`assets/stylesheet.css`) owns two
   behaviors worth knowing before editing it: the reflow threshold is a
   container query measuring the chart row rather than the window, because the
   fixed navbar shrinks the content area without touching the viewport; and
