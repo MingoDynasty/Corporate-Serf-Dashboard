@@ -1550,8 +1550,9 @@ future DMC versions.
 - A failing threshold verdict names the target it missed: one extra number with
   real motivational value.
 - No "New personal best!" retitle. A new overall PB necessarily places 1st
-  within its sensitivity, so it already gets the run-verdict toast titled "New
-  best score"; retitling it would create by the back door the dedicated PB toast
+  within its sensitivity, so it already earns the run-verdict toast — titled
+  "New best score" when unjudged, or carrying the threshold verdict when
+  judged; retitling it would create by the back door the dedicated PB toast
   that `product.md` records as declined.
 
 Two manual-refresh failure toasts deliberately share the title "Position
