@@ -1662,7 +1662,7 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
 
 def test_playlist_scenarios_without_a_username_registers_no_fill(monkeypatch):
     # The real service, not a fake: an empty registry is what guarantees no
-    # later interval drain can fire the summary toast.
+    # later interval drain finds fill work to do.
     playlist = PlaylistData(
         name="Voltaic Benchmarks",
         code="KovaaKsTestCode",
