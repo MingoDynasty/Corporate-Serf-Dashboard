@@ -82,9 +82,11 @@ def _label_text(component) -> str:
     )
 
 
-# The chart options inspector's inputs, with the defaults that must not move:
-# Dash persistence is keyed by component id, and changing a layout default
-# silently wipes every value the browser already stored under it.
+# The chart options inspector's label-bearing inputs, with the defaults that
+# must not move: Dash persistence is keyed by component id, and changing a
+# layout default silently wipes every value the browser already stored under
+# it. The Run Data Points controls answer to the same rule; they are covered in
+# tests/test_home_point_appearance.py, where the rest of their behavior lives.
 CHART_OPTIONS_INPUT_DEFAULTS = {
     "rank-overlay-switch": ("checked", True),
     "show-all-ranks-switch": ("checked", False),
@@ -276,11 +278,10 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
 
     assert titles["Scenario Stats"].order == 2
     assert titles["Scenario Stats"].size == "h6"
-    # The inspector's two groups sit under the page's h2 sections.
-    assert titles["Overlays"].order == 3
-    assert titles["Overlays"].size == "h6"
-    assert titles["Score Threshold"].order == 3
-    assert titles["Score Threshold"].size == "h6"
+    # The inspector's groups sit under the page's h2 sections.
+    for group in ("Overlays", "Run Data Points", "Score Threshold"):
+        assert titles[group].order == 3
+        assert titles[group].size == "h6"
 
 
 def test_chart_options_controls_have_help_tooltips(monkeypatch):

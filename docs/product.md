@@ -79,6 +79,16 @@ list in the roadmap.)
   default it draws only the bands around your scores, so the runs fill the
   chart; a **Show all ranks** chart option draws the whole ladder instead, for
   when you want to see how far the climb goes rather than what is next.
+- **Point size and color** (Scenario Performance page, PR #241; design in
+  #238). Chart options can make the raw run points smaller, larger, or a color
+  you choose, from eight curated swatches or any hex value. *Problem solved:*
+  the points are one fixed size and one fixed blue, which is too faint to pick
+  out on some charts, too heavy on a dense history, and not everyone's easiest
+  color to read. Leaving the size on Default and the color on Automatic keeps
+  the chart exactly as it was, so the feature costs nothing to ignore. It
+  deliberately stops there: nothing else about the chart is customizable,
+  because a graph that answers "am I improving" should not turn into a style
+  editor.
 - **Chart options beside the chart** (Scenario Performance page, PRs #209,
   #215). The graph's display preferences — the overlays, and the score
   threshold and its percentage — open in a panel next to the chart, grouped by

@@ -4,7 +4,10 @@ import plotly.graph_objs as go
 
 from source.kovaaks.data_models import Rank, RunData
 from source.plot.plot_service import (
+    POINT_SIZE_PRESET_PX,
+    RUN_DATA_POINT_TRACE_NAME,
     _add_rank_overlays,
+    apply_point_appearance,
     generate_empty_plot,
     generate_placeholder_plot,
     generate_sensitivity_plot,
@@ -231,3 +234,65 @@ def test_rank_overlays_include_boundary_ties() -> None:
         Rank(name="D", color="#444444", threshold=90.0),
     ]
     assert _drawn_ranks(ladder, [70.0, 80.0]) == ["B", "C", "D"]
+
+
+def _point_figure() -> go.Figure:
+    """A two-trace stand-in for a scored figure, run trace second."""
+    return go.Figure(
+        data=[
+            go.Scatter(name="Average Score", y=[1, 2]),
+            go.Scatter(name=RUN_DATA_POINT_TRACE_NAME, y=[1, 2]),
+        ]
+    )
+
+
+def test_apply_point_appearance_leaves_the_figure_alone_for_default_automatic() -> None:
+    figure = _point_figure()
+    before = figure.to_json()
+
+    assert apply_point_appearance(figure, "Default", "").to_json() == before
+
+
+def test_apply_point_appearance_sets_only_the_run_trace_marker() -> None:
+    figure = apply_point_appearance(_point_figure(), "Small", "#1c7ed6")
+
+    run_trace = figure.data[1]
+    assert run_trace.marker.size == POINT_SIZE_PRESET_PX["Small"]
+    assert run_trace.marker.color == "#1c7ed6"
+    # The average line is a different trace and stays generated.
+    assert figure.data[0].marker.size is None
+    assert figure.data[0].marker.color is None
+
+
+def test_apply_point_appearance_matches_by_name_not_by_index() -> None:
+    # The run trace is index 0 in the shipped figures, but a figure that ever
+    # reorders its traces must still style the run points and only those.
+    figure = apply_point_appearance(_point_figure(), "Large", None)
+
+    assert figure.data[1].marker.size == POINT_SIZE_PRESET_PX["Large"]
+    assert figure.data[0].marker.size is None
+
+
+def test_apply_point_appearance_ignores_values_it_does_not_recognize() -> None:
+    figure = apply_point_appearance(_point_figure(), "Enormous", "not-a-color")
+    assert figure.data[1].marker.size is None
+    assert figure.data[1].marker.color is None
+
+    # A cleared dmc input sends "", never None -- both mean Automatic.
+    figure = apply_point_appearance(_point_figure(), None, "")
+    assert figure.data[1].marker.color is None
+
+    # One unusable half never blocks the other.
+    figure = apply_point_appearance(_point_figure(), "Small", "#12345")
+    assert figure.data[1].marker.size == POINT_SIZE_PRESET_PX["Small"]
+    assert figure.data[1].marker.color is None
+
+
+def test_apply_point_appearance_tolerates_figures_without_a_run_trace() -> None:
+    for figure in (
+        generate_placeholder_plot(),
+        generate_empty_plot("No runs to plot", "Nothing here yet."),
+        go.Figure(data=[go.Scatter(name="Average Score", y=[1, 2])]),
+    ):
+        before = figure.to_json()
+        assert apply_point_appearance(figure, "Large", "#f03e3e").to_json() == before

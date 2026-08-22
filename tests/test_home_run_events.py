@@ -96,7 +96,7 @@ def test_home_layout_initial_graph_has_placeholder(monkeypatch):
 
 
 def test_graph_theme_callback_falls_back_to_initial_placeholder():
-    figure = home.apply_light_dark_theme_to_graph("light", None)
+    figure = home.apply_graph_appearance("light", None, "Default", "")
 
     _assert_placeholder_figure(figure)
     assert figure.layout.template.layout.paper_bgcolor == "#ffffff"

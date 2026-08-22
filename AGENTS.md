@@ -165,6 +165,19 @@ only maintainer product or workflow judgment and costly-to-reverse trade-offs;
 mechanical, reversible, and evidence-resolvable details remain the author's
 responsibility even though reviewers may challenge them.
 
+User-facing copy is author-owned, not a Decisions needed item, but it must be
+argued in the proposal rather than left to the implementer: a proposal that
+adds or edits user-facing strings gathers every one of them in a **Copy**
+block in Design, and the co-design review must explicitly address that block
+(endorse or redline) as it must every Decisions needed item. Implementation
+receives the block verbatim; a divergence is flagged in the PR description,
+never applied silently, and any string the proposal did not foresee is listed
+under "New copy" in the PR body so the reviewer checks it with the same eyes.
+The rule applies to proposals opened or materially edited after it landed. A
+proposal already in flight keeps its strings where they are, and its kickoff
+prompt gathers them into the Copy block the implementer receives — the same
+no-backfill convention the layer-1 summaries follow.
+
 ### Proposal template
 
 ```markdown

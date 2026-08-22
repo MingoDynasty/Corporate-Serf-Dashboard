@@ -11,7 +11,9 @@ notifications update automatically in the background.
 ## Features
 
 - **Scenario plots** — Sensitivity vs Score and score-over-time plots per scenario, with optional
-  PB-score, score-threshold, and benchmark-rank overlays.
+  PB-score, score-threshold, and benchmark-rank overlays. Chart options also set the run points'
+  size and color, so a dense or a faint chart can be made readable; both preferences stay in your
+  browser.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
   it rather than stacking a second one beside it, and a run that earns neither says nothing.
