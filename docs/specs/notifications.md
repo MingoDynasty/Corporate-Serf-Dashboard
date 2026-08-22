@@ -47,14 +47,16 @@ their full behavior.
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
   Only the run-verdict family uses it.
 - Toasts are built only inside Dash callbacks. A background thread publishes
-  to typed shared state that a Scenario Performance interval callback polls,
-  and never writes `sendNotifications` itself
+  to typed shared state that an interval callback polls, and never writes
+  `sendNotifications` itself
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy);
   the channels are enumerated under
   [background threads never drive UI outputs](../architecture.md#background-threads-never-drive-ui-outputs)).
-  So every thread-fed toast — run verdicts, run-import failures, startup
-  playlist warnings — appears only while Scenario Performance is mounted, on
-  its next poll tick.
+  The three channels Scenario Performance drains — run verdicts, run-import
+  failures, startup playlist warnings — reach the screen only while that
+  page is mounted: the first two on its next poll tick, the warnings on a
+  one-shot interval after mount. The playlist fill's channel is drained by
+  the playlist scenarios page; the playlists spec owns it.
 
 ## Routing policy
 
@@ -83,8 +85,11 @@ their full behavior.
   [scenario_rank.md](scenario_rank.md#failure-handling).
 - With a scenario selected, Manual Refresh answers every click with a
   toast — red, yellow, green, or blue; with none selected the click sets the
-  field to `N/A` and toasts nothing. The passive rank renders that used to
-  toast red or yellow no longer do
+  field to `N/A` and toasts nothing. The red and yellow answers carry stable
+  ids, so a repeat of the same failure while its toast is still up is
+  deduped and shows nothing new; only the green and blue answers are
+  per-click. The passive rank renders that used to toast red or yellow no
+  longer do
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)
   as amended by
   [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy));
@@ -96,9 +101,10 @@ their full behavior.
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy))
   and the blue unset-username notice
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
-- The title carries the verdict and never reads "Notification"; the message
-  leads with the scenario, with sensitivity as a trailing qualifier; a failing
-  threshold verdict names the target it missed; a new personal best gets no
+- The title carries the verdict and never reads "Notification"; a run
+  verdict's message leads with the scenario, with sensitivity as a trailing
+  qualifier; a failing threshold verdict names the target it missed; a new
+  personal best gets no
   toast of its own beyond the run verdict it already earned
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - A local validation problem is an inline field error, not a toast: an empty
@@ -106,8 +112,14 @@ their full behavior.
 - The playlist scenarios page's progressive fill ends with at most one
   aggregate toast per fill — red when positions could not be updated, yellow
   when some were served from cache, nothing when clean
-  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill));
-  the playlists spec owns it.
+  ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
+  That toast fires on an automatic failure during navigation that the page's
+  status line also states, and whether it conforms to the routing order
+  above is an open ruling: the policy entry does not name it, and the
+  configured-but-wrong username case it still reports is recorded as
+  deferred
+  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  The playlists spec owns the toast.
 
 ## Run notifications
 
@@ -133,9 +145,10 @@ their full behavior.
   off, the drained messages are dropped
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
 - The interval runs only while the page is mounted, so runs played while
-  another page is open wait in the deque and arrive as one digest on the
-  next visit. The supported usage model is one active Scenario Performance
-  tab; extra tabs are crash-safe but unsynchronized
+  another page is open wait in the deque and arrive together on the next
+  visit: as one digest when there is more than one, as the single-run
+  verdict otherwise. The supported usage model is one active Scenario
+  Performance tab; extra tabs are crash-safe but unsynchronized
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
   The interval keeps ticking while the tab is hidden
   ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
@@ -208,8 +221,9 @@ their full behavior.
   `{n} new run files could not be processed. See debug.log for details.` for
   a batch; a drained batch never toasts again
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
-- Playlist files the startup scan could not load are recorded in
-  `playlist_startup_warning_queue`; `flush_startup_playlist_warnings` drains
+- The warnings the startup playlist scan records — a file it could not
+  load, the loser of a duplicate-code pair, a missing bundled directory — go
+  to `playlist_startup_warning_queue`; `flush_startup_playlist_warnings` drains
   it 250 ms after a Scenario Performance mount (a one-shot interval), one
   yellow persistent toast per warning, ids `startup-playlist-warning-{n}`,
   title "Playlist not loaded"
