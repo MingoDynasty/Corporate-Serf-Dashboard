@@ -179,7 +179,7 @@
 /* A labelled field inside the inspector, for controls Mantine does not give
    a label slot of its own (the point-size segmented control) and for the
    action that belongs to the field above it rather than to the group (Use
-   automatic). Tighter than the group's own gap, so the pair reads as one
+   default). Tighter than the group's own gap, so the pair reads as one
    control rather than as two. */
 .chart-options-field {
     display: flex;
@@ -195,6 +195,27 @@
 .chart-options-field-label {
     font-size: var(--mantine-font-size-sm);
     font-weight: bold;
+}
+
+/* An empty Point color field means the generated color, so its preview swatch
+   shows that color rather than Mantine's stand-in. ColorInput paints the
+   preview of an empty value white, as an inline style, which is what the
+   !important is for. The color itself is the graph template's, one per color
+   scheme: Home sets --point-color-default-light and -dark on the field from
+   plot_service.generated_point_color, so the swatch cannot drift from the
+   graph. A typed or picked color hides the placeholder, and with it these
+   rules: Mantine's own preview of that color takes over. */
+.point-color-field:has(input:placeholder-shown)
+    .mantine-ColorInput-colorPreview
+    .mantine-ColorSwatch-colorOverlay {
+    background-color: var(--point-color-default-light) !important;
+}
+
+:root[data-mantine-color-scheme="dark"]
+    .point-color-field:has(input:placeholder-shown)
+    .mantine-ColorInput-colorPreview
+    .mantine-ColorSwatch-colorOverlay {
+    background-color: var(--point-color-default-dark) !important;
 }
 
 /* The disclosure chevron points down when the panel is closed and up when it
