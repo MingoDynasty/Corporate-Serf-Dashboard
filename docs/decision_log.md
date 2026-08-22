@@ -2904,7 +2904,10 @@ whichever source resolved it, never the pasted input.
 
 ## 2026-07-16: Warm Playlist Percentiles With One Polite Background Worker
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-08-03 quiet-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy):
+the fatal-state toast for an unknown username was removed in PR #196; the
+overview's status line and a WARNING log carry it. Everything else stands.
 
 Decision: After startup finishes ingesting local runs, one app-lifetime daemon
 worker warms the rank and leaderboard-total caches used by the Playlists
