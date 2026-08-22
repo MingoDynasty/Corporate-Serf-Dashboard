@@ -1718,7 +1718,7 @@ def test_playlist_fill_drain_guards_phantom_initial_call(monkeypatch):
     assert result == (no_update, no_update)
 
 
-def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
+def test_playlist_fill_terminal_tick_applies_updates_and_status_reasserts(
     monkeypatch,
 ):
     consuming = _fill_drain(
@@ -1726,6 +1726,8 @@ def test_playlist_fill_terminal_one_shots_run_once_and_status_reasserts(
         unknown=1,
         stale=1,
     )
+    # consuming_terminal is a service-side flag the page no longer reads --
+    # kept here only so the fixture matches what a later tick really returns.
     post_consumption = _fill_drain(
         consuming=False,
         unknown=1,
