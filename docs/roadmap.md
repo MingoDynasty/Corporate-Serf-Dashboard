@@ -81,6 +81,12 @@ sequence.
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md).
+- **Personal best celebration** — confetti and a "New personal best" toast
+  when a run beats a scenario's personal best, on every page and for every
+  scenario, with a Settings-page control to pick the style or turn it off.
+  The motivation layer the per-run verdict toast can't provide: the one
+  moment every run is chasing currently passes in silence. Design in
+  [`pb_celebration_proposal.md`](./pb_celebration_proposal.md).
 
 ---
 
