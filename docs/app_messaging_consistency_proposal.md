@@ -167,7 +167,8 @@ The inventory was taken against `39f96d4` (main, 2026-08-21) by reading every
 user-facing string in `source/pages/`, `source/app_shell.py`, the service
 messages that reach a toast or alert (`source/kovaaks/data_service.py`,
 `source/kovaaks/api_service.py`, `source/utilities/store_schema.py`,
-`source/my_watchdog/file_watchdog.py`), the chart annotations in
+`source/kovaaks/percentile_warmup_service.py` and the fatal reasons it
+relays, `source/my_watchdog/file_watchdog.py`), the chart annotations in
 `source/plot/plot_service.py`, and the grid renderers in `assets/`. It
 supersedes the 2026-08-11 design note that seeded it; that note's one
 "carry-along fix" (the Home restart hint saying "the dashboard") has already
@@ -190,8 +191,10 @@ drift, each small, together the "vibe-coded" feel:
    (the `—` empty-value glyph under Last played, ratified 2026-06-30, and
    the scenario/score separator in run-toast bodies).
 2. **Terminal punctuation.** Most sentences end with a period; the four
-   above and a handful of grid tooltips do not. Three messages join
-   sentences with a semicolon; one ends with an exclamation mark.
+   above and a handful of grid tooltips do not. Ten messages join two
+   sentences with a semicolon (an AST sweep of every non-docstring string
+   constant under `source/` finds no others that reach the screen); one
+   ends with an exclamation mark.
 3. **Contractions.** "Couldn't refresh", "Couldn't update", "can't read your
    runs" beside "Could not save", "could not be checked", "cannot look one
    up". Full forms are the majority by nine sites to four.
@@ -212,8 +215,8 @@ drift, each small, together the "vibe-coded" feel:
    `Failed to load playlist data for playlist code: X`, `Invalid playlist
    data returned by API for playlist code: X`, `Skipping playlist file X:
    missing or blank playlist code; add a \`code\` field.` (backticks render
-   literally). The Steam-ID mismatch toast quotes its values in single
-   quotes; nothing else does.
+   literally). The Steam-ID mismatch toast and the warmup's unknown-username
+   reason quote their values in single quotes; nothing else does.
 9. **A stray capital.** The Position value reads `(52.47% Percentile)`
    mid-phrase.
 
@@ -239,16 +242,17 @@ time, replacing the current one-line em-dash convention.
    do not.** `Settings saved.` and `No such folder.` are sentences.
    `Updating positions from KovaaK's… 12/40`, `Update interrupted · 8 of 40
    refreshed`, `3 of 40 positions unavailable`, and the Position hint (D1)
-   are readouts and stay bare. A sentence that ends on an inline link puts
+   are readouts and stay bare. A semicolon never joins two sentences; they
+   are two sentences. A sentence that ends on an inline link puts
    its period in a **separate child after the anchor**, or it renders
    underlined as part of the link; `_username_unset_status()` in
    `source/pages/playlists.py` is the pattern.
 2. **No em dashes.** Prose breaks into two sentences. A readout that chains
    fragments joins them with ` · ` (space, middle dot, space), which the grid
-   status lines already use. Two exceptions, named so a later sweep does not
-   delete them: the `—` empty-value glyph under Last played when no scenario
-   is selected (ratified 2026-06-30), and nothing else. The run-toast
-   scenario/score separator becomes a colon.
+   status lines already use. One exception, named so a later sweep does not
+   delete it: the `—` empty-value glyph under Last played when no scenario
+   is selected (ratified 2026-06-30). The run-toast scenario/score separator
+   becomes a colon.
 3. **Casing** per D2.
 4. **One ellipsis form.** The single `…` character, never three periods,
    and only where something is still going on: the in-progress fill readout,
@@ -303,7 +307,10 @@ separate child.
   read your runs yet. Set it in Settings.`
 - Setup card fine print *(ratified 2026-08-11)*: `Skipping username disables
   rank lookups. You can set it anytime in Settings.` → `Skipping turns rank
-  lookups off. You can add your username anytime in Settings.`
+  lookups off. You can add your username anytime in Settings.` No rule
+  requires this one: "Skipping username" drops its article and reads
+  clipped, and "turn rank lookups off" is the phrase the username field's
+  own description uses (rule 7, one vocabulary).
 
 **Scenario Performance: controls and help text** (D2 unless noted)
 
@@ -317,6 +324,11 @@ separate child.
 - `Run Notifications` *(ratified 2026-08-21)* → `Run notifications`; its
   dependent help text `Needs Run Notifications turned on.` → `Needs Run
   notifications turned on.`
+- Score threshold percentage help text: `…The overlay line tracks your
+  current personal best; notifications judge the run against the personal
+  best it was chasing.` → `…The overlay line tracks your current personal
+  best. Notifications judge the run against the personal best it was
+  chasing.`
 - Top N scores help text: `How many of your best scores to plot per
   sensitivity — or per day in Score vs Time — within the selected date range.
   A new run that lands in the top N also triggers a notification.` → `How
@@ -328,7 +340,8 @@ separate child.
   `Score Percentage...` → `Percentage`
 - Empty chart, incomplete controls: `Choose a Top N value and start date to
   plot this scenario.` → `Set Top N scores and the oldest date to plot this
-  scenario.` (names the controls as labelled)
+  scenario.` (`the oldest date` paraphrases the `Oldest date to consider`
+  label, the one place the block knowingly does so)
 - Empty chart, date range: `Choose an older start date or play more runs.` →
   `Choose an older date or play more runs.`
 - Chart annotations and legend names: `PB Score (123.00)` → `PB score
@@ -350,8 +363,8 @@ separate child.
   3rd-best at 0.35 cm/360. Keep grinding...` → `…, 92.1% of PB (need 95.0%).
   Still your 3rd-best at 0.35 cm/360. Keep grinding…` (D4)
 - Backlog digest, passed: `3 new X runs. Latest: 120.00 — 96.2% of PB,
-  passed threshold.` → `3 new X runs. Latest: 120.00, 96.2% of PB, above your
-  95.0% threshold.`
+  passed threshold.` → `3 new X runs. Latest: 120.00, 96.2% of PB, met your
+  95.0% threshold.` ("met", not "above": the verdict passes at equality)
 - Backlog digest, below: `3 new X runs. Latest: 120.00 — 92.1% of PB, below
   the 95.0% threshold.` → `3 new X runs. Latest: 120.00, 92.1% of PB, below
   your 95.0% threshold.`
@@ -377,16 +390,31 @@ separate child.
     {source}.` → `{file} was skipped. Its playlist code {code} is already
     loaded from {source}.`
   - `Skipping playlist file: {store message}` → `{store message}` (the store
-    message is already a full sentence naming the file)
+    message is already a full sentence naming the file). One of the
+    messages composed after the file name is not yet in style: the
+    playlist-payload check's `has a missing or blank playlist code; add a
+    \`code\` field.` → `has no playlist code. Add a "code" field to it.`,
+    mirroring the bundled-root sibling above. Its neighbour `is not valid
+    playlist data.` is already fine.
 
 **Playlists overview**
 
 - Status, all hidden: `All playlists are hidden. Toggle "Show hidden" to
   manage them.` → `All playlists are hidden. Turn on Show hidden to manage
   them.`
+- Warmup stopped, the reason relayed after `Percentile update stopped:`:
+  `KovaaK's username 'X' was not found.` → `KovaaK's username X was not
+  found.` (a mistyped username; the other fixed reason, `KovaaK's username
+  is not configured.`, is already in style and unchanged). The combined line
+  renders as a readout label followed by the reason sentence, which is
+  accepted: the label says what stopped and the sentence says why.
 - Warmup status, paused: `Updating percentile data: 8 remaining · paused;
   retrying at 3:05 PM` → `Updating percentile data: 8 remaining · paused
   until 3:05 PM`
+- Lowest Percentile header tooltip: `…Shown once every played scenario has
+  enough cached leaderboard data; hover a value to see which scenario.` →
+  `…Shown once every played scenario has enough cached leaderboard data.
+  Hover a value to see which scenario.`
 - Type header tooltip: `Benchmarks carry rank thresholds (Bronze, Silver,
   ...) for their scenarios; playlists are plain scenario lists.` →
   `Benchmarks carry rank thresholds (Bronze, Silver, and so on) for their
@@ -418,13 +446,20 @@ separate child.
     returns no usable record *and* the Evxl by-code fallback then fails,
     whether with a 400 for an unknown code or with a connection error or an
     invalid payload, so it cannot claim that no playlist matches.
-  - `Found more than one playlist from code: {code}` → `More than one
-    playlist matches the code {code}.`
+  - `Found more than one playlist from code: {code}` → the same `Could not
+    load a playlist for the code {code}. Check the code and try again.`, for
+    the same reason: the ambiguous-search branch also returns its message
+    only after the Evxl fallback fails, and a 400 there means no playlist
+    has that exact code. The log lines beside the two branches keep the
+    zero-versus-many diagnostic.
   - `Invalid playlist data returned by API for playlist code: {code}` and
-    `Invalid playlist data returned by API: {name} ({code})` → `KovaaK's
-    returned unusable data for {code}.`
+    `Invalid playlist data returned by API: {name} ({code})` → `The
+    playlist data for {code} is unusable.` (no source named: the second
+    original fires on local filename sanitization, and the data may have
+    come from Evxl)
   - `Playlist code already exists: {code} is already imported as {name}
-    ({code}).` → `{code} is already imported as "{name}" ({code}).`
+    ({code}).` → `{code} is already imported as "{name}".` (both codes in
+    the original are the same canonical code, so one is enough)
   - `Failed to save playlist data: {name} ({code})` → `Could not save the
     playlist file for "{name}" ({code}). See data/logs/debug.log.`
   - `Cannot save this playlist: {name} ({code}) would replace a playlist
@@ -483,7 +518,9 @@ separate child.
   `Enter a 17-digit SteamID64. It starts with 7656119.`
 - Steam ID description: `Your 17-digit SteamID64. Optional; it disambiguates
   accounts that share a KovaaK's username.` → `Your 17-digit SteamID64.
-  Optional. It tells apart accounts that share a KovaaK's username.`
+  Optional. It tells apart accounts that share a KovaaK's username.` The
+  semicolon split is rule 1; "tells apart" for "disambiguates" is a plain
+  word for a jargon one and needs no rule.
 - Save failed: `Could not save settings — nothing was written. See
   data/logs/debug.log.` → `Could not save settings, so nothing was written.
   See data/logs/debug.log.`
@@ -538,8 +575,10 @@ distinction it cannot make. The three-period ellipsis is deliberately not
 gated: the same walk finds it in the JavaScript spread operator inside a
 clientside-callback source string (`...navbar` in `app_shell.py`) and in a
 logging-only line in `file_watchdog.py`, neither of which is app copy, and
-any future `...args` in callback JavaScript would trip it again. Ellipses,
-casing, and contractions are review territory, not a gate.
+any future `...args` in callback JavaScript would trip it again. The walk
+also does not see `assets/`: a `—` typed into a grid renderer there would
+pass (today there are none in user-facing text). Ellipses, casing,
+contractions, and the renderers are review territory, not a gate.
 
 ## Out of scope
 
