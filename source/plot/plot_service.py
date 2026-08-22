@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+import plotly.io as pio
 
 from source.kovaaks.data_models import Rank, RunData
 from source.utilities.utilities import format_absolute_timestamp, format_decimal
@@ -26,14 +27,11 @@ _K = TypeVar("_K")
 # combined figure is assembled, while the name is what the legend, the hover
 # template, and the appearance callback all already agree on.
 RUN_DATA_POINT_TRACE_NAME = "Run Data Point"
-# The color the run points have when no point color is chosen. It is not
-# ours to pick: ``px.scatter`` writes the first colorway entry of Plotly's
-# default template into the trace when the figure is generated, and a
-# template applied later (the Mantine light and dark ones) never overrides a
-# property the trace already sets, so the points are this color in both
-# themes. The value is pinned here only so the empty Point color field can
-# preview it; tests hold it to what generation actually produces.
-RUN_DATA_POINT_DEFAULT_COLOR = "#636efa"
+# The Mantine figure template each color scheme draws with. The run trace
+# carries no color of its own (see the ``px.scatter`` note in the generator),
+# so the template's colorway is what colors the points, and it is also where
+# the Point color field's Default preview comes from.
+_THEME_TEMPLATES = {"light": "mantine_light", "dark": "mantine_dark"}
 
 POINT_SIZE_DEFAULT = "Default"
 # The size presets a reader chooses between. Default is deliberately absent
@@ -261,6 +259,12 @@ def _generate_xy_plot(  # noqa: PLR0913
         custom_data=["Datetime", "Accuracy"],
     )
     figure_scatter.update_traces(
+        # px bakes the first colorway entry of Plotly's default template into
+        # the trace, and a template applied later never overrides a property
+        # the trace already sets. Clearing it leaves the color to whichever
+        # Mantine template the theme applies at render, as the first trace's
+        # share of that template's colorway.
+        marker_color=None,
         hovertemplate="<b>%{customdata[0]}</b><br><br>"
         + "<b>Score</b>: %{y}<br>"
         + f"{hover_x_label}<br>"
@@ -394,9 +398,27 @@ def apply_light_dark_mode(figure: go.Figure, color_scheme: str) -> go.Figure:
     :param color_scheme: active Mantine color scheme.
     :return: figure with template applied.
     """
-    template = "mantine_dark" if color_scheme == "dark" else "mantine_light"
-    figure.update_layout(template=template)
+    figure.update_layout(template=_theme_template(color_scheme))
     return figure
+
+
+def _theme_template(color_scheme: str) -> str:
+    """Name the Mantine figure template for a color scheme; light unless dark."""
+    return _THEME_TEMPLATES.get(color_scheme, _THEME_TEMPLATES["light"])
+
+
+def generated_point_color(color_scheme: str) -> str:
+    """Return the color the run points have in a scheme with no point color chosen.
+
+    The run trace is the figure's first, and carries no color of its own, so
+    Plotly draws it in the first colorway entry of the template
+    ``apply_light_dark_mode`` applies for that scheme. This reads the same
+    entry, so the Point color field can preview the color the graph will use.
+    :param color_scheme: active Mantine color scheme.
+    :return: a hex color string.
+    """
+    colorway = pio.templates[_theme_template(color_scheme)].layout.colorway
+    return str(colorway[0])
 
 
 def apply_point_appearance(

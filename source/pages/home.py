@@ -56,7 +56,6 @@ from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
 from source.plot.plot_service import (
     POINT_SIZE_DEFAULT,
     POINT_SIZE_OPTIONS,
-    RUN_DATA_POINT_DEFAULT_COLOR,
     add_high_score_overlay,
     add_score_threshold_overlay,
     apply_light_dark_mode,
@@ -65,6 +64,7 @@ from source.plot.plot_service import (
     generate_placeholder_plot,
     generate_sensitivity_plot,
     generate_time_plot,
+    generated_point_color,
 )
 from source.utilities.notifications import (
     TOAST_LIFETIME_STORE_ID,
@@ -154,10 +154,14 @@ POINT_COLOR_DEFAULT_ID = "point-color-default"
 POINT_COLOR_DEFAULT = ""
 # The empty field previews the generated point color. Mantine paints the
 # preview of an empty ColorInput white, so the stylesheet repaints it from
-# this custom property while the placeholder shows; the value comes from
-# plot_service so the swatch and the graph cannot disagree.
+# these custom properties while the placeholder shows, one per color scheme
+# because the graph's templates differ; the values come from plot_service so
+# the swatch and the graph cannot disagree.
 POINT_COLOR_FIELD_CLASS = "point-color-field"
-POINT_COLOR_DEFAULT_CSS_VARIABLE = "--point-color-default"
+POINT_COLOR_DEFAULT_CSS_VARIABLES = {
+    "light": "--point-color-default-light",
+    "dark": "--point-color-default-dark",
+}
 # Eight color families, one shade each, chosen per family against both real
 # plot backgrounds (#ffffff light, #242424 dark) rather than by taking one
 # Mantine shade index across the board. Yellow, lime, gray, and dark are
@@ -1643,7 +1647,8 @@ def _chart_options_panel() -> dmc.Box:
                     dmc.Box(
                         className=f"{CHART_OPTIONS_FIELD_CLASS} {POINT_COLOR_FIELD_CLASS}",
                         style={
-                            POINT_COLOR_DEFAULT_CSS_VARIABLE: RUN_DATA_POINT_DEFAULT_COLOR
+                            variable: generated_point_color(scheme)
+                            for scheme, variable in POINT_COLOR_DEFAULT_CSS_VARIABLES.items()
                         },
                         children=[
                             dmc.ColorInput(

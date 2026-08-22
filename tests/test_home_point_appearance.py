@@ -25,11 +25,11 @@ from source.kovaaks.data_models import RunData  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.plot.plot_service import (  # noqa: E402
     POINT_SIZE_PRESET_PX,
-    RUN_DATA_POINT_DEFAULT_COLOR,
     RUN_DATA_POINT_TRACE_NAME,
     apply_light_dark_mode,
     generate_sensitivity_plot,
     generate_time_plot,
+    generated_point_color,
 )
 
 APPEARANCE_INPUT_IDS = {home.POINT_SIZE_INPUT_ID, home.POINT_COLOR_INPUT_ID}
@@ -126,9 +126,10 @@ def test_point_controls_are_mounted_with_the_defaults_persistence_relies_on(
 
 def test_empty_point_color_field_previews_the_generated_color(components):
     # Mantine paints the preview of an empty ColorInput white, so the field
-    # carries the generated color as a custom property and the stylesheet
-    # repaints the swatch from it while the placeholder shows. The Python
-    # side names both hooks; this holds the CSS to the same names.
+    # carries each theme's generated color as a custom property and the
+    # stylesheet repaints the swatch from the active theme's while the
+    # placeholder shows. The Python side names the hooks; this holds the CSS
+    # to the same names.
     field = next(
         component
         for component in _walk_components(components[home.CHART_OPTIONS_PANEL_ID])
@@ -139,29 +140,39 @@ def test_empty_point_color_field_previews_the_generated_color(components):
         getattr(child, "id", None) for child in field.children
     ]
     assert field.style == {
-        home.POINT_COLOR_DEFAULT_CSS_VARIABLE: RUN_DATA_POINT_DEFAULT_COLOR
+        "--point-color-default-light": generated_point_color("light"),
+        "--point-color-default-dark": generated_point_color("dark"),
     }
 
     css = re.sub(r"\s+", " ", STYLESHEET.read_text(encoding="utf-8"))
-    assert (
+    swatch = (
         f".{home.POINT_COLOR_FIELD_CLASS}:has(input:placeholder-shown)"
         " .mantine-ColorInput-colorPreview .mantine-ColorSwatch-colorOverlay"
-        f" {{ background-color: var({home.POINT_COLOR_DEFAULT_CSS_VARIABLE})"
-        " !important; }"
+    )
+    assert (
+        f"{swatch} {{ background-color: var(--point-color-default-light) !important; }}"
+        in css
+    )
+    assert (
+        f':root[data-mantine-color-scheme="dark"] {swatch}'
+        " { background-color: var(--point-color-default-dark) !important; }"
     ) in css
 
 
-def test_generated_run_points_are_the_color_the_empty_field_previews(cached_plot):
-    # px.scatter bakes Plotly's default-template color into the trace when
-    # the figure is generated, and the Mantine templates applied afterwards
-    # never override a property the trace already sets: the generated color
-    # is one value in both themes, and it is the one the swatch shows.
-    assert _run_trace(go.Figure(json.loads(cached_plot))).marker.color == (
-        RUN_DATA_POINT_DEFAULT_COLOR
-    )
+def test_generated_run_points_take_the_theme_template_colorway(cached_plot):
+    # The run trace is the figure's first and carries no color of its own, so
+    # Plotly draws it in the first colorway entry of whichever template the
+    # theme applies. That entry is what the empty field previews, per theme.
+    figure = go.Figure(json.loads(cached_plot))
+    assert figure.data[0].name == RUN_DATA_POINT_TRACE_NAME
+    assert figure.data[0].marker.color is None
+
+    expected = {"light": "#228be6", "dark": "#1971c2"}
     for color_scheme in ("light", "dark"):
         themed = home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
-        assert _run_trace(themed).marker.color == RUN_DATA_POINT_DEFAULT_COLOR
+        assert _run_trace(themed).marker.color is None
+        assert themed.layout.template.layout.colorway[0] == expected[color_scheme]
+        assert generated_point_color(color_scheme) == expected[color_scheme]
 
 
 def test_point_color_offers_the_curated_swatches_on_one_row(components):
@@ -264,8 +275,9 @@ def test_theme_switches_keep_an_explicit_color_and_leave_default_generated(
         assert explicit.marker.color == "#099268"
         assert explicit.marker.size == POINT_SIZE_PRESET_PX["Small"]
 
-    # Default keeps whatever the cached figure gives it, so the two themes
-    # differ only where the base figure does.
+    # Default leaves the trace's own color alone (none, so the theme template
+    # colors it at render), so the two themes differ only where the base
+    # figure does.
     default = [
         _run_trace(
             home.apply_graph_appearance(color_scheme, cached_plot, "Default", "")
