@@ -438,13 +438,28 @@ def test_bare_required_directory_entry_blocks_publication(
     assert any(f"missing required entry {required}" in problem for problem in problems)
 
 
+#: Relative links into `docs/` in a Markdown document. `#` is excluded so an
+#: anchored link yields the file path: the archive carries files, and
+#: `docs/architecture.md#layout` is a target no contract entry could satisfy.
+_README_DOC_LINK = re.compile(r"\]\((docs/[^)\s#]+)")
+
+
+def _readme_doc_targets(markdown: str) -> set[str]:
+    return {match.group(1) for match in _README_DOC_LINK.finditer(markdown)}
+
+
+def test_anchored_readme_links_contribute_their_file_path() -> None:
+    assert _readme_doc_targets("[layout](docs/architecture.md#layout)") == {
+        "docs/architecture.md"
+    }
+
+
 def test_readme_doc_targets_are_all_required() -> None:
     # A README link into docs/ that the contract does not name could be pruned
     # from the archive alone: checkout-level doc tests would stay green while
     # the shipped README's link breaks, permanently.
     root = Path(__file__).resolve().parent.parent
-    readme = (root / "README.md").read_text(encoding="utf-8")
-    targets = {match.group(1) for match in re.finditer(r"\]\((docs/[^)\s]+)", readme)}
+    targets = _readme_doc_targets((root / "README.md").read_text(encoding="utf-8"))
     assert targets, "expected the README to link into docs/"
     assert targets <= set(REQUIRED_ARCHIVE_ENTRIES)
 
