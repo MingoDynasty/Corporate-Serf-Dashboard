@@ -168,9 +168,10 @@ benchmark tier) — see the
   refresh Timer) moves the cache on, the interval reads a different value and
   the hint is retired rather than left contradicting a position that has
   since arrived.
-- Manual Refresh answers with a toast whatever happens — the user asked for
-  it — and all four outcomes come off the callback's own notification
-  output. A hard failure (an `error_message` result or a raised exception) is
+- With a scenario selected, Manual Refresh answers with a toast whatever
+  happens — the user asked for it — and all four outcomes come off the
+  callback's own notification output; with none selected the click sets the
+  field to `N/A` and toasts nothing. A hard failure (an `error_message` result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
   position unchanged." is true whether a cached position was on screen or

@@ -81,9 +81,10 @@ their full behavior.
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure));
   the instances are specified in
   [scenario_rank.md](scenario_rank.md#failure-handling).
-- Manual Refresh answers every click with a toast — red, yellow, green, or
-  blue — and the passive rank renders that used to toast red or yellow no
-  longer do
+- With a scenario selected, Manual Refresh answers every click with a
+  toast — red, yellow, green, or blue; with none selected the click sets the
+  field to `N/A` and toasts nothing. The passive rank renders that used to
+  toast red or yellow no longer do
   ([2026-07-12](../decision_log.md#2026-07-12-rank-fetch-failure-degrades-to-the-last-cached-rank)
   as amended by
   [2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy));
