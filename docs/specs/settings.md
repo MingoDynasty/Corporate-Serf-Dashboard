@@ -16,16 +16,17 @@ filesystem roots and the in-memory stores, is mapped in
 [architecture.md](../architecture.md#state); the user-facing rationale is in
 [product.md](../product.md#getting-data-in); the user's view of both files is
 the README's [Configuration](../../README.md#configuration) section; the
-endpoint identity detection calls is in
+endpoint that identity detection calls is documented in
 [kovaaks_api_notes.md](../kovaaks_api_notes.md#userprofileby-username). How
 the installer and launcher set the state root and write the first-run
 configuration is owned by [release_and_install.md](release_and_install.md).
 
 ## The configuration file
 
-- `config.toml` in the state root is written once by the installer at first
-  install and is human-owned and app-read-only from then on: the app never
-  writes it, and an update never touches it
+- `config.toml` in the state root is created once, by the installer at first
+  install or by hand from `example.toml` in a checkout, and is human-owned and
+  app-read-only from then on: the app never writes it, and an update never
+  touches it
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
   `ConfigData` holds `port` (required, no default), `host` (`"127.0.0.1"`),
   `polling_interval` (`1000` ms), `sens_round_decimal_places` (`1`), `debug`
@@ -84,9 +85,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   port error
   ([2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
 - `debug = true` serves through Flask's development server on the same host
-  and port, validates `host` the same way, and warns at startup when `host`
-  is not the default because the debugger console is then reachable from that
-  network; the combination is not refused
+  and port, validates `host` the same way, and warns at startup, when `host`
+  is not the default, that the debugger is reachable from that network; the
+  combination is not refused
   ([2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
 
 ## The settings store
@@ -140,9 +141,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 - `is_restart_pending()` is derived, never stored: true when the stored
   `stats_dir` differs from the pinned one (an empty and an absent value
   compare equal), or when an identity pin exists and the stored pair differs
-  from it. An unfrozen identity pin is never a difference.
-  `is_stats_dir_change_pending()` answers the directory half alone
+  from it. An unfrozen identity pin is never a difference
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  `is_stats_dir_change_pending()` answers the directory half alone.
 - The app starts and serves with no usable stats directory. Unset and
   set-but-missing behave the same: the initial scan and the file watchdog are
   skipped, one warning names what was configured, and only `port` is needed to
@@ -184,12 +185,13 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 
 - `/settings` renders from the stored view, never the pins, so it shows what
   is on disk. Three fields: "Stats directory" (an Autocomplete over the
-  suggestions with filtering off, a chevron and the sentence "Click the field
-  to pick from the folders found on this machine." only when there are any),
-  "KovaaK's username", and "Steam ID", all free text. Opening the page never
-  calls KovaaK's
+  suggestions with filtering off), "KovaaK's username", and "Steam ID", all
+  free text. Opening the page never calls KovaaK's
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page),
   [2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  The stats-directory field shows a chevron and the sentence "Click the field
+  to pick from the folders found on this machine." only when there are
+  suggestions.
 - Save is all-or-nothing and offline: `stats_dir` must be empty or an existing
   directory ("No such directory."), `steam_id` must be empty or 17 ASCII
   digits at or above `76561197960265728` ("Enter a 17-digit SteamID64 — it
@@ -211,18 +213,22 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   apply. This app is still running on the settings it started with.", on
   every visit and immediately after the save that caused it
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
-- "Detect my accounts" sits beside the hint "Checks the Steam accounts on
-  this machine against KovaaK's." and fills inputs only. Exactly one
-  candidate with nothing unchecked and discovery complete fills both fields
-  ("Found `<username>`. Save to apply it."); anything else goes to the
-  "Detected KovaaK's accounts" picker, whose pick fills both fields from the
-  rendered result without a second detection. The conclusive "No Steam
-  account on this machine has a KovaaK's profile. Type your username in
-  yourself — KovaaK's cannot look one up from a Steam ID." appears only when
-  nothing was unresolved; otherwise "No KovaaK's profile matched the Steam
-  accounts that could be checked.", followed by the discovery and unchecked
-  caveats
+- "Detect my accounts" fills inputs only. Exactly one candidate with nothing
+  unchecked and discovery complete fills both fields ("Found `<username>`.
+  Save to apply it."); any other result with at least one candidate goes to
+  the "Detected KovaaK's accounts" picker, led by "Found `<n>` KovaaK's
+  accounts. Choose the one to use, then Save." ("account" for one), whose
+  pick fills both fields from the rendered result without a second
+  detection; an empty result leaves the picker hidden. The conclusive "No
+  Steam account on this machine has a KovaaK's profile. Type your username
+  in yourself — KovaaK's cannot look one up from a Steam ID." appears only
+  when nothing was unresolved; otherwise "No KovaaK's profile matched the
+  Steam accounts that could be checked.", followed by the discovery and
+  unchecked caveats
   ([2026-08-03](../decision_log.md#2026-08-03-settings-detection-suggests-and-identity-is-offered-only-once-verified)).
+  Before any detection the button sits beside the hint "Checks the Steam
+  accounts on this machine against KovaaK's.", which a detection's report
+  replaces.
 - An alert titled "Your saved settings are not being used" carries the
   store's message in the error and future states and is re-derived after a
   save that repairs the file
@@ -251,10 +257,11 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
   Placement and copy belong to the Scenario Performance spec.
 - Skip calls `decline_identity`: the username becomes `""`, nothing else
-  changes, no worker starts, nothing pins, and the card never returns. A
-  future-state store refuses it, the card stays up, and the red toast "Skip
-  was not saved" explains
+  changes, no worker starts, nothing pins, and the card never returns
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  A future-state store refuses it and the card stays up
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp));
+  the red toast "Skip was not saved" explains.
 - The landing page's in-place hint "No stats directory configured — set it in
   Settings" speaks only for a `stats_dir` key that exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply
