@@ -178,9 +178,9 @@ interval mounted in the Scenario Performance layout and filtered to the
 selected scenario, so any feature built on it is blind on every other page
 and for every other scenario. The master switch decision-log entry
 (2026-08-21) deferred making run toasts app-wide because judging a run
-against the selected scenario's threshold does not generalize. A celebration has no such
-dependency: it needs "a personal best happened, in this scenario, with this
-score", which the watchdog already knows.
+against the selected scenario's threshold does not generalize. A
+celebration has no such dependency: it needs "a personal best happened, in
+this scenario, with this score", which the watchdog already knows.
 
 ## Verified facts
 
@@ -265,7 +265,9 @@ exactly when `is_new_high_score` is true and a previous high score exists
 (Cases 2 and 3); Case 1 never celebrates. `NewFileMessage` and the Scenario
 Performance `RunEventData` also gain an explicit `is_new_high_score: bool`,
 set at all three construction sites, because the page's own toast needs the
-scenario-wide fact and cannot derive it (see Problem). The rank refresh keeps
+scenario-wide fact and cannot derive it (see Problem). `RunEventData` also
+carries the message's `datetime_created` (as an ISO string; the store is
+JSON), so the page can apply the freshness rule below. The rank refresh keeps
 its current trigger; the celebration is not coupled to a network call.
 
 **The consumer.** The app shell hosts a `dcc.Interval`
@@ -314,19 +316,28 @@ shapes are possible later styles, not v1.
 **The toast.** The shell's celebration toast reuses the run-verdict toast id,
 which moves from `home.py` to `notifications.py` as a shared constant, so a
 personal best toast and the next run's verdict replace each other exactly as
-two run toasts do today. On Scenario Performance, the page's own live run
-toast yields for a personal best run when celebrations are on (the page reads
-the setting mirror as `State`): `_build_run_event_notification` returns
-`None` for a live event whose `is_new_high_score` is set, leaving the shell's
-toast as the one toast that run earns. The backlog digest is unaffected,
-since the shell never replays a stale personal best; a digest whose latest
-run is a personal best headlines it per D4. With celebrations Off the page
-behaves as today, except that a personal best run's own toast headlines the
-personal best (D4) instead of the verdict. The invariant: a personal best
-run earns exactly one toast on any page, from exactly one producer. The
-alternative considered, a page-local replacement where both producers emit
-and the later one wins, depends on callback ordering within a tick and was
-rejected.
+two run toasts do today. On Scenario Performance, the page yields to the
+shell exactly when the shell celebrates, for the live toast and the backlog
+digest alike: `_build_run_event_notification` returns `None` when
+celebrations are on (the page reads the setting mirror as `State`) and the
+run it would toast about, the live run or the digest's latest run, is a
+personal best the shell celebrated. "Celebrated" is decided by the same
+freshness rule the shell applies, computed by one shared helper in
+`notifications.py` from the event's `datetime_created`; no callback asks
+another what it did. A digest whose latest run is a stale personal best
+(older than the window, which the shell drops unseen) still fires and
+headlines it per D4. Because the two callbacks judge freshness on their own
+ticks, the page's window is one polling interval shorter than the shell's: a
+yield then always implies the shell saw the event as fresh and toasted it,
+and the residual boundary case (an event aging past the page's window but
+not yet the shell's) costs at most two same-headlined toasts, never silence.
+The shared lifetime counter has one writer per event under the same rule.
+With celebrations Off the page behaves as today, except that a personal best
+run's own toast headlines the personal best (D4) instead of the verdict. The
+invariant: a personal best run earns exactly one toast on any page, from
+exactly one producer. The alternative considered, a page-local replacement
+where both producers emit and the later one wins, depends on callback
+ordering within a tick and was rejected.
 
 The toast is informational, so it shows under reduced motion too; only the
 animation is skipped.
@@ -335,7 +346,12 @@ animation is skipped.
 celebration is its own family, gated by its own setting. Master off with a
 style selected still celebrates a personal best; celebrations Off with master
 on reports the personal best through the page's run toast, on Scenario
-Performance only, as today. Neither setting reads the other.
+Performance only, as today. Neither setting reads the other. Guard order in
+`_build_run_event_notification`: the master switch's early return stays
+first, the celebration yield comes second. So the page's personal best toast
+(the celebrations-Off case) is a run toast like any other and the master
+switch gates it; with both settings off, the page is silent and the shell has
+nothing to say.
 
 **Storage.** Browser-local Dash persistence on the select, as every other UI
 preference is stored. Because the consumer is shell-level and the Settings
@@ -425,7 +441,8 @@ early return.
 
 - **App-wide run toasts.** Verdict, placement, and digest toasts stay on
   Scenario Performance; the deferral recorded in the master switch
-  decision-log entry stands. This proposal adds one app-wide family, not a general producer.
+  decision-log entry stands. This proposal adds one app-wide family, not a
+  general producer.
 - **Per-sensitivity personal bests.** The celebration is scenario-wide, like
   the watchdog's flag. A per-sensitivity best is already the placement
   toast's job.
@@ -453,9 +470,13 @@ early return.
 - Scenario Performance tests beside the existing ones in
   `tests/test_home_run_events.py`: a live personal best event yields (returns
   `None`) when celebrations are on and headlines "New personal best" when
-  they are off; the backlog digest headlines it either way; non-personal-best
-  events are unchanged; the master switch's value has no effect on any of
-  the above (D7).
+  they are off; a backlog digest whose latest run is a fresh personal best
+  yields the same way, and one whose latest run is a stale personal best
+  headlines it; the page's yield window is one polling interval shorter than
+  the shell's; non-personal-best events are unchanged. With celebrations on,
+  the master switch's value has no effect on the yield (D7). With
+  celebrations Off, the master switch gates the page's personal best toast
+  like every other run toast, so master off is silent.
 - Callback-level checks through a direct POST to `/_dash-update-component`,
   the established way to exercise shell-level outputs here.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
