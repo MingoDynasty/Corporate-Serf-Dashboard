@@ -1,12 +1,12 @@
 # Playlists and Benchmarks
 
 The Playlists page is the one place playlists and benchmarks are managed, and
-it lists every loaded one with local aggregates. A benchmark is a playlist that also carries rank thresholds, and
-the bundled library ships with the app with only the popular ones visible.
-Clicking a row opens that playlist's scenario table, which paints local stats
-immediately and streams leaderboard positions in behind them. A background
-worker keeps the overview's percentile columns warm without getting in the way
-of anything the user is doing.
+it lists every loaded one with local aggregates. A benchmark is a playlist
+that also carries rank thresholds, and the bundled library ships with the app
+with only the popular ones visible. Clicking a row opens that playlist's
+scenario table, which paints local stats immediately and streams leaderboard
+positions in behind them. A background worker keeps the overview's percentile
+columns warm without getting in the way of anything the user is doing.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
