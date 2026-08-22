@@ -271,8 +271,8 @@ time, replacing the current one-line em-dash convention.
    the diagnostic detail stays in the log line beside them.
 9. **Error copy says what happened first, then what to do when there is
    something to do.** A failure with no useful recovery step says only what
-   happened and does not invent one (`No playlist matches the code X.`,
-   `X is not valid JSON.`). The toast title carries the verdict (unchanged
+   happened and does not invent one (`X could not be read.`, `X is not
+   valid JSON.`). The toast title carries the verdict (unchanged
    from 2026-08-03).
 
 ### Copy
@@ -412,8 +412,12 @@ separate child.
   - `Failed to look up playlist code {code}: KovaaK's API error.` → `Could
     not look up {code} on KovaaK's. Check the code and try again.` (covers
     both causes: a slow spell and a code KovaaK's rejects outright)
-  - `Failed to load playlist data for playlist code: {code}` → `No playlist
-    matches the code {code}.`
+  - `Failed to load playlist data for playlist code: {code}` → `Could not
+    load a playlist for the code {code}. Check the code and try again.`
+    Outcome-neutral on purpose: this branch is reached when KovaaK's search
+    returns no usable record *and* the Evxl by-code fallback then fails,
+    whether with a 400 for an unknown code or with a connection error or an
+    invalid payload, so it cannot claim that no playlist matches.
   - `Found more than one playlist from code: {code}` → `More than one
     playlist matches the code {code}.`
   - `Invalid playlist data returned by API for playlist code: {code}` and
@@ -591,8 +595,19 @@ casing, and contractions are review territory, not a gate.
    the rules and their rationale, "superseded in part, for copy" notes on the
    2026-08-03, 2026-08-09, 2026-08-11, and 2026-08-21 entries whose quoted
    strings change, the `tech_debt.md` edit for the refresh-toast title, a
-   `product.md` line, and the deletion of this file. No capability spec
-   covers app copy and this does not justify creating one. No hard
-   dependency on other in-flight work. Under D5 it is sequenced before the
-   release the announcement post promotes, and the shipping PR ticks the
-   matching item off the launch prep notes' pre-post checklist.
+   `product.md` line, the roadmap milestone moved to Shipped, and the
+   deletion of this file. The current-behavior docs that quote changed
+   strings are updated in the same commit, because a spec that names the
+   old copy is wrong the moment the new copy ships:
+   `docs/specs/scenario_rank.md` (the unset-username status line, the three
+   Position hints under D1, and the refresh toast's title and body),
+   `docs/product.md` (the unset-username
+   status, the refresh toast, and the Run Notifications control name),
+   `docs/architecture.md` and `docs/roadmap.md` (the control names D2
+   renames), and the README wherever `rg` finds a changed string. No new
+   capability spec is created: app copy as a whole has no spec, and the
+   strings that do live in one live in the spec of the capability they
+   belong to. No hard dependency on other in-flight work. Under D5 it is
+   sequenced before the release the announcement post promotes, and the
+   shipping PR ticks the matching item off the launch prep notes' pre-post
+   checklist.
