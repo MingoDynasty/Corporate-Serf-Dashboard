@@ -35,6 +35,7 @@ sequence.
   to import still says so. The switch that used to read "Score Threshold
   Notification" never gated toasts at all, so it is now "Score Threshold
   Verdict" and says what it does. (PR #245; design in #240) Design rationale
+  distilled into [`decision_log.md`](./decision_log.md).
 - **Scenario Performance point customization** — the raw run points can now be
   made smaller, larger, or a color of your choosing, from a Run Data Points
   group in Chart options. Eight curated swatches read on both the light and the

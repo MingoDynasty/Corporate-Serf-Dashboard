@@ -283,18 +283,21 @@ flowchart LR
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.
   The inspector is a collapsible in-flow panel beside the chart holding the
-  overlay, run-point, score-threshold, and run-notification preferences, so
-  every adjustment shows on the live chart; `toggle_chart_options` writes its
-  open state as a CSS class, which hides the controls without unmounting them.
-  The overlay and threshold controls are inputs to `generate_graph`, which
-  rebuilds the figure; the *Run Data Points* size and color are inputs to
+  overlay, run-point, score-threshold, and run-notification preferences. The
+  panel itself starts closed on every visit and its open state is never
+  persisted; `toggle_chart_options` writes that open state as a CSS class,
+  which hides the controls without unmounting them. Each control's own value
+  is browser-persisted (`persistence=True`) independently of the panel. Most
+  of those controls show their change on the live chart: the overlay and
+  threshold controls are inputs to `generate_graph`, which rebuilds the
+  figure; the *Run Data Points* size and color are inputs to
   `apply_graph_appearance` instead, the cheap callback that themes the cached
   figure and then hands it to `plot_service.apply_point_appearance` —
   appearance never reruns the data read, the overlays, or the notification
-  logic. The *Notifications* master switch is neither: it is a `State` on
-  `generate_graph`, read only when a run event fires, so flipping it rebuilds
-  nothing. It starts closed on every
-  visit and is never persisted. The CSS (`assets/stylesheet.css`) owns two
+  logic. The *Notifications* master switch is the one that changes nothing on
+  the chart: it defaults to on, and it is a `State` on `generate_graph` read
+  only when a run event fires, so flipping it neither rebuilds the figure nor
+  redraws it. The CSS (`assets/stylesheet.css`) owns two
   behaviors worth knowing before editing it: the reflow threshold is a
   container query measuring the chart row rather than the window, because the
   fixed navbar shrinks the content area without touching the viewport; and
