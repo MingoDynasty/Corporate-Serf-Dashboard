@@ -1,8 +1,7 @@
 # Playlists and Benchmarks
 
-The Playlists page is where playlists and benchmarks are managed: it lists
-every loaded one with local aggregates and hosts show/hide, share-code import,
-and delete. A benchmark is a playlist that also carries rank thresholds, and
+The Playlists page is the one place playlists and benchmarks are managed, and
+it lists every loaded one with local aggregates. A benchmark is a playlist that also carries rank thresholds, and
 the bundled library ships with the app with only the popular ones visible.
 Clicking a row opens that playlist's scenario table, which paints local stats
 immediately and streams leaderboard positions in behind them. A background
@@ -81,8 +80,8 @@ section and [product.md](../product.md). Leaderboard placement is worded
   all N played scenarios have data — open the playlist to fetch now"; a
   resolved all-UNRANKED playlist reads `N/A`. Lowest shows "Lowest:
   {scenario}" on hover. The warmup status line reads "Updating percentile
-  data: N remaining (~ETA)" while work exists, "… · paused; retrying at
-  H:MM AM" in backoff, and "Percentile update stopped: {reason}" after a
+  data: N remaining" while work exists, with " (~ETA)" appended once a pace
+  sample exists, "… · paused; retrying at H:MM AM" in backoff, and "Percentile update stopped: {reason}" after a
   fatal stop; a one-second interval rebuilds rows without recording
   interactive activity, disables after one idle rebuild, and re-arms on the
   worker's enqueue generation
