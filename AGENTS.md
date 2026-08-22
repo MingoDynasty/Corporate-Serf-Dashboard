@@ -96,8 +96,10 @@ Codex <codex@local>
   (a statement with no governing entry stays unlinked — do not invent an
   entry for it), and opening with a layer-1 summary (see "Doc style — two
   readers, two layers"). `docs/decision_log.md` stays the chronological
-  change history. Create a spec when a capability needs one — do not
-  backfill specs ahead of need.
+  change history. Every shipped capability with a durable behavior contract
+  has a spec: a new capability gets its spec in the PR that ships it, and a
+  PR that changes specified behavior updates the spec in the same PR (this
+  is step 2 of "Shipping a proposal" below).
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data
@@ -232,8 +234,9 @@ in the same PR — do not leave it for later:
 1. Distill the proposal's durable decisions into `docs/decision_log.md`;
    each new entry opens with its layer-1 summary (see "Doc style — two
    readers, two layers").
-2. Update the touched capability's spec under `docs/specs/` (if it has one)
-   so it states the shipped behavior, linking the new decision-log entries.
+2. Update the touched capability's spec under `docs/specs/` so it states the
+   shipped behavior, linking the new decision-log entries — creating the spec
+   here if the capability is new.
 3. Delete the proposal file (git history preserves the full text).
 4. Update `docs/roadmap.md`: move the milestone to Shipped with PR numbers
    and promote what's next. Shipped keeps only the ~5 most recent
@@ -277,8 +280,9 @@ in the same PR — do not leave it for later:
 - Cache writes should be atomic where practical.
 - Derived display fields should not be persisted unless there is a clear reason.
 
-## Scenario Rank Feature
+## Capability Specs
 
-Current behavior — endpoints, caching, refresh, and the service/UI
-failure-handling boundaries — is specified in
-[docs/specs/scenario_rank.md](docs/specs/scenario_rank.md).
+[docs/specs/](docs/specs/) is the current-behavior index: one file per
+shipped capability, each a set of plain statements of what the app does
+today linking the decision-log entries that set them. Read the capability's
+spec before changing its behavior, and update it in the same PR.
