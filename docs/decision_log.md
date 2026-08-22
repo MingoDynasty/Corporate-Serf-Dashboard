@@ -62,9 +62,10 @@ which leaves the theme template decorative for the primary data mark;
 a callback, a round trip per keystroke to do what two CSS rules do.
 
 Not changed: the Average Score line, which `px.line` bakes in the same
-`#636efa` and which now sits beside blue points. Clearing its color too would
-hand it the colorway's second entry (red) rather than the points' color, a
-separate look to decide on.
+`#636efa` and which now sits beside blue points. Clearing its color would hand
+it the colorway's second entry (red) rather than the points' color. Ruled
+2026-08-22: the line gets a user setting of its own in a later PR, not a
+colorway change here.
 
 ## 2026-08-21: Release Integrity Rests On GitHub Digests And An Enforced Archive Contract
 
