@@ -20,10 +20,11 @@ Status: Accepted
 Every shipped capability with a durable behavior contract must have a spec
 that states what the app does today, and the four still missing are being
 written in one deliberate pass instead of waiting for a change to touch each
-capability. A new capability brings its spec in the PR that ships it, and a
-change to specified behavior updates the spec in the same PR. The specs are
-how a reader finds the decision behind a behavior, so the log still keeps no
-topic index.
+capability. The title names that choice of one pass over on-demand writing,
+not a finished layer. A new capability brings its spec in the PR that ships
+it, and a change to specified behavior updates the spec in the same PR. The
+specs are how a reader finds the decision behind a behavior, so the log
+still keeps no topic index.
 
 Decision: the "do not backfill specs ahead of need" rule in `AGENTS.md` is
 replaced by a standing criterion — **every shipped capability with a durable
@@ -52,7 +53,7 @@ by a fresh Fable session plus Codex, in dependency order —
   of each other.
 
 Deliberately excluded: app copy, which the app messaging consistency
-proposal (PR #247) already ruled out of the spec layer; bug-report intake,
+proposal (PR #247) leaves out of the spec layer; bug-report intake,
 which one decision-log entry covers in full; Home as a standalone capability,
 folded into `scenario_performance.md`; and tooling and process, for which
 `AGENTS.md` is the spec.
@@ -79,12 +80,13 @@ inherit:
   included. Specs link `architecture.md` and `product.md` rather than
   restating them, and link another spec only to say a rule lives there.
 
-Consequences: this closes the
+Consequences: the
 [2026-08-01 doc-style follow-up entry](#2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index)'s
 "revisit a log index only if findability still hurts after specs land"
-loop — the specs are the findability fix, and a topic index stays rejected.
-`docs/product.md` and `docs/roadmap.md` are untouched: nothing user-facing
-changes.
+loop closes when the pass's last PR merges — the specs are the findability
+fix, and a topic index stays rejected; until then the loop is open only in
+the sense that the fix is still landing. `docs/product.md` and
+`docs/roadmap.md` are untouched: nothing user-facing changes.
 
 ## 2026-08-21: The Empty Point Color Is Called Default, And The Points Follow The Theme
 
