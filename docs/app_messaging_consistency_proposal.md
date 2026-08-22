@@ -124,7 +124,11 @@ has a personality, and the product's name suggests it wants one.
 
 **Recommendation: keep all three, and fix only their typography.** "Keep
 grinding..." becomes "Keep grinding…" with the single ellipsis character, so
-the app has one ellipsis form. The other two are already correct sentences.
+the app has one ellipsis form; rule 4 names this line as the one place
+outside a progress readout the character appears, so a later reviewer can
+tell it is deliberate. "Keep grinding." with a period is the alternative if
+the ellipsis reads as a wink too many; it needs no exception in the rule.
+The other two are already correct sentences.
 
 Decide this with the launch visual in mind, not only the running app: the
 launch prep notes want the announcement post to lead with a clip of a run
@@ -193,7 +197,8 @@ drift, each small, together the "vibe-coded" feel:
    up". Full forms are the majority by nine sites to four.
 4. **Ellipses, three ways.** `Keep grinding...` and every placeholder use
    three periods; the fill status uses the `…` character; one tooltip uses
-   `, ...` inside parentheses.
+   `, ...` inside parentheses, and the stats folder description elides a
+   path with `...\`.
 5. **Casing.** See D2.
 6. **Quoting control names.** `Toggle "Show hidden"` in two places, bare
    `press Detect my accounts again`, `then Save`, `Needs Rank Thresholds
@@ -245,10 +250,11 @@ time, replacing the current one-line em-dash convention.
    is selected (ratified 2026-06-30), and nothing else. The run-toast
    scenario/score separator becomes a colon.
 3. **Casing** per D2.
-4. **One ellipsis form.** The single `…` character, and only in an
-   in-progress readout. Placeholders are bare noun phrases (`Select a
-   scenario`, `Filter playlists`). The three-period form does not appear in
-   app copy.
+4. **One ellipsis form.** The single `…` character, never three periods,
+   and only where something is still going on: the in-progress fill readout,
+   and the one coaching line that trails off on purpose (`Keep grinding…`,
+   D4). Placeholders are bare noun phrases (`Select a scenario`, `Filter
+   playlists`), and a path is never elided with one.
 5. **No contractions.** `Could not`, `cannot`, `does not`.
 6. **Control names are unquoted and carry their on-screen casing.** `Turn on
    Show hidden`, `press Detect my accounts again`, `then Save`. A literal
@@ -263,8 +269,11 @@ time, replacing the current one-line em-dash convention.
 8. **A message that reaches the screen is user copy wherever it is built.**
    Service-layer strings that a page shows verbatim follow every rule above;
    the diagnostic detail stays in the log line beside them.
-9. **Error copy says what happened, then what to do**, in that order, and
-   the toast title carries the verdict (unchanged from 2026-08-03).
+9. **Error copy says what happened first, then what to do when there is
+   something to do.** A failure with no useful recovery step says only what
+   happened and does not invent one (`No playlist matches the code X.`,
+   `X is not valid JSON.`). The toast title carries the verdict (unchanged
+   from 2026-08-03).
 
 ### Copy
 
@@ -401,7 +410,8 @@ separate child.
 - Import refusals (built in `data_service.py`, shown under "Playlist import
   failed"; the diagnostic detail stays in the log line each already writes):
   - `Failed to look up playlist code {code}: KovaaK's API error.` → `Could
-    not look up {code} on KovaaK's.`
+    not look up {code} on KovaaK's. Check the code and try again.` (covers
+    both causes: a slow spell and a code KovaaK's rejects outright)
   - `Failed to load playlist data for playlist code: {code}` → `No playlist
     matches the code {code}.`
   - `Found more than one playlist from code: {code}` → `More than one
@@ -459,6 +469,12 @@ separate child.
 
 - Field label `Stats directory` → `Stats folder`; its error `No such
   directory.` → `No such folder.`
+- Stats folder description, the path example: `The KovaaK's stats folder
+  this app reads runs from, usually ...\FPSAimTrainer\FPSAimTrainer\stats.`
+  → `The KovaaK's stats folder this app reads runs from, usually
+  FPSAimTrainer\FPSAimTrainer\stats inside your Steam library.` (the rest
+  of the description, in both its with- and without-suggestions forms, is
+  unchanged)
 - Steam ID error: `Enter a 17-digit SteamID64 — it starts with 7656119.` →
   `Enter a 17-digit SteamID64. It starts with 7656119.`
 - Steam ID description: `Your 17-digit SteamID64. Optional; it disambiguates
@@ -508,10 +524,18 @@ therefore walk the AST: for every module under `source/`, visit every
 constants inside `ast.JoinedStr`, so inline bodies are covered), skip
 docstrings (the first statement of a module, class, or function body), and
 fail on any `—` outside an explicit allowlist holding the one ratified glyph
-site. Comments never reach the AST, so the check cannot misfire on them. The
-same walk can assert the three-period ellipsis is absent from string
-constants. Anything beyond those two characters (casing, contractions) is
-review territory, not a gate.
+site. Comments never reach the AST, so the check cannot misfire on them.
+
+The guard covers the em dash only. Walking `source/` this way at `39f96d4`
+finds 24 non-docstring string constants containing `—`: the 23 Copy-block
+sites and the allowlisted glyph, and no log line or other non-UI string, so
+the gate passes the moment the Copy block ships and needs no UI-versus-log
+distinction it cannot make. The three-period ellipsis is deliberately not
+gated: the same walk finds it in the JavaScript spread operator inside a
+clientside-callback source string (`...navbar` in `app_shell.py`) and in a
+logging-only line in `file_watchdog.py`, neither of which is app copy, and
+any future `...args` in callback JavaScript would trip it again. Ellipses,
+casing, and contractions are review territory, not a gate.
 
 ## Out of scope
 
