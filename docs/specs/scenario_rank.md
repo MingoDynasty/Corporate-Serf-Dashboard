@@ -97,7 +97,9 @@ benchmark tier) — see the
   ([2026-04-27](../decision_log.md#2026-04-27-use-json-files-for-runtime-api-caches),
   root relocated by
   [2026-07-11](../decision_log.md#2026-07-11-move-the-api-cache-under-datacache)),
-  subject to the cache conventions in [AGENTS.md](../../AGENTS.md).
+  subject to the cache conventions in [AGENTS.md](../../AGENTS.md). They
+  carry no schema stamp; the durable-store contract that exempts them lives in
+  [settings.md](settings.md#durable-store-schema-contract).
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
