@@ -192,19 +192,20 @@ section and [product.md](../product.md). Leaderboard placement is worded
   row id `generation_token:playlist_order`. Starting a fill cancels every
   other live fill; terminal fills are tombstones in an eight-item set,
   consumed evicted before unconsumed. The first terminal tick alone drains
-  final updates, rebuilds unresolved cancelled rows cache-only, and emits the
-  toast; it and every later tick assert the settled status. The toast uses
-  the red, yellow, and silent tiers
+  final updates and rebuilds unresolved cancelled rows cache-only; it and
+  every later tick assert the settled status
   ([2026-07-15](../decision_log.md#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill)).
   Hydration is skipped when every scenario is already mapped. Status:
   "Updating positions from KovaaK's… {done}/{total}" live; "Update
   interrupted · {done} of {total} refreshed" cancelled; "{n} of {total}
   positions unavailable" (+ " · {m} from cache — KovaaK's unreachable") or
   "{m} of {total} positions from cache — KovaaK's unreachable" degraded;
-  empty when clean. The toast fires once per generation: red "Position
-  update incomplete" if any lookup ended UNKNOWN, yellow "Positions served
-  from cache" if only stale results occurred, nothing when clean or
-  cancelled.
+  empty when clean.
+- That status line is the fill's only report. The fill emits no
+  notification, whatever the outcome: unavailable positions, positions
+  served from cache, a cancelled fill, and a clean one all settle in place.
+  The drain callback declares no `sendNotifications` output at all
+  ([2026-08-22](../decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)).
 - With no username the fill is skipped, pending flags are cleared, and the
   status reads "Positions unavailable — set your KovaaK's username in
   Settings" with Settings linked
