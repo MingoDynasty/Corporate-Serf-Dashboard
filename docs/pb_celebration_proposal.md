@@ -10,17 +10,20 @@ celebration: a burst of confetti and one toast that says so. Today a new
 personal best earns nothing on screen except a quiet rank refresh. The
 celebration fires on every page and for every scenario, because a personal
 best is an achievement regardless of what the user happens to be looking at.
-A setting on the Settings page picks the animation style or turns it off.
+A Settings-page control turns the celebration off; the first version ships
+one confetti effect, and a follow-up adds a choice of styles.
 
 ## Decisions needed
 
-Every decision below is open. Each carries the current lean from the design
-conversation of 2026-08-21 and the review rounds since, so the trade-off is
-concrete; none is ratified.
+The maintainer ruled on 2026-08-25, after three review rounds: D1 through
+D7 are ratified, D6 as a staged compromise. D8 is the one decision still
+open; its lean carries the current recommendation.
 
 ### D1 — Does the celebration fire on every page, for every scenario?
 
-Status: Open. Lean: **yes, app-wide.**
+Status: Ratified (2026-08-25)
+
+**Decision: yes, app-wide.**
 
 A personal best is an app-level achievement; the current page and the
 selected scenario are incidental. The run toasts are produced only by the
@@ -37,8 +40,10 @@ copy would then have to explain.
 
 ### D2 — Where does the setting live, and where is it stored?
 
-Status: Open. Lean: **a control on the Settings page, persisted in the
-browser, in its own section outside the Save form.**
+Status: Ratified (2026-08-25)
+
+**Decision: a control on the Settings page, persisted in the browser, in
+its own section outside the Save form.**
 
 The behavior is app-wide, so the Chart options inspector on one page is the
 wrong home: undiscoverable, and a control there describes itself as a chart
@@ -64,7 +69,9 @@ deserves it; this one would be folded into that version when it comes.
 
 ### D3 — Vendor `canvas-confetti`, or hand-roll the animation?
 
-Status: Open. Lean: **vendor `canvas-confetti` 1.9.4 (ISC), unminified.**
+Status: Ratified (2026-08-25)
+
+**Decision: vendor `canvas-confetti` 1.9.4 (ISC), unminified.**
 
 The market survey in Verified facts found one candidate that is small,
 dependency-free, loadable as a classic script (which is how Dash serves
@@ -82,7 +89,9 @@ ownership.
 
 ### D4 — Does a personal best take the run toast's headline?
 
-Status: Open. Lean: **yes, on the celebration toast only.** When
+Status: Ratified (2026-08-25)
+
+**Decision: yes, on the celebration toast only.** When
 celebrations are on, a personal best run's one toast is the celebration
 toast ("New personal best"), and the page's run toast yields to it. When
 celebrations are Off, the page's run-toast policy is unchanged: the threshold
@@ -107,11 +116,13 @@ need a different name and description.
 
 ### D5 — Ship without a noise gate for young scenarios?
 
-Status: Open. Lean: **yes, ungated.**
+Status: Ratified (2026-08-25)
+
+**Decision: yes, ungated.**
 
 Early in a scenario's life most runs are personal bests, so a freshly
 imported playlist celebrates nearly every run for a session, which is when
-it means least. The lean is to ship with the one gate that is clearly right
+it means least. The ruling ships with the one gate that is clearly right
 (an existing personal best must be beaten; a scenario's first run sets a
 baseline and is never celebrated) and let the setting be the escape hatch.
 This follows the repo's accepted-limitation habit: document the gap, point at
@@ -123,24 +134,33 @@ before anyone knows the noise grates. It can be added later if it does.
 
 ### D6 — One toggle, or a choice of styles?
 
-Status: Open. Lean: **a choice of styles, as one control with Off.**
+Status: Ratified (2026-08-25)
 
-`canvas-confetti`'s demo recipes give four distinct short effects for the
-price of a lookup table (see Design, "Styles"): Confetti, Fireworks,
-Cannons, Stars. The lean is a single select with Off plus those four,
-defaulting to Confetti, and a Preview button beside it, because with several
-styles the only other way to see one is to set a personal best. Curated
-presets only: no duration, particle, or color knobs, and no custom style.
+**Decision: staged. Version one ships an on/off switch with one polished
+Confetti effect and the Preview button; a follow-up converts the switch to
+a style select with Off plus Confetti, Fireworks, Cannons, and Stars.**
 
-Choosing a plain on/off switch instead is simpler by one control and a few
-strings, and converting it into a select later resets the persisted value
-once. A Random option (a style per personal best) is cheap and is left out of
-the lean only to keep the copy block short; say the word and it joins the
-list.
+Both reviewers recommended shipping one effect first: the extra styles
+multiply a manual-only JavaScript and cancellation surface before any
+evidence that style choice matters, and two of the four presets are
+loop-based with their own cancellation handling. The maintainer wants the
+styles, so the ruling stages them instead of dropping them: the follow-up
+is recorded here and in the Delivery plan as its own step, and the styles
+table in Design is its specification. To keep that step purely additive,
+the persisted value is a style string from the start ("off" or "confetti");
+the v1 switch maps onto those two values, so the select only adds values to
+an existing contract. The one cost the conversion keeps is the accepted
+persisted-value reset when the control changes component type. Preview
+ships in v1 because it is the only way to see the effect without setting a
+personal best. Curated presets only, in both versions: no duration,
+particle, or color knobs, and no custom style. A Random option stays out;
+it can join the select later if wanted.
 
 ### D7 — Does the Run Notifications master switch gate the celebration?
 
-Status: Open. Lean: **no. The two settings are independent families.**
+Status: Ratified (2026-08-25)
+
+**Decision: no. The two settings are independent families.**
 
 The style select governs the confetti and the celebration toast together;
 the master switch governs the verdict, placement, and catch-up toasts. With
@@ -155,7 +175,7 @@ so a fourth family outside that list breaks no promise, and a user in the
 off-plus-style state has asked for two things at once: no narration of
 routine runs, and a celebration of personal bests. `product.md` currently
 summarizes the switch as "with it off the chart still updates and nothing
-toasts about a run"; the lean amends that sentence to except the
+toasts about a run"; the ruling amends that sentence to except the
 celebration toast, in the same edit D4 makes to the paragraph.
 
 Choosing to let the master switch silence the celebration toast (or the
@@ -185,9 +205,19 @@ that works on one monitor.
 Choosing the hard drop instead is simpler in `pbCelebration.js` and keeps
 every toast lifetime uniform, at the cost above; the Copy block's "Works on
 every page" would then need qualifying, since on one monitor the animation
-would be Preview-only. Evidence that would settle this: a `visibilitychange`
-log in the browser console while KovaaK's runs fullscreen on the
-maintainer's setup, confirming how occlusion behaves there.
+would be Preview-only.
+
+The lean does not need pre-ship evidence, and that asymmetry is the
+argument for it: on a setup where the tab never reports hidden, the pending
+path is dormant and behaviour is identical to playing immediately, while on
+a setup where occlusion does mark the tab hidden, pending is the only
+version that plays at all. It is the hard drop that would need evidence
+(that the tab stays visible during real play) to be safe. The maintainer
+cannot currently run the occlusion check, so the check moves to a post-ship
+observation: a `visibilitychange` console log while KovaaK's runs
+fullscreen, whenever that machine is next available. Deferring the whole
+behaviour to a follow-up was considered and rejected: v1 would then ship
+the drop untested, which is the one variant that can fail invisibly.
 
 ## Problem
 
@@ -363,9 +393,11 @@ stop a `setInterval` or animation-frame loop, so the loop-based styles must
 not be taken from the demo verbatim.
 
 **Styles.** A name-keyed registry in `pbCelebration.js`, mirrored by the
-option list in Python; the two lists agree by convention, and an unknown name
-plays Confetti rather than nothing, so a style removed later never silently
-turns celebrations off. The v1 set, derived from the upstream recipes:
+option list in Python; the two lists agree by convention, and an unknown
+name plays Confetti rather than nothing, so a style removed later never
+silently turns celebrations off. Version one registers Confetti alone,
+behind the on/off switch (D6); the follow-up adds the other three and the
+select. The full set, derived from the upstream recipes:
 
 - **Confetti**: the Realistic Look recipe, unchanged.
 - **Fireworks**: the Fireworks recipe cut from 15 s to about 3 s.
@@ -456,10 +488,11 @@ and the mirror would change.
 
 **Settings page placement.** A new section after the version section's
 divider (or between the form and the version section; author's call at
-build time), with its own heading, the select, its description, and the
-Preview button in one row. The select applies instantly and does not go
-through Save; the restart notice and the store alert concern the form's
-three keys and are untouched. Preview plays the currently selected style
+build time), with its own heading, the control (a switch in version one,
+the style select in the follow-up), its description, and the Preview button
+in one row. The control applies instantly and does not go through Save; the
+restart notice and the store alert concern the form's three keys and are
+untouched. Preview plays the currently selected style
 through the same clientside path as a real celebration, so it obeys the
 reduced-motion guard; it shows no toast. The hidden-tab hold never applies
 to Preview, since clicking it requires a visible tab.
@@ -468,15 +501,16 @@ to Preview, since clicking it requires a visible tab.
 following the house rules: short sentences, no em dashes.
 
 - Settings section heading: **Celebrations**.
-- Select label: **Personal best celebration**. Description under it: "Plays a
-  short animation and shows a toast when a run beats your personal best in
-  any scenario. Works on every page, and does not depend on Run
-  Notifications. Takes effect right away." The last sentence keeps the
-  section's instant model from blurring into the form's Save-then-restart
-  model beside it.
-- Select options, in order: **Off**, **Confetti**, **Fireworks**,
-  **Cannons**, **Stars**.
-- Button beside the select: **Preview**.
+- Control label: **Personal best celebration** (the v1 switch and the
+  follow-up's select share it). Description under it: "Plays a short
+  animation and shows a toast when a run beats your personal best in any
+  scenario. Works on every page, and does not depend on Run Notifications.
+  Takes effect right away." The last sentence keeps the section's instant
+  model from blurring into the form's Save-then-restart model beside it.
+- Follow-up select options, in order: **Off**, **Confetti**, **Fireworks**,
+  **Cannons**, **Stars**. These ship with the styles step, not v1; they are
+  gathered here so the whole feature's copy is in one block.
+- Button beside the control: **Preview**.
 - Celebration toast title: **New personal best**. Message, when the
   previous best is positive: "{scenario}: {score}. Up {percent}% on your
   previous best of {previous}." Otherwise: "{scenario}: {score}. Your
@@ -492,19 +526,27 @@ deferred all-messaging review.
 
 ## Delivery plan
 
-One implementation PR, with an optional split if review prefers smaller
-diffs:
+Three implementation PRs, smallest reviewable steps first (the
+maintainer's stated preference):
 
 1. **Event and toast** (can stand alone): `is_new_high_score` on the run
    message and page payload; `pb_celebration_queue` and `PersonalBestEvent`;
    the shell interval, drain callback, freshness rule, celebrated-run
    registry, and celebration toast; the Scenario Performance yield rule; the
    dedicated celebration toast id and payload-driven lifetime; the trophy
-   icon; tests.
-2. **Animation and setting** (depends on 1): the vendored library and its
-   license record; `pbCelebration.js` with the four styles and guards; the
-   Settings page section, the select, the mirror store, and Preview; the
-   clientside callback.
+   icon; tests. Interim state until PR 2: the celebration toast is
+   unconditional (the setting does not exist yet) and there is no
+   animation. Acceptable for a single-user app across one review window.
+2. **Animation and setting** (depends on 1; completes v1 and ships the
+   proposal): the vendored library and its license record;
+   `pbCelebration.js` with the Confetti effect, the guards, and the D8
+   behaviour; the Settings page section, the on/off switch, the mirror
+   store, and Preview; the clientside callback. The "Shipping a proposal"
+   checklist lands here.
+3. **Styles** (the D6 follow-up, any time after v1): the switch becomes the
+   style select; Fireworks, Cannons, and Stars join the registry with their
+   cancellation handling; the follow-up copy from the Copy block. Tracked
+   on the roadmap once this file is deleted.
 
 Plus the shipping checklist from `AGENTS.md`: decision-log entries (the
 celebration itself and its storage, the D4 priority amendment, the
@@ -573,8 +615,9 @@ early return.
   the established way to exercise shell-level outputs here.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
   links.
-- Manual: with the app running, the Preview button plays each of the five
-  options (Off plays nothing); dropping a run CSV that beats a known
+- Manual: with the app running, the Preview button plays the effect and
+  plays nothing with the switch off (each select option, once the styles
+  step lands); dropping a run CSV that beats a known
   personal best celebrates on the Playlists page and on Settings, not only
   on Scenario Performance; a CSV older than the freshness window does not;
   the same run with a system reduced-motion preference shows the toast and
