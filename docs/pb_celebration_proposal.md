@@ -15,9 +15,9 @@ one confetti effect, and a follow-up adds a choice of styles.
 
 ## Decisions needed
 
-The maintainer ruled on 2026-08-25, after three review rounds: D1 through
-D7 are ratified, D6 as a staged compromise. D8 is the one decision still
-open; its lean carries the current recommendation.
+The maintainer ruled on 2026-08-25, after three review rounds: all eight
+decisions are ratified, D6 as a staged compromise and D8 with a post-ship
+observation in place of pre-ship evidence.
 
 ### D1 — Does the celebration fire on every page, for every scenario?
 
@@ -187,31 +187,37 @@ store in Design.
 
 ### D8 — What happens when the tab is hidden at the moment of the best?
 
-Status: Open. Lean: **hold one pending celebration and play it when the tab
-next becomes visible, with a celebration toast that stays until dismissed.**
+Status: Ratified (2026-08-25)
+
+**Decision: hold one pending celebration and play it when the tab next
+becomes visible, with a celebration toast that stays until dismissed.**
 
 Chromium on Windows marks a fully occluded window's tab hidden (native
 window occlusion tracking), and the player is in KovaaK's fullscreen when a
 personal best lands. On a single-monitor setup a hard `document.hidden` drop
 therefore means the animation never plays for a real personal best, only
 from Preview, and a normal-lifetime toast has usually expired by the time
-the player alt-tabs back. The lean holds at most one pending celebration
+the player alt-tabs back. The ruling holds at most one pending celebration
 (a newer event replaces it) and plays it on the next `visibilitychange` to
 visible; the celebration toast is sent with `auto_close=False`, the
 existing convention for conditions that fire when nobody may be looking, so
 the news is still there on return. This is the only version of the feature
-that works on one monitor.
+that works on one monitor. The accepted cost, stated with the ruling:
+personal best toasts are dismissed by hand on every setup, including one
+where the animation played in view. If that grates in practice, relaxing
+the toast to the normal lifetime is a one-line follow-up that does not
+touch the pending mechanism.
 
 Choosing the hard drop instead is simpler in `pbCelebration.js` and keeps
 every toast lifetime uniform, at the cost above; the Copy block's "Works on
 every page" would then need qualifying, since on one monitor the animation
 would be Preview-only.
 
-The lean does not need pre-ship evidence, and that asymmetry is the
-argument for it: on a setup where the tab never reports hidden, the pending
-path is dormant and behaviour is identical to playing immediately, while on
-a setup where occlusion does mark the tab hidden, pending is the only
-version that plays at all. It is the hard drop that would need evidence
+The ruling needed no pre-ship evidence, and that asymmetry was the
+deciding argument: on a setup where the tab never reports hidden, the
+pending path is dormant and behaviour is identical to playing immediately,
+while on a setup where occlusion does mark the tab hidden, pending is the
+only version that plays at all. It is the hard drop that would need evidence
 (that the tab stays visible during real play) to be safe. The maintainer
 cannot currently run the occlusion check, so the check moves to a post-ship
 observation: a `visibilitychange` console log while KovaaK's runs
@@ -381,7 +387,7 @@ counts as hidden under Chromium's occlusion tracking, and the player is in
 KovaaK's fullscreen when this fires) the animation is not dropped: it is
 held as the one pending celebration and plays on the next
 `visibilitychange` to visible, a newer event replacing any pending one.
-That behaviour is D8's lean; the rejected hard drop is recorded there.
+That behaviour is D8's ruling; the rejected hard drop is recorded there.
 Playing immediately while hidden would also dump a stalled burst on the
 next alt-tab, since a hidden tab throttles animation frames. It cancels any
 burst still in flight
@@ -409,18 +415,24 @@ Snow is ambient, not a celebration, and is excluded. Emoji and custom SVG
 shapes are possible later styles, not v1.
 
 **The toast.** The celebration toast has its own id, a
-`notifications.py` constant distinct from the page's run-verdict id, and
-its `upsert_toast` alternation is driven by the sequence number already in
-the `pb-celebration-event` payload. The shell therefore touches neither the
+`notifications.py` constant distinct from the page's run-verdict id, and it
+is sent as the update-plus-show pair with `autoClose` False on both
+actions: a sticky variant of `upsert_toast` (a parameter that skips the
+alternation, or a sibling helper), because `upsert_toast` as it exists
+stamps the alternating lifetimes over `autoClose` and would silently turn
+the sticky toast into an ordinary 8 s one. No alternation is needed here:
+alternation exists to re-arm a replacement's timer, and a sticky toast has
+no timer. The payload's sequence number serves the clientside animation
+replay, not the toast lifetime. The shell therefore touches neither the
 run-verdict id nor `TOAST_LIFETIME_STORE_ID`: the two producers share no
 toast id and no store, so no interleaving of their responses can make one
 overwrite the other. That is the point. Both callbacks run on independent
 one-second intervals under a multi-threaded server, and Dash does not order
 concurrent duplicate-output responses, so any design where both write the
 same id is order-dependent no matter how the decision to write is
-coordinated. Per D8's lean the celebration toast is sent with
-`auto_close=False`; a dedicated id is also what lets it survive the next
-ordinary run toast instead of being dismissed by it.
+coordinated. Per D8's ruling the toast stays until dismissed; a dedicated
+id is also what lets it survive the next ordinary run toast instead of
+being dismissed by it.
 
 On Scenario Performance, the page's live run toast still yields by run
 identity: `_build_run_event_notification` returns `None` when the live run's
@@ -598,8 +610,9 @@ early return.
   drops everything and records nothing; the registry is bounded.
 - Producer-isolation contract tests: the celebration toast id differs from
   the run-verdict id; the shell callback declares no output on
-  `TOAST_LIFETIME_STORE_ID`, and its toast's alternation comes from the
-  payload sequence. These pin the no-shared-state construction that makes
+  `TOAST_LIFETIME_STORE_ID`, and its toast payload carries `autoClose`
+  False on both actions of the pair. These pin the no-shared-state
+  construction that makes
   concurrent responses unable to overwrite each other; the overlap itself
   is not schedulable from a unit test.
 - Toast builder tests: the percentage message for a positive previous best;
