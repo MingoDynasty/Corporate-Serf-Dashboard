@@ -173,15 +173,29 @@ class NewFileHandler(FileSystemEventHandler):
 
         pct_threshold = SESSION_LOG_SCORE_THRESHOLD_PCT
         score_threshold = pct_threshold * high_score
-        pct_diff = (run_data.score / high_score - 1) * 100
-        logger.debug(
-            "Current score (%g) is %+.2f%% from high score (%g) "
-            "with score threshold (%.2f)",
-            run_data.score,
-            pct_diff,
-            high_score,
-            score_threshold,
-        )
+        if high_score > 0:
+            pct_diff = (run_data.score / high_score - 1) * 100
+            logger.debug(
+                "Current score (%g) is %+.2f%% from high score (%g) "
+                "with score threshold (%.2f)",
+                run_data.score,
+                pct_diff,
+                high_score,
+                score_threshold,
+            )
+        else:
+            # KovaaK's scores are unconstrained floats, so a scenario whose
+            # stored runs all scored 0 divides by zero here and drops the run
+            # before it is ever loaded. There is no usable denominator, not a
+            # zero-percent one, so log the raw figures instead -- the same
+            # judgment _threshold_verdict makes in source/pages/home.py.
+            logger.debug(
+                "Current score (%g) has no percentage from high score (%g) "
+                "with score threshold (%.2f)",
+                run_data.score,
+                high_score,
+                score_threshold,
+            )
         if is_new_high_score:
             new_score_threshold = pct_threshold * run_data.score
             logger.debug(
