@@ -545,8 +545,8 @@ maintainer's stated preference):
    message and page payload; `pb_celebration_queue` and `PersonalBestEvent`;
    the shell interval, drain callback, freshness rule, celebrated-run
    registry, and celebration toast; the Scenario Performance yield rule; the
-   dedicated celebration toast id and payload-driven lifetime; the trophy
-   icon; tests. Interim state until PR 2: the celebration toast is
+   dedicated celebration toast id and its sticky update-plus-show pair;
+   the trophy icon; tests. Interim state until PR 2: the celebration toast is
    unconditional (the setting does not exist yet) and there is no
    animation. Acceptable for a single-user app across one review window.
 2. **Animation and setting** (depends on 1; completes v1 and ships the
