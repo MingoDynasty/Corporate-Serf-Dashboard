@@ -15,7 +15,8 @@ A setting on the Settings page picks the animation style or turns it off.
 ## Decisions needed
 
 Every decision below is open. Each carries the current lean from the design
-conversation of 2026-08-21 so the trade-off is concrete; none is ratified.
+conversation of 2026-08-21 and the review rounds since, so the trade-off is
+concrete; none is ratified.
 
 ### D1 — Does the celebration fire on every page, for every scenario?
 
@@ -164,6 +165,30 @@ the master switch's persisted value lives on the Scenario Performance page,
 so the shell would need a second mirror store to see it, like the style
 store in Design.
 
+### D8 — What happens when the tab is hidden at the moment of the best?
+
+Status: Open. Lean: **hold one pending celebration and play it when the tab
+next becomes visible, with a celebration toast that stays until dismissed.**
+
+Chromium on Windows marks a fully occluded window's tab hidden (native
+window occlusion tracking), and the player is in KovaaK's fullscreen when a
+personal best lands. On a single-monitor setup a hard `document.hidden` drop
+therefore means the animation never plays for a real personal best, only
+from Preview, and a normal-lifetime toast has usually expired by the time
+the player alt-tabs back. The lean holds at most one pending celebration
+(a newer event replaces it) and plays it on the next `visibilitychange` to
+visible; the celebration toast is sent with `auto_close=False`, the
+existing convention for conditions that fire when nobody may be looking, so
+the news is still there on return. This is the only version of the feature
+that works on one monitor.
+
+Choosing the hard drop instead is simpler in `pbCelebration.js` and keeps
+every toast lifetime uniform, at the cost above; the Copy block's "Works on
+every page" would then need qualifying, since on one monitor the animation
+would be Preview-only. Evidence that would settle this: a `visibilitychange`
+log in the browser console while KovaaK's runs fullscreen on the
+maintainer's setup, confirming how occlusion behaves there.
+
 ## Problem
 
 The watchdog already decides, for every run file, whether the run beat the
@@ -289,32 +314,47 @@ call.
 (`pb-celebration-interval`, period `config.polling_interval`), a
 `dcc.Store` (`pb-celebration-event`) that carries one event to the browser,
 and the setting mirror described under Storage. A shell callback drains the
-queue on each tick. It celebrates every fresh event in the drain, in order;
-fresh means `datetime_created` is within a short window of the drain. The
-window must comfortably exceed the polling interval so a live event is never
-judged stale by its own delivery latency; 10 s is the working value,
-author-owned. Anything older is dropped unseen: a personal best set while no
-tab was open, or while the app was closed, is never replayed on the next
-visit. Each celebration cancels the burst before it and replaces the toast
-before it, so when two fresh personal bests land in one tick the newest is
-what stays on screen, by replacement rather than by selection; every
-celebrated run is then accounted for, which "The toast" relies on. The
-callback emits the celebration toast (below) through the shared
-notification container, using `upsert_toast` with the shell's lifetime
-counter, and records each celebrated `run_id` in `celebrated_runs`, a
-bounded server-side registry in `notifications.py` (the last 64 ids;
-module-level state shared between callbacks, as `_last_rank_hints` in
-`home.py` already is). With the setting at Off the drain drops every event
-unseen and records nothing.
+queue on each tick and celebrates at most one event per drain: the newest
+fresh one, where fresh means `datetime_created` is within the freshness
+window of the drain. The window is relative to the interval,
+`max(10 s, 3 × polling_interval)`, because `polling_interval` is an
+unbounded config int and an absolute window would silently kill the feature
+at large intervals; the multiplier keeps a live event from being judged
+stale by its own delivery latency. Anything older is dropped unseen: a
+personal best set while no tab was open is never replayed on the next
+visit. One event per drain is a contract, not a convenience: a Dash
+callback returns one final value per output, so one response can carry one
+store payload and drive one animation. An older fresh personal best in the
+same drain is not celebrated and not recorded; it falls through to the
+ordinary run-toast path, which "The toast" spells out. The callback emits
+the celebration toast (below) and records the celebrated `run_id` in
+`celebrated_runs`, a bounded server-side registry in `notifications.py`
+(the last 64 ids; module-level state shared between callbacks, as
+`_last_rank_hints` in `home.py` already is). With the setting at Off the
+drain drops every event unseen and records nothing.
+
+This interval is the first poll outside Scenario Performance: it adds one
+request per second on every page for the life of the tab, which changes
+what idle looks like in devtools and in the waitress log. Acceptable for a
+local single-user app, and stated here and in the `architecture.md` update
+so nobody reads the traffic as a bug. Folding the page's existing
+`interval-component` consumers into one shell interval would put both
+drains on the same tick, but that refactor is not this proposal.
 
 **The animation.** A clientside callback on `pb-celebration-event` calls
 `window.pbCelebration.play(style)`, defined in a small app-owned file
-(`assets/pbCelebration.js`) beside the vendored library. It does nothing when
-the style is Off, when `document.hidden` is true (a background tab throttles
-animation frames and would dump a stalled burst on the next alt-tab; the
-player is in KovaaK's fullscreen when this fires), or when the user prefers
-reduced motion (`disableForReducedMotion` on the instance, plus the same
-check around the app's own loops). It cancels any burst still in flight
+(`assets/pbCelebration.js`) beside the vendored library. It does nothing
+when the style is Off or when the user prefers reduced motion
+(`disableForReducedMotion` on the instance, plus the same check around the
+app's own loops). When `document.hidden` is true (a fully occluded window
+counts as hidden under Chromium's occlusion tracking, and the player is in
+KovaaK's fullscreen when this fires) the animation is not dropped: it is
+held as the one pending celebration and plays on the next
+`visibilitychange` to visible, a newer event replacing any pending one.
+That behaviour is D8's lean; the rejected hard drop is recorded there.
+Playing immediately while hidden would also dump a stalled burst on the
+next alt-tab, since a hidden tab throttles animation frames. It cancels any
+burst still in flight
 before starting a new one, so a fast streak never stacks. The store payload
 carries a monotonic sequence number so two identical personal bests back to
 back both fire. Every style is bounded to at most about three seconds and
@@ -336,33 +376,41 @@ turns celebrations off. The v1 set, derived from the upstream recipes:
 Snow is ambient, not a celebration, and is excluded. Emoji and custom SVG
 shapes are possible later styles, not v1.
 
-**The toast.** The shell's celebration toast reuses the run-verdict toast id,
-which moves from `home.py` to `notifications.py` as a shared constant, so a
-personal best toast and the next run's verdict replace each other exactly as
-two run toasts do today. On Scenario Performance, the page yields to the
-shell by run identity: `_build_run_event_notification` returns `None` when
-the run it would toast about, the live run or the backlog digest's latest
-run, has its `run_id` in `celebrated_runs`. That is the only question the
-page asks, and it is answered by what the shell actually did rather than by
-a window that approximates it; the page never reads the style setting. A
-digest whose latest run was not celebrated (a stale personal best the shell
-dropped unseen, or an ordinary run after a celebrated one) fires as today
-and, like any later run toast, replaces whatever celebration toast is still
-up. That is the existing "the next news replaces" rule, unchanged.
+**The toast.** The celebration toast has its own id, a
+`notifications.py` constant distinct from the page's run-verdict id, and
+its `upsert_toast` alternation is driven by the sequence number already in
+the `pb-celebration-event` payload. The shell therefore touches neither the
+run-verdict id nor `TOAST_LIFETIME_STORE_ID`: the two producers share no
+toast id and no store, so no interleaving of their responses can make one
+overwrite the other. That is the point. Both callbacks run on independent
+one-second intervals under a multi-threaded server, and Dash does not order
+concurrent duplicate-output responses, so any design where both write the
+same id is order-dependent no matter how the decision to write is
+coordinated. Per D8's lean the celebration toast is sent with
+`auto_close=False`; a dedicated id is also what lets it survive the next
+ordinary run toast instead of being dismissed by it.
 
-Callback order within a tick cannot change the end state. If the page's
-callback runs after the shell's, it yields. If it runs before, it emits the
-run's ordinary toast and the shell's celebration toast replaces it a moment
-later under the same id; the lifetime counter then advances twice, which is
-harmless. Either way the toast left on screen for a celebrated run is the
-celebration toast. The invariant: a celebrated run's visible toast is the
-celebration toast, from the shell, on any page; an uncelebrated run's toast
-comes from the page, as today. Two alternatives were considered and
-rejected: a page-side freshness window, which cannot tell which event the
-shell chose when personal bests in two scenarios land in one tick, so the
-page could yield a run nobody celebrated; and a page-local replacement where
-both producers emit and the later one wins, whose end state depends on
-callback order.
+On Scenario Performance, the page's live run toast still yields by run
+identity: `_build_run_event_notification` returns `None` when the live run's
+`run_id` is in `celebrated_runs`, so the celebrated run is not narrated
+twice. The page never reads the style setting. The backlog digest never
+yields: it keeps its count and today's headline policy, and coexists beside
+the celebration toast under its own id. An uncelebrated personal best (the
+older of two fresh ones in a single drain, or a stale one) takes the
+ordinary run-toast path, which reports its verdict or placement truthfully.
+
+The residual race is additive, not destructive: with the registry check and
+the recording on two threads, the page can read `celebrated_runs` just
+before the shell records, and its ordinary toast then appears beside the
+celebration for one lifetime. Nothing can replace the celebration toast,
+because nothing else writes its id. The invariant: once the shell
+celebrates a run, that celebration toast is on screen until dismissed, on
+any page, whatever else lands; the page narrates only runs the registry
+does not claim. Rejected alternatives: a shared run-verdict id (any
+concurrent interleaving can bury the celebration under a slower ordinary
+response); a page-side freshness window (cannot tell which event the shell
+chose); a multi-event store payload (one response drives one clientside
+invocation, so the extra events could never be delivered).
 
 With celebrations Off the shell neither celebrates nor records, so the page
 never yields and behaves exactly as today (D4).
@@ -390,7 +438,12 @@ store's default is Confetti, so a browser that has never visited Settings
 celebrates. The known costs of
 browser persistence apply and are accepted: per origin, cleared with site
 data, and reset if the layout default ever changes. Every one of those fails
-toward "celebrations came back", never toward silence.
+toward "celebrations came back", never toward silence. One more accepted
+cost: the queue and registry are process-wide with per-response delivery,
+so with two tabs open the celebration lands in whichever tab's drain runs
+first and the other tab sees nothing for that run. This is the
+single-consumer shape `message_queue` already has, noted so nobody files it
+as a bug.
 
 `data/settings.json` was rejected for v1 on cost, not principle. Settings v1
 is a closed set of three string keys, so a new key is settings v2: a
@@ -408,7 +461,8 @@ Preview button in one row. The select applies instantly and does not go
 through Save; the restart notice and the store alert concern the form's
 three keys and are untouched. Preview plays the currently selected style
 through the same clientside path as a real celebration, so it obeys the
-reduced-motion and hidden-tab guards; it shows no toast.
+reduced-motion guard; it shows no toast. The hidden-tab hold never applies
+to Preview, since clicking it requires a visible tab.
 
 **Copy.** Every user-facing string this change adds or edits, in one place,
 following the house rules: short sentences, no em dashes.
@@ -417,7 +471,9 @@ following the house rules: short sentences, no em dashes.
 - Select label: **Personal best celebration**. Description under it: "Plays a
   short animation and shows a toast when a run beats your personal best in
   any scenario. Works on every page, and does not depend on Run
-  Notifications."
+  Notifications. Takes effect right away." The last sentence keeps the
+  section's instant model from blurring into the form's Save-then-restart
+  model beside it.
 - Select options, in order: **Off**, **Confetti**, **Fireworks**,
   **Cannons**, **Stars**.
 - Button beside the select: **Preview**.
@@ -443,7 +499,8 @@ diffs:
    message and page payload; `pb_celebration_queue` and `PersonalBestEvent`;
    the shell interval, drain callback, freshness rule, celebrated-run
    registry, and celebration toast; the Scenario Performance yield rule; the
-   shared toast id; the trophy icon; tests.
+   dedicated celebration toast id and payload-driven lifetime; the trophy
+   icon; tests.
 2. **Animation and setting** (depends on 1): the vendored library and its
    license record; `pbCelebration.js` with the four styles and guards; the
    Settings page section, the select, the mirror store, and Preview; the
@@ -452,10 +509,11 @@ diffs:
 Plus the shipping checklist from `AGENTS.md`: decision-log entries (the
 celebration itself and its storage, the D4 priority amendment, the
 Settings-page placement departure, the D7 independence from the master
-switch), the `product.md` run-notifications
+switch, the D8 hidden-tab ruling), the `product.md` run-notifications
 paragraph and a new inventory entry, `architecture.md` (the new channel in
-the sanctioned-channels list, the shell's interval and stores, the asset
-file), the README, the roadmap, and deletion of this file.
+the sanctioned-channels list, the shell's interval and stores, the
+app-wide polling note, the asset file), the README, the roadmap, and
+deletion of this file.
 
 Dependencies: none. The run notifications master switch (PR #245) has
 landed; its guard sits at the top of `_build_run_event_notification`, and
@@ -490,25 +548,27 @@ early return.
   on the run message in all three cases.
 - Shell drain tests: an empty queue is a no-op; a fresh event produces one
   store payload with an incremented sequence, one toast, and one registry
-  entry; several fresh events in one drain each celebrate, in order, and
-  each is recorded; a stale event is dropped and not recorded; the style
-  store at Off drops everything and records nothing; the registry is
-  bounded.
+  entry; two fresh personal bests in one drain celebrate and record only
+  the newest, and the older is neither toasted nor recorded; a stale event
+  is dropped and not recorded; the freshness window equals
+  `max(10 s, 3 × polling_interval)`, pinned at the boundary (a live event
+  still celebrates at a 10 s and a 30 s interval); the style store at Off
+  drops everything and records nothing; the registry is bounded.
+- Producer-isolation contract tests: the celebration toast id differs from
+  the run-verdict id; the shell callback declares no output on
+  `TOAST_LIFETIME_STORE_ID`, and its toast's alternation comes from the
+  payload sequence. These pin the no-shared-state construction that makes
+  concurrent responses unable to overwrite each other; the overlap itself
+  is not schedulable from a unit test.
 - Toast builder tests: the percentage message for a positive previous best;
   the fallback message for a previous best of zero and for a negative one.
 - Scenario Performance tests beside the existing ones in
   `tests/test_home_run_events.py`: a live run whose `run_id` is in the
-  registry yields (returns `None`) whatever its verdict; one whose id is not
-  gets today's toast, personal best or not; a backlog digest yields exactly
-  when its latest run's id is in the registry; the master switch's early
+  registry yields (returns `None`) whatever its verdict; one whose id is
+  not, personal best or not, gets today's toast; the backlog digest never
+  yields and keeps today's headline policy; the master switch's early
   return precedes the yield, so master off is silent whether or not the run
   was celebrated (D7).
-- Mixed-batch tests, each run in both callback orders: two fresh personal
-  bests in different scenarios in one tick, with either scenario selected;
-  a celebrated personal best followed by an ordinary run in the same batch;
-  a celebrated personal best that is the latest run of a backlog digest. In
-  every case the toast left on screen is the one "The toast" specifies, and
-  the lifetime counter advances at most twice.
 - Callback-level checks through a direct POST to `/_dash-update-component`,
   the established way to exercise shell-level outputs here.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
@@ -518,5 +578,7 @@ early return.
   personal best celebrates on the Playlists page and on Settings, not only
   on Scenario Performance; a CSV older than the freshness window does not;
   the same run with a system reduced-motion preference shows the toast and
-  no animation. No JavaScript harness exists, so the animation file is
-  verified by this manual pass and by review.
+  no animation; with the tab occluded during the drop, nothing plays until
+  the tab is next visible, then the animation plays once and the toast is
+  still up until dismissed (D8). No JavaScript harness exists, so the
+  animation file is verified by this manual pass and by review.
