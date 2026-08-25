@@ -149,8 +149,9 @@ is recorded here and in the Delivery plan as its own step, and the styles
 table in Design is its specification. To keep that step purely additive,
 the persisted value is a style string from the start ("off" or "confetti");
 the v1 switch maps onto those two values, so the select only adds values to
-an existing contract. The one cost the conversion keeps is the accepted
-persisted-value reset when the control changes component type. Preview
+an existing contract. Because the store, not the control, is the persisted
+value (see Storage), the conversion keeps the saved setting; the reset the
+ruling accepted turns out not to be needed. Preview
 ships in v1 because it is the only way to see the effect without setting a
 personal best. Curated presets only, in both versions: no duration,
 particle, or color knobs, and no custom style. A Random option stays out;
@@ -342,8 +343,12 @@ Upstream demo recipes, from the `gh-pages` branch:
 `run_id` is the run CSV's file name: unique per run, already in hand where
 the messages are built, and the identity the shell and the page coordinate
 on (see "The toast"). The watchdog appends one exactly when
-`is_new_high_score` is true and a previous high score exists (Cases 2 and
-3); Case 1 never celebrates. Every enqueue is stamped with `event_seq`, one
+`is_new_high_score` is true. The flag is computed against the scenario-wide
+high score and can only be true in Cases 2 and 3; Case 1's first run has
+nothing to beat, carries the flag as False, and never celebrates. So the
+flag alone means "a celebration event was enqueued for this run", which is
+what the page's candidate test relies on. Every enqueue is stamped with
+`event_seq`, one
 monotonic counter shared by both queues and incremented only by the
 watchdog thread, so "has the shell seen this event yet" is a comparison,
 not a guess (see the watermark under "The toast"). `NewFileMessage` and
@@ -357,7 +362,7 @@ call.
 **The consumer.** The app shell hosts a `dcc.Interval`
 (`pb-celebration-interval`, period `config.polling_interval`), a
 `dcc.Store` (`pb-celebration-event`) that carries one event to the browser,
-and the setting mirror described under Storage. A shell callback drains the
+and the style store described under Storage. A shell callback drains the
 queue on each tick and celebrates at most one event per drain: the newest
 fresh one, where fresh means `datetime_created` is within the freshness
 window of the drain. The window is relative to the interval,
@@ -446,18 +451,32 @@ id is also what lets it survive the next ordinary run toast instead of
 being dismissed by it.
 
 On Scenario Performance, the page decides about a candidate run (one with
-`is_new_high_score` set and a previous high score) only after the shell's
-decision for it is on record: while the run's `event_seq` is above
-`pb_drain_watermark`, `_build_run_event_notification` defers, holding the
-pending toast decision in a module-level slot and re-evaluating on the
-next interval tick; the graph update and everything else in the callback
-proceed. Once the watermark has passed the run, registry membership is
-final and the answer is definitive: claimed means the page yields (returns
-`None`), unclaimed means the page narrates today's toast. Deferral costs
-at most a tick or two, only for candidate runs, and only when the page's
-interval fires before the shell's for the same second; non-candidates
-never defer, and the shell interval is mounted in the same client, so the
-watermark always advances. The page never reads the style setting: an Off
+`is_new_high_score` set; the flag is only ever true when a scenario-wide
+previous best exists, exactly when a celebration event was enqueued, so it
+alone defines the candidate — a Case 2 personal best is a candidate even
+though its run message's `previous_high_score` is `None`) only after the
+shell's decision for it is on record: while the run's `event_seq` is above
+`pb_drain_watermark`, the toast decision is deferred. The deferral lives in
+the page's existing single chain, because `_build_run_event_notification`
+only runs when `generate_graph` is triggered by `run-events`, and an empty
+drain emits nothing: `check_for_new_data` owns a module-level pending slot.
+A tick that drains a candidate still above the watermark parks it there
+and forwards it without a toast; a tick that drains nothing while the slot
+holds a candidate the watermark has now passed re-emits `run-events` for
+that candidate, re-triggering `generate_graph`, whose toast logic is then
+purely claimed-yields or unclaimed-narrates; a tick that drains newer
+events supersedes and clears the slot, newest wins, as today. The cost is
+one extra graph rebuild per deferred candidate, the same price as a run
+landing; accepted for simplicity over a payload flag that would skip the
+rebuild. No second writer of the run-verdict id or the lifetime store
+appears, and re-evaluation cannot starve: the shell interval is mounted in
+the same client, so the watermark always advances. Once the watermark has
+passed the run, registry membership is final and the answer is definitive:
+claimed means the page yields (returns `None`), unclaimed means the page
+narrates today's toast. Deferral costs at most a tick or two, only for
+candidate runs, and only when the page's interval fires before the shell's
+for the same second; non-candidates never defer. The page never reads the
+style setting: an Off
 drain advances the watermark without recording, which reads as "decided,
 not celebrated", and the page narrates.
 
@@ -502,21 +521,24 @@ personal best run gets today's run toast, gated by the master switch like
 any other; with both settings off, the page is silent and the shell has
 nothing to say.
 
-**Storage.** Browser-local Dash persistence on the select, as every other UI
-preference is stored. Because the consumer is shell-level and the Settings
-page is not always mounted, the select mirrors its value into a shell-hosted
-`dcc.Store(id="pb-celebration-style", storage_type="local")` through a small
-callback, and the shell's drain callback reads that store as `State`. The
-store's default is Confetti, so a browser that has never visited Settings
-celebrates. The known costs of
+**Storage.** The shell-hosted
+`dcc.Store(id="pb-celebration-style", storage_type="local")` is the
+setting: one authoritative browser-persisted string, "off" or a style
+name. The Settings page control (v1's switch, the follow-up's select)
+initializes from it and writes to it through a small callback pair, and
+carries no Dash persistence of its own, so the switch's boolean and the
+select's string never become two competing persisted values and the
+switch-to-select conversion keeps the saved setting. The shell's drain
+callback reads the store as `State`. The store's default is Confetti, so a
+browser that has never visited Settings celebrates. The known costs of
 browser persistence apply and are accepted: per origin, cleared with site
-data, and reset if the layout default ever changes. Every one of those fails
-toward "celebrations came back", never toward silence. One more accepted
-cost: the queue and registry are process-wide with per-response delivery,
-so with two tabs open the celebration lands in whichever tab's drain runs
-first and the other tab sees nothing for that run. This is the
-single-consumer shape `message_queue` already has, noted so nobody files it
-as a bug.
+data, and reset if the layout default ever changes. Every one of those
+fails toward "celebrations came back", never toward silence. One more
+accepted cost: the queues, registry, watermark, and pending slot are
+process-wide with per-response delivery, so with two tabs open the
+celebration lands in whichever tab's drain runs first and the other tab
+sees nothing for that run. This is the single-consumer shape
+`message_queue` already has, noted so nobody files it as a bug.
 
 `data/settings.json` was rejected for v1 on cost, not principle. Settings v1
 is a closed set of three string keys, so a new key is settings v2: a
@@ -524,8 +546,8 @@ validator, a version bump, the stamp script becoming a real migration under
 the documented ordering contract, the launcher's trial-run window to be
 solved for the first migrating release, and an older build refusing the v2
 file on rollback. When a setting that deserves v2 arrives, this preference
-joins it. Nothing here forecloses that move; only the select's persistence
-and the mirror would change.
+joins it. Nothing here forecloses that move; only the store's backing
+would change.
 
 **Settings page placement.** A new section after the version section's
 divider (or between the form and the version section; author's call at
@@ -577,8 +599,10 @@ maintainer's stated preference):
    dedicated celebration toast id and its sticky update-plus-show pair;
    the watermark and deferral rule; the trophy icon; tests. Owning docs in
    the same PR: `docs/specs/notifications.md` (the celebration family, its
-   dedicated sticky toast, and the preserved one-notification-per-run
-   contract) and the `architecture.md` entries (the new channel, the shell
+   dedicated sticky toast, the preserved one-notification-per-run
+   contract, and an amendment to the spec's replaces-rather-than-stacks
+   sentence, to which the sticky celebration toast is D8's deliberate
+   exception) and the `architecture.md` entries (the new channel, the shell
    interval and stores, the app-wide polling note). Interim state until
    PR 2: the celebration toast is unconditional (the setting does not
    exist yet) and there is no animation; the spec update states that
@@ -587,8 +611,9 @@ maintainer's stated preference):
 2. **Animation and setting** (depends on 1; completes v1 and ships the
    proposal): the vendored library and its license record;
    `pbCelebration.js` with the Confetti effect, the guards, and the D8
-   behaviour; the Settings page section, the on/off switch, the mirror
-   store, and Preview; the clientside callback. Owning doc in the same
+   behaviour; the Settings page section, the on/off switch, the
+   authoritative style store, and Preview; the clientside callback.
+   Owning doc in the same
    PR: `docs/specs/settings.md` (the Celebrations section and its
    browser-local, instant-apply model). The rest of the "Shipping a
    proposal" checklist lands here.
@@ -636,8 +661,10 @@ early return.
 
 - Watchdog unit tests: Case 1 enqueues no celebration; Case 2 and Case 3
   enqueue exactly one when the score strictly beats the previous high score
-  and none on a tie or a lower score; `is_new_high_score` is set correctly
-  on the run message in all three cases.
+  and none on a tie or a lower score; `is_new_high_score` is False on the
+  Case 1 message and true on Case 2 and Case 3 messages exactly when the
+  celebration event was enqueued, including a Case 2 message whose own
+  `previous_high_score` is `None`.
 - Shell drain tests: an empty queue is a no-op; a fresh event produces one
   store payload with an incremented sequence, one toast, and one registry
   entry; two fresh personal bests in one drain celebrate and record only
@@ -656,12 +683,15 @@ early return.
 - Toast builder tests: the percentage message for a positive previous best;
   the fallback message for a previous best of zero and for a negative one.
 - Scenario Performance tests beside the existing ones in
-  `tests/test_home_run_events.py`: a candidate run above the watermark
-  defers (no toast this tick, pending slot set) and resolves on the next
-  call once the watermark passes; below the watermark, a claimed run
-  yields (returns `None`) whatever its verdict and an unclaimed one gets
-  today's toast; a non-candidate never defers; the digest defers, yields,
-  or narrates by its latest run under the same rule; an Off drain advances
+  `tests/test_home_run_events.py`: a candidate run above the watermark is
+  parked (forwarded without a toast, pending slot set), and an
+  otherwise-empty later tick re-emits `run-events` for it once the
+  watermark passes; a newer drained run supersedes and clears the pending
+  slot; a Case 2 candidate whose message `previous_high_score` is `None`
+  defers like any other; below the watermark, a claimed run yields
+  (returns `None`) whatever its verdict and an unclaimed one gets today's
+  toast; a non-candidate never defers; the digest defers, yields, or
+  narrates by its latest run under the same rule; an Off drain advances
   the watermark so the page narrates rather than deferring forever; the
   master switch's early return precedes the yield, so master off is silent
   whether or not the run was celebrated (D7). Together these pin the
