@@ -51,8 +51,8 @@ of scope here.
   the Scenario Stats block. A second column carries the "Score vs
   Sensitivity" / "Score vs Time" radio (default Score vs Sensitivity) and
   the "Chart options" button. Every control except the two dropdowns
-  persists in the browser unconditionally; each labelled control carries a
-  help tooltip.
+  persists in the browser unconditionally. The follow switch and the Top N
+  input carry help tooltips; the other row controls have plain labels.
 - The follow switch sits under the scenario selector, not in the panel: it
   governs selection, not presentation
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
@@ -85,7 +85,11 @@ of scope here.
   order and color: the ranks whose thresholds land inside the plotted score
   range plus the nearest one below and above, or the whole ladder with
   "Show all ranks" on. No playlist selected means no rank lines; an empty
-  threshold percentage skips the threshold line.
+  threshold percentage skips the threshold line. The playlist selection is
+  read only when the graph rebuilds — switching playlists alone triggers no
+  rebuild, so when the selected scenario survives the switch the drawn rank
+  lines lag the selection until the next rebuild (a control change, a
+  scenario change, or a new run).
 - Until the first data callback resolves, the chart is a transparent,
   annotation-free placeholder; a resolved-but-empty result gets an explicit
   empty state instead
