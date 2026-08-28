@@ -84,7 +84,8 @@ of scope here.
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
   "Rank Thresholds" draws the selected playlist's rank lines, in ladder
   order and color: the ranks whose thresholds land inside the plotted score
-  range plus the nearest one below and above, or the whole ladder with
+  range plus every rank tied at the nearest threshold below and at the
+  nearest above, or the whole ladder with
   "Show all ranks" on. No playlist selected means no rank lines; an empty
   threshold percentage skips the threshold line. The playlist selection is
   read only when the graph rebuilds — switching playlists alone triggers no
