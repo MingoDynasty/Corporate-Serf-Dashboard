@@ -5,8 +5,8 @@ sensitivity or time, with the personal best, a configurable score goal, and
 playlist rank thresholds available as overlay lines. A collapsible Chart
 options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
-reaches the chart within about a second, and the page can follow the scenario
-just played automatically. The page also hosts the first-run surfaces that
+reaches the chart automatically once its file is imported, and the page can
+follow the scenario just played. The page also hosts the first-run surfaces that
 point a fresh install at Settings.
 
 Statements below describe what the app does today and link the
@@ -62,7 +62,8 @@ of scope here.
   ([2026-08-03](../decision_log.md#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window)).
 - The scenario list comes from the selected playlist when one is chosen, and
   otherwise from the stats directory's CSV files; without a usable stats
-  directory it is empty.
+  directory that local fallback is empty, while a selected playlist still
+  lists its scenarios.
 
 ## The graph
 
