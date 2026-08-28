@@ -38,8 +38,9 @@ of scope here.
   build's release label; the key is specified in
   [settings.md](settings.md#the-configuration-file).
 - `?scenario=` and `?playlist_code=` query parameters preselect the
-  dropdowns; an unknown playlist code is ignored, and a control set by query
-  parameter does not persist that visit's value.
+  dropdowns, and a control set by query parameter neither restores nor
+  stores a persisted value that visit; an unknown playlist code selects
+  nothing while still counting as set for that visit's persistence.
 
 ## The controls row
 
@@ -67,9 +68,9 @@ of scope here.
 
 ## The graph
 
-- Both modes plot each kept run as a point with an "Average Score" line per
-  group: Score vs Sensitivity groups by the run's sensitivity-and-scale
-  string, Score vs Time by calendar day. Within the date range, the top N
+- Both modes plot each kept run as a point, with one "Average Score" line
+  through each group's average score: Score vs Sensitivity groups by the
+  run's sensitivity-and-scale string, Score vs Time by calendar day. Within the date range, the top N
   scores are kept per sensitivity, or per day in Score vs Time. The date
   range is inclusive of the selected date; the plot title reads
   `{scenario} (updated: {timestamp})`.
