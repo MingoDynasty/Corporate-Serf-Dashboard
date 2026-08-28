@@ -299,7 +299,9 @@ Repository, at `main` as of 2026-08-21:
   vendoring third-party assets with a license table.
 - Since this proposal's baseline, `main` gained capability specs:
   `docs/specs/notifications.md` (which states "A run earns at most one
-  notification") and `docs/specs/settings.md`. A behavior-changing PR
+  notification"), `docs/specs/settings.md`, and
+  `docs/specs/scenario_performance.md` (which enumerates the page's
+  graph-rebuild triggers and per-tick callbacks). A behavior-changing PR
   updates its owning spec in the same PR.
 
 Library survey, checked 2026-08-21 against the npm registry, GitHub, and the
@@ -602,8 +604,11 @@ maintainer's stated preference):
    dedicated sticky toast, the preserved one-notification-per-run
    contract, and an amendment to the spec's replaces-rather-than-stacks
    sentence, to which the sticky celebration toast is D8's deliberate
-   exception) and the `architecture.md` entries (the new channel, the shell
-   interval and stores, the app-wide polling note). Interim state until
+   exception), `docs/specs/scenario_performance.md` (its run-delivery
+   statements: the per-tick callback count and the graph-rebuild triggers,
+   which gain the deferred-candidate re-emission), and the
+   `architecture.md` entries (the new channel, the shell interval and
+   stores, the app-wide polling note). Interim state until
    PR 2: the celebration toast is unconditional (the setting does not
    exist yet) and there is no animation; the spec update states that
    interim honestly and PR 2 rewrites it. Acceptable for a single-user app
