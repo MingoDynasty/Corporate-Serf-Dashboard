@@ -319,3 +319,53 @@ def test_on_created_does_not_enqueue_or_refresh_when_load_fails(monkeypatch):
     assert file_watchdog.drain_run_import_failures() == [
         file_watchdog.RUN_IMPORT_FAILURE_MESSAGE
     ]
+
+
+@pytest.mark.parametrize("previous_high_score", [0.0, -5.0])
+def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
+    monkeypatch,
+    previous_high_score,
+):
+    """A high score of 0 must not divide a perfectly good run out of ingestion.
+
+    KovaaK's scores are unconstrained floats and a run can score exactly 0, so
+    a scenario whose stored runs all scored 0 leaves no usable denominator for
+    the debug log's percent-from-high-score figure. The negative case pins that
+    the guard left the path that already worked alone.
+    """
+    file_watchdog.run_import_failure_queue.clear()
+    run_data = _run_data(score=100.0)
+    messages, loads, schedules = _patch_common(monkeypatch, run_data)
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: True,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_high_score",
+        lambda _scenario: previous_high_score,
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_sensitivities_vs_runs",
+        lambda _scenario: {SENSITIVITY_KEY: _sorted_runs(previous_high_score)},
+    )
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path="run.csv")
+    )
+
+    assert loads == ["run.csv"]
+    assert len(messages) == 1
+    assert messages[0].previous_high_score == previous_high_score
+    assert schedules == [
+        (
+            SCENARIO_NAME,
+            "MingoDynasty",
+            "steam-id",
+            run_data.score,
+            24,
+        )
+    ]
+    assert file_watchdog.drain_run_import_failures() == []

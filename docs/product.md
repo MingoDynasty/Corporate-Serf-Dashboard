@@ -75,9 +75,13 @@ list in the roadmap.)
   count through an update that was fetching nothing, then land on a red
   "couldn't update 16 of 16 positions" — and Refresh answered the same
   configuration state with an anonymous "Position refresh failed". Both now
-  name the actual condition and point at where to fix it. (A username that is
-  set but wrong still reports as a generic failure; that case is not fixed
-  yet.)
+  name the actual condition and point at where to fix it. That red playlist
+  toast is gone for every cause, not just a missing username (PR #253): a
+  position update that comes back short now says so in the line above the
+  table and nowhere else, because a toast repeating a count already on screen
+  is an interruption that buys nothing. (A username that is set but wrong is
+  still not named anywhere: the table reports the positions as unavailable
+  without saying why, and Refresh still answers with a generic failure.)
 - **Rank overlays.** Benchmark rank thresholds drawn onto the plots.
   *Problem solved:* a raw score is meaningless without context; the overlay
   shows which rank band a score sits in and how far the next band is. By

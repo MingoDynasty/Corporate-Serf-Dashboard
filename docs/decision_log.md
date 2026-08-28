@@ -13,6 +13,148 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-08-22: The Playlist Fill Reports Degradation In Place Only
+
+Status: Accepted
+
+Opening a playlist used to end a degraded position update with a red or
+yellow toast that repeated a count the page's own status line already showed.
+The toast is gone. The status line above the grid, beside the filter box, is
+now the only place the fill reports that positions were unavailable or served
+from cache, and a clean fill still clears it and stays silent. Nothing else about the update
+changes.
+
+Decision: the progressive fill on `/playlists/<code>` states degradation in
+its status line and emits no notification. `_fill_summary_notification` and
+the `notification-container.sendNotifications` output of
+`drain_playlist_scenario_rows` (`source/pages/playlist_scenarios.py`) are
+deleted; the callback returns the row transaction and the status only. The
+status copy is unchanged, and `tests/test_playlist_pages.py` guards the
+callback's declared outputs so the toast cannot return unnoticed.
+
+Why: the toast was non-conformant against the
+[2026-08-03 routing policy](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy).
+A degraded fill is an automatic failure during passive navigation, which that
+entry routes to in-place state with no toast, and its second litmus — already
+visible somewhere? then nothing — is answered by the status line, which
+carries the same counts ("1 of 3 positions unavailable · 1 from cache —
+KovaaK's unreachable") in the filter row directly above the grid the user is
+already reading.
+
+Rejected: ratifying the toast as a third named exception to the
+persistent-condition rule, beside the Steam-ID mismatch and the startup
+playlist warnings. Both of those earn their exception by having no in-place
+home; this fill has one, on screen, in the reader's line of sight. The
+exception would be defensible only if the status line were easy to miss, and
+it is not. Ratifying it would also have made "the policy names it" the test
+for conformance rather than the litmus tests themselves.
+
+Supersedes, in part, the
+[2026-07-15 progressive-fill entry](#2026-07-15-stream-playlist-positions-with-generation-scoped-progressive-fill):
+its completion-toast clauses only — the first terminal tick no longer "emits
+any aggregate completion toast", and "Completion uses the existing
+red/yellow/silent failure tiers" no longer describes a notification. The two
+phases, the generation-scoped row identity, the cancel-on-start rule, the
+tombstone retention and eviction order, the pending-flag rules, the outcome
+counting, and the status settling are all unchanged and remain Accepted.
+
+Discharges, for the playlist page only, one half of what the
+[2026-08-09 unset-username entry](#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)
+left open. That entry deferred the configured-but-wrong-username case,
+noting it "still produces both generic red toasts today". A wrong username
+resolves every position to `UNKNOWN`, so the aggregate toast was the
+playlist page's half, and deleting it settles that surface: the fill reports
+the count in place, like any other degradation.
+
+The other half stands, and this entry rules nothing on it. Clicking Refresh
+on Scenario Performance with a wrong username still answers with the generic
+red "Position refresh failed" toast, and correctly so — a manual Refresh is a
+user-initiated failure, which the routing policy toasts. Neither surface
+diagnoses the wrong username: the playlist status line says positions are
+unavailable, not why. Naming the condition is still the open question, and a
+typed reason on `ScenarioRankInfo` is still where it should be
+reconsidered.
+
+Consequences: the app has one fewer toast id, and the notifications
+inventory in [specs/notifications.md](specs/notifications.md#inventory)
+loses its `playlist-progressive-fill-{generation}` row. The fill's
+background-thread channel is untouched — it still streams rows into the
+registry an interval callback drains, which was never a notification path.
+
+## 2026-08-22: The Capability Spec Layer Is Written In One Pass
+
+Status: Accepted
+
+Every shipped capability with a durable behavior contract must have a spec
+that states what the app does today, and the four still missing are being
+written in one deliberate pass instead of waiting for a change to touch each
+capability. A new capability brings its spec in the PR that ships it, and a
+change to specified behavior updates the spec in the same PR. The specs are
+how a reader finds the decision behind a behavior, so the log still keeps no
+topic index.
+
+Decision: the "do not backfill specs ahead of need" rule in `AGENTS.md` is
+replaced by a standing criterion — **every shipped capability with a durable
+behavior contract must have a spec under `docs/specs/`**. A new capability
+gets its spec in the shipping PR; a PR that changes specified behavior
+updates the spec in the same PR (the "Shipping a proposal" checklist's step 2
+now says the same thing). The criterion is a requirement, not a description
+of the tree: when this entry landed the directory held two specs, and the
+four the pass names below are in flight as their own PRs, so the layer is
+complete only once those merge. The `AGENTS.md` "Scenario Rank Feature"
+pointer becomes a
+"Capability Specs" section pointing at the directory, which lists itself, so
+no per-spec list is touched by every spec PR; `architecture.md`'s "Where to
+look first" table carries the same pointer.
+
+The pass: five specs, five PRs, each authored by a Fable session and reviewed
+by a fresh Fable session plus Codex, in dependency order —
+
+- `notifications.md` (PR #249; also carries this entry and the rule change),
+- `settings.md` (after notifications: its in-place statuses cite the routing
+  policy),
+- `scenario_performance.md` (after settings: the Chart options switches'
+  gating semantics live in the notifications spec, their placement and
+  persistence here),
+- `playlists.md` and `release_and_install.md`, independent of the others and
+  of each other.
+
+Deliberately excluded: app copy, which the app messaging consistency
+proposal (PR #247) leaves out of the spec layer; bug-report intake,
+which one decision-log entry covers in full; Home as a standalone capability,
+folded into `scenario_performance.md`; and tooling and process, for which
+`AGENTS.md` is the spec.
+
+The spec contract, which every file in the pass follows and later specs
+inherit:
+
+- Statement form, present tense, no rationale. Each statement links the
+  decision-log entry that governs it by heading anchor; a statement with no
+  governing entry is an implementation fact, stays unlinked, and is covered
+  by the preamble's disclaimer — no entry is invented for it.
+- Verified against code or a test before it is written, never transcribed
+  from the log. The PR body carries the evidence map; the spec does not.
+- Where code contradicts an entry, the spec states what the code does and
+  the PR body lists the contradiction as a finding for the maintainer. No
+  code changes ride in a spec PR.
+- Supersession is cited as current: the governing entry, or the surviving
+  clause "as amended by" the amending entry; a superseded clause is never
+  cited as current.
+- Opens with a layer-1 summary held to the 2–4 sentence budget, then H2
+  sections. No `Status:` line; anchors as GitHub slugs them
+  (`tests/test_docs.py` validates both).
+- App strings are quoted exactly as the code has them, shipped em dashes
+  included. Specs link `architecture.md` and `product.md` rather than
+  restating them, and link another spec only to say a rule lives there.
+
+Consequences: the
+[2026-08-01 doc-style follow-up entry](#2026-08-01-doc-style-follow-up--decisions-needed-roadmap-trim-no-log-index)'s
+"revisit a log index only if findability still hurts after specs land"
+loop closes when the pass's last PR merges — the specs are the findability
+fix, and a topic index stays rejected; until then the loop is open only in
+the sense that the fix is still landing. `docs/product.md` and
+`docs/roadmap.md` are untouched: nothing user-facing changes.
+
 ## 2026-08-21: The Empty Point Color Is Called Default, And The Points Follow The Theme
 
 Status: Accepted
@@ -884,7 +1026,12 @@ pages cannot import `app`, and the literal should exist once.
 
 ## 2026-08-09: An Unset Username Is Stated In Place, Never Reported As A Failure
 
-Status: Accepted
+Status: Accepted; the configured-but-wrong-username case the Scope note below
+defers is now half settled by the 2026-08-22
+["The Playlist Fill Reports Degradation In Place Only"](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
+entry, which deleted the playlist fill's aggregate toast — and with it
+`_fill_summary_notification`, described below as untouched. Only the Refresh
+half of "both generic red toasts" still fires. Everything else here stands.
 
 With no KovaaK's username configured, opening a playlist used to run a
 position update that fetched nothing and then popped a red "Position update
@@ -1476,8 +1623,9 @@ future DMC versions.
 - A failing threshold verdict names the target it missed: one extra number with
   real motivational value.
 - No "New personal best!" retitle. A new overall PB necessarily places 1st
-  within its sensitivity, so it already gets the run-verdict toast titled "New
-  best score"; retitling it would create by the back door the dedicated PB toast
+  within its sensitivity, so it already earns the run-verdict toast — titled
+  "New best score" when unjudged, or carrying the threshold verdict when
+  judged; retitling it would create by the back door the dedicated PB toast
   that `product.md` records as declined.
 
 Two manual-refresh failure toasts deliberately share the title "Position
@@ -2829,7 +2977,10 @@ whichever source resolved it, never the pasted input.
 
 ## 2026-07-16: Warm Playlist Percentiles With One Polite Background Worker
 
-Status: Accepted
+Status: Superseded in part by the
+[2026-08-03 quiet-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy):
+the fatal-state toast for an unknown username was removed in PR #196; the
+overview's status line and a WARNING log carry it. Everything else stands.
 
 Decision: After startup finishes ingesting local runs, one app-lifetime daemon
 worker warms the rank and leaderboard-total caches used by the Playlists
@@ -2936,7 +3087,11 @@ Constraints:
 
 ## 2026-07-12: Rank-Fetch Failure Degrades To The Last Cached Rank
 
-Status: Accepted
+Status: Superseded in part, for the passive red/yellow toasts of the
+three-tier toast model in Constraints below, by the
+[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+(passive renders state the condition in place; manual Refresh keeps all
+three tiers). The fallback semantics are unchanged and remain Accepted.
 
 Decision: When `get_scenario_rank_info` has resolved a leaderboard but the
 live rank fetch fails — either an unreachable endpoint (`RequestException`) or
@@ -3681,7 +3836,12 @@ its author.
 
 ## 2026-07-15: Stream Playlist Positions With Generation-Scoped Progressive Fill
 
-Status: Accepted
+Status: Superseded in part, for the aggregate completion toast alone, by
+the
+[2026-08-22 in-place-only entry](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
+(the fill states degradation in the page's status line and emits no
+notification). The fill mechanism, generation scoping, tombstones, and
+status settling are unchanged and remain Accepted.
 
 Supersedes: The blocking all-scenarios load and Dash Loading wrapper for the
 per-playlist scenario grid. The bounded, grid-owned scrolling decision from
