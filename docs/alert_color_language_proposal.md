@@ -9,7 +9,7 @@ The app has no shared color language for its inline notices. The first-run
 setup card is a plain white panel that disappears into the page, and the
 inline alerts are the palest yellow wash with no icons, so the surfaces that
 most need attention are the easiest to miss. This proposal adopts one
-severity scale — blue for information, yellow for warnings, red for errors —
+severity scale — blue for information, yellow for caution, red for errors —
 rendered as a tinted background with a leading icon, and applies it to every
 inline notice including the setup card. Toasts and all user-facing wording
 stay exactly as they are.
@@ -21,7 +21,7 @@ the reason this is a proposal rather than a styling PR; reviewers are asked
 for an independent position on it before reading the recommendation.
 
 **D1 — Adopt a severity color language for inline notices.**
-Status: Open. Recommended: yes — blue informational, yellow warning, red
+Status: Open. Recommended: yes — blue informational, yellow caution, red
 error, the same scale the toast layer already speaks per outcome. The
 alternative raised during design was one accent color (light blue) for every
 notice: calmer and uniform, but it makes "your saved choices are silently not
@@ -84,9 +84,9 @@ One scale for every notice, inline and toast alike:
 | Color | Meaning | Already used by |
 | --- | --- | --- |
 | Blue | Informational; any action is optional | Backlog digest, unset-username Refresh answer |
-| Yellow | Warning: a choice is silently not applying, or a degraded state needs the user | Store alert, visibility alert, below-threshold verdict |
+| Yellow | Caution: an attention-worthy negative outcome or a state that needs the user, but not an error | Store alert, visibility alert, below-threshold verdict |
 | Red | Error: an operation failed | Run-import failure, refresh failure, refused writes |
-| Green | Success | Run verdicts, playlist action confirmations |
+| Green | A positive outcome | Run verdicts, playlist action confirmations |
 | Orange | Partial success: the action committed but a follow-up write failed | The "Playlist imported — not shown" split outcome |
 
 The toast layer already speaks this scale, orange included: the one orange
@@ -97,6 +97,13 @@ and it stays a distinct severity rather than being folded into yellow. This
 proposal brings the inline layer to the same scale. Green and orange stay
 toast-only — no inline success or split-outcome panel exists, and none is
 added.
+
+Yellow deliberately spans two kinds of caution — a configuration or store
+state that needs the user, and a coaching outcome like a below-threshold
+run. Both are "worth attention, nothing failed"; a narrower warning-only
+definition would leave the shipped threshold verdicts outside the scale.
+Green is "a positive outcome" rather than "success" for the mirror-image
+reason: a threshold pass is not an operation succeeding.
 
 ### Surface-by-surface changes
 
@@ -109,22 +116,38 @@ added.
   icon, deleting the hard-coded hex.
 - The leftover-files alert becomes blue per D3; the store alert and the
   visibility alert stay yellow. All keep the default `light` variant.
-- The setup card keeps its `dmc.Paper` structure and gains its tint in
-  `assets/stylesheet.css` on the existing `.setup-card` class: background
-  `var(--mantine-color-blue-light)` plus a colored border accent echoing
-  alert anatomy, with a modifier class switching the yellow tokens for the
-  stats-folder state per D2. Mantine defines the `-light` tokens per color
-  scheme, so dark mode needs no separate rules (verified in both schemes).
+- The setup card keeps its `dmc.Paper` structure and gets the full alert
+  anatomy: its tint lands in `assets/stylesheet.css` on the existing
+  `.setup-card` class — background `var(--mantine-color-blue-light)` plus a
+  colored border accent — with a modifier class switching the yellow tokens
+  for the stats-folder state per D2, and a leading icon beside the title
+  matched to the state the same way (warning for "Finish setting up", info
+  for "Add your KovaaK's account"). The title is a plain `dmc.Text` in a
+  Stack, so an icon-and-title row accommodates the icon without touching
+  the card's actions or wiring. Mantine defines the `-light` tokens per
+  color scheme, so dark mode needs no separate rules (verified in both
+  schemes).
 
 ### Why the setup card keeps its Paper
 
-Rebuilding the card as a `dmc.Alert` was considered and rejected. The card's
-primary action is a link deliberately styled as a button through
-`assets/stylesheet.css` because the dmc 2.8.0 wrapper does not expose
-Mantine's `component=` escape hatch, and the Skip button's mounting is load
-bearing for the skip callback (`allow_optional`). A rebuild would churn that
-wiring and its tests for no visual gain over a few lines of CSS on the class
-the card already has.
+Rebuilding the card as a `dmc.Alert` was considered and rejected. The card
+borrows alert *anatomy* — tint, border accent, icon, colored title — but
+deliberately not the alert *component*, because the component carries
+semantics: Mantine renders `Alert`'s root with `role="alert"` (verified
+live on dmc 2.8.0; `Paper` carries no role). That ARIA role is an assertive
+live region meant for transient, time-sensitive messages, and the ARIA
+Authoring Practices direct that an alert must not contain interactive
+elements — while this card exists precisely to hold two interactive
+controls (the "Open Settings" call to action and Skip) and to sit
+persistently at the top of the page. A component whose semantics we would
+immediately have to strip is the wrong starting point; the content model is
+a card with actions, so the component stays a card. The secondary cost is
+churn: the existing `.setup-card` styling and its structural tests
+(`tests/test_home_setup_card.py`) assume the Paper layout, and a rebuild
+would rework both for no visual gain over CSS on the class the card
+already has. The card's action wiring itself (the CSS-styled CTA anchor,
+Skip's `allow_optional` mounting) would transfer into an Alert's children
+unchanged, so it is deliberately not the argument here.
 
 ### Copy
 
@@ -155,8 +178,8 @@ of the in-flight app-wide messaging sweep.
 
 - PR 1: this proposal.
 - PR 2 (after D1–D3 are ruled): the implementation — icons and recolors on
-  the four alerts, the setup-card CSS, and the docs definition of done
-  across every affected spec:
+  the four alerts, the setup-card CSS and per-state icon, and the docs
+  definition of done across every affected spec:
   - Distill D1 into `decision_log.md` as the durable color-language entry.
   - State the shared scale in [specs/notifications.md](specs/notifications.md)
     (already the messaging-layer spec: it carries the routing policy and the
@@ -179,9 +202,17 @@ of the in-flight app-wide messaging sweep.
 
 - This PR: docs gates only (`tests/test_docs.py` enforces the Status line,
   section order, and link integrity).
-- PR 2: no behavior changes, so no new unit tests are expected; existing
-  gates must stay green, and the visual result is verified by running the
-  app in both color schemes and checking each surface (the trigger
-  conditions for every notice are enumerated in the specs). The tint
-  rendering itself was already validated during design with a standalone
-  dmc 2.8.0 test bed in both schemes.
+- PR 2: one new test, on the one piece of conditional presentation this
+  proposal introduces — the setup card's state-to-treatment mapping
+  (stats-folder state gets the yellow modifier and warning icon, identity
+  state the blue treatment and info icon), asserted over
+  `_setup_card_children()` alongside the structural tests that already
+  cover the card. The four alerts' static colors and icons deliberately
+  get no prop-echo assertions — a test that restates a literal only fails
+  when the literal is edited on purpose — and are covered instead by the
+  visual pass and the spec statements. Existing gates must stay green, and
+  the visual result is verified by running the app in both color schemes
+  and checking each surface (the trigger conditions for every notice are
+  enumerated in the specs). The tint rendering itself was already
+  validated during design with a standalone dmc 2.8.0 test bed in both
+  schemes.
