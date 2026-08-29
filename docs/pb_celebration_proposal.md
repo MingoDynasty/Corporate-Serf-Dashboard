@@ -726,6 +726,16 @@ early return.
 - **Interval consolidation.** The page's `interval-component` keeps its
   other consumers (the rank refresh path and the import-failure flush);
   folding them into the shell interval is a refactor for another day.
+- **Per-family celebration staleness.** The freshness cap applies the
+  quiet-return rule to celebrations and ordinary toasts alike, so a
+  personal best set with no tab open celebrates only within the cap,
+  while D8 delivers a hidden tab's celebration however late. Whether the
+  celebration family deserves its own longer or unbounded window is a
+  follow-up proposal once v1 has real usage. The evidence to bring:
+  whether the missed celebration in the play-then-open-the-dashboard flow
+  grates, and how D8's late delivery feels when it fires. Nothing shipped
+  forecloses the change; it is one conditional in the drain's decision
+  rule plus a D9 amendment.
 - **Per-sensitivity personal bests.** The celebration is scenario-wide, like
   the watchdog's flag. A per-sensitivity best is already the placement
   toast's job.
