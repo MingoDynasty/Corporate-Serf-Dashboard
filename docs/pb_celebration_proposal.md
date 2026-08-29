@@ -407,29 +407,33 @@ decides the celebration for the batch — the newest live event that beats
 its `scenario_previous_best` under the strict derivation in "The event",
 with the style store read as `State`; Off means no celebration — and
 publishes one payload carrying the drained runs
-in order plus the stamped decision: the celebrated `run_id` or none, a
-monotonic animation sequence, and the celebration toast's fields. The
+in order, each stamped with the drain's liveness verdict, plus the
+stamped decision: the celebrated `run_id` or none, a monotonic animation
+sequence, and the celebration toast's fields. The
 callback also emits the celebration toast (below). One decision per drain
 is a contract, not a convenience: a Dash callback returns one final value
 per output, so one response carries one payload and drives one animation.
 An older live personal best in the same batch is not celebrated; it falls
 through to the ordinary run-toast path, which "The toast" spells out.
 
-Freshness is drain-relative, not a wall-clock window: an event is live if
-no earlier drain could have seen it (its `datetime_created` is after the
-previous drain's completion, tracked in one module-level timestamp whose
-only writer is the drain callback), subject to a modest wall-clock cap of
-120 s, an author-owned constant. Drain-relative is the load-bearing half:
-Chromium's intensive throttling slows a hidden tab's interval to about one
-tick per minute after roughly five minutes hidden, and the tab is occluded
-during play, so any ~10 s wall-clock window would silently drop
-mid-session personal bests at exactly the moment the feature exists for.
-The cap is the other half: it stops a queue that accumulated with no tab
-open from replaying old personal bests on the next visit, and 120 s sits
-an order of magnitude above the polling interval and comfortably above the
-worst throttled gap while staying well under any real absence. A
-celebration decided during a throttled drain lands correctly because the
-toast is sticky and the animation holds until the tab is visible (D8).
+Freshness needs no drain bookkeeping, because the drain-relative half is
+structural: every drain empties the queue, so any message a drain finds
+was never seen by an earlier drain. There is no timestamp to compare and
+no watermark to keep, and a message appended while a drain is mid-pop is
+caught by that drain or the next one, exactly once either way. What
+remains is one wall-clock cap: a run is live if its `datetime_created` is
+within 120 s of the drain, an author-owned constant. The cap stops a
+queue that accumulated with no tab open from replaying old personal bests
+on the next visit, and 120 s sits two orders of magnitude above the
+default polling interval and comfortably above Chromium's intensive
+throttling, which slows a hidden tab's interval to about one tick per
+minute after roughly five minutes hidden — and the tab is occluded during
+play, so a ~10 s window would have dropped mid-session personal bests at
+exactly the moment the feature exists for. The stamp is taken at message
+construction, moments before the load-and-enqueue step; that gap costs
+milliseconds against a 120 s budget, never a celebration. A celebration
+decided during a throttled drain lands correctly because the toast is
+sticky and the animation holds until the tab is visible (D8).
 
 This interval is the first poll outside Scenario Performance: it adds one
 request per second on every page for the life of the tab, which changes
@@ -494,30 +498,40 @@ dismissed; a dedicated id is also what lets it survive the next ordinary
 run toast instead of being dismissed by it.
 
 On Scenario Performance, the page stops draining and starts listening:
-`check_for_new_data` takes the batch store as `Input` instead of popping
-`message_queue`, keeps its outputs (the `run-events` summary and the
-scenario auto-switch), and forwards the stamped decision with the summary.
-`_build_run_event_notification` then never predicts anything: a run whose
-`run_id` the decision names yields (returns `None`), because the
-celebration toast is that run's one notification (D4); every other run,
-personal best or not, narrates today's verdict or placement toast. The
-ordering argument is the dependency graph, not a protocol: a page callback
+`check_for_new_data` takes the batch store as its only `Input`, keeps its
+outputs (the `run-events` summary and the scenario auto-switch), and
+forwards the stamped decision and liveness with the summary. The
+auto-switch and the scenario dropdown move from `Input` to `State`: a
+queue pop was destructive, so a control-triggered rerun used to find
+nothing, but a Store replays its last value, and a control flip must not
+re-forward a batch already processed. `_build_run_event_notification`
+then never predicts anything: a run whose `run_id` the decision names
+yields (returns `None`), because the celebration toast is that run's one
+notification (D4); any other run stamped live narrates today's verdict or
+placement toast; a run stamped stale narrates nothing. The ordering
+argument is the dependency graph, not a protocol: a page callback
 triggered by the batch store necessarily runs after the shell wrote the
 decision that payload carries, so the page can read the decision instead
 of racing it. There is no registry, no watermark, no deferral, and no
 second consumer of the queue to coordinate with. The invariant, pinned by
 a contract test: facts travel, only the drain decides. The drain derives
-the celebration once and stamps it into the batch payload; the page reads
-the stamped decision and never re-derives a celebration from the raw
-fields.
+the celebration and each run's liveness once and stamps both into the
+batch payload; the page reads the stamps and re-derives neither from the
+raw fields.
 
 There is no catch-up digest (D9). A batch with several runs rebuilds the
-graph once, auto-switches once, and toasts at most once: the celebration
-toast if the decision names a run, else the ordinary toast for the batch's
-latest matching run if that run is live, else nothing; a stale backlog is
-the plot's job. One personal best therefore earns exactly one
-notification, on any page, in every interleaving there is, because only
-one callback ever decides. Rejected alternatives, from the review history:
+graph once and auto-switches once, and each run earns at most one
+notification: the celebrated run gets the celebration toast, the batch's
+latest matching run gets today's verdict or placement toast when it is
+stamped live and is not the celebrated run, and every other run, stale
+backlogs included, is the plot's job. The contract is per run, never per
+batch: one batch can put two toasts on screen when the celebration and
+the page's narration concern different runs — a personal best in another
+scenario beside an ordinary live run in the selected one — and that is
+correct, because each toast reports its own run once. One personal best
+earns exactly one notification, on any page, in every interleaving there
+is, because only one callback ever decides. Rejected alternatives, from
+the review history:
 two independent drains coordinated by a shared toast id, by a page-side
 freshness window, by a celebrated-run registry, or by a registry plus a
 drain watermark with deferral. Each fix moved the race without closing it;
@@ -613,7 +627,8 @@ maintainer's stated preference):
 
 1. **Drain move and toast** (can stand alone): the three new
    `NewFileMessage` fields; the shell interval, the drain callback with
-   its batch store, decision stamping, and drain-relative freshness; the
+   its batch store, decision and liveness stamping, and the freshness
+   cap; the
    page consuming the store instead of popping the queue; the digest
    removal (D9); the dedicated celebration toast id and its sticky
    update-plus-show pair; the trophy icon; tests. Owning docs in the same
@@ -701,16 +716,16 @@ early return.
   two qualifying runs in one batch is never named; the sequence
   increments only when a run is celebrated; the celebration toast is
   emitted exactly when the decision names a run.
-- Freshness tests: an event enqueued after the previous drain is live even
-  when the gap is about 60 s (the throttled-drain boundary); an event
-  older than the 120 s cap is not celebrated; the first drain after start
-  does not celebrate a backlog that predates it.
+- Freshness tests: a run about 60 s old at the drain (the throttled-tick
+  boundary) is still live; a run older than the 120 s cap is not; a
+  message appended while a drain is popping is seen exactly once, by that
+  drain or the next; every run in the payload carries a liveness stamp.
 - Contract tests: the celebration toast id differs from the run-verdict
   id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
   and its toast payload carries `autoClose` False on both actions of the
   pair; the run message carries no decision field, and the page's toast
-  builder consults only the stamped decision, never re-deriving a
-  celebration from the raw fields.
+  builder consults only the stamped decision and liveness, never
+  re-deriving either from the raw fields.
 - Toast builder tests: the percentage message for a positive previous best;
   the fallback message for a previous best of zero and for a negative one.
 - Verdict-gate derivation tests: `_threshold_verdict` judges exactly when
@@ -720,17 +735,19 @@ early return.
   with `scenario_previous_best` as the denominator.
 - Scenario Performance tests beside the existing ones in
   `tests/test_home_run_events.py`: `check_for_new_data` consumes the
-  batch store, forwards the decision, and auto-switches as before; a run
-  the decision names yields (returns `None`) whatever its verdict,
-  including a Case 2 run (first at its sensitivity, scenario-wide best
-  beaten); a run the decision does not name gets
-  today's toast, personal best or not; a multi-run batch produces no
-  digest toast, at most the one toast the decision or the live latest run
-  earns, and a stale backlog produces none; the master switch's early
-  return precedes the yield, so master off is silent whether or not the
-  run was celebrated (D7). Together these pin the
-  one-notification-per-run invariant, which holds by construction: one
-  callback decides.
+  batch store as its only `Input`, forwards the decision and the liveness
+  stamps, and auto-switches as before; an auto-switch flip or a dropdown
+  change alone forwards nothing, because both are `State`; a run the
+  decision names yields (returns `None`) whatever its verdict, including
+  a Case 2 run (first at its sensitivity, scenario-wide best beaten); a
+  run the decision does not name gets today's toast when stamped live and
+  nothing when stamped stale; a multi-run batch produces no digest toast;
+  a mixed batch, celebrated run in another scenario beside a live
+  ordinary run in the selected one, shows both toasts, one per run; the
+  master switch's early return precedes the yield, so master off is
+  silent whether or not the run was celebrated (D7). Together these pin
+  the one-notification-per-run invariant, which holds by construction:
+  one callback decides.
 - Callback-level checks through a direct POST to `/_dash-update-component`,
   the established way to exercise shell-level outputs here.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
