@@ -80,7 +80,8 @@ sequence.
   vs warmed-up comparisons). Gap-based *sessions* are a later
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
-  [`run_history_proposal.md`](./run_history_proposal.md).
+  [`run_history_proposal.md`](./run_history_proposal.md), against the
+  baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
 - **App messaging consistency** — a one-time sweep of every string the app
   shows, so the same condition reads the same way on every page: one set of
   copy rules (punctuation, casing, no em dashes, one vocabulary), every

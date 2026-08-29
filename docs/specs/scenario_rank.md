@@ -68,8 +68,8 @@ benchmark tier) — see the
   persistent configuration state rather than a failure. The playlist
   scenarios page skips its progressive position
   fill entirely and says so in place — "Positions unavailable — set your
-  KovaaK's username in Settings", with Settings linked — so the fill's red
-  summary toast cannot fire over a pass that fetched nothing
+  KovaaK's username in Settings", with Settings linked — so no lookup runs
+  over a pass that would fetch nothing
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
   The playlists overview, whose percentile columns empty for the same reason,
   states it in its own status line as well: "Percentiles unavailable. Set your
@@ -97,7 +97,9 @@ benchmark tier) — see the
   ([2026-04-27](../decision_log.md#2026-04-27-use-json-files-for-runtime-api-caches),
   root relocated by
   [2026-07-11](../decision_log.md#2026-07-11-move-the-api-cache-under-datacache)),
-  subject to the cache conventions in [AGENTS.md](../../AGENTS.md).
+  subject to the cache conventions in [AGENTS.md](../../AGENTS.md). They
+  carry no schema stamp; the durable-store contract that exempts them lives in
+  [settings.md](settings.md#durable-store-schema-contract).
 - `scenario_rank_cache_ttl_hours` and `leaderboard_total_cache_ttl_hours`
   both default to `168`
   ([2026-04-29](../decision_log.md#2026-04-29-cache-leaderboard-totals-for-one-week)).
@@ -168,9 +170,11 @@ benchmark tier) — see the
   refresh Timer) moves the cache on, the interval reads a different value and
   the hint is retired rather than left contradicting a position that has
   since arrived.
-- Manual Refresh answers with a toast whatever happens — the user asked for
-  it — and all four outcomes come off the callback's own notification
-  output. A hard failure (an `error_message` result or a raised exception) is
+- With a scenario selected, Manual Refresh answers with a toast whatever
+  happens — the user asked for it — and all four outcomes come off the
+  callback's own notification output; with none selected the click sets the
+  field to `N/A` and toasts nothing. A hard failure (an `error_message`
+  result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
   position unchanged." is true whether a cached position was on screen or
@@ -186,7 +190,9 @@ benchmark tier) — see the
   Only a genuinely fresh result gets the green confirmation, titled "Position
   refreshed". The green confirmation and the blue unset-username notice both
   keep a fresh id per click so back-to-back refreshes each answer; they are
-  the two instances of the same named exception to the stable-id rule
+  the two instances of the same named exception to the stable-id rule. The
+  red and yellow outcomes keep their stable ids, so a repeat of the same
+  failure while its toast is still up is deduped and shows nothing new
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
