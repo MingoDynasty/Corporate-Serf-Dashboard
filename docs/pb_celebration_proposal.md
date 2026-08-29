@@ -15,9 +15,11 @@ one confetti effect, and a follow-up adds a choice of styles.
 
 ## Decisions needed
 
-The maintainer ruled on 2026-08-25, after three review rounds: all eight
-decisions are ratified, D6 as a staged compromise and D8 with a post-ship
-observation in place of pre-ship evidence.
+The maintainer ruled on 2026-08-25, after three review rounds: D1 through
+D8 are ratified, D6 as a staged compromise and D8 with a post-ship
+observation in place of pre-ship evidence. A further ruling on 2026-08-29
+pivoted the delivery mechanism to a single drain and retired the catch-up
+digest (D9); every earlier ruling stands.
 
 ### D1 — Does the celebration fire on every page, for every scenario?
 
@@ -226,6 +228,28 @@ fullscreen, whenever that machine is next available. Deferring the whole
 behaviour to a follow-up was considered and rejected: v1 would then ship
 the drop untested, which is the one variant that can fail invisibly.
 
+### D9 — Is the "While you were away" digest retired?
+
+Status: Ratified (2026-08-29)
+
+**Decision: yes.** The catch-up digest existed because run events could
+accumulate while the Scenario Performance page was closed. With the drain
+moved to the app shell (see Design), delivery is app-wide and continuous
+while any tab is open, so batches stop accumulating in the one case the
+digest served; what remains is the no-tab case, which the freshness rule
+already declines to replay. The digest is removed rather than kept as a
+rare special case: `docs/product.md` and `docs/specs/notifications.md`
+shrink accordingly in the delivery plan. A backlog that does arrive
+rebuilds the graph once, silently; the plot is the record, and only a
+fresh latest run earns a toast.
+
+The same ruling supersedes the 2026-08-21 master-switch decision-log
+entry's deferral of the queue-to-UI redesign, for the drain alone: four
+review rounds of coordination machinery between two independent drains
+were the evidence that the deferral had expired. The deferred product
+question it protected, app-wide verdict toasts, stays deferred: run
+toasts remain page-built and page-scoped.
+
 ## Problem
 
 The watchdog already decides, for every run file, whether the run beat the
@@ -265,6 +289,10 @@ Repository, at `main` as of 2026-08-21:
 - `NewFileMessage` carries `datetime_created`, so freshness is measurable
   without adding a field. The watchdog handler has the run CSV's path in
   hand at all three message construction sites.
+- Chromium's intensive timer throttling runs a hidden tab's interval about
+  once per minute after roughly five minutes hidden, and window occlusion
+  counts as hidden, so a tab behind a fullscreen game reaches that state
+  mid-session.
 - Scores are unconstrained floats. The threshold path declines to judge a
   run when `previous_high_score <= 0` because there is no usable
   denominator.
@@ -338,54 +366,52 @@ Upstream demo recipes, from the `gh-pages` branch:
 
 ## Design
 
-**The event.** The watchdog gains a second typed channel,
-`pb_celebration_queue: deque[PersonalBestEvent]`, beside
-`run_import_failure_queue`. `PersonalBestEvent` carries `run_id`,
-`datetime_created`, `scenario_name`, `score`, and `previous_high_score`.
-`run_id` is the run CSV's file name: unique per run, already in hand where
-the messages are built, and the identity the shell and the page coordinate
-on (see "The toast"). The watchdog appends one exactly when
-`is_new_high_score` is true. The flag is computed against the scenario-wide
-high score and can only be true in Cases 2 and 3; Case 1's first run has
-nothing to beat, carries the flag as False, and never celebrates. So the
-flag alone means "a celebration event was enqueued for this run", which is
-what the page's candidate test relies on. Every enqueue is stamped with
-`event_seq`, one
-monotonic counter shared by both queues and incremented only by the
-watchdog thread, so "has the shell seen this event yet" is a comparison,
-not a guess (see the watermark under "The toast"). `NewFileMessage` and
-the Scenario Performance `RunEventData` also gain `run_id`, `event_seq`,
-and an explicit `is_new_high_score: bool`, set at all three construction
-sites, because the page's own toast needs the scenario-wide fact and
-cannot derive it (see Problem). The rank refresh
-keeps its current trigger; the celebration is not coupled to a network
-call.
+**The event.** One queue, `message_queue`, as today; no second channel.
+`NewFileMessage` gains three fields, set at all three construction sites:
+`run_id` (the run CSV's file name: unique per run, already in hand where
+the messages are built, and the identity a celebration decision names), an
+explicit `is_new_high_score: bool`, and `scenario_previous_best:
+float | None` (the watchdog's scenario-wide high score before this run;
+`None` on Case 1, whose first run has nothing to beat). The flag is
+computed against the scenario-wide high score and can only be true in
+Cases 2 and 3; Case 1 carries it as False and never celebrates. The
+existing per-sensitivity `previous_high_score` is untouched;
+`scenario_previous_best` exists so the celebration toast keeps its
+percentage without a second event type. The page's `RunEventData` carries
+the new fields through. The rank refresh keeps its current trigger; the
+celebration is not coupled to a network call.
 
-**The consumer.** The app shell hosts a `dcc.Interval`
-(`pb-celebration-interval`, period `config.polling_interval`), a
-`dcc.Store` (`pb-celebration-event`) that carries one event to the browser,
-and the style store described under Storage. A shell callback drains the
-queue on each tick and celebrates at most one event per drain: the newest
-fresh one, where fresh means `datetime_created` is within the freshness
-window of the drain. The window is relative to the interval,
-`max(10 s, 3 × polling_interval)`, because `polling_interval` is an
-unbounded config int and an absolute window would silently kill the feature
-at large intervals; the multiplier keeps a live event from being judged
-stale by its own delivery latency. Anything older is dropped unseen: a
-personal best set while no tab was open is never replayed on the next
-visit. One event per drain is a contract, not a convenience: a Dash
-callback returns one final value per output, so one response can carry one
-store payload and drive one animation. An older fresh personal best in the
-same drain is not celebrated and not recorded; it falls through to the
-ordinary run-toast path, which "The toast" spells out. The callback emits
-the celebration toast (below) and records the celebrated `run_id` in
-`celebrated_runs`, a bounded server-side registry in `notifications.py`
-(the last 64 ids; module-level state shared between callbacks, as
-`_last_rank_hints` in `home.py` already is). After every drain, celebrated
-or not, it publishes `pb_drain_watermark`, the highest `event_seq` it has
-examined, beside the registry; the shell is the only writer of both. With
-the setting at Off the drain still advances the watermark while dropping
-every event unseen and recording nothing.
+**The consumer.** The drain moves to the app shell, which becomes the one
+consumer of `message_queue`. The shell hosts a `dcc.Interval`
+(`pb-celebration-interval`, period `config.polling_interval`), the batch
+store `run-events-batch` (a `dcc.Store`), and the style store described
+under Storage. On each tick the shell's drain callback empties the queue,
+decides the celebration for the batch — the newest live event whose
+`is_new_high_score` is set, with the style store read as `State`; Off
+means no celebration — and publishes one payload carrying the drained runs
+in order plus the stamped decision: the celebrated `run_id` or none, a
+monotonic animation sequence, and the celebration toast's fields. The
+callback also emits the celebration toast (below). One decision per drain
+is a contract, not a convenience: a Dash callback returns one final value
+per output, so one response carries one payload and drives one animation.
+An older live personal best in the same batch is not celebrated; it falls
+through to the ordinary run-toast path, which "The toast" spells out.
+
+Freshness is drain-relative, not a wall-clock window: an event is live if
+no earlier drain could have seen it (its `datetime_created` is after the
+previous drain's completion, tracked in one module-level timestamp whose
+only writer is the drain callback), subject to a modest wall-clock cap of
+120 s, an author-owned constant. Drain-relative is the load-bearing half:
+Chromium's intensive throttling slows a hidden tab's interval to about one
+tick per minute after roughly five minutes hidden, and the tab is occluded
+during play, so any ~10 s wall-clock window would silently drop
+mid-session personal bests at exactly the moment the feature exists for.
+The cap is the other half: it stops a queue that accumulated with no tab
+open from replaying old personal bests on the next visit, and 120 s sits
+an order of magnitude above the polling interval and comfortably above the
+worst throttled gap while staying well under any real absence. A
+celebration decided during a throttled drain lands correctly because the
+toast is sticky and the animation holds until the tab is visible (D8).
 
 This interval is the first poll outside Scenario Performance: it adds one
 request per second on every page for the life of the tab, which changes
@@ -395,8 +421,9 @@ so nobody reads the traffic as a bug. Folding the page's existing
 `interval-component` consumers into one shell interval would put both
 drains on the same tick, but that refactor is not this proposal.
 
-**The animation.** A clientside callback on `pb-celebration-event` calls
-`window.pbCelebration.play(style)`, defined in a small app-owned file
+**The animation.** A clientside callback on the batch store's decision
+calls `window.pbCelebration.play(style)`, defined in a small app-owned
+file
 (`assets/pbCelebration.js`) beside the vendored library. It does nothing
 when the style is Off or when the user prefers reduced motion
 (`disableForReducedMotion` on the instance, plus the same check around the
@@ -409,12 +436,13 @@ That behaviour is D8's ruling; the rejected hard drop is recorded there.
 Playing immediately while hidden would also dump a stalled burst on the
 next alt-tab, since a hidden tab throttles animation frames. It cancels any
 burst still in flight
-before starting a new one, so a fast streak never stacks. The store payload
-carries a monotonic sequence number so two identical personal bests back to
-back both fire. Every style is bounded to at most about three seconds and
-returns a cancel handle; `confetti.reset()` clears particles but does not
-stop a `setInterval` or animation-frame loop, so the loop-based styles must
-not be taken from the demo verbatim.
+before starting a new one, so a fast streak never stacks. The decision
+carries a monotonic sequence number so two identical personal bests back
+to back both fire, and a payload whose decision is none changes no
+sequence and plays nothing. Every style is bounded to at most about three
+seconds and returns a cancel handle; `confetti.reset()` clears particles
+but does not stop a `setInterval` or animation-frame loop, so the
+loop-based styles must not be taken from the demo verbatim.
 
 **Styles.** A name-keyed registry in `pbCelebration.js`, mirrored by the
 option list in Python; the two lists agree by convention, and an unknown
@@ -441,73 +469,40 @@ stamps the alternating lifetimes over `autoClose` and would silently turn
 the sticky toast into an ordinary 8 s one. No alternation is needed here:
 alternation exists to re-arm a replacement's timer, and a sticky toast has
 no timer. The payload's sequence number serves the clientside animation
-replay, not the toast lifetime. The shell therefore touches neither the
-run-verdict id nor `TOAST_LIFETIME_STORE_ID`: the two producers share no
-toast id and no store, so no interleaving of their responses can make one
-overwrite the other. That is the point. Both callbacks run on independent
-one-second intervals under a multi-threaded server, and Dash does not order
-concurrent duplicate-output responses, so any design where both write the
-same id is order-dependent no matter how the decision to write is
-coordinated. Per D8's ruling the toast stays until dismissed; a dedicated
-id is also what lets it survive the next ordinary run toast instead of
-being dismissed by it.
+replay, not the toast lifetime. The shell touches neither the run-verdict
+id nor `TOAST_LIFETIME_STORE_ID`, so the celebration and the page's run
+toasts stay in separate lanes. Per D8's ruling the toast stays until
+dismissed; a dedicated id is also what lets it survive the next ordinary
+run toast instead of being dismissed by it.
 
-On Scenario Performance, the page decides about a candidate run (one with
-`is_new_high_score` set; the flag is only ever true when a scenario-wide
-previous best exists, exactly when a celebration event was enqueued, so it
-alone defines the candidate — a Case 2 personal best is a candidate even
-though its run message's `previous_high_score` is `None`) only after the
-shell's decision for it is on record: while the run's `event_seq` is above
-`pb_drain_watermark`, the toast decision is deferred. The deferral lives in
-the page's existing single chain, because `_build_run_event_notification`
-only runs when `generate_graph` is triggered by `run-events`, and an empty
-drain emits nothing: `check_for_new_data` owns a module-level pending slot.
-A tick that drains a candidate still above the watermark parks it there
-and forwards it without a toast; a tick that drains nothing while the slot
-holds a candidate the watermark has now passed re-emits `run-events` for
-that candidate, re-triggering `generate_graph`, whose toast logic is then
-purely claimed-yields or unclaimed-narrates; a tick that drains newer
-events supersedes and clears the slot, newest wins, as today. The cost is
-one extra graph rebuild per deferred candidate, the same price as a run
-landing; accepted for simplicity over a payload flag that would skip the
-rebuild. No second writer of the run-verdict id or the lifetime store
-appears, and re-evaluation cannot starve: the shell interval is mounted in
-the same client, so the watermark always advances. Once the watermark has
-passed the run, registry membership is final and the answer is definitive:
-claimed means the page yields (returns `None`), unclaimed means the page
-narrates today's toast. Deferral costs at most a tick or two, only for
-candidate runs, and only when the page's interval fires before the shell's
-for the same second; non-candidates never defer. The page never reads the
-style setting: an Off
-drain advances the watermark without recording, which reads as "decided,
-not celebrated", and the page narrates.
+On Scenario Performance, the page stops draining and starts listening:
+`check_for_new_data` takes the batch store as `Input` instead of popping
+`message_queue`, keeps its outputs (the `run-events` summary and the
+scenario auto-switch), and forwards the stamped decision with the summary.
+`_build_run_event_notification` then never predicts anything: a run whose
+`run_id` the decision names yields (returns `None`), because the
+celebration toast is that run's one notification (D4); every other run,
+personal best or not, narrates today's verdict or placement toast. The
+ordering argument is the dependency graph, not a protocol: a page callback
+triggered by the batch store necessarily runs after the shell wrote the
+decision that payload carries, so the page can read the decision instead
+of racing it. There is no registry, no watermark, no deferral, and no
+second consumer of the queue to coordinate with.
 
-The backlog digest follows the same rule through its latest run: a claimed
-latest run yields the digest (the celebration toast is the fresher news,
-and the batch's remaining information is the plot's job), an unclaimed one
-narrates as today, and a digest whose latest run is still above the
-watermark defers like a live one. This restores the one-notification
-contract for digests too; the earlier never-yield shape kept the count on
-screen but let one run be narrated twice, which the ratified D4 and the
-notifications spec's "A run earns at most one notification" both rule out.
+There is no catch-up digest (D9). A batch with several runs rebuilds the
+graph once, auto-switches once, and toasts at most once: the celebration
+toast if the decision names a run, else the ordinary toast for the batch's
+latest matching run if that run is live, else nothing; a stale backlog is
+the plot's job. One personal best therefore earns exactly one
+notification, on any page, in every interleaving there is, because only
+one callback ever decides. Rejected alternatives, from the review history:
+two independent drains coordinated by a shared toast id, by a page-side
+freshness window, by a celebrated-run registry, or by a registry plus a
+drain watermark with deferral. Each fix moved the race without closing it;
+the single drain closes it by construction.
 
-No interleaving of the two callbacks can now produce two toasts for one
-run, and none can produce silence: every candidate decision happens after
-the shell's decision for that run is recorded, and an uncelebrated
-candidate (the older of two fresh personal bests in a single drain, a
-stale one, or any candidate under an Off drain) always falls through to
-the ordinary run-toast path, which reports its verdict or placement
-truthfully. Nothing can replace the celebration toast, because nothing
-else writes its id. Rejected alternatives: a shared run-verdict id (any
-concurrent interleaving can bury the celebration under a slower ordinary
-response); a page-side freshness window (cannot tell which event the shell
-chose); a registry check without the watermark (the page can read just
-before the shell records, narrating a celebrated run twice); and a
-page-local replacement where both producers emit and the later one wins,
-whose end state depends on callback order.
-
-With celebrations Off the shell neither celebrates nor records, so the page
-never yields and behaves exactly as today (D4).
+With celebrations Off the shell stamps no celebration, so the page
+narrates every run as today (D4).
 
 The toast is informational, so it shows under reduced motion too; only the
 animation is skipped.
@@ -536,11 +531,11 @@ browser that has never visited Settings celebrates. The known costs of
 browser persistence apply and are accepted: per origin, cleared with site
 data, and reset if the layout default ever changes. Every one of those
 fails toward "celebrations came back", never toward silence. One more
-accepted cost: the queues, registry, watermark, and pending slot are
-process-wide with per-response delivery, so with two tabs open the
-celebration lands in whichever tab's drain runs first and the other tab
-sees nothing for that run. This is the single-consumer shape
-`message_queue` already has, noted so nobody files it as a bug.
+accepted cost: `message_queue` is process-wide and each drain's payload is
+delivered to one client, so with two tabs open a batch lands in whichever
+tab's drain runs first and the other tab sees nothing for it. This is the
+single-consumer shape the page's drain already had, and the supported
+usage model stays one active tab, noted so nobody files it as a bug.
 
 `data/settings.json` was rejected for v1 on cost, not principle. Settings v1
 is a closed set of three string keys, so a new key is settings v2: a
@@ -594,25 +589,27 @@ deferred all-messaging review.
 Three implementation PRs, smallest reviewable steps first (the
 maintainer's stated preference):
 
-1. **Event and toast** (can stand alone): `is_new_high_score` on the run
-   message and page payload; `pb_celebration_queue` and `PersonalBestEvent`;
-   the shell interval, drain callback, freshness rule, celebrated-run
-   registry, and celebration toast; the Scenario Performance yield rule; the
-   dedicated celebration toast id and its sticky update-plus-show pair;
-   the watermark and deferral rule; the trophy icon; tests. Owning docs in
-   the same PR: `docs/specs/notifications.md` (the celebration family, its
+1. **Drain move and toast** (can stand alone): the three new
+   `NewFileMessage` fields; the shell interval, the drain callback with
+   its batch store, decision stamping, and drain-relative freshness; the
+   page consuming the store instead of popping the queue; the digest
+   removal (D9); the dedicated celebration toast id and its sticky
+   update-plus-show pair; the trophy icon; tests. Owning docs in the same
+   PR: `docs/specs/notifications.md` (the celebration family, its
    dedicated sticky toast, the preserved one-notification-per-run
-   contract, and an amendment to the spec's replaces-rather-than-stacks
+   contract, an amendment to the spec's replaces-rather-than-stacks
    sentence, to which the sticky celebration toast is D8's deliberate
-   exception), `docs/specs/scenario_performance.md` (its run-delivery
-   statements: the per-tick callback count and the graph-rebuild triggers,
-   which gain the deferred-candidate re-emission), and the
-   `architecture.md` entries (the new channel, the shell interval and
-   stores, the app-wide polling note). Interim state until
-   PR 2: the celebration toast is unconditional (the setting does not
-   exist yet) and there is no animation; the spec update states that
-   interim honestly and PR 2 rewrites it. Acceptable for a single-user app
-   across one review window.
+   exception, and the digest's removal), `docs/product.md` (the
+   run-notifications paragraph loses the catch-up digest and gains the
+   celebration), `docs/specs/scenario_performance.md` (the run-delivery
+   section: the drain lives in the shell and the page consumes the batch
+   store), and the `architecture.md` entries (the drain move in the
+   sanctioned-channels list, the shell interval and stores, the app-wide
+   polling note). Interim state until PR 2: the celebration toast is
+   unconditional (the setting does not exist yet) and there is no
+   animation; the spec update states that interim honestly and PR 2
+   rewrites it. Acceptable for a single-user app across one review
+   window.
 2. **Animation and setting** (depends on 1; completes v1 and ships the
    proposal): the vendored library and its license record;
    `pbCelebration.js` with the Confetti effect, the guards, and the D8
@@ -631,11 +628,12 @@ maintainer's stated preference):
 Plus the shipping checklist from `AGENTS.md`: decision-log entries (the
 celebration itself and its storage, the D4 priority amendment, the
 Settings-page placement departure, the D7 independence from the master
-switch, the D8 hidden-tab ruling), the `product.md` run-notifications
-paragraph and a new inventory entry, `architecture.md` (the new channel in
-the sanctioned-channels list, the shell's interval and stores, the
-app-wide polling note, the asset file), the README, the roadmap, and
-deletion of this file.
+switch, the D8 hidden-tab ruling, the D9 digest retirement, and a
+supersession of the 2026-08-21 master-switch entry's queue-flow deferral
+for the drain alone, with app-wide verdict toasts still deferred), the
+`product.md` inventory entry for the celebration, `architecture.md` (the
+drain move, the shell's interval and stores, the app-wide polling note,
+the asset file), the README, the roadmap, and deletion of this file.
 
 Dependencies: none. The run notifications master switch (PR #245) has
 landed; its guard sits at the top of `_build_run_event_notification`, and
@@ -644,10 +642,13 @@ early return.
 
 ## Out of scope
 
-- **App-wide run toasts.** Verdict, placement, and digest toasts stay on
-  Scenario Performance; the deferral recorded in the master switch
-  decision-log entry stands. This proposal adds one app-wide family, not a
-  general producer.
+- **App-wide run toasts.** Verdict and placement toasts stay page-built
+  and page-scoped; that half of the master-switch entry's deferral stands
+  even though the drain move supersedes the other half (D9). This proposal
+  adds one app-wide family, not a general producer.
+- **Interval consolidation.** The page's `interval-component` keeps its
+  other consumers (the rank refresh path and the import-failure flush);
+  folding them into the shell interval is a refactor for another day.
 - **Per-sensitivity personal bests.** The celebration is scenario-wide, like
   the watchdog's flag. A per-sensitivity best is already the placement
   toast's job.
@@ -670,37 +671,36 @@ early return.
   Case 1 message and true on Case 2 and Case 3 messages exactly when the
   celebration event was enqueued, including a Case 2 message whose own
   `previous_high_score` is `None`.
-- Shell drain tests: an empty queue is a no-op; a fresh event produces one
-  store payload with an incremented sequence, one toast, and one registry
-  entry; two fresh personal bests in one drain celebrate and record only
-  the newest, and the older is neither toasted nor recorded; a stale event
-  is dropped and not recorded; the freshness window equals
-  `max(10 s, 3 × polling_interval)`, pinned at the boundary (a live event
-  still celebrates at a 10 s and a 30 s interval); the style store at Off
-  drops everything and records nothing; the registry is bounded.
-- Producer-isolation contract tests: the celebration toast id differs from
-  the run-verdict id; the shell callback declares no output on
-  `TOAST_LIFETIME_STORE_ID`, and its toast payload carries `autoClose`
-  False on both actions of the pair. These pin the no-shared-state
-  construction that makes
-  concurrent responses unable to overwrite each other; the overlap itself
-  is not schedulable from a unit test.
+- Shell drain tests: an empty queue publishes nothing; a batch produces
+  one payload carrying the runs in order and the stamped decision; the
+  decision names the newest live personal best, or none when the style is
+  Off or no live personal best exists, and the older of two live personal
+  bests in one batch is never named; the sequence increments only when a
+  run is celebrated; the celebration toast is emitted exactly when the
+  decision names a run.
+- Freshness tests: an event enqueued after the previous drain is live even
+  when the gap is about 60 s (the throttled-drain boundary); an event
+  older than the 120 s cap is not celebrated; the first drain after start
+  does not celebrate a backlog that predates it.
+- Contract tests: the celebration toast id differs from the run-verdict
+  id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
+  and its toast payload carries `autoClose` False on both actions of the
+  pair.
 - Toast builder tests: the percentage message for a positive previous best;
   the fallback message for a previous best of zero and for a negative one.
 - Scenario Performance tests beside the existing ones in
-  `tests/test_home_run_events.py`: a candidate run above the watermark is
-  parked (forwarded without a toast, pending slot set), and an
-  otherwise-empty later tick re-emits `run-events` for it once the
-  watermark passes; a newer drained run supersedes and clears the pending
-  slot; a Case 2 candidate whose message `previous_high_score` is `None`
-  defers like any other; below the watermark, a claimed run yields
-  (returns `None`) whatever its verdict and an unclaimed one gets today's
-  toast; a non-candidate never defers; the digest defers, yields, or
-  narrates by its latest run under the same rule; an Off drain advances
-  the watermark so the page narrates rather than deferring forever; the
-  master switch's early return precedes the yield, so master off is silent
-  whether or not the run was celebrated (D7). Together these pin the
-  one-notification-per-run invariant under any callback order.
+  `tests/test_home_run_events.py`: `check_for_new_data` consumes the
+  batch store, forwards the decision, and auto-switches as before; a run
+  the decision names yields (returns `None`) whatever its verdict,
+  including a Case 2 personal best whose per-sensitivity
+  `previous_high_score` is `None`; a run the decision does not name gets
+  today's toast, personal best or not; a multi-run batch produces no
+  digest toast, at most the one toast the decision or the live latest run
+  earns, and a stale backlog produces none; the master switch's early
+  return precedes the yield, so master off is silent whether or not the
+  run was celebrated (D7). Together these pin the
+  one-notification-per-run invariant, which holds by construction: one
+  callback decides.
 - Callback-level checks through a direct POST to `/_dash-update-component`,
   the established way to exercise shell-level outputs here.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
