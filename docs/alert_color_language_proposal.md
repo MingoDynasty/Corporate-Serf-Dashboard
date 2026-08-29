@@ -221,15 +221,21 @@ of the in-flight app-wide messaging sweep.
 
 - This PR: docs gates only (`tests/test_docs.py` enforces the Status line,
   section order, and link integrity).
-- PR 2: one new test, on the one piece of conditional presentation this
-  proposal introduces — the setup card's state-to-treatment mapping
+- PR 2: two new tests, one per semantic contract this proposal
+  introduces. First, the setup card's state-to-treatment mapping
   (stats-folder state gets the yellow modifier and warning icon, identity
   state the blue treatment and info icon), asserted over
   `_setup_card_children()` alongside the structural tests that already
-  cover the card. The four alerts' static colors and icons deliberately
-  get no prop-echo assertions — a test that restates a literal only fails
-  when the literal is edited on purpose — and are covered instead by the
-  visual pass and the spec statements. Existing gates must stay green, and
+  cover the card. Second, the leftover-files conversion: a structural
+  assertion that the `playlists-superseded-alert` layout node is a
+  `dmc.Paper` and not a `dmc.Alert` while still holding the delete
+  button — the existing playlist tests exercise the callbacks and cleanup
+  flow but never the component type, so without this an implementation
+  that skipped the conversion (and the `role="alert"` fix it carries)
+  would pass every planned test. The alerts' static colors and icons
+  deliberately get no prop-echo assertions — a test that restates a
+  literal only fails when the literal is edited on purpose — and are
+  covered instead by the visual pass and the spec statements. Existing gates must stay green, and
   the visual result is verified by running the app in both color schemes
   and checking each surface (the trigger conditions for every notice are
   enumerated in the specs). The tint rendering itself was already
