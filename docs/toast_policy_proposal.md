@@ -12,11 +12,12 @@ second import failed. A survey of design systems, UX literature, and
 production apps converged on one decision rule: distinct actions get separate
 stacked toasts, updates to one ongoing thing replace each other in place, and
 bursts of the same event fold into one summary. This proposal adopts that rule
-as the app's standing toast policy, splitting the toasts along one test. A
-toast whose repeats always read differently stacks as separate messages. A
-toast whose repeats could read the same replaces its predecessor in place, so
-a retry keeps its answer on screen instead of being silently dropped, and a
-success also clears the leftover failure message it answers.
+as the app's standing toast policy. The classifying test is recurrence: every
+toast is keyed to the thing it reports, and a report that can happen again
+while its toast is still up replaces that toast in place, so a retry keeps
+its answer on screen instead of being silently dropped. Reports about
+different subjects still stack side by side, and a success also clears the
+leftover failure message it answers.
 
 ## Decisions needed
 
@@ -24,15 +25,22 @@ success also clears the leftover failure message it answers.
   Recommended: yes, recorded in `docs/specs/notifications.md` so every future
   toast picks its id pattern deliberately. The classifier is two questions,
   not copy inspection alone. First: can the reported fact recur inside one
-  toast lifetime? A fact that cannot recur is an event toast (unique id,
-  plain show, stacks, no sequence wiring). A fact that can recur is a
-  channel. Second: what is the channel's identity? A channel is keyed by its
-  subject when independent subjects can be in flight at once (a per-scenario
-  refresh), and all outcomes of one serial attempt slot share a single id
-  regardless of outcome flavor, so two contradictory claims about the same
-  latest attempt can never be on screen together. Choosing differently means
-  each new toast re-litigates the choice ad hoc, which is how today's mixed
-  inventory (three patterns, no stated rule) came to be.
+  toast lifetime, judged against the complete supported workflow including
+  inverse actions that make the same subject eligible again (a deleted
+  playlist can be re-imported at once)? A fact that cannot recur is an event
+  toast (unique id, plain show, stacks, no sequence wiring). A fact that can
+  recur is a channel. Second: what is the channel's identity? Identity
+  follows the semantic lane. An operation's problem lane is one channel: its
+  mutually exclusive outcome flavors (a red hard failure, a yellow
+  served-stale) share a single id, so two contradictory claims about the
+  same latest attempt can never be on screen together. Success lanes and
+  standing-condition lanes are their own channels, keyed by subject when
+  independent subjects can be in flight at once (one refresh-success channel
+  per scenario, one import-success channel per playlist code); lanes
+  interact only through explicit cross-clears, such as a success clearing
+  its operation's problem lane. Choosing differently means each new toast
+  re-litigates the choice ad hoc, which is how today's mixed inventory
+  (three patterns, no stated rule) came to be.
 - **D2 — Toasts whose repeats can carry identical copy become
   replace-in-place (`upsert_toast`).** Recommended: convert the three
   per-action failure toasts (`imported-playlist-failed-notification`,
@@ -50,7 +58,13 @@ success also clears the leftover failure message it answers.
   attempt's instead of sitting beside it, and the green
   `rank-refresh-notification-{uuid}` success becomes a channel keyed by
   scenario, so re-refreshing the same scenario replaces its own toast while
-  refreshes of different scenarios still stack. These are the toasts whose
+  refreshes of different scenarios still stack. The three playlist success
+  toasts become channels keyed by canonical playlist code for the same
+  reason: the supported delete-then-re-import cycle lets the same playlist
+  succeed twice inside one lifetime with byte-identical copy, so recurrence
+  — judged by possibility, exactly as for the cleanup success — puts them
+  in the channel bucket, while distinct playlists still stack because their
+  keys differ, which is all the reported bug's fix requires. These are the toasts whose
   repeats can carry identical text — most because a user retries against
   them (the failed-import modal deliberately keeps the pasted code for a
   quick resubmit), and stacking identical toasts is the literature's
@@ -70,8 +84,7 @@ success also clears the leftover failure message it answers.
   recommended, but it is a real option and the material difference is
   exactly that visibility. Keeping the stable ids (status quo) remains the
   do-nothing alternative: a retry inside the 8 s window then gets no answer
-  at all, the same dead-UI failure the import bug exhibits. The success-side
-  conversions in the Design section follow from D1 directly.
+  at all, the same dead-UI failure the import bug exhibits.
 
 ## Problem
 
@@ -166,25 +179,28 @@ see Out of scope.
 **The policy (D1), as it would read in the notifications spec:**
 
 1. **Event toasts** — the reported fact cannot recur inside one toast
-   lifetime (an import success names a playlist that cannot import again
-   while its toast shows). Unique id per emission (`-{uuid}` suffix), plain
-   `show`, occurrences stack, and the emitting callback needs no sequence
-   wiring. The test is recurrence, not whether the copy names a subject: a
-   fact that can recur with identical text (a retryable failure, a repeated
-   same-subject success) is not an event toast — it is a channel toast,
-   rule 2.
+   lifetime, judged against the complete supported workflow including
+   inverse actions that make the subject eligible again. Unique id per
+   emission (`-{uuid}` suffix), plain `show`, occurrences stack, and the
+   emitting callback needs no sequence wiring. Applying that test today
+   leaves this bucket empty — every current toast's fact can recur through
+   some supported cycle — so the rule exists to classify future toasts, and
+   any claim that a fact cannot recur must survive the inverse-action check
+   (delete-then-re-import defeats the naive claim for import success).
 2. **Channel toasts** — the toast is the current state of one ongoing thing
    (the latest run's verdict, the latest attempt's outcome). Replaced in
    place via `upsert_toast` so the timer restarts and the toast stays up
-   while its condition keeps recurring. The channel's id is its identity:
-   keyed by subject when independent subjects can be in flight at once (one
-   channel per scenario for refresh successes), and one shared id for every
-   outcome flavor of the same serial attempt slot (hard-failure and
-   served-stale are one channel whose payload differs), so two contradictory
+   while its condition keeps recurring. Identity follows the semantic lane.
+   An operation's problem lane is one channel: its mutually exclusive
+   outcome flavors share a single id with a payload that differs
+   (hard-failure and served-stale are one channel), so two contradictory
    claims about the same latest attempt can never be on screen together.
-   When the operation behind a failure channel also reports success, the
-   success emission clears that failure channel, so a stale failure never
-   outlives the answer that supersedes it.
+   Success lanes and standing-condition lanes are their own channels, keyed
+   by subject when independent subjects can be in flight at once (per
+   scenario, per playlist code). Lanes interact only through explicit
+   cross-clears: when the operation behind a problem lane reports success,
+   the success emission clears that problem channel, so a stale failure
+   never outlives the answer that supersedes it.
 3. **Burst toasts** — many same-type events where the aggregate is the
    message ("3 new run files could not be processed"). Fold into one summary
    carrying a count, and point at where the individual events are recorded.
@@ -194,16 +210,19 @@ see Out of scope.
 
 **Mechanical application to today's inventory:**
 
-- Convert to event toasts (rule 1): the three playlist success toasts —
-  `imported-playlist-successful-notification`,
-  `imported-playlist-visibility-failed-notification` (the import did land;
+- Convert to subject-keyed channel toasts (rule 2), keyed by canonical
+  playlist code: `imported-playlist-successful-{code}`,
+  `imported-playlist-visibility-failed-{code}` (the import did land;
   occurrences are distinct playlists), and
-  `deleted-playlist-successful-notification`. They pass rule 1's recurrence
-  test: each names its playlist, and the same playlist cannot succeed twice
-  inside one toast lifetime (a re-import hits the duplicate refusal, a
-  deleted playlist is gone), so repeats with identical copy cannot occur.
-  Only the import success has a reachable swallowing window today; the
-  delete success converts for uniformity under D1.
+  `deleted-playlist-successful-{code}`. Distinct playlists get distinct
+  keys, so back-to-back imports of different playlists stack — the reported
+  bug's fix. But these facts can recur for one subject: the supported
+  delete-then-re-import cycle can produce two byte-identical import
+  successes (or delete successes) inside one lifetime, and the delete
+  dialog itself promises re-import by share code. On recurrence the
+  subject-keyed replacement absorbs the repeat instead of stacking
+  duplicates. Key by the canonical stored code, never the pasted input,
+  which can differ in case.
 - Convert to single-id channel toasts (rule 2), pending D2: the three
   per-action failure toasts, the two refusal toasts,
   `superseded-cleanup-successful-notification`, and
@@ -221,8 +240,8 @@ see Out of scope.
   with byte-identical repeats (spam-clicking Refresh with no username
   stacks identical blue toasts), so it moves to a stable channel id under
   the same test.
-- Restructure the rank-refresh family (rule 2's two keying clauses), pending
-  D2. The two failure outcomes merge into one attempt-slot channel
+- Restructure the rank-refresh family (rule 2's lane and keying clauses),
+  pending D2. The two failure outcomes merge into one attempt-slot channel
   (proposed id `rank-refresh-problem`; toast ids are internal, so the
   rename is free): they already share the title "Position refresh failed"
   and differ only in payload (red "Couldn't refresh — position unchanged."
@@ -313,13 +332,13 @@ block must then be amended with the exact copy before implementation.
 ## Delivery plan
 
 - **PR 1 (this PR):** the proposal.
-- **PR 2 (implementation, after D1/D2 are ruled):** the three event-toast id
-  conversions, the seven single-id channel conversions, the rank-refresh
-  restructuring (merged problem channel and subject-keyed success channel),
-  the per-channel lifetime store, the success-clears-failure wiring, test
-  updates, the spec additions above, and the proposal-shipping checklist
-  including deleting this file. Single small PR; no dependency beyond
-  ratification.
+- **PR 2 (implementation, after D1/D2 are ruled):** the four subject-keyed
+  channel conversions (three playlist successes keyed by canonical code,
+  refresh success keyed by scenario), the seven single-id channel
+  conversions, the merged rank problem channel, the per-channel lifetime
+  store, the success-clears-failure wiring, test updates, the spec
+  additions above, and the proposal-shipping checklist including deleting
+  this file. Single small PR; no dependency beyond ratification.
   Kickoff prompt recommendation per convention: Opus 5 at effort high — the
   changes are mechanical id and wiring edits with a test tail, and added
   model capability beyond that would not change the outcome.
@@ -329,8 +348,10 @@ block must then be amended with the exact copy before implementation.
 - This PR: `tests/test_docs.py` gates the Status line, section order, and
   link integrity.
 - Implementation PR: update the tests that assert the fixed toast ids;
-  regression-test that two successive import successes emit toasts with
-  distinct ids (the reported bug); assert the failure and refusal paths emit
+  regression-test that imports of two different playlists emit toasts with
+  distinct subject keys (the reported bug) while an import, delete, and
+  re-import of one playlist re-emits the same subject-keyed id (replacement,
+  not a stack); assert the failure and refusal paths emit
   `upsert_toast`'s update+show pair and bump their own channel's sequence;
   regression-test the interleaving case (channel A, channel B, channel A
   again — A's second emission must carry a different `autoClose` than its
