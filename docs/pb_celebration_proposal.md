@@ -94,12 +94,16 @@ ownership.
 
 Status: Ratified (2026-08-25)
 
-**Decision: yes, on the celebration toast only.** When
-celebrations are on, a personal best run's one toast is the celebration
-toast ("New personal best"), and the page's run toast yields to it. When
-celebrations are Off, the page's run-toast policy is unchanged: the threshold
-verdict headlines when there is one, a placement otherwise, and a personal
-best has no toast of its own, as today.
+**Decision: yes, on the celebration toast only.** When celebrations are
+on, the celebrated run's one toast is the celebration toast ("New personal
+best"), and the page's run toast yields to it. A personal best the drain
+does not celebrate (an older qualifying run coalesced out of the batch, or
+one outside the selected scenario with auto-switch off) follows the
+ordinary run-toast rules: narrated when it is the batch's latest matching
+run, plot-only otherwise, as such runs are today. When celebrations are
+Off, the page's run-toast policy is unchanged: the threshold verdict
+headlines when there is one, a placement otherwise, and a personal best
+has no toast of its own, as today.
 
 Today a personal best has no toast of its own; the threshold verdict
 headlines when there is one, and a placement otherwise. The score threshold
@@ -167,17 +171,19 @@ Status: Ratified (2026-08-25)
 **Decision: no. The two settings are independent families.**
 
 The style select governs the confetti and the celebration toast together;
-the master switch governs the verdict, placement, and catch-up toasts. With
-the celebration set to a style and the master switch off, a personal best
-still gets confetti and its "New personal best" toast on every page; ordinary
-runs stay silent. The toast travels with the animation because it is the
-part that carries information (which scenario, what score, by how much); on
-a page other than Scenario Performance, confetti without it is a burst with
-no explanation, and under reduced motion the toast is the whole celebration.
-The master switch's shipped help text enumerates the three shapes it gates,
-so a fourth family outside that list breaks no promise, and a user in the
-off-plus-style state has asked for two things at once: no narration of
-routine runs, and a celebration of personal bests. `product.md` currently
+the master switch governs the verdict and placement toasts (it once gated
+the catch-up digest too, which D9 retires). With the celebration set to a
+style and the master switch off, a personal best still gets confetti and
+its "New personal best" toast on every page; ordinary runs stay silent.
+The toast travels with the animation because it is the part that carries
+information (which scenario, what score, by how much); on a page other
+than Scenario Performance, confetti without it is a burst with no
+explanation, and under reduced motion the toast is the whole celebration.
+The switch's shipped help text becomes false under D9 and this ruling, so
+Copy carries its staged replacement, whose final text names both families
+explicitly ("Personal best celebrations use their own setting."); a user
+in the off-plus-style state has asked for two things at once: no
+narration of routine runs, and a celebration of personal bests. `product.md` currently
 summarizes the switch as "with it off the chart still updates and nothing
 toasts about a run"; the ruling amends that sentence to except the
 celebration toast, in the same edit D4 makes to the paragraph.
@@ -246,8 +252,11 @@ suppression would need exactly the client-liveness bookkeeping this
 design retired. The digest is removed rather than kept as a
 rare special case: `docs/product.md` and `docs/specs/notifications.md`
 shrink accordingly in the delivery plan. A backlog that does arrive
-rebuilds the graph once, silently; the plot is the record, and only a
-fresh latest run earns a toast.
+rebuilds the graph once and follows the per-run rules in Design: a run
+the drain celebrated gets the celebration toast (recent no-tab replay
+included, per the bounded-replay line above), the latest matching run
+gets its ordinary toast when stamped live, and everything else is the
+plot's job — up to two toasts, never a digest.
 
 The same ruling supersedes the 2026-08-21 master-switch decision-log
 entry's deferral of the queue-to-UI redesign, for the drain alone: four
