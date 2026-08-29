@@ -18,8 +18,9 @@ one confetti effect, and a follow-up adds a choice of styles.
 The maintainer ruled on 2026-08-25, after three review rounds: D1 through
 D8 are ratified, D6 as a staged compromise and D8 with a post-ship
 observation in place of pre-ship evidence. A further ruling on 2026-08-29
-pivoted the delivery mechanism to a single drain and retired the catch-up
-digest (D9); every earlier ruling stands.
+pivoted the delivery mechanism to a single drain, retired the catch-up
+digest (D9), and cleaned the run message schema to facts; every earlier
+ruling stands.
 
 ### D1 — Does the celebration fire on every page, for every scenario?
 
@@ -285,7 +286,10 @@ Repository, at `main` as of 2026-08-21:
   the watchdog; strictly greater, scenario-wide
   (`get_high_score(scenario)`). A scenario's first run (Case 1) and a
   sensitivity's first run (Case 2) both enqueue with
-  `previous_high_score=None`; Case 2 can be a scenario personal best.
+  `previous_high_score=None`; Case 2 can be a scenario personal best. The
+  field therefore plays a dual role today: scenario-wide denominator in
+  Case 3, and, through its Case 2 `None`, the signal that a run cannot be
+  judged — the bundling the schema cleanup in Design unbundles.
 - `NewFileMessage` carries `datetime_created`, so freshness is measurable
   without adding a field. The watchdog handler has the run CSV's path in
   hand at all three message construction sites.
@@ -366,29 +370,43 @@ Upstream demo recipes, from the `gh-pages` branch:
 
 ## Design
 
-**The event.** One queue, `message_queue`, as today; no second channel.
-`NewFileMessage` gains three fields, set at all three construction sites:
-`run_id` (the run CSV's file name: unique per run, already in hand where
-the messages are built, and the identity a celebration decision names), an
-explicit `is_new_high_score: bool`, and `scenario_previous_best:
-float | None` (the watchdog's scenario-wide high score before this run;
-`None` on Case 1, whose first run has nothing to beat). The flag is
-computed against the scenario-wide high score and can only be true in
-Cases 2 and 3; Case 1 carries it as False and never celebrates. The
-existing per-sensitivity `previous_high_score` is untouched;
-`scenario_previous_best` exists so the celebration toast keeps its
-percentage without a second event type. The page's `RunEventData` carries
-the new fields through. The rank refresh keeps its current trigger; the
-celebration is not coupled to a network call.
+**The event.** One queue, `message_queue`, as today; no second channel,
+and no decision fields: the message carries facts, and only the drain
+decides (see "The toast"). `NewFileMessage.previous_high_score` is
+replaced by two fact fields, set at all three construction sites:
+`scenario_previous_best: float | None`, the scenario-wide best before
+this run (`None` only when the scenario has no prior run, Case 1; the
+name keeps "previous" because after the run the scenario high score is
+the new score, and an unqualified name would invite that wrong reading),
+and `is_new_sensitivity: bool`, whether the run is the first at its
+sensitivity (True in Cases 1 and 2, the existing Case 2 branch
+condition; False in Case 3). `run_id` (the run CSV's file name: unique
+per run, already in hand where the messages are built) joins them as the
+identity a celebration decision names. The old field's Case 2 `None`
+did two jobs at once, scenario-wide value and judge gate, which is
+exactly the dual role behind two review-round bugs; the split gives each
+consumer a derivation instead. The drain derives the celebration:
+`scenario_previous_best is not None and score > scenario_previous_best`,
+strict, so a tie never celebrates and a first run only sets the
+baseline, which is D5's ratified gate. The page's `_threshold_verdict`
+derives its gate: judge exactly when `not is_new_sensitivity and
+scenario_previous_best > 0`, with `scenario_previous_best` as the
+denominator. Behavior is byte-identical to today — Case 2 runs stay
+unjudged, ties stay silent, Case 1 only sets the baseline, and the
+nonpositive-denominator guard holds — so no spec change follows from the
+schema itself; `RunEventData` and the verdict path update in the same
+PR 1 lines. The rank refresh keeps its current trigger; the celebration
+is not coupled to a network call.
 
 **The consumer.** The drain moves to the app shell, which becomes the one
 consumer of `message_queue`. The shell hosts a `dcc.Interval`
 (`pb-celebration-interval`, period `config.polling_interval`), the batch
 store `run-events-batch` (a `dcc.Store`), and the style store described
 under Storage. On each tick the shell's drain callback empties the queue,
-decides the celebration for the batch — the newest live event whose
-`is_new_high_score` is set, with the style store read as `State`; Off
-means no celebration — and publishes one payload carrying the drained runs
+decides the celebration for the batch — the newest live event that beats
+its `scenario_previous_best` under the strict derivation in "The event",
+with the style store read as `State`; Off means no celebration — and
+publishes one payload carrying the drained runs
 in order plus the stamped decision: the celebrated `run_id` or none, a
 monotonic animation sequence, and the celebration toast's fields. The
 callback also emits the celebration toast (below). One decision per drain
@@ -487,7 +505,11 @@ ordering argument is the dependency graph, not a protocol: a page callback
 triggered by the batch store necessarily runs after the shell wrote the
 decision that payload carries, so the page can read the decision instead
 of racing it. There is no registry, no watermark, no deferral, and no
-second consumer of the queue to coordinate with.
+second consumer of the queue to coordinate with. The invariant, pinned by
+a contract test: facts travel, only the drain decides. The drain derives
+the celebration once and stamps it into the batch payload; the page reads
+the stamped decision and never re-derives a celebration from the raw
+fields.
 
 There is no catch-up digest (D9). A batch with several runs rebuilds the
 graph once, auto-switches once, and toasts at most once: the celebration
@@ -665,19 +687,20 @@ early return.
 
 ## Testing
 
-- Watchdog unit tests: Case 1 enqueues no celebration; Case 2 and Case 3
-  enqueue exactly one when the score strictly beats the previous high score
-  and none on a tie or a lower score; `is_new_high_score` is False on the
-  Case 1 message and true on Case 2 and Case 3 messages exactly when the
-  celebration event was enqueued, including a Case 2 message whose own
-  `previous_high_score` is `None`.
+- Watchdog unit tests: the fact fields are set correctly at all three
+  construction sites — `scenario_previous_best` is `None` on Case 1 and
+  the pre-run scenario-wide best on Cases 2 and 3, `is_new_sensitivity`
+  is True on Cases 1 and 2 and False on Case 3 — and the message carries
+  no decision field.
 - Shell drain tests: an empty queue publishes nothing; a batch produces
   one payload carrying the runs in order and the stamped decision; the
-  decision names the newest live personal best, or none when the style is
-  Off or no live personal best exists, and the older of two live personal
-  bests in one batch is never named; the sequence increments only when a
-  run is celebrated; the celebration toast is emitted exactly when the
-  decision names a run.
+  decision names the newest live run that strictly beats its
+  `scenario_previous_best`, or none when the style is Off or no such run
+  exists; a tie with the previous best is never named, a first run
+  (`scenario_previous_best` of `None`) is never named, and the older of
+  two qualifying runs in one batch is never named; the sequence
+  increments only when a run is celebrated; the celebration toast is
+  emitted exactly when the decision names a run.
 - Freshness tests: an event enqueued after the previous drain is live even
   when the gap is about 60 s (the throttled-drain boundary); an event
   older than the 120 s cap is not celebrated; the first drain after start
@@ -685,15 +708,22 @@ early return.
 - Contract tests: the celebration toast id differs from the run-verdict
   id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
   and its toast payload carries `autoClose` False on both actions of the
-  pair.
+  pair; the run message carries no decision field, and the page's toast
+  builder consults only the stamped decision, never re-deriving a
+  celebration from the raw fields.
 - Toast builder tests: the percentage message for a positive previous best;
   the fallback message for a previous best of zero and for a negative one.
+- Verdict-gate derivation tests: `_threshold_verdict` judges exactly when
+  `not is_new_sensitivity and scenario_previous_best > 0`, reproducing
+  today's behavior byte for byte — a Case 2 run is unjudged even when its
+  scenario has a high score, and the nonpositive-denominator guard holds
+  with `scenario_previous_best` as the denominator.
 - Scenario Performance tests beside the existing ones in
   `tests/test_home_run_events.py`: `check_for_new_data` consumes the
   batch store, forwards the decision, and auto-switches as before; a run
   the decision names yields (returns `None`) whatever its verdict,
-  including a Case 2 personal best whose per-sensitivity
-  `previous_high_score` is `None`; a run the decision does not name gets
+  including a Case 2 run (first at its sensitivity, scenario-wide best
+  beaten); a run the decision does not name gets
   today's toast, personal best or not; a multi-run batch produces no
   digest toast, at most the one toast the decision or the live latest run
   earns, and a stale backlog produces none; the master switch's early
