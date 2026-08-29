@@ -11,8 +11,10 @@ inline alerts are the palest yellow wash with no icons, so the surfaces that
 most need attention are the easiest to miss. This proposal adopts one
 severity scale — blue for information, yellow for caution, red for errors —
 rendered as a tinted background with a leading icon, and applies it to every
-inline notice including the setup card. Toasts and all user-facing wording
-stay exactly as they are.
+inline notice including the setup card. The one notice that today holds a
+button inside an alert component becomes a plain card with the same look, so
+screen readers stop being told a panel of controls is an alert. Toasts and
+all user-facing wording stay exactly as they are.
 
 ## Decisions needed
 
@@ -107,15 +109,22 @@ reason: a threshold pass is not an operation succeeding.
 
 ### Surface-by-surface changes
 
-- Every `dmc.Alert` gains an `icon`: `material-symbols:warning-outline` for
-  yellow, `material-symbols:info-outline` for blue. Both are already
-  vendored (toasts use the former, the Settings help tooltips the latter),
-  so no new assets. In a live render the icon was the dominant legibility
-  fix — more than any background change.
+- Every inline notice gains a leading `icon`:
+  `material-symbols:warning-outline` for yellow,
+  `material-symbols:info-outline` for blue. Both are already vendored
+  (toasts use the former, the Settings help tooltips the latter), so no
+  new assets. In a live render the icon was the dominant legibility fix —
+  more than any background change.
 - The journey work-in-progress banner becomes `color="blue"` with the info
   icon, deleting the hard-coded hex.
-- The leftover-files alert becomes blue per D3; the store alert and the
-  visibility alert stay yellow. All keep the default `light` variant.
+- The leftover-files surface becomes blue per D3 — and changes component:
+  it is a persistent notice holding a focusable button ("Delete leftover
+  files"), which the component rule below reserves for `dmc.Paper`. It
+  adopts the same blue anatomy classes as the setup card, keeping its ids,
+  callbacks, and hidden-class reveal mechanism verbatim, so its existing
+  behavior coverage carries over unchanged. The store alert and the
+  visibility alert stay yellow `dmc.Alert`s with the default `light`
+  variant.
 - The setup card keeps its `dmc.Paper` structure and gets the full alert
   anatomy: its tint lands in `assets/stylesheet.css` on the existing
   `.setup-card` class — background `var(--mantine-color-blue-light)` plus a
@@ -128,21 +137,30 @@ reason: a threshold pass is not an operation succeeding.
   color scheme, so dark mode needs no separate rules (verified in both
   schemes).
 
-### Why the setup card keeps its Paper
+### The component rule
 
-Rebuilding the card as a `dmc.Alert` was considered and rejected. The card
-borrows alert *anatomy* — tint, border accent, icon, colored title — but
-deliberately not the alert *component*, because the component carries
-semantics: Mantine renders `Alert`'s root with `role="alert"` (verified
-live on dmc 2.8.0; `Paper` carries no role). That ARIA role is an assertive
-live region meant for transient, time-sensitive messages, and the ARIA
+Which component a notice uses follows its content model, not its look. The
+constraint is semantic: Mantine renders `Alert`'s root with `role="alert"`
+(verified live on dmc 2.8.0; `Paper` carries no role), an assertive ARIA
+live region meant for brief, time-sensitive messages, and the ARIA
 Authoring Practices direct that an alert must not contain interactive
-elements — while this card exists precisely to hold two interactive
-controls (the "Open Settings" call to action and Skip) and to sit
-persistently at the top of the page. A component whose semantics we would
-immediately have to strip is the wrong starting point; the content model is
-a card with actions, so the component stays a card. The secondary cost is
-churn: the existing `.setup-card` styling and its structural tests
+elements. So:
+
+- A notice that is plain text — a message worth interrupting the user for
+  when it appears — is a `dmc.Alert`. The store alert, the visibility
+  alert, and the journey banner qualify: none holds a control, and for the
+  two that callbacks reveal, the assertive announcement is the point.
+- A notice that holds interactive controls or persists as a call to action
+  is a `dmc.Paper` wearing the alert anatomy through CSS. The setup card
+  qualifies (two controls, persistent), and so does the leftover-files
+  surface — today a `dmc.Alert` with a focusable delete button inside
+  `role="alert"`, an existing mismatch this proposal corrects rather than
+  repaints.
+
+Rebuilding the setup card as a `dmc.Alert` was considered and rejected
+under the same rule: a component whose semantics we would immediately have
+to strip is the wrong starting point. The secondary cost is churn — the
+existing `.setup-card` styling and its structural tests
 (`tests/test_home_setup_card.py`) assume the Paper layout, and a rebuild
 would rework both for no visual gain over CSS on the class the card
 already has. The card's action wiring itself (the CSS-styled CTA anchor,
@@ -177,9 +195,10 @@ of the in-flight app-wide messaging sweep.
 ## Delivery plan
 
 - PR 1: this proposal.
-- PR 2 (after D1–D3 are ruled): the implementation — icons and recolors on
-  the four alerts, the setup-card CSS and per-state icon, and the docs
-  definition of done across every affected spec:
+- PR 2 (after D1–D3 are ruled): the implementation — icons and recolors
+  across the five inline notices, the leftover-files conversion to the
+  shared Paper anatomy, the setup-card CSS and per-state icon, and the
+  docs definition of done across every affected spec:
   - Distill D1 into `decision_log.md` as the durable color-language entry.
   - State the shared scale in [specs/notifications.md](specs/notifications.md)
     (already the messaging-layer spec: it carries the routing policy and the
