@@ -174,6 +174,13 @@ supersedes the 2026-08-11 design note that seeded it; that note's one
 "carry-along fix" (the Home restart hint saying "the dashboard") has already
 shipped in `b288b9f` and is not repeated here.
 
+Re-verified against `16f9afd` (main, 2026-08-23) after the capability-spec
+pass and PR #253 merged. The one copy-bearing change was #253 deleting the
+playlist fill's two summary toasts (the 2026-08-22 in-place-only entry), so
+their Copy-block entries are gone and the counts below are restated for the
+new base; the fill's status-line strings survive unchanged and stay in the
+block.
+
 The same condition, four shapes, is the seed symptom:
 
 | Surface | Current text |
@@ -187,17 +194,17 @@ Only the first postdates the 2026-08-11 no-em-dash ruling and is already in
 the target style. Reading the whole surface found eight further kinds of
 drift, each small, together the "vibe-coded" feel:
 
-1. **Em dashes.** 25 sites. 23 join clauses in prose; 2 are typographic
+1. **Em dashes.** 23 sites. 21 join clauses in prose; 2 are typographic
    (the `—` empty-value glyph under Last played, ratified 2026-06-30, and
    the scenario/score separator in run-toast bodies).
 2. **Terminal punctuation.** Most sentences end with a period; the four
-   above and a handful of grid tooltips do not. Ten messages join two
+   above and a handful of grid tooltips do not. Nine messages join two
    sentences with a semicolon (an AST sweep of every non-docstring string
    constant under `source/` finds no others that reach the screen); one
    ends with an exclamation mark.
-3. **Contractions.** "Couldn't refresh", "Couldn't update", "can't read your
-   runs" beside "Could not save", "could not be checked", "cannot look one
-   up". Full forms are the majority by nine sites to four.
+3. **Contractions.** "Couldn't refresh", "can't read your runs" beside
+   "Could not save", "could not be checked", "cannot look one up". Full
+   forms are the majority by nine sites to three.
 4. **Ellipses, three ways.** `Keep grinding...` and every placeholder use
    three periods; the fill status uses the `…` character; one tooltip uses
    `, ...` inside parentheses, and the stats folder description elides a
@@ -209,7 +216,9 @@ drift, each small, together the "vibe-coded" feel:
 7. **Vocabulary.** "the dashboard" in the setup card against "this app" and
    "the app" on Settings and in every store message; "Stats directory" as a
    field label against "stats folder" in its own description and the setup
-   card; "served from cache" in toasts against "from cache" in status lines.
+   card. (A fourth split, "served from cache" in the fill toasts against
+  "from cache" in the status lines, resolved itself when #253 deleted the
+  toasts.)
 8. **Developer voice reaching the screen.** Import refusals and startup
    playlist warnings are built in `data_service.py` and shown verbatim:
    `Failed to load playlist data for playlist code: X`, `Invalid playlist
@@ -488,12 +497,11 @@ separate child.
   → ` · 5 from cache · KovaaK's unreachable`; `5 of 40 positions from cache —
   KovaaK's unreachable` → `5 of 40 positions from cache · KovaaK's
   unreachable`
-- Fill summary toast, incomplete: `Couldn't update 3 of 40 positions; 5 more
-  served from cache` → `Could not update 3 of 40 positions. 5 more are from
-  cache.`
-- Fill summary toast, stale: title `Positions served from cache` → `Cached
-  positions shown`; body `5 of 40 positions served from cache — KovaaK's was
-  unreachable` → `KovaaK's was unreachable. 5 of 40 positions are from cache.`
+- The fill's two summary toasts ("Position update incomplete" and
+  "Positions served from cache"), redlined in an earlier draft, were deleted
+  wholesale by PR #253 under the 2026-08-22 in-place-only ruling before this
+  proposal shipped; the status line above is now the fill's only report and
+  there is nothing left to reword.
 - Percentile header tooltip: `Your percentile on the scenario's global
   leaderboard — the share of players you place above (higher is better).` →
   `Your percentile on the scenario's global leaderboard: the share of players
@@ -567,9 +575,10 @@ docstrings (the first statement of a module, class, or function body), and
 fail on any `—` outside an explicit allowlist holding the one ratified glyph
 site. Comments never reach the AST, so the check cannot misfire on them.
 
-The guard covers the em dash only. Walking `source/` this way at `39f96d4`
-finds 24 non-docstring string constants containing `—`: the 23 Copy-block
-sites and the allowlisted glyph, and no log line or other non-UI string, so
+The guard covers the em dash only. Walking `source/` this way at `16f9afd`
+finds 23 non-docstring string constants containing `—` (24 occurrences; the
+Top N help text has two): the 22 Copy-block sites and the allowlisted glyph,
+and no log line or other non-UI string, so
 the gate passes the moment the Copy block ships and needs no UI-versus-log
 distinction it cannot make. The three-period ellipsis is deliberately not
 gated: the same walk finds it in the JavaScript spread operator inside a
@@ -632,18 +641,27 @@ contractions, and the renderers are review territory, not a gate.
    (source and AGENTS.md), the tests and AST guard, then the docs. The docs
    commit carries the full shipping checklist: the decision-log entry with
    the rules and their rationale, "superseded in part, for copy" notes on the
-   2026-08-03, 2026-08-09, 2026-08-11, and 2026-08-21 entries whose quoted
-   strings change, the `tech_debt.md` edit for the refresh-toast title, a
+   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-21, and 2026-08-22 entries
+   whose quoted strings change, the `tech_debt.md` edit for the
+   refresh-toast title, a
    `product.md` line, the roadmap milestone moved to Shipped, and the
    deletion of this file. The current-behavior docs that quote changed
    strings are updated in the same commit, because a spec that names the
-   old copy is wrong the moment the new copy ships:
-   `docs/specs/scenario_rank.md` (the unset-username status line, the three
-   Position hints under D1, and the refresh toast's title and body),
-   `docs/product.md` (the unset-username
-   status, the refresh toast, and the Run Notifications control name),
-   `docs/architecture.md` and `docs/roadmap.md` (the control names D2
-   renames), and the README wherever `rg` finds a changed string. No new
+   old copy is wrong the moment the new copy ships. The capability-spec
+   layer that landed 2026-08-22 quotes current strings throughout, so the
+   sweep runs `rg` for every changed string across `docs/specs/` and updates
+   each hit — today that is `scenario_rank.md` (the unset-username status
+   line, the three Position hints under D1, and the refresh toast's title
+   and body), `playlists.md` (the overview status lines, the import modal
+   title and toasts, the Show hidden phrasing, the percentile tooltip, and
+   the fill status lines), `settings.md` (the field label, the Steam ID
+   error, the save-failed status, and the detection copy),
+   `scenario_performance.md` and `notifications.md` (the control names D2
+   renames and the toast bodies) — plus `docs/product.md` (the
+   unset-username status, the refresh toast, and the Run Notifications
+   control name), `docs/architecture.md` and `docs/roadmap.md` (the control
+   names D2 renames), and the README wherever the same `rg` finds a changed
+   string. No new
    capability spec is created: app copy as a whole has no spec, and the
    strings that do live in one live in the spec of the capability they
    belong to. No hard dependency on other in-flight work. Under D5 it is
