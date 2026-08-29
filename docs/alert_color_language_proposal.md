@@ -140,32 +140,58 @@ reason: a threshold pass is not an operation succeeding.
 ### The component rule
 
 Which component a notice uses follows its content model, not its look. The
-constraint is semantic: Mantine renders `Alert`'s root with `role="alert"`
-(verified live on dmc 2.8.0; `Paper` carries no role), an assertive ARIA
-live region meant for brief, time-sensitive messages, and the ARIA
-Authoring Practices direct that an alert must not contain interactive
-elements. So:
+constraint is behavioral: Mantine renders `Alert`'s root with
+`role="alert"` — verified live on dmc 2.8.0, with no role override exposed
+by the wrapper, while `Paper` carries no role. Per
+[WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria-1.2/#alert) that role is an
+assertive, atomic live region for important, usually time-sensitive
+messages, and the
+[W3C Alert Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/alert/)
+describes what it does: a dynamically rendered alert is announced by
+assistive technology, keyboard focus never moves to it, and a workflow
+that genuinely requires a response belongs to the separate alert-dialog
+pattern.
+[MDN's `role=alert` guidance](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/alert_role)
+draws the practical consequences this rule applies: the role is for text
+content rather than interactive elements like links or buttons, and for
+content that appears dynamically rather than with the page. So:
 
-- A notice that is plain text — a message worth interrupting the user for
-  when it appears — is a `dmc.Alert`. The store alert, the visibility
-  alert, and the journey banner qualify: none holds a control, and for the
-  two that callbacks reveal, the assertive announcement is the point.
-- A notice that holds interactive controls or persists as a call to action
-  is a `dmc.Paper` wearing the alert anatomy through CSS. The setup card
-  qualifies (two controls, persistent), and so does the leftover-files
-  surface — today a `dmc.Alert` with a focusable delete button inside
+- A text-only notice may be a `dmc.Alert`. The store alert and the
+  visibility alert are revealed by callbacks when a store degrades, so the
+  assertive announcement is exactly right; the journey banner renders with
+  the page, where the role is inert and harmless on plain text.
+- A notice that holds interactive controls is a `dmc.Paper` wearing the
+  alert anatomy through CSS. The setup card is persistent initial-layout
+  content: `role="alert"` would buy no reliable announcement there and
+  would only mislabel a standing onboarding card as an urgent interruption
+  in the accessibility tree. The leftover-files surface is dynamically
+  revealed, so the role genuinely interrupts — the wrong politeness for
+  optional housekeeping — and the announcement carries only the text:
+  focus never moves and the delete button is not part of what the user
+  hears, so the interruption advertises an action it cannot present. That
+  surface is today a `dmc.Alert` with a focusable button inside
   `role="alert"`, an existing mismatch this proposal corrects rather than
-  repaints.
+  repaints. Should an interactive notice ever need announcing, the shape
+  is a separate polite status message — or an alert dialog for a workflow
+  that requires a response — never `role="alert"` around controls.
 
 Rebuilding the setup card as a `dmc.Alert` was considered and rejected
-under the same rule: a component whose semantics we would immediately have
-to strip is the wrong starting point. The secondary cost is churn — the
-existing `.setup-card` styling and its structural tests
-(`tests/test_home_setup_card.py`) assume the Paper layout, and a rebuild
-would rework both for no visual gain over CSS on the class the card
-already has. The card's action wiring itself (the CSS-styled CTA anchor,
-Skip's `allow_optional` mounting) would transfer into an Alert's children
-unchanged, so it is deliberately not the argument here.
+under the same rule — and since the wrapper cannot override the role,
+adopting the component would entrench the mislabel permanently, not
+merely start from the wrong place. The counterweights, recorded so the
+ruling is informed: Mantine's own `withCloseButton` renders a button
+inside `role="alert"`, so interactive content in alerts is
+ecosystem-common, and in a single-user local app the practical
+screen-reader harm today rounds to zero. Paper is still the right call
+because it is nearly free — the anatomy CSS must exist for the setup card
+regardless — with one real ongoing cost: the Paper anatomy tracks
+Mantine's Alert look by hand across upgrades. The secondary cost of a
+rebuild is churn — the existing `.setup-card` styling and its structural
+tests (`tests/test_home_setup_card.py`) assume the Paper layout, and a
+rebuild would rework both for no visual gain over CSS on the class the
+card already has. The card's action wiring itself (the CSS-styled CTA
+anchor, Skip's `allow_optional` mounting) would transfer into an Alert's
+children unchanged, so it is deliberately not the argument here.
 
 ### Copy
 
