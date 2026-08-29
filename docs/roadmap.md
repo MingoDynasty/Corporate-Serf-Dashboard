@@ -82,6 +82,13 @@ sequence.
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
+- **Personal best celebration** — confetti and a "New personal best" toast
+  when a run beats a scenario's personal best, on every page and for every
+  scenario, with a Settings-page switch to turn it off; a follow-up adds
+  a choice of styles.
+  The motivation layer the per-run verdict toast can't provide: the one
+  moment every run is chasing currently passes in silence. Design in
+  [`pb_celebration_proposal.md`](./pb_celebration_proposal.md).
 
 ---
 
