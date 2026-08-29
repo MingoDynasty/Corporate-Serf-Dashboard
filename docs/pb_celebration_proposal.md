@@ -520,8 +520,9 @@ re-forward a batch already processed. The callback also keeps
 Scenario Performance remounts the page against a retained store value,
 and a mount must not replay it — a caution this repo has already paid
 for once with `allow_duplicate` callbacks firing on initial load.
-`_build_run_event_notification` then never predicts anything: it considers only the batch's latest
-matching run, exactly the coalescing the page has today. When that run is
+`_build_run_event_notification` then never predicts anything: it
+considers only the batch's latest matching run, exactly the coalescing
+the page has today. When that run is
 the one the decision names, the page yields (returns `None`), because the
 celebration toast is that run's one notification (D4); when it is another
 run stamped live, the page narrates today's verdict or placement toast;
