@@ -183,10 +183,11 @@ The switch's shipped help text becomes false under D9 and this ruling, so
 Copy carries its staged replacement, whose final text names both families
 explicitly ("Personal best celebrations use their own setting."); a user
 in the off-plus-style state has asked for two things at once: no
-narration of routine runs, and a celebration of personal bests. `product.md` currently
-summarizes the switch as "with it off the chart still updates and nothing
-toasts about a run"; the ruling amends that sentence to except the
-celebration toast, in the same edit D4 makes to the paragraph.
+narration of routine runs, and a celebration of personal bests.
+`product.md` currently summarizes the switch as "with it off the chart
+still updates and nothing toasts about a run"; the ruling amends that
+sentence to except the celebration toast, in the same edit D4 makes to
+the paragraph.
 
 Choosing to let the master switch silence the celebration toast (or the
 whole celebration) reads the master-switch proposal's "do not toast me about
