@@ -22,23 +22,38 @@ success also clears the leftover failure message it answers.
 
 - **D1 — Adopt the event / channel / burst policy as the standing rule.**
   Recommended: yes, recorded in `docs/specs/notifications.md` so every future
-  toast picks its id pattern deliberately. Choosing differently means each new
-  toast re-litigates the choice ad hoc, which is how today's mixed inventory
-  (three patterns, no stated rule) came to be.
+  toast picks its id pattern deliberately. The classifier is two questions,
+  not copy inspection alone. First: can the reported fact recur inside one
+  toast lifetime? A fact that cannot recur is an event toast (unique id,
+  plain show, stacks, no sequence wiring). A fact that can recur is a
+  channel. Second: what is the channel's identity? A channel is keyed by its
+  subject when independent subjects can be in flight at once (a per-scenario
+  refresh), and all outcomes of one serial attempt slot share a single id
+  regardless of outcome flavor, so two contradictory claims about the same
+  latest attempt can never be on screen together. Choosing differently means
+  each new toast re-litigates the choice ad hoc, which is how today's mixed
+  inventory (three patterns, no stated rule) came to be.
 - **D2 — Toasts whose repeats can carry identical copy become
   replace-in-place (`upsert_toast`).** Recommended: convert the three
   per-action failure toasts (`imported-playlist-failed-notification`,
   `deleted-playlist-failed-notification`,
-  `superseded-cleanup-failed-notification`), the four refusal toasts
-  (`rank-refresh-failed`, `rank-refresh-stale`,
-  `visibility-refused-notification`,
+  `superseded-cleanup-failed-notification`), the two refusal toasts
+  (`visibility-refused-notification`,
   `setup-card-skip-refused-notification`), the constant-copy
   `superseded-cleanup-successful-notification`, and
   `rank-refresh-username-unset-{uuid}` (today a unique-id stacker whose
-  repeats are byte-identical) to the upsert pattern. These are the toasts
-  whose repeats can carry identical text — most because a user retries
-  against them (the failed-import modal deliberately keeps the pasted code
-  for a quick resubmit), and stacking identical toasts is the literature's
+  repeats are byte-identical) to single-id upsert channels. The rank-refresh
+  family gets the same treatment in its own shape: today's
+  `rank-refresh-failed` and `rank-refresh-stale` merge into one problem
+  channel whose payload carries the outcome (red hard-failure or yellow
+  served-stale), so one attempt's verdict always replaces the previous
+  attempt's instead of sitting beside it, and the green
+  `rank-refresh-notification-{uuid}` success becomes a channel keyed by
+  scenario, so re-refreshing the same scenario replaces its own toast while
+  refreshes of different scenarios still stack. These are the toasts whose
+  repeats can carry identical text — most because a user retries against
+  them (the failed-import modal deliberately keeps the pasted code for a
+  quick resubmit), and stacking identical toasts is the literature's
   documented anti-pattern. Ratifying D2 also ratifies its two supporting
   mechanics in Design: the per-channel lifetime sequence, without which a
   retry's timer restart silently fails whenever channels interleave, and
@@ -85,8 +100,8 @@ in use, each chosen locally without a stated rule:
   (`run-import-failure` batches a poll tick's failures into one message).
 
 So the codebase has already invented all three industry patterns; what it
-lacks is the rule for which one a new toast should use, and twelve toasts sit
-on the wrong side of that rule today.
+lacks is the rule for which one a new toast should use, and thirteen toasts
+sit on the wrong side of that rule today.
 
 ## Research
 
@@ -150,19 +165,26 @@ see Out of scope.
 
 **The policy (D1), as it would read in the notifications spec:**
 
-1. **Event toasts** — each emission reports a distinct user action's outcome
-   (an import, a delete). Unique id per emission (`-{uuid}` suffix), so
-   occurrences stack. Stacking is only legal when the copy distinguishes the
-   occurrences: the message must name its subject, and a toast whose repeats
-   can carry identical text (every retryable failure) is not an event toast —
-   it is a channel toast, rule 2.
+1. **Event toasts** — the reported fact cannot recur inside one toast
+   lifetime (an import success names a playlist that cannot import again
+   while its toast shows). Unique id per emission (`-{uuid}` suffix), plain
+   `show`, occurrences stack, and the emitting callback needs no sequence
+   wiring. The test is recurrence, not whether the copy names a subject: a
+   fact that can recur with identical text (a retryable failure, a repeated
+   same-subject success) is not an event toast — it is a channel toast,
+   rule 2.
 2. **Channel toasts** — the toast is the current state of one ongoing thing
-   (the latest run's verdict, the latest attempt's failure). One stable id,
-   replaced in place via `upsert_toast` so the timer restarts and the toast
-   stays up while its condition keeps recurring. When the operation behind a
-   failure channel also reports success, the success emission clears that
-   failure channel, so a stale failure never outlives the answer that
-   supersedes it.
+   (the latest run's verdict, the latest attempt's outcome). Replaced in
+   place via `upsert_toast` so the timer restarts and the toast stays up
+   while its condition keeps recurring. The channel's id is its identity:
+   keyed by subject when independent subjects can be in flight at once (one
+   channel per scenario for refresh successes), and one shared id for every
+   outcome flavor of the same serial attempt slot (hard-failure and
+   served-stale are one channel whose payload differs), so two contradictory
+   claims about the same latest attempt can never be on screen together.
+   When the operation behind a failure channel also reports success, the
+   success emission clears that failure channel, so a stale failure never
+   outlives the answer that supersedes it.
 3. **Burst toasts** — many same-type events where the aggregate is the
    message ("3 new run files could not be processed"). Fold into one summary
    carrying a count, and point at where the individual events are recorded.
@@ -172,33 +194,52 @@ see Out of scope.
 
 **Mechanical application to today's inventory:**
 
-- Convert to event toasts (rule 1), the `rank-refresh-notification-{uuid}`
-  pattern: the three success toasts whose copy names their subject —
+- Convert to event toasts (rule 1): the three playlist success toasts —
   `imported-playlist-successful-notification`,
   `imported-playlist-visibility-failed-notification` (the import did land;
   occurrences are distinct playlists), and
-  `deleted-playlist-successful-notification`. Their occurrences cannot
-  repeat with identical text: each names its playlist, and the same playlist
-  cannot succeed twice inside one toast lifetime. Only the import success
-  has a reachable swallowing window today; the delete success converts for
-  uniformity under D1.
-- Convert to channel toasts (rule 2), pending D2: the three per-action
-  failure toasts, the four refusal toasts,
+  `deleted-playlist-successful-notification`. They pass rule 1's recurrence
+  test: each names its playlist, and the same playlist cannot succeed twice
+  inside one toast lifetime (a re-import hits the duplicate refusal, a
+  deleted playlist is gone), so repeats with identical copy cannot occur.
+  Only the import success has a reachable swallowing window today; the
+  delete success converts for uniformity under D1.
+- Convert to single-id channel toasts (rule 2), pending D2: the three
+  per-action failure toasts, the two refusal toasts,
   `superseded-cleanup-successful-notification`, and
   `rank-refresh-username-unset-{uuid}`. The failures and refusals are
   retried — the failed-import modal deliberately keeps the pasted code for
   resubmission — and a retry of the same input reproduces the same message,
-  so they fail rule 1's distinguishability test; the toast instead reflects
-  the latest attempt's outcome, which the serial modal workflows make
+  so they fail rule 1's recurrence test; the toast instead reflects the
+  latest attempt's outcome, which the serial modal workflows make
   unambiguous. The cleanup success fails the same test differently: its
   title and message are constant ("Leftover files deleted" / "Deleted
   leftover playlist files."), and while a second cleanup inside one toast
-  lifetime is practically unreachable, the policy classifies by copy, not
-  by reachability — as a channel it needs no new copy and no observable
-  behavior changes. The username-unset toast is today's one uuid stacker
+  lifetime is practically unreachable, the policy classifies by what can
+  recur, not by likelihood — as a channel it needs no new copy and no
+  observable behavior changes. The username-unset toast is a uuid stacker
   with byte-identical repeats (spam-clicking Refresh with no username
   stacks identical blue toasts), so it moves to a stable channel id under
   the same test.
+- Restructure the rank-refresh family (rule 2's two keying clauses), pending
+  D2. The two failure outcomes merge into one attempt-slot channel
+  (proposed id `rank-refresh-problem`; toast ids are internal, so the
+  rename is free): they already share the title "Position refresh failed"
+  and differ only in payload (red "Couldn't refresh — position unchanged."
+  versus yellow "Couldn't refresh — showing the cached position."), and as
+  separate ids a hard failure followed by a served-stale retry leaves both
+  on screen making contradictory claims about the latest attempt. As one
+  channel, each attempt's verdict replaces the previous one by
+  construction. The green success toast becomes a subject-keyed channel
+  (id derived from the scenario, e.g. `rank-refresh-success-{scenario}`;
+  derivation must be a stable, collision-free function of the scenario
+  name — an implementation detail to pin in the kickoff): its copy is
+  byte-identical for repeats of the same scenario, so uuid stacking
+  violated rule 1, while different scenarios remain distinct facts that
+  stack. This preserves the original purpose of the uuid pattern — the
+  "done" cue on back-to-back refreshes survives, as a timer-restarting
+  replacement instead of a stack of duplicates. Existing strings are
+  carried unchanged; the merge introduces no new copy.
 - Per-channel lifetime state. `upsert_toast`'s timer restart works by
   alternating between two indistinguishable `autoClose` values, and Mantine
   re-arms only when the value differs from the one the toast is showing —
@@ -209,7 +250,9 @@ see Out of scope.
   store therefore becomes a dict keyed by notification id, `run-verdict`'s
   existing scalar usage migrates onto it so there is one mechanism, and
   each converting callback gains a State and an `allow_duplicate` Output on
-  that store. Accepted limitation: two concurrent callbacks can race the
+  that store. Subject-keyed channels put their dynamic ids in the same
+  dict; it grows by one small entry per subject seen in a session, which
+  is negligible for a per-client memory store. Accepted limitation: two concurrent callbacks can race the
   dict write and lose one bump, which degrades that single retry to today's
   no-restart behavior — rare, and never worse than the status quo.
 - Success clears the failure channel. A failure channel claims to show the
@@ -220,7 +263,7 @@ see Out of scope.
   hides `imported-playlist-failed-notification`, delete success hides
   `deleted-playlist-failed-notification`, cleanup success hides
   `superseded-cleanup-failed-notification`, and rank-refresh success hides
-  `rank-refresh-failed` and `rank-refresh-stale`. Mechanism note: in
+  the merged `rank-refresh-problem` channel. Mechanism note: in
   dash-mantine-components 2.8.0 hiding is not a `sendNotifications` action
   but the container's separate hide prop, whose effect runs after the send
   effect (the 2026-08-03 quiet-notification-layer decision-log entry records
@@ -232,10 +275,9 @@ see Out of scope.
   and success alike) would make two consecutive distinct successes replace
   each other, breaking rule 1 for the success toasts.
 - Keep unchanged: `run-verdict` (already rule 2, ratified),
-  `run-import-failure` (already rule 3), `steam-id-mismatch` and
+  `run-import-failure` (already rule 3), and `steam-id-mismatch` and
   `startup-playlist-warning-{n}` (rule 4 instances, the latter already
-  unique per warning), and `rank-refresh-notification-{uuid}` (already an
-  event toast with subject-naming copy).
+  unique per warning).
 - Spec work in the implementation PR: add the policy to
   `docs/specs/notifications.md` — listing `run-import-failure`'s cross-tick
   swallowing as an explicit accepted exception rather than implying the
@@ -272,8 +314,9 @@ block must then be amended with the exact copy before implementation.
 
 - **PR 1 (this PR):** the proposal.
 - **PR 2 (implementation, after D1/D2 are ruled):** the three event-toast id
-  conversions, the nine upsert conversions (or fewer, per D2), the
-  per-channel lifetime store, the success-clears-failure wiring, test
+  conversions, the seven single-id channel conversions, the rank-refresh
+  restructuring (merged problem channel and subject-keyed success channel),
+  the per-channel lifetime store, the success-clears-failure wiring, test
   updates, the spec additions above, and the proposal-shipping checklist
   including deleting this file. Single small PR; no dependency beyond
   ratification.
@@ -292,4 +335,8 @@ block must then be amended with the exact copy before implementation.
   regression-test the interleaving case (channel A, channel B, channel A
   again — A's second emission must carry a different `autoClose` than its
   first); assert each success path also hides its operation's failure
-  channel ids; run the standard five local gates.
+  channel ids; cover the rank family's new shape (a hard failure followed
+  by a served-stale retry emits the same channel id, two refreshes of one
+  scenario emit the same subject-keyed id while two scenarios emit
+  different ids, and a refresh success hides the problem channel); run the
+  standard five local gates.
