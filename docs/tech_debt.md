@@ -14,6 +14,66 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
+The seven entries below were established by the two 2026-08-12 audits, which
+hold the reproductions, soak measurements, and sequenced fix plans:
+`ignore/audits/engineering/2026-08-12-project-audit.md` and
+`ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
+(gitignored, main checkout only — deliberately not linked so a fresh clone's
+docs link check stays green). An eighth defect from the same corpus, the
+zero-score-PB `ZeroDivisionError` in the watchdog's log math, was fixed by
+PR #254.
+
+### Run files missed until restart on a single failed parse
+
+`source/my_watchdog/file_watchdog.py:136-146` — one fixed 1-second sleep, one
+parse attempt, no retry. A CSV still locked by KovaaK's or mid-write when the
+attempt fires raises a toast but is never imported until a restart rescans the
+directory. Both audits name this plus the sleep item below as the corpus's
+first fix PR, treating the two as one design problem (readiness detection plus
+bounded retry).
+
+### Fixed one-second handler sleep serializes ingestion
+
+`source/my_watchdog/file_watchdog.py:136` — every create event holds the
+handler thread for a full second, so bursts queue behind it: the 2026-08-12
+soak left 391 of 1,000 files unprocessed after a ten-minute adversarial burst
+plus settle. Fix together with the retry item above.
+
+### Startup loss window between the initial scan and the watchdog
+
+`source/app.py:369-386` — a run written after `initialize_kovaaks_data`
+finishes scanning but before `observer.start()` is never imported this
+session; the soak reproduced it with a synchronized arrival. Restart
+reconciles.
+
+### Duplicate create events double-count one logical run
+
+`source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
+duplicate create events and delete/recreate patterns for one logical run file
+import it twice (observed in the 2026-08-12 soak).
+
+### Invalid-UTF-8 cache bytes escape the tolerant read boundary
+
+`source/kovaaks/api_service.py:440-447` — `_read_json` catches `OSError` and
+`json.JSONDecodeError` but not `UnicodeDecodeError`, so corrupt cache bytes
+raise instead of reading as a miss; the soak run showed this can terminate
+startup. One-line guard.
+
+### Distinct usernames collide onto one cache path
+
+`source/kovaaks/api_service.py:468-472` — `_safe_cache_key` maps every
+non-alphanumeric character to `_`, so usernames like `a.b` and `a_b` share and
+overwrite each other's identity and rank caches (reproduced in the engineering
+audit).
+
+### Out-of-range port crashes with a raw traceback
+
+`source/config/config_service.py:37` accepts any `int` for `port`;
+`sock.bind()` then raises `OverflowError` for e.g. 70000, which the
+`except OSError` in `source/app.py:164-167` does not catch — the user gets a
+traceback instead of the curated startup error naming the setting (reproduced
+in the engineering audit).
+
 ## Code Smells
 
 ## Refactors
