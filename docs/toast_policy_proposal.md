@@ -197,10 +197,16 @@ see Out of scope.
    claims about the same latest attempt can never be on screen together.
    Success lanes and standing-condition lanes are their own channels, keyed
    by subject when independent subjects can be in flight at once (per
-   scenario, per playlist code). Lanes interact only through explicit
-   cross-clears: when the operation behind a problem lane reports success,
-   the success emission clears that problem channel, so a stale failure
-   never outlives the answer that supersedes it.
+   scenario, per playlist code). The mutual-exclusion clause is
+   deliberately problem-lane-only: success flavors of one operation (a
+   green full success and an orange partial success) may keep distinct
+   channels, accepting the narrow cross-flavor window a re-attempt can
+   open — do not re-litigate this when applying the rule to a new toast.
+   Lanes interact only through explicit cross-clears: when the operation
+   behind a problem lane reports success, the success emission clears that
+   problem channel — and any standing-condition channel the success
+   falsifies — so a stale claim never outlives the answer that supersedes
+   it.
 3. **Burst toasts** — many same-type events where the aggregate is the
    message ("3 new run files could not be processed"). Fold into one summary
    carrying a count, and point at where the individual events are recorded.
@@ -282,7 +288,10 @@ see Out of scope.
   hides `imported-playlist-failed-notification`, delete success hides
   `deleted-playlist-failed-notification`, cleanup success hides
   `superseded-cleanup-failed-notification`, and rank-refresh success hides
-  the merged `rank-refresh-problem` channel. Mechanism note: in
+  the merged `rank-refresh-problem` channel and the username-unset channel
+  (a success proves a username is configured, so the blue claim cannot
+  still stand — reachable when the user sets the username in Settings and
+  refreshes again inside one lifetime). Mechanism note: in
   dash-mantine-components 2.8.0 hiding is not a `sendNotifications` action
   but the container's separate hide prop, whose effect runs after the send
   effect (the 2026-08-03 quiet-notification-layer decision-log entry records
@@ -304,7 +313,11 @@ see Out of scope.
   pattern, and update every spec that owns a converting toast's behavior:
   the notifications, playlists, and rank specs, plus `docs/specs/settings.md`
   (its setup-card section owns the `setup-card-skip-refused-notification`
-  refusal semantics).
+  refusal semantics). The conversions supersede ratified clauses, so per
+  convention the old decisions stay and get supersession markers in
+  `docs/decision_log.md`: the 2026-08-03 entry's per-click-id
+  presentation-standard exception and its distinct-rank-ids rationale, and
+  the 2026-08-09 unset-username entry's per-click blue-toast clause.
 
 **Copy:** none under the recommended design. No user-facing string is added
 or edited; only notification ids and replacement/timer semantics change.
