@@ -63,8 +63,8 @@ startup. One-line guard.
 
 `source/kovaaks/api_service.py:468-472` — `_safe_cache_key` maps every
 non-alphanumeric character to `_`, so usernames like `a.b` and `a_b` share and
-overwrite each other's identity and rank caches (reproduced in the engineering
-audit).
+overwrite each other's total-play caches (merged and per-page) and rank caches
+(reproduced in the engineering audit).
 
 ### Out-of-range port crashes with a raw traceback
 
