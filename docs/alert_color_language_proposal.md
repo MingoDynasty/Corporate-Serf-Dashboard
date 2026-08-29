@@ -166,9 +166,11 @@ content that appears dynamically rather than with the page. So:
   would only mislabel a standing onboarding card as an urgent interruption
   in the accessibility tree. The leftover-files surface is dynamically
   revealed, so the role genuinely interrupts — the wrong politeness for
-  optional housekeeping — and the announcement carries only the text:
-  focus never moves and the delete button is not part of what the user
-  hears, so the interruption advertises an action it cannot present. That
+  optional housekeeping — and the interruption cannot act: the role is
+  atomic, so assistive technology reads the element's entire contents as
+  one message, but keyboard focus never moves to it and a live
+  announcement offers no direct interaction, leaving the user assertively
+  interrupted for an optional action they must then find by hand. That
   surface is today a `dmc.Alert` with a focusable button inside
   `role="alert"`, an existing mismatch this proposal corrects rather than
   repaints. Should an interactive notice ever need announcing, the shape
