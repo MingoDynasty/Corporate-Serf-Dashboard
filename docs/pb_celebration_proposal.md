@@ -237,8 +237,13 @@ Status: Ratified (2026-08-29)
 accumulate while the Scenario Performance page was closed. With the drain
 moved to the app shell (see Design), delivery is app-wide and continuous
 while any tab is open, so batches stop accumulating in the one case the
-digest served; what remains is the no-tab case, which the freshness rule
-already declines to replay. The digest is removed rather than kept as a
+digest served; what remains is the no-tab case, where the freshness cap
+draws the line: a personal best set within the cap of the next drain is
+celebrated on it, and anything older is never replayed. Bounded recent
+replay is accepted rather than suppressed, since a player who reopens the
+tab within two minutes of the run wants the celebration, and absolute
+suppression would need exactly the client-liveness bookkeeping this
+design retired. The digest is removed rather than kept as a
 rare special case: `docs/product.md` and `docs/specs/notifications.md`
 shrink accordingly in the delivery plan. A backlog that does arrive
 rebuilds the graph once, silently; the plot is the record, and only a
@@ -413,8 +418,10 @@ sequence, and the celebration toast's fields. The
 callback also emits the celebration toast (below). One decision per drain
 is a contract, not a convenience: a Dash callback returns one final value
 per output, so one response carries one payload and drives one animation.
-An older live personal best in the same batch is not celebrated; it falls
-through to the ordinary run-toast path, which "The toast" spells out.
+An older live personal best in the same batch is not celebrated; like
+every non-celebrated run it follows the page's existing latest-matching
+coalescing, so it is narrated only if it happens to be the batch's latest
+matching run, and is otherwise plot-only ("The toast" spells this out).
 
 Freshness needs no drain bookkeeping, because the drain-relative half is
 structural: every drain empties the queue, so any message a drain finds
@@ -422,9 +429,13 @@ was never seen by an earlier drain. There is no timestamp to compare and
 no watermark to keep, and a message appended while a drain is mid-pop is
 caught by that drain or the next one, exactly once either way. What
 remains is one wall-clock cap: a run is live if its `datetime_created` is
-within 120 s of the drain, an author-owned constant. The cap stops a
-queue that accumulated with no tab open from replaying old personal bests
-on the next visit, and 120 s sits two orders of magnitude above the
+within 120 s of the drain, an author-owned constant. The cap bounds
+no-tab replay rather than eliminating it: a queue that accumulated with
+no tab open replays nothing older than the cap on the next visit, while a
+personal best set within the cap still celebrates, which D9 accepts
+deliberately — the timestamp cannot tell a recent no-tab event from a
+throttled hidden tab's, and only the hidden tab's must land. 120 s sits
+two orders of magnitude above the
 default polling interval and comfortably above Chromium's intensive
 throttling, which slows a hidden tab's interval to about one tick per
 minute after roughly five minutes hidden — and the tab is occluded during
@@ -504,11 +515,17 @@ forwards the stamped decision and liveness with the summary. The
 auto-switch and the scenario dropdown move from `Input` to `State`: a
 queue pop was destructive, so a control-triggered rerun used to find
 nothing, but a Store replays its last value, and a control flip must not
-re-forward a batch already processed. `_build_run_event_notification`
-then never predicts anything: a run whose `run_id` the decision names
-yields (returns `None`), because the celebration toast is that run's one
-notification (D4); any other run stamped live narrates today's verdict or
-placement toast; a run stamped stale narrates nothing. The ordering
+re-forward a batch already processed. The callback also keeps
+`prevent_initial_call=True` for the same reason: navigating back to
+Scenario Performance remounts the page against a retained store value,
+and a mount must not replay it — a caution this repo has already paid
+for once with `allow_duplicate` callbacks firing on initial load.
+`_build_run_event_notification` then never predicts anything: it considers only the batch's latest
+matching run, exactly the coalescing the page has today. When that run is
+the one the decision names, the page yields (returns `None`), because the
+celebration toast is that run's one notification (D4); when it is another
+run stamped live, the page narrates today's verdict or placement toast;
+when it is stamped stale, the page narrates nothing. The ordering
 argument is the dependency graph, not a protocol: a page callback
 triggered by the batch store necessarily runs after the shell wrote the
 decision that payload carries, so the page can read the decision instead
@@ -528,9 +545,13 @@ backlogs included, is the plot's job. The contract is per run, never per
 batch: one batch can put two toasts on screen when the celebration and
 the page's narration concern different runs — a personal best in another
 scenario beside an ordinary live run in the selected one — and that is
-correct, because each toast reports its own run once. One personal best
-earns exactly one notification, on any page, in every interleaving there
-is, because only one callback ever decides. Rejected alternatives, from
+correct, because each toast reports its own run once. The guarantee is
+per run and one-sided: every run earns at most one notification, and the
+celebrated run exactly one, in every interleaving there is, because only
+one callback ever decides. A non-celebrated personal best has no
+guaranteed toast — an older qualifying run in the same batch, or a
+personal best outside the selected scenario with auto-switch off, is
+plot-only, as such runs already are today. Rejected alternatives, from
 the review history:
 two independent drains coordinated by a shared toast id, by a page-side
 freshness window, by a celebrated-run registry, or by a registry plus a
@@ -616,6 +637,14 @@ following the house rules: short sentences, no em dashes.
   previous best to two decimals, percentage to one, matching the run toasts.
   Green, with a trophy icon vendored into `assets/icons/` under the existing
   license table.
+
+- The Run Notifications switch's help text, made false by D9 (no more
+  catch-up toasts) and D7 (master off no longer means a silent chart), is
+  edited in two stages. PR 1, with the digest removal: "Controls threshold
+  verdict and placement notifications for your runs." PR 2, when the
+  celebration setting exists, appends: "Personal best celebrations use
+  their own setting." The final text is both sentences; a test pins the
+  string in each PR.
 
 The existing run toast bodies keep their em dashes; they belong to the
 deferred all-messaging review.
@@ -718,8 +747,10 @@ early return.
   emitted exactly when the decision names a run.
 - Freshness tests: a run about 60 s old at the drain (the throttled-tick
   boundary) is still live; a run older than the 120 s cap is not; a
-  message appended while a drain is popping is seen exactly once, by that
-  drain or the next; every run in the payload carries a liveness stamp.
+  no-tab backlog younger than the cap celebrates on the first drain and
+  one older does not (D9's bounded-replay line); a message appended while
+  a drain is popping is seen exactly once, by that drain or the next;
+  every run in the payload carries a liveness stamp.
 - Contract tests: the celebration toast id differs from the run-verdict
   id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
   and its toast payload carries `autoClose` False on both actions of the
@@ -740,16 +771,22 @@ early return.
   change alone forwards nothing, because both are `State`; a run the
   decision names yields (returns `None`) whatever its verdict, including
   a Case 2 run (first at its sensitivity, scenario-wide best beaten); a
-  run the decision does not name gets today's toast when stamped live and
-  nothing when stamped stale; a multi-run batch produces no digest toast;
-  a mixed batch, celebrated run in another scenario beside a live
-  ordinary run in the selected one, shows both toasts, one per run; the
-  master switch's early return precedes the yield, so master off is
-  silent whether or not the run was celebrated (D7). Together these pin
+  latest matching run the decision does not name gets today's toast when
+  stamped live and nothing when stamped stale; an older qualifying
+  personal best coalesced out of the summary is plot-only, pinned in the
+  mixed-PB batch case; a multi-run batch produces no digest toast; a
+  mixed batch, celebrated run in another scenario beside a live ordinary
+  run in the selected one, shows both toasts, one per run; a remount of
+  the page against a retained store value forwards nothing
+  (`prevent_initial_call`, plus the known initial-load duplicate-callback
+  hazard); the master switch's early return precedes the yield, so master
+  off is silent whether or not the run was celebrated (D7). Together these pin
   the one-notification-per-run invariant, which holds by construction:
   one callback decides.
 - Callback-level checks through a direct POST to `/_dash-update-component`,
   the established way to exercise shell-level outputs here.
+- Copy tests: the Run Notifications help text equals the PR 1 string
+  after the digest removal and the two-sentence final string after PR 2.
 - Docs gate: `tests/test_docs.py` for the proposal's section order and
   links.
 - Manual: with the app running, the Preview button plays the effect and
