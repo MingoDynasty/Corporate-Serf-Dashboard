@@ -45,7 +45,7 @@ Low stakes either way; listed because it re-colors a shipped surface.
 
 The app's message surfaces split into two layers. Toasts are consistent:
 every payload already carries an outcome color (red failure, green success,
-yellow warning, blue information) and an icon, per
+orange partial success, yellow warning, blue information) and an icon, per
 [specs/notifications.md](specs/notifications.md). Inline notices are not:
 each one chose its look ad hoc, and the result is uniformly faint. The
 current inventory, verified by rendering every surface live with dmc 2.8.0 in
@@ -87,10 +87,16 @@ One scale for every notice, inline and toast alike:
 | Yellow | Warning: a choice is silently not applying, or a degraded state needs the user | Store alert, visibility alert, below-threshold verdict |
 | Red | Error: an operation failed | Run-import failure, refresh failure, refused writes |
 | Green | Success | Run verdicts, playlist action confirmations |
+| Orange | Partial success: the action committed but a follow-up write failed | The "Playlist imported — not shown" split outcome |
 
-The toast layer already conforms; this proposal brings the inline layer to
-the same scale. Green stays toast-only — no inline success panel exists, and
-none is added.
+The toast layer already speaks this scale, orange included: the one orange
+toast is the committed-side-effect split outcome, deliberately neither a
+plain success nor a warning about the import itself
+([2026-08-02](decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)),
+and it stays a distinct severity rather than being folded into yellow. This
+proposal brings the inline layer to the same scale. Green and orange stay
+toast-only — no inline success or split-outcome panel exists, and none is
+added.
 
 ### Surface-by-surface changes
 
@@ -149,11 +155,24 @@ of the in-flight app-wide messaging sweep.
 
 - PR 1: this proposal.
 - PR 2 (after D1–D3 are ruled): the implementation — icons and recolors on
-  the four alerts, the setup-card CSS, and the docs definition of done:
-  update the two [specs/playlists.md](specs/playlists.md) statements that
-  name alert colors, distill D1 into `decision_log.md` as the durable
-  color-language entry with the specs linking it, and delete this file. No
-  dependencies on other in-flight work. A kickoff prompt for the
+  the four alerts, the setup-card CSS, and the docs definition of done
+  across every affected spec:
+  - Distill D1 into `decision_log.md` as the durable color-language entry.
+  - State the shared scale in [specs/notifications.md](specs/notifications.md)
+    (already the messaging-layer spec: it carries the routing policy and the
+    toast color inventory), linking the new entry.
+  - Update the two [specs/playlists.md](specs/playlists.md) statements that
+    name alert colors.
+  - Add the new presentation to the statements that describe the recolored
+    surfaces where their owning specs already describe them: the store
+    alert in [specs/settings.md](specs/settings.md) and the setup card in
+    [specs/scenario_performance.md](specs/scenario_performance.md).
+  - The Aim Training Journey page is explicitly work in progress and has no
+    capability spec, so its banner is recorded only by the shared-scale
+    section until that page ships.
+  - Delete this file.
+
+  No dependencies on other in-flight work. A kickoff prompt for the
   implementing agent is authored once the decisions are ruled.
 
 ## Testing
