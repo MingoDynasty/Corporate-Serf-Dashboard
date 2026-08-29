@@ -12,9 +12,10 @@ second import failed. A survey of design systems, UX literature, and
 production apps converged on one decision rule: distinct actions get separate
 stacked toasts, updates to one ongoing thing replace each other in place, and
 bursts of the same event fold into one summary. This proposal adopts that rule
-as the app's standing toast policy, converts the seven per-action toasts to
-stack, and gives the four refusal toasts replace-in-place semantics so a
-repeated click always gets a visible answer.
+as the app's standing toast policy, splitting the per-action toasts along a
+simple line: successes stack as separate toasts, while failures and refusals
+replace their previous toast in place, so a retry keeps the answer on screen
+instead of being silently dropped.
 
 ## Decisions needed
 
@@ -23,17 +24,31 @@ repeated click always gets a visible answer.
   toast picks its id pattern deliberately. Choosing differently means each new
   toast re-litigates the choice ad hoc, which is how today's mixed inventory
   (three patterns, no stated rule) came to be.
-- **D2 — Refusal toasts become replace-in-place (`upsert_toast`).**
-  Recommended: convert `rank-refresh-failed`, `rank-refresh-stale`,
-  `visibility-refused-notification`, and
-  `setup-card-skip-refused-notification` to the upsert pattern, so a repeat
-  attempt visibly restarts the toast instead of being silently swallowed.
-  Alternatives: keep the stable ids (status quo — a retry inside the 8 s
-  window gets no visible answer, the same dead-UI failure the import bug
-  exhibits, just narrower), or stack them with unique ids (stacks
-  identical-text toasts, the literature's documented anti-pattern). This is
-  the one genuinely contested call; the seven event-toast conversions in the
-  Design section follow from D1 directly.
+- **D2 — Failure and refusal toasts become replace-in-place
+  (`upsert_toast`).** Recommended: convert the three per-action failure
+  toasts (`imported-playlist-failed-notification`,
+  `deleted-playlist-failed-notification`,
+  `superseded-cleanup-failed-notification`) and the four refusal toasts
+  (`rank-refresh-failed`, `rank-refresh-stale`,
+  `visibility-refused-notification`,
+  `setup-card-skip-refused-notification`) to the upsert pattern. These are
+  the toasts a user retries against — the failed-import modal deliberately
+  keeps the pasted code for a quick resubmit — so a repeat can carry
+  byte-identical text, and stacking identical toasts is the literature's
+  documented anti-pattern. Be clear-eyed about what upsert delivers: the
+  replacement restarts the 8 s timer, but at the moment of the click nothing
+  visibly changes — no re-animation, no new text. The honest claim is an
+  invariant, not an animation: while the user keeps retrying, the answer
+  stays on screen, where the status quo lets it vanish mid-retry or drops
+  the retry's answer entirely. If stronger per-click feedback is wanted, the
+  alternative is distinguishing copy — an attempt count such as "(attempt
+  2)" appended on repeat — which buys a visible mutation at the cost of new
+  user-facing strings (a Copy block) and per-callback attempt state; not
+  recommended, but it is a real option and the material difference is
+  exactly that visibility. Keeping the stable ids (status quo) remains the
+  do-nothing alternative: a retry inside the 8 s window then gets no answer
+  at all, the same dead-UI failure the import bug exhibits. The success-side
+  conversions in the Design section follow from D1 directly.
 
 ## Problem
 
@@ -62,7 +77,7 @@ in use, each chosen locally without a stated rule:
   (`run-import-failure` batches a poll tick's failures into one message).
 
 So the codebase has already invented all three industry patterns; what it
-lacks is the rule for which one a new toast should use, and seven toasts sit
+lacks is the rule for which one a new toast should use, and eleven toasts sit
 on the wrong side of that rule today.
 
 ## Research
@@ -129,11 +144,14 @@ see Out of scope.
 
 1. **Event toasts** — each emission reports a distinct user action's outcome
    (an import, a delete). Unique id per emission (`-{uuid}` suffix), so
-   occurrences stack; the message must name its subject so stacked toasts are
-   distinguishable.
+   occurrences stack. Stacking is only legal when the copy distinguishes the
+   occurrences: the message must name its subject, and a toast whose repeats
+   can carry identical text (every retryable failure) is not an event toast —
+   it is a channel toast, rule 2.
 2. **Channel toasts** — the toast is the current state of one ongoing thing
-   (the latest run's verdict). One stable id, replaced in place via
-   `upsert_toast` so the timer restarts and the payload visibly changes.
+   (the latest run's verdict, the latest attempt's failure). One stable id,
+   replaced in place via `upsert_toast` so the timer restarts and the toast
+   stays up while its condition keeps recurring.
 3. **Burst toasts** — many same-type events where the aggregate is the
    message ("3 new run files could not be processed"). Fold into one summary
    carrying a count, and point at where the individual events are recorded.
@@ -144,34 +162,45 @@ see Out of scope.
 **Mechanical application to today's inventory:**
 
 - Convert to event toasts (rule 1), the `rank-refresh-notification-{uuid}`
-  pattern: `imported-playlist-successful-notification`,
-  `imported-playlist-visibility-failed-notification`,
-  `imported-playlist-failed-notification`,
-  `deleted-playlist-successful-notification`,
-  `deleted-playlist-failed-notification`,
-  `superseded-cleanup-successful-notification`,
-  `superseded-cleanup-failed-notification`. Only the import trio has a
-  reachable swallowing window today (delete and cleanup sit behind
-  per-action modals); the other four convert for uniformity under D1.
-- Convert to channel toasts (rule 2), pending D2: the four refusal toasts.
-  Their repeat message is always identical, so stacking is wrong and
-  swallowing is the dead-UI hazard; upsert restarts the 8 s timer on every
-  attempt. Wiring cost: each converting callback gains a State and an
-  `allow_duplicate` Output on the shared `toast-lifetime-sequence` store that
-  `upsert_toast`'s duration alternation requires — the same wiring
-  `generate_graph` already carries.
+  pattern: the four success-family toasts
+  `imported-playlist-successful-notification`,
+  `imported-playlist-visibility-failed-notification` (the import did land;
+  occurrences are distinct playlists),
+  `deleted-playlist-successful-notification`, and
+  `superseded-cleanup-successful-notification`. Their occurrences cannot
+  repeat with identical text: an import or delete success names its
+  playlist, the same playlist cannot succeed twice in a window, and a second
+  cleanup requires a new conflict to appear first. Only the import success
+  has a reachable swallowing window today; the others convert for uniformity
+  under D1.
+- Convert to channel toasts (rule 2), pending D2: the three per-action
+  failure toasts and the four refusal toasts. A failure is retried — the
+  failed-import modal deliberately keeps the pasted code for resubmission —
+  and a retry of the same input reproduces the same message, so these fail
+  rule 1's distinguishability test; the toast instead reflects the latest
+  attempt's outcome, which the serial modal workflows make unambiguous.
+  Upsert restarts the 8 s timer on every attempt (see D2 for the honest
+  scope of that feedback). Wiring cost: each converting callback gains a
+  State and an `allow_duplicate` Output on the shared
+  `toast-lifetime-sequence` store that `upsert_toast`'s duration alternation
+  requires — the same wiring `generate_graph` already carries.
 - Keep unchanged: `run-verdict` (already rule 2, ratified),
   `run-import-failure` (already rule 3), `steam-id-mismatch` and
   `startup-playlist-warning-{n}` (rule 4 instances, the latter already
   unique per warning), and the two already-uuid refresh toasts.
 - Spec work in the implementation PR: add the policy to
   `docs/specs/notifications.md`, re-annotate the inventory rows with their
-  pattern, and touch the affected rows' id spellings (`-{uuid}` suffixes) in
-  the notifications, playlists, and rank specs.
+  pattern, and update every spec that owns a converting toast's behavior —
+  the notifications, playlists, and rank specs, plus `docs/specs/settings.md`
+  (its setup-card section owns the `setup-card-skip-refused-notification`
+  refusal semantics).
 
-**Copy:** none. No user-facing string is added or edited; only notification
-ids and replacement/timer semantics change. (Stated explicitly because the
-copy-block convention requires proposals to gather any strings they touch.)
+**Copy:** none under the recommended design. No user-facing string is added
+or edited; only notification ids and replacement/timer semantics change.
+(Stated explicitly because the copy-block convention requires proposals to
+gather any strings they touch.) The one path that would change this is D2's
+attempt-count alternative: choosing it introduces new strings, and this
+block must then be amended with the exact copy before implementation.
 
 ## Out of scope
 
@@ -192,10 +221,11 @@ copy-block convention requires proposals to gather any strings they touch.)
 ## Delivery plan
 
 - **PR 1 (this PR):** the proposal.
-- **PR 2 (implementation, after D1/D2 are ruled):** the seven id
-  conversions, the four upsert conversions (or fewer, per D2), test updates,
-  the spec additions above, and the proposal-shipping checklist including
-  deleting this file. Single small PR; no dependency beyond ratification.
+- **PR 2 (implementation, after D1/D2 are ruled):** the four event-toast id
+  conversions, the seven upsert conversions (or fewer, per D2), test
+  updates, the spec additions above, and the proposal-shipping checklist
+  including deleting this file. Single small PR; no dependency beyond
+  ratification.
   Kickoff prompt recommendation per convention: Opus 5 at effort high — the
   changes are mechanical id and wiring edits with a test tail, and added
   model capability beyond that would not change the outcome.
@@ -205,7 +235,7 @@ copy-block convention requires proposals to gather any strings they touch.)
 - This PR: `tests/test_docs.py` gates the Status line, section order, and
   link integrity.
 - Implementation PR: update the tests that assert the fixed toast ids;
-  regression-test that two successive imports emit toasts with distinct ids
-  (the reported bug); assert the refusal paths emit `upsert_toast`'s
-  update+show pair and bump the lifetime sequence; run the standard five
-  local gates.
+  regression-test that two successive import successes emit toasts with
+  distinct ids (the reported bug); assert the failure and refusal paths emit
+  `upsert_toast`'s update+show pair and bump the lifetime sequence; run the
+  standard five local gates.
