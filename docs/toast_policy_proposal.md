@@ -14,10 +14,10 @@ stacked toasts, updates to one ongoing thing replace each other in place, and
 bursts of the same event fold into one summary. This proposal adopts that rule
 as the app's standing toast policy. The classifying test is recurrence: every
 toast is keyed to the thing it reports, and a report that can happen again
-while its toast is still up replaces that toast in place, so a retry keeps
-its answer on screen instead of being silently dropped. Reports about
-different subjects still stack side by side, and a success also clears the
-leftover failure message it answers.
+while its toast is still up replaces that toast with a visible re-entry, so
+a retry pops its answer back onto the screen instead of being silently
+dropped. Reports about different subjects still stack side by side, and a
+success also clears the leftover failure message it answers.
 
 ## Decisions needed
 
@@ -42,7 +42,7 @@ leftover failure message it answers.
   re-litigates the choice ad hoc, which is how today's mixed inventory
   (three patterns, no stated rule) came to be.
 - **D2 — Toasts whose repeats can carry identical copy become
-  replace-in-place (`upsert_toast`).** Recommended: convert the three
+  replace-in-place channels.** Recommended: convert the three
   per-action failure toasts (`imported-playlist-failed-notification`,
   `deleted-playlist-failed-notification`,
   `superseded-cleanup-failed-notification`), the two refusal toasts
@@ -50,7 +50,7 @@ leftover failure message it answers.
   `setup-card-skip-refused-notification`), the constant-copy
   `superseded-cleanup-successful-notification`, and
   `rank-refresh-username-unset-{uuid}` (today a unique-id stacker whose
-  repeats are byte-identical) to single-id upsert channels. The rank-refresh
+  repeats are byte-identical) to single-identity channels. The rank-refresh
   family gets the same treatment in its own shape: today's
   `rank-refresh-failed` and `rank-refresh-stale` merge into one problem
   channel whose payload carries the outcome (red hard-failure or yellow
@@ -68,23 +68,39 @@ leftover failure message it answers.
   repeats can carry identical text — most because a user retries against
   them (the failed-import modal deliberately keeps the pasted code for a
   quick resubmit), and stacking identical toasts is the literature's
-  documented anti-pattern. Ratifying D2 also ratifies its two supporting
-  mechanics in Design: the per-channel lifetime sequence, without which a
-  retry's timer restart silently fails whenever channels interleave, and
-  success-clears-failure, without which a stale failure toast outlives the
-  success that answers it. Be clear-eyed about what upsert delivers: the
-  replacement restarts the 8 s timer, but at the moment of the click nothing
-  visibly changes — no re-animation, no new text. The honest claim is an
-  invariant, not an animation: while the user keeps retrying, the answer
-  stays on screen, where the status quo lets it vanish mid-retry or drops
-  the retry's answer entirely. If stronger per-click feedback is wanted, the
-  alternative is distinguishing copy — an attempt count such as "(attempt
-  2)" appended on repeat — which buys a visible mutation at the cost of new
-  user-facing strings (a Copy block) and per-callback attempt state; not
-  recommended, but it is a real option and the material difference is
-  exactly that visibility. Keeping the stable ids (status quo) remains the
-  do-nothing alternative: a retry inside the 8 s window then gets no answer
-  at all, the same dead-UI failure the import bug exhibits.
+  documented anti-pattern. The recommended replacement mechanism is
+  **hide-and-reshow**, verified by a live POC against the installed
+  dash-mantine-components 2.8.0 on 2026-08-29 (findings comment on PR #257;
+  harness under `ignore/scripts/toast_hide_reshow_poc/`): each emission
+  shows a fresh instance id and hides the channel's previous instance in
+  the same response, so every retry visibly re-pops the toast with the
+  full entry animation and a structurally fresh 8 s lifetime — the
+  measured numbers are in Design. Ratifying D2 also ratifies its two
+  supporting mechanics there: the per-channel instance registry (the store
+  that knows which instance id to hide), and success-clears-failure,
+  without which a stale failure toast outlives the success that answers
+  it. Alternatives, in the order they fell: plain upsert (the update+show
+  pair with the alternating `autoClose`) restarts the timer with zero
+  visible change — a retried click reads as a dead click while the toast
+  silently extends — and survives only as the fallback if the maintainer
+  prefers stillness over motion; attempt-count copy ("(attempt 2)"
+  appended on repeat) bought that visibility at the cost of new
+  user-facing strings and per-callback counters, and is strictly dominated
+  now that hide-and-reshow delivers the visibility with no copy; keeping
+  the stable ids (status quo) remains the do-nothing alternative, where a
+  retry inside the 8 s window gets no answer at all, the dead-UI failure
+  the import bug exhibits.
+- **D3 — Retire `upsert_toast`: `run-verdict` migrates to hide-and-reshow
+  too.** Recommended: yes. With every D2 channel on hide-and-reshow, the
+  alternating-`autoClose` trick exists for one toast only; migrating
+  `run-verdict` deletes the trick and its sequence semantics outright and
+  leaves one replacement mechanism app-wide. The ratified run-verdict
+  contract is preserved — one run, one toast, the newest verdict replacing
+  whatever is on screen — but each new verdict now re-enters with the pop
+  animation instead of morphing in place, which is a small visible change
+  to shipped behavior and is why this is its own decision. Choosing
+  differently keeps two replacement mechanisms alive indefinitely for one
+  toast's benefit.
 
 ## Problem
 
@@ -189,8 +205,10 @@ see Out of scope.
    (delete-then-re-import defeats the naive claim for import success).
 2. **Channel toasts** — the toast is the current state of one ongoing thing
    (the latest run's verdict, the latest attempt's outcome). Replaced in
-   place via `upsert_toast` so the timer restarts and the toast stays up
-   while its condition keeps recurring. Identity follows the semantic lane.
+   place by hide-and-reshow (the mechanism bullet below): each emission
+   visibly re-enters with a structurally fresh lifetime, so the toast stays
+   up and every recurrence visibly answers. Identity follows the semantic
+   lane.
    An operation's problem lane is one channel: its mutually exclusive
    outcome flavors share a single id with a payload that differs
    (hard-failure and served-stale are one channel), so two contradictory
@@ -265,21 +283,37 @@ see Out of scope.
   "done" cue on back-to-back refreshes survives, as a timer-restarting
   replacement instead of a stack of duplicates. Existing strings are
   carried unchanged; the merge introduces no new copy.
-- Per-channel lifetime state. `upsert_toast`'s timer restart works by
-  alternating between two indistinguishable `autoClose` values, and Mantine
-  re-arms only when the value differs from the one the toast is showing —
-  so the alternation must be sequenced per notification id, not globally. A
-  single shared counter breaks under interleaving: channel A at sequence 0
-  (8000), channel B at 1 (8001), channel A's retry at 2 (8000 again) — the
-  retry's timer silently fails to restart. The `toast-lifetime-sequence`
-  store therefore becomes a dict keyed by notification id, `run-verdict`'s
-  existing scalar usage migrates onto it so there is one mechanism, and
-  each converting callback gains a State and an `allow_duplicate` Output on
-  that store. Subject-keyed channels put their dynamic ids in the same
-  dict; it grows by one small entry per subject seen in a session, which
-  is negligible for a per-client memory store. Accepted limitation: two concurrent callbacks can race the
-  dict write and lose one bump, which degrades that single retry to today's
-  no-restart behavior — rare, and never worse than the status quo.
+- The hide-and-reshow mechanism, POC-verified live on 2026-08-29 (findings
+  comment on PR #257; harness and captured frames under
+  `ignore/scripts/toast_hide_reshow_poc/`). A channel emission shows a
+  fresh unique instance id and lists the channel's previous instance id in
+  the container's hide prop in the same callback response. The hide effect
+  runs after the send effect (the 2026-08-03 ordering), which is exactly
+  why differing ids work: the new instance entered with the full animation
+  (opacity 0 to 1, ~440 px slide over ~135 ms, first paint ~31 ms after the
+  click) while the old one animated out — a ~250 ms crossfade with
+  complementary opacities that reads as replacement, never as stacked
+  duplicates. The new instance's lifetime is structurally fresh — measured
+  ~8.0 s from its own show even when replacing at 7.5 s — so the
+  alternating-`autoClose` trick is unnecessary on these channels (and
+  deleted outright under D3). Hiding an absent or already-closed id is a
+  measured clean no-op with a clean console. Rapid repeats (three clicks
+  inside a second) stayed stable with no orphans, and the final stack
+  layout after a mid-stack replacement was byte-identical. Supporting
+  state: the `toast-lifetime-sequence` store becomes a per-channel
+  instance registry — a dict mapping each logical channel key
+  (subject-keyed channels use their dynamic keys) to its current instance
+  id, where an instance id is the channel key plus a per-emission unique
+  suffix — read to know what to hide, written on each emission, with a
+  State and an `allow_duplicate` Output in each emitting callback; it grows one
+  small entry per channel seen in a session, negligible for a per-client
+  memory store. Accepted limitation: two concurrent callbacks can race the
+  registry and lose one write, leaving one stale instance to expire on its
+  own timer beside the new one for up to 8 s — rare, transient,
+  self-healing. Accepted cosmetics from the POC: a toast that arrived as a
+  replacement auto-closes without its own exit fade (it pops out at full
+  opacity), and bystander toasts bounce upward for roughly 280 ms during a
+  replacement.
 - Success clears the failure channel. A failure channel claims to show the
   latest attempt's outcome, so a successful retry must not leave the
   previous failure on screen beside the green success toast. Each success
@@ -291,21 +325,19 @@ see Out of scope.
   the merged `rank-refresh-problem` channel and the username-unset channel
   (a success proves a username is configured, so the blue claim cannot
   still stand — reachable when the user sets the username in Settings and
-  refreshes again inside one lifetime). Mechanism note: in
-  dash-mantine-components 2.8.0 hiding is not a `sendNotifications` action
-  but the container's separate hide prop, whose effect runs after the send
-  effect (the 2026-08-03 quiet-notification-layer decision-log entry records
-  why a hide-then-show of one id therefore cannot work). That ordering is harmless
-  here because the hidden id and the shown id always differ; the
-  implementation PR still verifies that hiding an id that is not on screen
-  is a clean no-op before relying on it. Alternative rejected: widening
+  refreshes again inside one lifetime). Cross-clears ride the same hide
+  prop as the mechanism itself: the emission looks up the target channel's
+  current instance id in the registry and appends it to the hide list.
+  Hiding an id that is not on screen is a clean no-op — measured in the
+  POC, no longer an open verification item. Alternative rejected: widening
   channel identity to span all outcomes of an operation (one id for failure
   and success alike) would make two consecutive distinct successes replace
   each other, breaking rule 1 for the success toasts.
-- Keep unchanged: `run-verdict` (already rule 2, ratified),
-  `run-import-failure` (already rule 3), and `steam-id-mismatch` and
-  `startup-playlist-warning-{n}` (rule 4 instances, the latter already
-  unique per warning).
+- Keep unchanged in contract: `run-verdict` (rule 2, ratified — its
+  replacement mechanism migrates to hide-and-reshow under D3, its
+  one-run-one-toast contract untouched), `run-import-failure` (already
+  rule 3), and `steam-id-mismatch` and `startup-playlist-warning-{n}`
+  (rule 4 instances, the latter already unique per warning).
 - Spec work in the implementation PR: add the policy to
   `docs/specs/notifications.md` — listing `run-import-failure`'s cross-tick
   swallowing as an explicit accepted exception rather than implying the
@@ -331,7 +363,8 @@ block must then be amended with the exact copy before implementation.
 - `run-import-failure`'s own cross-tick swallowing (a second batch inside
   8 s is dropped). Accepted for now: it is a background burst channel where
   anti-flood wins, the folded copy already points at debug.log, and no user
-  report exists. If it ever surfaces, the fix is upsert, not uuids.
+  report exists. If it ever surfaces, the fix is a replacement channel, not
+  uuids.
 - The research's broader "error toasts should be banners" position. This
   app's red toasts report transient outcomes of just-clicked actions in a
   single-user desktop app; re-platforming them onto persistent surfaces is a
@@ -345,11 +378,12 @@ block must then be amended with the exact copy before implementation.
 ## Delivery plan
 
 - **PR 1 (this PR):** the proposal.
-- **PR 2 (implementation, after D1/D2 are ruled):** the four subject-keyed
-  channel conversions (three playlist successes keyed by canonical code,
-  refresh success keyed by scenario), the seven single-id channel
-  conversions, the merged rank problem channel, the per-channel lifetime
-  store, the success-clears-failure wiring, test updates, the spec
+- **PR 2 (implementation, after D1/D2/D3 are ruled):** the hide-and-reshow
+  helper and instance registry, the four subject-keyed channel conversions
+  (three playlist successes keyed by canonical code, refresh success keyed
+  by scenario), the seven single-identity channel conversions, the merged
+  rank problem channel, the success-clears wiring, the `run-verdict`
+  migration and `upsert_toast` deletion (per D3), test updates, the spec
   additions above, and the proposal-shipping checklist including deleting
   this file. Single small PR; no dependency beyond ratification.
   Kickoff prompt recommendation per convention: Opus 5 at effort high — the
@@ -361,16 +395,17 @@ block must then be amended with the exact copy before implementation.
 - This PR: `tests/test_docs.py` gates the Status line, section order, and
   link integrity.
 - Implementation PR: update the tests that assert the fixed toast ids;
-  regression-test that imports of two different playlists emit toasts with
-  distinct subject keys (the reported bug) while an import, delete, and
-  re-import of one playlist re-emits the same subject-keyed id (replacement,
-  not a stack); assert the failure and refusal paths emit
-  `upsert_toast`'s update+show pair and bump their own channel's sequence;
-  regression-test the interleaving case (channel A, channel B, channel A
-  again — A's second emission must carry a different `autoClose` than its
-  first); assert each success path also hides its operation's failure
-  channel ids; cover the rank family's new shape (a hard failure followed
-  by a served-stale retry emits the same channel id, two refreshes of one
-  scenario emit the same subject-keyed id while two scenarios emit
-  different ids, and a refresh success hides the problem channel); run the
-  standard five local gates.
+  regression-test that imports of two different playlists emit instances
+  under distinct channel keys with no cross-hide (the reported bug) while
+  an import, delete, and re-import of one playlist emits under the same
+  channel key and hides the prior instance (replacement, not a stack);
+  assert every channel emission pairs a fresh-instance show with a hide of
+  the registry's previous instance and rotates the registry entry; assert
+  each success path's hide list also carries its operation's problem
+  channel (and, for rank refresh, the username-unset channel); cover the
+  rank family (a hard failure followed by a served-stale retry emits under
+  the one problem key, two refreshes of one scenario share a channel key
+  while two scenarios do not); assert `run-verdict` rides the same
+  mechanism and that `upsert_toast` is gone (per D3). The POC's
+  browser-level findings are evidence, not gates — unit tests assert
+  emission shapes and registry state. Run the standard five local gates.
