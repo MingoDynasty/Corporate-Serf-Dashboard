@@ -12,10 +12,11 @@ second import failed. A survey of design systems, UX literature, and
 production apps converged on one decision rule: distinct actions get separate
 stacked toasts, updates to one ongoing thing replace each other in place, and
 bursts of the same event fold into one summary. This proposal adopts that rule
-as the app's standing toast policy, splitting the per-action toasts along a
-simple line: successes stack as separate toasts, while failures and refusals
-replace their previous toast in place, so a retry keeps the answer on screen
-instead of being silently dropped.
+as the app's standing toast policy, splitting the toasts along one test. A
+toast whose repeats always read differently stacks as separate messages. A
+toast whose repeats could read the same replaces its predecessor in place, so
+a retry keeps its answer on screen instead of being silently dropped, and a
+success also clears the leftover failure message it answers.
 
 ## Decisions needed
 
@@ -24,18 +25,25 @@ instead of being silently dropped.
   toast picks its id pattern deliberately. Choosing differently means each new
   toast re-litigates the choice ad hoc, which is how today's mixed inventory
   (three patterns, no stated rule) came to be.
-- **D2 — Failure and refusal toasts become replace-in-place
-  (`upsert_toast`).** Recommended: convert the three per-action failure
-  toasts (`imported-playlist-failed-notification`,
+- **D2 — Toasts whose repeats can carry identical copy become
+  replace-in-place (`upsert_toast`).** Recommended: convert the three
+  per-action failure toasts (`imported-playlist-failed-notification`,
   `deleted-playlist-failed-notification`,
-  `superseded-cleanup-failed-notification`) and the four refusal toasts
+  `superseded-cleanup-failed-notification`), the four refusal toasts
   (`rank-refresh-failed`, `rank-refresh-stale`,
   `visibility-refused-notification`,
-  `setup-card-skip-refused-notification`) to the upsert pattern. These are
-  the toasts a user retries against — the failed-import modal deliberately
-  keeps the pasted code for a quick resubmit — so a repeat can carry
-  byte-identical text, and stacking identical toasts is the literature's
-  documented anti-pattern. Be clear-eyed about what upsert delivers: the
+  `setup-card-skip-refused-notification`), the constant-copy
+  `superseded-cleanup-successful-notification`, and
+  `rank-refresh-username-unset-{uuid}` (today a unique-id stacker whose
+  repeats are byte-identical) to the upsert pattern. These are the toasts
+  whose repeats can carry identical text — most because a user retries
+  against them (the failed-import modal deliberately keeps the pasted code
+  for a quick resubmit), and stacking identical toasts is the literature's
+  documented anti-pattern. Ratifying D2 also ratifies its two supporting
+  mechanics in Design: the per-channel lifetime sequence, without which a
+  retry's timer restart silently fails whenever channels interleave, and
+  success-clears-failure, without which a stale failure toast outlives the
+  success that answers it. Be clear-eyed about what upsert delivers: the
   replacement restarts the 8 s timer, but at the moment of the click nothing
   visibly changes — no re-animation, no new text. The honest claim is an
   invariant, not an animation: while the user keeps retrying, the answer
@@ -77,7 +85,7 @@ in use, each chosen locally without a stated rule:
   (`run-import-failure` batches a poll tick's failures into one message).
 
 So the codebase has already invented all three industry patterns; what it
-lacks is the rule for which one a new toast should use, and eleven toasts sit
+lacks is the rule for which one a new toast should use, and twelve toasts sit
 on the wrong side of that rule today.
 
 ## Research
@@ -151,7 +159,10 @@ see Out of scope.
 2. **Channel toasts** — the toast is the current state of one ongoing thing
    (the latest run's verdict, the latest attempt's failure). One stable id,
    replaced in place via `upsert_toast` so the timer restarts and the toast
-   stays up while its condition keeps recurring.
+   stays up while its condition keeps recurring. When the operation behind a
+   failure channel also reports success, the success emission clears that
+   failure channel, so a stale failure never outlives the answer that
+   supersedes it.
 3. **Burst toasts** — many same-type events where the aggregate is the
    message ("3 new run files could not be processed"). Fold into one summary
    carrying a count, and point at where the individual events are recorded.
@@ -162,35 +173,74 @@ see Out of scope.
 **Mechanical application to today's inventory:**
 
 - Convert to event toasts (rule 1), the `rank-refresh-notification-{uuid}`
-  pattern: the four success-family toasts
+  pattern: the three success toasts whose copy names their subject —
   `imported-playlist-successful-notification`,
   `imported-playlist-visibility-failed-notification` (the import did land;
-  occurrences are distinct playlists),
-  `deleted-playlist-successful-notification`, and
-  `superseded-cleanup-successful-notification`. Their occurrences cannot
-  repeat with identical text: an import or delete success names its
-  playlist, the same playlist cannot succeed twice in a window, and a second
-  cleanup requires a new conflict to appear first. Only the import success
-  has a reachable swallowing window today; the others convert for uniformity
-  under D1.
+  occurrences are distinct playlists), and
+  `deleted-playlist-successful-notification`. Their occurrences cannot
+  repeat with identical text: each names its playlist, and the same playlist
+  cannot succeed twice inside one toast lifetime. Only the import success
+  has a reachable swallowing window today; the delete success converts for
+  uniformity under D1.
 - Convert to channel toasts (rule 2), pending D2: the three per-action
-  failure toasts and the four refusal toasts. A failure is retried — the
-  failed-import modal deliberately keeps the pasted code for resubmission —
-  and a retry of the same input reproduces the same message, so these fail
-  rule 1's distinguishability test; the toast instead reflects the latest
-  attempt's outcome, which the serial modal workflows make unambiguous.
-  Upsert restarts the 8 s timer on every attempt (see D2 for the honest
-  scope of that feedback). Wiring cost: each converting callback gains a
-  State and an `allow_duplicate` Output on the shared
-  `toast-lifetime-sequence` store that `upsert_toast`'s duration alternation
-  requires — the same wiring `generate_graph` already carries.
+  failure toasts, the four refusal toasts,
+  `superseded-cleanup-successful-notification`, and
+  `rank-refresh-username-unset-{uuid}`. The failures and refusals are
+  retried — the failed-import modal deliberately keeps the pasted code for
+  resubmission — and a retry of the same input reproduces the same message,
+  so they fail rule 1's distinguishability test; the toast instead reflects
+  the latest attempt's outcome, which the serial modal workflows make
+  unambiguous. The cleanup success fails the same test differently: its
+  title and message are constant ("Leftover files deleted" / "Deleted
+  leftover playlist files."), and while a second cleanup inside one toast
+  lifetime is practically unreachable, the policy classifies by copy, not
+  by reachability — as a channel it needs no new copy and no observable
+  behavior changes. The username-unset toast is today's one uuid stacker
+  with byte-identical repeats (spam-clicking Refresh with no username
+  stacks identical blue toasts), so it moves to a stable channel id under
+  the same test.
+- Per-channel lifetime state. `upsert_toast`'s timer restart works by
+  alternating between two indistinguishable `autoClose` values, and Mantine
+  re-arms only when the value differs from the one the toast is showing —
+  so the alternation must be sequenced per notification id, not globally. A
+  single shared counter breaks under interleaving: channel A at sequence 0
+  (8000), channel B at 1 (8001), channel A's retry at 2 (8000 again) — the
+  retry's timer silently fails to restart. The `toast-lifetime-sequence`
+  store therefore becomes a dict keyed by notification id, `run-verdict`'s
+  existing scalar usage migrates onto it so there is one mechanism, and
+  each converting callback gains a State and an `allow_duplicate` Output on
+  that store. Accepted limitation: two concurrent callbacks can race the
+  dict write and lose one bump, which degrades that single retry to today's
+  no-restart behavior — rare, and never worse than the status quo.
+- Success clears the failure channel. A failure channel claims to show the
+  latest attempt's outcome, so a successful retry must not leave the
+  previous failure on screen beside the green success toast. Each success
+  emission (including the orange split outcome, whose import did land) also
+  sends a `hide` for its operation's failure channel ids: import success
+  hides `imported-playlist-failed-notification`, delete success hides
+  `deleted-playlist-failed-notification`, cleanup success hides
+  `superseded-cleanup-failed-notification`, and rank-refresh success hides
+  `rank-refresh-failed` and `rank-refresh-stale`. Mechanism note: in
+  dash-mantine-components 2.8.0 hiding is not a `sendNotifications` action
+  but the container's separate hide prop, whose effect runs after the send
+  effect (the 2026-08-03 quiet-notification-layer decision-log entry records
+  why a hide-then-show of one id therefore cannot work). That ordering is harmless
+  here because the hidden id and the shown id always differ; the
+  implementation PR still verifies that hiding an id that is not on screen
+  is a clean no-op before relying on it. Alternative rejected: widening
+  channel identity to span all outcomes of an operation (one id for failure
+  and success alike) would make two consecutive distinct successes replace
+  each other, breaking rule 1 for the success toasts.
 - Keep unchanged: `run-verdict` (already rule 2, ratified),
   `run-import-failure` (already rule 3), `steam-id-mismatch` and
   `startup-playlist-warning-{n}` (rule 4 instances, the latter already
-  unique per warning), and the two already-uuid refresh toasts.
+  unique per warning), and `rank-refresh-notification-{uuid}` (already an
+  event toast with subject-naming copy).
 - Spec work in the implementation PR: add the policy to
-  `docs/specs/notifications.md`, re-annotate the inventory rows with their
-  pattern, and update every spec that owns a converting toast's behavior —
+  `docs/specs/notifications.md` — listing `run-import-failure`'s cross-tick
+  swallowing as an explicit accepted exception rather than implying the
+  inventory conforms in full — re-annotate the inventory rows with their
+  pattern, and update every spec that owns a converting toast's behavior:
   the notifications, playlists, and rank specs, plus `docs/specs/settings.md`
   (its setup-card section owns the `setup-card-skip-refused-notification`
   refusal semantics).
@@ -221,8 +271,9 @@ block must then be amended with the exact copy before implementation.
 ## Delivery plan
 
 - **PR 1 (this PR):** the proposal.
-- **PR 2 (implementation, after D1/D2 are ruled):** the four event-toast id
-  conversions, the seven upsert conversions (or fewer, per D2), test
+- **PR 2 (implementation, after D1/D2 are ruled):** the three event-toast id
+  conversions, the nine upsert conversions (or fewer, per D2), the
+  per-channel lifetime store, the success-clears-failure wiring, test
   updates, the spec additions above, and the proposal-shipping checklist
   including deleting this file. Single small PR; no dependency beyond
   ratification.
@@ -237,5 +288,8 @@ block must then be amended with the exact copy before implementation.
 - Implementation PR: update the tests that assert the fixed toast ids;
   regression-test that two successive import successes emit toasts with
   distinct ids (the reported bug); assert the failure and refusal paths emit
-  `upsert_toast`'s update+show pair and bump the lifetime sequence; run the
-  standard five local gates.
+  `upsert_toast`'s update+show pair and bump their own channel's sequence;
+  regression-test the interleaving case (channel A, channel B, channel A
+  again — A's second emission must carry a different `autoClose` than its
+  first); assert each success path also hides its operation's failure
+  channel ids; run the standard five local gates.
