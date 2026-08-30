@@ -244,11 +244,15 @@ Status: Ratified (2026-08-29)
 accumulate while the Scenario Performance page was closed. With the drain
 moved to the app shell (see Design), delivery is app-wide and continuous
 while any tab is open, so batches stop accumulating in the one case the
-digest served; what remains is the no-tab case, where the freshness cap
-draws the line: a personal best set within the cap of the next drain is
-celebrated on it, and anything older is never replayed. Bounded recent
-replay is accepted rather than suppressed, since a player who reopens the
-tab within two minutes of the run wants the celebration, and absolute
+digest served; what remains is the no-tab case, where the freshness
+window draws the line: a personal best set within the window of the next
+drain is celebrated on it, and anything older is never replayed. That
+window is the 120 s cap plus one poll period (see Design), so it is about
+two minutes at any ordinary setting and widens with a deliberately slow
+poll — by exactly the period that configuration chose, which is the scale
+on which it already receives everything else. Bounded recent replay is
+accepted rather than suppressed, since a player who reopens the tab
+within a couple of minutes of the run wants the celebration, and absolute
 suppression would need exactly the client-liveness bookkeeping this
 design retired. The digest is removed rather than kept as a
 rare special case: `docs/product.md` and `docs/specs/notifications.md`
@@ -684,7 +688,7 @@ maintainer's stated preference):
 1. **Drain move and toast** (can stand alone): the three new
    `NewFileMessage` fields; the shell interval, the drain callback with
    its batch store, decision and liveness stamping, and the freshness
-   cap; the
+   window; the
    page consuming the store instead of popping the queue; the digest
    removal (D9); the dedicated celebration toast id and its sticky
    update-plus-show pair; the trophy icon; tests. Owning docs in the same
@@ -742,9 +746,9 @@ early return.
 - **Interval consolidation.** The page's `interval-component` keeps its
   other consumers (the rank refresh path and the import-failure flush);
   folding them into the shell interval is a refactor for another day.
-- **Per-family celebration staleness.** The freshness cap applies the
+- **Per-family celebration staleness.** The freshness window applies the
   quiet-return rule to celebrations and ordinary toasts alike, so a
-  personal best set with no tab open celebrates only within the cap,
+  personal best set with no tab open celebrates only within that window,
   while D8 delivers a hidden tab's celebration however late. Whether the
   celebration family deserves its own longer or unbounded window is a
   follow-up proposal once v1 has real usage. The evidence to bring:
