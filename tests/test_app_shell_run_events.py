@@ -60,6 +60,11 @@ def frozen_clock(monkeypatch):
     monkeypatch.setattr(app_shell, "datetime", _Clock)
 
 
+def _window() -> float:
+    """The freshness window this environment's config resolves to."""
+    return app_shell._run_event_freshness_seconds()
+
+
 def _drain(monkeypatch, *messages, previous_batch=None):
     """Run one drain over a queue holding exactly these messages."""
     monkeypatch.setattr(app_shell, "message_queue", deque(messages))
@@ -262,12 +267,10 @@ def test_a_throttled_tick_old_run_is_still_live(monkeypatch, frozen_clock):
     assert notifications is not no_update
 
 
-def test_a_run_older_than_the_cap_is_not_live(monkeypatch, frozen_clock):
+def test_a_run_older_than_the_window_is_not_live(monkeypatch, frozen_clock):
     batch, notifications = _drain(
         monkeypatch,
-        _message(
-            score=830.0, age_seconds=app_shell.RUN_EVENT_FRESHNESS_CAP_SECONDS + 1
-        ),
+        _message(score=830.0, age_seconds=_window() + 1),
     )
 
     assert batch["runs"][0]["is_live"] is False
@@ -275,13 +278,43 @@ def test_a_run_older_than_the_cap_is_not_live(monkeypatch, frozen_clock):
     assert notifications is no_update
 
 
-def test_a_run_at_exactly_the_cap_is_still_live(monkeypatch, frozen_clock):
+def test_a_run_at_exactly_the_window_is_still_live(monkeypatch, frozen_clock):
     batch, _notifications = _drain(
         monkeypatch,
-        _message(score=830.0, age_seconds=app_shell.RUN_EVENT_FRESHNESS_CAP_SECONDS),
+        _message(score=830.0, age_seconds=_window()),
     )
 
     assert batch["runs"][0]["is_live"] is True
+
+
+def test_the_window_is_never_shorter_than_one_poll_period(monkeypatch, frozen_clock):
+    """A slow poll must not stamp every run stale.
+
+    `polling_interval` is an unconstrained config key, so a deliberately slow
+    poll can make every run a whole period old by the time the drain sees it.
+    A fixed cap below that period would then mark all of them stale and
+    silently retire every toast liveness gates -- the celebration and the
+    page's ordinary run toasts alike -- while the plot kept updating.
+    """
+    monkeypatch.setattr(app_shell, "_drain_interval_ms", lambda: 300_000)
+
+    batch, notifications = _drain(
+        monkeypatch,
+        _message(score=830.0, age_seconds=290.0),
+    )
+
+    assert app_shell._run_event_freshness_seconds() == 420.0
+    assert batch["runs"][0]["is_live"] is True
+    assert batch["celebrated_run_id"] == "run-1.csv"
+    assert notifications is not no_update
+
+
+def test_the_default_poll_period_leaves_the_ratified_cap_intact(monkeypatch):
+    # 121 s rather than 120 s: the one poll period the cadence itself costs,
+    # which no viewer can tell apart from the ratified figure.
+    monkeypatch.setattr(app_shell, "_drain_interval_ms", lambda: 1000)
+
+    assert app_shell._run_event_freshness_seconds() == 121.0
 
 
 def test_a_recent_no_tab_backlog_still_celebrates(monkeypatch, frozen_clock):

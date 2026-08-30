@@ -151,13 +151,17 @@ their full behavior.
   `celebrated_run_id` (or none) and a monotonic `animation_sequence`. An empty
   queue publishes nothing. The drain runs on every page, so a run no longer
   waits for a Scenario Performance visit to be delivered.
-- A run is stamped live when its `datetime_created` is within 120 seconds of
-  the drain, and stale otherwise. There is no watermark and no drain
+- A run is stamped live when its `datetime_created` is within the freshness
+  window of the drain, and stale otherwise. The window is a 120-second cap
+  plus one poll period, so it is 121 seconds at the default 1000 ms interval:
+  a run can be a whole period old through nothing but the drain's cadence, and
+  a window shorter than the configured period would stamp every run stale and
+  silence the toasts liveness gates. There is no watermark and no drain
   bookkeeping: every drain empties the queue, so a message a drain finds was
   never seen by an earlier one, and a message appended while a drain is
   popping is caught by that drain or the next, exactly once either way. The
-  cap bounds replay rather than removing it — a queue that accumulated with no
-  tab open announces nothing older than the cap on the next visit, and
+  window bounds replay rather than removing it — a queue that accumulated with
+  no tab open announces nothing older than the window on the next visit, and
   anything within it is announced.
 - `celebrated_run_id` names the newest live run whose score is strictly
   greater than its `scenario_previous_best`, and nothing when no run

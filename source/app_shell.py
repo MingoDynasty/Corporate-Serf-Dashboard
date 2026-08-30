@@ -26,15 +26,15 @@ from source.utilities.notifications import (
 RUN_EVENTS_BATCH_STORE_ID = "run-events-batch"
 PB_CELEBRATION_INTERVAL_ID = "pb-celebration-interval"
 
-# How old a run may be and still count as news. Freshness needs no drain
-# bookkeeping -- every drain empties the queue, so a message a drain finds was
-# never seen by an earlier one -- and this wall-clock cap is all that remains.
-# It sits two orders of magnitude above the default poll interval and
-# comfortably above Chromium's intensive throttling, which slows a hidden tab's
-# interval to about one tick per minute; the tab is occluded during play, so a
-# tighter window would drop the mid-session personal bests this exists for. It
-# also bounds replay: a queue that accumulated with no tab open announces
-# nothing older than the cap on the next visit.
+# How much older than one delivery a run may be and still count as news.
+# Freshness needs no drain bookkeeping -- every drain empties the queue, so a
+# message a drain finds was never seen by an earlier one -- and this wall-clock
+# cap is all that remains. It sits two orders of magnitude above the default
+# poll interval and comfortably above Chromium's intensive throttling, which
+# slows a hidden tab's interval to about one tick per minute; the tab is
+# occluded during play, so a tighter window would drop the mid-session personal
+# bests this exists for. It also bounds replay: a queue that accumulated with
+# no tab open announces nothing older than the window on the next visit.
 RUN_EVENT_FRESHNESS_CAP_SECONDS = 120
 
 APP_INDEX_STRING = """<!DOCTYPE html>
@@ -134,7 +134,23 @@ def _drain_interval_ms() -> int:
         return ConfigData.polling_interval
 
 
-def _run_event_data(message: NewFileMessage, now: datetime) -> RunEventData:
+def _run_event_freshness_seconds() -> float:
+    """Return the freshness window: the cap plus one poll period.
+
+    A run can be a whole poll period old through nothing but the drain's
+    cadence, so a window shorter than that period would stamp every run stale
+    and silently retire the toasts liveness gates. Adding the period says what
+    the cap means -- how much staleness is tolerated *beyond* one delivery --
+    and leaves the default 1000 ms interval at an indistinguishable 121 s.
+    """
+    return RUN_EVENT_FRESHNESS_CAP_SECONDS + _drain_interval_ms() / 1000
+
+
+def _run_event_data(
+    message: NewFileMessage,
+    now: datetime,
+    freshness_seconds: float,
+) -> RunEventData:
     """Project one queued message into the batch, stamping its liveness."""
     age_seconds = (now - message.datetime_created).total_seconds()
     return {
@@ -145,11 +161,11 @@ def _run_event_data(message: NewFileMessage, now: datetime) -> RunEventData:
         "score": message.score,
         "scenario_previous_best": message.scenario_previous_best,
         "is_new_sensitivity": message.is_new_sensitivity,
-        "is_live": age_seconds <= RUN_EVENT_FRESHNESS_CAP_SECONDS,
+        "is_live": age_seconds <= freshness_seconds,
     }
 
 
-def _drain_message_queue(now: datetime) -> list[RunEventData]:
+def _drain_message_queue(now: datetime, freshness_seconds: float) -> list[RunEventData]:
     """Empty the run-event queue into one ordered batch."""
     runs: list[RunEventData] = []
     while True:
@@ -157,7 +173,7 @@ def _drain_message_queue(now: datetime) -> list[RunEventData]:
             message = message_queue.popleft()
         except IndexError:
             return runs
-        runs.append(_run_event_data(message, now))
+        runs.append(_run_event_data(message, now, freshness_seconds))
 
 
 def _celebrated_run(runs: list[RunEventData]) -> RunEventData | None:
@@ -238,7 +254,7 @@ def publish_run_events(_n_intervals, previous_batch):
         animation sequence.
     :return: the new batch, and the celebration toast when one is earned
     """
-    runs = _drain_message_queue(datetime.now())
+    runs = _drain_message_queue(datetime.now(), _run_event_freshness_seconds())
     if not runs:
         return no_update, no_update
 
