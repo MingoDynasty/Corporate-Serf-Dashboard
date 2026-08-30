@@ -72,6 +72,16 @@ def _anchors(component):
     ]
 
 
+def _icon_mask(component):
+    """The card's leading icon, identified by the SVG its mask points at."""
+    icon = next(
+        child
+        for child in _walk_components(component)
+        if getattr(child, "className", None) == "alert-panel-icon"
+    )
+    return icon.style["mask"]
+
+
 @pytest.fixture(autouse=True)
 def quiet_home(monkeypatch):
     """Keep the rest of the page out of the way of the card."""
@@ -132,6 +142,28 @@ def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
     ]
     assert _button_labels(card) == []
     assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+
+
+def test_each_card_state_wears_its_own_severity_treatment(stats_dir):
+    """Blocking setup is caution; the account offer is information.
+
+    The stats-folder state cannot be dismissed and leaves every plot on the
+    page empty, so it takes the yellow treatment and the warning icon. The
+    identity state is an optional offer, so it stays blue with the info icon.
+    """
+    _store()
+    blocked = _card(home.layout())
+
+    _store(**{STATS_DIR_KEY: str(stats_dir)})
+    offered = _card(home.layout())
+
+    assert blocked is not None
+    assert blocked.className == home.SETUP_CARD_CAUTION_CLASS
+    assert "material-symbols-warning-outline.svg" in _icon_mask(blocked)
+
+    assert offered is not None
+    assert offered.className == home.SETUP_CARD_CLASS
+    assert "material-symbols-info-outline.svg" in _icon_mask(offered)
 
 
 @pytest.mark.parametrize("stats_dir_value", ["", "no-such-stats-dir"])

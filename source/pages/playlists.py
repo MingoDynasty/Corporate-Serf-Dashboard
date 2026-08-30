@@ -85,8 +85,19 @@ VISIBILITY_REFUSED_TITLE = "Show and hide are unavailable"
 
 VISIBILITY_ALERT_TITLE = "Playlist visibility is not being used"
 # The alert ships hidden and the render callback drops this modifier, the same
-# way the leftover-files alert below it works.
+# way the leftover-files notice below it works.
 VISIBILITY_ALERT_HIDDEN_CLASS = "playlists-visibility-alert-hidden"
+
+SUPERSEDED_NOTICE_TITLE = "Leftover playlist files"
+# The leftover-files notice holds a button, so it wears the alert anatomy on a
+# ``dmc.Paper`` instead of being a ``dmc.Alert``: the component's ``role=alert``
+# is for text content, and it would assertively interrupt for an optional bit of
+# housekeeping the announcement cannot act on. Blue, because the bundled copy
+# already won and nothing is broken.
+SUPERSEDED_NOTICE_CLASS = "alert-panel"
+SUPERSEDED_NOTICE_HIDDEN_CLASS = (
+    f"{SUPERSEDED_NOTICE_CLASS} playlists-superseded-alert-hidden"
+)
 
 dash.register_page(
     __name__,
@@ -707,7 +718,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
     """
     superseded_files = get_superseded_user_playlist_files()
     if not superseded_files:
-        return "playlists-superseded-alert-hidden", ""
+        return SUPERSEDED_NOTICE_HIDDEN_CLASS, ""
     count = len(superseded_files)
     noun = "file" if count == 1 else "files"
     verb = "is" if count == 1 else "are"
@@ -715,7 +726,7 @@ def render_superseded_alert(_mounted, _rows_refresh):
         f"{count} leftover playlist {noun} in data/playlists {verb} superseded "
         "by bundled benchmarks."
     )
-    return "", message
+    return SUPERSEDED_NOTICE_CLASS, message
 
 
 @callback(
@@ -967,26 +978,45 @@ def layout(**kwargs):  # noqa: ARG001
                 id="playlists-visibility-alert",
                 title=VISIBILITY_ALERT_TITLE,
                 color="yellow",
+                icon=local_icon("material-symbols:warning-outline"),
                 className=VISIBILITY_ALERT_HIDDEN_CLASS,
                 children=dmc.Text(id="playlists-visibility-text"),
             ),
             # Cleanup affordance for user files superseded by bundled
             # benchmarks. Hidden until superseded files exist.
-            dmc.Alert(
+            dmc.Paper(
                 id="playlists-superseded-alert",
-                title="Leftover playlist files",
-                color="yellow",
-                className="playlists-superseded-alert-hidden",
-                children=dmc.Group(
-                    justify="space-between",
-                    align="center",
+                className=SUPERSEDED_NOTICE_HIDDEN_CLASS,
+                withBorder=True,
+                children=dmc.Stack(
+                    gap="xs",
                     children=[
-                        dmc.Text(id="playlists-superseded-text"),
-                        dmc.Button(
-                            "Delete leftover files",
-                            id="playlists-superseded-delete-button",
-                            color="red",
-                            variant="light",
+                        dmc.Group(
+                            gap="xs",
+                            align="center",
+                            children=[
+                                local_icon(
+                                    "material-symbols:info-outline",
+                                    className="alert-panel-icon",
+                                ),
+                                dmc.Text(
+                                    SUPERSEDED_NOTICE_TITLE,
+                                    className="alert-panel-title",
+                                ),
+                            ],
+                        ),
+                        dmc.Group(
+                            justify="space-between",
+                            align="center",
+                            children=[
+                                dmc.Text(id="playlists-superseded-text"),
+                                dmc.Button(
+                                    "Delete leftover files",
+                                    id="playlists-superseded-delete-button",
+                                    color="red",
+                                    variant="light",
+                                ),
+                            ],
                         ),
                     ],
                 ),

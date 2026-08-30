@@ -630,7 +630,7 @@ def test_render_superseded_alert_hidden_when_no_files(monkeypatch):
 
     class_name, text = playlists.render_superseded_alert(True, 0)
 
-    assert class_name == "playlists-superseded-alert-hidden"
+    assert class_name == playlists.SUPERSEDED_NOTICE_HIDDEN_CLASS
     assert text == ""
 
 
@@ -643,7 +643,7 @@ def test_render_superseded_alert_shows_count_when_files_exist(monkeypatch):
 
     class_name, text = playlists.render_superseded_alert(True, 1)
 
-    assert class_name == ""
+    assert class_name == playlists.SUPERSEDED_NOTICE_CLASS
     assert "2 leftover playlist files" in text
 
 
@@ -780,6 +780,30 @@ def test_playlists_overview_layout_includes_show_hidden_switch_and_row_muting():
     assert grid.rowClassRules == {
         "playlist-overview-row-hidden": "params.data.hidden",
     }
+
+
+def test_the_leftover_files_notice_is_a_paper_not_an_alert():
+    """A focusable button must not sit inside Mantine's ``role="alert"`` root.
+
+    The callbacks and the cleanup flow are covered above, but never the
+    component type, so an implementation that only repainted the alert would
+    pass every other test here while keeping the role mismatch.
+    """
+    page = playlists.layout()
+    notice = next(
+        component
+        for component in _walk_components(page)
+        if getattr(component, "id", None) == "playlists-superseded-alert"
+    )
+    button_ids = {
+        getattr(child, "id", None)
+        for child in _walk_components(notice)
+        if isinstance(child, dmc.Button)
+    }
+
+    assert isinstance(notice, dmc.Paper)
+    assert not isinstance(notice, dmc.Alert)
+    assert "playlists-superseded-delete-button" in button_ids
 
 
 def test_playlists_overview_layout_includes_quick_filter_input():

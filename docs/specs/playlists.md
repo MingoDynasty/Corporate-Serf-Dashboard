@@ -107,7 +107,8 @@ section and [product.md](../product.md). Leaderboard placement is worded
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
   `schema_version`-stamped: an unusable or newer-build file yields the seed
-  and shows the yellow alert "Playlist visibility is not being used" with the
+  and shows the yellow alert "Playlist visibility is not being used", with a
+  warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)), carrying the
   store's message; an unusable file is copied aside by the first write, and a
   newer-build file refuses every write
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
@@ -236,8 +237,10 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - A user file whose code a bundled benchmark serves is recorded and never
   deleted at startup; the overview offers an in-app cleanup instead
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
-  The yellow alert is titled "Leftover playlist files" and reads "1 leftover
-  playlist file in data/playlists is superseded by bundled benchmarks." or
+  The notice is a blue panel with an info icon, not a `dmc.Alert`, because it
+  holds a button ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)). It is titled "Leftover playlist files" and reads "1
+  leftover playlist file in data/playlists is superseded by bundled
+  benchmarks." or
   "{N} leftover playlist files in data/playlists are superseded by bundled
   benchmarks.", with a "Delete leftover files" button. The "Delete Leftover
   Files" modal asks "Delete 1 leftover playlist file from data/playlists? They

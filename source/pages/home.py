@@ -217,6 +217,14 @@ SETUP_CARD_SKIP_REFUSED_MESSAGE = (
 # escape hatch (``component="a"``) is not exposed by the dmc 2.8.0 wrapper, so
 # the styling lives in ``assets/stylesheet.css`` instead.
 SETUP_CARD_CTA_CLASS = "setup-card-cta"
+# The card wears the shared alert anatomy on the ``dmc.Paper`` it already is.
+# Blue is the informational default; the caution modifier swaps in the yellow
+# tokens for the stats-folder state, which blocks every plot on the page and
+# cannot be dismissed.
+SETUP_CARD_CLASS = "alert-panel setup-card"
+SETUP_CARD_CAUTION_CLASS = f"{SETUP_CARD_CLASS} alert-panel-caution"
+SETUP_CARD_CAUTION_ICON = "material-symbols:warning-outline"
+SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1397,7 +1405,13 @@ def _stats_dir_hint() -> list:
     ]
 
 
-def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
+def _setup_card(
+    title: str,
+    body: str,
+    *,
+    offer_skip: bool,
+    caution: bool,
+) -> dmc.Paper:
     """Build one state of the setup card: a heading, a reason, and a way out.
 
     Navigation and dismissal only. The primary action is a link to the settings
@@ -1408,6 +1422,12 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
 
     The two actions are deliberately different elements: one navigates and is a
     link, the other acts on this page and is a button.
+
+    ``caution`` picks the severity treatment rather than being read off
+    ``offer_skip``: the two happen to agree today, but one is about how loud the
+    card is and the other about whether it can be dismissed. It stays a
+    ``dmc.Paper`` wearing the alert anatomy through CSS, because the card holds
+    a link and a button and ``role="alert"`` is for text content.
     """
     actions = [
         dmc.Anchor(
@@ -1428,7 +1448,17 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
             )
         )
     children = [
-        dmc.Text(title, className="setup-card-title"),
+        dmc.Group(
+            [
+                local_icon(
+                    SETUP_CARD_CAUTION_ICON if caution else SETUP_CARD_INFO_ICON,
+                    className="alert-panel-icon",
+                ),
+                dmc.Text(title, className="alert-panel-title"),
+            ],
+            gap="xs",
+            align="center",
+        ),
         dmc.Text(body),
         dmc.Group(actions, gap="sm"),
     ]
@@ -1438,7 +1468,7 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
         )
     return dmc.Paper(
         dmc.Stack(children, gap="xs"),
-        className="setup-card",
+        className=SETUP_CARD_CAUTION_CLASS if caution else SETUP_CARD_CLASS,
         withBorder=True,
     )
 
@@ -1471,6 +1501,7 @@ def _setup_card_children() -> list:
                 SETUP_CARD_STATS_DIR_TITLE,
                 SETUP_CARD_STATS_DIR_BODY,
                 offer_skip=False,
+                caution=True,
             )
         ]
     if KOVAAKS_USERNAME_KEY not in settings:
@@ -1479,6 +1510,7 @@ def _setup_card_children() -> list:
                 SETUP_CARD_IDENTITY_TITLE,
                 SETUP_CARD_IDENTITY_BODY,
                 offer_skip=True,
+                caution=False,
             )
         ]
     return []

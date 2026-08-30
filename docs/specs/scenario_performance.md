@@ -227,6 +227,10 @@ of scope here.
   fine print "Skipping username disables rank lookups. You can set it
   anytime in Settings."
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  The card is a panel wearing the shared alert treatment rather than a
+  `dmc.Alert`, because it holds a link and a button: the stats-folder state is
+  yellow with a warning icon beside its title, and the identity state blue
+  with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
 - The stats-folder hint is a single line above the controls: "No stats

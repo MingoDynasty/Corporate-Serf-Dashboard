@@ -371,8 +371,9 @@ flowchart LR
   Delete action cell (user playlists only; bundled rows render nothing) opens a
   confirmation modal, then `delete_user_playlist` unlinks the file and the same
   refresh store rebuilds the grid. When the loader recorded user files
-  superseded by bundled benchmarks, an alert above the grid offers a one-click
-  cleanup (`delete_superseded_user_playlist_files`).
+  superseded by bundled benchmarks, a notice above the grid offers a one-click
+  cleanup (`delete_superseded_user_playlist_files`). It is a `dmc.Paper`
+  rather than a `dmc.Alert` because it holds a button (see decision log).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log). It paints
