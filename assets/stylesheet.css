@@ -269,18 +269,50 @@
     padding-bottom: 0.5rem;
 }
 
-/* The first-run setup card at the top of Scenario Performance. It asks for
-   what the app could not configure on its own, so it reads as one bounded
-   block rather than page furniture: narrow enough that the eye takes it in at
-   once, and spaced off the controls below it. */
-.setup-card {
-    margin-bottom: var(--mantine-spacing-md);
-    max-width: 32rem;
+/* The alert anatomy for inline notices that hold interactive controls: the
+   first-run setup card and the playlists page's leftover-files notice. Those
+   cannot be a dmc.Alert without putting a focusable button inside
+   role="alert", so they are dmc.Paper elements wearing the look through these
+   classes -- the tint, a heavier leading border, and an icon beside the title.
+   Blue is the informational default and the caution modifier swaps in the
+   yellow tokens. Mantine defines the -light tokens per color scheme, so dark
+   mode needs no separate rules. */
+.alert-panel {
+    background-color: var(--mantine-color-blue-light);
+    /* Mantine's own light-variant foreground: contrast-tuned against the tint
+       above it in both schemes, unlike the raw -filled token. */
+    border-color: var(--mantine-color-blue-light-color);
+    border-left-width: 0.1875rem;
     padding: var(--mantine-spacing-md);
 }
 
-.setup-card-title {
+.alert-panel-caution {
+    background-color: var(--mantine-color-yellow-light);
+    border-color: var(--mantine-color-yellow-light-color);
+}
+
+/* local_icon paints its mask with currentColor, so the panel's severity
+   reaches the icon by setting color rather than a background. */
+.alert-panel-icon {
+    color: var(--mantine-color-blue-light-color);
+}
+
+.alert-panel-caution .alert-panel-icon {
+    color: var(--mantine-color-yellow-light-color);
+}
+
+.alert-panel-title {
     font-weight: 600;
+}
+
+/* The first-run setup card at the top of Scenario Performance. It asks for
+   what the app could not configure on its own, so it reads as one bounded
+   block rather than page furniture: narrow enough that the eye takes it in at
+   once, and spaced off the controls below it. Its tint and icon come from the
+   alert anatomy above. */
+.setup-card {
+    margin-bottom: var(--mantine-spacing-md);
+    max-width: 32rem;
 }
 
 /* The card's primary action. It navigates, so it is an anchor, not a button —
@@ -357,7 +389,7 @@ a.playlist-scenario-link-cell:hover {
     color: var(--mantine-color-blue-filled-hover);
 }
 
-/* The overview's leftover-files alert ships hidden and is revealed by the
+/* The overview's leftover-files notice ships hidden and is revealed by the
    render_superseded_alert callback, which toggles this class on and off. */
 .playlists-superseded-alert-hidden {
     display: none;
