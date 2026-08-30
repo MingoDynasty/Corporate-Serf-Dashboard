@@ -326,11 +326,16 @@ see Out of scope.
   otherwise let a later response resurrect an obsolete instance id and
   leave two same-channel toasts visible, or leave a problem toast beside
   the success that cleared it. What remains is only same-operation
-  concurrency, and every channel's emissions and cross-clears originate in
-  one callback whose spam-triggers the existing running/loading disables
-  and the serialized run-events pipeline already prevent; the
+  concurrency, and that is covered by the renderer, not by loading guards
+  (most converting callbacks have none): every channel has exactly one
+  producing callback, and Dash 4.4.1 marks an older in-flight invocation
+  with the same output set outdated and discards its response before
+  applying it — corroborated by the POC's rapid-repeat run. The import
+  button's running disable and the serialized run-events pipeline add
+  further serialization where they exist but are not load-bearing. The
   implementation PR asserts the per-key patch shape in unit tests,
-  including the interleaved two-callback case. Accepted cosmetics from the
+  including the interleaved two-callback case and the same-callback
+  overlap case. Accepted cosmetics from the
   POC: a toast that arrived as a
   replacement auto-closes without its own exit fade (it pops out at full
   opacity), and bystander toasts bounce upward for roughly 280 ms during a
