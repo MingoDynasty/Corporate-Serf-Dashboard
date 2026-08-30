@@ -6,7 +6,8 @@ act on. A condition that stays true is explained where it happens instead of
 popping up again on every trigger. A run earns at most one notification, its
 title states the verdict, and the next run replaces it rather than stacking
 beside it. One switch in Chart options silences the run notifications while
-the chart keeps updating.
+the chart keeps updating. Toasts and the notices printed into the page share
+one severity color scale, so a color means the same thing wherever it appears.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -18,6 +19,42 @@ belong to another capability — the Position field's hints, the manual
 Refresh outcomes, the Steam ID mismatch, the playlist outcome toasts — are
 named here only as instances of the routing policy; their owning spec keeps
 their full behavior.
+
+## The severity scale
+
+- One color scale governs every notification surface, toast and inline notice
+  alike. Blue is informational and any action it offers is optional; yellow is
+  caution, an attention-worthy negative outcome or a state that needs the user
+  without anything having failed; red is an error, an operation that failed;
+  green is a positive outcome; orange is partial success, where the action
+  committed but a follow-up write did not
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  Green and orange are toast-only: no inline surface uses either.
+- Every inline notice carries a leading icon,
+  `material-symbols:warning-outline` on yellow and
+  `material-symbols:info-outline` on blue
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+- Which component a notice uses follows its content model. A text-only notice
+  may be a `dmc.Alert`, whose root Mantine renders with `role="alert"`: an
+  assertive, atomic live region, so assistive technology reads the element's
+  entire contents as one message, keyboard focus never moves to it, and the
+  announcement offers no direct interaction. A notice that holds interactive
+  controls is a `dmc.Paper` wearing the alert anatomy through the shared
+  `.alert-panel` classes in `assets/stylesheet.css`, per
+  [MDN's `role=alert` guidance](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/alert_role)
+  that the role is for text content rather than interactive elements like
+  links or buttons, and for content that appears dynamically rather than with
+  the page
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+- The five inline notices, each owned by the spec named beside it: the
+  Settings store alert (settings spec) and the Playlists visibility alert
+  (playlists spec) are yellow `dmc.Alert`s; the Aim Training Journey
+  work-in-progress banner is a blue `dmc.Alert`, recorded only here because
+  that page is work in progress and has no capability spec; the Playlists
+  leftover-files notice (playlists spec) is a blue `dmc.Paper`; the Home setup
+  card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
+  in its identity state and yellow in its stats-folder state
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
 
 ## Delivery
 

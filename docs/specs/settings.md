@@ -229,7 +229,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   Before any detection the button sits beside the hint "Checks the Steam
   accounts on this machine against KovaaK's.", which a detection's report
   replaces.
-- An alert titled "Your saved settings are not being used" carries the
+- A yellow alert with a warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices))
+  titled "Your saved settings are not being used" carries the
   store's message in the error and future states and is re-derived after a
   save that repairs the file
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).

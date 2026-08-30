@@ -28,6 +28,16 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Alert color language** — the notices printed into the page now speak one
+  severity scale, the same one the toasts already spoke: blue for
+  information, yellow for caution, red for errors, each with a leading icon.
+  The first-run setup card used to be a white card on a white page and is now
+  tinted like the rest, turning yellow in the state where nothing can be
+  plotted until it is answered. The leftover-playlist-files notice became a
+  plain panel, so a screen reader is no longer told that a panel of buttons is
+  an alert. No wording changed anywhere. (PR #260; design in #256, rulings in
+  #259) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Run notifications master switch** — run toasts can now be turned off. One
   Chart options switch, Run Notifications, silences the whole per-run toast
   family: the threshold verdict, the placement, and the catch-up digest after
@@ -60,15 +70,6 @@ sequence.
   Settings page pre-fills the version into the form and shows where the log
   lives, so filing a report is a click instead of a hunt. (PRs #228, #229;
   design in #226) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **Chart options inspector** — the Scenario Performance graph's display
-  preferences left the blocking "Settings" modal for a collapsible panel beside
-  the chart, so an overlay is tuned against the live chart instead of through an
-  open-close-open loop behind a dimmed page. On a narrow window the panel stacks
-  above the chart instead. The page itself is now named Scenario Performance in
-  the navbar and the browser tab, so only the Settings page answers to
-  "Settings". No preference changed what it does or where it is stored. (PRs
-  #209, #215; design in #206) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 ---
 

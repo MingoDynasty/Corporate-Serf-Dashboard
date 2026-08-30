@@ -718,6 +718,7 @@ def layout(**kwargs):  # noqa: ARG001
                 id="app-settings-store-alert",
                 title=STORE_ALERT_TITLE,
                 color="yellow",
+                icon=local_icon("material-symbols:warning-outline"),
                 className=store_alert_class,
             ),
             _stats_dir_input(

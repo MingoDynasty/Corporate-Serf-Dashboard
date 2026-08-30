@@ -110,6 +110,17 @@ list in the roadmap.)
   means the Settings page and nothing else — the modal, the button that opened
   it, and the navbar link had all been calling themselves Settings, two of
   them with the same icon.
+- **One color language for notices** (PR #260; design in #256). Every notice
+  the app prints into the page now uses the same severity colors the toasts
+  use — blue for information, yellow for caution, red for a failure — and
+  carries a matching icon. The first-run setup card is tinted and iconed like
+  the rest, and turns yellow in the state where nothing can be plotted until
+  it is answered. *Problem solved:* the surfaces that most needed attention
+  were the faintest things on the screen. The setup card was a white card on a
+  white page, the alerts were the palest wash in the palette with nothing to
+  anchor them, and one purely informational banner was tinted red for no
+  reason, so a color told you nothing about how much it mattered. Nothing the
+  app says changed; only how loudly it says it.
 
 ### Standing: where do I rank
 
