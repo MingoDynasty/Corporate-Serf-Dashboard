@@ -28,7 +28,7 @@ success also clears the leftover failure message it answers.
   toast lifetime, judged against the complete supported workflow including
   inverse actions that make the same subject eligible again (a deleted
   playlist can be re-imported at once)? A fact that cannot recur is an event
-  toast (unique id, plain show, stacks, no sequence wiring). A fact that can
+  toast (unique id, plain show, stacks, no registry wiring). A fact that can
   recur is a channel. Second: what is the channel's identity? Identity
   follows the semantic lane. An operation's problem lane is one channel: its
   mutually exclusive outcome flavors (a red hard failure, a yellow
@@ -77,7 +77,9 @@ success also clears the leftover failure message it answers.
   full entry animation and a structurally fresh 8 s lifetime — the
   measured numbers are in Design. Ratifying D2 also ratifies its two
   supporting mechanics there: the per-channel instance registry (the store
-  that knows which instance id to hide), and success-clears-failure,
+  that knows which instance id to hide, written only through per-key
+  partial updates so responses cannot clobber unrelated channels), and
+  success-clears-failure,
   without which a stale failure toast outlives the success that answers
   it. Alternatives, in the order they fell: plain upsert (the update+show
   pair with the alternating `autoClose`) restarts the timer with zero
@@ -91,14 +93,21 @@ success also clears the leftover failure message it answers.
   retry inside the 8 s window gets no answer at all, the dead-UI failure
   the import bug exhibits.
 - **D3 — Retire `upsert_toast`: `run-verdict` migrates to hide-and-reshow
-  too.** Recommended: yes. With every D2 channel on hide-and-reshow, the
-  alternating-`autoClose` trick exists for one toast only; migrating
-  `run-verdict` deletes the trick and its sequence semantics outright and
-  leaves one replacement mechanism app-wide. The ratified run-verdict
-  contract is preserved — one run, one toast, the newest verdict replacing
-  whatever is on screen — but each new verdict now re-enters with the pop
-  animation instead of morphing in place, which is a small visible change
-  to shipped behavior and is why this is its own decision. Choosing
+  too.** Recommended: yes, conditional on D2's per-key registry writes —
+  under a whole-dict registry a clobbered entry could put two run-verdict
+  toasts on screen at once, and stable-id upsert would keep a genuine
+  correctness advantage rather than a mere stillness preference; the
+  `dash.Patch` write semantics in Design are what remove that advantage
+  and make this migration safe to recommend. With every D2 channel on
+  hide-and-reshow, the alternating-`autoClose` trick exists for one toast
+  only; migrating `run-verdict` deletes the trick and its sequence
+  semantics outright and leaves one replacement mechanism app-wide. The
+  ratified run-verdict contract is preserved — one run, one toast, the
+  newest verdict replacing whatever is on screen, with the qualifier that
+  during the ~250 ms replacement crossfade the outgoing instance is still
+  animating out — and each new verdict now re-enters with the pop
+  animation instead of morphing in place, a small visible change to
+  shipped behavior, which is why this is its own decision. Choosing
   differently keeps two replacement mechanisms alive indefinitely for one
   toast's benefit.
 
@@ -198,7 +207,7 @@ see Out of scope.
    lifetime, judged against the complete supported workflow including
    inverse actions that make the subject eligible again. Unique id per
    emission (`-{uuid}` suffix), plain `show`, occurrences stack, and the
-   emitting callback needs no sequence wiring. Applying that test today
+   emitting callback needs no registry wiring. Applying that test today
    leaves this bucket empty — every current toast's fact can recur through
    some supported cycle — so the rule exists to classify future toasts, and
    any claim that a fact cannot recur must survive the inverse-action check
@@ -247,7 +256,9 @@ see Out of scope.
   subject-keyed replacement absorbs the repeat instead of stacking
   duplicates. Key by the canonical stored code, never the pasted input,
   which can differ in case.
-- Convert to single-id channel toasts (rule 2), pending D2: the three
+- Convert to single-identity channel toasts (rule 2), pending D2 — one
+  fixed logical channel key each, while the rendered instance id still
+  rotates per emission under hide-and-reshow: the three
   per-action failure toasts, the two refusal toasts,
   `superseded-cleanup-successful-notification`, and
   `rank-refresh-username-unset-{uuid}`. The failures and refusals are
@@ -304,13 +315,23 @@ see Out of scope.
   instance registry — a dict mapping each logical channel key
   (subject-keyed channels use their dynamic keys) to its current instance
   id, where an instance id is the channel key plus a per-emission unique
-  suffix — read to know what to hide, written on each emission, with a
-  State and an `allow_duplicate` Output in each emitting callback; it grows one
-  small entry per channel seen in a session, negligible for a per-client
-  memory store. Accepted limitation: two concurrent callbacks can race the
-  registry and lose one write, leaving one stale instance to expire on its
-  own timer beside the new one for up to 8 s — rare, transient,
-  self-healing. Accepted cosmetics from the POC: a toast that arrived as a
+  suffix — read via State to know what to hide, with an `allow_duplicate`
+  Output in each emitting callback; it grows one small entry per channel
+  seen in a session, negligible for a per-client memory store. Registry
+  writes are per-key partial updates (`dash.Patch`, verified importable in
+  the installed Dash 4.4.1), never whole-dict replacements: a callback's
+  response assigns only the channel keys it emitted or cleared, so a
+  concurrent response from another callback structurally cannot carry a
+  stale value for an unrelated channel — the interleaving that would
+  otherwise let a later response resurrect an obsolete instance id and
+  leave two same-channel toasts visible, or leave a problem toast beside
+  the success that cleared it. What remains is only same-operation
+  concurrency, and every channel's emissions and cross-clears originate in
+  one callback whose spam-triggers the existing running/loading disables
+  and the serialized run-events pipeline already prevent; the
+  implementation PR asserts the per-key patch shape in unit tests,
+  including the interleaved two-callback case. Accepted cosmetics from the
+  POC: a toast that arrived as a
   replacement auto-closes without its own exit fade (it pops out at full
   opacity), and bystander toasts bounce upward for roughly 280 ms during a
   replacement.
@@ -348,7 +369,10 @@ see Out of scope.
   refusal semantics). The conversions supersede ratified clauses, so per
   convention the old decisions stay and get supersession markers in
   `docs/decision_log.md`: the 2026-08-03 entry's per-click-id
-  presentation-standard exception and its distinct-rank-ids rationale, and
+  presentation-standard exception and its distinct-rank-ids rationale, the
+  same entry's "at most one run-verdict toast is visible at a time" clause
+  (which under D3 gains the ~250 ms replacement-crossfade qualifier — the
+  outgoing instance is still animating out while the new one enters), and
   the 2026-08-09 unset-username entry's per-click blue-toast clause.
 
 **Copy:** none under the recommended design. No user-facing string is added
@@ -402,10 +426,14 @@ block must then be amended with the exact copy before implementation.
   assert every channel emission pairs a fresh-instance show with a hide of
   the registry's previous instance and rotates the registry entry; assert
   each success path's hide list also carries its operation's problem
-  channel (and, for rank refresh, the username-unset channel); cover the
-  rank family (a hard failure followed by a served-stale retry emits under
-  the one problem key, two refreshes of one scenario share a channel key
-  while two scenarios do not); assert `run-verdict` rides the same
-  mechanism and that `upsert_toast` is gone (per D3). The POC's
+  channel (and, for rank refresh, the username-unset channel); assert
+  every registry write is a per-key partial update touching only the keys
+  that emission emitted or cleared, and simulate the interleaved
+  two-callback case (responses landing out of order must leave every other
+  channel's registry entry intact); cover the rank family (a hard failure
+  followed by a served-stale retry emits under the one problem key, two
+  refreshes of one scenario share a channel key while two scenarios do
+  not); assert `run-verdict` rides the same mechanism and that
+  `upsert_toast` is gone (per D3). The POC's
   browser-level findings are evidence, not gates — unit tests assert
   emission shapes and registry state. Run the standard five local gates.
