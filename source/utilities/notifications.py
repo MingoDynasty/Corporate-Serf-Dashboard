@@ -11,6 +11,12 @@ NOTIFICATION_CONTAINER_ID = "notification-container"
 # still-visible toast the duration it is already displaying.
 TOAST_LIFETIME_STORE_ID = "toast-lifetime-sequence"
 
+# The personal best celebration's own toast id, deliberately not the page's
+# run-verdict id: the celebration is an app-wide family with its own lifetime,
+# so it must survive the next ordinary run toast instead of being replaced by
+# it.
+CELEBRATION_NOTIFICATION_ID = "pb-celebration"
+
 # The one nominal toast lifetime. Conditions that fire when nobody may be
 # looking pass ``auto_close=False`` instead and stay until dismissed.
 DEFAULT_AUTO_CLOSE_MS = 8000
@@ -72,4 +78,18 @@ def upsert_toast(
         **notification,
         "autoClose": _ALTERNATING_AUTO_CLOSE_MS[(sequence or 0) % 2],
     }
+    return [{**payload, "action": "update"}, payload]
+
+
+def upsert_sticky_toast(notification: dict[str, Any]) -> list[dict[str, Any]]:
+    """Pair the payloads that let one until-dismissed id replace what it shows.
+
+    Same ``update``-plus-``show`` pairing as ``upsert_toast`` without the
+    lifetime alternation, and the reason it is a sibling rather than a flag:
+    ``upsert_toast`` stamps one of its two durations over ``autoClose``, so
+    routing a sticky toast through it would quietly give it an 8 s lifetime.
+    A toast that stays until dismissed has no timer to re-arm, so there is
+    nothing for the alternation to do here.
+    """
+    payload = {**notification, "autoClose": False}
     return [{**payload, "action": "update"}, payload]

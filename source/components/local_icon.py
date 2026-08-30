@@ -53,6 +53,7 @@ ICONS: dict[str, IconAsset] = {
         24,
         24,
     ),
+    "material-symbols:trophy": IconAsset("material-symbols-trophy.svg", 24, 24),
     "material-symbols:upload": IconAsset("material-symbols-upload.svg", 24, 24),
     "material-symbols:warning-outline": IconAsset(
         "material-symbols-warning-outline.svg",

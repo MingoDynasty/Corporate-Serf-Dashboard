@@ -1,58 +1,60 @@
 import json
-from collections import deque
-from datetime import datetime
 from types import SimpleNamespace
 
 import dash
 import plotly.graph_objects as go
 from dash import no_update
-from dash._callback import GLOBAL_CALLBACK_MAP
+from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.my_queue.message_queue import NewFileMessage  # noqa: E402
+from source.app_shell import RunEventBatch, RunEventData  # noqa: E402
 from source.pages import home  # noqa: E402
 
 
-def _message(
-    scenario_name: str,
+def _run(
+    scenario_name: str = "Scenario A",
     *,
+    run_id: str = "run-1.csv",
     nth_score: int = 2,
     score: float = 812.4,
     scenario_previous_best: float | None = 800.0,
     is_new_sensitivity: bool = False,
-) -> NewFileMessage:
-    return NewFileMessage(
-        datetime_created=datetime(2026, 7, 6, 12),
-        is_new_sensitivity=is_new_sensitivity,
-        nth_score=nth_score,
-        run_id=f"{scenario_name} {score}.csv",
-        scenario_name=scenario_name,
-        scenario_previous_best=scenario_previous_best,
-        score=score,
-        sensitivity="34.64 cm/360",
-    )
+    is_live: bool = True,
+) -> RunEventData:
+    """One run as the shell stamped it: facts plus the drain's liveness."""
+    return {
+        "run_id": run_id,
+        "scenario_name": scenario_name,
+        "sensitivity": "34.64 cm/360",
+        "nth_score": nth_score,
+        "score": score,
+        "scenario_previous_best": scenario_previous_best,
+        "is_new_sensitivity": is_new_sensitivity,
+        "is_live": is_live,
+    }
+
+
+def _batch(
+    *runs: RunEventData,
+    celebrated_run_id: str | None = None,
+) -> RunEventBatch:
+    return {
+        "runs": list(runs),
+        "celebrated_run_id": celebrated_run_id,
+        "animation_sequence": 1 if celebrated_run_id else 0,
+    }
 
 
 def _payload(
     scenario_name: str = "Scenario A",
     *,
-    count: int = 1,
-    nth_score: int = 2,
-    score: float = 812.4,
-    scenario_previous_best: float | None = 800.0,
-    is_new_sensitivity: bool = False,
+    celebrated_run_id: str | None = None,
+    **run_fields,
 ) -> home.RunEventsPayload:
     return {
-        "count": count,
-        "latest": {
-            "scenario_name": scenario_name,
-            "sensitivity": "34.64 cm/360",
-            "nth_score": nth_score,
-            "score": score,
-            "scenario_previous_best": scenario_previous_best,
-            "is_new_sensitivity": is_new_sensitivity,
-        },
+        "latest": _run(scenario_name, **run_fields),
+        "celebrated_run_id": celebrated_run_id,
     }
 
 
@@ -108,97 +110,129 @@ def test_graph_theme_callback_falls_back_to_initial_placeholder():
     assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
 
 
-def test_drain_run_events_summarizes_single_scenario_backlog(monkeypatch):
-    queue = deque([_message("Scenario A"), _message("Scenario A", score=830.1)])
-    monkeypatch.setattr(home, "message_queue", queue)
-
-    target, payload = home._drain_run_events("Scenario A", False)
+def test_summarize_run_events_coalesces_a_single_scenario_backlog():
+    target, payload = home._summarize_run_events(
+        _batch(
+            _run(run_id="a.csv"),
+            _run(run_id="b.csv", score=830.1),
+        ),
+        "Scenario A",
+        False,
+    )
 
     assert target == "Scenario A"
-    assert payload == _payload(
-        count=2,
-        score=830.1,
-    )
-    assert not queue
+    assert payload == _payload(run_id="b.csv", score=830.1)
     json.dumps(payload)
 
 
-def test_drain_run_events_auto_change_lands_on_latest_scenario(monkeypatch):
-    queue = deque(
-        [
-            _message("Scenario B", score=700.0),
-            _message("Scenario A", score=800.0),
-            _message("Scenario B", score=830.1),
-        ]
+def test_summarize_run_events_auto_change_lands_on_latest_scenario():
+    target, payload = home._summarize_run_events(
+        _batch(
+            _run("Scenario B", run_id="a.csv", score=700.0),
+            _run("Scenario A", run_id="b.csv", score=800.0),
+            _run("Scenario B", run_id="c.csv", score=830.1),
+        ),
+        "Scenario A",
+        True,
     )
-    monkeypatch.setattr(home, "message_queue", queue)
-
-    target, payload = home._drain_run_events("Scenario A", True)
 
     assert target == "Scenario B"
-    assert payload == _payload(
-        "Scenario B",
-        count=2,
-        score=830.1,
+    assert payload == _payload("Scenario B", run_id="c.csv", score=830.1)
+
+
+def test_summarize_run_events_without_auto_change_discards_other_scenarios():
+    target, payload = home._summarize_run_events(
+        _batch(
+            _run("Scenario B", run_id="a.csv"),
+            _run("Scenario A", run_id="b.csv", score=820.0),
+            _run("Scenario B", run_id="c.csv", score=830.1),
+        ),
+        "Scenario A",
+        False,
     )
-    assert not queue
-
-
-def test_drain_run_events_without_auto_change_discards_other_scenarios(monkeypatch):
-    queue = deque(
-        [
-            _message("Scenario B"),
-            _message("Scenario A", score=820.0),
-            _message("Scenario B", score=830.1),
-        ]
-    )
-    monkeypatch.setattr(home, "message_queue", queue)
-
-    target, payload = home._drain_run_events("Scenario A", False)
 
     assert target == "Scenario A"
-    assert payload == _payload(score=820.0)
-    assert not queue
+    assert payload == _payload(run_id="b.csv", score=820.0)
 
 
-def test_drain_run_events_returns_no_payload_when_nothing_relevant(monkeypatch):
-    queue = deque([_message("Scenario B")])
-    monkeypatch.setattr(home, "message_queue", queue)
+def test_summarize_run_events_returns_no_payload_when_nothing_relevant():
+    batch = _batch(_run("Scenario B"))
 
-    assert home._drain_run_events("Scenario A", False) == ("Scenario A", None)
-    assert not queue
+    assert home._summarize_run_events(batch, "Scenario A", False) == (
+        "Scenario A",
+        None,
+    )
 
 
-def test_check_for_new_data_updates_store_once_and_dropdown_at_most_once(monkeypatch):
-    queue = deque([_message("Scenario A"), _message("Scenario B")])
-    monkeypatch.setattr(home, "message_queue", queue)
+def test_the_decision_travels_even_when_it_names_another_scenarios_run():
+    # The celebration is app-wide, so the run it names need not be one this
+    # page is showing. Forwarding it unconditionally is what lets the page
+    # recognize the celebrated run when it *is* the one being narrated.
+    _target, payload = home._summarize_run_events(
+        _batch(
+            _run("Scenario B", run_id="pb.csv", score=900.0),
+            _run("Scenario A", run_id="ordinary.csv"),
+            celebrated_run_id="pb.csv",
+        ),
+        "Scenario A",
+        False,
+    )
 
-    payload, target = home.check_for_new_data(1, True, "Scenario A")
-    second_payload, second_target = home.check_for_new_data(1, True, "Scenario B")
+    assert payload["celebrated_run_id"] == "pb.csv"
+    assert payload["latest"]["run_id"] == "ordinary.csv"
 
-    assert payload == _payload("Scenario B")
+
+def test_check_for_new_data_updates_store_once_and_dropdown_at_most_once():
+    payload, target = home.check_for_new_data(
+        _batch(_run("Scenario A", run_id="a.csv"), _run("Scenario B", run_id="b.csv")),
+        True,
+        "Scenario A",
+    )
+    second_payload, second_target = home.check_for_new_data(
+        _batch(_run("Scenario B", run_id="b.csv")),
+        True,
+        "Scenario B",
+    )
+
+    assert payload == _payload("Scenario B", run_id="b.csv")
     assert target == "Scenario B"
-    assert second_payload is no_update
+    assert second_payload == _payload("Scenario B", run_id="b.csv")
     assert second_target is no_update
 
 
-def test_drain_run_events_tolerates_popleft_race(monkeypatch):
-    class RacingQueue:
-        def __init__(self):
-            self.calls = 0
+def test_check_for_new_data_forwards_nothing_without_a_batch():
+    assert home.check_for_new_data(None, True, "Scenario A") == (no_update, no_update)
 
-        def popleft(self):
-            self.calls += 1
-            if self.calls == 1:
-                return _message("Scenario A")
-            raise IndexError
 
-    monkeypatch.setattr(home, "message_queue", RacingQueue())
+def test_check_for_new_data_consumes_the_batch_store_as_its_only_input():
+    """The controls are State, and the store is the sole trigger.
 
-    target, payload = home._drain_run_events("Scenario A", False)
+    A queue pop was destructive, so a control-triggered rerun used to find
+    nothing. A Store replays its last value instead, so an auto-switch flip or
+    a dropdown change must not re-forward a batch already processed -- and
+    prevent_initial_call keeps a remount from replaying the retained value,
+    the initial-load duplicate-callback hazard this repo has already paid for.
+    """
+    key = "..run-events.data...scenario-dropdown-selection.value.."
+    spec = GLOBAL_CALLBACK_MAP[key]
+    (registration,) = [
+        entry for entry in GLOBAL_CALLBACK_LIST if str(entry["output"]) == key
+    ]
 
-    assert target == "Scenario A"
-    assert payload == _payload()
+    assert [(dep["id"], dep["property"]) for dep in spec["inputs"]] == [
+        ("run-events-batch", "data")
+    ]
+    assert {(dep["id"], dep["property"]) for dep in spec["state"]} == {
+        ("automatically-change-scenario-switch", "checked"),
+        ("scenario-dropdown-selection", "value"),
+    }
+    assert registration["prevent_initial_call"] is True
+
+
+def test_the_page_never_pops_the_run_event_queue():
+    # One consumer, in the shell. A second drain here is the race the design
+    # closed by construction.
+    assert not hasattr(home, "message_queue")
 
 
 def _notification(
@@ -220,14 +254,13 @@ def _notification(
 
 
 def test_every_run_verdict_shares_one_replaceable_id():
-    # One run, one toast: the placement toast, the threshold verdict, and the
-    # catch-up digest all land under the same id, so the newest one replaces
-    # whatever is on screen instead of stacking beside it.
+    # One run, one toast: the placement toast and both threshold verdicts land
+    # under the same id, so the newest one replaces whatever is on screen
+    # instead of stacking beside it.
     ids = {
         _notification(_payload(is_new_sensitivity=True))["id"],
         _notification(_payload(score=830.0))["id"],
-        _notification(_payload(score=780.0, scenario_previous_best=800.0))["id"],
-        _notification(_payload(count=3))["id"],
+        _notification(_payload(score=780.0))["id"],
     }
 
     assert ids == {"run-verdict"}
@@ -342,56 +375,95 @@ def test_a_run_qualifying_for_neither_verdict_says_nothing():
     assert _notification(_payload(nth_score=9, is_new_sensitivity=True)) is None
 
 
-def test_backlog_summary_reports_the_count_and_the_latest_verdict():
-    notification = _notification(
-        _payload(count=3, score=780.0, scenario_previous_best=800.0),
-        score_threshold_percentage=98.75,
+def test_a_multi_run_batch_narrates_only_its_latest_matching_run():
+    """No digest: the plot is every other run's record.
+
+    A batch of several runs rebuilds the graph once, auto-switches once, and
+    toasts about the latest matching run exactly as a single run would.
+    """
+    _target, payload = home._summarize_run_events(
+        _batch(
+            _run(run_id="a.csv", score=700.0),
+            _run(run_id="b.csv", score=760.0),
+            _run(run_id="c.csv", score=780.0),
+        ),
+        "Scenario A",
+        False,
+    )
+    notification = _notification(payload, score_threshold_percentage=98.75)
+
+    assert notification["title"] == "Below threshold"
+    assert "runs" not in notification["message"]
+    assert not hasattr(home, "_build_backlog_notification")
+
+
+def test_an_older_qualifying_personal_best_in_the_batch_is_plot_only():
+    # Two personal bests in one batch. The drain names the newer one, the page
+    # narrates the newer one and yields it to the celebration, and the older
+    # one earns nothing -- exactly as such coalesced runs already do today.
+    _target, payload = home._summarize_run_events(
+        _batch(
+            _run(run_id="older-pb.csv", score=810.0),
+            _run(run_id="newer-pb.csv", score=830.0),
+            celebrated_run_id="newer-pb.csv",
+        ),
+        "Scenario A",
+        False,
     )
 
-    assert notification["title"] == "While you were away"
-    assert notification["color"] == "yellow"
-    assert notification["message"] == (
-        "3 new Scenario A runs. Latest: 780.00 — 97.5% of PB, below the "
-        "98.8% threshold."
-    )
+    assert payload["latest"]["run_id"] == "newer-pb.csv"
+    assert _notification(payload) is None
 
 
-def test_backlog_summary_without_a_verdict_stays_neutral():
-    for empty_percentage in (None, ""):
-        notification = _notification(
-            _payload(count=3, score=780.0, scenario_previous_best=800.0),
-            score_threshold_percentage=empty_percentage,
+def test_a_celebrated_run_yields_its_toast_to_the_celebration():
+    # The celebration toast is that run's one notification, whatever verdict
+    # the run would otherwise have earned -- including a stretch goal it
+    # missed, which would have read "Below threshold" under the confetti.
+    for goal in (95.0, 105.0):
+        assert (
+            _notification(
+                _payload(score=830.0, celebrated_run_id="run-1.csv"),
+                score_threshold_percentage=goal,
+            )
+            is None
         )
 
-        assert notification["title"] == "While you were away"
-        assert notification["color"] == "blue"
-        assert notification["message"] == (
-            "3 new Scenario A runs. Latest: 780.00 at 34.64 cm/360."
+
+def test_a_celebrated_first_run_at_a_new_sensitivity_yields_too():
+    # Case 2: unjudged, first at its sensitivity, and still the scenario's
+    # best. The old schema could not tell this run from one with no history.
+    assert (
+        _notification(
+            _payload(
+                nth_score=1,
+                score=900.0,
+                is_new_sensitivity=True,
+                celebrated_run_id="run-1.csv",
+            )
         )
-
-
-def test_backlog_summary_passes_at_exactly_the_goal():
-    notification = _notification(
-        _payload(count=3, score=820.0, scenario_previous_best=800.0),
-        score_threshold_percentage=102.5,
-    )
-
-    assert notification["color"] == "green"
-    assert notification["message"] == (
-        "3 new Scenario A runs. Latest: 820.00 — 102.5% of PB, passed threshold."
+        is None
     )
 
 
-def test_backlog_summary_passes_a_new_pb_above_a_stretch_goal():
-    notification = _notification(
-        _payload(count=3, score=850.0, scenario_previous_best=800.0),
-        score_threshold_percentage=105.0,
-    )
+def test_the_page_reads_the_stamp_and_never_re_derives_the_celebration():
+    """Facts travel; only the drain decides.
 
-    assert notification["color"] == "green"
-    assert notification["message"] == (
-        "3 new Scenario A runs. Latest: 850.00 — 106.2% of PB, passed threshold."
-    )
+    A run whose raw fields beat its previous best still narrates when the
+    decision does not name it, and a run whose fields did not still yields when
+    it does. Re-deriving here is what the single-drain design removed.
+    """
+    beat_its_best = _payload(score=830.0, celebrated_run_id=None)
+    did_not = _payload(score=780.0, celebrated_run_id="run-1.csv")
+
+    assert _notification(beat_its_best) is not None
+    assert _notification(did_not) is None
+
+
+def test_a_stale_run_narrates_nothing():
+    # Past the freshness cap the run still reaches the plot; only the
+    # interruption is withheld.
+    assert _notification(_payload(score=830.0, is_live=False)) is None
+    assert _notification(_payload(score=830.0, is_live=True)) is not None
 
 
 def test_notifications_ignore_payload_for_another_scenario():
@@ -409,17 +481,33 @@ def test_notifications_ignore_payload_for_another_scenario():
 
 
 def test_the_master_switch_silences_the_whole_run_toast_family():
-    # One guard, three shapes. Each payload earns a toast with the switch on,
+    # One guard, both shapes. Each payload earns a toast with the switch on,
     # so the off assertions cannot pass vacuously.
     shapes = (
-        _payload(score=830.0, scenario_previous_best=800.0),  # threshold verdict
+        _payload(score=830.0),  # threshold verdict
         _payload(is_new_sensitivity=True),  # top-N placement
-        _payload(count=3),  # "While you were away" digest
     )
 
     for payload in shapes:
         assert _notification(payload) is not None
         assert _notification(payload, run_notification_switch=False) is None
+
+
+def test_the_master_switch_guard_precedes_the_celebration_yield():
+    # The two settings are independent families, and the order says which one
+    # answers first: with run notifications off the page is silent whether or
+    # not the drain celebrated the run.
+    celebrated = _payload(score=830.0, celebrated_run_id="run-1.csv")
+    ordinary = _payload(score=830.0)
+
+    assert _notification(celebrated, run_notification_switch=False) is None
+    assert _notification(ordinary, run_notification_switch=False) is None
+
+
+def test_the_run_notifications_help_text_drops_the_retired_digest():
+    assert home.SETTINGS_HELP_TEXT["run-notification"] == (
+        "Controls threshold verdict and placement notifications for your runs."
+    )
 
 
 def test_the_run_notification_switch_is_state_not_input():

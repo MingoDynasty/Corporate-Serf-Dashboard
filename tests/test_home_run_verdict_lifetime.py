@@ -32,8 +32,10 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source import app_shell  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
+    CELEBRATION_NOTIFICATION_ID,
     DEFAULT_AUTO_CLOSE_MS,
     TOAST_LIFETIME_STORE_ID,
+    upsert_sticky_toast,
 )
 
 # What dmc.NotificationContainer resolves autoClose to when a payload omits it.
@@ -112,6 +114,20 @@ def plotting(monkeypatch):
     )
 
 
+def _run_event(score: float) -> dict:
+    """One run as the shell's drain stamps it."""
+    return {
+        "run_id": f"run-{score}.csv",
+        "scenario_name": "Scenario A",
+        "sensitivity": "34.64 cm/360",
+        "nth_score": 2,
+        "score": score,
+        "scenario_previous_best": 800.0,
+        "is_new_sensitivity": False,
+        "is_live": True,
+    }
+
+
 class _Client:
     """One browser: the shell's lifetime store plus its rendered toasts."""
 
@@ -119,17 +135,10 @@ class _Client:
         self.container = FakeNotificationContainer()
         self.lifetime_sequence = 0
 
-    def play(self, *, score: float, count: int = 1) -> None:
+    def play(self, *, score: float) -> None:
         payload = {
-            "count": count,
-            "latest": {
-                "scenario_name": "Scenario A",
-                "sensitivity": "34.64 cm/360",
-                "nth_score": 2,
-                "score": score,
-                "scenario_previous_best": 800.0,
-                "is_new_sensitivity": False,
-            },
+            "latest": _run_event(score),
+            "celebrated_run_id": None,
         }
         _plot, notifications, next_sequence = home.generate_graph(
             payload,
@@ -167,18 +176,30 @@ def test_a_second_run_replaces_the_visible_toast_with_a_full_lifetime(plotting):
     assert client.container.remaining_lifetime("run-verdict") >= DEFAULT_AUTO_CLOSE_MS
 
 
-def test_a_live_run_replaces_the_backlog_digest_with_a_full_lifetime(plotting):
+def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plotting):
+    """The one deliberate exception to replaces-rather-than-stacks.
+
+    The celebration is its own family with its own id and no lifetime, so an
+    ordinary run toast lands beside it rather than over it, expires on its own
+    schedule, and leaves the celebration up until the user dismisses it.
+    """
     client = _Client()
-    client.play(score=780.0, count=6)
-    assert client.container.visible[0]["title"] == "While you were away"
+    celebrated = _run_event(901.7)
+    celebrated["nth_score"] = 1
+    client.container.send(upsert_sticky_toast(app_shell._celebration_toast(celebrated)))
 
-    client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
-    client.play(score=901.7)
+    client.play(score=812.4)
 
-    visible = client.container.visible
-    assert len(visible) == 1
-    assert visible[0]["title"] == "New 2nd-best score"
-    assert client.container.remaining_lifetime("run-verdict") >= DEFAULT_AUTO_CLOSE_MS
+    assert {entry["id"] for entry in client.container.visible} == {
+        CELEBRATION_NOTIFICATION_ID,
+        "run-verdict",
+    }
+
+    client.container.advance(DEFAULT_AUTO_CLOSE_MS + 1)
+
+    assert [entry["id"] for entry in client.container.visible] == [
+        CELEBRATION_NOTIFICATION_ID
+    ]
 
 
 def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(
