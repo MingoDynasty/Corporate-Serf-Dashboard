@@ -1,6 +1,6 @@
 # Alert Color Language
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-28
 
 ## TL;DR
@@ -18,30 +18,29 @@ all user-facing wording stay exactly as they are.
 
 ## Decisions needed
 
-Nothing below is ratified. D1 sets UI/UX direction for the whole app and is
-the reason this is a proposal rather than a styling PR; reviewers are asked
-for an independent position on it before reading the recommendation.
+All three decisions were ruled by the maintainer on 2026-08-30, each
+accepting the recommendation; implementation may proceed against them.
 
 **D1 — Adopt a severity color language for inline notices.**
-Status: Open. Recommended: yes — blue informational, yellow caution, red
-error, the same scale the toast layer already speaks per outcome. The
-alternative raised during design was one accent color (light blue) for every
-notice: calmer and uniform, but it makes "your saved choices are silently not
+Status: Ruled — adopted (2026-08-30). Blue informational, yellow caution,
+red error, the same scale the toast layer already speaks per outcome. The
+rejected alternative was one accent color (light blue) for every notice:
+calmer and uniform, but it makes "your saved choices are silently not
 applying" look identical to an FYI, and it splits the app into two color
 vocabularies, one for toasts and another for panels.
 
 **D2 — Setup card: color per state, or one color for both states.**
-Status: Open. Recommended: per state — yellow for "Finish setting up" (the
-app cannot plot anything and the card is not dismissible), blue for "Add your
-KovaaK's account" (optional and skippable). One blue for both reads calmer on
-a first run, at the cost of hiding that the first state is blocking while the
-second is an offer.
+Status: Ruled — per state (2026-08-30). Yellow for "Finish setting up" (the
+app cannot plot anything and the card is not dismissible), blue for "Add
+your KovaaK's account" (optional and skippable). The rejected one-blue
+alternative reads calmer on a first run, at the cost of hiding that the
+first state is blocking while the second is an offer.
 
 **D3 — "Leftover playlist files" alert: blue or yellow.**
-Status: Open. Recommended: blue. The bundled copy of the playlist already
-won and the app behaves correctly; the alert is a cleanup offer, not a
-malfunction, and yellow keeps housekeeping louder than the problem warrants.
-Low stakes either way; listed because it re-colors a shipped surface.
+Status: Ruled — blue (2026-08-30). The bundled copy of the playlist already
+won and the app behaves correctly; the surface is a cleanup offer, not a
+malfunction, and the rejected yellow keeps housekeeping louder than the
+problem warrants and dilutes the two yellow alerts that earn it.
 
 ## Problem
 
