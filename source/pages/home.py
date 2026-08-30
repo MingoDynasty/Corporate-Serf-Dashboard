@@ -275,13 +275,14 @@ def _placeholder_plot_json() -> str:
 
 
 class RunEventData(TypedDict):
-    """JSON-safe fields from the latest run event in a drained batch."""
+    """JSON-safe facts from the latest run event in a drained batch."""
 
     scenario_name: str
     sensitivity: str
     nth_score: int
     score: float
-    previous_high_score: float | None
+    scenario_previous_best: float | None
+    is_new_sensitivity: bool
 
 
 class RunEventsPayload(TypedDict):
@@ -383,7 +384,8 @@ def _drain_run_events(
             "sensitivity": latest.sensitivity,
             "nth_score": latest.nth_score,
             "score": latest.score,
-            "previous_high_score": latest.previous_high_score,
+            "scenario_previous_best": latest.scenario_previous_best,
+            "is_new_sensitivity": latest.is_new_sensitivity,
         },
     }
 
@@ -880,21 +882,24 @@ def _threshold_verdict(
     """Judge a run against the threshold, or return None when nothing judges it.
 
     A run goes unjudged when the switch is off, the goal percentage is blank,
-    or the scenario/sensitivity has no previous high score to be a percentage
-    of -- there is no denominator, not a failing one.
+    the run is the first at its sensitivity, or the scenario has no positive
+    previous best to be a percentage of -- there is no denominator, not a
+    failing one. The message carries the facts and this derives the gate; the
+    two used to be bundled into one nullable field that meant both.
     """
     goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
-    previous_high_score = latest["previous_high_score"]
+    scenario_previous_best = latest["scenario_previous_best"]
     if (
         not score_threshold_notification_switch
         or not goal_percentage
-        or previous_high_score is None
-        or previous_high_score <= 0
+        or latest["is_new_sensitivity"]
+        or scenario_previous_best is None
+        or scenario_previous_best <= 0
     ):
         return None
     return _ThresholdVerdict(
-        passed=latest["score"] >= previous_high_score * goal_percentage / 100,
-        percentage=latest["score"] / previous_high_score * 100,
+        passed=latest["score"] >= scenario_previous_best * goal_percentage / 100,
+        percentage=latest["score"] / scenario_previous_best * 100,
         goal_percentage=goal_percentage,
     )
 

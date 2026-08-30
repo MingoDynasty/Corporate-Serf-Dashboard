@@ -127,7 +127,8 @@ class _Client:
                 "sensitivity": "34.64 cm/360",
                 "nth_score": 2,
                 "score": score,
-                "previous_high_score": 800.0,
+                "scenario_previous_best": 800.0,
+                "is_new_sensitivity": False,
             },
         }
         _plot, notifications, next_sequence = home.generate_graph(

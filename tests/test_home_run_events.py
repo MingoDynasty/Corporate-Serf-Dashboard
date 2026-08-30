@@ -19,13 +19,16 @@ def _message(
     *,
     nth_score: int = 2,
     score: float = 812.4,
-    previous_high_score: float | None = 800.0,
+    scenario_previous_best: float | None = 800.0,
+    is_new_sensitivity: bool = False,
 ) -> NewFileMessage:
     return NewFileMessage(
         datetime_created=datetime(2026, 7, 6, 12),
+        is_new_sensitivity=is_new_sensitivity,
         nth_score=nth_score,
-        previous_high_score=previous_high_score,
+        run_id=f"{scenario_name} {score}.csv",
         scenario_name=scenario_name,
+        scenario_previous_best=scenario_previous_best,
         score=score,
         sensitivity="34.64 cm/360",
     )
@@ -37,7 +40,8 @@ def _payload(
     count: int = 1,
     nth_score: int = 2,
     score: float = 812.4,
-    previous_high_score: float | None = 800.0,
+    scenario_previous_best: float | None = 800.0,
+    is_new_sensitivity: bool = False,
 ) -> home.RunEventsPayload:
     return {
         "count": count,
@@ -46,7 +50,8 @@ def _payload(
             "sensitivity": "34.64 cm/360",
             "nth_score": nth_score,
             "score": score,
-            "previous_high_score": previous_high_score,
+            "scenario_previous_best": scenario_previous_best,
+            "is_new_sensitivity": is_new_sensitivity,
         },
     }
 
@@ -219,9 +224,9 @@ def test_every_run_verdict_shares_one_replaceable_id():
     # catch-up digest all land under the same id, so the newest one replaces
     # whatever is on screen instead of stacking beside it.
     ids = {
-        _notification(_payload(previous_high_score=None))["id"],
+        _notification(_payload(is_new_sensitivity=True))["id"],
         _notification(_payload(score=830.0))["id"],
-        _notification(_payload(score=780.0, previous_high_score=800.0))["id"],
+        _notification(_payload(score=780.0, scenario_previous_best=800.0))["id"],
         _notification(_payload(count=3))["id"],
     }
 
@@ -231,7 +236,7 @@ def test_every_run_verdict_shares_one_replaceable_id():
 def test_top_n_placement_alone_leads_with_the_scenario():
     # No previous high score means no threshold verdict; the placement is the
     # whole story and the title carries it.
-    notification = _notification(_payload(previous_high_score=None))
+    notification = _notification(_payload(is_new_sensitivity=True))
 
     assert notification["title"] == "New 2nd-best score"
     assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
@@ -241,7 +246,7 @@ def test_top_n_placement_alone_leads_with_the_scenario():
 def test_a_first_place_run_is_titled_new_best_score():
     # Deliberately not "New personal best!": the recorded decision is that a PB
     # gets no toast of its own, and a retitle would create one by the back door.
-    notification = _notification(_payload(nth_score=1, previous_high_score=None))
+    notification = _notification(_payload(nth_score=1, is_new_sensitivity=True))
 
     assert notification["title"] == "New best score"
     assert notification["message"] == "Scenario A — 812.40 at 34.64 cm/360."
@@ -249,7 +254,7 @@ def test_a_first_place_run_is_titled_new_best_score():
 
 def test_threshold_pass_headlines_over_the_placement_it_also_earned():
     notification = _notification(
-        _payload(score=830.0, previous_high_score=800.0),
+        _payload(score=830.0, scenario_previous_best=800.0),
         score_threshold_percentage=102.5,
     )
 
@@ -262,7 +267,7 @@ def test_threshold_pass_headlines_over_the_placement_it_also_earned():
 
 def test_threshold_pass_without_a_placement_points_at_the_next_scenario():
     notification = _notification(
-        _payload(score=830.0, previous_high_score=800.0, nth_score=9),
+        _payload(score=830.0, scenario_previous_best=800.0, nth_score=9),
         score_threshold_percentage=102.5,
     )
 
@@ -274,7 +279,7 @@ def test_threshold_pass_without_a_placement_points_at_the_next_scenario():
 
 def test_threshold_passes_at_exactly_the_goal():
     notification = _notification(
-        _payload(score=820.0, previous_high_score=800.0),
+        _payload(score=820.0, scenario_previous_best=800.0),
         score_threshold_percentage=102.5,
     )
 
@@ -284,7 +289,7 @@ def test_threshold_passes_at_exactly_the_goal():
 
 def test_threshold_fail_names_the_target_it_missed():
     notification = _notification(
-        _payload(score=780.0, previous_high_score=800.0),
+        _payload(score=780.0, scenario_previous_best=800.0),
         score_threshold_percentage=98.75,
     )
 
@@ -301,7 +306,7 @@ def test_a_new_pb_short_of_a_stretch_goal_still_reads_as_below_threshold():
     # still missed the bar. The verdict is the title, so it stays "Below
     # threshold" rather than being retitled for the PB.
     notification = _notification(
-        _payload(score=820.0, previous_high_score=800.0, nth_score=1),
+        _payload(score=820.0, scenario_previous_best=800.0, nth_score=1),
         score_threshold_percentage=105.0,
     )
 
@@ -314,7 +319,7 @@ def test_a_new_pb_short_of_a_stretch_goal_still_reads_as_below_threshold():
 
 def test_threshold_fail_without_a_placement_drops_the_placement_clause():
     notification = _notification(
-        _payload(score=780.0, previous_high_score=800.0, nth_score=9),
+        _payload(score=780.0, scenario_previous_best=800.0, nth_score=9),
         score_threshold_percentage=98.75,
     )
 
@@ -326,7 +331,7 @@ def test_threshold_fail_without_a_placement_drops_the_placement_clause():
 def test_an_empty_threshold_percentage_leaves_the_run_unjudged():
     for empty_percentage in (None, ""):
         notification = _notification(
-            _payload(score=780.0, previous_high_score=800.0),
+            _payload(score=780.0, scenario_previous_best=800.0),
             score_threshold_percentage=empty_percentage,
         )
 
@@ -334,12 +339,12 @@ def test_an_empty_threshold_percentage_leaves_the_run_unjudged():
 
 
 def test_a_run_qualifying_for_neither_verdict_says_nothing():
-    assert _notification(_payload(nth_score=9, previous_high_score=None)) is None
+    assert _notification(_payload(nth_score=9, is_new_sensitivity=True)) is None
 
 
 def test_backlog_summary_reports_the_count_and_the_latest_verdict():
     notification = _notification(
-        _payload(count=3, score=780.0, previous_high_score=800.0),
+        _payload(count=3, score=780.0, scenario_previous_best=800.0),
         score_threshold_percentage=98.75,
     )
 
@@ -354,7 +359,7 @@ def test_backlog_summary_reports_the_count_and_the_latest_verdict():
 def test_backlog_summary_without_a_verdict_stays_neutral():
     for empty_percentage in (None, ""):
         notification = _notification(
-            _payload(count=3, score=780.0, previous_high_score=800.0),
+            _payload(count=3, score=780.0, scenario_previous_best=800.0),
             score_threshold_percentage=empty_percentage,
         )
 
@@ -367,7 +372,7 @@ def test_backlog_summary_without_a_verdict_stays_neutral():
 
 def test_backlog_summary_passes_at_exactly_the_goal():
     notification = _notification(
-        _payload(count=3, score=820.0, previous_high_score=800.0),
+        _payload(count=3, score=820.0, scenario_previous_best=800.0),
         score_threshold_percentage=102.5,
     )
 
@@ -379,7 +384,7 @@ def test_backlog_summary_passes_at_exactly_the_goal():
 
 def test_backlog_summary_passes_a_new_pb_above_a_stretch_goal():
     notification = _notification(
-        _payload(count=3, score=850.0, previous_high_score=800.0),
+        _payload(count=3, score=850.0, scenario_previous_best=800.0),
         score_threshold_percentage=105.0,
     )
 
@@ -407,8 +412,8 @@ def test_the_master_switch_silences_the_whole_run_toast_family():
     # One guard, three shapes. Each payload earns a toast with the switch on,
     # so the off assertions cannot pass vacuously.
     shapes = (
-        _payload(score=830.0, previous_high_score=800.0),  # threshold verdict
-        _payload(previous_high_score=None),  # top-N placement
+        _payload(score=830.0, scenario_previous_best=800.0),  # threshold verdict
+        _payload(is_new_sensitivity=True),  # top-N placement
         _payload(count=3),  # "While you were away" digest
     )
 
@@ -599,7 +604,7 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
 
     for sequence, empty_percentage in enumerate((None, "")):
         _plot, notifications, lifetime_sequence = home.generate_graph(
-            _payload(score=780.0, previous_high_score=800.0),
+            _payload(score=780.0, scenario_previous_best=800.0),
             "Scenario A",
             5,
             "2026-07-01",
@@ -653,7 +658,7 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
     )
 
     _plot, notifications, lifetime_sequence = home.generate_graph(
-        _payload(score=830.0, previous_high_score=800.0),
+        _payload(score=830.0, scenario_previous_best=800.0),
         "Scenario A",
         5,
         "2026-07-01",
