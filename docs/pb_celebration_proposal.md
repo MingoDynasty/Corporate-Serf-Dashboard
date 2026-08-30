@@ -1,6 +1,6 @@
 # Personal Best Celebration
 
-Status: Proposed
+Status: In progress
 Date: 2026-08-21
 
 ## TL;DR

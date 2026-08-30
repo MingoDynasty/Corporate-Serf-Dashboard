@@ -70,23 +70,31 @@ UI — the server side (pull-based reads):
 
 ```mermaid
 flowchart TD
+    subgraph Shell["Server threads (app_shell.py, mounted on every page)"]
+        ShellTick["dcc.Interval tick<br/>pb-celebration-interval"]
+        Drain["publish_run_events<br/>empties the queue, stamps each run live<br/>or stale, names at most one celebrated<br/>run and sends its toast"]
+        ShellTick --> Drain
+    end
+
     subgraph Server["Server threads (Waitress or Flask, home.py callbacks)"]
         Tick["dcc.Interval tick"]
         Check["check_for_new_data<br/>may auto-switch scenario"]
         Graph["generate_graph<br/>rebuilds the plot via plot_service"]
         Rank["get_scenario_rank<br/>interval-only calls are cache-only and<br/>surface Timer writes within ~1s"]
         Refresh["refresh_rank<br/>runs when the user clicks Refresh"]
-        Tick --> Check
         Check -->|"run-events summary"| Graph
         Tick --> Rank
     end
 
     Queue[["message_queue (deque of NewFileMessage)"]]
+    Batch[("run-events-batch dcc.Store")]
     Stores[("data_service module-global stores")]
     Cache[("JSON cache under data/cache/")]
     API["KovaaK's HTTP API"]
 
-    Check -->|"drains and summarizes"| Queue
+    Drain -->|"drains and stamps"| Queue
+    Drain -->|"one batch per tick"| Batch
+    Batch -->|"triggers"| Check
     Graph -->|"reads runs"| Stores
     Rank -->|"reads via get_scenario_rank_info"| Cache
     Refresh -->|"authoritative fetch"| API
@@ -97,9 +105,10 @@ The watchdog and UI share two channels: `message_queue` (a `deque`) carries
 *notifications* that new data exists, while the run data itself is shared through
 the `data_service.py` module-global stores the UI reads directly. Note the order
 above — the run is loaded into the stores before its message becomes visible.
-The UI is pull-based: a `dcc.Interval` on the Scenario Performance page drains
-the entire queue each tick and publishes one scenario-specific summary.
-`generate_graph` reads that summary and never accesses the queue directly.
+The UI is pull-based: a `dcc.Interval` in the app shell drains the entire queue
+each tick and publishes one batch for whatever page is open. The page reads that
+batch and never accesses the queue directly, so run delivery no longer depends
+on Scenario Performance being mounted.
 
 ### Background threads never drive UI outputs
 
@@ -113,8 +122,10 @@ for the judgment of whether an event is worth interrupting someone for.
 
 The sanctioned channels, each typed and single-purpose:
 
-- `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only; its
-  consumer assumes run-specific fields.
+- `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only,
+  drained by the app shell's `publish_run_events` on every page. It carries
+  facts about a run and no decision field, so each consumer derives its own
+  verdict and two of them can never disagree about one run.
 - `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
   drained by a dedicated Scenario Performance interval callback.
 - `file_watchdog.run_import_failure_queue` — run files the watchdog thread
@@ -233,10 +244,10 @@ flowchart LR
     App --> FileWatchdog
 
     Shell --> LocalIcon
+    Shell --> Queue
     Home --> DataService
     Home --> ApiService
     Home --> PlotService
-    Home --> Queue
     Home --> LocalIcon
     Playlists --> OverviewService
     Playlists --> WarmupService
@@ -273,13 +284,27 @@ flowchart LR
   and the notification host — the one `dmc.NotificationContainer`, plus the
   toast-lifetime `dcc.Store` beside it, shell-hosted so its lifecycle matches
   the toasts' rather than resetting when a page remounts.
+  It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
+  `polling_interval`), the `run-events-batch` `dcc.Store`, and the
+  `publish_run_events` callback that is `message_queue`'s only consumer. That
+  interval polls on every page for the life of the tab, so roughly one request
+  a second is what idle looks like in devtools and in the waitress log —
+  accepted for a local single-user app, and recorded here so nobody reads the
+  traffic as a bug. Folding the Scenario Performance interval's other
+  consumers into this one is a refactor for another day.
+  The layout is built while `source/app.py` is imported, before startup
+  validates the config file, so `_drain_interval_ms` falls back to the field
+  default rather than turning a bad config into an import traceback.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — the Scenario Performance page (the module and route keep
   their names; the rename was labels-only): sensitivity/time plots, high score,
   rank, and the chart options inspector. Owns the live-update callbacks
-  (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
-  resulting `run-events` summary).
+  (`check_for_new_data` takes the shell's `run-events-batch` store as its only
+  `Input` and summarizes it for the shown scenario; `generate_graph` consumes
+  the resulting `run-events` summary). The follow switch and the scenario
+  dropdown are `State` there, not `Input`: a Store replays its last value, so a
+  control flip would otherwise re-forward a batch already processed.
   As the landing page it also carries the first-run setup card
   (`_setup_card_children`), which renders while a settings key has never been
   written — an absent `stats_dir`, or an absent `kovaaks_username` once the
@@ -471,7 +496,7 @@ flowchart LR
   push `NewFileMessage`, and schedule the bounded rank freshness poll on a new
   high score.
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
-  watchdog-to-UI hand-off.
+  watchdog-to-UI hand-off, drained by the app shell.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
   Unknown keys are named in one warning and ignored, so a config carrying keys
   a release has retired still loads.
@@ -570,7 +595,7 @@ flowchart LR
 | To change... | Start in |
 | --- | --- |
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
-| The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
+| The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
