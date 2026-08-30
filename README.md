@@ -17,10 +17,10 @@ notifications update automatically in the background.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
   it rather than stacking a second one beside it, and a run that earns neither says nothing. One
-  Chart options switch turns the whole family off, leaving the chart to update silently.
+  Chart options switch, Run Notifications, turns these off, leaving the chart to update silently.
 - **Personal best celebration** — a run that beats your scenario best gets its own toast instead,
   on whatever page you have open, and it stays until you dismiss it so the news survives a
-  fullscreen session.
+  fullscreen session. It is its own family, so Run Notifications does not silence it.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.

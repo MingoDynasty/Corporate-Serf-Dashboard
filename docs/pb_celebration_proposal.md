@@ -438,14 +438,14 @@ structural: every drain empties the queue, so any message a drain finds
 was never seen by an earlier drain. There is no timestamp to compare and
 no watermark to keep, and a message appended while a drain is mid-pop is
 caught by that drain or the next one, exactly once either way. What
-remains is one wall-clock cap: a run is live if its `datetime_created` is
-within 120 s of the drain, an author-owned constant. The cap bounds
-no-tab replay rather than eliminating it: a queue that accumulated with
-no tab open replays nothing older than the cap on the next visit, while a
-personal best set within the cap still celebrates, which D9 accepts
-deliberately — the timestamp cannot tell a recent no-tab event from a
-throttled hidden tab's, and only the hidden tab's must land. 120 s sits
-two orders of magnitude above the
+remains is one wall-clock window: a run is live if its `datetime_created`
+is within a 120 s cap plus one poll period of the drain, both
+author-owned. The window bounds no-tab replay rather than eliminating it:
+a queue that accumulated with no tab open replays nothing older than the
+window on the next visit, while a personal best set within it still
+celebrates, which D9 accepts deliberately — the timestamp cannot tell a
+recent no-tab event from a throttled hidden tab's, and only the hidden
+tab's must land. 120 s sits two orders of magnitude above the
 default polling interval and comfortably above Chromium's intensive
 throttling, which slows a hidden tab's interval to about one tick per
 minute after roughly five minutes hidden — and the tab is occluded during
@@ -455,6 +455,22 @@ construction, moments before the load-and-enqueue step; that gap costs
 milliseconds against a 120 s budget, never a celebration. A celebration
 decided during a throttled drain lands correctly because the toast is
 sticky and the animation holds until the tab is visible (D8).
+
+The poll period is part of the window because `polling_interval` is an
+unconstrained config key. A run can be a whole period old through nothing
+but the drain's cadence, so a fixed cap below the configured period would
+stamp every run stale and silently retire every toast liveness gates —
+the celebration and the page's ordinary run toasts alike — while the plot
+kept updating. Adding the period says what the cap always meant: how much
+staleness is tolerated *beyond* one delivery. At the default 1000 ms
+interval the window is 121 s, indistinguishable from the figure above, so
+nothing about the ratified behaviour changes at any ordinary setting. The
+accepted consequence, stated rather than hidden: a deliberately slow poll
+widens no-tab replay by exactly the period it chose, which is the same
+scale on which that configuration already receives everything else.
+Validating `polling_interval` with an upper bound instead was rejected —
+it would refuse a config file that loads today, trading a missing toast
+for a refused startup.
 
 This interval is the first poll outside Scenario Performance: it adds one
 request per second on every page for the life of the tab, which changes
@@ -767,11 +783,14 @@ early return.
   increments only when a run is celebrated; the celebration toast is
   emitted exactly when the decision names a run.
 - Freshness tests: a run about 60 s old at the drain (the throttled-tick
-  boundary) is still live; a run older than the 120 s cap is not; a
-  no-tab backlog younger than the cap celebrates on the first drain and
-  one older does not (D9's bounded-replay line); a message appended while
-  a drain is popping is seen exactly once, by that drain or the next;
-  every run in the payload carries a liveness stamp.
+  boundary) is still live; a run older than the window is not, and one at
+  exactly the window still is; the window is never shorter than one poll
+  period, so a deliberately slow poll does not stamp every run stale, and
+  the default interval leaves it at 121 s; a no-tab backlog younger than
+  the window celebrates on the first drain and one older does not (D9's
+  bounded-replay line); a message appended while a drain is popping is
+  seen exactly once, by that drain or the next; every run in the payload
+  carries a liveness stamp.
 - Contract tests: the celebration toast id differs from the run-verdict
   id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
   and its toast payload carries `autoClose` False on both actions of the
