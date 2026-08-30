@@ -81,6 +81,25 @@
     );
 }
 
+/* Only the grid yields height in this column; everything above it is
+   intrinsic content. Stated because a flex item shrinks by default, and
+   Mantine's Alert root sets overflow: hidden, which drops its automatic
+   minimum size to zero -- so a shrinking Alert silently clips its own message
+   instead of overflowing where the clipping would be visible. The Playlists
+   page can show the visibility alert and the leftover-files notice at once,
+   and on a short viewport the alert lost its closing recovery line to exactly
+   that. The grid takes the shrinking back below and floors at its own
+   minHeight; past that the column overflows and the page scrolls. */
+.page-fill-column > * {
+    flex-shrink: 0;
+}
+
+/* Restated rather than left to the grids' inline ``flex: 1``, so moving that
+   sizing into a class cannot silently make the column stop yielding. */
+.page-fill-column > .ag-theme-quartz {
+    flex-shrink: 1;
+}
+
 /* Floor the graph height so extreme zoom degrades to page scroll instead of
    a crushed, unreadable plot. The graph fills whatever the chart row hands
    it, in either orientation: its own grid track when the inspector is beside
