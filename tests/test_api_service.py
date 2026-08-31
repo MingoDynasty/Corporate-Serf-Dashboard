@@ -1068,6 +1068,21 @@ def test_mapping_cache_tolerates_malformed_file(monkeypatch, tmp_path):
     assert api_service.get_cached_leaderboard_id("Scenario A") == 111
 
 
+def test_get_cached_leaderboard_id_tolerates_non_numeric_value(
+    monkeypatch, tmp_path, caplog
+):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service._write_json(
+        api_service._leaderboard_mapping_file(),
+        {"Some Scenario": {"leaderboard_id": "abc"}},
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        assert api_service.get_cached_leaderboard_id("Some Scenario") is None
+
+    assert "Ignoring non-numeric cached leaderboard id" in caplog.text
+
+
 def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     monkeypatch,
 ):
@@ -1325,6 +1340,83 @@ def test_get_user_scenario_total_play_serves_stale_valid_cache_after_failure(
     assert response.total == 1
     assert [scenario.scenarioName for scenario in response.data] == ["Cached Scenario"]
     assert "Using stale total-play cache for MingoDynasty" in caplog.text
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+SCHEMA_INVALID_TOTAL_PLAY_CACHE = {"page": 0, "max": 100, "total": 1, "data": [{}]}
+
+
+def test_get_user_scenario_total_play_refetches_schema_invalid_fresh_cache(
+    monkeypatch,
+    caplog,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    api_service._write_json(
+        api_service._user_scenario_total_play_cache_file("MingoDynasty"),
+        SCHEMA_INVALID_TOTAL_PLAY_CACHE,
+    )
+
+    api_response = {
+        "page": 0,
+        "max": 100,
+        "total": 1,
+        "data": [
+            {
+                "leaderboardId": "1",
+                "scenarioName": "Fetched Scenario",
+                "counts": {"plays": 10},
+                "rank": 12,
+                "score": 100,
+            }
+        ],
+    }
+
+    def fake_get(_url, params, timeout):
+        assert timeout == api_service.DEFAULT_TIMEOUT_SECONDS
+        assert params["page"] == 0
+        return FakeResponse(api_response)
+
+    monkeypatch.setattr(api_service, "_session_get", fake_get)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        response = api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert [scenario.scenarioName for scenario in response.data] == ["Fetched Scenario"]
+    assert (
+        "Ignoring schema-invalid fresh total-play cache for MingoDynasty" in caplog.text
+    )
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_user_scenario_total_play_keeps_request_error_for_invalid_stale_cache(
+    monkeypatch,
+    caplog,
+):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+    api_service.make_cache()
+
+    cache_file = api_service._user_scenario_total_play_cache_file("MingoDynasty")
+    api_service._write_json(cache_file, SCHEMA_INVALID_TOTAL_PLAY_CACHE)
+    stale_timestamp = time.time() - (25 * 60 * 60)
+    os.utime(cache_file, (stale_timestamp, stale_timestamp))
+
+    def fail_get(*_args, **_kwargs):
+        raise api_service.requests.RequestException("total-play unavailable")
+
+    monkeypatch.setattr(api_service, "_session_get", fail_get)
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        with pytest.raises(api_service.requests.RequestException) as exc_info:
+            api_service.get_user_scenario_total_play("MingoDynasty")
+
+    assert str(exc_info.value) == "total-play unavailable"
+    assert (
+        "Ignoring schema-invalid stale total-play cache for MingoDynasty" in caplog.text
+    )
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -1869,6 +1961,34 @@ def test_saved_rank_is_not_readable_by_a_colliding_username(monkeypatch):
 
     assert api_service.get_cached_scenario_rank(98330, "a.b") is not None
     assert api_service.get_cached_scenario_rank(98330, "a_b") is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_cached_scenario_rank_tolerates_invalid_utf8_bytes(monkeypatch, caplog):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
+    cache_file.parent.mkdir(parents=True, exist_ok=True)
+    cache_file.write_bytes(b"\xff\xfe{")
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        assert api_service.get_cached_scenario_rank(98330, "MingoDynasty") is None
+
+    assert "Failed to read cache file" in caplog.text
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_get_cached_scenario_rank_tolerates_schema_invalid_cache(monkeypatch, caplog):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    api_service._write_json(api_service._rank_cache_file(98330, "MingoDynasty"), {})
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        assert api_service.get_cached_scenario_rank(98330, "MingoDynasty") is None
+
+    assert "Failed to validate rank cache file" in caplog.text
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
