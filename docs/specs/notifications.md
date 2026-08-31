@@ -90,13 +90,12 @@ their full behavior.
   `hideNotifications` list, and a `dash.Patch` for the registry, and the
   emitting callback wires all three as outputs. The hide list holds the
   channel's previous instance id plus the current instance of every channel
-  named in `clears`
-  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
-- `upsert_sticky_toast(notification)` sends an `update` and a `show` with the
-  same id, stamping `autoClose` false on both, so whichever matches the toast's
-  current state applies. Only the celebration family uses it: a toast that
-  stays until dismissed has no timer to re-arm, and re-popping it would replay
-  the entry animation for news the user has already chosen to leave up
+  named in `clears`. It carries the payload's `autoClose` through untouched,
+  which is what lets one mechanism serve every channel: an ordinary channel
+  keeps the nominal 8 s lifetime, and the personal best celebration passes
+  `auto_close=False` at its builder and stays until dismissed while a later
+  celebration still replaces it. It is the only helper — there is no separate
+  sticky pairing
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - Toasts are built only inside Dash callbacks. A background thread publishes
   to typed shared state that an interval callback polls, and never writes
@@ -147,7 +146,10 @@ toasts under, and it applies to every toast the app adds from here on
   It folds into one summary carrying a count and points at where the individual
   events are recorded. `run-import-failure` is the one instance.
 - Persistence (`auto_close=False`, process- or session-gated) is orthogonal to
-  all three and stacks with any of them.
+  all three and stacks with any of them. The personal best celebration is a
+  persistent channel: it replaces its own previous instance and never expires
+  on its own
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - **The registry.** `toast-channel-registry` is the per-client `dcc.Store`
   mapping each logical channel key to the instance id currently on screen for
   it, hosted in the app shell beside the container with initial data `{}`. It
@@ -283,10 +285,15 @@ toasts under, and it applies to every toast the app adds from here on
   exactly when a run is named. The celebration is currently unconditional; the
   setting that turns it off ships with the animation.
 - The celebration toast is green with a trophy icon, titled "New personal
-  best", and stays until dismissed. Its id is `pb-celebration`, deliberately
-  not `run-verdict`, so an ordinary run toast lands beside it rather than
-  replacing it. It goes out through `upsert_sticky_toast`, and the shell
-  writes nothing to `toast-channel-registry` and hides nothing. With a positive previous best
+  best", and stays until dismissed. Its channel key is `pb-celebration`,
+  deliberately not `run-verdict`, so an ordinary run toast lands beside it
+  rather than replacing it; only a later celebration replaces a celebration,
+  showing a fresh instance and hiding the one before it. It goes out through
+  `channel_toast` like every other replaceable toast, with `auto_close=False`
+  passed at the builder, and the shell writes exactly the one
+  `toast-channel-registry` key
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  With a positive previous best
   the message is
   `{scenario}: {score:.2f}. Up {pct:.1f}% on your previous best of {previous:.2f}.`;
   with a zero or negative one, which has no percentage to give, it is
@@ -356,8 +363,10 @@ toasts under, and it applies to every toast the app adds from here on
   animating out
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
   The celebration toast is the deliberate exception to
-  replaces-rather-than-stacks: its own id and no lifetime, so it sits beside a
-  run verdict and outlives it.
+  replaces-*this* lane: its own channel key and no lifetime, so it sits beside
+  a run verdict and outlives it. It is not an exception to the mechanism —
+  it replaces its own previous instance the same way
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - The Run Notifications master switch (`run-notification-switch`, on by
   default; help text "Controls threshold verdict and placement notifications
   for your runs.") gates the page-built shapes through one early return at the
@@ -441,7 +450,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | Key | Pattern | Title | Color | Clears | Produced by |
 | --- | --- | --- | --- | --- | --- |
 | `run-verdict` | channel | per verdict | green / yellow | — | `generate_graph`; this spec |
-| `pb-celebration` | fixed id, sticky | "New personal best" | green, until dismissed | — | `publish_run_events`; this spec |
+| `pb-celebration` | channel, persistent | "New personal best" | green, until dismissed | — | `publish_run_events`; this spec |
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |

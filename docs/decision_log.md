@@ -111,17 +111,34 @@ success clears both the problem channel and username-unset. No user-facing
 string is added or edited; titles, messages, colors, and icons carry over
 verbatim.
 
-**`upsert_toast` is deleted.** With every channel on hide-and-reshow, the
-`update`-plus-`show` pair with its alternating 8000/8001 ms durations existed
-for one toast only, so `run-verdict` migrates and the trick goes with its
-sequence store. The ratified run-verdict contract is preserved -- one run, one
-toast, the newest verdict replacing what is on screen with a full lifetime, per
-browser client and across navigation -- with one qualifier: during the ~250 ms
-replacement crossfade the outgoing instance is still animating out, and each new
-verdict now re-enters with the pop animation instead of morphing in place.
-`upsert_sticky_toast` stays for the personal best celebration, which has no
-timer to re-arm and should not replay its entry animation for news the user has
-already chosen to leave up.
+**Both upsert helpers are deleted.** With every channel on hide-and-reshow,
+the `update`-plus-`show` pair with its alternating 8000/8001 ms durations
+existed for one toast only, so `run-verdict` migrates and the trick goes with
+its sequence store. The ratified run-verdict contract is preserved -- one run,
+one toast, the newest verdict replacing what is on screen with a full lifetime,
+per browser client and across navigation -- with one qualifier: during the
+~250 ms replacement crossfade the outgoing instance is still animating out, and
+each new verdict now re-enters with the pop animation instead of morphing in
+place. `upsert_sticky_toast` goes with it, because `channel_toast` carries the
+payload's `autoClose` through untouched instead of stamping a lifetime, which
+is the only thing the sticky sibling existed to avoid.
+
+**The personal best celebration is reconciled onto this policy.** PR #261
+landed the `pb-celebration` toast through `upsert_sticky_toast` while this
+proposal was still under review, so it arrived as the one family the standing
+rule had not been applied to. It is a channel by the classifier -- a second
+personal best inside one lifetime is plainly reachable -- so it moves to
+`channel_toast` as a **persistent channel**: its own key, still distinct from
+`run-verdict`, a fresh rendered instance per celebration, the previous instance
+hidden with it, and `auto_close=False` passed at its builder so it still stays
+until dismissed. Its ratified product contract is untouched: a dedicated lane
+that an ordinary run verdict lands beside rather than replacing, the newest
+celebration replacing the previous one, and no lifetime. What changes is only
+the mechanism, and one visible detail that follows from it -- a second personal
+best now re-enters with the pop animation instead of morphing in place, which
+is the same visible re-entry every other channel gets and the reason it is
+wanted. This is a mechanism conformance change, not new celebration scope; the
+in-flight `docs/pb_celebration_proposal.md` is updated in step.
 
 **What this supersedes.** The
 [2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)

@@ -523,20 +523,31 @@ select. The full set, derived from the upstream recipes:
 Snow is ambient, not a celebration, and is excluded. Emoji and custom SVG
 shapes are possible later styles, not v1.
 
-**The toast.** The celebration toast has its own id, a
-`notifications.py` constant distinct from the page's run-verdict id, and it
-is sent as the update-plus-show pair with `autoClose` False on both
-actions: a sticky variant of `upsert_toast` (a parameter that skips the
-alternation, or a sibling helper), because `upsert_toast` as it exists
-stamps the alternating lifetimes over `autoClose` and would silently turn
-the sticky toast into an ordinary 8 s one. No alternation is needed here:
-alternation exists to re-arm a replacement's timer, and a sticky toast has
-no timer. The payload's sequence number serves the clientside animation
-replay, not the toast lifetime. The shell touches neither the run-verdict
-id nor `TOAST_LIFETIME_STORE_ID`, so the celebration and the page's run
-toasts stay in separate lanes. Per D8's ruling the toast stays until
-dismissed; a dedicated id is also what lets it survive the next ordinary
-run toast instead of being dismissed by it.
+**The toast.** The celebration toast has its own **channel key**, a
+`notifications.py` constant distinct from the page's run-verdict key, and it
+goes out through `channel_toast` -- the one app-wide replacement mechanism --
+as a **persistent channel**: each celebration shows a fresh rendered instance
+id, hides the previous celebration instance, and carries `autoClose` False,
+which the builder passes explicitly because the helper carries the payload's
+lifetime through untouched rather than stamping one. The payload's sequence
+number serves the clientside animation replay, not the toast lifetime. The
+shell touches no channel but its own -- its registry write is a per-key
+`dash.Patch` assigning exactly `pb-celebration` -- so the celebration and the
+page's run toasts stay in separate lanes. Per D8's ruling the toast stays until
+dismissed; a dedicated key is also what lets it survive the next ordinary run
+toast instead of being dismissed by it, while a later personal best still
+replaces the celebration on screen.
+
+*Mechanism note, added 2026-08-31.* PR 1 shipped this toast through
+`upsert_sticky_toast`, an update-plus-show pair on a stable id, which is what
+this paragraph originally prescribed. The toast policy proposal merged and was
+ratified afterwards
+([decision log](decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)),
+retiring both upsert helpers in favor of hide-and-reshow, so this family was
+migrated to conform. The product outcome above is unchanged and remains
+ratified; only the delivery mechanism moved, and with it one visible detail --
+a second personal best now re-enters with the pop animation instead of morphing
+in place.
 
 On Scenario Performance, the page stops draining and starts listening:
 `check_for_new_data` takes the batch store as its only `Input`, keeps its
@@ -795,10 +806,11 @@ early return.
   bounded-replay line); a message appended while a drain is popping is
   seen exactly once, by that drain or the next; every run in the payload
   carries a liveness stamp.
-- Contract tests: the celebration toast id differs from the run-verdict
-  id; the shell callback declares no output on `TOAST_LIFETIME_STORE_ID`,
-  and its toast payload carries `autoClose` False on both actions of the
-  pair; the run message carries no decision field, and the page's toast
+- Contract tests: the celebration toast's channel key differs from the
+  run-verdict key; the shell callback's registry write is a per-key `Patch`
+  touching only `pb-celebration`, a later celebration shows a fresh instance
+  and hides the previous one, and its toast payload carries `autoClose` False;
+  the run message carries no decision field, and the page's toast
   builder consults only the stamped decision and liveness, never
   re-deriving either from the raw fields.
 - Toast builder tests: the percentage message for a positive previous best;

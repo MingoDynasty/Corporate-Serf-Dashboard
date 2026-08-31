@@ -564,8 +564,9 @@ flowchart LR
   replaces a toast in place, minting a fresh instance id under the payload's
   logical channel key, hiding the instance it replaces plus any channels it
   `clears`, and returning a per-key `dash.Patch` for the per-client
-  `TOAST_CHANNEL_REGISTRY_STORE_ID` store; `upsert_sticky_toast()` keeps the
-  `update`+`show` pairing for the until-dismissed celebration),
+  `TOAST_CHANNEL_REGISTRY_STORE_ID` store, and carrying the payload's
+  `autoClose` through untouched so the until-dismissed personal best
+  celebration rides the same one helper),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
