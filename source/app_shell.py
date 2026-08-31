@@ -15,7 +15,7 @@ from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.notifications import (
     CELEBRATION_NOTIFICATION_ID,
     NOTIFICATION_CONTAINER_ID,
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
     toast,
     upsert_sticky_toast,
 )
@@ -339,9 +339,9 @@ def layout(**kwargs):  # noqa: ARG001
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
                     # Beside the container on purpose: a toast outlives the
-                    # page that emitted it, so the counter that keeps its
-                    # replacement lifetimes honest has to outlive it too.
-                    dcc.Store(id=TOAST_LIFETIME_STORE_ID, data=0),
+                    # page that emitted it, so the registry that knows which
+                    # instance to replace has to outlive it too.
+                    dcc.Store(id=TOAST_CHANNEL_REGISTRY_STORE_ID, data={}),
                     # The app-wide run-event channel. The drain and its batch
                     # live here rather than on Scenario Performance so a run
                     # reaches the screen whatever page is open; that page
