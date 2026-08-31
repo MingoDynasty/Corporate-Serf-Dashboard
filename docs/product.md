@@ -127,6 +127,18 @@ list in the roadmap.)
   anchor them, and one purely informational banner was tinted red for no
   reason, so a color told you nothing about how much it mattered. Nothing the
   app says changed; only how loudly it says it.
+- **Every action visibly answers** (PR #PENDING; design in #257). Toasts about
+  different things now stand side by side, and a toast about the same thing
+  replaces its own previous copy by popping back onto the screen with a fresh
+  eight seconds. A success also takes away the failure message it answers, so a
+  red toast never lingers beside the green one that supersedes it.
+  *Problem solved:* importing a second playlist while the first one's toast was
+  still up showed nothing at all, which reads as a failed import. The same trap
+  caught every retry in the app: the failed-import dialog keeps your pasted code
+  so you can correct it, but a second failure inside eight seconds answered with
+  silence, and spam-clicking Refresh either stacked identical toasts or gave
+  nothing back. Now every click gets an answer you can see, and nothing is
+  quietly swallowed.
 
 ### Standing: where do I rank
 

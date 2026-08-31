@@ -178,22 +178,31 @@ benchmark tier) — see the
   red, titled "Position refresh failed", and leaves the displayed value
   untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
   position unchanged." is true whether a cached position was on screen or
-  not. A served-stale result is yellow under that same title — deliberately,
-  since both are outcomes of one click and only the id has to differ so a
-  later result is not swallowed — and its value carries the same "from cache,
-  Refresh to update" affordance a passive render would give it. A click with
+  not. A served-stale result is yellow under that same title, and its value
+  carries the same "from cache, Refresh to update" affordance a passive render
+  would give it. The two share one `rank-refresh-problem` channel: they are
+  mutually exclusive verdicts on one attempt, so a stale retry after a hard
+  failure replaces it instead of leaving both on screen contradicting each
+  other
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)). A click with
   no username configured never reaches the service at all: it is caught on the
   direct settings read after the `n_clicks` and selected-scenario guards, and
   answered blue, titled "KovaaK's username not set", leaving the value alone
   because the field's own hint already explains it
   ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
   Only a genuinely fresh result gets the green confirmation, titled "Position
-  refreshed". The green confirmation and the blue unset-username notice both
-  keep a fresh id per click so back-to-back refreshes each answer; they are
-  the two instances of the same named exception to the stable-id rule. The
-  red and yellow outcomes keep their stable ids, so a repeat of the same
-  failure while its toast is still up is deduped and shows nothing new
-  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
+  refreshed". Every outcome is a channel emission, so a repeat click always
+  re-pops its answer instead of being swallowed while the previous toast is
+  still up
+  ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+  as amended by
+  [2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
+  The green confirmation is keyed by scenario, so re-refreshing one scenario
+  replaces its own toast while refreshes of different scenarios stack; the blue
+  notice is a single channel. A successful refresh also clears the problem
+  channel and the unset-username channel, since a lookup that returned proves
+  neither claim still stands
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - Leaderboard total enrichment is best-effort: if the total lookup fails, the
   valid rank/unranked result is preserved
   ([2026-04-27](../decision_log.md#2026-04-27-make-leaderboard-total-enrichment-best-effort)).

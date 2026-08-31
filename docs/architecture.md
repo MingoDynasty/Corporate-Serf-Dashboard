@@ -557,12 +557,15 @@ flowchart LR
   titles as callables, so the flag is read per request rather than at import
   time, when the config is not yet loaded).
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
-  the one builder for `sendNotifications` payloads: stable semantic id, title,
+  the one builder for `sendNotifications` payloads: semantic id, title,
   message, color, optional icon, and the shared auto-close duration —
   `auto_close=False` for the conditions that must survive until dismissed;
-  `upsert_toast()` pairs the `update`+`show` actions and alternates the
-  duration so a replacement under a reused id starts a full lifetime, keyed off
-  the per-client `TOAST_LIFETIME_STORE_ID` counter),
+  `channel_toast()` turns one payload into the show/hide/registry triple that
+  replaces a toast in place, minting a fresh instance id under the payload's
+  logical channel key, hiding the instance it replaces plus any channels it
+  `clears`, and returning a per-key `dash.Patch` for the per-client
+  `TOAST_CHANNEL_REGISTRY_STORE_ID` store; `upsert_sticky_toast()` keeps the
+  `update`+`show` pairing for the until-dismissed celebration),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
