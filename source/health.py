@@ -47,3 +47,9 @@ def register_health_endpoint(server: Flask) -> None:
                 "launch_token": os.environ.get(LAUNCH_TOKEN_ENV_VAR),
             }
         )
+
+    # SPIKE ARTIFACT (D7 codex-exec review spike, 2026-08-30): disposable.
+    @server.route("/health/ready")
+    def ready() -> Response:
+        """Report that the server is up."""
+        return jsonify({"ready": True})
