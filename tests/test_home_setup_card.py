@@ -213,10 +213,12 @@ def test_skip_records_the_decline_and_takes_the_card_away(monkeypatch, stats_dir
     )
     _store(**{STATS_DIR_KEY: str(stats_dir), STEAM_ID_KEY: "76561197986713986"})
 
-    card, notifications = home.skip_identity_setup(1)
+    card, notifications, hidden, toast_channels = home.skip_identity_setup(1, {})
 
     assert card == []
     assert notifications is no_update
+    assert hidden is no_update
+    assert toast_channels is no_update
 
     assert settings_service.get_settings() == {
         STATS_DIR_KEY: str(stats_dir),
@@ -233,7 +235,7 @@ def test_skip_leaves_a_missing_stats_folder_for_the_next_boot_to_find(monkeypatc
     )
     _store()
 
-    home.skip_identity_setup(1)
+    home.skip_identity_setup(1, {})
 
     assert settings_service.get_settings() == {USERNAME_KEY: ""}
 
@@ -253,7 +255,7 @@ def test_skip_starts_no_warmup_worker_and_needs_no_restart(monkeypatch, stats_di
     assert not hasattr(home, "start_percentile_warmup_worker")
     _store(**{STATS_DIR_KEY: str(stats_dir)})
 
-    home.skip_identity_setup(1)
+    home.skip_identity_setup(1, {})
 
     assert settings_service.is_restart_pending() is False
 
@@ -323,7 +325,12 @@ def test_a_skip_nobody_clicked_declines_nothing(monkeypatch, n_clicks, triggered
         lambda: pytest.fail("a page load answered the identity ask"),
     )
 
-    assert home.skip_identity_setup(n_clicks) == (no_update, no_update)
+    assert home.skip_identity_setup(n_clicks, {}) == (
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
@@ -337,8 +344,21 @@ def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
 
     monkeypatch.setattr(home, "decline_identity", refuse)
 
-    card, notifications = home.skip_identity_setup(1)
+    first_card, first, first_hidden, first_patch = home.skip_identity_setup(1, {})
 
-    assert card is no_update
-    assert notifications[0]["color"] == "red"
-    assert notifications[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
+    assert first_card is no_update
+    assert first[0]["color"] == "red"
+    assert first[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
+    assert first[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_REFUSED_CHANNEL}-")
+    assert first_hidden == []
+
+    # A second refused click re-pops the same answer instead of clicking into
+    # silence: a fresh instance shown, the first one hidden with it.
+    registry = {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in first_patch._operations
+    }
+    _card, second, second_hidden, _patch = home.skip_identity_setup(2, registry)
+
+    assert second[0]["id"] != first[0]["id"]
+    assert second_hidden == [first[0]["id"]]

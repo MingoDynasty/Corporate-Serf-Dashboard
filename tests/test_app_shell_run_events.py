@@ -20,7 +20,7 @@ from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_NOTIFICATION_ID,
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
 )
 
 _NOW = datetime(2026, 8, 29, 12, 0, 0)
@@ -192,9 +192,10 @@ def test_the_celebration_toast_is_emitted_exactly_when_a_run_is_named(
 
 
 def test_the_celebration_toast_stays_until_dismissed(monkeypatch, frozen_clock):
-    # Sticky on both actions of the pair. Routing this through ``upsert_toast``
-    # would stamp one of its alternating durations over ``autoClose`` and
-    # quietly turn the celebration into an ordinary 8 s toast.
+    # Sticky on both actions of the pair. The celebration keeps the update+show
+    # pairing rather than moving to ``channel_toast``: it has no timer to
+    # re-arm, and re-popping it would replay the entry animation for news the
+    # user has already seen and chosen to leave up.
     _batch, notifications = _drain(monkeypatch, _message(score=830.0))
 
     assert [payload["autoClose"] for payload in notifications] == [False, False]
@@ -206,15 +207,16 @@ def test_the_celebration_toast_has_its_own_id(monkeypatch, frozen_clock):
     _batch, notifications = _drain(monkeypatch, _message(score=830.0))
 
     assert {payload["id"] for payload in notifications} == {CELEBRATION_NOTIFICATION_ID}
-    assert CELEBRATION_NOTIFICATION_ID != home._RUN_VERDICT_NOTIFICATION_ID
+    assert CELEBRATION_NOTIFICATION_ID != home._RUN_VERDICT_CHANNEL
 
 
-def test_the_shell_never_writes_the_run_verdict_lifetime_store():
+def test_the_shell_never_writes_the_toast_channel_registry():
     """The two toast families stay in separate lanes.
 
-    The alternation exists to re-arm a replacement's timer, and a sticky toast
-    has no timer; an output here would also let the shell disturb the page's
-    run-verdict sequence.
+    The registry records which instance a channel has on screen so the next
+    emission can hide it. The celebration is not a channel -- it replaces
+    nothing and is never replaced -- so an output here would only let the shell
+    disturb the page's run-verdict entry.
     """
     (spec,) = [
         spec
@@ -222,7 +224,8 @@ def test_the_shell_never_writes_the_run_verdict_lifetime_store():
         if "run-events-batch.data" in str(spec["output"])
     ]
 
-    assert TOAST_LIFETIME_STORE_ID not in str(spec["output"])
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in str(spec["output"])
+    assert "hideNotifications" not in str(spec["output"])
     assert spec["prevent_initial_call"] is True
 
 
@@ -443,5 +446,5 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
     assert batch["celebrated_run_id"] == "pb.csv"
     assert celebration[0]["id"] == CELEBRATION_NOTIFICATION_ID
     assert celebration[0]["message"].startswith("Scenario B: 900.00.")
-    assert verdict["id"] == home._RUN_VERDICT_NOTIFICATION_ID
+    assert verdict["id"] == home._RUN_VERDICT_CHANNEL
     assert verdict["message"].startswith("Scenario A — 780.00")

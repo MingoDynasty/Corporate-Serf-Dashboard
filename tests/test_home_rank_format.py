@@ -40,6 +40,33 @@ def _rendered_rank(*args, **kwargs):
     return display
 
 
+class _RefreshClient:
+    """One browser clicking Refresh, carrying the shell's channel registry."""
+
+    def __init__(self) -> None:
+        self.toast_channels: dict[str, str | None] = {}
+        self.clicks = 0
+
+    def click(self, scenario: str | None):
+        """Return this click's (display, shown payloads, hidden ids)."""
+        self.clicks += 1
+        display, shown, hidden, patch = home.refresh_rank(
+            self.clicks, scenario, self.toast_channels
+        )
+        self.toast_channels.update(_registry_writes(patch))
+        return display, shown, hidden
+
+
+def _registry_writes(patch) -> dict[str, str | None]:
+    """Read a per-key ``dash.Patch`` as the assignments it will apply."""
+    if patch is no_update:
+        return {}
+    return {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in patch._operations
+    }
+
+
 def _rank_text(rendered) -> str:
     """Flatten a rendered Position value into the text a reader would see."""
     if isinstance(rendered, str):
@@ -969,7 +996,7 @@ def test_a_successful_manual_refresh_retires_the_stale_affordance(monkeypatch):
         ),
     )
 
-    home.refresh_rank(1, "Scenario")
+    _RefreshClient().click("Scenario")
 
     assert home._last_rank_hints["Scenario"] == ("1,240", None)
     assert _rendered_rank("Scenario", allow_network=False) == "1,240"
@@ -1039,14 +1066,14 @@ def test_manual_rank_refresh_is_one_shot_and_authoritative(
         lambda rank_info, _ttl: rank_info,
     )
 
-    rank_text, notifications = home.refresh_rank(1, scenario_name)
+    rank_text, notifications, _hidden = _RefreshClient().click(scenario_name)
     assert rank_text == expected
     # Any completed refresh — ranked or unranked — confirms with a green
-    # toast; a fresh id per refresh so back-to-back clicks each confirm.
+    # toast, on a channel keyed to the scenario it refreshed.
     assert notifications[0]["color"] == "green"
     assert notifications[0]["title"] == "Position refreshed"
     assert scenario_name in notifications[0]["message"]
-    assert notifications[0]["id"].startswith("rank-refresh-notification-")
+    assert notifications[0]["id"].startswith(f"rank-refresh-success-{scenario_name}-")
     assert fetched == [True]
     stored = api_service._cached_rank(leaderboard_id, username)
     assert stored is not None
@@ -1069,7 +1096,7 @@ def test_manual_rank_refresh_failure_toasts_red_and_leaves_the_value_alone(
 
     monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
 
-    rank_display, notifications = home.refresh_rank(1, "Scenario")
+    rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
     # no_update, not "N/A": whatever the field showed -- usually the cached
     # position -- stays put, which is what the toast copy promises.
@@ -1088,7 +1115,7 @@ def test_manual_rank_refresh_crash_toasts_red_and_leaves_the_value_alone(monkeyp
 
     monkeypatch.setattr(home, "get_scenario_rank_info", explode)
 
-    rank_display, notifications = home.refresh_rank(1, "Scenario")
+    rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
     assert rank_display is no_update
     assert [notification["color"] for notification in notifications] == ["red"]
@@ -1115,7 +1142,7 @@ def test_manual_rank_refresh_served_stale_toasts_yellow_and_marks_the_value(
 
     monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
 
-    rank_display, notifications = home.refresh_rank(1, "Scenario")
+    rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
     assert _rank_text(rank_display) == "50 — from cache, Refresh to update"
     assert [notification["color"] for notification in notifications] == ["yellow"]
@@ -1142,7 +1169,7 @@ def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeyp
 
     monkeypatch.setattr(home, "get_scenario_rank_info", get_rank)
 
-    rank_display, notifications = home.refresh_rank(1, "Scenario")
+    rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
     assert rank_display == "50"
     assert [notification["color"] for notification in notifications] == ["green"]
@@ -1150,7 +1177,7 @@ def test_manual_rank_refresh_reports_a_steam_mismatch_as_a_clean_refresh(monkeyp
 
 def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
     # ``show`` swallows a repeated id while the first toast is still up, so
-    # each deliberate click gets its own.
+    # each deliberate click shows a fresh instance and hides the one before it.
     settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
     monkeypatch.setattr(
         home,
@@ -1163,13 +1190,17 @@ def test_back_to_back_manual_refreshes_each_render_their_result(monkeypatch):
         ),
     )
 
-    _first_display, first = home.refresh_rank(1, "Scenario")
-    _second_display, second = home.refresh_rank(2, "Scenario")
+    client = _RefreshClient()
+    _first_display, first, first_hidden = client.click("Scenario")
+    _second_display, second, second_hidden = client.click("Scenario")
 
     assert first[0]["color"] == second[0]["color"] == "green"
     assert first[0]["id"] != second[0]["id"]
-    assert first[0]["id"].startswith("rank-refresh-notification-")
-    assert second[0]["id"].startswith("rank-refresh-notification-")
+    assert first[0]["id"].startswith("rank-refresh-success-Scenario-")
+    assert second[0]["id"].startswith("rank-refresh-success-Scenario-")
+    # The replacement: the second click retires the first click's instance.
+    assert first_hidden == []
+    assert second_hidden == [first[0]["id"]]
 
 
 def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch):
@@ -1184,7 +1215,7 @@ def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch)
         ),
     )
 
-    rank_display, notifications = home.refresh_rank(1, "Scenario")
+    rank_display, notifications, _hidden = _RefreshClient().click("Scenario")
 
     assert rank_display is no_update
     assert [notification["color"] for notification in notifications] == ["blue"]
@@ -1195,8 +1226,8 @@ def test_manual_rank_refresh_without_a_username_names_the_condition(monkeypatch)
 
 
 def test_back_to_back_unset_username_refreshes_each_answer(monkeypatch):
-    # Same reason the green confirmation carries a fresh id: a stable one would
-    # be swallowed while the first toast is still on screen.
+    # Same reason the green confirmation re-pops: a stable id would be
+    # swallowed while the first toast is still on screen.
     monkeypatch.setattr(
         home,
         "get_scenario_rank_info",
@@ -1205,12 +1236,108 @@ def test_back_to_back_unset_username_refreshes_each_answer(monkeypatch):
         ),
     )
 
-    _first_display, first = home.refresh_rank(1, "Scenario")
-    _second_display, second = home.refresh_rank(2, "Scenario")
+    client = _RefreshClient()
+    _first_display, first, first_hidden = client.click("Scenario")
+    _second_display, second, second_hidden = client.click("Scenario")
 
     assert first[0]["id"] != second[0]["id"]
     assert first[0]["id"].startswith("rank-refresh-username-unset-")
     assert second[0]["id"].startswith("rank-refresh-username-unset-")
+    assert first_hidden == []
+    assert second_hidden == [first[0]["id"]]
+
+
+def test_the_two_refresh_problems_share_one_channel(monkeypatch):
+    """A hard failure and a served-stale retry are verdicts on one attempt.
+
+    Under the separate ids they used to carry, a stale retry after a hard
+    failure left both toasts on screen contradicting each other about the same
+    click. One channel makes each attempt's verdict replace the last.
+    """
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    outcomes = [
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="Rank lookup failed.",
+        ),
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=1,
+            scenario_name="Scenario",
+            served_stale=True,
+            warning_message="Showing the last cached position.",
+        ),
+    ]
+    monkeypatch.setattr(
+        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+    )
+
+    client = _RefreshClient()
+    _display, failed, failed_hidden = client.click("Scenario")
+    _display, stale, stale_hidden = client.click("Scenario")
+
+    assert failed[0]["color"] == "red"
+    assert stale[0]["color"] == "yellow"
+    assert failed[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
+    assert stale[0]["id"].startswith(f"{home._RANK_REFRESH_PROBLEM_CHANNEL}-")
+    assert failed_hidden == []
+    assert stale_hidden == [failed[0]["id"]]
+
+
+def test_refreshes_of_two_scenarios_keep_separate_success_channels(monkeypatch):
+    """Different scenarios are different facts, so their confirmations stack."""
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    monkeypatch.setattr(
+        home,
+        "get_scenario_rank_info",
+        lambda scenario, *_a, **_k: ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=1,
+            scenario_name=scenario,
+        ),
+    )
+
+    client = _RefreshClient()
+    _display, first, first_hidden = client.click("Scenario A")
+    _display, second, second_hidden = client.click("Scenario B")
+
+    assert first_hidden == second_hidden == []
+    assert client.toast_channels["rank-refresh-success-Scenario A"] == first[0]["id"]
+    assert client.toast_channels["rank-refresh-success-Scenario B"] == second[0]["id"]
+
+
+def test_a_successful_refresh_clears_the_problem_and_username_channels(monkeypatch):
+    """The success falsifies both standing claims about the same scenario."""
+    outcomes = [
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.UNKNOWN,
+            error_message="Rank lookup failed.",
+        ),
+        ScenarioRankInfo(
+            status=ScenarioRankStatus.RANKED,
+            rank=50,
+            leaderboard_id=1,
+            scenario_name="Scenario",
+        ),
+    ]
+    monkeypatch.setattr(
+        home, "get_scenario_rank_info", lambda *_a, **_k: outcomes.pop(0)
+    )
+
+    # No username first: the blue notice stands, and nothing reached the
+    # service. Then the username is set and the refresh fails, then succeeds.
+    client = _RefreshClient()
+    _display, unset, _hidden = client.click("Scenario")
+    settings_service.save_settings({"kovaaks_username": "MingoDynasty"})
+    _display, failed, _hidden = client.click("Scenario")
+    _display, success, success_hidden = client.click("Scenario")
+
+    assert success[0]["color"] == "green"
+    assert set(success_hidden) == {failed[0]["id"], unset[0]["id"]}
+    assert client.toast_channels[home._RANK_REFRESH_PROBLEM_CHANNEL] is None
+    assert client.toast_channels[home._RANK_REFRESH_USERNAME_UNSET_CHANNEL] is None
 
 
 def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
@@ -1224,7 +1351,12 @@ def test_manual_rank_refresh_ignores_initial_load_fire(monkeypatch):
         ),
     )
 
-    assert home.refresh_rank(None, "Scenario") == (no_update, no_update)
+    assert home.refresh_rank(None, "Scenario", {}) == (
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch):
@@ -1236,7 +1368,12 @@ def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch)
         ),
     )
 
-    assert home.refresh_rank(1, None) == ("N/A", no_update)
+    assert home.refresh_rank(1, None, {}) == (
+        "N/A",
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):

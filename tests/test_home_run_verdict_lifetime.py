@@ -1,23 +1,30 @@
 """Regression tests for D5's normative run-verdict replace behaviors.
 
 The contract these pin is about *elapsed time*, not payload contents: at most
-one run-verdict toast is visible, a later verdict replaces it, and the
-replacement gets a full lifetime rather than the remainder of the old timer.
+one run-verdict toast is on screen once a response has been applied, a later
+verdict replaces it, and the replacement gets a full lifetime rather than the
+remainder of the old timer.
 
 ``FakeNotificationContainer`` is a Python model of the DMC 2.8.0 notification
 store, transcribed from the shipped bundle so the assertions can advance a
-clock. Three behaviors are modelled, and all three were read out of
+clock. Four behaviors are modelled, and all four were read out of
 ``dash_mantine_components.js``:
 
 - ``show`` is a no-op for an id already on screen
-  (``e.id && list.some(n => n.id === e.id) ? list : [...list, e]``).
+  (``e.id && list.some(n => n.id === e.id) ? list : [...list, e]``) -- which is
+  why a channel emission mints a fresh instance id every time.
 - ``update`` merges into an existing entry and is a no-op for an absent id
-  (``list.map(n => n.id === e.id ? {...n, ...e} : n)``).
+  (``list.map(n => n.id === e.id ? {...n, ...e} : n)``). Only the sticky
+  celebration still sends it.
+- ``hideNotifications`` drops the ids it names, and the container declares that
+  effect *after* the ``sendNotifications`` one, so one response shows the fresh
+  instance before retiring the instance it replaces.
 - the auto-close timer is a React effect keyed on the *resolved duration
-  alone* (``useEffect(() => (arm(), clear), [resolvedAutoClose])``), so a
-  replacement carrying the same duration leaves the running timer untouched.
+  alone* (``useEffect(() => (arm(), clear), [resolvedAutoClose])``); a fresh id
+  is a fresh entry, so it arms its own timer whatever the outgoing one had
+  left.
 
-If a DMC upgrade changes any of those, this model goes stale — re-read the
+If a DMC upgrade changes any of those, this model goes stale -- re-read the
 bundle before trusting a green run here.
 """
 
@@ -34,7 +41,7 @@ from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
     CELEBRATION_NOTIFICATION_ID,
     DEFAULT_AUTO_CLOSE_MS,
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
     upsert_sticky_toast,
 )
 
@@ -71,6 +78,8 @@ class FakeNotificationContainer:
         self._entries: dict[str, _Entry] = {}
 
     def send(self, notifications) -> None:
+        if notifications is dash.no_update:
+            return
         for payload in notifications:
             action = payload.get("action", "show")
             entry = self._entries.get(payload["id"])
@@ -79,6 +88,13 @@ class FakeNotificationContainer:
                     self._entries[payload["id"]] = _Entry(payload, self.now)
             elif entry is not None:
                 entry.merge(payload, self.now)
+
+    def hide(self, notification_ids) -> None:
+        """Apply the hide effect, which the container runs after the send one."""
+        if notification_ids is dash.no_update:
+            return
+        for notification_id in notification_ids:
+            self._entries.pop(notification_id, None)
 
     def advance(self, milliseconds: int) -> None:
         self.now += milliseconds
@@ -96,6 +112,16 @@ class FakeNotificationContainer:
     def remaining_lifetime(self, notification_id: str) -> int:
         self.advance(0)
         return self._entries[notification_id].expires_at - self.now
+
+
+def apply_registry_patch(registry: dict, patch) -> None:
+    """Apply a per-key ``dash.Patch`` the way the Dash client applies it."""
+    if patch is dash.no_update:
+        return
+    for operation in patch._operations:
+        assert operation["operation"] == "Assign"
+        (key,) = operation["location"]
+        registry[key] = operation["params"]["value"]
 
 
 @pytest.fixture
@@ -129,18 +155,25 @@ def _run_event(score: float) -> dict:
 
 
 class _Client:
-    """One browser: the shell's lifetime store plus its rendered toasts."""
+    """One browser: the shell's channel registry plus its rendered toasts."""
 
     def __init__(self) -> None:
         self.container = FakeNotificationContainer()
-        self.lifetime_sequence = 0
+        self.toast_channels: dict[str, str | None] = {}
+        self.last_shown: list[dict] = []
+        self.last_hidden: list[str] = []
+
+    @property
+    def verdict_instance(self) -> str | None:
+        """The instance id the registry says this browser's verdict is under."""
+        return self.toast_channels.get(home._RUN_VERDICT_CHANNEL)
 
     def play(self, *, score: float) -> None:
         payload = {
             "latest": _run_event(score),
             "celebrated_run_id": None,
         }
-        _plot, notifications, next_sequence = home.generate_graph(
+        _plot, notifications, hidden, registry_patch = home.generate_graph(
             payload,
             "Scenario A",
             5,
@@ -154,11 +187,13 @@ class _Client:
             True,
             True,
             None,
-            self.lifetime_sequence,
+            self.toast_channels,
         )
+        self.last_shown = notifications
+        self.last_hidden = hidden
         self.container.send(notifications)
-        if next_sequence is not dash.no_update:
-            self.lifetime_sequence = next_sequence
+        self.container.hide(hidden)
+        apply_registry_patch(self.toast_channels, registry_patch)
 
 
 def test_a_second_run_replaces_the_visible_toast_with_a_full_lifetime(plotting):
@@ -173,7 +208,30 @@ def test_a_second_run_replaces_the_visible_toast_with_a_full_lifetime(plotting):
     assert "901.70" in visible[0]["message"]
     # The point of the test: 500 ms short of expiry, the replacement starts its
     # own timer rather than flashing for what was left of the old one.
-    assert client.container.remaining_lifetime("run-verdict") >= DEFAULT_AUTO_CLOSE_MS
+    assert (
+        client.container.remaining_lifetime(client.verdict_instance)
+        >= DEFAULT_AUTO_CLOSE_MS
+    )
+
+
+def test_each_verdict_shows_a_fresh_instance_and_hides_the_one_it_replaces(plotting):
+    """The mechanism itself: show a new id, hide the registered old one."""
+    client = _Client()
+
+    client.play(score=812.4)
+    first_instance = client.verdict_instance
+
+    assert [payload["id"] for payload in client.last_shown] == [first_instance]
+    assert first_instance.startswith(f"{home._RUN_VERDICT_CHANNEL}-")
+    # Nothing to replace on the first emission, so nothing is hidden.
+    assert client.last_hidden == []
+
+    client.play(score=901.7)
+    second_instance = client.verdict_instance
+
+    assert second_instance != first_instance
+    assert [payload["id"] for payload in client.last_shown] == [second_instance]
+    assert client.last_hidden == [first_instance]
 
 
 def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plotting):
@@ -192,7 +250,7 @@ def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plottin
 
     assert {entry["id"] for entry in client.container.visible} == {
         CELEBRATION_NOTIFICATION_ID,
-        "run-verdict",
+        client.verdict_instance,
     }
 
     client.container.advance(DEFAULT_AUTO_CLOSE_MS + 1)
@@ -212,40 +270,43 @@ def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
     # Navigate away and back: Home's layout is rebuilt from scratch, so every
-    # store it declares resets to its default. The container and the lifetime
-    # store sit outside that layout, so the toast is still up and the sequence
-    # still knows which duration it is displaying.
-    assert TOAST_LIFETIME_STORE_ID not in _component_ids(home.layout())
+    # store it declares resets to its default. The container and the registry
+    # sit outside that layout, so the toast is still up and the registry still
+    # knows which instance it is showing.
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(home.layout())
     assert len(client.container.visible) == 1
 
     client.play(score=901.7)
 
     assert len(client.container.visible) == 1
-    assert client.container.remaining_lifetime("run-verdict") >= DEFAULT_AUTO_CLOSE_MS
+    assert (
+        client.container.remaining_lifetime(client.verdict_instance)
+        >= DEFAULT_AUTO_CLOSE_MS
+    )
 
 
-def test_a_page_scoped_sequence_would_not_re_arm_the_timer(plotting):
+def test_a_page_scoped_registry_would_leave_two_verdicts_on_screen(plotting):
     # Why the store belongs in the shell: a page-layout store resets to its
-    # default on remount, so the post-navigation emission would hand the
-    # visible toast the duration it is already displaying and the timer -- keyed
-    # on that duration alone -- would never re-arm. This is the failure the
-    # test above is guarding against, asserted directly.
+    # default on remount, so the post-navigation emission would have no instance
+    # id to hide and its fresh id would stack beside the toast already on
+    # screen. This is the failure the test above is guarding against, asserted
+    # directly.
     client = _Client()
     client.play(score=812.4)
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
 
-    client.lifetime_sequence = 0  # what a remounted page-layout store would say
+    client.toast_channels = {}  # what a remounted page-layout store would say
     client.play(score=901.7)
 
-    assert client.container.remaining_lifetime("run-verdict") == 500
+    assert len(client.container.visible) == 2
 
 
-def test_the_toast_lifetime_store_is_hosted_by_the_app_shell(monkeypatch):
+def test_the_toast_channel_registry_is_hosted_by_the_app_shell(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
     monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
 
-    assert TOAST_LIFETIME_STORE_ID in _component_ids(app_shell.layout())
-    assert TOAST_LIFETIME_STORE_ID not in _component_ids(home.layout())
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID in _component_ids(app_shell.layout())
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(home.layout())
 
 
 def _component_ids(component) -> set[str]:
@@ -263,19 +324,17 @@ def _component_ids(component) -> set[str]:
     return found
 
 
-def test_run_verdict_emissions_alternate_between_indistinguishable_durations(plotting):
+def test_run_verdict_emissions_carry_the_one_nominal_lifetime(plotting):
+    """No more duration alternation: a fresh id is what re-arms the timer."""
     client = _Client()
     durations = []
+    instances = []
     for score in (812.4, 901.7, 933.0):
         client.play(score=score)
         durations.append(client.container.visible[0]["autoClose"])
+        instances.append(client.verdict_instance)
 
-    assert durations == [
-        DEFAULT_AUTO_CLOSE_MS,
-        DEFAULT_AUTO_CLOSE_MS + 1,
-        DEFAULT_AUTO_CLOSE_MS,
-    ]
-    # Advancing past the nominal lifetime retires the toast either way, so the
-    # 1 ms is invisible to the user and only exists to re-key the timer effect.
+    assert durations == [DEFAULT_AUTO_CLOSE_MS] * 3
+    assert len(set(instances)) == 3
     client.container.advance(DEFAULT_AUTO_CLOSE_MS + 1)
     assert client.container.visible == []
