@@ -2,6 +2,7 @@
 Provides business logic for Kovaak's API.
 """
 
+import hashlib
 import json
 import logging
 import os
@@ -466,10 +467,20 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
 
 
 def _safe_cache_key(value: str) -> str:
-    """Normalize user-provided values before embedding them in cache paths."""
-    return "".join(
+    """Normalize user-provided values before embedding them in cache paths.
+
+    Sanitizing alone is lossy: every character outside the preserved set folds
+    to `_`, so distinct usernames like `a.b` and `a_b` produced one key and
+    silently shared (and overwrote) each other's cache files. The sanitized
+    prefix stays so cache directories remain human-readable, and a short digest
+    of the raw value makes distinct values distinct. sha256 is used rather than
+    `hash()` because the key must be stable across runs.
+    """
+    sanitized = "".join(
         char if char.isalnum() or char in ("-", "_") else "_" for char in value
     )
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:8]
+    return f"{sanitized}-{digest}"
 
 
 def _user_scenario_total_play_cache_file(username: str) -> Path:

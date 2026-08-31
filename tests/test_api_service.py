@@ -1117,16 +1117,16 @@ def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     assert response.total == 2
     assert [scenario.scenarioName for scenario in response.data] == ["First", "Second"]
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("MingoDynasty")
     cached_data = json.loads(cache_file.read_text())
     assert cached_data["total"] == 2
     assert len(cached_data["data"]) == 2
 
-    page_0_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_0_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 0
     )
-    page_1_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_1_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 1
     )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
@@ -1186,16 +1186,16 @@ def test_get_user_scenario_total_play_continues_after_full_page(monkeypatch):
     assert response.total == 101
     assert len(response.data) == 101
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("MingoDynasty")
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["total"] == 101
     assert len(cached_data["data"]) == 101
 
-    page_0_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_0_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 0
     )
-    page_1_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_1_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 1
     )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
@@ -1221,7 +1221,7 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
 
     assert fetched_pages == [0]
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("UnknownUser")
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data == {
         "page": 0,
@@ -1232,8 +1232,8 @@ def test_get_user_scenario_total_play_handles_unknown_username(monkeypatch):
         "username": "UnknownUser",
     }
 
-    page_0_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser" / "page_0.json"
+    page_0_file = api_service._user_scenario_total_play_page_cache_file(
+        "UnknownUser", 0
     )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == {
         "page": 0,
@@ -1258,7 +1258,7 @@ def test_get_user_scenario_total_play_rejects_stale_unknown_username_marker(
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "UnknownUser.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("UnknownUser")
     api_service._write_json(
         cache_file,
         {
@@ -1293,7 +1293,7 @@ def test_get_user_scenario_total_play_serves_stale_valid_cache_after_failure(
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("MingoDynasty")
     api_service._write_json(
         cache_file,
         {
@@ -1335,7 +1335,7 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
     monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
     api_service.make_cache()
 
-    cache_file = TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty.json"
+    cache_file = api_service._user_scenario_total_play_cache_file("MingoDynasty")
     api_service._write_json(
         cache_file,
         {
@@ -1399,11 +1399,11 @@ def test_hydrate_leaderboard_id_cache_refetches_incomplete_total_play_cache(
         "Fresh First",
         "Fresh Second",
     ]
-    page_0_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_0.json"
+    page_0_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 0
     )
-    page_1_file = (
-        TEST_CACHE_DIR / "user_scenario_total_play" / "MingoDynasty" / "page_1.json"
+    page_1_file = api_service._user_scenario_total_play_page_cache_file(
+        "MingoDynasty", 1
     )
     assert json.loads(page_0_file.read_text(encoding="utf-8")) == responses[0]
     assert json.loads(page_1_file.read_text(encoding="utf-8")) == responses[1]
@@ -1589,9 +1589,7 @@ def test_get_scenario_rank_info_adds_scenario_name_to_fresh_rank_cache(monkeypat
 
     assert rank_info.scenario_name == "VT Pasu Intermediate S5"
 
-    cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["scenario_name"] == "VT Pasu Intermediate S5"
     assert cached_data["matched_steam_id"] == "right-steam-id"
@@ -1815,7 +1813,8 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     username = "Mingo Dynasty/Bad:Name"
     safe_username = api_service._safe_cache_key(username)
 
-    assert safe_username == "Mingo_Dynasty_Bad_Name"
+    assert safe_username.startswith("Mingo_Dynasty_Bad_Name-")
+    assert re.fullmatch(r"Mingo_Dynasty_Bad_Name-[0-9a-f]{8}", safe_username)
     assert api_service._user_scenario_total_play_cache_file(username) == (
         TEST_CACHE_DIR / "user_scenario_total_play" / f"{safe_username}.json"
     )
@@ -1828,6 +1827,49 @@ def test_cache_file_helpers_share_username_sanitization(monkeypatch):
     assert api_service._leaderboard_total_cache_file(98330) == (
         TEST_CACHE_DIR / "leaderboard" / "totals" / "98330.json"
     )
+
+
+def test_cache_keys_distinguish_usernames_that_sanitize_alike(monkeypatch):
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    # "a.b" and "a_b" both sanitize to "a_b"; the digest suffix keeps them apart.
+    colliding = ["a.b", "a_b", "a-b"]
+    rank_paths = {api_service._rank_cache_file(98330, name) for name in colliding}
+    total_play_paths = {
+        api_service._user_scenario_total_play_cache_file(name) for name in colliding
+    }
+    page_paths = {
+        api_service._user_scenario_total_play_page_cache_file(name, 0)
+        for name in colliding
+    }
+
+    assert len(rank_paths) == len(colliding)
+    assert len(total_play_paths) == len(colliding)
+    assert len(page_paths) == len(colliding)
+
+
+def test_cache_key_is_stable_across_calls(monkeypatch):
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    assert api_service._safe_cache_key("a.b") == api_service._safe_cache_key("a.b")
+    assert api_service._rank_cache_file(98330, "a.b") == api_service._rank_cache_file(
+        98330, "a.b"
+    )
+
+
+def test_saved_rank_is_not_readable_by_a_colliding_username(monkeypatch):
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+    monkeypatch.setattr(api_service, "CACHE_DIR", TEST_CACHE_DIR)
+
+    api_service.save_scenario_rank(
+        98330,
+        "a.b",
+        ScenarioRankInfo(status=ScenarioRankStatus.RANKED, rank=42, score=100.0),
+    )
+
+    assert api_service.get_cached_scenario_rank(98330, "a.b") is not None
+    assert api_service.get_cached_scenario_rank(98330, "a_b") is None
+    shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
 def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch):
@@ -1860,9 +1902,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
     assert rank_info.rank is None
     assert rank_info.error_message == "KovaaK's username 'UnknownUser' was not found."
 
-    rank_cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "UnknownUser" / "98330.json"
-    )
+    rank_cache_file = api_service._rank_cache_file(98330, "UnknownUser")
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -1929,9 +1969,7 @@ def test_get_scenario_rank_info_returns_unknown_when_rank_fetch_fails(monkeypatc
         == "Failed to fetch leaderboard position for VT Pasu Intermediate S5."
     )
 
-    rank_cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    rank_cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -1969,9 +2007,7 @@ def _seed_expired_rank_cache(monkeypatch, *, with_total, fetch_fake=None):
             leaderboard_id=98330,
         ),
     )
-    rank_cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    rank_cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     stale_timestamp = time.time() - (200 * 60 * 60)
     os.utime(rank_cache_file, (stale_timestamp, stale_timestamp))
     if with_total:
@@ -2097,9 +2133,7 @@ def test_get_scenario_rank_info_returns_unknown_when_response_invalid_no_cache(
         rank_info.error_message
         == "Invalid leaderboard response for VT Pasu Intermediate S5."
     )
-    rank_cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    rank_cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     assert not rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
@@ -2355,9 +2389,7 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
         "KovaaK's user 'MingoDynasty' (actual Steam ID: actual-steam-id)."
     )
 
-    cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     cached_data = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached_data["matched_steam_id"] == "actual-steam-id"
     assert "warning_message" not in cached_data
@@ -2411,9 +2443,7 @@ def test_get_scenario_rank_info_reuses_cache_and_clears_warning_after_steam_id_f
     assert rank_info.rank == 11266
     assert rank_info.warning_message is None
 
-    rank_cache_file = (
-        TEST_CACHE_DIR / "leaderboard" / "user_rank" / "MingoDynasty" / "98330.json"
-    )
+    rank_cache_file = api_service._rank_cache_file(98330, "MingoDynasty")
     assert rank_cache_file.exists()
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
