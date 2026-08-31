@@ -49,9 +49,10 @@ list in the roadmap.)
   you dismiss it, because the run that earned it was played in a fullscreen
   game and the news should still be there when you alt-tab back. It also
   triggers the background rank refresh, as it always did. If runs accumulate
-  while no tab is open, the next visit rebuilds once from final state and
-  narrates the most recent one instead of replaying stale toasts and
-  selections. The ordinary run toasts can be turned off with one Chart options
+  while no tab is open, the next visit rebuilds once from final state instead
+  of replaying stale toasts and selections; it narrates the most recent run if
+  you come back within a couple of minutes of playing it, and anything older
+  reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
   switch, Run Notifications: with it off the chart still updates and nothing
   toasts about a routine run, though a personal best still celebrates and a run
   file that failed to import still says so. The threshold switch beside the
