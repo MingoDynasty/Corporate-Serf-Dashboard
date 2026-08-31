@@ -181,14 +181,29 @@ def test_a_missing_registry_reads_as_an_empty_one():
     assert set(_registry_writes(patch)) == {"import-failed"}
 
 
-def test_upsert_toast_is_gone():
+def test_both_upsert_helpers_are_gone():
     """One replacement mechanism app-wide (D3).
 
     The alternating-``autoClose`` upsert existed only to re-arm a replacement's
-    timer under a reused id. Every channel now shows a fresh id instead, so the
-    trick and its sequence store are deleted rather than kept for one toast.
+    timer under a reused id, and its sticky sibling existed only to skip that
+    alternation. Every channel now shows a fresh id instead, so both helpers
+    and the sequence store are deleted rather than kept for one toast each.
     """
     assert not hasattr(notifications, "upsert_toast")
+    assert not hasattr(notifications, "upsert_sticky_toast")
     assert not hasattr(notifications, "TOAST_LIFETIME_STORE_ID")
-    # The sticky pairing survives: the celebration has no timer to re-arm.
-    assert hasattr(notifications, "upsert_sticky_toast")
+
+
+def test_a_persistent_channel_keeps_its_own_lifetime():
+    """The helper carries ``autoClose`` through, so one mechanism serves both.
+
+    Stamping a lifetime here would quietly turn the personal best celebration
+    into an ordinary 8 s toast -- the exact failure the deleted sticky helper
+    existed to avoid.
+    """
+    send, _hide, _patch = channel_toast(
+        toast("pb-celebration", "T", "M", color="green", auto_close=False),
+        {},
+    )
+
+    assert send[0]["autoClose"] is False

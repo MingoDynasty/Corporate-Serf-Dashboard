@@ -39,10 +39,10 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 from source import app_shell  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
-    CELEBRATION_NOTIFICATION_ID,
+    CELEBRATION_CHANNEL,
     DEFAULT_AUTO_CLOSE_MS,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
-    upsert_sticky_toast,
+    channel_toast,
 )
 
 # What dmc.NotificationContainer resolves autoClose to when a payload omits it.
@@ -244,20 +244,24 @@ def test_the_celebration_toast_sits_beside_a_run_verdict_and_outlives_it(plottin
     client = _Client()
     celebrated = _run_event(901.7)
     celebrated["nth_score"] = 1
-    client.container.send(upsert_sticky_toast(app_shell._celebration_toast(celebrated)))
+    send, hide, patch = channel_toast(
+        app_shell._celebration_toast(celebrated), client.toast_channels
+    )
+    client.container.send(send)
+    client.container.hide(hide)
+    apply_registry_patch(client.toast_channels, patch)
+    celebration_instance = client.toast_channels[CELEBRATION_CHANNEL]
 
     client.play(score=812.4)
 
     assert {entry["id"] for entry in client.container.visible} == {
-        CELEBRATION_NOTIFICATION_ID,
+        celebration_instance,
         client.verdict_instance,
     }
 
     client.container.advance(DEFAULT_AUTO_CLOSE_MS + 1)
 
-    assert [entry["id"] for entry in client.container.visible] == [
-        CELEBRATION_NOTIFICATION_ID
-    ]
+    assert [entry["id"] for entry in client.container.visible] == [celebration_instance]
 
 
 def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(

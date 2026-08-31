@@ -19,7 +19,7 @@ from source import app_shell  # noqa: E402
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
-    CELEBRATION_NOTIFICATION_ID,
+    CELEBRATION_CHANNEL,
     TOAST_CHANNEL_REGISTRY_STORE_ID,
 )
 
@@ -65,10 +65,33 @@ def _window() -> float:
     return app_shell._run_event_freshness_seconds()
 
 
-def _drain(monkeypatch, *messages, previous_batch=None):
-    """Run one drain over a queue holding exactly these messages."""
+def _drain_emission(monkeypatch, *messages, previous_batch=None, toast_channels=None):
+    """Run one drain and return all four outputs, registry patch included."""
     monkeypatch.setattr(app_shell, "message_queue", deque(messages))
-    return app_shell.publish_run_events(1, previous_batch)
+    return app_shell.publish_run_events(1, previous_batch, toast_channels or {})
+
+
+def _drain(monkeypatch, *messages, previous_batch=None):
+    """Run one drain over a queue holding exactly these messages.
+
+    Returns the batch and the toasts to show. The hide list and the registry
+    patch are the celebration channel's business, asserted through
+    ``_drain_emission`` in the channel tests below.
+    """
+    batch, send, _hide, _patch = _drain_emission(
+        monkeypatch, *messages, previous_batch=previous_batch
+    )
+    return batch, send
+
+
+def _registry_writes(patch) -> dict[str, str | None]:
+    """Read a per-key ``dash.Patch`` as the assignments it will apply."""
+    if patch is no_update:
+        return {}
+    return {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in patch._operations
+    }
 
 
 def test_an_empty_queue_publishes_nothing(monkeypatch, frozen_clock):
@@ -187,36 +210,64 @@ def test_the_celebration_toast_is_emitted_exactly_when_a_run_is_named(
     assert silent is no_update
 
     _batch, notifications = _drain(monkeypatch, _message(score=830.0))
-    assert [payload["action"] for payload in notifications] == ["update", "show"]
+    assert [payload["action"] for payload in notifications] == ["show"]
     assert notifications[0]["title"] == "New personal best"
 
 
 def test_the_celebration_toast_stays_until_dismissed(monkeypatch, frozen_clock):
-    # Sticky on both actions of the pair. The celebration keeps the update+show
-    # pairing rather than moving to ``channel_toast``: it has no timer to
-    # re-arm, and re-popping it would replay the entry animation for news the
-    # user has already seen and chosen to leave up.
+    # The builder passes ``auto_close=False`` explicitly, because
+    # ``channel_toast`` carries the payload's lifetime through untouched rather
+    # than stamping one. This is the one channel with no timer at all.
     _batch, notifications = _drain(monkeypatch, _message(score=830.0))
 
-    assert [payload["autoClose"] for payload in notifications] == [False, False]
+    assert [payload["autoClose"] for payload in notifications] == [False]
 
 
-def test_the_celebration_toast_has_its_own_id(monkeypatch, frozen_clock):
-    # A dedicated id is what lets the celebration survive the next ordinary
-    # run toast instead of being replaced by it.
-    _batch, notifications = _drain(monkeypatch, _message(score=830.0))
+def test_the_celebration_toast_has_its_own_channel(monkeypatch, frozen_clock):
+    # A dedicated lane is what lets the celebration survive the next ordinary
+    # run toast instead of being replaced by it. Only a later celebration
+    # replaces a celebration.
+    _batch, notifications, _hide, patch = _drain_emission(
+        monkeypatch, _message(score=830.0)
+    )
 
-    assert {payload["id"] for payload in notifications} == {CELEBRATION_NOTIFICATION_ID}
-    assert CELEBRATION_NOTIFICATION_ID != home._RUN_VERDICT_CHANNEL
+    assert notifications[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
+    assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
+    assert CELEBRATION_CHANNEL != home._RUN_VERDICT_CHANNEL
 
 
-def test_the_shell_never_writes_the_toast_channel_registry():
+def test_a_later_celebration_replaces_the_one_on_screen(monkeypatch, frozen_clock):
+    """The PR #261 family, reconciled onto the standing policy.
+
+    Two personal bests inside one session used to be an ``update``-plus-``show``
+    pair on a stable id. Now each shows a fresh instance and hides the one it
+    replaces, which is what makes the second one visibly arrive -- while the
+    contract it was ratified with holds: still its own lane, still no lifetime.
+    """
+    _batch, first, first_hide, first_patch = _drain_emission(
+        monkeypatch, _message(run_id="pb-1.csv", score=830.0)
+    )
+    registry = _registry_writes(first_patch)
+
+    _batch, second, second_hide, second_patch = _drain_emission(
+        monkeypatch,
+        _message(run_id="pb-2.csv", score=900.0),
+        toast_channels=registry,
+    )
+
+    assert first_hide == []
+    assert second[0]["id"] != first[0]["id"]
+    assert second_hide == [first[0]["id"]]
+    assert _registry_writes(second_patch) == {CELEBRATION_CHANNEL: second[0]["id"]}
+    assert second[0]["autoClose"] is False
+
+
+def test_the_shell_writes_only_the_celebration_channel(monkeypatch, frozen_clock):
     """The two toast families stay in separate lanes.
 
-    The registry records which instance a channel has on screen so the next
-    emission can hide it. The celebration is not a channel -- it replaces
-    nothing and is never replaced -- so an output here would only let the shell
-    disturb the page's run-verdict entry.
+    The shell declares the registry and hide outputs it needs for its own
+    channel, and its emission assigns exactly one key. A whole-dict write here
+    would let the shell clobber the page's run-verdict entry.
     """
     (spec,) = [
         spec
@@ -224,9 +275,23 @@ def test_the_shell_never_writes_the_toast_channel_registry():
         if "run-events-batch.data" in str(spec["output"])
     ]
 
-    assert TOAST_CHANNEL_REGISTRY_STORE_ID not in str(spec["output"])
-    assert "hideNotifications" not in str(spec["output"])
+    assert TOAST_CHANNEL_REGISTRY_STORE_ID in str(spec["output"])
+    assert "hideNotifications" in str(spec["output"])
     assert spec["prevent_initial_call"] is True
+
+    _batch, _send, _hide, patch = _drain_emission(
+        monkeypatch, _message(score=830.0), toast_channels={"run-verdict": "verdict-1"}
+    )
+
+    assert set(_registry_writes(patch)) == {CELEBRATION_CHANNEL}
+
+
+def test_a_quiet_drain_touches_neither_the_hide_list_nor_the_registry(
+    monkeypatch, frozen_clock
+):
+    _batch, send, hide, patch = _drain_emission(monkeypatch, _message(score=700.0))
+
+    assert (send, hide, patch) == (no_update, no_update, no_update)
 
 
 def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
@@ -373,7 +438,7 @@ def test_a_message_appended_mid_drain_is_seen_exactly_once(monkeypatch, frozen_c
         _RacingQueue([_message(run_id="early.csv", score=805.0)]),
     )
 
-    batch, _notifications = app_shell.publish_run_events(1, None)
+    batch, *_emission = app_shell.publish_run_events(1, None, {})
 
     assert [run["run_id"] for run in batch["runs"]] == ["early.csv", "late.csv"]
     assert not app_shell.message_queue
@@ -444,7 +509,7 @@ def test_a_mixed_batch_toasts_the_celebration_and_the_live_ordinary_run(
     )
 
     assert batch["celebrated_run_id"] == "pb.csv"
-    assert celebration[0]["id"] == CELEBRATION_NOTIFICATION_ID
+    assert celebration[0]["id"].startswith(f"{CELEBRATION_CHANNEL}-")
     assert celebration[0]["message"].startswith("Scenario B: 900.00.")
     assert verdict["id"] == home._RUN_VERDICT_CHANNEL
     assert verdict["message"].startswith("Scenario A — 780.00")

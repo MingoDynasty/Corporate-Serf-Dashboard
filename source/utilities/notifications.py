@@ -16,11 +16,11 @@ NOTIFICATION_CONTAINER_ID = "notification-container"
 # still-visible toast with no id to replace it by.
 TOAST_CHANNEL_REGISTRY_STORE_ID = "toast-channel-registry"
 
-# The personal best celebration's own toast id, deliberately not the page's
-# run-verdict id: the celebration is an app-wide family with its own lifetime,
+# The personal best celebration's own channel key, deliberately not the page's
+# run-verdict key: the celebration is an app-wide family with its own lifetime,
 # so it must survive the next ordinary run toast instead of being replaced by
-# it.
-CELEBRATION_NOTIFICATION_ID = "pb-celebration"
+# it. Only a later celebration replaces a celebration.
+CELEBRATION_CHANNEL = "pb-celebration"
 
 # The one nominal toast lifetime. Conditions that fire when nobody may be
 # looking pass ``auto_close=False`` instead and stay until dismissed.
@@ -85,10 +85,17 @@ def channel_toast(
     one carries its own full lifetime rather than the remainder of the old
     timer.
 
+    The payload's ``autoClose`` is carried through untouched, which is what
+    lets one mechanism serve every channel: an ordinary channel keeps the
+    nominal 8 s lifetime, and a persistent one (the personal best celebration)
+    passes ``auto_close=False`` at its builder and stays until dismissed while
+    a later emission still replaces it.
+
     ``clears`` names the other channels this emission falsifies -- a success
     clearing the failure it answers. Their current instances join the hide
     list, and their registry entries are cleared with them. Hiding an id that
-    is not on screen is a no-op, so a channel that never fired costs nothing.
+    is not on screen is a no-op, so a channel that never fired costs nothing,
+    and neither does one the user already dismissed.
 
     Registry writes are per-key ``dash.Patch`` assignments, never a whole-dict
     replacement: a response that rewrote the whole dict would carry a stale
@@ -112,20 +119,3 @@ def channel_toast(
         # instance on screen.
         patch[key] = None
     return ChannelEmission([{**notification, "id": instance_id}], hide, patch)
-
-
-def upsert_sticky_toast(notification: dict[str, Any]) -> list[dict[str, Any]]:
-    """Pair the payloads that let one until-dismissed id replace what it shows.
-
-    A bare ``show`` cannot replace: DMC 2.8.0 ignores it for an id already on
-    screen, and ``update`` is a no-op for an id that is not. So each emission
-    sends both actions with the same id and payload -- whichever matches the
-    toast's current state applies, and the other does nothing.
-
-    Why the celebration keeps this instead of moving to ``channel_toast``: a
-    toast that stays until dismissed has no timer to re-arm, and re-popping it
-    would replay the entry animation for news the user has already seen and
-    chosen to leave up.
-    """
-    payload = {**notification, "autoClose": False}
-    return [{**payload, "action": "update"}, payload]
