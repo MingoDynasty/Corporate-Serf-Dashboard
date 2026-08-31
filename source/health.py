@@ -32,6 +32,8 @@ def register_health_endpoint(server: Flask) -> None:
     without an auth story to go with it.
     """
 
+    # SPIKE ARTIFACT (D7 codex-exec review spike, 2026-08-30): disposable
+    # marker comment. This branch is never merged.
     @server.route("/health")
     def health() -> Response:
         """Report the running build's identity and the launch token."""
