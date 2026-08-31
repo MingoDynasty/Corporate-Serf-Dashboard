@@ -158,9 +158,11 @@ class NewFileHandler(FileSystemEventHandler):
             )
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
+                is_new_sensitivity=True,
                 nth_score=1,
-                previous_high_score=None,
+                run_id=Path(file).name,
                 scenario_name=run_data.scenario,
+                scenario_previous_best=None,
                 score=run_data.score,
                 sensitivity=sensitivity_key,
             )
@@ -216,9 +218,11 @@ class NewFileHandler(FileSystemEventHandler):
             logger.debug("Found new sensitivity: %s", sensitivity_key)
             message = NewFileMessage(
                 datetime_created=datetime.datetime.now(),
+                is_new_sensitivity=True,
                 nth_score=1,
-                previous_high_score=None,
+                run_id=Path(file).name,
                 scenario_name=run_data.scenario,
+                scenario_previous_best=high_score,
                 score=run_data.score,
                 sensitivity=sensitivity_key,
             )
@@ -248,9 +252,11 @@ class NewFileHandler(FileSystemEventHandler):
 
         message = NewFileMessage(
             datetime_created=datetime.datetime.now(),
+            is_new_sensitivity=False,
             nth_score=nth_score,
-            previous_high_score=high_score,
+            run_id=Path(file).name,
             scenario_name=run_data.scenario,
+            scenario_previous_best=high_score,
             score=run_data.score,
             sensitivity=sensitivity_key,
         )

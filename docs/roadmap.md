@@ -39,13 +39,15 @@ sequence.
   #259) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 - **Run notifications master switch** — run toasts can now be turned off. One
-  Chart options switch, Run Notifications, silences the whole per-run toast
-  family: the threshold verdict, the placement, and the catch-up digest after
-  time away. The chart keeps updating either way, and a run file that failed
-  to import still says so. The switch that used to read "Score Threshold
-  Notification" never gated toasts at all, so it is now "Score Threshold
-  Verdict" and says what it does. (PR #245; design in #240) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
+  Chart options switch, Run Notifications, silences the per-run toast family:
+  the threshold verdict and the placement. The chart keeps updating either
+  way, and a run file that failed to import still says so. The switch that
+  used to read "Score Threshold Notification" never gated toasts at all, so it
+  is now "Score Threshold Verdict" and says what it does. (PR #245; design in
+  #240) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md). The catch-up digest this switch also
+  gated has since been retired, and the personal best celebration is a
+  separate family the switch does not reach (PR #261).
 - **Scenario Performance point customization** — the raw run points can now be
   made smaller, larger, or a color of your choosing, from a Run Data Points
   group in Chart options. Eight curated swatches read on both the light and the

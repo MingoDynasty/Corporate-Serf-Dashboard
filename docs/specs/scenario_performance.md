@@ -175,21 +175,26 @@ of scope here.
 
 ## Run delivery
 
-- The page polls on one interval, `polling_interval` (default 1000 ms). Its
-  `check_for_new_data` callback is the sole consumer of the process-wide
-  run-event deque the watchdog feeds — a run is enqueued only after it is
-  loaded into the stores — and each tick drains the whole backlog, lands on
-  the most recently played scenario when the follow switch is on, and
-  changes the dropdown at most once. The supported usage model is one active
-  Scenario Performance tab
+- The page no longer drains the run-event deque. The app shell does, on its
+  own interval and on every page, and publishes one batch per tick; this
+  page's `check_for_new_data` consumes that batch store as its only `Input`,
+  lands on the most recently played scenario when the follow switch is on, and
+  changes the dropdown at most once. The follow switch and the scenario
+  dropdown are `State` there, so flipping either forwards nothing on its own.
+  The supported usage model is one active tab
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
   The drain semantics and the toasts the summary produces are specified in
   [notifications.md](notifications.md#run-notifications).
-- The graph rebuild consumes the drained summary, so a backlog becomes one
-  rebuild rather than a replay
+- The graph rebuild consumes the forwarded summary, so a batch of several runs
+  becomes one rebuild and one auto-switch rather than a replay
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
-- Each poll tick fires three callbacks at once; Waitress's 8 worker threads
-  absorb that burst, and the interval keeps ticking while the tab is hidden
+  Its other rebuild triggers are unchanged: any Chart options control that
+  feeds it, a scenario change, and the date and axis controls.
+- The page still polls on `polling_interval` (default 1000 ms), now for two
+  callbacks rather than three: the run-import failure flush and the rank read.
+  The shell's drain is the third poll, on its own interval, and it runs on
+  every page. Waitress's 8 worker threads absorb the burst, and both intervals
+  keep ticking while the tab is hidden
   ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
 - The page is also where two background queues reach the screen: run-import
   failures on the next poll tick, and the startup playlist warnings on a

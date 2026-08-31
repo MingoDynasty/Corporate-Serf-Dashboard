@@ -42,21 +42,27 @@ list in the roadmap.)
   leads with the scenario, and the sensitivity is a trailing qualifier. The
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
-  nothing else. A new personal best has no toast of its own; it triggers the
-  background rank refresh. If runs accumulate while Scenario Performance is
-  not open, the next visit rebuilds once from final state and gives one
-  scenario-named summary instead of replaying stale toasts and selections —
-  and the next run you play replaces that catch-up digest, which is by then
-  the staler news. The whole family can be turned off with one Chart options
+  nothing else. A run that beats your personal best gets a toast of its own
+  instead of that verdict: "New personal best", naming the scenario, the score,
+  and how far ahead of your old best it landed. It appears on whatever page you
+  are looking at rather than only on Scenario Performance, and it stays until
+  you dismiss it, because the run that earned it was played in a fullscreen
+  game and the news should still be there when you alt-tab back. It also
+  triggers the background rank refresh, as it always did. If runs accumulate
+  while no tab is open, the next visit rebuilds once from final state instead
+  of replaying stale toasts and selections; it narrates the most recent run if
+  you come back within a couple of minutes of playing it, and anything older
+  reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
   switch, Run Notifications: with it off the chart still updates and nothing
-  toasts about a run, though a run file that failed to import still says so.
-  The threshold switch beside the percentage decides only whether a run is
-  judged, never whether it toasts.
+  toasts about a routine run, though a personal best still celebrates and a run
+  file that failed to import still says so. The threshold switch beside the
+  percentage decides only whether a run is judged, never whether it toasts.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
-  pile of toasts accumulating over a session or a noisy catch-up sequence
-  after time away — and, for a session where any interruption is one too many,
-  a way to silence the feedback without giving up the plot.
+  pile of toasts accumulating over a session — plus the one moment worth
+  interrupting for, which the app used to pass over in silence — and, for a
+  session where any interruption is one too many, a way to quiet the routine
+  feedback without giving up the plot.
 - **Quiet by default.** Toasts are reserved for what you did, what you
   achieved, and failures you would act on. A condition that stays true — no
   username configured, a leaderboard lookup that failed, a scenario with no

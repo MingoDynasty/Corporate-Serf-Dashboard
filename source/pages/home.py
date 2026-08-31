@@ -20,6 +20,11 @@ from dash import (
     no_update,
 )
 
+from source.app_shell import (
+    RUN_EVENTS_BATCH_STORE_ID,
+    RunEventBatch,
+    RunEventData,
+)
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import (
@@ -49,7 +54,6 @@ from source.kovaaks.data_service import (
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
-from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
@@ -107,8 +111,7 @@ SETTINGS_HELP_TEXT = {
         "judged against the score threshold. Needs Run Notifications turned on."
     ),
     "run-notification": (
-        "Controls the threshold, placement, and catch-up notifications for "
-        "your runs. Turn this off to update the chart silently."
+        "Controls threshold verdict and placement notifications for your runs."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "
@@ -243,10 +246,10 @@ _STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
 _RANK_REFRESH_FAILED_NOTIFICATION_ID = "rank-refresh-failed"
 _RANK_REFRESH_STALE_NOTIFICATION_ID = "rank-refresh-stale"
 _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
-# One run, one toast: every run verdict and the catch-up digest share this id,
-# so the newest verdict replaces whatever is on screen instead of stacking.
+# One run, one toast: every run verdict shares this id, so the newest one
+# replaces whatever is on screen instead of stacking. The celebration toast is
+# deliberately not in this lane -- it has its own id and stays until dismissed.
 _RUN_VERDICT_NOTIFICATION_ID = "run-verdict"
-_BACKLOG_NOTIFICATION_TITLE = "While you were away"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
 # Both refresh-failure paths leave the displayed value alone, so one line
 # covers them: the hard failure keeps whatever was on screen, and the
@@ -282,21 +285,11 @@ def _placeholder_plot_json() -> str:
     return generate_placeholder_plot().to_json()
 
 
-class RunEventData(TypedDict):
-    """JSON-safe fields from the latest run event in a drained batch."""
-
-    scenario_name: str
-    sensitivity: str
-    nth_score: int
-    score: float
-    previous_high_score: float | None
-
-
 class RunEventsPayload(TypedDict):
-    """Summary passed from the queue consumer to Home's other callbacks."""
+    """Summary passed from the batch-store consumer to Home's callbacks."""
 
-    count: int
     latest: RunEventData
+    celebrated_run_id: str | None
 
 
 def _settings_help_label(label: str, help_text: str) -> dmc.Group:
@@ -354,59 +347,57 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     return "N/A"
 
 
-def _drain_run_events(
+def _summarize_run_events(
+    batch: RunEventBatch,
     selected_scenario: str | None,
     automatically_change_scenario: bool,
 ) -> tuple[str | None, RunEventsPayload | None]:
-    """Drain pending run messages and summarize the landing scenario."""
-    drained: list[NewFileMessage] = []
-    while True:
-        try:
-            drained.append(message_queue.popleft())
-        except IndexError:
-            break
-
-    if not drained:
+    """Summarize one shell batch for the scenario this page should show."""
+    runs = batch["runs"]
+    if not runs:
         return selected_scenario, None
 
     target_scenario = (
-        drained[-1].scenario_name
+        runs[-1]["scenario_name"]
         if automatically_change_scenario
         else selected_scenario
     )
     if target_scenario is None:
         return None, None
 
-    matching_messages = [
-        message for message in drained if message.scenario_name == target_scenario
-    ]
-    if not matching_messages:
+    matching_runs = [run for run in runs if run["scenario_name"] == target_scenario]
+    if not matching_runs:
         return target_scenario, None
 
-    latest = matching_messages[-1]
+    # Coalescing, as before: several runs rebuild the plot once and only the
+    # latest matching one is narrated. The drain's decision travels with it,
+    # because the celebrated run may belong to another scenario entirely.
     return target_scenario, {
-        "count": len(matching_messages),
-        "latest": {
-            "scenario_name": latest.scenario_name,
-            "sensitivity": latest.sensitivity,
-            "nth_score": latest.nth_score,
-            "score": latest.score,
-            "previous_high_score": latest.previous_high_score,
-        },
+        "latest": matching_runs[-1],
+        "celebrated_run_id": batch["celebrated_run_id"],
     }
 
 
 @callback(
     Output("run-events", "data"),
     Output("scenario-dropdown-selection", "value"),
-    Input("interval-component", "n_intervals"),
-    Input("automatically-change-scenario-switch", "checked"),
-    Input("scenario-dropdown-selection", "value"),
+    Input(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    # State, not Input: the old drain was destructive, so a control-triggered
+    # rerun found nothing. A Store replays its last value instead, and a
+    # control flip must not re-forward a batch already processed. The same
+    # reason keeps prevent_initial_call on: navigating back here remounts the
+    # page against a retained store value, and a mount must not replay it.
+    State("automatically-change-scenario-switch", "checked"),
+    State("scenario-dropdown-selection", "value"),
     prevent_initial_call=True,
 )
-def check_for_new_data(_, automatically_change_scenario, selected_scenario):
-    """Drain pending run events and forward one summary to Home callbacks."""
-    target_scenario, run_events = _drain_run_events(
+def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
+    """Forward the shell's run-event batch as one summary for this page."""
+    if not batch:
+        return no_update, no_update
+
+    target_scenario, run_events = _summarize_run_events(
+        batch,
         selected_scenario,
         automatically_change_scenario,
     )
@@ -888,21 +879,24 @@ def _threshold_verdict(
     """Judge a run against the threshold, or return None when nothing judges it.
 
     A run goes unjudged when the switch is off, the goal percentage is blank,
-    or the scenario/sensitivity has no previous high score to be a percentage
-    of -- there is no denominator, not a failing one.
+    the run is the first at its sensitivity, or the scenario has no positive
+    previous best to be a percentage of -- there is no denominator, not a
+    failing one. The message carries the facts and this derives the gate; the
+    two used to be bundled into one nullable field that meant both.
     """
     goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
-    previous_high_score = latest["previous_high_score"]
+    scenario_previous_best = latest["scenario_previous_best"]
     if (
         not score_threshold_notification_switch
         or not goal_percentage
-        or previous_high_score is None
-        or previous_high_score <= 0
+        or latest["is_new_sensitivity"]
+        or scenario_previous_best is None
+        or scenario_previous_best <= 0
     ):
         return None
     return _ThresholdVerdict(
-        passed=latest["score"] >= previous_high_score * goal_percentage / 100,
-        percentage=latest["score"] / previous_high_score * 100,
+        passed=latest["score"] >= scenario_previous_best * goal_percentage / 100,
+        percentage=latest["score"] / scenario_previous_best * 100,
         goal_percentage=goal_percentage,
     )
 
@@ -965,47 +959,6 @@ def _build_live_run_notification(
     )
 
 
-def _build_backlog_notification(
-    run_events: RunEventsPayload,
-    selected_scenario: str,
-    verdict: _ThresholdVerdict | None,
-) -> dict[str, object]:
-    """Summarize runs that accrued while Home was closed.
-
-    Shares the live run's id, so playing again replaces this digest with the
-    fresher verdict rather than stacking beside it.
-    """
-    latest = run_events["latest"]
-    summary = (
-        f"{run_events['count']} new {selected_scenario} runs. "
-        f"Latest: {latest['score']:.2f}"
-    )
-    if verdict is None:
-        return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
-            _BACKLOG_NOTIFICATION_TITLE,
-            f"{summary} at {latest['sensitivity']}.",
-            color="blue",
-            icon=local_icon("fontisto:line-chart"),
-        )
-    if verdict.passed:
-        return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
-            _BACKLOG_NOTIFICATION_TITLE,
-            f"{summary} — {verdict.percentage:.1f}% of PB, passed threshold.",
-            color="green",
-            icon=local_icon("material-symbols:check"),
-        )
-    return toast(
-        _RUN_VERDICT_NOTIFICATION_ID,
-        _BACKLOG_NOTIFICATION_TITLE,
-        f"{summary} — {verdict.percentage:.1f}% of PB, below the "
-        f"{verdict.goal_percentage:.1f}% threshold.",
-        color="yellow",
-        icon=local_icon("material-symbols:warning-outline"),
-    )
-
-
 def _build_run_event_notification(  # noqa: PLR0913
     run_events: RunEventsPayload | None,
     selected_scenario: str,
@@ -1014,10 +967,16 @@ def _build_run_event_notification(  # noqa: PLR0913
     score_threshold_notification_switch: bool,
     run_notification_switch: bool,
 ) -> dict[str, object] | None:
-    """Build the at-most-one toast a batch of run events earned.
+    """Build the at-most-one toast this page's latest matching run earned.
 
-    The master switch is checked first, and so gates the whole family: the
-    live toast and the backlog digest are both born here.
+    Nothing here predicts or re-derives: the drain stamped the celebration and
+    each run's liveness, and this reads the stamps. The master switch is
+    checked first, so it gates the whole page-built family, and the yield to
+    the celebration comes second -- with celebrations reporting a run, that
+    run's one notification is the celebration toast.
+
+    A batch's other runs earn nothing: the plot is their record, which is what
+    retires the "While you were away" digest.
     """
     if not run_notification_switch:
         return None
@@ -1025,13 +984,16 @@ def _build_run_event_notification(  # noqa: PLR0913
         return None
 
     latest = run_events["latest"]
+    if run_events["celebrated_run_id"] == latest["run_id"]:
+        return None
+    if not latest["is_live"]:
+        return None
+
     verdict = _threshold_verdict(
         latest,
         score_threshold_percentage,
         score_threshold_notification_switch,
     )
-    if run_events["count"] > 1:
-        return _build_backlog_notification(run_events, selected_scenario, verdict)
     return _build_live_run_notification(
         latest,
         selected_scenario,
