@@ -5,6 +5,7 @@ key: a key that exists -- with any value -- has been asked about already and
 must never bring the card back.
 """
 
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,7 +17,7 @@ from dash._callback import GLOBAL_CALLBACK_MAP
 
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
-from source.utilities.store_schema import UnsupportedSchemaError
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -101,6 +102,21 @@ def _store(**values):
     settings_service.resolve_stats_dir()
 
 
+def _unusable_store(document):
+    """Leave an unreadable settings file behind and boot the way startup does.
+
+    Written raw rather than through ``save_settings``, which refuses to produce
+    either state, and followed by the same pin startup takes: an unusable store
+    reads as no keys, so the pin lands on None and no stats-directory change is
+    left looking pending.
+    """
+    settings_service.SETTINGS_FILE_PATH.write_text(
+        json.dumps(document), encoding="utf-8"
+    )
+    settings_service.clear_settings_cache()
+    settings_service.resolve_stats_dir()
+
+
 def _card(page):
     """Return the rendered card, or None when the container is empty."""
     container = _component_by_id(page, home.SETUP_CARD_ID)
@@ -142,6 +158,45 @@ def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
     ]
     assert _button_labels(card) == []
     assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+
+
+@pytest.mark.parametrize(
+    ("document", "state"),
+    [
+        ({"kovaaks_username": "MingoDynasty"}, StoreState.ERROR),
+        (
+            {"schema_version": 2, "kovaaks_username": "MingoDynasty"},
+            StoreState.FUTURE,
+        ),
+    ],
+    ids=["error", "future"],
+)
+def test_an_unusable_store_gets_its_own_card_instead_of_a_fresh_install_one(
+    document,
+    state,
+):
+    """No keys is not the same claim as never asked.
+
+    A store the app cannot read yields no keys, so the key-absence states would
+    announce a missing stats folder that is configured on disk. One card covers
+    both unusable states: the Settings page's alert is what tells them apart.
+    """
+    _unusable_store(document)
+    assert settings_service.get_settings_store_state() is state
+
+    card = _card(home.layout())
+
+    assert card is not None
+    assert _texts(card) == [
+        home.SETUP_CARD_STORE_TITLE,
+        home.SETUP_CARD_STORE_BODY,
+    ]
+    assert home.SETUP_CARD_STATS_DIR_TITLE not in _texts(card)
+    assert _button_labels(card) == []
+    assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert _anchors(card)[0].href == "/settings"
+    assert card.className == home.SETUP_CARD_CAUTION_CLASS
+    assert "material-symbols-warning-outline.svg" in _icon_mask(card)
 
 
 def test_each_card_state_wears_its_own_severity_treatment(stats_dir):

@@ -33,6 +33,7 @@ from source.config.settings_service import (
     get_identity,
     get_kovaaks_username,
     get_settings,
+    get_settings_store_state,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
 )
@@ -74,7 +75,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.store_schema import UnsupportedSchemaError
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -198,6 +199,15 @@ SETUP_CARD_STATS_DIR_TITLE = "Finish setting up"
 SETUP_CARD_STATS_DIR_BODY = (
     "No KovaaK's stats folder was found, so the dashboard can't read your runs "
     "yet. Set it in Settings."
+)
+# Shown when the settings file exists but cannot be used. The key-absence
+# states below cannot speak for it: an unusable store reads as no keys at all,
+# so they would claim a fresh install when a configured one is sitting on disk.
+SETUP_CARD_STORE_TITLE = "Your settings can't be read"
+SETUP_CARD_STORE_BODY = (
+    "A settings file exists, but this version of the app can't use it, so the "
+    "dashboard started without your settings. Open Settings to see what's "
+    "wrong and how to fix it."
 )
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
@@ -1541,9 +1551,26 @@ def _setup_card_children() -> list:
     stacking the identity ask on top of it would be two banners for one
     unfinished action. The card comes back after the restart if identity is
     still unasked.
+
+    Key absence only means "never asked" for a store the app can read. An
+    unusable one -- a hand-edited typo, or a file stamped by a newer build --
+    yields no keys either, and startup detection declines to run against it, so
+    the key-absence states below would report a fresh install and a search that
+    never happened. That state gets its own card, which does nothing but route
+    to the Settings page, where the store alert already names the real problem
+    and distinguishes the two ways a store can be unusable.
     """
     if is_stats_dir_change_pending():
         return []
+    if get_settings_store_state() in (StoreState.ERROR, StoreState.FUTURE):
+        return [
+            _setup_card(
+                SETUP_CARD_STORE_TITLE,
+                SETUP_CARD_STORE_BODY,
+                offer_skip=False,
+                caution=True,
+            )
+        ]
     settings = get_settings()
     if STATS_DIR_KEY not in settings:
         return [

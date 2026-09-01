@@ -62,7 +62,8 @@ their full behavior.
   that page is work in progress and has no capability spec; the Playlists
   leftover-files notice (playlists spec) is a blue `dmc.Paper`; the Home setup
   card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
-  in its identity state and yellow in its stats-folder state
+  in its identity state and yellow in its stats-folder and unusable-store
+  states
   ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
 
 ## Delivery

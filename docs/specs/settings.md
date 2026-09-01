@@ -248,6 +248,14 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 
 ## The setup card
 
+- A store the app cannot read gets its own card first. In the `ERROR` and
+  `FUTURE` states the card shows "Your settings can't be read" with no Skip,
+  and the key-absence states below never run: both states read as no keys, so
+  they would report a fresh install for a store that is configured on disk.
+  One card covers both, because the Settings page's store alert is where they
+  are told apart and where the remedy lives
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  Copy and treatment belong to the Scenario Performance spec.
 - The landing page's card is keyed to key absence in the stored view: an
   absent `stats_dir` shows "Finish setting up" with no Skip and wins when both
   keys are absent; a present `stats_dir` with an absent `kovaaks_username`
