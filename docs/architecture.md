@@ -282,8 +282,10 @@ flowchart LR
 - `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
   collapse applied by a clientside callback), theme toggle, Dash `page_container`,
   and the notification host — the one `dmc.NotificationContainer`, plus the
-  toast-lifetime `dcc.Store` beside it, shell-hosted so its lifecycle matches
-  the toasts' rather than resetting when a page remounts.
+  `toast-channel-registry` `dcc.Store` beside it, holding each toast channel's
+  current instance id so the next emission knows which one to hide,
+  shell-hosted so its lifecycle matches the toasts' rather than resetting when
+  a page remounts.
   It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
   `polling_interval`), the `run-events-batch` `dcc.Store`, and the
   `publish_run_events` callback that is `message_queue`'s only consumer. That
