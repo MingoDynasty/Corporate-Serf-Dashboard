@@ -358,8 +358,8 @@ def test_a_run_at_exactly_the_window_is_still_live(monkeypatch, frozen_clock):
 def test_the_window_is_never_shorter_than_one_poll_period(monkeypatch, frozen_clock):
     """A slow poll must not stamp every run stale.
 
-    `polling_interval` is an unconstrained config key, so a deliberately slow
-    poll can make every run a whole period old by the time the drain sees it.
+    `polling_interval` has no upper bound, so a deliberately slow poll can
+    make every run a whole period old by the time the drain sees it.
     A fixed cap below that period would then mark all of them stale and
     silently retire every toast liveness gates -- the celebration and the
     page's ordinary run toasts alike -- while the plot kept updating.

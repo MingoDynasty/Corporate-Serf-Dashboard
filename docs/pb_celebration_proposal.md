@@ -460,8 +460,8 @@ milliseconds against a 120 s budget, never a celebration. A celebration
 decided during a throttled drain lands correctly because the toast is
 sticky and the animation holds until the tab is visible (D8).
 
-The poll period is part of the window because `polling_interval` is an
-unconstrained config key. A run can be a whole period old through nothing
+The poll period is part of the window because `polling_interval` has no
+upper bound. A run can be a whole period old through nothing
 but the drain's cadence, so a fixed cap below the configured period would
 stamp every run stale and silently retire every toast liveness gates —
 the celebration and the page's ordinary run toasts alike — while the plot

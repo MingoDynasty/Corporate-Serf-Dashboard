@@ -2,10 +2,10 @@
 # This is an example configuration file.
 #
 
-# How often to poll for updates (in milliseconds)
+# How often to poll for updates (in milliseconds). Must be greater than 0.
 polling_interval = 1000  # 1 second
 
-# Port to use for the backend server.
+# Port to use for the backend server. Valid range: 1 to 65535.
 port = 8050
 
 # Address the backend server listens on. The default serves this machine only.

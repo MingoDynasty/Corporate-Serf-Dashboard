@@ -34,13 +34,22 @@ def config_file_path() -> Path:
 class ConfigData:
     """Dataclass models configuration for this app."""
 
-    port: int
+    # ge=1/le=65535: an out-of-range port used to reach sock.bind(), which
+    # raises an OverflowError neither bind-path except-clause catches, so the
+    # user saw a raw traceback instead of the startup configuration error.
+    # Port 0 is refused here even though the socket layer accepts it: the
+    # installed launcher probes and opens the configured port, and an
+    # OS-chosen one is not a port it can discover.
+    port: Annotated[int, Field(ge=1, le=65535)]
     # Loopback by default: the app has no authentication, so serving an
     # address other than this one exposes the run data and the settings to
     # every device that can reach it. Must be an IP literal, not a name --
     # source.app rejects anything else.
     host: str = DEFAULT_HOST
-    polling_interval: int = 1000
+    # gt=0: this feeds a dcc.Interval, so a zero or negative period is
+    # nonsense that the browser silently clamps into a request flood rather
+    # than failing anywhere the user would look.
+    polling_interval: Annotated[int, Field(gt=0)] = 1000
     sens_round_decimal_places: int = 1
     debug: bool = False
     scenario_metadata_cache_ttl_hours: int = 24

@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 # Bound here, before the autouse config fixture replaces the module attribute
 # with a canned loader: these tests exercise the real file-reading loader.
@@ -51,8 +52,15 @@ def _run_app(cwd: Path) -> subprocess.CompletedProcess[str]:
         "port = 8050\n"
         "sens_round_decimal_places = 1\n"
         "kovaaks_api_timeout_seconds = 0",
+        "port = 70000",
     ],
-    ids=["missing", "invalid-toml", "missing-port", "non-positive-timeout"],
+    ids=[
+        "missing",
+        "invalid-toml",
+        "missing-port",
+        "non-positive-timeout",
+        "out-of-range-port",
+    ],
 )
 def test_startup_with_missing_or_invalid_config_exits_cleanly(
     tmp_path: Path,
@@ -144,3 +152,70 @@ def test_show_version_in_title_round_trips_through_the_config_file(
     monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
 
     assert load_config().show_version_in_title is configured
+
+
+def _load_from(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, body: str
+) -> ConfigData:
+    """Write ``body`` as the config file in ``tmp_path``, then load it."""
+    (tmp_path / "config.toml").write_text(body, encoding="utf-8")
+    monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
+    return load_config()
+
+
+@pytest.mark.parametrize("port", [70000, 65536, 0, -1])
+def test_out_of_range_port_is_refused_at_config_load(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    port: int,
+) -> None:
+    """The port range is a config rule, not something ``bind()`` discovers.
+
+    70000 is the original audit reproduction, which reached ``sock.bind()`` and
+    raised an ``OverflowError`` that neither bind-path handler catches; 65536
+    is the exact upper edge. 0 is valid to the socket layer but not a usable
+    configured endpoint, because the installed launcher probes and opens the
+    port it read from the config file.
+    """
+    with pytest.raises(ValidationError):
+        _load_from(tmp_path, monkeypatch, f"port = {port}")
+
+
+@pytest.mark.parametrize("port", [1, 65535])
+def test_ports_at_the_edges_of_the_range_load(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    port: int,
+) -> None:
+    """Both edges of the accepted range are accepted."""
+    assert _load_from(tmp_path, monkeypatch, f"port = {port}").port == port
+
+
+@pytest.mark.parametrize("polling_interval", [0, -5])
+def test_non_positive_polling_interval_is_refused_at_config_load(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    polling_interval: int,
+) -> None:
+    """A non-positive period is nonsense for the UI interval it feeds."""
+    body = f"""
+port = 8050
+polling_interval = {polling_interval}
+"""
+    with pytest.raises(ValidationError):
+        _load_from(tmp_path, monkeypatch, body)
+
+
+def test_positive_polling_interval_loads(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The default and an explicit positive value both load."""
+    defaulted = _load_from(tmp_path, monkeypatch, "port = 8050")
+    assert defaulted.polling_interval == 1000
+
+    body = """
+port = 8050
+polling_interval = 250
+"""
+    assert _load_from(tmp_path, monkeypatch, body).polling_interval == 250

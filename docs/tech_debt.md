@@ -16,15 +16,15 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The five entries below were established by the two 2026-08-12 audits, which
+The four entries below were established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
-docs link check stays green). Three further defects from the same corpus are
+docs link check stays green). Four further defects from the same corpus are
 already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
-(PR #254), and the two cache defects — colliding cache keys and the
-invalid-UTF-8 read escape (PR #264).
+(PR #254), the two cache defects — colliding cache keys and the invalid-UTF-8
+read escape (PR #264) — and the unbounded configured port (PR #266).
 
 ### Run files missed until restart on a single failed parse
 
@@ -56,15 +56,6 @@ reconciles.
 `source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
 duplicate create events and delete/recreate patterns for one logical run file
 import it twice (observed in the 2026-08-12 soak).
-
-### Out-of-range port crashes with a raw traceback
-
-`source/config/config_service.py:37` accepts any `int` for `port`;
-`sock.bind()` then raises `OverflowError` for e.g. 70000, which neither
-`_bind_face`'s `except OSError` (`source/app.py:163-167`) nor the classifying
-one in `bind_server_socket` (`source/app.py:280-283`) catches — the user gets
-a traceback instead of the curated startup error naming the setting
-(reproduced in the engineering audit).
 
 ## Code Smells
 
