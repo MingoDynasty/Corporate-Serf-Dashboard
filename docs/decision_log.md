@@ -17,14 +17,15 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 
 Status: Accepted
 
-Every toast the app can show twice now replaces its own previous copy with a
-visible re-entry, instead of stacking a duplicate or being dropped in silence.
-Importing a second playlist while the first import's toast was still up used to
-show nothing at all; both toasts now stand, because reports about different
-playlists are different toasts. A retry of the same action pops its answer back
-onto the screen with a fresh eight seconds. And a success now clears the failure
-message it answers, so a stale red toast never outlives the green one that
-supersedes it.
+Every toast that answers one thing you did now replaces its own previous copy
+with a visible re-entry, instead of stacking a duplicate or being dropped in
+silence. Importing a second playlist while the first import's toast was still up
+used to show nothing at all; both toasts now stand, because reports about
+different playlists are different toasts. A retry of the same action pops its
+answer back onto the screen with a fresh eight seconds, and a success clears the
+failure message it answers. The one deliberate exception is the background
+report that folds several unreadable run files into a single message, which
+keeps batching exactly as it did.
 
 Provenance: distilled from `docs/toast_policy_proposal.md` (three decisions
 ratified 2026-08-30), committed in PR #257 and deleted in this shipping PR --

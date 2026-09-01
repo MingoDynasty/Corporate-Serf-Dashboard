@@ -5,10 +5,12 @@ something the player did, a run worth celebrating, or a failure they would
 act on. A condition that stays true is explained where it happens instead of
 popping up again on every trigger. A run earns at most one notification, its
 title states the verdict, and the next run replaces it rather than stacking
-beside it. That is the general rule: any message the app can show twice
+beside it. That is the general rule: a message answering something you did
 replaces its own previous copy, popping back onto the screen so a retry always
 gets a visible answer, while messages about different things stack side by
-side. A success also clears the failure message it answers. A run that beats
+side. A background report that folds several events into one summary is the
+deliberate exception and keeps batching instead. A success also clears the
+failure message it answers. A run that beats
 your personal best is the exception the app makes
 for itself: it gets its own toast, on whatever page you are looking at, and
 that one stays until you dismiss it. One switch in Chart options silences the
