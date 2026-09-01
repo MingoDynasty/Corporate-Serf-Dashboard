@@ -1083,6 +1083,51 @@ def test_get_cached_leaderboard_id_tolerates_non_numeric_value(
     assert "Ignoring non-numeric cached leaderboard id" in caplog.text
 
 
+def test_get_cached_leaderboard_id_tolerates_out_of_range_value(
+    monkeypatch, tmp_path, caplog
+):
+    """JSON accepts out-of-range literals: 1e309 parses to inf, and int(inf)
+    raises OverflowError rather than ValueError."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    mapping_file = api_service._leaderboard_mapping_file()
+    mapping_file.parent.mkdir(parents=True)
+    mapping_file.write_text(
+        '{"Some Scenario": {"leaderboard_id": 1e309}}', encoding="utf-8"
+    )
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        assert api_service.get_cached_leaderboard_id("Some Scenario") is None
+
+    assert "Ignoring non-numeric cached leaderboard id" in caplog.text
+
+
+def test_save_leaderboard_id_replaces_an_unusable_stored_value(monkeypatch, tmp_path):
+    """An unusable stored value counts as absent, not as a conflict: blocking
+    the write would strand the entry as a permanent miss that refetches forever."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service._write_json(
+        api_service._leaderboard_mapping_file(),
+        {"Some Scenario": {"leaderboard_id": "abc"}},
+    )
+
+    api_service.save_leaderboard_id("Some Scenario", 98330, "test")
+
+    assert api_service.get_cached_leaderboard_id("Some Scenario") == 98330
+
+
+def test_save_leaderboard_id_still_refuses_a_genuine_conflict(
+    monkeypatch, tmp_path, caplog
+):
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Some Scenario", 111, "test")
+
+    with caplog.at_level(logging.WARNING, logger=api_service.__name__):
+        api_service.save_leaderboard_id("Some Scenario", 222, "test")
+
+    assert api_service.get_cached_leaderboard_id("Some Scenario") == 111
+    assert "Conflicting leaderboard id" in caplog.text
+
+
 def test_get_user_scenario_total_play_fetches_all_pages_and_caches(
     monkeypatch,
 ):

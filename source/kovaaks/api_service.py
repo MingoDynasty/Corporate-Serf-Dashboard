@@ -604,6 +604,22 @@ def _load_leaderboard_mapping() -> dict:
         return _leaderboard_mapping_cache
 
 
+def _coerce_leaderboard_id(value: object) -> int | None:
+    """
+    Coerce a cached leaderboard ID, returning None for an unusable value.
+
+    `OverflowError` is caught alongside `ValueError` because JSON accepts
+    out-of-range literals: `1e309` parses to `float("inf")`, which `int()`
+    rejects with `OverflowError` rather than `ValueError`.
+    """
+    if not isinstance(value, int | float | str):
+        return None
+    try:
+        return int(value)
+    except ValueError, OverflowError:
+        return None
+
+
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     """Return the stored leaderboard ID for an exact scenario name."""
     scenario_data = _load_leaderboard_mapping().get(scenario_name)
@@ -613,15 +629,15 @@ def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     leaderboard_id = scenario_data.get("leaderboard_id")
     if leaderboard_id is None:
         return None
-    try:
-        return int(leaderboard_id)
-    except TypeError, ValueError:
+
+    coerced = _coerce_leaderboard_id(leaderboard_id)
+    if coerced is None:
         logger.warning(
             "Ignoring non-numeric cached leaderboard id for scenario %s: %r",
             scenario_name,
             leaderboard_id,
         )
-        return None
+    return coerced
 
 
 def save_leaderboard_id(
@@ -635,15 +651,20 @@ def save_leaderboard_id(
         cache_data = _read_json(cache_file)
         mappings = cache_data if isinstance(cache_data, dict) else {}
 
+        # An unusable stored value counts as absent, not as a conflict. Blocking
+        # the write on it would strand the entry: every lookup reads it as a
+        # miss, refetches, and is then refused here, so the malformed row would
+        # drive API calls forever until the file was deleted by hand.
         existing = mappings.get(scenario_name)
-        if isinstance(existing, dict) and existing.get("leaderboard_id") not in (
-            None,
-            leaderboard_id,
-        ):
+        existing_raw = (
+            existing.get("leaderboard_id") if isinstance(existing, dict) else None
+        )
+        existing_id = _coerce_leaderboard_id(existing_raw)
+        if existing_id is not None and existing_id != leaderboard_id:
             logger.warning(
                 "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
                 scenario_name,
-                existing.get("leaderboard_id"),
+                existing_raw,
                 leaderboard_id,
                 source,
             )
