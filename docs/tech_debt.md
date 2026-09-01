@@ -16,14 +16,15 @@ Running list of code smells, minor bugs, refactors, and UI/UX paper cuts worth c
 
 ## Bugs
 
-The seven entries below were established by the two 2026-08-12 audits, which
+The five entries below were established by the two 2026-08-12 audits, which
 hold the reproductions, soak measurements, and sequenced fix plans:
 `ignore/audits/engineering/2026-08-12-project-audit.md` and
 `ignore/audits/runtime/2026-08-12-runtime-soak-data-integrity-audit.md`
 (gitignored, main checkout only — deliberately not linked so a fresh clone's
-docs link check stays green). An eighth defect from the same corpus, the
-zero-score-PB `ZeroDivisionError` in the watchdog's log math, was fixed by
-PR #254.
+docs link check stays green). Three further defects from the same corpus are
+already fixed: the zero-score-PB `ZeroDivisionError` in the watchdog's log math
+(PR #254), and the two cache defects — colliding cache keys and the
+invalid-UTF-8 read escape (PR #264).
 
 ### Run files missed until restart on a single failed parse
 
@@ -55,22 +56,6 @@ reconciles.
 `source/my_watchdog/file_watchdog.py` — the handler has no event dedup, so
 duplicate create events and delete/recreate patterns for one logical run file
 import it twice (observed in the 2026-08-12 soak).
-
-### Invalid-UTF-8 cache bytes escape the tolerant read boundary
-
-`source/kovaaks/api_service.py:440-447` — `_read_json` catches `OSError` and
-`json.JSONDecodeError` but not `UnicodeDecodeError`, so corrupt cache bytes
-raise instead of reading as a miss; the soak run showed this can terminate
-startup. Small guard; the runtime register also records `ValidationError` and
-`ValueError` escapes at the same boundary.
-
-### Distinct usernames collide onto one cache path
-
-`source/kovaaks/api_service.py:468-472` — `_safe_cache_key` maps every
-character other than alphanumerics, `-`, and `_` to `_`, so usernames like
-`a.b` and `a_b` share and
-overwrite each other's total-play caches (merged and per-page) and rank caches
-(reproduced in the engineering audit).
 
 ### Out-of-range port crashes with a raw traceback
 
