@@ -113,7 +113,9 @@ section and [product.md](../product.md). Leaderboard placement is worded
   newer-build file refuses every write
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
   A refused toggle answers with a red "Show and hide are unavailable" toast
-  and leaves the rows alone. An ordinary failed toggle write propagates;
+  and leaves the rows alone. The toast is a channel, so a second refused click
+  re-pops the same answer rather than reading as a dead toggle
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)). An ordinary failed toggle write propagates;
   nothing was committed and the next click retries
   ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
 - With rows and no username the status line reads "Percentiles unavailable.
@@ -160,6 +162,12 @@ section and [product.md](../product.md). Leaderboard placement is worded
   toast: orange "Playlist imported — not shown", with a hint to toggle "Show
   hidden" and click the row's eye icon
   ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+- Both landing toasts are channels keyed by the canonical stored code, so two
+  playlists imported back to back both stand while re-importing one playlist
+  replaces its own toast. Either one also clears the import-failure channel,
+  which is a single channel for the whole modal: a refused submit re-pops on
+  every retry, and the retry that lands takes the red toast away with it
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - Delete exists only for user playlists; it unlinks the file recorded for
   the code, drops the store entry, and forgets the show-list membership
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
@@ -171,6 +179,10 @@ section and [product.md](../product.md). Leaderboard placement is worded
   "Playlist delete failed" and leaves the store alone. A failed show-list
   write after the delete is logged; the green toast still shows
   ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+  The success is a channel keyed by the deleted code and clears the
+  delete-failure channel; the failure is a single channel that re-pops on each
+  retry
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
   Confirm handlers act only on a real click (`n_clicks`), because
   duplicate-output callbacks can fire once on page load.
 
@@ -248,7 +260,9 @@ section and [product.md](../product.md). Leaderboard placement is worded
   leftover playlist files from data/playlists? They are superseded by bundled
   benchmarks and hold no data." with a "Delete" button. Cleanup tolerates
   files already gone, keeps any that fail, and toasts "Leftover files deleted"
-  or red "Cleanup failed".
+  or red "Cleanup failed". Both are channels, and the success clears the
+  failure
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - User files are stamped and read through the store state machine (unusable
   or newer files skipped with an actionable warning); bundled files are
   unstamped by design

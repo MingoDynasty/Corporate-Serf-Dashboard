@@ -282,8 +282,10 @@ flowchart LR
 - `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
   collapse applied by a clientside callback), theme toggle, Dash `page_container`,
   and the notification host — the one `dmc.NotificationContainer`, plus the
-  toast-lifetime `dcc.Store` beside it, shell-hosted so its lifecycle matches
-  the toasts' rather than resetting when a page remounts.
+  `toast-channel-registry` `dcc.Store` beside it, holding each toast channel's
+  current instance id so the next emission knows which one to hide,
+  shell-hosted so its lifecycle matches the toasts' rather than resetting when
+  a page remounts.
   It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
   `polling_interval`), the `run-events-batch` `dcc.Store`, and the
   `publish_run_events` callback that is `message_queue`'s only consumer. That
@@ -557,12 +559,16 @@ flowchart LR
   titles as callables, so the flag is read per request rather than at import
   time, when the config is not yet loaded).
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
-  the one builder for `sendNotifications` payloads: stable semantic id, title,
+  the one builder for `sendNotifications` payloads: semantic id, title,
   message, color, optional icon, and the shared auto-close duration —
   `auto_close=False` for the conditions that must survive until dismissed;
-  `upsert_toast()` pairs the `update`+`show` actions and alternates the
-  duration so a replacement under a reused id starts a full lifetime, keyed off
-  the per-client `TOAST_LIFETIME_STORE_ID` counter),
+  `channel_toast()` turns one payload into the show/hide/registry triple that
+  replaces a toast in place, minting a fresh instance id under the payload's
+  logical channel key, hiding the instance it replaces plus any channels it
+  `clears`, and returning a per-key `dash.Patch` for the per-client
+  `TOAST_CHANNEL_REGISTRY_STORE_ID` store, and carrying the payload's
+  `autoClose` through untouched so the until-dismissed personal best
+  celebration rides the same one helper),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store

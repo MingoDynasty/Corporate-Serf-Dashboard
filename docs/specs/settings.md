@@ -262,7 +262,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
   A future-state store refuses it and the card stays up
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp));
-  the red toast "Skip was not saved" explains.
+  the red toast "Skip was not saved" explains. It is a channel, so a second
+  Skip click re-pops the same answer instead of clicking into silence
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - The landing page's in-place hint "No stats directory configured — set it in
   Settings" speaks only for a `stats_dir` key that exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply

@@ -40,7 +40,11 @@ from source.kovaaks.playlist_visibility_service import (
     toggle_playlist_visibility,
 )
 from source.pages.page_title import page_title
-from source.utilities.notifications import toast
+from source.utilities.notifications import (
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
+    channel_toast,
+    toast,
+)
 from source.utilities.store_schema import UnsupportedSchemaError
 from source.utilities.utilities import format_approximate_duration
 
@@ -82,6 +86,36 @@ IMPORT_VISIBILITY_FAILED_HINT = (
 # newer build. Nothing was written and nothing changed, so the toast is the
 # whole report: without it the click would fail the Dash request silently.
 VISIBILITY_REFUSED_TITLE = "Show and hide are unavailable"
+
+# This page's toast channels. The three problem lanes are single-identity: a
+# retry against the same input reproduces the same message, and the policy
+# replaces identical copy rather than stacking it. The outcome lanes are keyed
+# by canonical playlist code, so two playlists in flight stack side by side
+# while the supported delete-then-re-import cycle replaces one playlist's own
+# toast. Never key by the pasted input, which can differ in case.
+VISIBILITY_REFUSED_CHANNEL = "visibility-refused-notification"
+IMPORT_FAILED_CHANNEL = "imported-playlist-failed-notification"
+DELETE_FAILED_CHANNEL = "deleted-playlist-failed-notification"
+CLEANUP_FAILED_CHANNEL = "superseded-cleanup-failed-notification"
+# Constant copy ("Leftover files deleted"), so a second cleanup would stack a
+# byte-identical toast. Classified by what can recur, not by how likely it is.
+CLEANUP_SUCCESSFUL_CHANNEL = "superseded-cleanup-successful-notification"
+
+
+def import_successful_channel(playlist_code: str) -> str:
+    """Name the import-success channel for one canonical playlist code."""
+    return f"imported-playlist-successful-{playlist_code}"
+
+
+def import_visibility_failed_channel(playlist_code: str) -> str:
+    """Name the split-outcome import channel for one canonical code."""
+    return f"imported-playlist-visibility-failed-{playlist_code}"
+
+
+def delete_successful_channel(playlist_code: str) -> str:
+    """Name the delete-success channel for one canonical playlist code."""
+    return f"deleted-playlist-successful-{playlist_code}"
+
 
 VISIBILITY_ALERT_TITLE = "Playlist visibility is not being used"
 # The alert ships hidden and the render callback drops this modifier, the same
@@ -310,19 +344,23 @@ def route_to_clicked_playlist(cell_clicked):
 
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Output("playlists-rows-refresh", "data", allow_duplicate=True),
     Input("playlists-overview-grid", "cellClicked"),
     State("playlists-rows-refresh", "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def update_playlist_visibility(cell_clicked, rows_refresh):
+def update_playlist_visibility(cell_clicked, rows_refresh, toast_channels):
     """Toggle one visibility cell and wake warmup work after an unhide.
 
     A refusal (the visibility file belongs to a newer build) reports through a
     toast and leaves the rows alone: nothing was written, so rebuilding them
-    would only redraw the state the user just tried to change. An ordinary
-    write failure still propagates untouched — see the PR #183 rule pinned in
-    the tests.
+    would only redraw the state the user just tried to change. The refusal is a
+    channel, so a second click on the same cell re-pops the same answer rather
+    than reading as a dead toggle. An ordinary write failure still propagates
+    untouched — see the PR #183 rule pinned in the tests.
     """
     if (
         ctx.triggered_id != "playlists-overview-grid"
@@ -331,7 +369,7 @@ def update_playlist_visibility(cell_clicked, rows_refresh):
         or not isinstance(cell_clicked.get("rowId"), str)
         or not cell_clicked["rowId"]
     ):
-        return no_update, no_update
+        return no_update, no_update, no_update, no_update
 
     playlist_code = cell_clicked["rowId"]
     try:
@@ -339,19 +377,19 @@ def update_playlist_visibility(cell_clicked, rows_refresh):
     except UnsupportedSchemaError as exc:
         logger.warning("Refused to change playlist visibility: %s", exc)
         notification = toast(
-            "visibility-refused-notification",
+            VISIBILITY_REFUSED_CHANNEL,
             VISIBILITY_REFUSED_TITLE,
             str(exc),
             color="red",
             icon=local_icon("material-symbols:warning-outline"),
         )
-        return [notification], no_update
+        return *channel_toast(notification, toast_channels), no_update
     if unhidden:
         enqueue_playlist_percentile_warmup(playlist_code)
     # Hides need an ordinary row rebuild. Unhides additionally need this
     # explicit bump so the disabled warmup interval's owner observes the new
     # enqueue generation and re-arms it.
-    return no_update, (rows_refresh or 0) + 1
+    return no_update, no_update, no_update, (rows_refresh or 0) + 1
 
 
 @callback(
@@ -473,6 +511,8 @@ def toggle_import_modal(_, opened):
 
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Output("playlists-rows-refresh", "data"),
     Output("playlists-import-modal", "opened", allow_duplicate=True),
     Output("playlists-import-textinput", "value"),
@@ -480,6 +520,7 @@ def toggle_import_modal(_, opened):
     Input("playlists-import-button", "n_clicks"),
     State("playlists-import-textinput", "value"),
     State("playlists-rows-refresh", "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     # The Import button spins (and, via Mantine's loading state, refuses further
     # clicks) for the duration of the fetch. The playlist search is the
     # timeout-prone endpoint, so a slow import can hang for tens of seconds; the
@@ -487,7 +528,7 @@ def toggle_import_modal(_, opened):
     running=[(Output("playlists-import-button", "loading"), True, False)],
     prevent_initial_call=True,
 )
-def import_playlist(n_clicks, playlist_to_import, rows_refresh):
+def import_playlist(n_clicks, playlist_to_import, rows_refresh, toast_channels):
     """Import a playlist code and surface the result on this page.
 
     Reuses the shared import service path. On success the playlist is marked
@@ -507,14 +548,34 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     already on disk, so the toast turns orange and reports the split outcome
     rather than vanishing (see the 2026-08-02 committed-side-effect entry in
     ``docs/decision_log.md``).
+
+    Both landing outcomes clear the failure channel: it claims to report the
+    latest attempt, so a corrected retry must not leave the red refusal beside
+    the toast that answers it.
     """
     if ctx.triggered_id != "playlists-import-button" or not n_clicks:
-        return no_update, no_update, no_update, no_update, no_update
+        return (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+        )
     playlist_to_import = (playlist_to_import or "").strip()
     if not playlist_to_import:
         # Inline field error, not a notification: this is a local validation
         # problem. Touch nothing else so the modal and field stay as they are.
-        return no_update, no_update, no_update, no_update, "Enter a playlist code."
+        return (
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            no_update,
+            "Enter a playlist code.",
+        )
     logger.debug("Importing playlist '%s'", playlist_to_import)
     error_message, canonical_code = load_playlist_from_code(playlist_to_import)
 
@@ -524,13 +585,19 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
         if canonical_code is not None and not is_playlist_shown(canonical_code):
             error_message += HIDDEN_DUPLICATE_HINT
         notification = toast(
-            "imported-playlist-failed-notification",
+            IMPORT_FAILED_CHANNEL,
             "Playlist import failed",
             error_message,
             color="red",
             icon=local_icon("material-symbols:upload"),
         )
-        return [notification], no_update, no_update, no_update, None
+        return (
+            *channel_toast(notification, toast_channels),
+            no_update,
+            no_update,
+            no_update,
+            None,
+        )
 
     # Importing is the intent to see: new playlists arrive visible. Mark the
     # canonical stored code, which can differ from the pasted input. The
@@ -563,7 +630,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
     imported_message = f'Imported "{label}" ({imported_code}).'
     if visibility_write_failed:
         notification = toast(
-            "imported-playlist-visibility-failed-notification",
+            import_visibility_failed_channel(imported_code),
             "Playlist imported — not shown",
             imported_message + IMPORT_VISIBILITY_FAILED_HINT,
             color="orange",
@@ -571,7 +638,7 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
         )
     else:
         notification = toast(
-            "imported-playlist-successful-notification",
+            import_successful_channel(imported_code),
             "Playlist imported",
             imported_message,
             color="green",
@@ -579,7 +646,13 @@ def import_playlist(n_clicks, playlist_to_import, rows_refresh):
         )
     # Every other output matches the success path: the import happened, so the
     # grid rebuilds and the modal closes with a cleared field either way.
-    return [notification], (rows_refresh or 0) + 1, False, "", None
+    return (
+        *channel_toast(notification, toast_channels, clears=(IMPORT_FAILED_CHANNEL,)),
+        (rows_refresh or 0) + 1,
+        False,
+        "",
+        None,
+    )
 
 
 @callback(
@@ -623,14 +696,17 @@ def manage_delete_modal(cell_clicked, _cancel):
 
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Output("playlists-rows-refresh", "data", allow_duplicate=True),
     Output("playlists-delete-modal", "opened", allow_duplicate=True),
     Input("playlists-delete-confirm-button", "n_clicks"),
     State("playlists-delete-target", "data"),
     State("playlists-rows-refresh", "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
+def confirm_delete_playlist(n_clicks, target_code, rows_refresh, toast_channels):
     """Delete the confirmed user playlist, then rebuild the grid.
 
     On failure the red notification carries the service's message and the grid
@@ -640,6 +716,8 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     so the deleted row disappears without a page reload. A failed visibility
     write is logged and otherwise ignored: the delete is what the toast reports
     (see the 2026-08-02 committed-side-effect entry in ``docs/decision_log.md``).
+    Success clears the failure channel, so a retry that lands does not leave the
+    red toast standing beside the green one.
 
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     still fire once on initial page load despite ``prevent_initial_call``, so a
@@ -647,19 +725,19 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
     ``n_clicks`` None and no target) before touching the filesystem.
     """
     if not n_clicks or not target_code:
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
     # Look up the label before the delete: afterwards the code is gone from
     # the playlist database and the lookup falls back to the raw code.
     label = get_playlist_display_label(target_code)
     error_message = delete_user_playlist(target_code)
     if error_message:
         notification = toast(
-            "deleted-playlist-failed-notification",
+            DELETE_FAILED_CHANNEL,
             "Playlist delete failed",
             error_message,
             color="red",
         )
-        return [notification], no_update, False
+        return *channel_toast(notification, toast_channels), no_update, False
     try:
         hide_playlist(target_code)
     except OSError, UnsupportedSchemaError:
@@ -674,12 +752,16 @@ def confirm_delete_playlist(n_clicks, target_code, rows_refresh):
             "Failed to drop deleted playlist '%s' from the shown set", target_code
         )
     notification = toast(
-        "deleted-playlist-successful-notification",
+        delete_successful_channel(target_code),
         "Playlist deleted",
         f'Deleted "{label}" ({target_code}).',
         color="green",
     )
-    return [notification], (rows_refresh or 0) + 1, False
+    return (
+        *channel_toast(notification, toast_channels, clears=(DELETE_FAILED_CHANNEL,)),
+        (rows_refresh or 0) + 1,
+        False,
+    )
 
 
 @callback(
@@ -760,42 +842,50 @@ def manage_superseded_modal(_delete, _cancel):
 
 @callback(
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Output("playlists-rows-refresh", "data", allow_duplicate=True),
     Output("playlists-superseded-modal", "opened", allow_duplicate=True),
     Input("playlists-superseded-confirm-button", "n_clicks"),
     State("playlists-rows-refresh", "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def confirm_delete_superseded(n_clicks, rows_refresh):
+def confirm_delete_superseded(n_clicks, rows_refresh, toast_channels):
     """Delete the superseded user files, then refresh the alert.
 
     ``delete_superseded_user_playlist_files`` prunes every file it removes even
     on partial failure, so the refresh store bumps in both branches to keep the
-    alert's count honest.
+    alert's count honest. Success clears the failure channel for the same reason
+    the delete path does.
 
     Guard on ``n_clicks``: like ``confirm_delete_playlist``, this
     ``allow_duplicate`` handler can fire once on initial page load under
     DashProxy, and it must never delete files without a real confirm click.
     """
     if not n_clicks:
-        return no_update, no_update, no_update
+        return no_update, no_update, no_update, no_update, no_update
     error_message = delete_superseded_user_playlist_files()
     next_refresh = (rows_refresh or 0) + 1
     if error_message:
         notification = toast(
-            "superseded-cleanup-failed-notification",
+            CLEANUP_FAILED_CHANNEL,
             "Cleanup failed",
             error_message,
             color="red",
         )
-        return [notification], next_refresh, False
+        return *channel_toast(notification, toast_channels), next_refresh, False
     notification = toast(
-        "superseded-cleanup-successful-notification",
+        CLEANUP_SUCCESSFUL_CHANNEL,
         "Leftover files deleted",
         "Deleted leftover playlist files.",
         color="green",
     )
-    return [notification], next_refresh, False
+    return (
+        *channel_toast(notification, toast_channels, clears=(CLEANUP_FAILED_CHANNEL,)),
+        next_refresh,
+        False,
+    )
 
 
 clientside_callback(

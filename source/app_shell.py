@@ -13,11 +13,11 @@ from source.components.local_icon import local_icon
 from source.config.config_service import ConfigData, get_config
 from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.notifications import (
-    CELEBRATION_NOTIFICATION_ID,
+    CELEBRATION_CHANNEL,
     NOTIFICATION_CONTAINER_ID,
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
+    channel_toast,
     toast,
-    upsert_sticky_toast,
 )
 
 # The batch the shell's drain publishes for every page, and the interval that
@@ -196,7 +196,14 @@ def _celebrated_run(runs: list[RunEventData]) -> RunEventData | None:
 
 
 def _celebration_toast(run: RunEventData) -> dict[str, Any]:
-    """Build the personal best toast, sticky and green with a trophy."""
+    """Build the personal best toast, sticky and green with a trophy.
+
+    ``auto_close=False`` is passed explicitly because ``channel_toast`` carries
+    the payload's lifetime through untouched. The celebration is a channel like
+    any other -- a later personal best replaces the one on screen -- it is just
+    the one channel with no timer, because the run that earned it was played in
+    a fullscreen game and the news should still be there on alt-tab.
+    """
     previous_best = run["scenario_previous_best"]
     # Guaranteed by _celebrated_run: a run with no previous best is never
     # celebrated, so there is always a figure to report here.
@@ -213,11 +220,12 @@ def _celebration_toast(run: RunEventData) -> dict[str, Any]:
         # declines, for the same reason.
         message = f"{headline} Your previous best was {previous_best:.2f}."
     return toast(
-        CELEBRATION_NOTIFICATION_ID,
+        CELEBRATION_CHANNEL,
         "New personal best",
         message,
         color="green",
         icon=local_icon("material-symbols:trophy"),
+        auto_close=False,
     )
 
 
@@ -237,11 +245,14 @@ def _next_animation_sequence(
 @callback(
     Output(RUN_EVENTS_BATCH_STORE_ID, "data"),
     Output(NOTIFICATION_CONTAINER_ID, "sendNotifications", allow_duplicate=True),
+    Output(NOTIFICATION_CONTAINER_ID, "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Input(PB_CELEBRATION_INTERVAL_ID, "n_intervals"),
     State(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def publish_run_events(_n_intervals, previous_batch):
+def publish_run_events(_n_intervals, previous_batch, toast_channels):
     """Drain the run-event queue and publish one batch for the whole app.
 
     The single consumer of ``message_queue``. Facts travel and only this
@@ -249,14 +260,20 @@ def publish_run_events(_n_intervals, previous_batch):
     celebrated run, and the pages read those stamps instead of re-deriving
     them. A page callback triggered by the batch store necessarily runs after
     this one wrote it, so there is no race to coordinate.
+    The celebration rides the same channel mechanism every other replaceable
+    toast uses: a second personal best shows a fresh instance and hides the one
+    it replaces, so the family keeps its ratified contract -- its own lane
+    beside the run verdict, the newest celebration replacing the previous one,
+    and no lifetime at all.
     :param _n_intervals: poll tick. Its actual value is not used.
     :param previous_batch: the batch this client last received, for its
         animation sequence.
-    :return: the new batch, and the celebration toast when one is earned
+    :param toast_channels: this client's toast channel instance registry.
+    :return: the new batch, and the celebration emission when one is earned
     """
     runs = _drain_message_queue(datetime.now(), _run_event_freshness_seconds())
     if not runs:
-        return no_update, no_update
+        return no_update, no_update, no_update, no_update
 
     celebrated = _celebrated_run(runs)
     batch: RunEventBatch = {
@@ -265,8 +282,8 @@ def publish_run_events(_n_intervals, previous_batch):
         "animation_sequence": _next_animation_sequence(previous_batch, celebrated),
     }
     if celebrated is None:
-        return batch, no_update
-    return batch, upsert_sticky_toast(_celebration_toast(celebrated))
+        return batch, no_update, no_update, no_update
+    return batch, *channel_toast(_celebration_toast(celebrated), toast_channels)
 
 
 discord_component = dmc.Tooltip(
@@ -339,9 +356,10 @@ def layout(**kwargs):  # noqa: ARG001
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
                     # Beside the container on purpose: a toast outlives the
-                    # page that emitted it, so the counter that keeps its
-                    # replacement lifetimes honest has to outlive it too.
-                    dcc.Store(id=TOAST_LIFETIME_STORE_ID, data=0),
+                    # page that emitted it, so the registry that knows which
+                    # instance to replace has to outlive it too. The shell's
+                    # own celebration channel is written from here as well.
+                    dcc.Store(id=TOAST_CHANNEL_REGISTRY_STORE_ID, data={}),
                     # The app-wide run-event channel. The drain and its batch
                     # live here rather than on Scenario Performance so a run
                     # reaches the screen whatever page is open; that page

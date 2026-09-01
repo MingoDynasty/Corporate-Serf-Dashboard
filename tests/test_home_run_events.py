@@ -527,7 +527,7 @@ def test_the_run_notification_switch_is_state_not_input():
 
 
 def test_generate_graph_returns_empty_state_before_scenario_selection():
-    plot_json, notifications, lifetime_sequence = home.generate_graph(
+    plot_json, notifications, hidden, toast_channels = home.generate_graph(
         None,
         None,
         5,
@@ -541,13 +541,14 @@ def test_generate_graph_returns_empty_state_before_scenario_selection():
         True,
         True,
         None,
-        0,
+        {},
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
-    assert lifetime_sequence is no_update
+    assert hidden is no_update
+    assert toast_channels is no_update
     assert "No scenario selected" in plot["layout"]["annotations"][0]["text"]
     assert plot["layout"]["annotations"][1]["text"] == (
         "Select a scenario to see your score history."
@@ -565,7 +566,7 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
 
     monkeypatch.setattr(home, "get_high_score", fail_if_called)
 
-    plot_json, notifications, lifetime_sequence = home.generate_graph(
+    plot_json, notifications, hidden, toast_channels = home.generate_graph(
         None,
         "Scenario A",
         5,
@@ -579,13 +580,14 @@ def test_generate_graph_returns_empty_state_for_unsupported_x_axis(monkeypatch):
         True,
         True,
         None,
-        0,
+        {},
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
-    assert lifetime_sequence is no_update
+    assert hidden is no_update
+    assert toast_channels is no_update
     assert "Unsupported graph option" in plot["layout"]["annotations"][0]["text"]
     assert plot["layout"]["annotations"][1]["text"] == (
         "Choose Score vs Sensitivity or Score vs Time."
@@ -600,7 +602,7 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
     # and nothing else; the parallel toast was a redundant second copy.
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: False)
 
-    plot_json, notifications, lifetime_sequence = home.generate_graph(
+    plot_json, notifications, hidden, toast_channels = home.generate_graph(
         None,
         "Unplayed Scenario",
         5,
@@ -614,13 +616,14 @@ def test_generate_graph_lets_the_empty_canvas_report_an_unplayed_scenario(monkey
         True,
         True,
         None,
-        0,
+        {},
     )
 
     plot = json.loads(plot_json)
 
     assert notifications is no_update
-    assert lifetime_sequence is no_update
+    assert hidden is no_update
+    assert toast_channels is no_update
     assert home._NO_SCENARIO_DATA_PLOT_TITLE in plot["layout"]["annotations"][0]["text"]
 
 
@@ -643,7 +646,7 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         SimpleNamespace(triggered=[{"prop_id": "date-picker.value"}]),
     )
 
-    _plot, notifications, lifetime_sequence = home.generate_graph(
+    _plot, notifications, hidden, toast_channels = home.generate_graph(
         _payload(),
         "Scenario A",
         5,
@@ -657,11 +660,12 @@ def test_generate_graph_control_change_does_not_retoast_stale_payload(monkeypatc
         True,
         True,
         None,
-        0,
+        {},
     )
 
     assert notifications == []
-    assert lifetime_sequence is no_update
+    assert hidden == []
+    assert toast_channels is no_update
 
 
 def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
@@ -690,8 +694,9 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
         SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
     )
 
-    for sequence, empty_percentage in enumerate((None, "")):
-        _plot, notifications, lifetime_sequence = home.generate_graph(
+    toast_channels: dict[str, str | None] = {}
+    for empty_percentage in (None, ""):
+        _plot, notifications, hidden, patch = home.generate_graph(
             _payload(score=780.0, scenario_previous_best=800.0),
             "Scenario A",
             5,
@@ -705,23 +710,28 @@ def test_generate_graph_skips_threshold_features_when_percentage_is_empty(
             True,
             True,
             None,
-            sequence,
+            toast_channels,
         )
 
-        # An unjudged run still placed, so one toast goes out -- as the paired
-        # update+show that lets it replace whatever is on screen.
-        assert [notification["action"] for notification in notifications] == [
-            "update",
-            "show",
-        ]
+        # An unjudged run still placed, so one toast goes out -- one fresh
+        # instance shown, and the previous one hidden with it.
+        previous_instance = toast_channels.get(home._RUN_VERDICT_CHANNEL)
+        assert [notification["action"] for notification in notifications] == ["show"]
         assert notifications[0]["title"] == "New 2nd-best score"
-        assert lifetime_sequence == sequence + 1
+        assert hidden == ([previous_instance] if previous_instance else [])
+        toast_channels.update(
+            {
+                operation["location"][0]: operation["params"]["value"]
+                for operation in patch._operations
+            }
+        )
+        assert toast_channels[home._RUN_VERDICT_CHANNEL] != previous_instance
 
 
 def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatch):
     # The run that would otherwise headline "Threshold passed" updates the plot
-    # and nothing else -- no toast, and no bump of the lifetime counter that
-    # would let a later toast replace one that was never shown.
+    # and nothing else -- no toast, and no registry rotation that would leave
+    # the next emission hiding an instance that was never shown.
     monkeypatch.setattr(home, "is_scenario_in_database", lambda _scenario: True)
     monkeypatch.setattr(
         home,
@@ -738,14 +748,14 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
     def fail_if_called(*_args):
         raise AssertionError("a silenced run must not reach the toast sender")
 
-    monkeypatch.setattr(home, "upsert_toast", fail_if_called)
+    monkeypatch.setattr(home, "channel_toast", fail_if_called)
     monkeypatch.setattr(
         home,
         "ctx",
         SimpleNamespace(triggered=[{"prop_id": "run-events.data"}]),
     )
 
-    _plot, notifications, lifetime_sequence = home.generate_graph(
+    _plot, notifications, hidden, toast_channels = home.generate_graph(
         _payload(score=830.0, scenario_previous_best=800.0),
         "Scenario A",
         5,
@@ -759,8 +769,9 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
         True,
         False,
         None,
-        0,
+        {},
     )
 
     assert notifications == []
-    assert lifetime_sequence is no_update
+    assert hidden == []
+    assert toast_channels is no_update

@@ -54,6 +54,16 @@ def _trigger(monkeypatch, triggered_id):
     )
 
 
+def _registry_writes(patch) -> dict[str, str | None]:
+    """Read a per-key ``dash.Patch`` as the assignments it will apply."""
+    if patch is no_update:
+        return {}
+    return {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in patch._operations
+    }
+
+
 def _warmup_snapshot(
     *,
     queued_names=(),
@@ -128,12 +138,14 @@ def test_playlists_overview_visibility_click_toggles_and_bumps_refresh(monkeypat
         "enqueue_playlist_percentile_warmup",
         enqueued.append,
     )
-    notifications, rows_refresh = playlists.update_playlist_visibility(
+    notifications, hidden, patch, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
         7,
+        {},
     )
 
     assert toggled == ["KovaaKsTestCode"]
+    assert (hidden, patch) == (no_update, no_update)
     assert enqueued == ["KovaaKsTestCode"]
     assert notifications is no_update
     assert rows_refresh == 8
@@ -147,12 +159,14 @@ def test_playlists_overview_non_visibility_click_changes_nothing(monkeypatch):
         lambda _code: pytest.fail("navigation clicks must not toggle visibility"),
     )
 
-    notifications, rows_refresh = playlists.update_playlist_visibility(
+    notifications, hidden, patch, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": "name"},
         0,
+        {},
     )
 
     assert notifications is no_update
+    assert (hidden, patch) == (no_update, no_update)
     assert rows_refresh is no_update
 
 
@@ -166,7 +180,12 @@ def test_playlists_overview_visibility_callback_ignores_phantom_initial_fire(
         lambda _code: pytest.fail("phantom initial fire must not toggle visibility"),
     )
 
-    assert playlists.update_playlist_visibility(None, 3) == (no_update, no_update)
+    assert playlists.update_playlist_visibility(None, 3, {}) == (
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
@@ -190,9 +209,10 @@ def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):
         return 1
 
     monkeypatch.setattr(playlists, "enqueue_playlist_percentile_warmup", enqueue)
-    _notifications, rows_refresh = playlists.update_playlist_visibility(
+    *_notifications, rows_refresh = playlists.update_playlist_visibility(
         {"rowId": "KovaaKsTestCode", "colId": playlists.VISIBILITY_COLUMN_ID},
         0,
+        {},
     )
 
     disabled, status, generation = playlists._playlist_overview_warmup_state(0)
@@ -525,8 +545,8 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
         ),
     )
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
-        1, "UserCode", 4
+    notifications, hidden_ids, patch, rows_refresh, opened = (
+        playlists.confirm_delete_playlist(1, "UserCode", 4, {})
     )
 
     assert deleted == ["UserCode"]
@@ -535,6 +555,15 @@ def test_confirm_delete_playlist_success_rebuilds_and_forgets_visibility(monkeyp
     assert hidden == ["UserCode"]
     assert notifications[0]["color"] == "green"
     assert notifications[0]["message"] == 'Deleted "User Label" (UserCode).'
+    assert notifications[0]["id"].startswith(
+        f"{playlists.delete_successful_channel('UserCode')}-"
+    )
+    # Nothing to replace and no failure toast standing, so nothing is hidden.
+    assert hidden_ids == []
+    assert _registry_writes(patch) == {
+        playlists.delete_successful_channel("UserCode"): notifications[0]["id"],
+        playlists.DELETE_FAILED_CHANNEL: None,
+    }
     assert rows_refresh == 5
     assert opened is False
 
@@ -547,12 +576,16 @@ def test_confirm_delete_playlist_failure_leaves_rows_and_visibility(monkeypatch)
         lambda _code: pytest.fail("a failed delete must not forget visibility"),
     )
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
-        1, "UserCode", 4
+    notifications, _hidden, patch, rows_refresh, opened = (
+        playlists.confirm_delete_playlist(1, "UserCode", 4, {})
     )
 
     assert notifications[0]["color"] == "red"
     assert notifications[0]["message"] == "boom"
+    # The failure lane rotates its own key and clears nothing else.
+    assert _registry_writes(patch) == {
+        playlists.DELETE_FAILED_CHANNEL: notifications[0]["id"]
+    }
     assert rows_refresh is no_update
     assert opened is False
 
@@ -581,8 +614,8 @@ def test_confirm_delete_playlist_reports_the_delete_despite_a_failed_write(monke
 
     monkeypatch.setattr(playlists, "hide_playlist", refuse_to_write)
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
-        1, "UserCode", 4
+    notifications, _hidden, _patch, rows_refresh, opened = (
+        playlists.confirm_delete_playlist(1, "UserCode", 4, {})
     )
 
     assert deleted == ["UserCode"]
@@ -609,7 +642,7 @@ def test_playlists_overview_visibility_toggle_propagates_a_failed_write(monkeypa
 
     with pytest.raises(PermissionError):
         playlists.update_playlist_visibility(
-            {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4
+            {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4, {}
         )
 
 
@@ -620,9 +653,9 @@ def test_confirm_delete_playlist_without_target_noops(monkeypatch):
         lambda _code: pytest.fail("no target must not trigger a delete"),
     )
 
-    result = playlists.confirm_delete_playlist(1, None, 0)
+    result = playlists.confirm_delete_playlist(1, None, 0, {})
 
-    assert result == (no_update, no_update, no_update)
+    assert result == (no_update, no_update, no_update, no_update, no_update)
 
 
 def test_render_superseded_alert_hidden_when_no_files(monkeypatch):
@@ -675,9 +708,17 @@ def test_confirm_delete_superseded_success_refreshes(monkeypatch):
         playlists, "delete_superseded_user_playlist_files", lambda: None
     )
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+    notifications, hidden, patch, rows_refresh, opened = (
+        playlists.confirm_delete_superseded(1, 2, {})
+    )
 
     assert notifications[0]["color"] == "green"
+    assert hidden == []
+    # The success clears the cleanup failure lane it answers.
+    assert _registry_writes(patch) == {
+        playlists.CLEANUP_SUCCESSFUL_CHANNEL: notifications[0]["id"],
+        playlists.CLEANUP_FAILED_CHANNEL: None,
+    }
     assert rows_refresh == 3
     assert opened is False
 
@@ -689,10 +730,15 @@ def test_confirm_delete_superseded_failure_still_refreshes(monkeypatch):
         playlists, "delete_superseded_user_playlist_files", lambda: "nope"
     )
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_superseded(1, 2)
+    notifications, _hidden, patch, rows_refresh, opened = (
+        playlists.confirm_delete_superseded(1, 2, {})
+    )
 
     assert notifications[0]["color"] == "red"
     assert notifications[0]["message"] == "nope"
+    assert _registry_writes(patch) == {
+        playlists.CLEANUP_FAILED_CHANNEL: notifications[0]["id"]
+    }
     assert rows_refresh == 3
     assert opened is False
 
@@ -707,7 +753,9 @@ def test_confirm_delete_superseded_ignores_initial_load(monkeypatch):
         lambda: pytest.fail("must not delete files without a confirm click"),
     )
 
-    assert playlists.confirm_delete_superseded(None, 0) == (
+    assert playlists.confirm_delete_superseded(None, 0, {}) == (
+        no_update,
+        no_update,
         no_update,
         no_update,
         no_update,
@@ -721,7 +769,9 @@ def test_confirm_delete_playlist_ignores_initial_load(monkeypatch):
         lambda _code: pytest.fail("must not delete without a confirm click"),
     )
 
-    assert playlists.confirm_delete_playlist(None, "UserCode", 0) == (
+    assert playlists.confirm_delete_playlist(None, "UserCode", 0, {}) == (
+        no_update,
+        no_update,
         no_update,
         no_update,
         no_update,
@@ -839,11 +889,18 @@ def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
         enqueued.append,
     )
 
-    notifications, import_refresh, opened, value, error = playlists.import_playlist(
-        1, "  canonicalcode  ", 0
+    notifications, hidden, patch, import_refresh, opened, value, error = (
+        playlists.import_playlist(1, "  canonicalcode  ", 0, {})
     )
 
     assert shown == ["CanonicalCode"]
+    assert hidden == []
+    # Keyed by the canonical stored code, and clearing the failure lane the
+    # success answers.
+    assert _registry_writes(patch) == {
+        playlists.import_successful_channel("CanonicalCode"): notifications[0]["id"],
+        playlists.IMPORT_FAILED_CHANNEL: None,
+    }
     assert enqueued == ["CanonicalCode"]
     assert notifications[0]["color"] == "green"
     # The toast names the playlist by its canonical stored code, not the pasted
@@ -868,9 +925,17 @@ def test_import_playlist_ignores_phantom_initial_fire(monkeypatch):
         lambda _code: pytest.fail("phantom initial fire must not import"),
     )
 
-    result = playlists.import_playlist(None, "KovaaKsTestCode", 2)
+    result = playlists.import_playlist(None, "KovaaKsTestCode", 2, {})
 
-    assert result == (no_update, no_update, no_update, no_update, no_update)
+    assert result == (
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_import_playlist_failure_does_not_show(monkeypatch):
@@ -884,12 +949,16 @@ def test_import_playlist_failure_does_not_show(monkeypatch):
         lambda _code: pytest.fail("must not mark failed imports as shown"),
     )
 
-    notifications, import_refresh, opened, value, error = playlists.import_playlist(
-        1, "BadCode", 3
+    notifications, hidden, patch, import_refresh, opened, value, error = (
+        playlists.import_playlist(1, "BadCode", 3, {})
     )
 
     assert notifications[0]["color"] == "red"
     assert notifications[0]["message"] == "boom"
+    assert hidden == []
+    assert _registry_writes(patch) == {
+        playlists.IMPORT_FAILED_CHANNEL: notifications[0]["id"]
+    }
     # A failed import must not rebuild rows, and leaves the modal open with the
     # pasted code intact so the user can correct it.
     assert import_refresh is no_update
@@ -917,8 +986,8 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
         lambda _code: pytest.fail("a refused import must not be shown"),
     )
 
-    notifications, import_refresh, opened, value, error = playlists.import_playlist(
-        1, "ExistingCode", 0
+    notifications, _hidden, _patch, import_refresh, opened, value, error = (
+        playlists.import_playlist(1, "ExistingCode", 0, {})
     )
 
     assert notifications[0]["color"] == "red"
@@ -942,9 +1011,7 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
     )
     monkeypatch.setattr(playlists, "is_playlist_shown", lambda _code: True)
 
-    notifications, _import_refresh, _opened, _value, _error = playlists.import_playlist(
-        1, "ExistingCode", 0
-    )
+    notifications, *_rest = playlists.import_playlist(1, "ExistingCode", 0, {})
 
     assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
 
@@ -958,14 +1025,15 @@ def test_import_playlist_empty_code_sets_inline_error(monkeypatch, submitted):
         lambda _code: pytest.fail("empty submit must not hit the import service"),
     )
 
-    notifications, import_refresh, opened, value, error = playlists.import_playlist(
-        1, submitted, 0
+    notifications, hidden, patch, import_refresh, opened, value, error = (
+        playlists.import_playlist(1, submitted, 0, {})
     )
 
     # A local validation problem: an inline field error, no notification, and
     # nothing else touched.
     assert error == "Enter a playlist code."
     assert notifications is no_update
+    assert (hidden, patch) == (no_update, no_update)
     assert import_refresh is no_update
     assert opened is no_update
     assert value is no_update
@@ -988,7 +1056,7 @@ def test_import_playlist_success_message_uses_display_label(monkeypatch):
         playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
     )
 
-    notifications, *_ = playlists.import_playlist(1, "canonicalcode", 0)
+    notifications, *_ = playlists.import_playlist(1, "canonicalcode", 0, {})
 
     assert notifications[0]["title"] == "Playlist imported"
     assert notifications[0]["message"] == 'Imported "My Playlist" (CanonicalCode).'
@@ -1022,13 +1090,20 @@ def test_import_playlist_reports_a_failed_visibility_write(monkeypatch):
         enqueued.append,
     )
 
-    notifications, import_refresh, opened, value, error = playlists.import_playlist(
-        1, "canonicalcode", 0
+    notifications, _hidden, patch, import_refresh, opened, value, error = (
+        playlists.import_playlist(1, "canonicalcode", 0, {})
     )
 
     notification = notifications[0]
     assert notification["color"] == "orange"
-    assert notification["id"] == "imported-playlist-visibility-failed-notification"
+    assert notification["id"].startswith(
+        f"{playlists.import_visibility_failed_channel('CanonicalCode')}-"
+    )
+    # The split outcome is still a landing, so it clears the failure lane too.
+    assert _registry_writes(patch) == {
+        playlists.import_visibility_failed_channel("CanonicalCode"): notification["id"],
+        playlists.IMPORT_FAILED_CHANNEL: None,
+    }
     # Never generic "import failed" wording: the import succeeded, and the
     # message names what landed plus the eye-toggle recovery.
     assert notification["message"].startswith('Imported "My Playlist" (CanonicalCode).')
@@ -1040,6 +1115,109 @@ def test_import_playlist_reports_a_failed_visibility_write(monkeypatch):
     assert error is None
     # The playlist file exists, so the warmup enqueue must not be skipped.
     assert enqueued == ["CanonicalCode"]
+
+
+def test_back_to_back_imports_of_two_playlists_both_answer(monkeypatch):
+    """The reported bug, in the shape it was reported.
+
+    Importing playlist B while playlist A's green toast is still up used to
+    show nothing, because both emissions carried one stable id and ``show``
+    ignores a duplicate. Subject-keyed channels give them different keys, so
+    neither hides the other and both toasts stand.
+    """
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(playlists, "load_playlist_from_code", lambda code: (None, code))
+    monkeypatch.setattr(playlists, "get_playlist_display_label", lambda code: code)
+    monkeypatch.setattr(playlists, "show_playlist", lambda _code: None)
+    monkeypatch.setattr(
+        playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
+    )
+    registry: dict[str, str | None] = {}
+
+    first, first_hidden, first_patch, *_rest = playlists.import_playlist(
+        1, "PlaylistA", 0, registry
+    )
+    registry.update(_registry_writes(first_patch))
+    second, second_hidden, second_patch, *_rest = playlists.import_playlist(
+        2, "PlaylistB", 1, registry
+    )
+    registry.update(_registry_writes(second_patch))
+
+    assert first[0]["id"] != second[0]["id"]
+    assert first_hidden == second_hidden == []
+    assert registry[playlists.import_successful_channel("PlaylistA")] == first[0]["id"]
+    assert registry[playlists.import_successful_channel("PlaylistB")] == second[0]["id"]
+
+
+def test_re_importing_one_playlist_replaces_its_own_toast(monkeypatch):
+    """The other half of the rule: one subject replaces itself.
+
+    Delete-then-re-import is a supported cycle, so the same playlist can report
+    two byte-identical import successes inside one toast lifetime. The second
+    emission re-pops under the same channel key and retires the first instance.
+    """
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(playlists, "load_playlist_from_code", lambda code: (None, code))
+    monkeypatch.setattr(playlists, "get_playlist_display_label", lambda code: code)
+    monkeypatch.setattr(playlists, "show_playlist", lambda _code: None)
+    monkeypatch.setattr(playlists, "hide_playlist", lambda _code: None)
+    monkeypatch.setattr(playlists, "delete_user_playlist", lambda _code: None)
+    monkeypatch.setattr(
+        playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
+    )
+    registry: dict[str, str | None] = {}
+
+    imported, _hidden, patch, *_rest = playlists.import_playlist(
+        1, "PlaylistA", 0, registry
+    )
+    registry.update(_registry_writes(patch))
+    deleted, deleted_hidden, patch, *_rest = playlists.confirm_delete_playlist(
+        1, "PlaylistA", 1, registry
+    )
+    registry.update(_registry_writes(patch))
+    reimported, reimport_hidden, patch, *_rest = playlists.import_playlist(
+        2, "PlaylistA", 2, registry
+    )
+    registry.update(_registry_writes(patch))
+
+    # The delete is a different fact under its own key, so it stacks.
+    assert deleted_hidden == []
+    assert deleted[0]["id"] != imported[0]["id"]
+    # The re-import is the same fact about the same subject, so it replaces.
+    assert reimport_hidden == [imported[0]["id"]]
+    assert reimported[0]["id"] != imported[0]["id"]
+    assert (
+        registry[playlists.import_successful_channel("PlaylistA")]
+        == reimported[0]["id"]
+    )
+
+
+def test_a_corrected_import_clears_the_refusal_it_answers(monkeypatch):
+    """A failure channel claims to report the latest attempt."""
+    _trigger(monkeypatch, "playlists-import-button")
+    monkeypatch.setattr(playlists, "get_playlist_display_label", lambda code: code)
+    monkeypatch.setattr(playlists, "show_playlist", lambda _code: None)
+    monkeypatch.setattr(
+        playlists, "enqueue_playlist_percentile_warmup", lambda _code: None
+    )
+    monkeypatch.setattr(
+        playlists, "load_playlist_from_code", lambda _code: ("boom", None)
+    )
+    registry: dict[str, str | None] = {}
+
+    refused, _hidden, patch, *_rest = playlists.import_playlist(
+        1, "BadCode", 0, registry
+    )
+    registry.update(_registry_writes(patch))
+
+    monkeypatch.setattr(playlists, "load_playlist_from_code", lambda code: (None, code))
+    _imported, hidden, patch, *_rest = playlists.import_playlist(
+        2, "GoodCode", 1, registry
+    )
+    registry.update(_registry_writes(patch))
+
+    assert hidden == [refused[0]["id"]]
+    assert registry[playlists.IMPORT_FAILED_CHANNEL] is None
 
 
 def test_import_playlist_refresh_bump_rebuilds_rows(monkeypatch):
@@ -2029,14 +2207,28 @@ def test_a_refused_visibility_toggle_reports_and_leaves_the_rows_alone(monkeypat
         lambda _code: pytest.fail("a refused toggle must not queue warmup work"),
     )
 
-    notifications, rows_refresh = playlists.update_playlist_visibility(
-        {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4
+    notifications, hidden, patch, rows_refresh = playlists.update_playlist_visibility(
+        {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4, {}
     )
 
     assert rows_refresh is no_update
     assert notifications[0]["color"] == "red"
     assert notifications[0]["title"] == playlists.VISIBILITY_REFUSED_TITLE
     assert "newer version of this app" in notifications[0]["message"]
+    # A channel, so a second refused click re-pops the answer rather than
+    # reading as a dead toggle.
+    assert hidden == []
+    assert _registry_writes(patch) == {
+        playlists.VISIBILITY_REFUSED_CHANNEL: notifications[0]["id"]
+    }
+
+    registry = _registry_writes(patch)
+    second, second_hidden, _patch, _rows = playlists.update_playlist_visibility(
+        {"rowId": "UserCode", "colId": playlists.VISIBILITY_COLUMN_ID}, 4, registry
+    )
+
+    assert second[0]["id"] != notifications[0]["id"]
+    assert second_hidden == [notifications[0]["id"]]
 
 
 def test_an_import_still_lands_when_the_visibility_write_is_refused(monkeypatch):
@@ -2053,8 +2245,8 @@ def test_an_import_still_lands_when_the_visibility_write_is_refused(monkeypatch)
 
     monkeypatch.setattr(playlists, "show_playlist", refuse)
 
-    notifications, rows_refresh, opened, value, error = playlists.import_playlist(
-        1, "NewCode", 2
+    notifications, _hidden, _patch, rows_refresh, opened, value, error = (
+        playlists.import_playlist(1, "NewCode", 2, {})
     )
 
     assert notifications[0]["color"] == "orange"
@@ -2072,8 +2264,8 @@ def test_a_delete_still_reports_when_the_visibility_write_is_refused(monkeypatch
 
     monkeypatch.setattr(playlists, "hide_playlist", refuse)
 
-    notifications, rows_refresh, opened = playlists.confirm_delete_playlist(
-        1, "UserCode", 4
+    notifications, _hidden, _patch, rows_refresh, opened = (
+        playlists.confirm_delete_playlist(1, "UserCode", 4, {})
     )
 
     assert notifications[0]["color"] == "green"
