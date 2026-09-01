@@ -268,10 +268,17 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 - Skip calls `decline_identity`: the username becomes `""`, nothing else
   changes, no worker starts, nothing pins, and the card never returns
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
-  A future-state store refuses it and the card stays up
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp));
-  the red toast "Skip was not saved" explains. It is a channel, so a second
-  Skip click re-pops the same answer instead of clicking into silence
+  Two things stop the write and neither takes the card away, because nothing
+  was recorded: a future-state store refuses it
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)),
+  and an unwritable `data/` fails it. Both report on the red toast "Skip was
+  not saved", the refusal with "The settings file was written by a newer
+  version of this app. Update the app to change settings." and the failure
+  with "Nothing was written. Try again, or see data/logs/debug.log for
+  details."; the failure is logged. They share one channel, so a second Skip
+  click re-pops the current answer instead of clicking into silence, and a
+  retry that fails differently replaces the first explanation rather than
+  sitting beside it
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - The landing page's in-place hint "No stats directory configured — set it in
   Settings" speaks only for a `stats_dir` key that exists and is unusable;

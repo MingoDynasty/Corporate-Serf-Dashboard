@@ -6,6 +6,7 @@ must never bring the card back.
 """
 
 import json
+import logging
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -404,7 +405,7 @@ def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
     assert first_card is no_update
     assert first[0]["color"] == "red"
     assert first[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
-    assert first[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_REFUSED_CHANNEL}-")
+    assert first[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_PROBLEM_CHANNEL}-")
     assert first_hidden == []
 
     # A second refused click re-pops the same answer instead of clicking into
@@ -415,5 +416,69 @@ def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
     }
     _card, second, second_hidden, _patch = home.skip_identity_setup(2, registry)
 
+    assert second[0]["id"] != first[0]["id"]
+    assert second_hidden == [first[0]["id"]]
+
+
+def test_a_skip_whose_write_fails_says_so_and_leaves_the_card_up(
+    monkeypatch,
+    caplog,
+):
+    """An unwritable ``data/`` used to 500 the callback: no toast, no card change.
+
+    The write is a temp file plus an atomic replace, so a failure leaves the
+    store exactly as it was and the card has to stay up.
+    """
+    monkeypatch.setattr(
+        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+    )
+
+    def fail():
+        raise OSError("data directory is read-only")
+
+    monkeypatch.setattr(home, "decline_identity", fail)
+
+    with caplog.at_level(logging.ERROR, logger=home.logger.name):
+        card, notifications, hidden, _patch = home.skip_identity_setup(1, {})
+
+    assert card is no_update
+    assert notifications[0]["color"] == "red"
+    assert notifications[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
+    assert notifications[0]["message"] == home.SETUP_CARD_SKIP_FAILED_MESSAGE
+    assert notifications[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_PROBLEM_CHANNEL}-")
+    assert hidden == []
+    assert "Failed to record the declined identity ask" in caplog.text
+
+
+@pytest.mark.parametrize("reversed_order", [False, True], ids=["refusal", "failure"])
+def test_the_two_skip_problems_replace_each_other_rather_than_stack(
+    monkeypatch,
+    reversed_order,
+):
+    """One click has one answer, so a retry must not leave two on screen."""
+    monkeypatch.setattr(
+        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+    )
+
+    def refuse():
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    def fail():
+        raise OSError("data directory is read-only")
+
+    first_raise, second_raise = (fail, refuse) if reversed_order else (refuse, fail)
+
+    monkeypatch.setattr(home, "decline_identity", first_raise)
+    _first_card, first, _first_hidden, first_patch = home.skip_identity_setup(1, {})
+
+    registry = {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in first_patch._operations
+    }
+    monkeypatch.setattr(home, "decline_identity", second_raise)
+    second_card, second, second_hidden, _patch = home.skip_identity_setup(2, registry)
+
+    assert second_card is no_update
+    assert second[0]["message"] != first[0]["message"]
     assert second[0]["id"] != first[0]["id"]
     assert second_hidden == [first[0]["id"]]

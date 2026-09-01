@@ -460,7 +460,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `rank-refresh-problem` | channel | "Position refresh failed" | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
 | `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" | green | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
-| `setup-card-skip-refused-notification` | channel | "Skip was not saved" | red | — | `skip_identity_setup`; settings spec |
+| `setup-card-skip-problem` | channel | "Skip was not saved" | red | — | `skip_identity_setup`; settings spec |
 | `imported-playlist-successful-{code}` | channel per playlist code | "Playlist imported" | green | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
 | `imported-playlist-visibility-failed-{code}` | channel per playlist code | "Playlist imported — not shown" | orange | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
 | `imported-playlist-failed-notification` | channel | "Playlist import failed" | red | — | `import_playlist`; playlists spec |
