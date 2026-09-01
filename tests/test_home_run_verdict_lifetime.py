@@ -14,8 +14,10 @@ clock. Four behaviors are modelled, and all four were read out of
   (``e.id && list.some(n => n.id === e.id) ? list : [...list, e]``) -- which is
   why a channel emission mints a fresh instance id every time.
 - ``update`` merges into an existing entry and is a no-op for an absent id
-  (``list.map(n => n.id === e.id ? {...n, ...e} : n)``). Only the sticky
-  celebration still sends it.
+  (``list.map(n => n.id === e.id ? {...n, ...e} : n)``). Nothing sends it any
+  more, now that both upsert helpers are gone; it stays modelled so this fake
+  keeps transcribing the bundle rather than only the subset today's callers
+  happen to use.
 - ``hideNotifications`` drops the ids it names, and the container declares that
   effect *after* the ``sendNotifications`` one, so one response shows the fresh
   instance before retiring the instance it replaces.
