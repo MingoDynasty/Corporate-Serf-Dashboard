@@ -42,13 +42,8 @@ list in the roadmap.)
   leads with the scenario, and the sensitivity is a trailing qualifier. The
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
-  nothing else. A run that beats your personal best gets a toast of its own
-  instead of that verdict: "New personal best", naming the scenario, the score,
-  and how far ahead of your old best it landed. It appears on whatever page you
-  are looking at rather than only on Scenario Performance, and it stays until
-  you dismiss it, because the run that earned it was played in a fullscreen
-  game and the news should still be there when you alt-tab back. It also
-  triggers the background rank refresh, as it always did. If runs accumulate
+  nothing else. A run that beats your personal best is not reported here at
+  all: it gets the celebration below instead of the verdict. If runs accumulate
   while no tab is open, the next visit rebuilds once from final state instead
   of replaying stale toasts and selections; it narrates the most recent run if
   you come back within a couple of minutes of playing it, and anything older
@@ -59,10 +54,29 @@ list in the roadmap.)
   percentage decides only whether a run is judged, never whether it toasts.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
-  pile of toasts accumulating over a session — plus the one moment worth
-  interrupting for, which the app used to pass over in silence — and, for a
-  session where any interruption is one too many, a way to quiet the routine
-  feedback without giving up the plot.
+  pile of toasts accumulating over a session — and, for a session where any
+  interruption is one too many, a way to quiet the routine feedback without
+  giving up the plot.
+- **Personal best celebration.** A run that beats a scenario's personal best
+  gets a short burst of confetti and a toast of its own: "New personal best",
+  naming the scenario, the score, and how far ahead of your old best it landed.
+  It fires on whatever page you are looking at rather than only on Scenario
+  Performance, and for every scenario rather than the one on screen, because a
+  personal best is an achievement whatever you happen to be watching. The
+  toast stays until you dismiss it, because the run that earned it was played
+  in a fullscreen game and the news should still be there when you alt-tab
+  back; if the window was covered when the run landed, the animation waits and
+  plays when you come back to it. It also triggers the background rank
+  refresh, as it always did. A Settings switch turns the whole thing off, with
+  a Preview button beside it so the effect can be seen without setting a
+  personal best, and it is independent of the Run Notifications switch: one is
+  about routine runs, the other about the moment worth interrupting for. If
+  your system asks for reduced motion, the toast still shows and the animation
+  does not. *Problem solved:* the one moment every run is chasing used to pass
+  in silence, with the run toast reporting a threshold percentage or a
+  placement instead of the achievement itself — and it passed in silence
+  wherever you were not looking, which on a benchmark run is usually the
+  playlist page.
 - **Quiet by default.** Toasts are reserved for what you did, what you
   achieved, and failures you would act on. A condition that stays true — no
   username configured, a leaderboard lookup that failed, a scenario with no

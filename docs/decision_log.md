@@ -13,6 +13,252 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-02: A New Personal Best Celebrates On Every Page
+
+Status: Accepted
+
+A run that beats a scenario's personal best now gets a short burst of confetti
+and a toast that says so. It fires on whatever page is open and for every
+scenario, not only the one being watched, and the toast stays until it is
+dismissed because the run that earned it was played in a fullscreen game. A
+Settings switch turns the whole thing off. Nothing else about how runs are
+reported changed.
+
+**One drain decides.** The app shell hosts the `pb-celebration-interval`
+(period `polling_interval`), the `run-events-batch` store, and
+`publish_run_events`, which is now `message_queue`'s only consumer. Facts
+travel and only the drain decides: it stamps each drained run `is_live`, names
+at most one `celebrated_run_id`, and advances a monotonic
+`animation_sequence` exactly when it names one. `NewFileMessage` carries
+`run_id`, `scenario_previous_best`, and `is_new_sensitivity` — facts with no
+verdict in them — and Scenario Performance reads the stamps instead of
+re-deriving either. The ordering argument is the dependency graph, not a
+protocol: a page callback triggered by the batch store necessarily runs after
+the shell wrote it, so there is nothing to race. Four review rounds of
+coordination machinery between two independent drains (a shared toast id, a
+page-side freshness window, a celebrated-run registry, a registry plus a
+watermark with deferral) are what this replaced; each moved the race without
+closing it, and the single drain closes it by construction.
+
+**The rule.** A run is celebrated when its score is *strictly* greater than
+its `scenario_previous_best`, so a tie never celebrates and a scenario's first
+run only sets the baseline. The newest qualifying live run in a batch wins and
+an older one is plot-only, because one Dash response carries one payload and
+drives one animation. That strict comparison is the only gate that ships: most
+runs in a freshly imported scenario are personal bests, and the ruling
+accepted that noise rather than inventing a minimum run count or margin before
+anyone knows it grates, with the setting as the escape hatch. A gate can be
+added later if it does.
+
+**Freshness.** A run is stamped live when its `datetime_created` is within a
+120-second cap plus one poll period of the drain, and stale otherwise. There
+is no watermark and no drain bookkeeping: every drain empties the queue, so a
+message a drain finds was never seen by an earlier one, and one appended
+mid-drain is caught by that drain or the next, exactly once either way. The
+cap sits two orders of magnitude above the default poll interval and
+comfortably above Chromium's intensive throttling, which slows a hidden tab's
+interval to about one tick per minute — and the tab is occluded during play,
+so a tight window would drop exactly the mid-session personal bests this
+exists for. The poll period is added because `polling_interval` carries no
+product cap: a run can be a whole period old through nothing but the drain's
+cadence, and a fixed cap below the configured period would stamp every run
+stale and silently retire every toast liveness gates. The consequence, stated
+rather than hidden: a deliberately slow poll widens no-tab replay by exactly
+the period it chose. Validating the interval with a product cap instead stays
+rejected, for the reasons in
+[2026-09-01](#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load).
+
+**The toast.** Green, a trophy icon, titled "New personal best", and sent with
+`auto_close=False` so it is still there on alt-tab. Its channel key is
+`pb-celebration`, deliberately not `run-verdict`: an ordinary run toast lands
+beside it rather than replacing it, and only a later celebration replaces a
+celebration. It is a persistent channel in the sense the
+[2026-08-31 toast-identity entry](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+defines, and that entry owns the mechanism.
+
+**The celebration takes the headline.** When celebrations are on, the
+celebrated run's one toast *is* the celebration toast and the page's run toast
+yields. The score threshold goal has no upper bound, so a goal above 100% let
+a personal best read "Below threshold" while confetti fell, and even under a
+goal it passes, "Threshold passed" says the less interesting thing. This
+amends the priority rule in
+[2026-08-03](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+for the celebrations-on state only: with the setting off, the verdict
+headlines and a personal best has no toast of its own, exactly as before. A
+personal best the drain did not celebrate — an older qualifying run coalesced
+out of the batch, or one outside the selected scenario with auto-switch off —
+follows the ordinary run-toast rules and has no guaranteed toast. The
+guarantee is per run and one-sided: every run earns at most one notification,
+and the celebrated run exactly one. One batch can therefore put two toasts on
+screen when the celebration and the page's narration concern different runs,
+and that is correct.
+
+**The master switch does not reach it.** The two settings are independent
+families: the celebration setting governs the confetti and the celebration
+toast together, and Run Notifications governs the verdict and placement
+toasts. With Run Notifications off and celebrations on, a personal best still
+celebrates on every page while ordinary runs stay silent — a user in that
+state has asked for two things at once. The toast travels with the animation
+because it is the half that carries information; on a page other than Scenario
+Performance, confetti without it is a burst with no explanation, and under
+reduced motion the toast is the whole celebration. Coupling them was rejected
+on that reading and on mechanics: the master switch's persisted value lives on
+the Scenario Performance page, so the shell would need a second mirror store
+to see it.
+
+**A hidden tab holds the animation.** Chromium marks a fully occluded window's
+tab hidden, and the player is in KovaaK's fullscreen when a personal best
+lands, so a hard `document.hidden` drop would mean the animation never plays
+for a real personal best on a single-monitor setup — only from Preview. At
+most one celebration is held instead, a newer one replacing it, and it plays
+on the next `visibilitychange` to visible; playing while hidden would also
+dump a stalled burst on the next alt-tab, since a hidden tab throttles
+animation frames. The accepted cost, stated with the ruling: personal best
+toasts are dismissed by hand on every setup, including one where the animation
+played in view. Relaxing the toast to the normal lifetime is a one-line
+follow-up that does not touch the pending mechanism. The ruling needed no
+pre-ship evidence, and the asymmetry was the deciding argument: where the tab
+never reports hidden the pending path is dormant and behaviour is identical,
+and where occlusion does mark it hidden, pending is the only version that
+plays at all. The `visibilitychange` observation during a real fullscreen
+session remains a post-ship check.
+
+**The animation.** `canvas-confetti` 1.9.4 (ISC) is vendored unminified under
+`assets/vendor/`, with its LICENSE and a version pin, rather than hand-rolled:
+it ships the physics, the shapes, the reduced-motion guard, cancellation, and
+worker-thread rendering, and every later change is configuration instead of
+physics code. `assets/pbCelebration.js` is the app-owned half — a name-keyed
+style registry, Confetti alone in version one (the upstream Realistic Look
+recipe unchanged, about three seconds), behind `play(style)` and
+`celebrate(batch, style)`. An unknown style name plays Confetti rather than
+nothing, so a style removed later never silently turns celebrations off. A
+clientside callback on the batch store drives it, so the burst costs no server
+round trip; the library is resolved at call time, because Dash serves
+`assets/*.js` in its own order. There is no JavaScript lint, test, or build
+step in this repo, so that file is held by review and a manual pass.
+
+**No catch-up digest.** The "While you were away" digest existed because run
+events accumulated while Scenario Performance was closed. Delivery is now
+app-wide and continuous while any tab is open, so batches stop accumulating in
+the case the digest served. What remains is the no-tab case, where the
+freshness window draws the line: a personal best set within the window of the
+next drain is celebrated on it, and anything older is never replayed. Bounded
+replay is accepted rather than suppressed — a player who reopens the tab a
+minute after the run wants the celebration, and the timestamp cannot tell that
+case from a throttled hidden tab's, which must land. A backlog that does
+arrive rebuilds the graph once, auto-switches once, and follows the per-run
+rules above: up to two toasts, never a digest. Whether the celebration family
+deserves its own longer or unbounded window is a follow-up question, carried
+on the roadmap.
+
+**What this supersedes.** The
+[2026-07-06 coalescing entry](#2026-07-06-coalesce-pending-home-run-events)
+loses its "sole consumer" clause — the shell's drain is the consumer now and
+the page listens to a store — and its digest. Its coalescing rule survives,
+applied to the batch: the page still considers only the latest matching run.
+The [2026-08-21 master-switch entry](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+loses the digest from the set of shapes its gate covers, and its deferral of
+the queue-to-UI redesign for the drain alone; the product question that
+deferral protected, app-wide verdict toasts, stays deferred, and run toasts
+remain page-built and page-scoped. The
+[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+loses its rule that a personal best earns nothing beyond the run verdict, and
+the "backlog digest included" clause of its replacement rule.
+
+Shipped in PRs #261 and #268; proposal and rulings in #248, toast mechanism
+reconciled in #263. Distilled from the personal best celebration proposal, now
+deleted.
+
+## 2026-09-02: The Celebration Setting Is Browser-Local, On The Settings Page
+
+Status: Accepted
+
+The switch that turns the personal best celebration on and off lives on the
+Settings page, in its own Celebrations section, with a Preview button beside
+it. It takes effect the moment it is flipped rather than waiting for Save, and
+the browser remembers it instead of the app's settings file. A different
+browser, or one whose site data has been cleared, celebrates by default.
+
+**The store is the setting.** `dcc.Store(id="pb-celebration-style",
+storage_type="local")` in the app shell holds one string: `"off"` or a style
+name, defaulting to `"confetti"`. The value is a style name from the start
+even though version one ships a switch, so the follow-up that turns the switch
+into a style select only adds values to a contract that already exists and
+keeps whatever was saved. The control initializes from the store and writes
+back to it and carries no Dash persistence of its own, so a switch's boolean
+and a select's string never become two competing persisted values. The drain
+reads the store as `State`, and so does the clientside animation: changing the
+setting must not replay a batch already delivered.
+
+**Why the Settings page.** The behavior is app-wide, so the Chart options
+inspector on one page is the wrong home — undiscoverable, and a control there
+describes itself as a chart option. This departs from the placement rule the
+[point customization](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+and [master switch](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+entries both state, that the inspector owns browser-persisted presentation
+preferences. The departure is deliberate and narrow: that rule governs
+preferences about the chart, and this one is about the app. It is also the
+first browser-persisted control on the Settings page, beside a form whose
+three fields are written to disk behind Save. The section is visibly separate,
+its control applies instantly, and it touches neither the restart notice nor
+the store alert, both of which speak for the form's three keys, so the form's
+contract is untouched.
+
+**Why not `data/settings.json`.** Rejected on cost, not principle. Settings v1
+is a closed set of three string keys, so a new key is settings v2: a
+validator, a version bump, the stamp script becoming a real migration under
+the documented ordering contract, the launcher's trial-run window to be solved
+for the first migrating release, and an older build refusing the v2 file on
+rollback
+([2026-08-11](#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+A cosmetic preference should not be what forces that. When a setting that
+deserves v2 arrives, this one joins it; only the store's backing would change.
+
+**Instant apply needs one tick, and the tick is load-bearing.** The obvious
+callback pair — the store as `Input` to the switch, the switch as `Input` to
+the store — is a dependency cycle the Dash renderer refuses, so the switch is
+initialized by a one-shot `dcc.Interval` that reads the store as `State`. That
+tick is also the gate on the write direction, and this is the part worth
+remembering: mounting the page fires the write callback with the switch's
+*layout default* despite `prevent_initial_call`, with the switch itself as
+`ctx.triggered_id` — so the repo's usual triggering-id guard does not catch
+it, and without the gate, opening Settings wrote the on value over a stored
+off. Ordering makes the gate safe rather than lucky: once the tick has landed
+the switch already holds the stored value, so the worst a late mount-fire can
+write is the value that was there. Any future browser-local control on a page
+layout has the same hazard.
+
+**Accepted costs.** Browser persistence is per origin, is cleared with site
+data, and resets if the layout default ever changes. Every one of those fails
+towards "celebrations came back", never towards silence, which is why only the
+exact `"off"` value silences the family: a style name a later build wrote, or
+a store this build cannot read, still celebrates. One more, inherited rather
+than introduced: `message_queue` is process-wide and each drain's payload
+reaches one client, so with two tabs open a batch lands in whichever drain
+runs first. That is the single-consumer shape the page's drain already had,
+and the supported usage model stays one active tab.
+
+**Preview, and the styles that follow.** Preview plays the currently selected
+style through the same clientside path a real celebration takes, so it obeys
+the reduced-motion guard; it shows no toast, because the toast reports a run
+and there is no run. It ships in version one because it is the only way to see
+the effect without setting a personal best. The follow-up converts the switch
+to a select over Off, Confetti, Fireworks, Cannons, and Stars — curated
+presets only, no duration, particle, or color knobs, no custom style, and no
+Random option. Since the proposal file is deleted, its specification of that
+step is recorded here: Confetti is the upstream Realistic Look recipe
+unchanged (five bursts from one origin, about 200 particles, about three
+seconds); Fireworks is the upstream Fireworks recipe cut from 15 s to about
+3 s; Cannons is School Pride cut to about 2.5 s with the app's accent colors
+in place of the demo's red and white; Stars is the upstream Stars recipe
+unchanged (three volleys, star and circle shapes, no gravity). Snow is
+ambient rather than a celebration and is excluded. `confetti.reset()` clears
+particles but does not stop a `setInterval` or animation-frame loop, so the
+two loop-based recipes must not be taken from the demo verbatim — each style
+is bounded to about three seconds and must cancel cleanly.
+
+Shipped in PR #268; ruled on #248.
+
 ## 2026-09-01: Configured Ports And Poll Intervals Are Bounded At Load
 
 Status: Accepted
@@ -198,7 +444,7 @@ the mechanism, and one visible detail that follows from it -- a second personal
 best now re-enters with the pop animation instead of morphing in place, which
 is the same visible re-entry every other channel gets and the reason it is
 wanted. This is a mechanism conformance change, not new celebration scope; the
-in-flight `docs/pb_celebration_proposal.md` is updated in step.
+in-flight personal best celebration proposal is updated in step.
 
 **What this supersedes.** The
 [2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
@@ -581,6 +827,14 @@ Rejected alternatives:
   with its own product questions, and this change forecloses none of it: the
   guard sits at toast production wherever that later runs, and Dash
   persistence survives a same-id component move.
+
+**Superseded in part (2026-09-02).** The catch-up digest above no longer
+exists, so the gate covers the threshold verdict and the placement alone, and
+the help text gained a second sentence naming the celebration's own setting.
+The last rejected alternative's deferral of the queue-to-UI redesign also
+falls, for the drain alone; the product question it protected, app-wide
+verdict toasts, stays deferred. Both are recorded in
+[A New Personal Best Celebrates On Every Page](#2026-09-02-a-new-personal-best-celebrates-on-every-page).
 
 Shipped in PR #245; design discussion in #240. Distilled from
 `docs/run_notifications_switch_proposal.md`, now deleted.

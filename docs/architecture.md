@@ -288,7 +288,15 @@ flowchart LR
   a page remounts.
   It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
   `polling_interval`), the `run-events-batch` `dcc.Store`, and the
-  `publish_run_events` callback that is `message_queue`'s only consumer. That
+  `publish_run_events` callback that is `message_queue`'s only consumer.
+  Beside them sit the celebration's two other stores: `pb-celebration-style`
+  (`storage_type="local"`, default `"confetti"`), which *is* the setting the
+  Settings page edits and the drain reads as `State`, and
+  `pb-celebration-signal`, a dead-end output that exists only because the
+  clientside callback driving the animation needs one. That callback takes the
+  batch store as its `Input` and the style store as `State` and calls
+  `window.pbCelebration.celebrate` in `assets/pbCelebration.js`, so the burst
+  costs no server round trip. That
   interval polls on every page for the life of the tab, so roughly one request
   a second is what idle looks like in devtools and in the waitress log —
   accepted for a local single-user app, and recorded here so nobody reads the
@@ -420,7 +428,17 @@ flowchart LR
   detection's report replaces it; it keeps the conclusive no-match message for
   the one outcome that ruled everything out, while unchecked probes and
   unreadable account lists each say so in their own words.
-  Below the form, a static version section names the running build from
+  Below the form and outside it, a **Celebrations** section holds the personal
+  best celebration's on/off switch, its description, and a Preview button. The
+  authoritative value is the shell's `pb-celebration-style` store, not the
+  control: a one-shot `dcc.Interval` initializes the switch from it (read as
+  `State`, because the store-as-`Input` pair would be a dependency cycle) and
+  that same tick gates the write direction, since mounting the page fires the
+  write callback with the switch's layout default despite
+  `prevent_initial_call` and with the switch as `triggered_id`. Preview is a
+  clientside callback into the same `assets/pbCelebration.js` entry a real
+  celebration uses, so it obeys the reduced-motion guard and shows no toast.
+  Below that, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
   with no callback and no network. The same section carries the bug-report
   affordance: a "Report a bug" anchor whose href `bug_report_url()` builds as
@@ -596,9 +614,22 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
+- `assets/pbCelebration.js` — the personal best celebration's animation:
+  a name-keyed style registry (v1 registers `confetti` alone, the upstream
+  Realistic Look recipe) behind `window.pbCelebration.play(style)` and
+  `celebrate(batch, style)`. It owns every animation guard: Off, reduced
+  motion, the hidden-tab hold that replays on `visibilitychange`, cancelling a
+  burst still in flight, the unknown-name fallback, and the batch's monotonic
+  `animation_sequence`, which is what stops one payload playing twice. It
+  resolves `window.confetti` at call time, so asset load order is not
+  load-bearing.
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
+- `assets/vendor/` — third-party browser libraries, copied in unminified with
+  their license and an exact version pin (`assets/vendor/README.md` holds the
+  table and the update recipe). One entry today: `canvas-confetti` 1.9.4
+  (ISC), which defines `window.confetti`.
 
 ## Where to look first
 
@@ -614,6 +645,7 @@ flowchart LR
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
+| The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
 | Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles, which the page runs behind its Detect button |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

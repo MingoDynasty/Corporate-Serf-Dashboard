@@ -28,6 +28,19 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Personal best celebration** — a run that beats a scenario's personal best
+  now gets a short burst of confetti and a toast that says so, on whatever page
+  is open and for every scenario rather than only the one being watched. The
+  toast stays until it is dismissed, because the run that earned it was played
+  in a fullscreen game, and if the window was covered when the run landed the
+  animation waits for the tab to come back. A Settings switch turns the whole
+  thing off, with a Preview button beside it, and it is independent of Run
+  Notifications. Run delivery moved into the app shell to make that possible,
+  which retired the "While you were away" catch-up digest: a run no longer
+  waits for a Scenario Performance visit to be announced. (PRs #261, #268;
+  design in #248) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md), which also carries the specification
+  for the follow-up that turns the switch into a choice of styles.
 - **Alert color language** — the notices printed into the page now speak one
   severity scale, the same one the toasts already spoke: blue for
   information, yellow for caution, red for errors, each with a leading icon.
@@ -64,15 +77,6 @@ sequence.
   and never asks again. The playlists overview explains its N/A percentile
   columns in the same words. (PRs #235, #236; design in #231) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Feedback and bug-report intake** — the app has a defined place to send
-  feedback and bug reports: GitHub Issues, with a bug form and a feature form
-  and no blank-issue option. The bug form asks almost nothing — what happened,
-  the version, and one attached log — and says plainly, before the upload box,
-  that the issue and its attachments are public and what the log contains. The
-  Settings page pre-fills the version into the form and shows where the log
-  lives, so filing a report is a click instead of a hunt. (PRs #228, #229;
-  design in #226) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -85,13 +89,6 @@ sequence.
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Personal best celebration** — confetti and a "New personal best" toast
-  when a run beats a scenario's personal best, on every page and for every
-  scenario, with a Settings-page switch to turn it off; a follow-up adds
-  a choice of styles.
-  The motivation layer the per-run verdict toast can't provide: the one
-  moment every run is chasing currently passes in silence. Design in
-  [`pb_celebration_proposal.md`](./pb_celebration_proposal.md).
 
 ---
 
@@ -100,6 +97,16 @@ sequence.
 Listed so they aren't forgotten, but not yet actively planned. Each will be
 expanded into its own roadmap entry when it becomes the next thing up.
 
+- **Per-family celebration staleness** — the run-event freshness window
+  applies the quiet-return rule to celebrations and ordinary run toasts alike,
+  so a personal best set with no tab open celebrates only if the dashboard is
+  opened within a couple of minutes of it, while a hidden tab's celebration is
+  delivered however late. Whether the celebration deserves its own longer or
+  unbounded window is a question for real usage: whether the missed
+  celebration in the play-then-open-the-dashboard flow grates, and how the late
+  delivery feels when it fires. Nothing shipped forecloses the change; it is
+  one conditional in the drain's decision rule plus an amendment to the
+  digest ruling.
 - **Score trend verdict** — *improving / plateauing / declining* classification
   per scenario, answering "is my current training working?" Likely shipped
   against raw score data first; richer rank-trend analysis would need rank
