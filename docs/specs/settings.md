@@ -2,11 +2,12 @@
 
 The app is told a few things by hand in a configuration file, such as the
 port, that an update never asks anyone to edit, and works the rest out for
-itself. Where the KovaaK's runs live and who the player is on the
-leaderboards live in a small file the app owns, shown and changed on a
-Settings page that also offers what the machine already knows. A setting the
-running app cannot pick up live is frozen at startup, and the page says when
-a restart is needed.
+itself. A number outside the range it can work with is refused as that file
+is read, with one line naming the file. Where the KovaaK's runs live and who
+the player is on the leaderboards live in a small file the app owns, shown and
+changed on a Settings page that also offers what the machine already knows. A
+setting the running app cannot pick up live is frozen at startup, and the page
+says when a restart is needed.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -28,13 +29,20 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   app-read-only from then on: the app never writes it, and an update never
   touches it
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
-  `ConfigData` holds `port` (required, no default), `host` (`"127.0.0.1"`),
-  `polling_interval` (`1000` ms), `sens_round_decimal_places` (`1`), `debug`
-  (`False`), `scenario_metadata_cache_ttl_hours` (`24`),
+  `ConfigData` holds `port` (required, no default, `1` to `65535`), `host`
+  (`"127.0.0.1"`), `polling_interval` (`1000` ms, `1` to `2147483647`),
+  `sens_round_decimal_places` (`1`), `debug` (`False`),
+  `scenario_metadata_cache_ttl_hours` (`24`),
   `scenario_rank_cache_ttl_hours` (`168`),
   `leaderboard_total_cache_ttl_hours` (`168`), `percentile_warmup_enabled`
   (`True`), `kovaaks_api_timeout_seconds` (`30`, must be above `0`), and
-  `show_version_in_title` (`False`).
+  `show_version_in_title` (`False`). The port and poll-interval bounds are set
+  by
+  [2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load);
+  a configured `0` port is refused even though `bind_server_socket(0)` still
+  asks the OS for a free port, and the poll interval's upper bound is the
+  largest delay `window.setInterval` can hold rather than a product cap on how
+  slow a poll may be. `example.toml` states both ranges beside the settings.
 - The app owns no default port. `example.toml` ships `port = 8050`, and an
   existing install keeps whatever its file says
   ([2026-07-19](../decision_log.md#2026-07-19-default-port-is-8050-not-8080)).
@@ -58,6 +66,10 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   `<path>` -- copy example.toml to config.toml.", and exit code 1, before
   playlists load or any service starts
   ([2026-07-09](../decision_log.md#2026-07-09-load-configuration-lazily-at-application-startup)).
+  An out-of-range `port` or `polling_interval` takes that same exit rather than
+  reaching the bind; `host` is not part of that check and fails later, at the
+  bind, with its own message
+  ([2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load)).
   The same line is written to the log files.
 - Unknown keys are named once in a warning, "Ignoring unknown key(s) in
   `<path>`: `<keys>`. Remove them when convenient.", and ignored; a file

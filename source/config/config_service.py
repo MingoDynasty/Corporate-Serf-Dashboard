@@ -34,13 +34,25 @@ def config_file_path() -> Path:
 class ConfigData:
     """Dataclass models configuration for this app."""
 
-    port: int
+    # ge=1/le=65535: an out-of-range port used to reach sock.bind(), which
+    # raises an OverflowError neither bind-path except-clause catches, so the
+    # user saw a raw traceback instead of the startup configuration error.
+    # Port 0 is refused here even though the socket layer accepts it: the
+    # installed launcher probes and opens the configured port, and an
+    # OS-chosen one is not a port it can discover.
+    port: Annotated[int, Field(ge=1, le=65535)]
     # Loopback by default: the app has no authentication, so serving an
     # address other than this one exposes the run data and the settings to
     # every device that can reach it. Must be an IP literal, not a name --
     # source.app rejects anything else.
     host: str = DEFAULT_HOST
-    polling_interval: int = 1000
+    # gt=0/le=2**31-1: this is handed straight to window.setInterval, whose
+    # delay is a signed 32-bit int. Either end of the range turns into the
+    # same silent request flood -- a non-positive period, and one above the
+    # limit, which overflows and fires immediately (measured in Chromium:
+    # 2_147_483_647 never fires, 2_147_483_648 fires at 0 ms). The upper bound
+    # is browser representability, not a product cap on how slow a poll may be.
+    polling_interval: Annotated[int, Field(gt=0, le=2_147_483_647)] = 1000
     sens_round_decimal_places: int = 1
     debug: bool = False
     scenario_metadata_cache_ttl_hours: int = 24
