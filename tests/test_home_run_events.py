@@ -504,9 +504,12 @@ def test_the_master_switch_guard_precedes_the_celebration_yield():
     assert _notification(ordinary, run_notification_switch=False) is None
 
 
-def test_the_run_notifications_help_text_drops_the_retired_digest():
+def test_the_run_notifications_help_text_names_both_families():
+    # The switch's own family, then the one it deliberately does not reach: the
+    # celebration has its own setting, and the digest it once mentioned is gone.
     assert home.SETTINGS_HELP_TEXT["run-notification"] == (
-        "Controls threshold verdict and placement notifications for your runs."
+        "Controls threshold verdict and placement notifications for your runs. "
+        "Personal best celebrations use their own setting."
     )
 
 
