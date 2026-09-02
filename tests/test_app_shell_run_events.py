@@ -16,6 +16,10 @@ from dash._callback import GLOBAL_CALLBACK_LIST
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source import app_shell  # noqa: E402
+from source.app_shell import (  # noqa: E402
+    CELEBRATION_STYLE_CONFETTI,
+    CELEBRATION_STYLE_OFF,
+)
 from source.my_queue.message_queue import NewFileMessage  # noqa: E402
 from source.pages import home  # noqa: E402
 from source.utilities.notifications import (  # noqa: E402
@@ -65,13 +69,26 @@ def _window() -> float:
     return app_shell._run_event_freshness_seconds()
 
 
-def _drain_emission(monkeypatch, *messages, previous_batch=None, toast_channels=None):
+def _drain_emission(
+    monkeypatch,
+    *messages,
+    previous_batch=None,
+    toast_channels=None,
+    celebration_style=CELEBRATION_STYLE_CONFETTI,
+):
     """Run one drain and return all four outputs, registry patch included."""
     monkeypatch.setattr(app_shell, "message_queue", deque(messages))
-    return app_shell.publish_run_events(1, previous_batch, toast_channels or {})
+    return app_shell.publish_run_events(
+        1, previous_batch, toast_channels or {}, celebration_style
+    )
 
 
-def _drain(monkeypatch, *messages, previous_batch=None):
+def _drain(
+    monkeypatch,
+    *messages,
+    previous_batch=None,
+    celebration_style=CELEBRATION_STYLE_CONFETTI,
+):
     """Run one drain over a queue holding exactly these messages.
 
     Returns the batch and the toasts to show. The hide list and the registry
@@ -79,7 +96,10 @@ def _drain(monkeypatch, *messages, previous_batch=None):
     ``_drain_emission`` in the channel tests below.
     """
     batch, send, _hide, _patch = _drain_emission(
-        monkeypatch, *messages, previous_batch=previous_batch
+        monkeypatch,
+        *messages,
+        previous_batch=previous_batch,
+        celebration_style=celebration_style,
     )
     return batch, send
 
@@ -294,6 +314,93 @@ def test_a_quiet_drain_touches_neither_the_hide_list_nor_the_registry(
     assert (send, hide, patch) == (no_update, no_update, no_update)
 
 
+# --- the setting -------------------------------------------------------
+
+
+def test_off_publishes_the_batch_but_stamps_no_celebration(monkeypatch, frozen_clock):
+    """Off silences the family, not the delivery.
+
+    The batch still carries every run and its liveness stamp, because the plot
+    is every run's record whatever the setting says, and the page then narrates
+    the run under its ordinary rules.
+    """
+    batch, notifications, hide, patch = _drain_emission(
+        monkeypatch,
+        _message(score=830.0),
+        celebration_style=CELEBRATION_STYLE_OFF,
+    )
+
+    assert [run["run_id"] for run in batch["runs"]] == ["run-1.csv"]
+    assert batch["runs"][0]["is_live"] is True
+    assert batch["celebrated_run_id"] is None
+    assert (notifications, hide, patch) == (no_update, no_update, no_update)
+
+
+def test_off_holds_the_animation_sequence_where_it_was(monkeypatch, frozen_clock):
+    celebrated, _n = _drain(monkeypatch, _message(score=830.0))
+
+    quiet, _n = _drain(
+        monkeypatch,
+        _message(score=900.0),
+        previous_batch=celebrated,
+        celebration_style=CELEBRATION_STYLE_OFF,
+    )
+
+    assert quiet["animation_sequence"] == celebrated["animation_sequence"]
+
+
+def test_an_unknown_stored_style_still_celebrates(monkeypatch, frozen_clock):
+    # Only the exact off value silences the family. A style a later build
+    # wrote, or a browser that lost its site data, has to fail towards the
+    # celebration rather than into silence.
+    batch, notifications = _drain(
+        monkeypatch, _message(score=830.0), celebration_style="fireworks"
+    )
+
+    assert batch["celebrated_run_id"] == "run-1.csv"
+    assert notifications is not no_update
+
+
+def test_the_style_store_is_browser_local_and_defaults_to_confetti():
+    store = _component(app_shell.layout(), app_shell.PB_CELEBRATION_STYLE_STORE_ID)
+
+    assert store.storage_type == "local"
+    assert store.data == CELEBRATION_STYLE_CONFETTI
+
+
+def test_the_drain_reads_the_style_store_as_state():
+    """State, not Input: flipping the setting must not replay a drained batch."""
+    (spec,) = [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if "run-events-batch.data" in str(spec["output"])
+    ]
+
+    assert app_shell.PB_CELEBRATION_STYLE_STORE_ID not in {
+        dep["id"] for dep in spec["inputs"]
+    }
+    assert (app_shell.PB_CELEBRATION_STYLE_STORE_ID, "data") in {
+        (dep["id"], dep["property"]) for dep in spec["state"]
+    }
+
+
+def test_the_animation_is_driven_clientside_from_the_batch():
+    """No server round trip for the burst, and no replay on a setting change."""
+    (spec,) = [
+        spec
+        for spec in GLOBAL_CALLBACK_LIST
+        if app_shell.PB_CELEBRATION_SIGNAL_STORE_ID in str(spec["output"])
+    ]
+
+    assert spec["clientside_function"] is not None
+    assert [(dep["id"], dep["property"]) for dep in spec["inputs"]] == [
+        (app_shell.RUN_EVENTS_BATCH_STORE_ID, "data")
+    ]
+    assert [(dep["id"], dep["property"]) for dep in spec["state"]] == [
+        (app_shell.PB_CELEBRATION_STYLE_STORE_ID, "data")
+    ]
+
+
 def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
     ids = _component_ids(app_shell.layout())
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
@@ -302,6 +409,20 @@ def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
     assert app_shell.PB_CELEBRATION_INTERVAL_ID in ids
     assert app_shell.RUN_EVENTS_BATCH_STORE_ID in ids
     assert app_shell.RUN_EVENTS_BATCH_STORE_ID not in _component_ids(home.layout())
+
+
+def _component(root, component_id):
+    """Find one component in a built layout by its id."""
+    stack = [root]
+    while stack:
+        current = stack.pop()
+        if getattr(current, "id", None) == component_id:
+            return current
+        children = getattr(current, "children", None)
+        if children is None:
+            continue
+        stack.extend(children if isinstance(children, list) else [children])
+    raise AssertionError(f"{component_id} is not in the layout")
 
 
 def _component_ids(component) -> set[str]:
@@ -439,7 +560,9 @@ def test_a_message_appended_mid_drain_is_seen_exactly_once(monkeypatch, frozen_c
         _RacingQueue([_message(run_id="early.csv", score=805.0)]),
     )
 
-    batch, *_emission = app_shell.publish_run_events(1, None, {})
+    batch, *_emission = app_shell.publish_run_events(
+        1, None, {}, CELEBRATION_STYLE_CONFETTI
+    )
 
     assert [run["run_id"] for run in batch["runs"]] == ["early.csv", "late.csv"]
     assert not app_shell.message_queue
