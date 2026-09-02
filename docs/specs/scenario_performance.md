@@ -7,9 +7,8 @@ options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
 reaches the chart automatically once its file is imported, and the page can
 follow the scenario just played. The page also hosts the setup surfaces that
-point you at Settings. They ask a fresh install for whatever it has not set
-yet. They also speak up when saved settings exist that this version of the app
-cannot read.
+point you at Settings, whether something has never been set or saved settings
+cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
