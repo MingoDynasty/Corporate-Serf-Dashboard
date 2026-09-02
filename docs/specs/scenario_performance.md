@@ -6,8 +6,9 @@ playlist rank thresholds available as overlay lines. A collapsible Chart
 options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
 reaches the chart automatically once its file is imported, and the page can
-follow the scenario just played. The page also hosts the first-run surfaces that
-point a fresh install at Settings.
+follow the scenario just played. The page also hosts the setup surfaces that
+point you at Settings, whether something has never been set or saved settings
+cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
@@ -219,7 +220,12 @@ of scope here.
 ## Hosted setup surfaces
 
 - The setup card renders above the controls row, one state at a time. The
-  stats-folder state shows "Finish setting up" over "No KovaaK's stats
+  unusable-store state shows "Your settings can't be read" over "A settings
+  file exists, but this version of the app can't use it, so the dashboard
+  started without your settings. Open Settings to see what's wrong and how to
+  fix it.", with "Open Settings" as its one action
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  The stats-folder state shows "Finish setting up" over "No KovaaK's stats
   folder was found, so the dashboard can't read your runs yet. Set it in
   Settings." with "Open Settings" as its one action. The identity state
   shows "Add your KovaaK's account" over "See your leaderboard position and
@@ -228,9 +234,9 @@ of scope here.
   anytime in Settings."
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
   The card is a panel wearing the shared alert treatment rather than a
-  `dmc.Alert`, because it holds a link and a button: the stats-folder state is
-  yellow with a warning icon beside its title, and the identity state blue
-  with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  `dmc.Alert`, because it holds a link and a button: the unusable-store and
+  stats-folder states are yellow with a warning icon beside the title, and the
+  identity state blue with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
 - The stats-folder hint is a single line above the controls: "No stats

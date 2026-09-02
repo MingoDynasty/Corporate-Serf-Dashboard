@@ -308,10 +308,13 @@ flowchart LR
   dropdown are `State` there, not `Input`: a Store replays its last value, so a
   control flip would otherwise re-forward a batch already processed.
   As the landing page it also carries the first-run setup card
-  (`_setup_card_children`), which renders while a settings key has never been
+  (`_setup_card_children`), which is suppressed while a stats-directory change
+  awaits a restart. It asks the store's read state before anything else: an
+  `ERROR` or `FUTURE` settings file gets a card of its own, because those
+  states read as no keys and the key-absence states below would take them for
+  a fresh install. Otherwise it renders while a settings key has never been
   written — an absent `stats_dir`, or an absent `kovaaks_username` once the
-  directory exists — and is suppressed while a stats-directory change awaits a
-  restart. It only links to `/settings`; its Skip button calls
+  directory exists. It only links to `/settings`; its Skip button calls
   `settings_service.decline_identity` and removes the card. Key *presence* is
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.

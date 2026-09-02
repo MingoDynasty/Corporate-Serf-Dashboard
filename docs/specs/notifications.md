@@ -62,7 +62,8 @@ their full behavior.
   that page is work in progress and has no capability spec; the Playlists
   leftover-files notice (playlists spec) is a blue `dmc.Paper`; the Home setup
   card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
-  in its identity state and yellow in its stats-folder state
+  in its identity state and yellow in its stats-folder and unusable-store
+  states
   ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
 
 ## Delivery
@@ -459,7 +460,7 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `rank-refresh-problem` | channel | "Position refresh failed" | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
 | `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" | green | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
-| `setup-card-skip-refused-notification` | channel | "Skip was not saved" | red | — | `skip_identity_setup`; settings spec |
+| `setup-card-skip-problem` | channel | "Skip was not saved" | red | — | `skip_identity_setup`; settings spec |
 | `imported-playlist-successful-{code}` | channel per playlist code | "Playlist imported" | green | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
 | `imported-playlist-visibility-failed-{code}` | channel per playlist code | "Playlist imported — not shown" | orange | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
 | `imported-playlist-failed-notification` | channel | "Playlist import failed" | red | — | `import_playlist`; playlists spec |

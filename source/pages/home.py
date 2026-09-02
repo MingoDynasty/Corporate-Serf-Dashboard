@@ -33,6 +33,7 @@ from source.config.settings_service import (
     get_identity,
     get_kovaaks_username,
     get_settings,
+    get_settings_store_state,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
 )
@@ -74,7 +75,7 @@ from source.utilities.notifications import (
     channel_toast,
     toast,
 )
-from source.utilities.store_schema import UnsupportedSchemaError
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -199,16 +200,31 @@ SETUP_CARD_STATS_DIR_BODY = (
     "No KovaaK's stats folder was found, so the dashboard can't read your runs "
     "yet. Set it in Settings."
 )
+# Shown when the settings file exists but cannot be used. The key-absence
+# states below cannot speak for it: an unusable store reads as no keys at all,
+# so they would claim a fresh install when a configured one is sitting on disk.
+SETUP_CARD_STORE_TITLE = "Your settings can't be read"
+SETUP_CARD_STORE_BODY = (
+    "A settings file exists, but this version of the app can't use it, so the "
+    "dashboard started without your settings. Open Settings to see what's "
+    "wrong and how to fix it."
+)
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
-# Shown when Skip cannot be recorded because the settings file belongs to a
-# newer build. The card has to stay up (nothing was written), so the toast is
-# what explains why the click appeared to do nothing.
-SETUP_CARD_SKIP_REFUSED_CHANNEL = "setup-card-skip-refused-notification"
+# Shown when Skip cannot be recorded, either because the settings file belongs
+# to a newer build or because the write itself failed. The card has to stay up
+# (nothing was written), so the toast is what explains why the click appeared
+# to do nothing. The two outcomes are mutually exclusive answers to the same
+# click, so they share one channel: a second attempt replaces whatever the
+# first one said instead of stacking a contradiction beside it.
+SETUP_CARD_SKIP_PROBLEM_CHANNEL = "setup-card-skip-problem"
 SETUP_CARD_SKIP_REFUSED_TITLE = "Skip was not saved"
 SETUP_CARD_SKIP_REFUSED_MESSAGE = (
     "The settings file was written by a newer version of this app. Update the "
     "app to change settings."
+)
+SETUP_CARD_SKIP_FAILED_MESSAGE = (
+    "Nothing was written. Try again, or see data/logs/debug.log for details."
 )
 # The primary action navigates, so it ships as one link wearing the button's
 # styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
@@ -1541,9 +1557,26 @@ def _setup_card_children() -> list:
     stacking the identity ask on top of it would be two banners for one
     unfinished action. The card comes back after the restart if identity is
     still unasked.
+
+    Key absence only means "never asked" for a store the app can read. An
+    unusable one -- a hand-edited typo, or a file stamped by a newer build --
+    yields no keys either, and startup detection declines to run against it, so
+    the key-absence states below would report a fresh install and a search that
+    never happened. That state gets its own card, which does nothing but route
+    to the Settings page, where the store alert already names the real problem
+    and distinguishes the two ways a store can be unusable.
     """
     if is_stats_dir_change_pending():
         return []
+    if get_settings_store_state() in (StoreState.ERROR, StoreState.FUTURE):
+        return [
+            _setup_card(
+                SETUP_CARD_STORE_TITLE,
+                SETUP_CARD_STORE_BODY,
+                offer_skip=False,
+                caution=True,
+            )
+        ]
     settings = get_settings()
     if STATS_DIR_KEY not in settings:
         return [
@@ -1595,11 +1628,16 @@ def skip_identity_setup(n_clicks, toast_channels):
     once on page load with nothing having triggered it, and a page load must
     never answer a question the user has not been asked yet.
 
-    A settings file stamped by a newer build refuses the write. The card then
-    has to stay up -- taking it away would claim a decline that was never
+    Two things can stop the write. A settings file stamped by a newer build
+    refuses it, and the write itself can fail on an unwritable ``data/``. Both
+    leave the card up -- taking it away would claim a decline that was never
     recorded, and it would be back on the next load anyway -- so the toast is
-    what explains why the click appeared to do nothing. It is a channel, so a
-    second Skip click re-pops the same answer instead of clicking into silence.
+    what explains why the click appeared to do nothing. Without the ``OSError``
+    guard the callback 500s instead, and the click reads as nothing at all.
+
+    Both report on one channel, so a second Skip click re-pops the current
+    answer instead of clicking into silence, and a retry that fails differently
+    replaces the first explanation rather than sitting beside it.
     """
     if not n_clicks or ctx.triggered_id != SETUP_CARD_SKIP_ID:
         return no_update, no_update, no_update, no_update
@@ -1608,9 +1646,24 @@ def skip_identity_setup(n_clicks, toast_channels):
     except UnsupportedSchemaError:
         logger.warning("Refused to record the declined identity ask")
         notification = toast(
-            SETUP_CARD_SKIP_REFUSED_CHANNEL,
+            SETUP_CARD_SKIP_PROBLEM_CHANNEL,
             SETUP_CARD_SKIP_REFUSED_TITLE,
             SETUP_CARD_SKIP_REFUSED_MESSAGE,
+            color="red",
+            icon=local_icon("material-symbols:warning-outline"),
+        )
+        return no_update, *channel_toast(notification, toast_channels)
+    except OSError:
+        # A locked, full, or read-only ``data/`` leaves the store exactly as it
+        # was: the write is a temp file plus an atomic replace, so there is
+        # nothing to clean up and nothing to undo. Separate from the refusal
+        # above because the remedy is the opposite -- retrying, not updating
+        # the app.
+        logger.exception("Failed to record the declined identity ask")
+        notification = toast(
+            SETUP_CARD_SKIP_PROBLEM_CHANNEL,
+            SETUP_CARD_SKIP_REFUSED_TITLE,
+            SETUP_CARD_SKIP_FAILED_MESSAGE,
             color="red",
             icon=local_icon("material-symbols:warning-outline"),
         )
