@@ -460,8 +460,8 @@ milliseconds against a 120 s budget, never a celebration. A celebration
 decided during a throttled drain lands correctly because the toast is
 sticky and the animation holds until the tab is visible (D8).
 
-The poll period is part of the window because `polling_interval` has no
-upper bound. A run can be a whole period old through nothing
+The poll period is part of the window because `polling_interval` carries no
+product cap. A run can be a whole period old through nothing
 but the drain's cadence, so a fixed cap below the configured period would
 stamp every run stale and silently retire every toast liveness gates —
 the celebration and the page's ordinary run toasts alike — while the plot
@@ -472,9 +472,12 @@ nothing about the ratified behaviour changes at any ordinary setting. The
 accepted consequence, stated rather than hidden: a deliberately slow poll
 widens no-tab replay by exactly the period it chose, which is the same
 scale on which that configuration already receives everything else.
-Validating `polling_interval` with an upper bound instead was rejected —
-it would refuse a config file that loads today, trading a missing toast
-for a refused startup.
+Validating `polling_interval` with a *product* upper bound instead — one
+tight enough to keep this window small — was rejected: it would refuse a
+config file that loads today, trading a missing toast for a refused
+startup. The `2147483647` ms ceiling the field later gained is browser
+representability, not that cap, and refuses no period a browser timer
+could have honoured.
 
 This interval is the first poll outside Scenario Performance: it adds one
 request per second on every page for the life of the tab, which changes

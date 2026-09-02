@@ -2,7 +2,8 @@
 # This is an example configuration file.
 #
 
-# How often to poll for updates (in milliseconds). Must be greater than 0.
+# How often to poll for updates (in milliseconds).
+# Valid range: 1 to 2147483647, the largest delay a browser timer can hold.
 polling_interval = 1000  # 1 second
 
 # Port to use for the backend server. Valid range: 1 to 65535.

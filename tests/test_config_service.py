@@ -191,13 +191,19 @@ def test_ports_at_the_edges_of_the_range_load(
     assert _load_from(tmp_path, monkeypatch, f"port = {port}").port == port
 
 
-@pytest.mark.parametrize("polling_interval", [0, -5])
-def test_non_positive_polling_interval_is_refused_at_config_load(
+@pytest.mark.parametrize("polling_interval", [0, -5, 2147483648, 3000000000])
+def test_out_of_range_polling_interval_is_refused_at_config_load(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     polling_interval: int,
 ) -> None:
-    """A non-positive period is nonsense for the UI interval it feeds."""
+    """Both ends of the range are the same silent request flood.
+
+    The period is handed straight to ``window.setInterval``, whose delay is a
+    signed 32-bit int: a non-positive one is nonsense, and one above
+    ``2147483647`` overflows and fires immediately. Measured in Chromium,
+    ``2147483647`` never fired and ``2147483648`` fired at 0 ms.
+    """
     body = f"""
 port = 8050
 polling_interval = {polling_interval}
@@ -210,7 +216,7 @@ def test_positive_polling_interval_loads(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The default and an explicit positive value both load."""
+    """The default, an explicit positive value, and the upper edge all load."""
     defaulted = _load_from(tmp_path, monkeypatch, "port = 8050")
     assert defaulted.polling_interval == 1000
 
@@ -219,3 +225,9 @@ port = 8050
 polling_interval = 250
 """
     assert _load_from(tmp_path, monkeypatch, body).polling_interval == 250
+
+    edge = """
+port = 8050
+polling_interval = 2147483647
+"""
+    assert _load_from(tmp_path, monkeypatch, edge).polling_interval == 2147483647
