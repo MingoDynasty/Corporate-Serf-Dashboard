@@ -185,8 +185,9 @@ storage_type="local")` in the app shell holds one string: `"off"` or a style
 name, defaulting to `"confetti"`. The value was a style name from the start
 even though version one shipped a switch, so the follow-up that turned the
 switch into a style select only added values to a contract that already
-existed and kept whatever was saved. The control initializes from the store and writes
-back to it and carries no Dash persistence of its own, so a switch's boolean
+existed and kept whatever was saved. The control initializes from the store
+and writes back to it and carries no Dash persistence of its own, so a
+switch's boolean
 and a select's string never become two competing persisted values. The drain
 reads the store as `State`, and so does the clientside animation: changing the
 setting must not replay a batch already delivered.

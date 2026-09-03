@@ -303,8 +303,8 @@ toasts under, and it applies to every toast the app adds from here on
   clientside callback on `run-events-batch`, with the style store as `State`,
   so no server round trip separates the decision from the burst. It holds a
   name-keyed registry of four styles, all played through the vendored
-  `assets/vendor/canvas-confetti.js` (1.9.4, ISC) and all spent in about three
-  seconds: `confetti` is the upstream Realistic Look recipe unchanged;
+  `assets/vendor/canvas-confetti.js` (1.9.4, ISC) and all bounded to about
+  three seconds: `confetti` is the upstream Realistic Look recipe unchanged;
   `fireworks` is the upstream Fireworks recipe cut to 3 s; `cannons` is School
   Pride cut to 2.5 s in Mantine's primary blue (`#228be6`) and white; `stars`
   is the upstream Stars recipe unchanged. An unknown style name plays

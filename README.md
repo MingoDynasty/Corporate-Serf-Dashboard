@@ -23,7 +23,8 @@ notifications update automatically in the background.
   dismiss it so the news survives a fullscreen session. If the window was covered when the run
   landed, the animation waits until you come back to it. A Settings control picks the animation,
   Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with a Preview button
-  beside it, and it is its own family, so Run Notifications does not silence it. A reduced-motion preference keeps the toast and drops the animation.
+  beside it, and it is its own family, so Run Notifications does not silence it.
+  A reduced-motion preference keeps the toast and drops the animation.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
