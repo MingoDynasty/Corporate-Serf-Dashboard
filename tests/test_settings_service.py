@@ -568,6 +568,56 @@ def test_a_backup_never_replaces_an_earlier_backup(settings_path):
     ) == "second corruption"
 
 
+def test_a_backup_holds_the_incumbent_byte_for_byte(tmp_path):
+    """Bytes, not text: an undecodable file is exactly what a backup is for."""
+    path = tmp_path / "settings.json"
+    path.write_bytes(b"\xff\xfe\x00garbage")
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-1.bak"
+    assert backup.read_bytes() == b"\xff\xfe\x00garbage"
+    assert path.read_bytes() == b"\xff\xfe\x00garbage"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_backup_skips_a_name_that_already_exists_on_disk(tmp_path):
+    """The claim is exclusive, so a stray backup is never overwritten."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+    incumbent_backup = tmp_path / "settings.json.corrupt-1.bak"
+    incumbent_backup.write_text("an earlier corruption", encoding="utf-8")
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-2.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+    assert incumbent_backup.read_text(encoding="utf-8") == "an earlier corruption"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_backup_leaves_no_temp_file_when_a_name_claim_fails(tmp_path, monkeypatch):
+    """The bytes are durable before any name is claimed; the temp never lingers."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+    real_link = store_schema.os.link
+    attempts = []
+
+    def refuse_the_first_claim(source, destination):
+        attempts.append(destination)
+        if len(attempts) == 1:
+            raise FileExistsError(destination)
+        real_link(source, destination)
+
+    monkeypatch.setattr(store_schema.os, "link", refuse_the_first_claim)
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-2.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
 def test_a_failed_replace_after_a_backup_leaves_the_original_in_place(
     settings_path,
     monkeypatch,

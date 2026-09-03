@@ -33,6 +33,7 @@ A stamp routes a payload to a validator; it never vouches for the payload.
 import json
 import logging
 import os
+import threading
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -59,7 +60,7 @@ SETTINGS_V1_KEYS = frozenset({STATS_DIR_KEY, KOVAAKS_USERNAME_KEY, STEAM_ID_KEY}
 SHOWN_PLAYLISTS_KEY = "shown_playlists"
 
 # A backup name that can never collide with a real store file or with an
-# earlier backup: the counter advances until an exclusive create succeeds.
+# earlier backup: the counter advances until an exclusive link succeeds.
 _BACKUP_NAME_TEMPLATE = "{name}.corrupt-{counter}.bak"
 _MAX_BACKUP_ATTEMPTS = 1000
 
@@ -223,22 +224,40 @@ def back_up_unusable_store(path: Path) -> Path:
     stays exactly where it is until the atomic replace lands, so a failure
     anywhere in the write leaves the original in place *and* a backup beside it.
     Raises ``OSError`` when the copy cannot be made, which refuses the write.
+
+    The bytes go to a uniquely named temp file first and are made durable
+    there; each candidate name is then claimed by hard-linking that temp file
+    into place, which fails on an existing target rather than replacing it. So
+    a backup name never appears until it already holds the whole file: a crash
+    or a full disk mid-write leaves no truncated ``.bak`` masquerading as a
+    complete one. A filesystem that refuses hard links raises ``OSError``,
+    which is the same refuse-the-write contract as any other copy failure.
     """
     data = path.read_bytes()
-    for counter in range(1, _MAX_BACKUP_ATTEMPTS + 1):
-        backup = path.with_name(
-            _BACKUP_NAME_TEMPLATE.format(name=path.name, counter=counter)
-        )
-        try:
-            # Exclusive create: a backup never replaces an earlier backup.
-            with open(backup, "xb") as file:
-                file.write(data)
-                file.flush()
-                os.fsync(file.fileno())
-        except FileExistsError:
-            continue
-        logger.warning("Copied the unusable file %s aside to %s.", path, backup)
-        return backup
+    # Distinct from ``atomic_write_text``'s temp name for the same destination:
+    # this runs inside that function's ``before_replace`` hook, where the
+    # house-shaped name would collide with the pending write's own temp file.
+    temp = path.with_name(
+        f".{path.name}.corrupt.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
+    try:
+        with open(temp, "wb") as file:
+            file.write(data)
+            file.flush()
+            os.fsync(file.fileno())
+        for counter in range(1, _MAX_BACKUP_ATTEMPTS + 1):
+            backup = path.with_name(
+                _BACKUP_NAME_TEMPLATE.format(name=path.name, counter=counter)
+            )
+            try:
+                # Exclusive link: a backup never replaces an earlier backup.
+                os.link(temp, backup)
+            except FileExistsError:
+                continue
+            logger.warning("Copied the unusable file %s aside to %s.", path, backup)
+            return backup
+    finally:
+        temp.unlink(missing_ok=True)
     msg = f"No free backup name beside {path} after {_MAX_BACKUP_ATTEMPTS} tries."
     raise OSError(msg)
 
