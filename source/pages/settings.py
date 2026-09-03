@@ -21,8 +21,22 @@ from urllib.parse import urlencode
 
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, callback, ctx, dcc, no_update
+from dash import (
+    Input,
+    Output,
+    State,
+    callback,
+    clientside_callback,
+    ctx,
+    dcc,
+    no_update,
+)
 
+from source.app_shell import (
+    CELEBRATION_STYLE_CONFETTI,
+    CELEBRATION_STYLE_OFF,
+    PB_CELEBRATION_STYLE_STORE_ID,
+)
 from source.components.local_icon import local_icon
 from source.config.identity_detection import (
     IdentityCandidate,
@@ -159,6 +173,28 @@ DISCOVERY_FAILED_STATUS = (
     "Steam's account list could not be read, so accounts on this machine may "
     "have been missed. See data/logs/debug.log."
 )
+
+CELEBRATIONS_HEADING = "Celebrations"
+CELEBRATION_LABEL = "Personal best celebration"
+# The last sentence keeps this section's instant model from blurring into the
+# Save-then-restart model of the form above it.
+CELEBRATION_DESCRIPTION = (
+    "Plays a short animation and shows a toast when a run beats your personal "
+    "best in any scenario. Works on every page, and does not depend on Run "
+    "Notifications. Takes effect right away."
+)
+PREVIEW_LABEL = "Preview"
+
+CELEBRATION_SWITCH_ID = "app-settings-celebration-switch"
+CELEBRATION_PREVIEW_BUTTON_ID = "app-settings-celebration-preview-button"
+# A clientside callback needs an output and Preview has nothing to write.
+CELEBRATION_PREVIEW_SIGNAL_ID = "app-settings-celebration-preview-signal"
+# One tick after mount, which is what shows the stored setting on a control the
+# store cannot write to directly. The store is the authoritative value, so the
+# obvious pair -- store to switch, switch to store -- would be a dependency
+# cycle; reading the store as ``State`` behind a one-shot interval is the same
+# initialization without one.
+CELEBRATION_INIT_INTERVAL_ID = "app-settings-celebration-init-interval"
 
 
 def _is_steam_id64(steam_id: str) -> bool:
@@ -694,6 +730,117 @@ def _identity_detection() -> dmc.Stack:
     )
 
 
+@callback(
+    Output(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    Input(CELEBRATION_SWITCH_ID, "checked"),
+    State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
+    prevent_initial_call=True,
+)
+def set_celebration_style(checked, initialized):
+    """Write the switch's position to the browser-local style store.
+
+    The store is the setting; this control is a view of it. The value is a
+    style name from the start rather than a boolean, so the follow-up that
+    turns this switch into a style select only adds values to a contract that
+    already exists, and the saved setting survives that change.
+
+    Nothing is written before the initializing tick, and that gate is
+    load-bearing: mounting the page fires this callback with the switch's
+    layout default despite ``prevent_initial_call`` and despite the triggering
+    id being the switch, which would write the on value over a stored off
+    before the browser's own value had even been shown. Ordering makes the
+    gate safe rather than lucky -- once the tick has landed the switch already
+    holds the stored value, so the worst a late mount-fire can write is the
+    value that was there.
+    """
+    if not initialized:
+        return no_update
+    return CELEBRATION_STYLE_CONFETTI if checked else CELEBRATION_STYLE_OFF
+
+
+@callback(
+    Output(CELEBRATION_SWITCH_ID, "checked"),
+    Input(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
+def show_stored_celebration_style(_n_intervals, style):
+    """Show the stored setting once the browser has handed its value over.
+
+    Anything but the off value reads as on, which is the direction this setting
+    fails in everywhere: a value written by a build with more styles than this
+    one still leaves celebrations enabled rather than silently disabling them.
+    """
+    return style != CELEBRATION_STYLE_OFF
+
+
+# Preview goes through the same clientside path a real celebration takes, so it
+# obeys the reduced-motion guard and answers with exactly what a personal best
+# would play. It shows no toast: the toast reports a run, and there is no run
+# here. The hidden-tab hold cannot apply either, since clicking needs a visible
+# tab.
+clientside_callback(
+    """
+    (nClicks, style) => {
+        if (nClicks && window.pbCelebration) {
+            window.pbCelebration.play(style);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output(CELEBRATION_PREVIEW_SIGNAL_ID, "data"),
+    Input(CELEBRATION_PREVIEW_BUTTON_ID, "n_clicks"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
+
+
+def _celebrations_section() -> dmc.Stack:
+    """Build the Celebrations section: the switch, its description, Preview.
+
+    Outside the Save form deliberately. It applies the moment it is flipped and
+    is stored in this browser rather than in ``data/settings.json``, so it
+    touches neither the restart notice nor the store alert, both of which speak
+    for the three keys the form writes.
+    """
+    return dmc.Stack(
+        children=[
+            dmc.Title(CELEBRATIONS_HEADING, order=3),
+            dmc.Group(
+                children=[
+                    dmc.Switch(
+                        id=CELEBRATION_SWITCH_ID,
+                        label=CELEBRATION_LABEL,
+                        description=CELEBRATION_DESCRIPTION,
+                        # Mirrors the store's own default, so the only browser
+                        # that sees this position corrected a tick later is one
+                        # that has turned the celebration off.
+                        checked=True,
+                        w=_FIELD_WIDTH,
+                    ),
+                    dmc.Button(
+                        PREVIEW_LABEL,
+                        id=CELEBRATION_PREVIEW_BUTTON_ID,
+                        # Secondary, like Detect: Save is the only button on
+                        # this page that changes anything on disk.
+                        variant="default",
+                    ),
+                ],
+                gap="md",
+                align="center",
+            ),
+            dcc.Interval(
+                id=CELEBRATION_INIT_INTERVAL_ID,
+                interval=1,
+                n_intervals=0,
+                max_intervals=1,
+            ),
+            dcc.Store(id=CELEBRATION_PREVIEW_SIGNAL_ID),
+        ],
+        gap="sm",
+    )
+
+
 # Per Dash documentation, we should include **kwargs in case the layout receives unexpected query strings.
 def layout(**kwargs):  # noqa: ARG001
     """Build the settings form from the stored values.
@@ -755,6 +902,8 @@ def layout(**kwargs):  # noqa: ARG001
                 id="app-settings-restart-notice",
                 className=notice_class,
             ),
+            dmc.Divider(),
+            _celebrations_section(),
             dmc.Divider(),
             _version_section(),
         ],

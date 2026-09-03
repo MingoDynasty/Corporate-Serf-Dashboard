@@ -3,20 +3,11 @@
 The dashboard stays quiet during normal play and interrupts only for
 something the player did, a run worth celebrating, or a failure they would
 act on. A condition that stays true is explained where it happens instead of
-popping up again on every trigger. A run earns at most one notification, its
-title states the verdict, and the next run replaces it rather than stacking
-beside it. That is the general rule: a message answering something you did
-replaces its own previous copy, popping back onto the screen so a retry always
-gets a visible answer, while messages about different things stack side by
-side. A background report that folds several events into one summary is the
-deliberate exception and keeps batching instead. A success also clears the
-failure message it answers. A run that beats
-your personal best is the exception the app makes
-for itself: it gets its own toast, on whatever page you are looking at, and
-that one stays until you dismiss it. One switch in Chart options silences the
-ordinary run notifications while the chart keeps updating. Toasts and the
-notices printed into the page share one severity color scale, so a color means
-the same thing wherever it appears.
+popping up again on every trigger. A message answering something you did
+replaces its own previous copy and pops back onto the screen, so a retry
+always gets a visible answer, while messages about different things stack
+side by side. Toasts and the notices printed into the page share one severity
+color scale, so a color means the same thing wherever it appears.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -285,8 +276,15 @@ toasts under, and it applies to every toast the app adds from here on
   qualifies: a tie never celebrates, and a scenario's first run only sets the
   baseline. At most one run per batch is named, so an older qualifying run in
   the same batch is not celebrated. `animation_sequence` advances by one
-  exactly when a run is named. The celebration is currently unconditional; the
-  setting that turns it off ships with the animation.
+  exactly when a run is named.
+- The drain reads the celebration setting as `State`
+  ([settings.md](settings.md#celebrations)). With it off it names no run, so
+  nothing is stamped, the sequence stands still, and no celebration toast goes
+  out; the batch still publishes every run with its liveness stamp, and the
+  page narrates it under the ordinary rules below. Only the exact value `off`
+  silences the family: any other stored value, including one a later build
+  wrote and a store the browser has lost, still celebrates
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - The celebration toast is green with a trophy icon, titled "New personal
   best", and stays until dismissed. Its channel key is `pb-celebration`,
   deliberately not `run-verdict`, so an ordinary run toast lands beside it
@@ -301,6 +299,28 @@ toasts under, and it applies to every toast the app adds from here on
   `{scenario}: {score:.2f}. Up {pct:.1f}% on your previous best of {previous:.2f}.`;
   with a zero or negative one, which has no percentage to give, it is
   `{scenario}: {score:.2f}. Your previous best was {previous:.2f}.`
+- The animation lives in `assets/pbCelebration.js` and is driven by a
+  clientside callback on `run-events-batch`, with the style store as `State`,
+  so no server round trip separates the decision from the burst. Version one
+  registers one style, `confetti`: the upstream Realistic Look recipe, about
+  three seconds, played through the vendored `assets/vendor/canvas-confetti.js`
+  (1.9.4, ISC). An unknown style name plays it too, so a style retired later
+  never silently turns celebrations off
+  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+- It plays nothing when the setting is off and nothing when the browser
+  prefers reduced motion; the toast still shows in that case, because it is
+  informational and under reduced motion it is the whole celebration. A burst
+  still in flight is cancelled before a new one starts. `animation_sequence`
+  is what makes a repeat play at all: the same sequence never replays, and a
+  payload naming no run plays nothing
+  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+- While the tab is hidden — a fully occluded window counts as hidden under
+  Chromium's occlusion tracking — the burst is not dropped. At most one
+  celebration is held, a newer one replacing it, and it plays on the next
+  `visibilitychange` to visible; the toast is already on screen and stays
+  until dismissed. The Settings page's Preview never reaches that path,
+  because clicking it needs a visible tab
+  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
 - Scenario Performance's `check_for_new_data` consumes `run-events-batch` as
   its only `Input`, with the follow switch and the scenario dropdown as
   `State`. It lands on the most recently played scenario when the follow
@@ -372,12 +392,17 @@ toasts under, and it applies to every toast the app adds from here on
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - The Run Notifications master switch (`run-notification-switch`, on by
   default; help text "Controls threshold verdict and placement notifications
-  for your runs.") gates the page-built shapes through one early return at the
-  top of the producing function, ahead of the celebration yield, so master off
-  is silent whether or not the run was celebrated. It does not gate the
-  celebration toast, which the shell produces and which no setting governs
-  yet, nor the run-import failure toast, the plot update, scenario
-  auto-switching, or the rank, Steam ID, and playlist toast families. It is
+  for your runs. Personal best celebrations use their own setting.") gates the
+  page-built shapes through one early return at the top of the producing
+  function, ahead of the celebration yield, so master off is silent whether or
+  not the run was celebrated. It does not gate the celebration, which the
+  shell produces and which the Celebrations setting governs alone
+  ([settings.md](settings.md#celebrations)); the two are independent families,
+  so master off with celebrations on still celebrates a personal best on every
+  page while ordinary runs stay silent
+  ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+  It does not gate the run-import failure toast, the plot update, scenario
+  auto-switching, or the rank, Steam ID, and playlist toast families either. It is
   read as `State`, so flipping it never rebuilds the plot
   ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
 - The Score Threshold Verdict switch (`score-threshold-notification-switch`,

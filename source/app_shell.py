@@ -26,6 +26,24 @@ from source.utilities.notifications import (
 RUN_EVENTS_BATCH_STORE_ID = "run-events-batch"
 PB_CELEBRATION_INTERVAL_ID = "pb-celebration-interval"
 
+# The celebration setting itself: one browser-local string, "off" or a style
+# name. It is the authoritative value rather than a mirror of the Settings
+# control, so the control initializes from it and writes to it and carries no
+# persistence of its own. Shell-hosted because both readers are here -- the
+# drain and the animation -- and because the setting is app-wide.
+PB_CELEBRATION_STYLE_STORE_ID = "pb-celebration-style"
+CELEBRATION_STYLE_OFF = "off"
+CELEBRATION_STYLE_CONFETTI = "confetti"
+# Only the exact off value silences the celebration. Every other reading of the
+# store -- a value this build does not know, a browser that cleared its site
+# data -- falls through to celebrating, which is the direction browser-local
+# storage should fail in.
+DEFAULT_CELEBRATION_STYLE = CELEBRATION_STYLE_CONFETTI
+
+# A clientside callback needs an output, and the animation has nothing to
+# write: this store is that output and never holds anything.
+PB_CELEBRATION_SIGNAL_STORE_ID = "pb-celebration-signal"
+
 # How much older than one delivery a run may be and still count as news.
 # Freshness needs no drain bookkeeping -- every drain empties the queue, so a
 # message a drain finds was never seen by an earlier one -- and this wall-clock
@@ -250,9 +268,10 @@ def _next_animation_sequence(
     Input(PB_CELEBRATION_INTERVAL_ID, "n_intervals"),
     State(RUN_EVENTS_BATCH_STORE_ID, "data"),
     State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def publish_run_events(_n_intervals, previous_batch, toast_channels):
+def publish_run_events(_n_intervals, previous_batch, toast_channels, celebration_style):
     """Drain the run-event queue and publish one batch for the whole app.
 
     The single consumer of ``message_queue``. Facts travel and only this
@@ -269,13 +288,18 @@ def publish_run_events(_n_intervals, previous_batch, toast_channels):
     :param previous_batch: the batch this client last received, for its
         animation sequence.
     :param toast_channels: this client's toast channel instance registry.
+    :param celebration_style: this browser's celebration setting. Off stamps no
+        decision and sends no toast; the batch is published either way, because
+        the plot is every run's record whatever the setting says.
     :return: the new batch, and the celebration emission when one is earned
     """
     runs = _drain_message_queue(datetime.now(), _run_event_freshness_seconds())
     if not runs:
         return no_update, no_update, no_update, no_update
 
-    celebrated = _celebrated_run(runs)
+    celebrated = (
+        None if celebration_style == CELEBRATION_STYLE_OFF else _celebrated_run(runs)
+    )
     batch: RunEventBatch = {
         "runs": runs,
         "celebrated_run_id": celebrated["run_id"] if celebrated else None,
@@ -284,6 +308,29 @@ def publish_run_events(_n_intervals, previous_batch, toast_channels):
     if celebrated is None:
         return batch, no_update, no_update, no_update
     return batch, *channel_toast(_celebration_toast(celebrated), toast_channels)
+
+
+# The animation, driven entirely in the browser: the burst is a canvas effect
+# with nothing to tell the server, so a round trip here would only add latency
+# to the one moment that is supposed to feel immediate. ``celebrate`` holds
+# every guard -- the decision, the monotonic sequence that stops one payload
+# playing twice, Off, reduced motion, and the hidden-tab hold -- in
+# ``assets/pbCelebration.js``. The style is ``State``: changing the setting
+# must not replay the batch already on screen.
+clientside_callback(
+    """
+    (batch, style) => {
+        if (window.pbCelebration) {
+            window.pbCelebration.celebrate(batch, style);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output(PB_CELEBRATION_SIGNAL_STORE_ID, "data"),
+    Input(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
 
 
 discord_component = dmc.Tooltip(
@@ -365,6 +412,17 @@ def layout(**kwargs):  # noqa: ARG001
                     # reaches the screen whatever page is open; that page
                     # listens to the store instead of popping the queue.
                     dcc.Store(id=RUN_EVENTS_BATCH_STORE_ID),
+                    # The celebration setting, and the output the animation's
+                    # clientside callback needs but never writes. The setting
+                    # is browser-local rather than a key in the app's settings
+                    # store: a cosmetic preference should not be the thing
+                    # that forces that file's first schema migration.
+                    dcc.Store(
+                        id=PB_CELEBRATION_STYLE_STORE_ID,
+                        storage_type="local",
+                        data=DEFAULT_CELEBRATION_STYLE,
+                    ),
+                    dcc.Store(id=PB_CELEBRATION_SIGNAL_STORE_ID),
                     dcc.Interval(
                         id=PB_CELEBRATION_INTERVAL_ID,
                         interval=_drain_interval_ms(),

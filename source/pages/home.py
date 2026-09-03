@@ -111,7 +111,8 @@ SETTINGS_HELP_TEXT = {
         "judged against the score threshold. Needs Run Notifications turned on."
     ),
     "run-notification": (
-        "Controls threshold verdict and placement notifications for your runs."
+        "Controls threshold verdict and placement notifications for your runs. "
+        "Personal best celebrations use their own setting."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "

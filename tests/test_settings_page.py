@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import dash
 import pytest
 from dash import no_update
+from dash._callback import GLOBAL_CALLBACK_LIST
 
 from source.config import settings_service
 from source.config.identity_detection import (
@@ -883,3 +884,146 @@ def test_a_recovery_save_clears_the_alert_without_a_reload(clicked):
 
     assert alert == ""
     assert alert_class == settings_page.STORE_ALERT_HIDDEN_CLASS
+
+
+# --- the Celebrations section ------------------------------------------
+
+# What the Save button writes. The celebration controls sit outside the form,
+# so nothing here may appear among their outputs, and none of theirs here.
+FORM_OUTPUT_IDS = (
+    "app-settings-stats-dir",
+    "app-settings-steam-id",
+    "app-settings-save-status",
+    "app-settings-store-alert",
+    "app-settings-restart-notice",
+)
+
+
+def _callback_output(fragment: str) -> str:
+    """Return the one registered callback id whose output list holds this."""
+    (spec,) = [spec for spec in GLOBAL_CALLBACK_LIST if fragment in str(spec["output"])]
+    return str(spec["output"])
+
+
+def _callback_spec(fragment: str):
+    (spec,) = [spec for spec in GLOBAL_CALLBACK_LIST if fragment in str(spec["output"])]
+    return spec
+
+
+def test_the_switch_writes_a_style_name_to_the_store():
+    # A style name from the start, not a boolean: the follow-up that turns this
+    # switch into a style select then only adds values to the same contract.
+    assert settings_page.set_celebration_style(True, 1) == "confetti"
+    assert settings_page.set_celebration_style(False, 1) == "off"
+
+
+def test_mounting_the_page_never_writes_the_switch_default_over_the_store():
+    """Opening Settings must not turn the celebration back on.
+
+    Mounting the page fires this callback with the switch's layout default
+    despite ``prevent_initial_call``, and the triggering id is the switch
+    itself, so the initializing tick is what tells the two apart: before it,
+    the control is still showing a default nobody chose.
+    """
+    assert settings_page.set_celebration_style(True, 0) is no_update
+    assert settings_page.set_celebration_style(True, None) is no_update
+
+
+def test_the_switch_shows_the_stored_setting():
+    assert settings_page.show_stored_celebration_style(1, "off") is False
+    assert settings_page.show_stored_celebration_style(1, "confetti") is True
+
+
+def test_a_store_this_build_cannot_read_still_shows_as_on():
+    """Browser-local storage fails towards the celebration, never into silence.
+
+    A cleared store reads as nothing, and a style name a later build wrote
+    means nothing here; both leave the switch on, which is what the store's own
+    default says.
+    """
+    assert settings_page.show_stored_celebration_style(1, None) is True
+    assert settings_page.show_stored_celebration_style(1, "fireworks") is True
+
+
+def test_the_switch_carries_no_persistence_of_its_own():
+    """The store is the setting; the control is a view of it.
+
+    Two persisted values for one preference is how a switch and the select that
+    replaces it end up disagreeing.
+    """
+    switch = _component_by_id(
+        settings_page.layout(), settings_page.CELEBRATION_SWITCH_ID
+    )
+
+    assert not hasattr(switch, "persistence")
+    assert switch.checked is True
+
+
+def test_the_section_renders_its_heading_control_and_preview():
+    layout = settings_page.layout()
+    switch = _component_by_id(layout, settings_page.CELEBRATION_SWITCH_ID)
+    preview = _component_by_id(layout, settings_page.CELEBRATION_PREVIEW_BUTTON_ID)
+    headings = [
+        component.children
+        for component in _titles(layout)
+        if component.children == settings_page.CELEBRATIONS_HEADING
+    ]
+
+    assert headings == [settings_page.CELEBRATIONS_HEADING]
+    assert switch.label == settings_page.CELEBRATION_LABEL
+    assert switch.description == settings_page.CELEBRATION_DESCRIPTION
+    assert preview.children == settings_page.PREVIEW_LABEL
+
+
+def test_preview_plays_in_the_browser_and_says_nothing():
+    """The same clientside path a real celebration takes, minus the toast.
+
+    The toast reports a run and there is no run here, so Preview writes only
+    its own dead-end output: no notification container, no server round trip.
+    """
+    spec = _callback_spec(settings_page.CELEBRATION_PREVIEW_SIGNAL_ID)
+
+    assert spec["clientside_function"] is not None
+    assert "sendNotifications" not in str(spec["output"])
+    assert [(dep["id"], dep["property"]) for dep in spec["state"]] == [
+        ("pb-celebration-style", "data")
+    ]
+
+
+def test_the_celebrations_section_stands_outside_the_save_form():
+    """It applies the moment it is flipped, and Save owns none of it.
+
+    The restart notice and the store alert speak for the three keys the form
+    writes to disk; a browser-local preference must not be able to disturb
+    either.
+    """
+    saved = _callback_output("app-settings-save-status.children")
+    celebration_ids = (
+        settings_page.CELEBRATION_SWITCH_ID,
+        settings_page.CELEBRATION_PREVIEW_SIGNAL_ID,
+        "pb-celebration-style",
+    )
+
+    for component_id in celebration_ids:
+        assert component_id not in saved
+    for component_id in celebration_ids:
+        written = _callback_output(f"{component_id}.")
+        assert not any(form_id in written for form_id in FORM_OUTPUT_IDS)
+
+
+def _titles(root):
+    """Every ``dmc.Title`` in a built layout, in no particular order."""
+    found = []
+    components = deque([root])
+    while components:
+        component = components.popleft()
+        if type(component).__name__ == "Title":
+            found.append(component)
+        children = getattr(component, "children", None)
+        if children is None:
+            continue
+        if isinstance(children, (list, tuple)):
+            components.extend(children)
+        else:
+            components.append(children)
+    return found
