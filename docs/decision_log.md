@@ -281,7 +281,7 @@ falls back to Confetti — a wrong answer rather than a visible failure. A
 JavaScript test harness was considered again here and again declined; the
 centralized cancellation is what shrinks the surface one would have covered.
 
-Shipped in PR #268, and the style select in #270; ruled on #248.
+Shipped in PR #268, and the style select in #272; ruled on #248.
 
 ## 2026-09-01: Configured Ports And Poll Intervals Are Bounded At Load
 

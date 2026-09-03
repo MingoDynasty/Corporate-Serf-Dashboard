@@ -39,9 +39,9 @@ sequence.
   Notifications. Run delivery moved into the app shell to make that possible,
   which retired the "While you were away" catch-up digest: a run no longer
   waits for a Scenario Performance visit to be announced. (PRs #261, #268,
-  #270; design in #248) Design rationale distilled into
+  #272; design in #248) Design rationale distilled into
   [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
-  into the choice of styles landed in #270, which closes the arc.
+  into the choice of styles landed in #272, which closes the arc.
 - **Alert color language** — the notices printed into the page now speak one
   severity scale, the same one the toasts already spoke: blue for
   information, yellow for caution, red for errors, each with a leading icon.
