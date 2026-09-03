@@ -160,7 +160,24 @@ fix. The graph-settings modal that held the other `Space(h="xs")` is gone
 
 ## Performance
 
-*(none currently tracked)*
+### One global lock serializes every cache file operation
+
+`_CACHE_IO_LOCK` in `source/kovaaks/api_service.py` is taken inside `_read_json`
+and `_write_json` themselves, so every cache read and write in the app
+serializes through it: the percentile warmup worker, the `playlist-fill-*`
+threads, rank-freshness refresh timers, the watchdog, and every request thread.
+Two holds are notably fat. `_write_json` spans an `fsync`. `save_leaderboard_id`
+does a full read-modify-write of the 434 KB, ~3,000-entry name-to-ID mapping on
+every call even when the stored ID is unchanged, because it still refreshes
+`fetched_at` (measured 2.3 ms parse + 11.6 ms write on a fast SSD; roughly 12x
+that on a slow one, once per warmed scenario).
+
+Each individual hold is a single file operation, so this cannot stall a page the
+way the warmup lock-scope defect could (see the 2026-09-02 decision-log entry).
+Found during that investigation and deliberately deferred: folding an app-wide
+cache-locking change into a targeted concurrency fix would have made the diff
+much harder to review. The cheap first step, if this is ever picked up, is
+making `save_leaderboard_id` a no-op when the stored ID already matches.
 
 ## Documentation
 

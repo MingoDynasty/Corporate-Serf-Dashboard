@@ -490,7 +490,16 @@ def _playlist_overview_warmup_state(observed_generation):
     if snapshot.enqueue_generation < observed_generation:
         return False, no_update, observed_generation
 
-    busy = bool(snapshot.queued_names) or snapshot.in_flight is not None
+    # `starting` covers the window before the worker is published: there is no
+    # generation counter to compare against yet, so an interval disarmed here
+    # would never observe the bump that publication and its parked enqueues
+    # produce, and the page would sit on stale percentiles until the next
+    # visit.
+    busy = (
+        snapshot.starting
+        or bool(snapshot.queued_names)
+        or snapshot.in_flight is not None
+    )
     new_generation = snapshot.enqueue_generation > observed_generation
     disabled = not (busy or new_generation)
     if snapshot.fatal_state:
