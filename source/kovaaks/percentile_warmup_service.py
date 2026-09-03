@@ -871,7 +871,19 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     with _worker_lock:
         if _worker is not None:
             return True
-        initial_queue = _startup_queue()
+
+    # Enumeration reads two cache files per played scenario, so it runs before
+    # the lock is taken: get_percentile_warmup_state needs the same lock, and
+    # this is reachable from a live callback (the settings save that first
+    # supplies a username), not only from pre-serving startup.
+    initial_queue = _startup_queue()
+
+    with _worker_lock:
+        # Another caller may have started the worker while this thread
+        # enumerated. Losing that race discards the queue just built rather
+        # than replacing a running worker.
+        if _worker is not None:
+            return True
         _worker = PercentileWarmupWorker(config, initial_queue)
         _worker.start()
     return True

@@ -814,3 +814,33 @@ def test_all_skip_drain_counts_each_unique_scenario_once(monkeypatch, caplog):
         )
         for message in messages
     )
+
+
+def test_startup_enumeration_runs_outside_the_worker_lock(monkeypatch):
+    """Starting the worker must not hold _worker_lock across enumeration.
+
+    get_percentile_warmup_state takes the same lock, and settings.py starts the
+    worker from a live callback when a username is first saved -- so holding it
+    across _startup_queue's two cache reads per played scenario would freeze the
+    Playlists page for the length of the enumeration.
+    """
+
+    class _FakeWorker:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def start(self):
+            return None
+
+    locked_during_enumeration = []
+
+    def probing_startup_queue():
+        locked_during_enumeration.append(warmup._worker_lock.locked())
+        return ["A"]
+
+    monkeypatch.setattr(warmup, "_worker", None)
+    monkeypatch.setattr(warmup, "_startup_queue", probing_startup_queue)
+    monkeypatch.setattr(warmup, "PercentileWarmupWorker", _FakeWorker)
+
+    assert warmup.start_percentile_warmup_worker(_config()) is True
+    assert locked_during_enumeration == [False]
