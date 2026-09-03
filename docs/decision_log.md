@@ -37,8 +37,12 @@ skip-drain, which reads two cache files per candidate. This only bites when the
 cache is warm: nothing returns early, so the loop walks the entire queue.
 Measured at 0.13s for 317 scenarios on a fast SSD and about 60s on a
 beta tester's disk, where per-file antivirus scanning makes small random reads
-roughly 400x slower. A direct callback measurement recorded 45.1s blocked
-versus 0.2s once the drain finished. `start_percentile_warmup_worker` held
+roughly 400x slower. A direct callback measurement, taken on the fast SSD with
+per-candidate latency injected into `_freshly_satisfied` to model the tester's
+disk, recorded 45.1s blocked versus 0.2s once the drain finished. That isolates
+the lock and only the lock: the overview's own row build reads two cache files
+per played scenario per row on the same disk, so the figure is not evidence
+that the tester's page renders promptly after this change. `start_percentile_warmup_worker` held
 `_worker_lock` across `_startup_queue()`, which reads two cache files per played
 scenario; harmless from `app.py` because it runs before the server accepts
 requests, but reachable from the settings save that first supplies a username.

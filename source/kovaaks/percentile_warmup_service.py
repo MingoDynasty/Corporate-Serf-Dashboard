@@ -921,7 +921,8 @@ def enqueue_playlist_percentile_warmup(playlist_code: str) -> int:
     """Prepend one newly visible/imported playlist, or no-op while disabled.
 
     Returns the number of scenarios queued now, so a code parked for a
-    still-starting worker reports 0. Callers use the count only for logging.
+    still-starting worker reports 0. Callers ignore the count; tests read it to
+    tell a parked code from a queued one.
     """
     config = get_config()
     # Same pre-enumeration guards as startup (R15).
