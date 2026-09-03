@@ -256,9 +256,15 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   pre-filled from the same label, and "Logs `<log directory>`" names where
   `debug.log` is
   ([2026-08-10](../decision_log.md#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)).
-- Every state-writing callback on the page guards on `n_clicks` and the
-  triggering id
+- Every callback that writes `data/settings.json` or spends a KovaaK's call
+  guards on its trigger: Save and Detect on `n_clicks` and the triggering id,
+  the picker on a chosen value and the triggering id
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  The Celebrations switch below is the one state-writing callback that does
+  neither, and deliberately: its write is browser-local, and the spurious call
+  it has to survive arrives *with* the switch as the triggering id, so it gates
+  on the initialization tick instead
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 ## Celebrations
 

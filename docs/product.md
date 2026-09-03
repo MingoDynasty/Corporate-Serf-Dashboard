@@ -42,15 +42,17 @@ list in the roadmap.)
   leads with the scenario, and the sensitivity is a trailing qualifier. The
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
-  nothing else. A run that beats your personal best is not reported here at
-  all: it gets the celebration below instead of the verdict. If runs accumulate
+  nothing else. A run that beats your personal best is not reported here at all
+  while the celebration below is on: it gets that instead of a verdict. Turn
+  celebrations off and it returns to this family, reported by whichever verdict
+  it earns like any other run. If runs accumulate
   while no tab is open, the next visit rebuilds once from final state instead
   of replaying stale toasts and selections; it narrates the most recent run if
   you come back within a couple of minutes of playing it, and anything older
   reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
   switch, Run Notifications: with it off the chart still updates and nothing
-  toasts about a routine run, though a personal best still celebrates and a run
-  file that failed to import still says so. The threshold switch beside the
+  toasts about a routine run, though a personal best still celebrates when
+  celebrations are on, and a run file that failed to import still says so. The threshold switch beside the
   percentage decides only whether a run is judged, never whether it toasts.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
