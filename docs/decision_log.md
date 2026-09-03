@@ -228,11 +228,18 @@ the switch already holds the stored value, so the worst a late mount-fire can
 write is the value that was there. Any future browser-local control on a page
 layout has the same hazard.
 
-**Accepted costs.** Browser persistence is per origin, is cleared with site
-data, and resets if the layout default ever changes. Every one of those fails
-towards "celebrations came back", never towards silence, which is why only the
-exact `"off"` value silences the family: a style name a later build wrote, or
-a store this build cannot read, still celebrates. One more, inherited rather
+**Accepted costs.** Browser persistence is per origin and is cleared with site
+data. Both fail towards "celebrations came back", never towards silence, which
+is why only the exact `"off"` value silences the family: a style name a later
+build wrote, or a store this build cannot read, still celebrates. The layout
+default is not a third cost: a `dcc.Store` writes it to storage only when
+nothing is stored yet and otherwise takes the stored value, so changing the
+default later resets nobody's setting. That is the opposite of Dash
+`persistence`, which keys the stored value on the layout default and drops it
+when that default moves (the
+[2026-08-20 point-customization entry](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+records the controls that pay it), and the distinction matters when the
+follow-up changes the default style. One more, inherited rather
 than introduced: `message_queue` is process-wide and each drain's payload
 reaches one client, so with two tabs open a batch lands in whichever drain
 runs first. That is the single-consumer shape the page's drain already had,
