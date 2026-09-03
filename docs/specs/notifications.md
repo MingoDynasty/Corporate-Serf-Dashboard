@@ -3,22 +3,11 @@
 The dashboard stays quiet during normal play and interrupts only for
 something the player did, a run worth celebrating, or a failure they would
 act on. A condition that stays true is explained where it happens instead of
-popping up again on every trigger. A run earns at most one notification, its
-title states the verdict, and the next run replaces it rather than stacking
-beside it. That is the general rule: a message answering something you did
-replaces its own previous copy, popping back onto the screen so a retry always
-gets a visible answer, while messages about different things stack side by
-side. A background report that folds several events into one summary is the
-deliberate exception and keeps batching instead. A success also clears the
-failure message it answers. A run that beats
-your personal best is the exception the app makes
-for itself: it gets a short burst of confetti and its own toast, on whatever
-page you are looking at, and that one stays until you dismiss it. A Settings
-switch turns that celebration off, and a separate switch in Chart options
-silences the ordinary run notifications while the chart keeps updating. The
-two settings do not reach each other. Toasts and the
-notices printed into the page share one severity color scale, so a color means
-the same thing wherever it appears.
+popping up again on every trigger. A message answering something you did
+replaces its own previous copy and pops back onto the screen, so a retry
+always gets a visible answer, while messages about different things stack
+side by side. Toasts and the notices printed into the page share one severity
+color scale, so a color means the same thing wherever it appears.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
