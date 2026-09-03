@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import threading
 
 import pytest
 
@@ -596,26 +598,74 @@ def test_a_backup_skips_a_name_that_already_exists_on_disk(tmp_path):
     assert not list(tmp_path.glob(".*.tmp"))
 
 
-def test_a_backup_leaves_no_temp_file_when_a_name_claim_fails(tmp_path, monkeypatch):
-    """The bytes are durable before any name is claimed; the temp never lingers."""
+def test_a_filesystem_that_refuses_hard_links_refuses_the_backup(tmp_path, monkeypatch):
+    """The claim is how the bytes get their name, so failing it refuses the write."""
     path = tmp_path / "settings.json"
     path.write_text("not json", encoding="utf-8")
-    real_link = store_schema.os.link
-    attempts = []
 
-    def refuse_the_first_claim(source, destination):
-        attempts.append(destination)
-        if len(attempts) == 1:
-            raise FileExistsError(destination)
-        real_link(source, destination)
+    def refuse_every_claim(_source, _destination):
+        # What a volume without hard-link support returns.
+        raise PermissionError(1, "Incorrect function")
 
-    monkeypatch.setattr(store_schema.os, "link", refuse_the_first_claim)
+    monkeypatch.setattr(store_schema.os, "link", refuse_every_claim)
+
+    with pytest.raises(OSError):
+        store_schema.back_up_unusable_store(path)
+
+    assert path.read_text(encoding="utf-8") == "not json"
+    assert not list(tmp_path.glob("*.bak"))
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def _backup_temp_name(path):
+    """The temp name ``back_up_unusable_store`` derives for this call site."""
+    return path.with_name(
+        f".{path.name}.corrupt.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
+
+
+def test_a_leftover_temp_never_truncates_the_backup_it_links_to(tmp_path):
+    """The temp name is fixed per store, process, and thread, and threads recur.
+
+    A leftover of that name is a second link to a backup an earlier call
+    claimed, so reopening it blind would rewrite that backup through the other
+    name -- the one thing the exclusive claim exists to prevent.
+    """
+    path = tmp_path / "settings.json"
+    path.write_text("first incumbent", encoding="utf-8")
+    earlier_backup = store_schema.back_up_unusable_store(path)
+    # Stands in for a previous call whose cleanup unlink the OS refused.
+    os.link(earlier_backup, _backup_temp_name(path))
+    path.write_text("second incumbent", encoding="utf-8")
 
     backup = store_schema.back_up_unusable_store(path)
 
+    assert earlier_backup.read_text(encoding="utf-8") == "first incumbent"
     assert backup.name == "settings.json.corrupt-2.bak"
-    assert backup.read_text(encoding="utf-8") == "not json"
+    assert backup.read_text(encoding="utf-8") == "second incumbent"
     assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_temp_that_cannot_be_removed_does_not_fail_a_claimed_backup(
+    tmp_path,
+    monkeypatch,
+):
+    """Bytes already durable under their own name must not refuse the write."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+    real_remove = store_schema.os.unlink
+
+    def refuse_to_remove_an_existing_temp(target):
+        if str(target).endswith(".tmp") and os.path.exists(target):
+            raise PermissionError(32, "held open by the indexer")
+        real_remove(target)
+
+    monkeypatch.setattr(store_schema.os, "unlink", refuse_to_remove_an_existing_temp)
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
 
 
 def test_a_failed_replace_after_a_backup_leaves_the_original_in_place(

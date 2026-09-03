@@ -241,6 +241,11 @@ def back_up_unusable_store(path: Path) -> Path:
         f".{path.name}.corrupt.{os.getpid()}.{threading.get_ident()}.tmp"
     )
     try:
+        # A leftover of this name is a second link to a backup an earlier call
+        # on this thread already claimed, left behind by an unlink the OS
+        # refused. Dropping the name is what stops the open below from
+        # truncating that backup through it; the backup keeps its own name.
+        temp.unlink(missing_ok=True)
         with open(temp, "wb") as file:
             file.write(data)
             file.flush()
@@ -257,7 +262,14 @@ def back_up_unusable_store(path: Path) -> Path:
             logger.warning("Copied the unusable file %s aside to %s.", path, backup)
             return backup
     finally:
-        temp.unlink(missing_ok=True)
+        try:
+            temp.unlink(missing_ok=True)
+        except OSError:
+            # A transient hold on the temp (the same antivirus/indexer class
+            # ``replace_with_retry`` exists for) must not fail a backup whose
+            # bytes are already durable under their own name. The unlink above
+            # clears the leftover on the next call.
+            logger.warning("Could not remove %s.", temp, exc_info=True)
     msg = f"No free backup name beside {path} after {_MAX_BACKUP_ATTEMPTS} tries."
     raise OSError(msg)
 
