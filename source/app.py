@@ -33,7 +33,7 @@ from source.config.settings_service import (
 )
 from source.config.stats_dir_detection import bootstrap_stats_dir
 from source.health import register_health_endpoint
-from source.kovaaks.api_service import set_request_timeout
+from source.kovaaks.api_service import make_cache, set_request_timeout
 from source.kovaaks.data_service import (
     initialize_kovaaks_data,
     load_playlists,
@@ -340,6 +340,9 @@ def main() -> None:
     set_request_timeout(config.kovaaks_api_timeout_seconds)
 
     load_playlists()
+
+    # Create the API cache tree before the first operation that consumes it.
+    make_cache()
 
     # Fold the bundled corpus's embedded leaderboard IDs into the permanent
     # name->ID mapping cache before any rank lookup needs them.

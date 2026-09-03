@@ -1861,6 +1861,3 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         leaderboard_total_cache_ttl_hours,
     )
     return _with_derived_rank_warning(rank_info, username, steam_id)
-
-
-make_cache()

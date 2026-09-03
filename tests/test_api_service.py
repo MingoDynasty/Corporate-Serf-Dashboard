@@ -3,6 +3,8 @@ import logging
 import os
 import re
 import shutil
+import subprocess
+import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -24,6 +26,7 @@ from source.kovaaks.api_models import (
 )
 from source.utilities import atomic_write
 from source.utilities.build_info import BuildInfo
+from source.utilities.paths import STATE_DIR_ENV_VAR
 
 TEST_CACHE_DIR = Path("tests/fixtures/generated/api_service_cache")
 
@@ -2675,3 +2678,32 @@ def test_search_scenario_exact_ignores_fuzzy_matches(monkeypatch):
     assert leaderboard_id == 98330
     assert api_service.get_cached_leaderboard_id("VT Pasu Intermediate S5") == 98330
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
+
+
+def test_importing_the_module_creates_nothing(tmp_path: Path) -> None:
+    """Importing api_service must not touch the state root.
+
+    The cache tree is built by ``make_cache()``, which startup calls; import
+    itself has no business creating directories or seeding the permanent
+    leaderboard mapping. A child process is required because this process
+    imported the module long ago.
+    """
+    state_root = tmp_path / "state"
+    state_root.mkdir()
+    environment = {
+        **os.environ,
+        "PYTHONPATH": str(Path(__file__).resolve().parents[1]),
+        STATE_DIR_ENV_VAR: str(state_root),
+    }
+
+    result = subprocess.run(
+        [sys.executable, "-c", "import source.kovaaks.api_service"],
+        env=environment,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=120,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert not (state_root / "data").exists()
