@@ -774,3 +774,39 @@ def test_a_newer_store_refuses_the_decline_and_keeps_its_bytes(settings_path):
 
     assert settings_path.read_text(encoding="utf-8") == stored
     assert not list(settings_path.parent.glob("*.bak"))
+
+
+def test_a_save_backs_up_a_file_corrupted_since_the_cached_read(settings_path):
+    """The guard reads disk, not the cache the action was decided on.
+
+    A settings file hand-mangled while the app runs used to be replaced on the
+    strength of what it was at the last read, so the corrupt bytes went out
+    with the write no backup was taken for.
+    """
+    _write(settings_path, {"kovaaks_username": "MingoDynasty"})
+    assert settings.get_settings() == {"kovaaks_username": "MingoDynasty"}
+
+    _write_raw(settings_path, "corrupted after the read")
+    settings.save_settings({"steam_id": "76561197986713986"})
+
+    backup = settings_path.parent / "settings.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "corrupted after the read"
+    assert settings.get_settings() == {"steam_id": "76561197986713986"}
+
+
+def test_a_decline_is_refused_by_a_future_file_written_since_the_cached_read(
+    settings_path,
+):
+    """The newer-build promise has to hold against the file, not the cache."""
+    _write(settings_path, {"steam_id": "76561197986713986"})
+    assert settings.get_settings() == {"steam_id": "76561197986713986"}
+
+    stored = json.dumps({"schema_version": 2, "kovaaks_username": "FromTheFuture"})
+    _write_raw(settings_path, stored)
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        settings.decline_identity()
+
+    assert settings_path.read_text(encoding="utf-8") == stored
+    assert not list(settings_path.parent.glob("*.bak"))
+    assert not list(settings_path.parent.glob(".*.tmp"))
