@@ -11,6 +11,7 @@ from dash.exceptions import PreventUpdate
 
 from source.config import settings_service
 from source.kovaaks import data_service, playlist_scenarios_service
+from source.kovaaks import percentile_warmup_service as warmup
 from source.kovaaks.data_models import PlaylistData, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
 from source.utilities.store_schema import UnsupportedSchemaError
@@ -73,6 +74,7 @@ def _warmup_snapshot(
     fatal_state=None,
     enqueue_generation=0,
     recent_pace_seconds=None,
+    starting=False,
 ):
     return PercentileWarmupSnapshot(
         queued_names=queued_names,
@@ -83,6 +85,7 @@ def _warmup_snapshot(
         fatal_state=fatal_state,
         enqueue_generation=enqueue_generation,
         recent_pace_seconds=recent_pace_seconds,
+        starting=starting,
     )
 
 
@@ -186,6 +189,32 @@ def test_playlists_overview_visibility_callback_ignores_phantom_initial_fire(
         no_update,
         no_update,
     )
+
+
+def test_poll_stays_armed_while_the_worker_is_starting(monkeypatch):
+    """A start that has not published its worker yet must not read as idle.
+
+    The settings save that first supplies a username begins the slow unlocked
+    enumeration; an import or unhide parks its code and bumps
+    playlists-rows-refresh; the row callback that fires then asks for warmup
+    state before the worker exists. Disarming the interval there would mean
+    nothing ever observes the generation bump that publication and the parked
+    drain go on to produce, leaving the page on stale percentiles.
+
+    Deliberately exercises the real get_percentile_warmup_state rather than a
+    stubbed snapshot: the defect lived in that function ignoring the module's
+    starting flag, which a stub would have hidden.
+    """
+    monkeypatch.setattr(warmup, "_worker", None)
+    monkeypatch.setattr(warmup, "_worker_starting", True)
+
+    disabled, status, generation = playlists._playlist_overview_warmup_state(0)
+
+    assert disabled is False
+    # No worker means no counts yet, so the strip stays silent while the
+    # interval keeps polling for the publication.
+    assert status == ""
+    assert generation == 0
 
 
 def test_worker_idle_then_unhide_rearms_live_refresh(monkeypatch):

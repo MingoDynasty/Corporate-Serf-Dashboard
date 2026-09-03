@@ -5,7 +5,7 @@ import threading
 import time
 from collections import deque
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from statistics import fmean
@@ -101,6 +101,12 @@ class PercentileWarmupSnapshot:
     fatal_state: str | None
     enqueue_generation: int
     recent_pace_seconds: float | None
+    # True from the moment a start claims the singleton until it has published
+    # its worker and drained the enqueues parked meanwhile. Consumers must read
+    # this as busy: before publication there is no generation counter to
+    # compare against, so a poll disarmed here would never observe the bumps
+    # that publication and the parked drain go on to produce.
+    starting: bool = False
 
 
 def _outcome(context: WarmupContext, key: str) -> SessionOutcome:
@@ -882,7 +888,6 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
             return True
         _worker_starting = True
 
-    pending: list[str] = []
     try:
         # Enumeration reads two cache files per played scenario, so it runs
         # with the lock released: get_percentile_warmup_state needs the same
@@ -897,15 +902,18 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
             _pending_enqueues.clear()
             _worker = worker
             worker.start()
+
+        # Outside the lock: enqueue_playlist reads playlists and stats of its
+        # own. These prepend, so a playlist made visible mid-enumeration is
+        # warmed first rather than behind the whole startup queue. The starting
+        # flag stays set across this drain deliberately: each enqueue bumps the
+        # generation a poll is watching for, so clearing it first would let one
+        # read the fresh worker as idle and disarm before those bumps land.
+        for playlist_code in pending:
+            worker.enqueue_playlist(playlist_code)
     finally:
         with _worker_lock:
             _worker_starting = False
-
-    # Outside the lock: enqueue_playlist reads playlists and stats of its own.
-    # These prepend, so a playlist made visible mid-enumeration is warmed
-    # first rather than behind the whole startup queue.
-    for playlist_code in pending:
-        worker.enqueue_playlist(playlist_code)
     return True
 
 
@@ -936,6 +944,7 @@ def get_percentile_warmup_state() -> PercentileWarmupSnapshot:
     """Return singleton progress, including a stable disabled/idle snapshot."""
     with _worker_lock:
         worker = _worker
+        starting = _worker_starting
     if worker is None:
         return PercentileWarmupSnapshot(
             queued_names=(),
@@ -946,5 +955,8 @@ def get_percentile_warmup_state() -> PercentileWarmupSnapshot:
             fatal_state=None,
             enqueue_generation=0,
             recent_pace_seconds=None,
+            starting=starting,
         )
-    return worker.snapshot()
+    # A published worker is still starting until its parked enqueues drain,
+    # and each of those bumps the generation the UI is watching for.
+    return replace(worker.snapshot(), starting=starting)

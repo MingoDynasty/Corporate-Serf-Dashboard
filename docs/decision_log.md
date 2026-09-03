@@ -60,6 +60,17 @@ arriving in it are parked in `_pending_enqueues`, and the starter adopts them in
 the same lock hold that publishes the worker. They are enqueued after
 publication, so they prepend ahead of the startup queue.
 
+**Starting is a busy state, not an idle one.** The snapshot carries a
+`starting` flag that is true from the moment a start claims the singleton until
+its parked enqueues have drained, and the overview reads it as busy. Without
+it, a poll landing before publication sees no queue, no in-flight item, and
+generation 0, concludes the worker is idle, and disarms its refresh interval —
+so nothing then observes the generation bumps that publication and the parked
+drain produce, and the page sits on stale percentiles until the next visit. The
+flag deliberately outlives publication for the same reason: clearing it at
+publication would leave the same window between a freshly published empty
+worker and its drain.
+
 **Not fixed here.** `_CACHE_IO_LOCK` serializes every cache file operation
 app-wide, but each hold is one file operation rather than a scan; recorded in
 `docs/tech_debt.md` under Performance.

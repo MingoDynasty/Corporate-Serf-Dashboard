@@ -98,6 +98,10 @@ section and [product.md](../product.md). Leaderboard placement is worded
   disables after one idle rebuild, and re-arms on the worker's enqueue
   generation
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
+  A worker that has claimed the singleton but not yet published counts as
+  busy, so the interval stays armed across that window rather than reading a
+  generation that does not exist yet as idle
+  ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
 - Visibility is a per-code show-list in `data/playlist_visibility.json`,
   uniform for bundled and user playlists. A missing or unusable file yields
   the first-run seed (eleven Voltaic S5 and Viscose codes plus every

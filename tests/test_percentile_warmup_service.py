@@ -876,8 +876,8 @@ def test_enqueue_during_startup_enumeration_is_not_dropped(monkeypatch):
 
     monkeypatch.setattr(warmup, "get_config", _config)
     monkeypatch.setattr(warmup, "_worker", None)
-    monkeypatch.setattr(warmup, "_worker_starting", False, raising=False)
-    monkeypatch.setattr(warmup, "_pending_enqueues", [], raising=False)
+    monkeypatch.setattr(warmup, "_worker_starting", False)
+    monkeypatch.setattr(warmup, "_pending_enqueues", [])
     monkeypatch.setattr(warmup, "_startup_queue", enumerating_startup_queue)
     monkeypatch.setattr(warmup, "PercentileWarmupWorker", _FakeWorker)
 
@@ -887,3 +887,56 @@ def test_enqueue_during_startup_enumeration_is_not_dropped(monkeypatch):
     assert enqueued == ["Late"]
     assert warmup._pending_enqueues == []
     assert warmup._worker_starting is False
+
+
+def test_worker_reads_as_starting_until_parked_enqueues_drain(monkeypatch):
+    """The starting flag must outlive publication, not just enumeration.
+
+    Parked enqueues bump the generation the overview poll watches for. Clearing
+    the flag at publication would leave a window where a poll sees a freshly
+    published worker with an empty queue, reads it as idle, and disarms itself
+    before those bumps land.
+    """
+    starting_during_drain: list[bool] = []
+
+    class _FakeWorker:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def start(self):
+            return None
+
+        def snapshot(self):
+            return warmup.PercentileWarmupSnapshot(
+                queued_names=(),
+                in_flight=None,
+                remaining_count=0,
+                paused_until=None,
+                backoff_seconds=None,
+                fatal_state=None,
+                enqueue_generation=0,
+                recent_pace_seconds=None,
+            )
+
+        def enqueue_playlist(self, _playlist_code):
+            starting_during_drain.append(warmup.get_percentile_warmup_state().starting)
+            return 1
+
+    def enumerating_startup_queue():
+        # Parks a code, so the starter has something to drain after publishing.
+        assert warmup.enqueue_playlist_percentile_warmup("Late") == 0
+        # An empty startup queue is the sharp case: the published worker looks
+        # idle on its own, and only the parked drain makes it busy.
+        return []
+
+    monkeypatch.setattr(warmup, "get_config", _config)
+    monkeypatch.setattr(warmup, "_worker", None)
+    monkeypatch.setattr(warmup, "_worker_starting", False)
+    monkeypatch.setattr(warmup, "_pending_enqueues", [])
+    monkeypatch.setattr(warmup, "_startup_queue", enumerating_startup_queue)
+    monkeypatch.setattr(warmup, "PercentileWarmupWorker", _FakeWorker)
+
+    assert warmup.start_percentile_warmup_worker(_config()) is True
+
+    assert starting_during_drain == [True]
+    assert warmup.get_percentile_warmup_state().starting is False
