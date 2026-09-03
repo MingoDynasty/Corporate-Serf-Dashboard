@@ -1053,13 +1053,18 @@ def test_preview_plays_in_the_browser_and_says_nothing():
 
     The toast reports a run and there is no run here, so Preview writes only
     its own dead-end output: no notification container, no server round trip.
+
+    It plays the select's value, not the store's. The store lags the control by
+    a round trip after a change and leads it by one at mount, so a Preview
+    reading the store can play a style the user is not looking at -- and the
+    disabled rule, which reads the control, would disagree with it.
     """
     spec = _callback_spec(settings_page.CELEBRATION_PREVIEW_SIGNAL_ID)
 
     assert spec["clientside_function"] is not None
     assert "sendNotifications" not in str(spec["output"])
     assert [(dep["id"], dep["property"]) for dep in spec["state"]] == [
-        ("pb-celebration-style", "data")
+        (settings_page.CELEBRATION_SELECT_ID, "value")
     ]
 
 

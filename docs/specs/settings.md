@@ -309,8 +309,9 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - Preview plays the currently selected style through the same clientside path
   a real celebration takes, so it obeys the reduced-motion guard, and it shows
-  no toast. It is `disabled` while Off is selected, driven from the select's
-  value by a clientside callback
+  no toast. It is `disabled` while Off is selected. Both rules read the
+  select's value rather than the store, so the button is enabled exactly when
+  clicking it plays what the select shows
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 ## The setup card

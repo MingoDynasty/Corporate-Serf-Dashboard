@@ -810,6 +810,13 @@ def show_stored_celebration_style(_n_intervals, style):
 # would play. It shows no toast: the toast reports a run, and there is no run
 # here. The hidden-tab hold cannot apply either, since clicking needs a visible
 # tab.
+#
+# Both of the callbacks below read the select rather than the store, so
+# "enabled exactly when clicking plays what the select shows" holds at every
+# instant. The store lags the control by one round trip after a change and
+# leads it by one at mount, where the store already holds the stored style
+# while the control is still on its layout default -- either way, a Preview
+# reading the store can play something the user is not looking at.
 clientside_callback(
     """
     (nClicks, style) => {
@@ -821,15 +828,13 @@ clientside_callback(
     """,
     Output(CELEBRATION_PREVIEW_SIGNAL_ID, "data"),
     Input(CELEBRATION_PREVIEW_BUTTON_ID, "n_clicks"),
-    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    State(CELEBRATION_SELECT_ID, "value"),
     prevent_initial_call=True,
 )
 
 
 # With Off selected there is nothing for Preview to play, so the button says so
-# the standard way instead of swallowing the click. It reads the control rather
-# than the store because the control is what the user just changed, and the two
-# agree a tick later anyway.
+# the standard way instead of swallowing the click.
 clientside_callback(
     f"(style) => style === '{CELEBRATION_STYLE_OFF}'",
     Output(CELEBRATION_PREVIEW_BUTTON_ID, "disabled"),
