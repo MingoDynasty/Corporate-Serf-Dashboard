@@ -33,14 +33,15 @@ sequence.
   is open and for every scenario rather than only the one being watched. The
   toast stays until it is dismissed, because the run that earned it was played
   in a fullscreen game, and if the window was covered when the run landed the
-  animation waits for the tab to come back. A Settings switch turns the whole
-  thing off, with a Preview button beside it, and it is independent of Run
+  animation waits for the tab to come back. A Settings control picks the
+  animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
+  off, with a Preview button beside it, and it is independent of Run
   Notifications. Run delivery moved into the app shell to make that possible,
   which retired the "While you were away" catch-up digest: a run no longer
-  waits for a Scenario Performance visit to be announced. (PRs #261, #268;
-  design in #248) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md), which also carries the specification
-  for the follow-up that turns the switch into a choice of styles.
+  waits for a Scenario Performance visit to be announced. (PRs #261, #268,
+  #270; design in #248) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
+  into the choice of styles landed in #270, which closes the arc.
 - **Alert color language** — the notices printed into the page now speak one
   severity scale, the same one the toasts already spoke: blue for
   information, yellow for caution, red for errors, each with a leading icon.

@@ -6,7 +6,7 @@ itself. A number outside the range it can work with is refused as that file
 is read, with one line naming the file. Where the KovaaK's runs live and who
 the player is on the leaderboards live in a small file the app owns, shown and
 changed on a Settings page that also offers what the machine already knows and
-holds one preference the browser remembers instead, whether a personal best
+holds one preference the browser remembers instead, how a personal best
 celebrates. A setting the running app cannot pick up live is frozen at startup,
 and the page says when a restart is needed.
 
@@ -259,27 +259,34 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   guards on its trigger: Save and Detect on `n_clicks` and the triggering id,
   the picker on a chosen value and the triggering id
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
-  The Celebrations switch below is the one state-writing callback that does
+  The Celebrations select below is the one state-writing callback that does
   neither, and deliberately: its write is browser-local, and the spurious call
-  it has to survive arrives *with* the switch as the triggering id, so it gates
+  it has to survive arrives *with* the select as the triggering id, so it gates
   on the initialization tick instead
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 ## Celebrations
 
 - A "Celebrations" section sits between the Save form and the version section,
-  outside the form: the switch "Personal best celebration", described as
+  outside the form: the select "Personal best celebration", described as
   "Plays a short animation and shows a toast when a run beats your personal
   best in any scenario. Works on every page, and does not depend on Run
   Notifications. Takes effect right away.", with a "Preview" button beside it.
   Nothing here goes through Save, and nothing here touches the restart notice
   or the store alert, which speak for the form's three keys
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- The select offers five options in this order: "Off", "Confetti",
+  "Fireworks", "Cannons", "Stars", carrying the values `"off"`, `"confetti"`,
+  `"fireworks"`, `"cannons"`, `"stars"`. Deselecting is disabled, so the
+  control always holds one of them; Off is a value like any other rather than
+  a second control. The four style names have to name entries in the animation
+  registry, which a test asserts
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - The setting is the shell-hosted `dcc.Store(id="pb-celebration-style",
   storage_type="local")`, not the control: one browser-local string, `"off"`
-  or a style name, defaulting to `"confetti"`. The switch initializes from it
-  and writes back to it, mapping on to `"confetti"` and off to `"off"`, and
-  carries no Dash persistence of its own. What the setting governs is in
+  or a style name, defaulting to `"confetti"`. The select initializes from it
+  and writes its value straight back to it, and carries no Dash persistence of
+  its own. What the setting governs is in
   [notifications.md](notifications.md#run-notifications)
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - The value is per browser, is cleared with site data, and is never written to
@@ -287,16 +294,23 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   Anything but the exact `"off"` reads as on, so a value this build does not
   know still celebrates rather than silently disabling the family
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
-- A one-shot `dcc.Interval` initializes the switch from the store, which reads
+- A one-shot `dcc.Interval` initializes the select from the store, which reads
   as `State` there; the store-as-`Input` pair would be a dependency cycle. The
   same tick gates the write direction, because mounting the page fires that
-  callback with the switch's layout default despite `prevent_initial_call` and
-  with the switch as the triggering id, which would otherwise write the on
-  value over a stored off on every visit
+  callback with the select's layout default despite `prevent_initial_call` and
+  with the select as the triggering id, which would otherwise write that
+  default over a stored choice on every visit
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- A stored value that is none of the five options — a cleared store, or a
+  style a later version wrote — leaves the select on its layout default, which
+  is Confetti. That mirrors the animation's own fallback, and the stored value
+  is not rewritten: showing the default changes nothing, so nothing travels
+  back to the store
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - Preview plays the currently selected style through the same clientside path
   a real celebration takes, so it obeys the reduced-motion guard, and it shows
-  no toast. With the setting off it plays nothing
+  no toast. It is `disabled` while Off is selected, driven from the select's
+  value by a clientside callback
   ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 ## The setup card

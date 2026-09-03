@@ -21,9 +21,9 @@ notifications update automatically in the background.
 - **Personal best celebration** — a run that beats your scenario best gets a short burst of
   confetti and its own toast, on whatever page you have open, and the toast stays until you
   dismiss it so the news survives a fullscreen session. If the window was covered when the run
-  landed, the animation waits until you come back to it. A Settings switch turns the whole thing
-  off, with a Preview button beside it, and it is its own family, so Run Notifications does not
-  silence it. A reduced-motion preference keeps the toast and drops the animation.
+  landed, the animation waits until you come back to it. A Settings control picks the animation,
+  Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with a Preview button
+  beside it, and it is its own family, so Run Notifications does not silence it. A reduced-motion preference keeps the toast and drops the animation.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
@@ -216,11 +216,11 @@ Edit this file only while the dashboard is stopped — it is read once per run.
 Saving from the Settings page while it runs is fine; the page tells you when a
 change needs a restart before it takes effect.
 
-One setting on that page is in neither file: the **Celebrations** switch, which
-turns the personal best celebration on and off. It is remembered by the browser
-rather than written to disk, applies the moment you flip it, and is not part of
-Save. A different browser, or one whose site data you have cleared, starts with
-celebrations on.
+One setting on that page is in neither file: the **Celebrations** choice, which
+picks the personal best celebration's animation or turns it off. It is
+remembered by the browser rather than written to disk, applies the moment you
+choose, and is not part of Save. A different browser, or one whose site data you
+have cleared, starts on Confetti.
 
 ## Usage
 

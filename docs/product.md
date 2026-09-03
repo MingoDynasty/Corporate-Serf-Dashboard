@@ -69,7 +69,8 @@ list in the roadmap.)
   in a fullscreen game and the news should still be there when you alt-tab
   back; if the window was covered when the run landed, the animation waits and
   plays when you come back to it. It also triggers the background rank
-  refresh, as it always did. A Settings switch turns the whole thing off, with
+  refresh, as it always did. A Settings control picks which animation plays,
+  Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with
   a Preview button beside it so the effect can be seen without setting a
   personal best, and it is independent of the Run Notifications switch: one is
   about routine runs, the other about the moment worth interrupting for. If

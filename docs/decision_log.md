@@ -173,18 +173,19 @@ deleted.
 
 Status: Accepted
 
-The switch that turns the personal best celebration on and off lives on the
-Settings page, in its own Celebrations section, with a Preview button beside
-it. It takes effect the moment it is flipped rather than waiting for Save, and
-the browser remembers it instead of the app's settings file. A different
-browser, or one whose site data has been cleared, celebrates by default.
+The control that chooses how a personal best celebrates lives on the Settings
+page, in its own Celebrations section, with a Preview button beside it. It
+offers Off and four animation styles, and takes effect the moment one is
+chosen rather than waiting for Save. The browser remembers the choice instead
+of the app's settings file, so a different browser, or one whose site data has
+been cleared, celebrates by default.
 
 **The store is the setting.** `dcc.Store(id="pb-celebration-style",
 storage_type="local")` in the app shell holds one string: `"off"` or a style
-name, defaulting to `"confetti"`. The value is a style name from the start
-even though version one ships a switch, so the follow-up that turns the switch
-into a style select only adds values to a contract that already exists and
-keeps whatever was saved. The control initializes from the store and writes
+name, defaulting to `"confetti"`. The value was a style name from the start
+even though version one shipped a switch, so the follow-up that turned the
+switch into a style select only added values to a contract that already
+existed and kept whatever was saved. The control initializes from the store and writes
 back to it and carries no Dash persistence of its own, so a switch's boolean
 and a select's string never become two competing persisted values. The drain
 reads the store as `State`, and so does the clientside animation: changing the
@@ -249,7 +250,7 @@ and the supported usage model stays one active tab.
 style through the same clientside path a real celebration takes, so it obeys
 the reduced-motion guard; it shows no toast, because the toast reports a run
 and there is no run. It ships in version one because it is the only way to see
-the effect without setting a personal best. The follow-up converts the switch
+the effect without setting a personal best. The follow-up converted the switch
 to a select over Off, Confetti, Fireworks, Cannons, and Stars — curated
 presets only, no duration, particle, or color knobs, no custom style, and no
 Random option. Since the proposal file is deleted, its specification of that
@@ -264,7 +265,23 @@ particles but does not stop a `setInterval` or animation-frame loop, so the
 two loop-based recipes must not be taken from the demo verbatim — each style
 is bounded to about three seconds and must cancel cleanly.
 
-Shipped in PR #268; ruled on #248.
+**What that step settled when it shipped.** Cancellation is centralized rather
+than repeated per style: every style returns a cancel closure, the animation
+module holds exactly one, and it is invoked before any new play. That way a
+style's whole leak surface is its own one-line closure, and a style that
+schedules nothing returns nothing. Cannons uses Mantine's primary blue
+(`#228be6`, the filled-button color) and white, which is the reading of "the
+app's accent colors" this repository can point at. Preview is `disabled` while
+Off is selected, replacing the earlier behavior of a click that produced
+nothing: the section applies instantly, so the committed value is the only
+sensible preview target, and previewing a merely highlighted option would be a
+different product. A Python test parses the animation's style registry and
+asserts it matches the select's options, because a name offered with no entry
+falls back to Confetti — a wrong answer rather than a visible failure. A
+JavaScript test harness was considered again here and again declined; the
+centralized cancellation is what shrinks the surface one would have covered.
+
+Shipped in PR #268, and the style select in #270; ruled on #248.
 
 ## 2026-09-01: Configured Ports And Poll Intervals Are Bounded At Load
 

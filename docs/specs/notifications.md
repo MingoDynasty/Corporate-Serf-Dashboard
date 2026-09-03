@@ -301,12 +301,21 @@ toasts under, and it applies to every toast the app adds from here on
   `{scenario}: {score:.2f}. Your previous best was {previous:.2f}.`
 - The animation lives in `assets/pbCelebration.js` and is driven by a
   clientside callback on `run-events-batch`, with the style store as `State`,
-  so no server round trip separates the decision from the burst. Version one
-  registers one style, `confetti`: the upstream Realistic Look recipe, about
-  three seconds, played through the vendored `assets/vendor/canvas-confetti.js`
-  (1.9.4, ISC). An unknown style name plays it too, so a style retired later
-  never silently turns celebrations off
+  so no server round trip separates the decision from the burst. It holds a
+  name-keyed registry of four styles, all played through the vendored
+  `assets/vendor/canvas-confetti.js` (1.9.4, ISC) and all spent in about three
+  seconds: `confetti` is the upstream Realistic Look recipe unchanged;
+  `fireworks` is the upstream Fireworks recipe cut to 3 s; `cannons` is School
+  Pride cut to 2.5 s in Mantine's primary blue (`#228be6`) and white; `stars`
+  is the upstream Stars recipe unchanged. An unknown style name plays
+  `confetti`, so a style retired later never silently turns celebrations off
   ([2026-09-02](../decision_log.md#2026-09-02-a-new-personal-best-celebrates-on-every-page)).
+- Every style returns a cancel closure, or nothing when it schedules nothing,
+  and the module holds exactly one such handle and invokes it before any new
+  play. That is what stops a looping style: `confetti.reset()` clears the
+  particles already drawn but does not cancel an interval or an animation
+  frame
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 - It plays nothing when the setting is off and nothing when the browser
   prefers reduced motion; the toast still shows in that case, because it is
   informational and under reduced motion it is the whole celebration. A burst
