@@ -185,13 +185,29 @@ CELEBRATION_DESCRIPTION = (
 )
 PREVIEW_LABEL = "Preview"
 
-CELEBRATION_SWITCH_ID = "app-settings-celebration-switch"
+# The offered styles, in order. Off is one value among five rather than a
+# separate control, because the store has always held one string. Every value
+# but the off one has to name an entry in the registry in
+# ``assets/pbCelebration.js``; a name with no entry there would fall back to
+# Confetti, so a test asserts the two lists agree.
+CELEBRATION_STYLE_OPTIONS = [
+    {"value": CELEBRATION_STYLE_OFF, "label": "Off"},
+    {"value": CELEBRATION_STYLE_CONFETTI, "label": "Confetti"},
+    {"value": "fireworks", "label": "Fireworks"},
+    {"value": "cannons", "label": "Cannons"},
+    {"value": "stars", "label": "Stars"},
+]
+_KNOWN_CELEBRATION_STYLES = frozenset(
+    option["value"] for option in CELEBRATION_STYLE_OPTIONS
+)
+
+CELEBRATION_SELECT_ID = "app-settings-celebration-select"
 CELEBRATION_PREVIEW_BUTTON_ID = "app-settings-celebration-preview-button"
 # A clientside callback needs an output and Preview has nothing to write.
 CELEBRATION_PREVIEW_SIGNAL_ID = "app-settings-celebration-preview-signal"
 # One tick after mount, which is what shows the stored setting on a control the
 # store cannot write to directly. The store is the authoritative value, so the
-# obvious pair -- store to switch, switch to store -- would be a dependency
+# obvious pair -- store to select, select to store -- would be a dependency
 # cycle; reading the store as ``State`` behind a one-shot interval is the same
 # initialization without one.
 CELEBRATION_INIT_INTERVAL_ID = "app-settings-celebration-init-interval"
@@ -732,34 +748,39 @@ def _identity_detection() -> dmc.Stack:
 
 @callback(
     Output(PB_CELEBRATION_STYLE_STORE_ID, "data"),
-    Input(CELEBRATION_SWITCH_ID, "checked"),
+    Input(CELEBRATION_SELECT_ID, "value"),
     State(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
     prevent_initial_call=True,
 )
-def set_celebration_style(checked, initialized):
-    """Write the switch's position to the browser-local style store.
+def set_celebration_style(style, initialized):
+    """Write the selected style to the browser-local style store.
 
-    The store is the setting; this control is a view of it. The value is a
-    style name from the start rather than a boolean, so the follow-up that
-    turns this switch into a style select only adds values to a contract that
-    already exists, and the saved setting survives that change.
+    The store is the setting; this control is a view of it. The stored value
+    was a style name from the start rather than a boolean, so converting the
+    switch into this select only added values to a contract that already
+    existed, and a setting saved by the switch survives the change.
 
     Nothing is written before the initializing tick, and that gate is
-    load-bearing: mounting the page fires this callback with the switch's
+    load-bearing: mounting the page fires this callback with the control's
     layout default despite ``prevent_initial_call`` and despite the triggering
-    id being the switch, which would write the on value over a stored off
+    id being the control, which would write the default over a stored choice
     before the browser's own value had even been shown. Ordering makes the
-    gate safe rather than lucky -- once the tick has landed the switch already
+    gate safe rather than lucky -- once the tick has landed the control already
     holds the stored value, so the worst a late mount-fire can write is the
     value that was there.
+
+    An empty value is refused rather than stored: it would leave the store
+    holding something the animation reads as off and the drain reads as on,
+    which is a celebration toast with no burst. The select cannot produce one
+    -- deselecting is disabled -- so this is a guard, not a path.
     """
-    if not initialized:
+    if not initialized or not style:
         return no_update
-    return CELEBRATION_STYLE_CONFETTI if checked else CELEBRATION_STYLE_OFF
+    return style
 
 
 @callback(
-    Output(CELEBRATION_SWITCH_ID, "checked"),
+    Output(CELEBRATION_SELECT_ID, "value"),
     Input(CELEBRATION_INIT_INTERVAL_ID, "n_intervals"),
     State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
     prevent_initial_call=True,
@@ -767,11 +788,21 @@ def set_celebration_style(checked, initialized):
 def show_stored_celebration_style(_n_intervals, style):
     """Show the stored setting once the browser has handed its value over.
 
-    Anything but the off value reads as on, which is the direction this setting
-    fails in everywhere: a value written by a build with more styles than this
-    one still leaves celebrations enabled rather than silently disabling them.
+    A value this build has no option for -- a cleared store, or a style a
+    later version wrote -- leaves the control on its own default, which is
+    Confetti. That mirrors the animation's fallback, and it is the direction
+    this setting fails in everywhere: an unreadable value still celebrates
+    rather than silently disabling the family.
+
+    Showing a fallback never stores it. Writing nothing back is what keeps the
+    stored value intact for the build that wrote it, so this returns
+    ``no_update`` rather than the fallback name: the control is already showing
+    it, and a value that never changes can never travel back through
+    :func:`set_celebration_style`.
     """
-    return style != CELEBRATION_STYLE_OFF
+    if style not in _KNOWN_CELEBRATION_STYLES:
+        return no_update
+    return style
 
 
 # Preview goes through the same clientside path a real celebration takes, so it
@@ -795,10 +826,21 @@ clientside_callback(
 )
 
 
-def _celebrations_section() -> dmc.Stack:
-    """Build the Celebrations section: the switch, its description, Preview.
+# With Off selected there is nothing for Preview to play, so the button says so
+# the standard way instead of swallowing the click. It reads the control rather
+# than the store because the control is what the user just changed, and the two
+# agree a tick later anyway.
+clientside_callback(
+    f"(style) => style === '{CELEBRATION_STYLE_OFF}'",
+    Output(CELEBRATION_PREVIEW_BUTTON_ID, "disabled"),
+    Input(CELEBRATION_SELECT_ID, "value"),
+)
 
-    Outside the Save form deliberately. It applies the moment it is flipped and
+
+def _celebrations_section() -> dmc.Stack:
+    """Build the Celebrations section: the style select, its description, Preview.
+
+    Outside the Save form deliberately. It applies the moment it is chosen and
     is stored in this browser rather than in ``data/settings.json``, so it
     touches neither the restart notice nor the store alert, both of which speak
     for the three keys the form writes.
@@ -808,14 +850,20 @@ def _celebrations_section() -> dmc.Stack:
             dmc.Title(CELEBRATIONS_HEADING, order=3),
             dmc.Group(
                 children=[
-                    dmc.Switch(
-                        id=CELEBRATION_SWITCH_ID,
+                    dmc.Select(
+                        id=CELEBRATION_SELECT_ID,
                         label=CELEBRATION_LABEL,
                         description=CELEBRATION_DESCRIPTION,
+                        data=CELEBRATION_STYLE_OPTIONS,
                         # Mirrors the store's own default, so the only browser
-                        # that sees this position corrected a tick later is one
-                        # that has turned the celebration off.
-                        checked=True,
+                        # that sees this corrected a tick later is one that has
+                        # chosen something else. It is also what an unreadable
+                        # stored value shows as.
+                        value=CELEBRATION_STYLE_CONFETTI,
+                        # The store holds one string and Off is one of its
+                        # values, so this control must never be able to hold
+                        # none of them.
+                        allowDeselect=False,
                         w=_FIELD_WIDTH,
                     ),
                     dmc.Button(
@@ -827,7 +875,10 @@ def _celebrations_section() -> dmc.Stack:
                     ),
                 ],
                 gap="md",
-                align="center",
+                # The select puts its input below the label and description, so
+                # the bottom edge is what lines Preview up with the control it
+                # previews.
+                align="flex-end",
             ),
             dcc.Interval(
                 id=CELEBRATION_INIT_INTERVAL_ID,
