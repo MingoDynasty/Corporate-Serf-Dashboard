@@ -649,25 +649,47 @@ class PercentileWarmupWorker:
         )
 
     def _next_item(self) -> str | None:
-        with self._condition:
-            while True:
+        """Claim the next scenario needing work, testing freshness unlocked.
+
+        ``_freshly_satisfied`` reads two cache files per candidate, so it runs
+        with the condition released. Holding the condition across a whole
+        all-skip drain -- the ordinary warm-cache shape, where nothing returns
+        early -- blocks every other holder for the length of that drain: the
+        Playlists progress read, and an import or unhide enqueue alike. The
+        hold is now one pop, never a scan.
+
+        The popped name is claimed as ``_in_flight`` before the lock drops, so
+        a candidate under evaluation still counts toward ``remaining_count``.
+        Without that claim the queue would read as empty mid-drain, the UI
+        would see an idle worker and disable its refresh interval, and
+        ``_log_completed_batch_locked`` would announce a batch that is still
+        running.
+        """
+        while True:
+            with self._condition:
                 if self._fatal_state is not None:
                     return None
-                while self._queue:
-                    scenario_name = self._queue.popleft()
-                    outcome = self.context.outcomes.get(scenario_name)
-                    if (outcome is not None and outcome.terminal) or _freshly_satisfied(
-                        scenario_name,
-                        self.context.config,
-                    ):
-                        if scenario_name not in self._batch_seen:
-                            self._batch_seen.add(scenario_name)
-                            self._batch_skipped += 1
-                        continue
-                    self._in_flight = scenario_name
-                    return scenario_name
-                self._log_completed_batch_locked()
-                self._condition.wait()
+                if not self._queue:
+                    self._log_completed_batch_locked()
+                    # Re-tested under the condition on the next pass, so an
+                    # enqueue notifying between the pop above and this wait
+                    # cannot be missed.
+                    self._condition.wait()
+                    continue
+                scenario_name = self._queue.popleft()
+                outcome = self.context.outcomes.get(scenario_name)
+                terminal = outcome is not None and outcome.terminal
+                self._in_flight = scenario_name
+
+            if terminal or _freshly_satisfied(scenario_name, self.context.config):
+                with self._condition:
+                    self._in_flight = None
+                    if scenario_name not in self._batch_seen:
+                        self._batch_seen.add(scenario_name)
+                        self._batch_skipped += 1
+                continue
+
+            return scenario_name
 
     def _wait_for_interactive_quiet(self) -> None:
         while True:

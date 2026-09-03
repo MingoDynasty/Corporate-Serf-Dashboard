@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 import time
 from datetime import UTC, datetime
 from pathlib import Path
@@ -684,3 +685,132 @@ def test_set_fatal_logs_a_warning(caplog):
 
     assert caplog.messages == ["Percentile warmup stopped: boom"]
     assert [record.levelno for record in caplog.records] == [logging.WARNING]
+
+
+def _drain_worker(queue):
+    """A worker whose loop reaches the drain without hydration or quiet-wait."""
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        queue,
+        sleep=lambda _seconds: None,
+        activity_timestamps=lambda: (0.0, 0.0),
+    )
+    worker._hydration_pending = False
+    return worker
+
+
+@pytest.fixture
+def running_workers():
+    """Stop any worker thread a concurrency case leaves running."""
+    started: list[warmup.PercentileWarmupWorker] = []
+    yield started
+    for worker in started:
+        worker._set_fatal("test teardown")
+        with worker._condition:
+            worker._condition.notify_all()
+        if worker._thread is not None:
+            worker._thread.join(timeout=5)
+
+
+def test_snapshot_is_not_blocked_by_an_all_skip_drain(monkeypatch, running_workers):
+    """Progress reads must not queue behind the drain's per-scenario cache reads.
+
+    The Playlists overview reads this snapshot before it renders any row, so a
+    drain holding the condition across its whole queue froze the grid for the
+    length of the startup batch -- measured at 45s on a slow disk.
+    """
+    entered = threading.Event()
+    release = threading.Event()
+
+    def blocking_predicate(_scenario_name, _config):
+        entered.set()
+        release.wait(10)
+        return True
+
+    monkeypatch.setattr(warmup, "_freshly_satisfied", blocking_predicate)
+    worker = _drain_worker(["A", "B", "C"])
+    running_workers.append(worker)
+    worker.start()
+    assert entered.wait(10), "worker never reached the freshness predicate"
+
+    try:
+        started = time.monotonic()
+        state = worker.snapshot()
+        elapsed = time.monotonic() - started
+    finally:
+        release.set()
+
+    assert elapsed < 1.0, f"snapshot blocked {elapsed:.1f}s behind the drain"
+    # The candidate being evaluated stays claimed, so the page cannot read the
+    # worker as idle mid-drain and disable its refresh interval.
+    assert state.in_flight is not None
+    assert state.remaining_count == 3
+
+
+def test_enqueue_during_a_drain_lands_and_is_picked_up(monkeypatch, running_workers):
+    """An import or unhide must neither block on a drain nor be lost to it.
+
+    enqueue_playlist notifies while the worker is evaluating outside the
+    condition rather than waiting on it, so no waiter receives that wakeup.
+    _next_item has to re-test the queue under the lock on its next pass, or a
+    newly visible playlist would sit unwarmed until the next restart.
+    """
+    seen: list[str] = []
+    reached_tail = threading.Event()
+    release = threading.Event()
+
+    def gated_predicate(scenario_name, _config):
+        seen.append(scenario_name)
+        if scenario_name == "Tail":
+            reached_tail.set()
+            release.wait(10)
+        return True
+
+    monkeypatch.setattr(warmup, "_freshly_satisfied", gated_predicate)
+    monkeypatch.setattr(
+        warmup, "get_playlist_by_code", lambda _code: _playlist("New", "Code", "NEW")
+    )
+    monkeypatch.setattr(
+        warmup, "get_scenario_stats_snapshot", lambda: {"NEW": _stats(1)}
+    )
+    monkeypatch.setattr(warmup, "_has_displayable_percentile", lambda _name: False)
+
+    worker = _drain_worker(["Tail"])
+    running_workers.append(worker)
+    worker.start()
+    assert reached_tail.wait(10), "worker never reached the freshness predicate"
+
+    try:
+        started = time.monotonic()
+        assert worker.enqueue_playlist("Code") == 1
+        elapsed = time.monotonic() - started
+    finally:
+        release.set()
+
+    assert elapsed < 1.0, f"enqueue blocked {elapsed:.1f}s behind the drain"
+    deadline = time.monotonic() + 10
+    while "NEW" not in seen and time.monotonic() < deadline:
+        time.sleep(0.01)
+    assert "NEW" in seen, "a mid-drain enqueue was notified but never picked up"
+
+
+def test_all_skip_drain_counts_each_unique_scenario_once(monkeypatch, caplog):
+    """Restructuring the drain must leave batch accounting untouched."""
+    monkeypatch.setattr(warmup, "_freshly_satisfied", lambda _name, _config: True)
+    worker = warmup.PercentileWarmupWorker(_config(), ["A", "B", "A"])
+
+    def _stop_worker(timeout=None):
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        assert worker._next_item() is None
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any(
+        message.startswith(
+            "Percentile warmup complete: processed=0 terminal=0 skipped=2 "
+        )
+        for message in messages
+    )
