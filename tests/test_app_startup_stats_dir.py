@@ -92,9 +92,10 @@ def test_startup_scans_and_watches_a_usable_stats_dir(state_root: Path) -> None:
     log_text = _debug_log(state_root)
     assert "CSV startup load complete" in log_text
     assert f"Monitoring directory: {stats_dir}" in log_text
-    # Startup, not module import, builds the API cache tree. This directory
-    # has exactly one creator (make_cache); the permanent mapping file is a
-    # weaker witness because the bundled seed merge can write it on its own.
+    # Startup, not module import, builds the API cache tree. On this path
+    # (no identity, no network) make_cache is the only creator of this
+    # directory; the permanent mapping file is a weaker witness because the
+    # bundled seed merge can write it on its own.
     assert (state_root / "data" / "cache" / "user_scenario_total_play").is_dir()
 
 
