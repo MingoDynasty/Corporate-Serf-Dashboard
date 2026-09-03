@@ -52,6 +52,14 @@ worker is evaluating is not lost. `start_percentile_warmup_worker` builds the
 queue before taking the lock and re-checks the singleton after, discarding the
 enumeration if it lost the race.
 
+**Publication is not a gap.** Releasing the lock across enumeration means an
+import or unhide can find no worker to enqueue against, where it previously
+just waited for one; dropping it there would defer that playlist's warmup until
+the next restart, silently. A `_worker_starting` flag marks the window, codes
+arriving in it are parked in `_pending_enqueues`, and the starter adopts them in
+the same lock hold that publishes the worker. They are enqueued after
+publication, so they prepend ahead of the startup queue.
+
 **Not fixed here.** `_CACHE_IO_LOCK` serializes every cache file operation
 app-wide, but each hold is one file operation rather than a scan; recorded in
 `docs/tech_debt.md` under Performance.

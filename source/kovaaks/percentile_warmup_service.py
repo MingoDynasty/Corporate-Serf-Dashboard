@@ -857,11 +857,16 @@ class PercentileWarmupWorker:
 
 _worker_lock = threading.Lock()
 _worker: PercentileWarmupWorker | None = None
+# True while a caller is enumerating the startup queue with _worker_lock
+# released. Enqueues arriving in that window have no worker to reach, so they
+# are parked below and drained by the starter once it publishes one.
+_worker_starting = False
+_pending_enqueues: list[str] = []
 
 
 def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     """Start the singleton worker; return False for either off configuration."""
-    global _worker  # noqa: PLW0603
+    global _worker, _worker_starting  # noqa: PLW0603
     config = config or get_config()
     # Guard before playlist/stats enumeration: empty username is fully offline.
     if not config.percentile_warmup_enabled or not get_kovaaks_username():
@@ -871,34 +876,59 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     with _worker_lock:
         if _worker is not None:
             return True
-
-    # Enumeration reads two cache files per played scenario, so it runs before
-    # the lock is taken: get_percentile_warmup_state needs the same lock, and
-    # this is reachable from a live callback (the settings save that first
-    # supplies a username), not only from pre-serving startup.
-    initial_queue = _startup_queue()
-
-    with _worker_lock:
-        # Another caller may have started the worker while this thread
-        # enumerated. Losing that race discards the queue just built rather
-        # than replacing a running worker.
-        if _worker is not None:
+        if _worker_starting:
+            # Another caller is already enumerating and will publish; a second
+            # enumeration would only be discarded.
             return True
-        _worker = PercentileWarmupWorker(config, initial_queue)
-        _worker.start()
+        _worker_starting = True
+
+    pending: list[str] = []
+    try:
+        # Enumeration reads two cache files per played scenario, so it runs
+        # with the lock released: get_percentile_warmup_state needs the same
+        # lock, and this is reachable from a live callback (the settings save
+        # that first supplies a username), not only from pre-serving startup.
+        initial_queue = _startup_queue()
+        worker = PercentileWarmupWorker(config, initial_queue)
+        with _worker_lock:
+            # Adopt anything parked during the enumeration and publish in the
+            # same hold, so no enqueue can observe a worker-less window twice.
+            pending = list(dict.fromkeys(_pending_enqueues))
+            _pending_enqueues.clear()
+            _worker = worker
+            worker.start()
+    finally:
+        with _worker_lock:
+            _worker_starting = False
+
+    # Outside the lock: enqueue_playlist reads playlists and stats of its own.
+    # These prepend, so a playlist made visible mid-enumeration is warmed
+    # first rather than behind the whole startup queue.
+    for playlist_code in pending:
+        worker.enqueue_playlist(playlist_code)
     return True
 
 
 def enqueue_playlist_percentile_warmup(playlist_code: str) -> int:
-    """Prepend one newly visible/imported playlist, or no-op while disabled."""
+    """Prepend one newly visible/imported playlist, or no-op while disabled.
+
+    Returns the number of scenarios queued now, so a code parked for a
+    still-starting worker reports 0. Callers use the count only for logging.
+    """
     config = get_config()
     # Same pre-enumeration guards as startup (R15).
     if not config.percentile_warmup_enabled or not get_kovaaks_username():
         return 0
     with _worker_lock:
         worker = _worker
-    if worker is None:
-        return 0
+        if worker is None:
+            if _worker_starting:
+                # A start is enumerating with the lock released. Park the code
+                # for it: before enumeration moved out of the lock this call
+                # simply waited here, so dropping it now would silently defer
+                # the playlist's warmup until the next restart.
+                _pending_enqueues.append(playlist_code)
+            return 0
     return worker.enqueue_playlist(playlist_code)
 
 

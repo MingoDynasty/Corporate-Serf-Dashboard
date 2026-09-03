@@ -844,3 +844,46 @@ def test_startup_enumeration_runs_outside_the_worker_lock(monkeypatch):
 
     assert warmup.start_percentile_warmup_worker(_config()) is True
     assert locked_during_enumeration == [False]
+
+
+def test_enqueue_during_startup_enumeration_is_not_dropped(monkeypatch):
+    """An import or unhide racing a username-save start must not be lost.
+
+    Enumeration runs with _worker_lock released, so
+    enqueue_playlist_percentile_warmup can now observe _worker is None where it
+    previously waited for publication. Dropping the code there would defer that
+    playlist's warmup until the next restart, silently -- and the window is the
+    whole enumeration, which is exactly what the release made long.
+    """
+    enqueued: list[str] = []
+
+    class _FakeWorker:
+        def __init__(self, *_args, **_kwargs):
+            pass
+
+        def start(self):
+            return None
+
+        def enqueue_playlist(self, playlist_code):
+            enqueued.append(playlist_code)
+            return 1
+
+    def enumerating_startup_queue():
+        # Runs with the lock released, exactly as a concurrent Dash request
+        # would find the module: a worker is coming but is not published yet.
+        assert warmup.enqueue_playlist_percentile_warmup("Late") == 0
+        return ["A"]
+
+    monkeypatch.setattr(warmup, "get_config", _config)
+    monkeypatch.setattr(warmup, "_worker", None)
+    monkeypatch.setattr(warmup, "_worker_starting", False, raising=False)
+    monkeypatch.setattr(warmup, "_pending_enqueues", [], raising=False)
+    monkeypatch.setattr(warmup, "_startup_queue", enumerating_startup_queue)
+    monkeypatch.setattr(warmup, "PercentileWarmupWorker", _FakeWorker)
+
+    assert warmup.start_percentile_warmup_worker(_config()) is True
+
+    # Adopted by the starter once it published, rather than dropped.
+    assert enqueued == ["Late"]
+    assert warmup._pending_enqueues == []
+    assert warmup._worker_starting is False
