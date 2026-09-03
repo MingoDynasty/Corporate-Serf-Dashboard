@@ -21,8 +21,9 @@ The Playlists page could show a loading spinner for up to a minute after
 startup, and importing or unhiding a playlist could appear to do nothing for
 just as long. A background worker was holding a lock while it read hundreds of
 small cache files, and the page needed that same lock to draw its progress
-line. The worker now does its file reads with the lock released. Nothing about
-what it warms, or in what order, changed.
+line. The worker now does its file reads with the lock released. It warms the
+same scenarios as before, and a playlist you have just imported or unhidden can
+now take its turn sooner instead of waiting for the scan to end.
 
 **The invariant.** Neither `PercentileWarmupWorker._condition` nor the
 module-global `_worker_lock` may be held across cache file I/O. Both are read
@@ -52,9 +53,15 @@ outside it; the popped name is claimed as `_in_flight` before the lock drops, so
 a candidate under evaluation still counts toward `remaining_count` and the batch
 cannot read as idle or announce completion mid-drain. The loop re-tests the
 queue under the lock before waiting, so an enqueue that notifies while the
-worker is evaluating is not lost. `start_percentile_warmup_worker` builds the
-queue before taking the lock and re-checks the singleton after, discarding the
-enumeration if it lost the race.
+worker is evaluating is not lost. `start_percentile_warmup_worker` runs a
+claim/park/publish handshake: it claims the start under the lock by setting
+`_worker_starting`, releases the lock to enumerate, and publishes in a later
+hold. There is no post-enumeration singleton re-check and nothing to discard,
+because a second caller arriving during the window returns early instead of
+enumerating a queue that would be thrown away. What can arrive in that window
+is not a competing starter but an enqueue, which is what the parking below
+exists for — the two halves are one protocol and must not be implemented
+separately.
 
 **Publication is not a gap.** Releasing the lock across enumeration means an
 import or unhide can find no worker to enqueue against, where it previously
