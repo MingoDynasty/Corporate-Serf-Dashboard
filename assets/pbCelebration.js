@@ -15,14 +15,26 @@
     // later version never silently turns celebrations off.
     const DEFAULT_STYLE = "confetti";
 
+    // Passed on every library call this file makes. `prefersReducedMotion`
+    // below asks the same question before anything is scheduled at all, which
+    // is what the styles that loop need; this flag is the library's own second
+    // line, on the particles themselves.
+    const REDUCED_MOTION_GUARD = {disableForReducedMotion: true};
+
+    // Every style takes the resolved library and returns either nothing or a
+    // cancel function. A style that schedules anything -- an interval, an
+    // animation frame, a timeout -- returns the call that unschedules it and
+    // nothing else; start() below owns when that runs. This is the whole
+    // reason the looping recipes are not the demo code verbatim:
+    // `confetti.reset()` clears the particles already drawn but does not stop
+    // a loop, so a style that schedules and returns nothing would keep firing
+    // over the style that replaced it.
+
     // The Realistic Look recipe from the canvas-confetti demos, unchanged:
     // five bursts from one origin, about 200 particles, spent in about three
-    // seconds. `disableForReducedMotion` is the library's own guard, passed on
-    // every call this file makes; `prefersReducedMotion` below asks the same
-    // question before anything is scheduled at all, which is what an
-    // app-owned loop would need (version one has none).
+    // seconds. It schedules nothing, so there is nothing to cancel.
     const confettiStyle = (confetti) => {
-        const defaults = {origin: {y: 0.7}, disableForReducedMotion: true};
+        const defaults = {...REDUCED_MOTION_GUARD, origin: {y: 0.7}};
         const fire = (particleRatio, options) => {
             confetti({
                 ...defaults,
@@ -38,9 +50,111 @@
         fire(0.1, {spread: 120, startVelocity: 45});
     };
 
-    // Version one registers Confetti alone; the Python side's option list
-    // mirrors these names by convention.
-    const styles = {confetti: confettiStyle};
+    // The Fireworks recipe, cut from the demo's 15 s to 3 s: paired volleys
+    // every 250 ms from random points left and right, thinning as the time
+    // runs out.
+    const fireworksStyle = (confetti) => {
+        const duration = 3000;
+        const end = Date.now() + duration;
+        const defaults = {
+            ...REDUCED_MOTION_GUARD,
+            startVelocity: 30,
+            spread: 360,
+            ticks: 60,
+        };
+        const between = (min, max) => Math.random() * (max - min) + min;
+        const interval = window.setInterval(() => {
+            const remaining = end - Date.now();
+            if (remaining <= 0) {
+                window.clearInterval(interval);
+                return;
+            }
+            const particleCount = 50 * (remaining / duration);
+            // Started a little above the top edge, since the particles fall.
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: {x: between(0.1, 0.3), y: Math.random() - 0.2},
+            });
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: {x: between(0.7, 0.9), y: Math.random() - 0.2},
+            });
+        }, 250);
+
+        return () => window.clearInterval(interval);
+    };
+
+    // The School Pride recipe, cut from 15 s to 2.5 s and in the app's own
+    // colors rather than the demo's team red and white: Mantine's primary
+    // blue (blue.6, #228be6, the filled-button color) and white.
+    const cannonsStyle = (confetti) => {
+        const end = Date.now() + 2500;
+        const shot = {
+            ...REDUCED_MOTION_GUARD,
+            particleCount: 2,
+            spread: 55,
+            colors: ["#228be6", "#ffffff"],
+        };
+        let frame = 0;
+        const fire = () => {
+            confetti({...shot, angle: 60, origin: {x: 0}});
+            confetti({...shot, angle: 120, origin: {x: 1}});
+            if (Date.now() < end) {
+                frame = window.requestAnimationFrame(fire);
+            }
+        };
+
+        fire();
+        return () => window.cancelAnimationFrame(frame);
+    };
+
+    // The Stars recipe, unchanged: three volleys of weightless stars 100 ms
+    // apart, spent in about a second.
+    const starsStyle = (confetti) => {
+        const defaults = {
+            ...REDUCED_MOTION_GUARD,
+            spread: 360,
+            ticks: 50,
+            gravity: 0,
+            decay: 0.94,
+            startVelocity: 30,
+            colors: ["FFE400", "FFBD00", "E89400", "FFCA6C", "FDFFB8"],
+        };
+        const shoot = () => {
+            confetti({
+                ...defaults,
+                particleCount: 40,
+                scalar: 1.2,
+                shapes: ["star"],
+            });
+            confetti({
+                ...defaults,
+                particleCount: 10,
+                scalar: 0.75,
+                shapes: ["circle"],
+            });
+        };
+        const timers = [0, 100, 200].map((d) => window.setTimeout(shoot, d));
+
+        return () => {
+            for (const timer of timers) {
+                window.clearTimeout(timer);
+            }
+        };
+    };
+
+    // The registry. Its keys and the Settings page's option list agree by
+    // convention, which a Python test pins by parsing this block: an option
+    // with no entry here falls back to Confetti, so the user picks Stars and
+    // gets Confetti, which is a wrong answer rather than a visible failure.
+    const styles = {
+        confetti: confettiStyle,
+        fireworks: fireworksStyle,
+        cannons: cannonsStyle,
+        stars: starsStyle,
+    };
 
     // The vendored library is resolved at call time, never captured while this
     // file runs: Dash serves assets/*.js as classic scripts in its own order,
@@ -60,15 +174,30 @@
     // it only when it celebrates, so this is what lets two identical personal
     // bests back to back both fire while one payload never plays twice.
     let playedSequence = null;
+    // The cancel handle of the style now playing, or null. Exactly one is ever
+    // held, and start() is the only way to begin a celebration, so the whole
+    // leak surface of this file is the four closures returned above.
+    let activeCancel = null;
 
     const start = (styleName) => {
         const confetti = library();
         if (!confetti) {
             return;
         }
-        // Cancel a burst still in flight, so a fast streak never stacks.
+        if (activeCancel) {
+            const cancel = activeCancel;
+            activeCancel = null;
+            // A handle whose style already finished is a no-op: clearing a
+            // spent timer or frame costs nothing, so a style never has to
+            // report that it is done.
+            cancel();
+        }
+        // Cancel a burst still in flight, so a fast streak never stacks. This
+        // clears the canvas; the handle above is what stops anything more from
+        // being scheduled onto it.
         confetti.reset();
-        (styles[styleName] || styles[DEFAULT_STYLE])(confetti);
+        const style = styles[styleName] || styles[DEFAULT_STYLE];
+        activeCancel = style(confetti) || null;
     };
 
     const play = (styleName) => {
