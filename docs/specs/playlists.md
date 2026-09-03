@@ -308,7 +308,11 @@ section and [product.md](../product.md). Leaderboard placement is worded
   quiet window, and backs off on outages, waking early on a real network
   success. Unhide and import prepend the playlist's played scenarios and wake
   it; hide and delete cancel nothing. Every dequeue rechecks cache freshness
-  and a session outcome map. UNRANKED is cached only after one positive
+  and a session outcome map; that recheck runs with the worker's lock
+  released, so a warm-cache drain (where every queued scenario is skipped)
+  delays neither the status line nor an import or unhide
+  ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
+  UNRANKED is cached only after one positive
   username validation per session. `percentile_warmup_enabled = false` or an
   empty username skips the worker
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
