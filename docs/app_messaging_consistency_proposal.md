@@ -698,16 +698,17 @@ contractions, and the renderers are review territory, not a gate.
    and body), `playlists.md` (the overview status lines, the import modal
    title and toasts, the Show hidden phrasing, the percentile tooltip, and
    the fill status lines), `settings.md` (the field label, the Steam ID
-   error, the save-failed status, and the detection copy),
-   `scenario_performance.md` and `notifications.md` (the control names D2
-   renames and the toast bodies) — plus `docs/product.md` (the
-   unset-username status, the refresh toast, and the Run Notifications
-   control name), `docs/architecture.md` and `docs/roadmap.md` (the control
-   names D2 renames), and the README wherever the same `rg` finds a changed
-   string. No new
-   capability spec is created: app copy as a whole has no spec, and the
-   strings that do live in one live in the spec of the capability they
-   belong to. No hard dependency on other in-flight work. Under D5 it is
-   sequenced before the release the announcement post promotes, and the
-   shipping PR ticks the matching item off the launch prep notes' pre-post
-   checklist.
+   error, the save-failed status, the detection copy, and the setup card's
+   unreadable-store title and Skip-failure line), `scenario_performance.md`
+   (the control names D2 renames, the toast bodies, and the setup card's
+   unreadable-store title and body, stats-folder body, and fine print), and
+   `notifications.md` (the control names D2 renames and the toast bodies) —
+   plus `docs/product.md` (the unset-username status, the refresh toast, and
+   the Run Notifications control name), `docs/architecture.md` and
+   `docs/roadmap.md` (the control names D2 renames), and the README wherever
+   the same `rg` finds a changed string. No new capability spec is created:
+   app copy as a whole has no spec, and the strings that do live in one live
+   in the spec of the capability they belong to. No hard dependency on other
+   in-flight work. Under D5 it is sequenced before the release the
+   announcement post promotes, and the shipping PR ticks the matching item
+   off the launch prep notes' pre-post checklist.
