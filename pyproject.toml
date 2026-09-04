@@ -1,7 +1,7 @@
 [project]
 name = "Corporate-Serf-Dashboard"
 version = "1.0.0"
-description = "Dash web app that watches your KovaaK's stats directory and turns your runs into training insight."
+description = "Dash web app that monitors your KovaaK's stats directory and turns your runs into training insight."
 readme = "README.md"
 requires-python = ">=3.14"
 # Lower bounds track the versions actually locked and tested (uv.lock is the
