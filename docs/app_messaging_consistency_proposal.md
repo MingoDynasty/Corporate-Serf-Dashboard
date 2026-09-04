@@ -227,7 +227,7 @@ drift, each small, together the "vibe-coded" feel:
    `, ...` inside parentheses, and the stats folder description elides a
    path with `...\`.
 5. **Casing.** See D2.
-6. **Quoting control names.** `Toggle "Show hidden"` in two places, bare
+6. **Quoting control names.** `Toggle "Show hidden"` in three places, bare
    `press Detect my accounts again`, `then Save`, `Needs Rank Thresholds
    turned on` everywhere else.
 7. **Vocabulary.** "the dashboard" in the setup card (both its
