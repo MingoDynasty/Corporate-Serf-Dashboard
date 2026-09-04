@@ -1,8 +1,10 @@
 """The settings page: form rendering, the save flow, and the restart notice."""
 
 import json
+import re
 from collections import deque
 from datetime import UTC, datetime
+from pathlib import Path
 from types import SimpleNamespace
 
 import dash
@@ -910,58 +912,80 @@ def _callback_spec(fragment: str):
     return spec
 
 
-def test_the_switch_writes_a_style_name_to_the_store():
-    # A style name from the start, not a boolean: the follow-up that turns this
-    # switch into a style select then only adds values to the same contract.
-    assert settings_page.set_celebration_style(True, 1) == "confetti"
-    assert settings_page.set_celebration_style(False, 1) == "off"
+def test_the_select_writes_a_style_name_to_the_store():
+    # A style name from the start, not a boolean: converting the switch into
+    # this select only added values to the same contract.
+    assert settings_page.set_celebration_style("confetti", 1) == "confetti"
+    assert settings_page.set_celebration_style("stars", 1) == "stars"
+    assert settings_page.set_celebration_style("off", 1) == "off"
 
 
-def test_mounting_the_page_never_writes_the_switch_default_over_the_store():
-    """Opening Settings must not turn the celebration back on.
+def test_the_store_never_holds_an_empty_selection():
+    """A stored empty value is off to the animation and on to the drain.
 
-    Mounting the page fires this callback with the switch's layout default
-    despite ``prevent_initial_call``, and the triggering id is the switch
+    That is a celebration toast with no burst. Deselecting is disabled on the
+    control, so this is the guard against a state nothing can currently reach.
+    """
+    assert settings_page.set_celebration_style(None, 1) is no_update
+    assert settings_page.set_celebration_style("", 1) is no_update
+
+
+def test_mounting_the_page_never_writes_the_select_default_over_the_store():
+    """Opening Settings must not overwrite the chosen style.
+
+    Mounting the page fires this callback with the control's layout default
+    despite ``prevent_initial_call``, and the triggering id is the control
     itself, so the initializing tick is what tells the two apart: before it,
     the control is still showing a default nobody chose.
     """
-    assert settings_page.set_celebration_style(True, 0) is no_update
-    assert settings_page.set_celebration_style(True, None) is no_update
+    assert settings_page.set_celebration_style("confetti", 0) is no_update
+    assert settings_page.set_celebration_style("confetti", None) is no_update
 
 
-def test_the_switch_shows_the_stored_setting():
-    assert settings_page.show_stored_celebration_style(1, "off") is False
-    assert settings_page.show_stored_celebration_style(1, "confetti") is True
+def test_the_select_shows_the_stored_setting():
+    assert settings_page.show_stored_celebration_style(1, "off") == "off"
+    assert settings_page.show_stored_celebration_style(1, "confetti") == "confetti"
+    assert settings_page.show_stored_celebration_style(1, "fireworks") == "fireworks"
 
 
-def test_a_store_this_build_cannot_read_still_shows_as_on():
+def test_a_store_this_build_cannot_read_still_shows_as_confetti():
     """Browser-local storage fails towards the celebration, never into silence.
 
     A cleared store reads as nothing, and a style name a later build wrote
-    means nothing here; both leave the switch on, which is what the store's own
-    default says.
+    means nothing here. Both leave the control on its layout default, which is
+    Confetti, mirroring the animation's own fallback -- and leaving it there is
+    also what keeps the stored value from being written back, since a value
+    that never changes cannot travel back through the write callback.
     """
-    assert settings_page.show_stored_celebration_style(1, None) is True
-    assert settings_page.show_stored_celebration_style(1, "fireworks") is True
-
-
-def test_the_switch_carries_no_persistence_of_its_own():
-    """The store is the setting; the control is a view of it.
-
-    Two persisted values for one preference is how a switch and the select that
-    replaces it end up disagreeing.
-    """
-    switch = _component_by_id(
-        settings_page.layout(), settings_page.CELEBRATION_SWITCH_ID
+    assert settings_page.show_stored_celebration_style(1, None) is no_update
+    assert settings_page.show_stored_celebration_style(1, "snow") is no_update
+    assert (
+        _component_by_id(
+            settings_page.layout(), settings_page.CELEBRATION_SELECT_ID
+        ).value
+        == "confetti"
     )
 
-    assert not hasattr(switch, "persistence")
-    assert switch.checked is True
+
+def test_the_select_carries_no_persistence_of_its_own():
+    """The store is the setting; the control is a view of it.
+
+    Two persisted values for one preference is how the control and the store
+    end up disagreeing.
+    """
+    select = _component_by_id(
+        settings_page.layout(), settings_page.CELEBRATION_SELECT_ID
+    )
+
+    assert not hasattr(select, "persistence")
+    assert select.value == "confetti"
+    # Off is one option among five, so the control must never hold none.
+    assert select.allowDeselect is False
 
 
 def test_the_section_renders_its_heading_control_and_preview():
     layout = settings_page.layout()
-    switch = _component_by_id(layout, settings_page.CELEBRATION_SWITCH_ID)
+    select = _component_by_id(layout, settings_page.CELEBRATION_SELECT_ID)
     preview = _component_by_id(layout, settings_page.CELEBRATION_PREVIEW_BUTTON_ID)
     headings = [
         component.children
@@ -970,9 +994,58 @@ def test_the_section_renders_its_heading_control_and_preview():
     ]
 
     assert headings == [settings_page.CELEBRATIONS_HEADING]
-    assert switch.label == settings_page.CELEBRATION_LABEL
-    assert switch.description == settings_page.CELEBRATION_DESCRIPTION
+    assert select.label == settings_page.CELEBRATION_LABEL
+    assert select.description == settings_page.CELEBRATION_DESCRIPTION
+    assert [option["label"] for option in select.data] == [
+        "Off",
+        "Confetti",
+        "Fireworks",
+        "Cannons",
+        "Stars",
+    ]
     assert preview.children == settings_page.PREVIEW_LABEL
+
+
+def test_preview_is_disabled_while_the_selection_is_off():
+    """Off has nothing to preview, so the button says so rather than swallowing
+    the click.
+
+    It reads the control rather than the store: the control is what the user
+    just changed, and the two agree a tick later anyway.
+    """
+    spec = _callback_spec(f"{settings_page.CELEBRATION_PREVIEW_BUTTON_ID}.disabled")
+
+    assert spec["clientside_function"] is not None
+    assert [(dep["id"], dep["property"]) for dep in spec["inputs"]] == [
+        (settings_page.CELEBRATION_SELECT_ID, "value")
+    ]
+
+
+def test_every_offered_style_has_an_animation_to_play():
+    """The option list and the JavaScript registry are one contract.
+
+    They agree by convention only, and the failure is silent: a name offered
+    here with no entry in ``assets/pbCelebration.js`` falls back to Confetti,
+    so the user picks Stars and gets Confetti with nothing to say it went
+    wrong.
+    """
+    animation = (
+        Path(settings_page.__file__).resolve().parents[2]
+        / "assets"
+        / "pbCelebration.js"
+    ).read_text(encoding="utf-8")
+    registry = re.search(r"const styles = \{(.*?)\};", animation, re.DOTALL)
+
+    assert registry is not None, "the style registry is not where this test looks"
+
+    registered = set(re.findall(r"^\s*(\w+):", registry.group(1), re.MULTILINE))
+    offered = {
+        option["value"]
+        for option in settings_page.CELEBRATION_STYLE_OPTIONS
+        if option["value"] != settings_page.CELEBRATION_STYLE_OFF
+    }
+
+    assert registered == offered
 
 
 def test_preview_plays_in_the_browser_and_says_nothing():
@@ -980,13 +1053,18 @@ def test_preview_plays_in_the_browser_and_says_nothing():
 
     The toast reports a run and there is no run here, so Preview writes only
     its own dead-end output: no notification container, no server round trip.
+
+    It plays the select's value, not the store's. The store lags the control by
+    a round trip after a change and leads it by one at mount, so a Preview
+    reading the store can play a style the user is not looking at -- and the
+    disabled rule, which reads the control, would disagree with it.
     """
     spec = _callback_spec(settings_page.CELEBRATION_PREVIEW_SIGNAL_ID)
 
     assert spec["clientside_function"] is not None
     assert "sendNotifications" not in str(spec["output"])
     assert [(dep["id"], dep["property"]) for dep in spec["state"]] == [
-        ("pb-celebration-style", "data")
+        (settings_page.CELEBRATION_SELECT_ID, "value")
     ]
 
 
@@ -999,7 +1077,7 @@ def test_the_celebrations_section_stands_outside_the_save_form():
     """
     saved = _callback_output("app-settings-save-status.children")
     celebration_ids = (
-        settings_page.CELEBRATION_SWITCH_ID,
+        settings_page.CELEBRATION_SELECT_ID,
         settings_page.CELEBRATION_PREVIEW_SIGNAL_ID,
         "pb-celebration-style",
     )

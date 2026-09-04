@@ -429,15 +429,18 @@ flowchart LR
   the one outcome that ruled everything out, while unchecked probes and
   unreadable account lists each say so in their own words.
   Below the form and outside it, a **Celebrations** section holds the personal
-  best celebration's on/off switch, its description, and a Preview button. The
-  authoritative value is the shell's `pb-celebration-style` store, not the
-  control: a one-shot `dcc.Interval` initializes the switch from it (read as
-  `State`, because the store-as-`Input` pair would be a dependency cycle) and
-  that same tick gates the write direction, since mounting the page fires the
-  write callback with the switch's layout default despite
-  `prevent_initial_call` and with the switch as `triggered_id`. Preview is a
-  clientside callback into the same `assets/pbCelebration.js` entry a real
-  celebration uses, so it obeys the reduced-motion guard and shows no toast.
+  best celebration's style select — Off, Confetti, Fireworks, Cannons, Stars —
+  its description, and a Preview button. The authoritative value is the shell's
+  `pb-celebration-style` store, not the control: a one-shot `dcc.Interval`
+  initializes the select from it (read as `State`, because the store-as-`Input`
+  pair would be a dependency cycle) and that same tick gates the write
+  direction, since mounting the page fires the write callback with the select's
+  layout default despite `prevent_initial_call` and with the select as
+  `triggered_id`. A stored value that is none of the options leaves the select
+  on its Confetti default and is not written back. Preview is a clientside
+  callback into the same `assets/pbCelebration.js` entry a real celebration
+  uses, so it obeys the reduced-motion guard and shows no toast; a second
+  clientside callback disables it while Off is selected.
   Below that, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
   with no callback and no network. The same section carries the bug-report
@@ -615,13 +618,15 @@ flowchart LR
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
 - `assets/pbCelebration.js` — the personal best celebration's animation:
-  a name-keyed style registry (v1 registers `confetti` alone, the upstream
-  Realistic Look recipe) behind `window.pbCelebration.play(style)` and
-  `celebrate(batch, style)`. It owns every animation guard: Off, reduced
-  motion, the hidden-tab hold that replays on `visibilitychange`, cancelling a
-  burst still in flight, the unknown-name fallback, and the batch's monotonic
-  `animation_sequence`, which is what stops one payload playing twice. It
-  resolves `window.confetti` at call time, so asset load order is not
+  a name-keyed style registry (`confetti`, `fireworks`, `cannons`, `stars`)
+  behind `window.pbCelebration.play(style)` and `celebrate(batch, style)`. It
+  owns every animation guard: Off, reduced motion, the hidden-tab hold that
+  replays on `visibilitychange`, cancelling a burst still in flight, the
+  unknown-name fallback, and the batch's monotonic `animation_sequence`, which
+  is what stops one payload playing twice. Cancellation is centralized: a style
+  returns a cancel closure, the module holds exactly one, and it runs before
+  any new play — `confetti.reset()` clears particles but does not stop a loop.
+  It resolves `window.confetti` at call time, so asset load order is not
   load-bearing.
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
