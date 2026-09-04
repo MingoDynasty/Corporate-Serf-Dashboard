@@ -1036,6 +1036,46 @@ def test_save_leaderboard_id_invalidates_mapping_cache(monkeypatch, tmp_path):
     assert api_service.get_cached_leaderboard_id("Scenario B") == 222
 
 
+def test_save_leaderboard_id_skips_the_write_when_the_id_is_unchanged(
+    monkeypatch, tmp_path
+):
+    """Startup hydration re-asserts one ID per total-play scenario.
+
+    Rewriting and fsyncing the whole mapping file for each of those dominated
+    startup on a slow disk (2026-09-04 decision log entry). Only ``fetched_at``
+    would change, and nothing reads it, so a redundant upsert must leave the
+    file byte-identical.
+    """
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    mapping_file = api_service._leaderboard_mapping_file()
+    before = mapping_file.read_bytes()
+
+    writes = []
+    monkeypatch.setattr(
+        api_service,
+        "_write_json",
+        lambda cache_file, data: writes.append(cache_file),
+    )
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+
+    assert writes == []
+    assert mapping_file.read_bytes() == before
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+
+
+def test_save_leaderboard_id_still_writes_a_changed_id(monkeypatch, tmp_path):
+    """The unchanged-ID fast path must not swallow a genuine correction."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.save_leaderboard_id("Scenario A", 111, "test")
+    # A conflicting automatic upsert is still refused, so prove the fast path
+    # on the one shape that does write: a name the mapping does not hold yet.
+    api_service.save_leaderboard_id("Scenario B", 222, "test")
+
+    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
+    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+
+
 def test_mapping_cache_reflects_external_rewrite(monkeypatch, tmp_path):
     _reset_mapping_cache(monkeypatch, tmp_path)
     api_service.save_leaderboard_id("Scenario A", 111, "test")
