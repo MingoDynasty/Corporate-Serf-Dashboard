@@ -640,6 +640,18 @@ def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     return coerced
 
 
+def _stored_leaderboard_id(
+    mappings: dict,
+    scenario_name: str,
+) -> tuple[object, int | None]:
+    """Return one mapping entry's raw and coerced leaderboard ID."""
+    existing = mappings.get(scenario_name)
+    existing_raw = (
+        existing.get("leaderboard_id") if isinstance(existing, dict) else None
+    )
+    return existing_raw, _coerce_leaderboard_id(existing_raw)
+
+
 def save_leaderboard_id(
     scenario_name: str,
     leaderboard_id: int,
@@ -647,6 +659,25 @@ def save_leaderboard_id(
 ) -> None:
     """Upsert a scenario-name to leaderboard-ID mapping unless it conflicts."""
     with _CACHE_IO_LOCK:
+        # Re-asserting an ID the cache already holds writes nothing. Startup
+        # hydration upserts one entry per total-play scenario -- thousands of
+        # them, essentially all unchanged after the first run -- and each call
+        # otherwise rewrote and fsynced the whole mapping file, which dominated
+        # startup (see the 2026-09-04 decision log entry). Only `fetched_at`
+        # would have changed, and nothing reads it.
+        #
+        # The check reads the same mtime-revalidated mirror every rank lookup
+        # resolves through, so it inherits that mirror's one accepted blind
+        # spot (a same-size rewrite forging the old mtime) and nothing else. A
+        # stale hit there skips a write whose sole effect would have been a
+        # `fetched_at` refresh; a miss simply falls through to the slow path.
+        _, mirrored_id = _stored_leaderboard_id(
+            _load_leaderboard_mapping(),
+            scenario_name,
+        )
+        if mirrored_id == leaderboard_id:
+            return
+
         cache_file = _leaderboard_mapping_file()
         cache_data = _read_json(cache_file)
         mappings = cache_data if isinstance(cache_data, dict) else {}
@@ -655,11 +686,7 @@ def save_leaderboard_id(
         # the write on it would strand the entry: every lookup reads it as a
         # miss, refetches, and is then refused here, so the malformed row would
         # drive API calls forever until the file was deleted by hand.
-        existing = mappings.get(scenario_name)
-        existing_raw = (
-            existing.get("leaderboard_id") if isinstance(existing, dict) else None
-        )
-        existing_id = _coerce_leaderboard_id(existing_raw)
+        existing_raw, existing_id = _stored_leaderboard_id(mappings, scenario_name)
         if existing_id is not None and existing_id != leaderboard_id:
             logger.warning(
                 "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
