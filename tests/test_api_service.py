@@ -978,6 +978,14 @@ def _reset_mapping_cache(monkeypatch, tmp_path):
     monkeypatch.setattr(api_service, "_leaderboard_mapping_signature", None)
 
 
+def _read_mapping_entry(cache_dir, scenario_name):
+    """Read one mapping row off disk, bypassing the in-memory mirror."""
+    mapping_file = (
+        cache_dir / "scenario_leaderboards" / "scenario_name_to_leaderboard_id.json"
+    )
+    return json.loads(mapping_file.read_text(encoding="utf-8"))[scenario_name]
+
+
 def test_mapping_cache_serves_forged_signature_rewrite_until_next_write(
     monkeypatch, tmp_path
 ):
@@ -1074,6 +1082,44 @@ def test_save_leaderboard_id_still_writes_a_changed_id(monkeypatch, tmp_path):
 
     assert api_service.get_cached_leaderboard_id("Scenario A") == 111
     assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+
+
+def test_save_leaderboard_id_promotes_a_seed_row_the_live_api_confirms(
+    monkeypatch, tmp_path
+):
+    """Confirming a seed row with the same ID must still take ownership of it.
+
+    `merge_seed_leaderboard_ids` deletes seed-owned rows the corpus stops
+    asserting and never touches learned ones, so a promotion skipped here would
+    let a later corpus release drop a mapping the live API had confirmed.
+    """
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.merge_seed_leaderboard_ids({"Seeded": 555}, allow_removals=True)
+    assert _read_mapping_entry(tmp_path, "Seeded")["source"] == "seed"
+
+    api_service.save_leaderboard_id("Seeded", 555, "total-play")
+    assert _read_mapping_entry(tmp_path, "Seeded")["source"] == "total-play"
+
+    # Promotion is a one-off: the next identical upsert takes the fast path.
+    writes = []
+    monkeypatch.setattr(
+        api_service,
+        "_write_json",
+        lambda cache_file, data: writes.append(cache_file),
+    )
+    api_service.save_leaderboard_id("Seeded", 555, "total-play")
+    assert writes == []
+
+
+def test_a_promoted_row_survives_a_corpus_release_that_drops_it(monkeypatch, tmp_path):
+    """The end-to-end reason the promotion above has to happen."""
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service.merge_seed_leaderboard_ids({"Seeded": 555}, allow_removals=True)
+    api_service.save_leaderboard_id("Seeded", 555, "total-play")
+
+    # A later corpus no longer asserts the name; learned rows are never touched.
+    api_service.merge_seed_leaderboard_ids({}, allow_removals=True)
+    assert api_service.get_cached_leaderboard_id("Seeded") == 555
 
 
 def test_mapping_cache_reflects_external_rewrite(monkeypatch, tmp_path):

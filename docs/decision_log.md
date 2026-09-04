@@ -57,6 +57,17 @@ reads are fine there; the cost was fsync-heavy writes. The lock-scope decision
 that entry records still stands on its own merits and is not superseded; only
 its supporting attribution was wrong.
 
+**Provenance is part of "unchanged".** The skip requires the stored `source` to
+match as well as the ID. `merge_seed_leaderboard_ids` removes seed-owned rows
+the corpus stops asserting and never touches learned ones (2026-07-20 entry),
+so a seed-owned row that `total-play` confirms must still be rewritten to take
+live ownership — otherwise a later corpus release could delete a mapping the
+live API had confirmed. An ID-only check shipped in review and was caught
+there. Promotion costs one write per row, once: the first hydration after an
+install promotes the seeded rows, and a corpus release promotes only the newly
+seeded names that `total-play` also covers. Every later startup is the steady
+state, measured at 0.09s and zero writes.
+
 **The stored value is authoritative.** The check reads the mtime-revalidated
 in-memory mirror (2026-07-18 entry) rather than the file, so it inherits that
 mirror's one accepted blind spot and no other. A stale hit skips a write whose
