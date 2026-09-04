@@ -261,6 +261,33 @@ in the same PR — do not leave it for later:
 
 - Prefer simple production APIs that reflect the app's real behavior. Do not add parameters, classes, or abstractions only for tests. Tests should usually adapt with fixtures, monkeypatching, or small fakes. Add explicit test seams only when they also improve the production design, or when testing would otherwise require brittle, slow, or unreliable workarounds.
 
+## Comment and Docstring Conventions
+
+- A comment earns its place by saying what the code cannot: the failure it
+  prevents, the alternative that looks right and is not, or the external
+  fact (an API quirk, a library behavior) it depends on. Do not narrate
+  what the code does.
+- Say it once, where it is durable. Rationale that has a decision-log entry
+  gets a one-line pointer, not a restatement. Library or platform behavior
+  that takes more than a few lines to explain goes in `docs/decision_log.md`
+  or `docs/kovaaks_api_notes.md`, with a pointer beside the code.
+- Write for the next maintainer, not the reviewer who asked. A comment that
+  only makes sense as the reply to a review question belongs in the PR
+  thread, which already holds it.
+- Avoid what rots: relative positions ("above", "below"), measured counts,
+  and the names of neighboring functions unless the comment is about them.
+  A change in behavior updates the comments that describe it, in the same
+  commit.
+- Docstrings open with an imperative summary on the first line, then an
+  optional paragraph for the contract the signature cannot carry (units,
+  side effects, failure behavior, lifecycle). No Args/Returns/Raises
+  sections. Identifiers in docstrings and comments take two backticks on
+  each side, reStructuredText style.
+- Lint suppressions stay narrow and name the reason when the rule code does
+  not say it. A blind-except suppression always names what the catch
+  protects.
+- A TODO names a concrete unresolved problem, not a wish.
+
 ## Styling Conventions
 
 - New user-facing copy avoids em dashes; use short sentences instead. Copy
