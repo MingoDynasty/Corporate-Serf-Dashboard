@@ -7,6 +7,7 @@ import dash_mantine_components as dmc
 from dash import Input, Output, callback, dcc
 from dash.exceptions import PreventUpdate
 
+from source.components.local_icon import local_icon
 from source.kovaaks.data_service import (
     filter_known_playlist_codes,
     get_aim_training_checkpoints,
@@ -114,7 +115,8 @@ def layout(**kwargs):  # noqa: ARG001
             dmc.Alert(
                 children="This page is still a work in progress!",
                 # props as configured above:
-                color="#ff6b6b",
+                color="blue",
+                icon=local_icon("material-symbols:info-outline"),
                 withCloseButton=False,
                 variant="light",
                 radius="sm",

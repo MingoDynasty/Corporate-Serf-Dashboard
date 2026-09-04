@@ -42,21 +42,44 @@ list in the roadmap.)
   leads with the scenario, and the sensitivity is a trailing qualifier. The
   overlay line for that same percentage tracks the current personal best. A
   run that qualifies for neither is reported by its new point on the plot and
-  nothing else. A new personal best has no toast of its own; it triggers the
-  background rank refresh. If runs accumulate while Scenario Performance is
-  not open, the next visit rebuilds once from final state and gives one
-  scenario-named summary instead of replaying stale toasts and selections —
-  and the next run you play replaces that catch-up digest, which is by then
-  the staler news. The whole family can be turned off with one Chart options
+  nothing else. A run that beats your personal best is not reported here at all
+  while the celebration below is on: it gets that instead of a verdict. Turn
+  celebrations off and it returns to this family, reported by whichever verdict
+  it earns like any other run. If runs accumulate
+  while no tab is open, the next visit rebuilds once from final state instead
+  of replaying stale toasts and selections; it narrates the most recent run if
+  you come back within a couple of minutes of playing it, and anything older
+  reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
   switch, Run Notifications: with it off the chart still updates and nothing
-  toasts about a run, though a run file that failed to import still says so.
-  The threshold switch beside the percentage decides only whether a run is
-  judged, never whether it toasts.
+  toasts about a routine run, though a personal best still celebrates when
+  celebrations are on, and a run file that failed to import still says so. The threshold switch beside the
+  percentage decides only whether a run is judged, never whether it toasts.
   *Problem solved:* immediate in-session feedback on whether the run you just
   played met your bar, readable at a glance without leaning in, and without a
-  pile of toasts accumulating over a session or a noisy catch-up sequence
-  after time away — and, for a session where any interruption is one too many,
-  a way to silence the feedback without giving up the plot.
+  pile of toasts accumulating over a session — and, for a session where any
+  interruption is one too many, a way to quiet the routine feedback without
+  giving up the plot.
+- **Personal best celebration.** A run that beats a scenario's personal best
+  gets a short burst of confetti and a toast of its own: "New personal best",
+  naming the scenario, the score, and how far ahead of your old best it landed.
+  It fires on whatever page you are looking at rather than only on Scenario
+  Performance, and for every scenario rather than the one on screen, because a
+  personal best is an achievement whatever you happen to be watching. The
+  toast stays until you dismiss it, because the run that earned it was played
+  in a fullscreen game and the news should still be there when you alt-tab
+  back; if the window was covered when the run landed, the animation waits and
+  plays when you come back to it. It also triggers the background rank
+  refresh, as it always did. A Settings control picks which animation plays,
+  Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with
+  a Preview button beside it so the effect can be seen without setting a
+  personal best, and it is independent of the Run Notifications switch: one is
+  about routine runs, the other about the moment worth interrupting for. If
+  your system asks for reduced motion, the toast still shows and the animation
+  does not. *Problem solved:* the one moment every run is chasing used to pass
+  in silence, with the run toast reporting a threshold percentage or a
+  placement instead of the achievement itself — and it passed in silence
+  wherever you were not looking, which on a benchmark run is usually the
+  playlist page.
 - **Quiet by default.** Toasts are reserved for what you did, what you
   achieved, and failures you would act on. A condition that stays true — no
   username configured, a leaderboard lookup that failed, a scenario with no
@@ -110,6 +133,29 @@ list in the roadmap.)
   means the Settings page and nothing else — the modal, the button that opened
   it, and the navbar link had all been calling themselves Settings, two of
   them with the same icon.
+- **One color language for notices** (PR #260; design in #256). Every notice
+  the app prints into the page now uses the same severity colors the toasts
+  use — blue for information, yellow for caution, red for a failure — and
+  carries a matching icon. The first-run setup card is tinted and iconed like
+  the rest, and turns yellow in the state where nothing can be plotted until
+  it is answered. *Problem solved:* the surfaces that most needed attention
+  were the faintest things on the screen. The setup card was a white card on a
+  white page, the alerts were the palest wash in the palette with nothing to
+  anchor them, and one purely informational banner was tinted red for no
+  reason, so a color told you nothing about how much it mattered. Nothing the
+  app says changed; only how loudly it says it.
+- **Every action visibly answers** (PR #263; design in #257). Toasts about
+  different things now stand side by side, and a toast about the same thing
+  replaces its own previous copy by popping back onto the screen with a fresh
+  eight seconds. A success also takes away the failure message it answers, so a
+  red toast never lingers beside the green one that supersedes it.
+  *Problem solved:* importing a second playlist while the first one's toast was
+  still up showed nothing at all, which reads as a failed import. The same trap
+  caught every retry in the app: the failed-import dialog keeps your pasted code
+  so you can correct it, but a second failure inside eight seconds answered with
+  silence, and spam-clicking Refresh either stacked identical toasts or gave
+  nothing back. Now every click gets an answer you can see, and nothing is
+  quietly swallowed.
 
 ### Standing: where do I rank
 
@@ -212,11 +258,13 @@ list in the roadmap.)
   written until Save, so a suggestion is never a decision made for the user.
 - **A fresh install explains itself, once** (Scenario Performance page, PRs
   #235, #236). A setup card appears while something has never been asked
-  about: it says so when no stats folder was found, and otherwise offers the
-  KovaaK's account that turns leaderboard positions and percentiles on. Either
-  way it points at the Settings page and nothing else; the account offer can
-  be skipped, which turns rank lookups off and never asks again. The playlists
-  overview says the same thing where its percentile columns read N/A. *Problem
+  about, or while saved settings cannot be read: it says so when no stats
+  folder was found, when a settings file exists that this build cannot use,
+  and otherwise offers the KovaaK's account that turns leaderboard positions
+  and percentiles on. In every case it points at the Settings page and nothing
+  else; the account offer can be skipped, which turns rank lookups off and
+  never asks again. The playlists overview says the same thing where its
+  percentile columns read N/A. *Problem
   solved:* a first launch usually charts runs with no setup at all, which left
   the one optional feature invisible unless a user stumbled onto it, and when
   the folder lookup missed, exactly one page explained why everything was

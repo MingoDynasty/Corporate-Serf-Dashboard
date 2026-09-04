@@ -17,7 +17,14 @@ notifications update automatically in the background.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
   it rather than stacking a second one beside it, and a run that earns neither says nothing. One
-  Chart options switch turns the whole family off, leaving the chart to update silently.
+  Chart options switch, Run Notifications, turns these off, leaving the chart to update silently.
+- **Personal best celebration** — a run that beats your scenario best gets a short burst of
+  confetti and its own toast, on whatever page you have open, and the toast stays until you
+  dismiss it so the news survives a fullscreen session. If the window was covered when the run
+  landed, the animation waits until you come back to it. A Settings control picks the animation,
+  Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with a Preview button
+  beside it, and it is its own family, so Run Notifications does not silence it.
+  A reduced-motion preference keeps the toast and drops the animation.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
   `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
@@ -209,6 +216,12 @@ can write it by hand instead:
 Edit this file only while the dashboard is stopped — it is read once per run.
 Saving from the Settings page while it runs is fine; the page tells you when a
 change needs a restart before it takes effect.
+
+One setting on that page is in neither file: the **Celebrations** choice, which
+picks the personal best celebration's animation or turns it off. It is
+remembered by the browser rather than written to disk, applies the moment you
+choose, and is not part of Save. A different browser, or one whose site data you
+have cleared, starts on Confetti.
 
 ## Usage
 

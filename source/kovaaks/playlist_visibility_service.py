@@ -97,12 +97,32 @@ def _write_shown_to_disk(shown: set[str]) -> None:
         stamped_payload({SHOWN_PLAYLISTS_KEY: sorted(shown)}), indent=2
     )
     VISIBILITY_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    atomic_write_text(VISIBILITY_FILE_PATH, payload + "\n", logger=logger)
+    atomic_write_text(
+        VISIBILITY_FILE_PATH,
+        payload + "\n",
+        logger=logger,
+        before_replace=_guard_visibility_destination,
+    )
 
 
-def _guard_visibility_write() -> None:
-    """Refuse a write over a newer schema; preserve an unusable file first."""
-    document = _visibility_document()
+def _guard_visibility_destination() -> None:
+    """Classify whatever sits at the store's path, immediately before a write.
+
+    Reads disk rather than the cache, which is what makes the guard true. The
+    cached classification is from boot: a file corrupted (or stamped by a newer
+    build) since then would otherwise be replaced on the strength of what it
+    used to be, losing the very bytes the backup exists to keep. The playlist
+    writer checks its destination the same way.
+
+    A file from a newer build refuses the write with ``UnsupportedSchemaError``
+    and the destination untouched. An unusable file is displaced, its bytes
+    copied aside first.
+    """
+    document = read_store_document(
+        VISIBILITY_FILE_PATH,
+        encoding="utf-8",
+        validate=validate_visibility_v1,
+    )
     if document.state is StoreState.FUTURE:
         raise UnsupportedSchemaError(document.message)
     if document.state is StoreState.ERROR:
@@ -149,7 +169,6 @@ def show_playlist(playlist_code: str) -> None:
         if playlist_code in shown:
             return
         shown.add(playlist_code)
-        _guard_visibility_write()
         _write_shown_to_disk(shown)
         _shown_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=shown)
 
@@ -161,7 +180,6 @@ def hide_playlist(playlist_code: str) -> None:
         if playlist_code not in shown:
             return
         shown.discard(playlist_code)
-        _guard_visibility_write()
         _write_shown_to_disk(shown)
         _shown_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=shown)
 

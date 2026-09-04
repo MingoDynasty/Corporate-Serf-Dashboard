@@ -241,23 +241,29 @@ def save_settings(values: Mapping[str, str]) -> None:
     """
     settings = dict(values)
     with _SETTINGS_LOCK:
-        _guard_settings_write()
         _write_settings_to_disk(settings)
         _settings_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=settings)
 
 
-def _guard_settings_write() -> None:
-    """Refuse a write over a newer schema; preserve an unusable file first.
+def _guard_settings_destination() -> None:
+    """Classify whatever sits at the store's path, immediately before a write.
 
-    Reads the store when nothing has yet, so the guard holds for a writer that
-    runs before any prior read (a save on a freshly started process).
+    Reads disk rather than the cache, which is what makes the guard true. The
+    cached classification can be arbitrarily old: a file corrupted (or stamped
+    by a newer build) since it was read would otherwise be replaced on the
+    strength of what it used to be, losing the very bytes the backup exists to
+    keep and downgrading a newer store to v1. The playlist writer checks its
+    destination the same way.
+
+    A file from a newer build refuses the write with ``UnsupportedSchemaError``
+    and the destination untouched. An unusable file is displaced, and
+    ``back_up_unusable_store`` raises ``OSError`` when its bytes cannot be
+    copied aside, which refuses the write just as firmly.
     """
-    document = _settings_document()
+    document = _read_settings_document()
     if document.state is StoreState.FUTURE:
         raise UnsupportedSchemaError(document.message)
     if document.state is StoreState.ERROR:
-        # Raises OSError when the copy cannot be made, which refuses the write:
-        # nothing is overwritten until its bytes are safely beside it.
         back_up_unusable_store(SETTINGS_FILE_PATH)
 
 
@@ -295,7 +301,6 @@ def decline_identity() -> None:
         if KOVAAKS_USERNAME_KEY in settings:
             return
         settings[KOVAAKS_USERNAME_KEY] = ""
-        _guard_settings_write()
         _write_settings_to_disk(settings)
         _settings_cache["value"] = StoreDocument(StoreState.SUPPORTED, value=settings)
 
@@ -352,4 +357,9 @@ def _write_settings_to_disk(settings: Mapping[str, str]) -> None:
         indent=2,
     )
     SETTINGS_FILE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    atomic_write_text(SETTINGS_FILE_PATH, payload + "\n", logger=logger)
+    atomic_write_text(
+        SETTINGS_FILE_PATH,
+        payload + "\n",
+        logger=logger,
+        before_replace=_guard_settings_destination,
+    )

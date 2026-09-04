@@ -5,7 +5,7 @@ import threading
 import time
 from collections import deque
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from statistics import fmean
@@ -101,6 +101,12 @@ class PercentileWarmupSnapshot:
     fatal_state: str | None
     enqueue_generation: int
     recent_pace_seconds: float | None
+    # True from the moment a start claims the singleton until it has published
+    # its worker and drained the enqueues parked meanwhile. Consumers must read
+    # this as busy: before publication there is no generation counter to
+    # compare against, so a poll disarmed here would never observe the bumps
+    # that publication and the parked drain go on to produce.
+    starting: bool = False
 
 
 def _outcome(context: WarmupContext, key: str) -> SessionOutcome:
@@ -649,25 +655,47 @@ class PercentileWarmupWorker:
         )
 
     def _next_item(self) -> str | None:
-        with self._condition:
-            while True:
+        """Claim the next scenario needing work, testing freshness unlocked.
+
+        ``_freshly_satisfied`` reads two cache files per candidate, so it runs
+        with the condition released. Holding the condition across a whole
+        all-skip drain -- the ordinary warm-cache shape, where nothing returns
+        early -- blocks every other holder for the length of that drain: the
+        Playlists progress read, and an import or unhide enqueue alike. The
+        hold is now one pop, never a scan.
+
+        The popped name is claimed as ``_in_flight`` before the lock drops, so
+        a candidate under evaluation still counts toward ``remaining_count``.
+        Without that claim the queue would read as empty mid-drain, the UI
+        would see an idle worker and disable its refresh interval, and
+        ``_log_completed_batch_locked`` would announce a batch that is still
+        running.
+        """
+        while True:
+            with self._condition:
                 if self._fatal_state is not None:
                     return None
-                while self._queue:
-                    scenario_name = self._queue.popleft()
-                    outcome = self.context.outcomes.get(scenario_name)
-                    if (outcome is not None and outcome.terminal) or _freshly_satisfied(
-                        scenario_name,
-                        self.context.config,
-                    ):
-                        if scenario_name not in self._batch_seen:
-                            self._batch_seen.add(scenario_name)
-                            self._batch_skipped += 1
-                        continue
-                    self._in_flight = scenario_name
-                    return scenario_name
-                self._log_completed_batch_locked()
-                self._condition.wait()
+                if not self._queue:
+                    self._log_completed_batch_locked()
+                    # Re-tested under the condition on the next pass, so an
+                    # enqueue notifying between the pop above and this wait
+                    # cannot be missed.
+                    self._condition.wait()
+                    continue
+                scenario_name = self._queue.popleft()
+                outcome = self.context.outcomes.get(scenario_name)
+                terminal = outcome is not None and outcome.terminal
+                self._in_flight = scenario_name
+
+            if terminal or _freshly_satisfied(scenario_name, self.context.config):
+                with self._condition:
+                    self._in_flight = None
+                    if scenario_name not in self._batch_seen:
+                        self._batch_seen.add(scenario_name)
+                        self._batch_skipped += 1
+                continue
+
+            return scenario_name
 
     def _wait_for_interactive_quiet(self) -> None:
         while True:
@@ -835,11 +863,16 @@ class PercentileWarmupWorker:
 
 _worker_lock = threading.Lock()
 _worker: PercentileWarmupWorker | None = None
+# True while a caller is enumerating the startup queue with _worker_lock
+# released. Enqueues arriving in that window have no worker to reach, so they
+# are parked below and drained by the starter once it publishes one.
+_worker_starting = False
+_pending_enqueues: list[str] = []
 
 
 def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     """Start the singleton worker; return False for either off configuration."""
-    global _worker  # noqa: PLW0603
+    global _worker, _worker_starting  # noqa: PLW0603
     config = config or get_config()
     # Guard before playlist/stats enumeration: empty username is fully offline.
     if not config.percentile_warmup_enabled or not get_kovaaks_username():
@@ -849,22 +882,62 @@ def start_percentile_warmup_worker(config: ConfigData | None = None) -> bool:
     with _worker_lock:
         if _worker is not None:
             return True
+        if _worker_starting:
+            # Another caller is already enumerating and will publish; a second
+            # enumeration would only be discarded.
+            return True
+        _worker_starting = True
+
+    try:
+        # Enumeration reads two cache files per played scenario, so it runs
+        # with the lock released: get_percentile_warmup_state needs the same
+        # lock, and this is reachable from a live callback (the settings save
+        # that first supplies a username), not only from pre-serving startup.
         initial_queue = _startup_queue()
-        _worker = PercentileWarmupWorker(config, initial_queue)
-        _worker.start()
+        worker = PercentileWarmupWorker(config, initial_queue)
+        with _worker_lock:
+            # Adopt anything parked during the enumeration and publish in the
+            # same hold, so no enqueue can observe a worker-less window twice.
+            pending = list(dict.fromkeys(_pending_enqueues))
+            _pending_enqueues.clear()
+            _worker = worker
+            worker.start()
+
+        # Outside the lock: enqueue_playlist reads playlists and stats of its
+        # own. These prepend, so a playlist made visible mid-enumeration is
+        # warmed first rather than behind the whole startup queue. The starting
+        # flag stays set across this drain deliberately: each enqueue bumps the
+        # generation a poll is watching for, so clearing it first would let one
+        # read the fresh worker as idle and disarm before those bumps land.
+        for playlist_code in pending:
+            worker.enqueue_playlist(playlist_code)
+    finally:
+        with _worker_lock:
+            _worker_starting = False
     return True
 
 
 def enqueue_playlist_percentile_warmup(playlist_code: str) -> int:
-    """Prepend one newly visible/imported playlist, or no-op while disabled."""
+    """Prepend one newly visible/imported playlist, or no-op while disabled.
+
+    Returns the number of scenarios queued now, so a code parked for a
+    still-starting worker reports 0. Callers ignore the count; tests read it to
+    tell a parked code from a queued one.
+    """
     config = get_config()
     # Same pre-enumeration guards as startup (R15).
     if not config.percentile_warmup_enabled or not get_kovaaks_username():
         return 0
     with _worker_lock:
         worker = _worker
-    if worker is None:
-        return 0
+        if worker is None:
+            if _worker_starting:
+                # A start is enumerating with the lock released. Park the code
+                # for it: before enumeration moved out of the lock this call
+                # simply waited here, so dropping it now would silently defer
+                # the playlist's warmup until the next restart.
+                _pending_enqueues.append(playlist_code)
+            return 0
     return worker.enqueue_playlist(playlist_code)
 
 
@@ -872,6 +945,7 @@ def get_percentile_warmup_state() -> PercentileWarmupSnapshot:
     """Return singleton progress, including a stable disabled/idle snapshot."""
     with _worker_lock:
         worker = _worker
+        starting = _worker_starting
     if worker is None:
         return PercentileWarmupSnapshot(
             queued_names=(),
@@ -882,5 +956,8 @@ def get_percentile_warmup_state() -> PercentileWarmupSnapshot:
             fatal_state=None,
             enqueue_generation=0,
             recent_pace_seconds=None,
+            starting=starting,
         )
-    return worker.snapshot()
+    # A published worker is still starting until its parked enqueues drain,
+    # and each of those bumps the generation the UI is watching for.
+    return replace(worker.snapshot(), starting=starting)

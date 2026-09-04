@@ -239,7 +239,15 @@ def convert(store: Store, report: Report) -> None:
     # file is rewritten from the parsed payload as plain UTF-8, which is what
     # the app has always written.
     text = json.dumps(stamped_payload(payload), indent=2) + "\n"
-    atomic_write_text(store.path, text, logger=logger)
+    try:
+        atomic_write_text(store.path, text, logger=logger)
+    except OSError as exc:
+        # One unwritable store (a read-only attribute, a sync client's hold)
+        # must not abort the run and discard the report of everything already
+        # stamped. The write is atomic, so the file is exactly as it was, and
+        # ``main`` still exits nonzero because anything skipped fails the run.
+        report.skipped.append((store.path, f"could not be written ({exc})"))
+        return
     report.stamped.append(store.path)
 
 

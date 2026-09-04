@@ -1,3 +1,4 @@
+import dataclasses
 import datetime
 import logging
 from types import SimpleNamespace
@@ -7,6 +8,7 @@ from sortedcontainers import SortedList
 
 from source.config import settings_service
 from source.kovaaks.data_models import RunData
+from source.my_queue.message_queue import NewFileMessage
 from source.my_watchdog import file_watchdog
 
 SCENARIO_NAME = "VT Pasu Intermediate S5"
@@ -358,7 +360,7 @@ def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
 
     assert loads == ["run.csv"]
     assert len(messages) == 1
-    assert messages[0].previous_high_score == previous_high_score
+    assert messages[0].scenario_previous_best == previous_high_score
     assert schedules == [
         (
             SCENARIO_NAME,
@@ -369,3 +371,103 @@ def test_on_created_ingests_run_when_high_score_has_no_usable_denominator(
         )
     ]
     assert file_watchdog.drain_run_import_failures() == []
+
+
+def _patch_scenario_path(monkeypatch, path_kind, high_score=90.0):
+    """Steer on_created down one of its three message-building branches."""
+    monkeypatch.setattr(
+        file_watchdog,
+        "is_scenario_in_database",
+        lambda _scenario: path_kind != "new_scenario",
+    )
+    if path_kind == "new_scenario":
+        return
+    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _scenario: high_score)
+    sensitivities = (
+        {} if path_kind == "new_sensitivity" else {SENSITIVITY_KEY: _sorted_runs()}
+    )
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_sensitivities_vs_runs",
+        lambda _scenario: sensitivities,
+    )
+
+
+@pytest.mark.parametrize(
+    ("path_kind", "expected_previous_best", "expected_new_sensitivity"),
+    [
+        ("new_scenario", None, True),
+        ("new_sensitivity", 90.0, True),
+        ("existing", 90.0, False),
+    ],
+)
+def test_on_created_publishes_facts_from_every_branch(
+    monkeypatch,
+    path_kind,
+    expected_previous_best,
+    expected_new_sensitivity,
+):
+    """Each branch reports the same two facts, so consumers can derive verdicts.
+
+    ``scenario_previous_best`` is the scenario-wide best before this run and is
+    None only when the scenario had no prior run at all. ``is_new_sensitivity``
+    carries the "nothing to judge this against" half that the one nullable
+    field used to mean as well -- which is why a new-sensitivity run now
+    reports the scenario best it may well have beaten.
+    """
+    run_data = _run_data()
+    messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
+    _patch_scenario_path(monkeypatch, path_kind)
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(
+            is_directory=False,
+            src_path="S:/stats/VT Pasu Intermediate S5 - Challenge - 2026.08.29 Stats.csv",
+        )
+    )
+
+    (message,) = messages
+    assert message.scenario_previous_best == expected_previous_best
+    assert message.is_new_sensitivity is expected_new_sensitivity
+    assert message.run_id == (
+        "VT Pasu Intermediate S5 - Challenge - 2026.08.29 Stats.csv"
+    )
+
+
+def test_the_run_message_carries_no_decision_field():
+    """Facts travel; only the drain decides.
+
+    A decision on the message would let two consumers disagree about one run,
+    or let one of them read a verdict the other set. The watchdog keeps its
+    ``is_new_high_score`` as a local for the rank refresh and the debug log.
+    """
+    assert {field.name for field in dataclasses.fields(NewFileMessage)} == {
+        "datetime_created",
+        "is_new_sensitivity",
+        "nth_score",
+        "run_id",
+        "scenario_name",
+        "scenario_previous_best",
+        "score",
+        "sensitivity",
+    }
+
+
+def test_a_new_sensitivity_run_that_is_a_personal_best_reports_both_facts(monkeypatch):
+    """The case the old schema could not express.
+
+    A first run at a new sensitivity can still beat the scenario's best. The
+    old field was None here, which hid the scenario best from anything that
+    wanted it and was the shape behind two review-round bugs.
+    """
+    run_data = _run_data(score=120.0)
+    messages, _loads, _schedules = _patch_common(monkeypatch, run_data)
+    _patch_scenario_path(monkeypatch, "new_sensitivity", high_score=90.0)
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path="run.csv")
+    )
+
+    (message,) = messages
+    assert message.is_new_sensitivity is True
+    assert message.scenario_previous_best == 90.0

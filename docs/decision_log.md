@@ -13,6 +13,649 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-02: Warmup Locks Are Never Held Across Cache I/O
+
+Status: Accepted
+
+The Playlists page could show a loading spinner for up to a minute after
+startup, and importing or unhiding a playlist could appear to do nothing for
+just as long. A background worker was holding a lock while it read hundreds of
+small cache files, and the page needed that same lock to draw its progress
+line. The worker now does its file reads with the lock released. It warms the
+same scenarios as before, and a playlist you have just imported or unhidden can
+now take its turn sooner instead of waiting for the scan to end.
+
+**The invariant.** Neither `PercentileWarmupWorker._condition` nor the
+module-global `_worker_lock` may be held across cache file I/O. Both are read
+by UI callbacks: `get_percentile_warmup_state` (the Playlists status line and
+refresh interval) takes `_worker_lock` and then `_condition`, and
+`enqueue_playlist_percentile_warmup` (import, unhide) takes both as well. A
+hold that spans per-scenario cache reads therefore blocks page renders, not
+just the worker.
+
+**Two sites violated it.** `_next_item` held `_condition` across its whole
+skip-drain, which reads two cache files per candidate. This only bites when the
+cache is warm: nothing returns early, so the loop walks the entire queue.
+Measured at 0.13s for 317 scenarios on a fast SSD and about 60s on a
+beta tester's disk, where per-file antivirus scanning makes small random reads
+roughly 400x slower. A direct callback measurement, taken on the fast SSD with
+per-candidate latency injected into `_freshly_satisfied` to model the tester's
+disk, recorded 45.1s blocked versus 0.2s once the drain finished. That isolates
+the lock and only the lock: the overview's own row build reads two cache files
+per played scenario per row on the same disk, so the figure is not evidence
+that the tester's page renders promptly after this change. `start_percentile_warmup_worker` held
+`_worker_lock` across `_startup_queue()`, which reads two cache files per played
+scenario; harmless from `app.py` because it runs before the server accepts
+requests, but reachable from the settings save that first supplies a username.
+
+**Shape of the fix.** `_next_item` pops under the lock and evaluates freshness
+outside it; the popped name is claimed as `_in_flight` before the lock drops, so
+a candidate under evaluation still counts toward `remaining_count` and the batch
+cannot read as idle or announce completion mid-drain. The loop re-tests the
+queue under the lock before waiting, so an enqueue that notifies while the
+worker is evaluating is not lost. `start_percentile_warmup_worker` runs a
+claim/park/publish handshake: it claims the start under the lock by setting
+`_worker_starting`, releases the lock to enumerate, and publishes in a later
+hold. There is no post-enumeration singleton re-check and nothing to discard,
+because a second caller arriving during the window returns early instead of
+enumerating a queue that would be thrown away. What can arrive in that window
+is not a competing starter but an enqueue, which is what the parking below
+exists for — the two halves are one protocol and must not be implemented
+separately.
+
+**Publication is not a gap.** Releasing the lock across enumeration means an
+import or unhide can find no worker to enqueue against, where it previously
+just waited for one; dropping it there would defer that playlist's warmup until
+the next restart, silently. A `_worker_starting` flag marks the window, codes
+arriving in it are parked in `_pending_enqueues`, and the starter adopts them in
+the same lock hold that publishes the worker. They are enqueued after
+publication, so they prepend ahead of the startup queue.
+
+**Starting is a busy state, not an idle one.** The snapshot carries a
+`starting` flag that is true from the moment a start claims the singleton until
+its parked enqueues have drained, and the overview reads it as busy. Without
+it, a poll landing before publication sees no queue, no in-flight item, and
+generation 0, concludes the worker is idle, and disarms its refresh interval —
+so nothing then observes the generation bumps that publication and the parked
+drain produce, and the page sits on stale percentiles until the next visit. The
+flag deliberately outlives publication for the same reason: clearing it at
+publication would leave the same window between a freshly published empty
+worker and its drain.
+
+**Not fixed here.** `_CACHE_IO_LOCK` serializes every cache file operation
+app-wide, but each hold is one file operation rather than a scan; recorded in
+`docs/tech_debt.md` under Performance.
+
+## 2026-09-02: A New Personal Best Celebrates On Every Page
+
+Status: Accepted
+
+A run that beats a scenario's personal best now gets a short burst of confetti
+and a toast that says so. It fires on whatever page is open and for every
+scenario, not only the one being watched, and the toast stays until it is
+dismissed because the run that earned it was played in a fullscreen game. A
+Settings switch turns the whole thing off. Nothing else about how runs are
+reported changed.
+
+**One drain decides.** The app shell hosts the `pb-celebration-interval`
+(period `polling_interval`), the `run-events-batch` store, and
+`publish_run_events`, which is now `message_queue`'s only consumer. Facts
+travel and only the drain decides: it stamps each drained run `is_live`, names
+at most one `celebrated_run_id`, and advances a monotonic
+`animation_sequence` exactly when it names one. `NewFileMessage` carries
+`run_id`, `scenario_previous_best`, and `is_new_sensitivity` — facts with no
+verdict in them — and Scenario Performance reads the stamps instead of
+re-deriving either. The ordering argument is the dependency graph, not a
+protocol: a page callback triggered by the batch store necessarily runs after
+the shell wrote it, so there is nothing to race. Four review rounds of
+coordination machinery between two independent drains (a shared toast id, a
+page-side freshness window, a celebrated-run registry, a registry plus a
+watermark with deferral) are what this replaced; each moved the race without
+closing it, and the single drain closes it by construction.
+
+**The rule.** A run is celebrated when its score is *strictly* greater than
+its `scenario_previous_best`, so a tie never celebrates and a scenario's first
+run only sets the baseline. The newest qualifying live run in a batch wins and
+an older one is plot-only, because one Dash response carries one payload and
+drives one animation. That strict comparison is the only gate that ships: most
+runs in a freshly imported scenario are personal bests, and the ruling
+accepted that noise rather than inventing a minimum run count or margin before
+anyone knows it grates, with the setting as the escape hatch. A gate can be
+added later if it does.
+
+**Freshness.** A run is stamped live when its `datetime_created` is within a
+120-second cap plus one poll period of the drain, and stale otherwise. There
+is no watermark and no drain bookkeeping: every drain empties the queue, so a
+message a drain finds was never seen by an earlier one, and one appended
+mid-drain is caught by that drain or the next, exactly once either way. The
+cap sits two orders of magnitude above the default poll interval and
+comfortably above Chromium's intensive throttling, which slows a hidden tab's
+interval to about one tick per minute — and the tab is occluded during play,
+so a tight window would drop exactly the mid-session personal bests this
+exists for. The poll period is added because `polling_interval` carries no
+product cap: a run can be a whole period old through nothing but the drain's
+cadence, and a fixed cap below the configured period would stamp every run
+stale and silently retire every toast liveness gates. The consequence, stated
+rather than hidden: a deliberately slow poll widens no-tab replay by exactly
+the period it chose. Validating the interval with a product cap instead stays
+rejected, for the reasons in
+[2026-09-01](#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load).
+
+**The toast.** Green, a trophy icon, titled "New personal best", and sent with
+`auto_close=False` so it is still there on alt-tab. Its channel key is
+`pb-celebration`, deliberately not `run-verdict`: an ordinary run toast lands
+beside it rather than replacing it, and only a later celebration replaces a
+celebration. It is a persistent channel in the sense the
+[2026-08-31 toast-identity entry](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+defines, and that entry owns the mechanism.
+
+**The celebration takes the headline.** When celebrations are on, the
+celebrated run's one toast *is* the celebration toast and the page's run toast
+yields. The score threshold goal has no upper bound, so a goal above 100% let
+a personal best read "Below threshold" while confetti fell, and even under a
+goal it passes, "Threshold passed" says the less interesting thing. This
+amends the priority rule in
+[2026-08-03](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+for the celebrations-on state only: with the setting off, the verdict
+headlines and a personal best has no toast of its own, exactly as before. A
+personal best the drain did not celebrate — an older qualifying run coalesced
+out of the batch, or one outside the selected scenario with auto-switch off —
+follows the ordinary run-toast rules and has no guaranteed toast. The
+guarantee is per run and one-sided: every run earns at most one notification,
+and the celebrated run exactly one. One batch can therefore put two toasts on
+screen when the celebration and the page's narration concern different runs,
+and that is correct.
+
+**The master switch does not reach it.** The two settings are independent
+families: the celebration setting governs the confetti and the celebration
+toast together, and Run Notifications governs the verdict and placement
+toasts. With Run Notifications off and celebrations on, a personal best still
+celebrates on every page while ordinary runs stay silent — a user in that
+state has asked for two things at once. The toast travels with the animation
+because it is the half that carries information; on a page other than Scenario
+Performance, confetti without it is a burst with no explanation, and under
+reduced motion the toast is the whole celebration. Coupling them was rejected
+on that reading and on mechanics: the master switch's persisted value lives on
+the Scenario Performance page, so the shell would need a second mirror store
+to see it.
+
+**A hidden tab holds the animation.** Chromium marks a fully occluded window's
+tab hidden, and the player is in KovaaK's fullscreen when a personal best
+lands, so a hard `document.hidden` drop would mean the animation never plays
+for a real personal best on a single-monitor setup — only from Preview. At
+most one celebration is held instead, a newer one replacing it, and it plays
+on the next `visibilitychange` to visible; playing while hidden would also
+dump a stalled burst on the next alt-tab, since a hidden tab throttles
+animation frames. The accepted cost, stated with the ruling: personal best
+toasts are dismissed by hand on every setup, including one where the animation
+played in view. Relaxing the toast to the normal lifetime is a one-line
+follow-up that does not touch the pending mechanism. The ruling needed no
+pre-ship evidence, and the asymmetry was the deciding argument: where the tab
+never reports hidden the pending path is dormant and behaviour is identical,
+and where occlusion does mark it hidden, pending is the only version that
+plays at all. The `visibilitychange` observation during a real fullscreen
+session remains a post-ship check.
+
+**The animation.** `canvas-confetti` 1.9.4 (ISC) is vendored unminified under
+`assets/vendor/`, with its LICENSE and a version pin, rather than hand-rolled:
+it ships the physics, the shapes, the reduced-motion guard, cancellation, and
+worker-thread rendering, and every later change is configuration instead of
+physics code. `assets/pbCelebration.js` is the app-owned half — a name-keyed
+style registry, Confetti alone in version one (the upstream Realistic Look
+recipe unchanged, about three seconds), behind `play(style)` and
+`celebrate(batch, style)`. An unknown style name plays Confetti rather than
+nothing, so a style removed later never silently turns celebrations off. A
+clientside callback on the batch store drives it, so the burst costs no server
+round trip; the library is resolved at call time, because Dash serves
+`assets/*.js` in its own order. There is no JavaScript lint, test, or build
+step in this repo, so that file is held by review and a manual pass.
+
+**No catch-up digest.** The "While you were away" digest existed because run
+events accumulated while Scenario Performance was closed. Delivery is now
+app-wide and continuous while any tab is open, so batches stop accumulating in
+the case the digest served. What remains is the no-tab case, where the
+freshness window draws the line: a personal best set within the window of the
+next drain is celebrated on it, and anything older is never replayed. Bounded
+replay is accepted rather than suppressed — a player who reopens the tab a
+minute after the run wants the celebration, and the timestamp cannot tell that
+case from a throttled hidden tab's, which must land. A backlog that does
+arrive rebuilds the graph once, auto-switches once, and follows the per-run
+rules above: up to two toasts, never a digest. Whether the celebration family
+deserves its own longer or unbounded window is a follow-up question, carried
+on the roadmap.
+
+**What this supersedes.** The
+[2026-07-06 coalescing entry](#2026-07-06-coalesce-pending-home-run-events)
+loses its "sole consumer" clause — the shell's drain is the consumer now and
+the page listens to a store — and its digest. Its coalescing rule survives,
+applied to the batch: the page still considers only the latest matching run.
+The [2026-08-21 master-switch entry](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+loses the digest from the set of shapes its gate covers, and its deferral of
+the queue-to-UI redesign for the drain alone; the product question that
+deferral protected, app-wide verdict toasts, stays deferred, and run toasts
+remain page-built and page-scoped. The
+[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+loses its rule that a personal best earns nothing beyond the run verdict, and
+the "backlog digest included" clause of its replacement rule.
+
+Shipped in PRs #261 and #268; proposal and rulings in #248, toast mechanism
+reconciled in #263. Distilled from the personal best celebration proposal, now
+deleted.
+
+## 2026-09-02: The Celebration Setting Is Browser-Local, On The Settings Page
+
+Status: Accepted
+
+The control that chooses how a personal best celebrates lives on the Settings
+page, in its own Celebrations section, with a Preview button beside it. It
+offers Off and four animation styles, and takes effect the moment one is
+chosen rather than waiting for Save. The browser remembers the choice instead
+of the app's settings file, so a different browser, or one whose site data has
+been cleared, celebrates by default.
+
+**The store is the setting.** `dcc.Store(id="pb-celebration-style",
+storage_type="local")` in the app shell holds one string: `"off"` or a style
+name, defaulting to `"confetti"`. The value was a style name from the start
+even though version one shipped a switch, so the follow-up that turned the
+switch into a style select only added values to a contract that already
+existed and kept whatever was saved. The control initializes from the store
+and writes back to it and carries no Dash persistence of its own, so a
+switch's boolean
+and a select's string never become two competing persisted values. The drain
+reads the store as `State`, and so does the clientside animation: changing the
+setting must not replay a batch already delivered.
+
+**Why the Settings page.** The behavior is app-wide, so the Chart options
+inspector on one page is the wrong home — undiscoverable, and a control there
+describes itself as a chart option. This departs from the placement rule the
+[point customization](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+and [master switch](#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)
+entries both state, that the inspector owns browser-persisted presentation
+preferences. The departure is deliberate and narrow: that rule governs
+preferences about the chart, and this one is about the app. It is also the
+first browser-persisted control on the Settings page, beside a form whose
+three fields are written to disk behind Save. The section is visibly separate,
+its control applies instantly, and it touches neither the restart notice nor
+the store alert, both of which speak for the form's three keys, so the form's
+contract is untouched.
+
+**Why not `data/settings.json`.** Rejected on cost, not principle. Settings v1
+is a closed set of three string keys, so a new key is settings v2: a
+validator, a version bump, the stamp script becoming a real migration under
+the documented ordering contract, the launcher's trial-run window to be solved
+for the first migrating release, and an older build refusing the v2 file on
+rollback
+([2026-08-11](#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+A cosmetic preference should not be what forces that. When a setting that
+deserves v2 arrives, this one joins it; only the store's backing would change.
+
+**Instant apply needs one tick, and the tick is load-bearing.** The obvious
+callback pair — the store as `Input` to the switch, the switch as `Input` to
+the store — is a dependency cycle the Dash renderer refuses, so the switch is
+initialized by a one-shot `dcc.Interval` that reads the store as `State`. That
+tick is also the gate on the write direction, and this is the part worth
+remembering: mounting the page fires the write callback with the switch's
+*layout default* despite `prevent_initial_call`, with the switch itself as
+`ctx.triggered_id` — so the repo's usual triggering-id guard does not catch
+it, and without the gate, opening Settings wrote the on value over a stored
+off. Ordering makes the gate safe rather than lucky: once the tick has landed
+the switch already holds the stored value, so the worst a late mount-fire can
+write is the value that was there. Any future browser-local control on a page
+layout has the same hazard.
+
+**Accepted costs.** Browser persistence is per origin and is cleared with site
+data. Both fail towards "celebrations came back", never towards silence, which
+is why only the exact `"off"` value silences the family: a style name a later
+build wrote, or a store this build cannot read, still celebrates. The layout
+default is not a third cost: a `dcc.Store` writes it to storage only when
+nothing is stored yet and otherwise takes the stored value, so changing the
+default later resets nobody's setting. That is the opposite of Dash
+`persistence`, which keys the stored value on the layout default and drops it
+when that default moves (the
+[2026-08-20 point-customization entry](#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
+records the controls that pay it), and the distinction matters when the
+follow-up changes the default style. One more, inherited rather
+than introduced: `message_queue` is process-wide and each drain's payload
+reaches one client, so with two tabs open a batch lands in whichever drain
+runs first. That is the single-consumer shape the page's drain already had,
+and the supported usage model stays one active tab.
+
+**Preview, and the styles that follow.** Preview plays the currently selected
+style through the same clientside path a real celebration takes, so it obeys
+the reduced-motion guard; it shows no toast, because the toast reports a run
+and there is no run. It ships in version one because it is the only way to see
+the effect without setting a personal best. The follow-up converted the switch
+to a select over Off, Confetti, Fireworks, Cannons, and Stars — curated
+presets only, no duration, particle, or color knobs, no custom style, and no
+Random option. Since the proposal file is deleted, its specification of that
+step is recorded here: Confetti is the upstream Realistic Look recipe
+unchanged (five bursts from one origin, about 200 particles, about three
+seconds); Fireworks is the upstream Fireworks recipe cut from 15 s to about
+3 s; Cannons is School Pride cut to about 2.5 s with the app's accent colors
+in place of the demo's red and white; Stars is the upstream Stars recipe
+unchanged (three volleys, star and circle shapes, no gravity). Snow is
+ambient rather than a celebration and is excluded. `confetti.reset()` clears
+particles but does not stop a `setInterval` or animation-frame loop, so the
+two loop-based recipes must not be taken from the demo verbatim — each style
+is bounded to about three seconds and must cancel cleanly.
+
+**What that step settled when it shipped.** Cancellation is centralized rather
+than repeated per style: every style returns a cancel closure, the animation
+module holds exactly one, and it is invoked before any new play. That way a
+style's whole leak surface is its own one-line closure, and a style that
+schedules nothing returns nothing. Cannons uses Mantine's primary blue
+(`#228be6`, the filled-button color) and white, which is the reading of "the
+app's accent colors" this repository can point at. Preview is `disabled` while
+Off is selected, replacing the earlier behavior of a click that produced
+nothing: the section applies instantly, so the committed value is the only
+sensible preview target, and previewing a merely highlighted option would be a
+different product. A Python test parses the animation's style registry and
+asserts it matches the select's options, because a name offered with no entry
+falls back to Confetti — a wrong answer rather than a visible failure. A
+JavaScript test harness was considered again here and again declined; the
+centralized cancellation is what shrinks the surface one would have covered.
+
+Shipped in PR #268, and the style select in #272; ruled on #248.
+
+## 2026-09-01: Configured Ports And Poll Intervals Are Bounded At Load
+
+Status: Accepted
+
+A port a machine could never serve, such as 70000, used to get all the way to
+the socket and fail with a raw Python traceback. It now fails as the
+configuration file is read, with one line naming that file and exit code 1.
+The accepted range is 1 through 65535, and the poll interval must be between 1
+and the largest delay a browser timer can hold. The example configuration file
+states both rules beside the settings they govern.
+
+Provenance: retires the "Out-of-range port crashes with a raw traceback" entry
+adopted into `docs/tech_debt.md` from the 2026-08-12 engineering audit corpus
+(PR #258); fixed in PR #266.
+
+**The bounds.** `ConfigData.port` is `Annotated[int, Field(ge=1, le=65535)]`
+and `polling_interval` is `Annotated[int, Field(gt=0, le=2_147_483_647)]`, both
+shaped like the `kovaaks_api_timeout_seconds` bound that preceded them. Nothing
+else in `ConfigData` gained a constraint: `sens_round_decimal_places` and the
+cache TTLs stay unbounded, deliberately. The scope is these two fields, so a
+bad `host` keeps its own later, differently-worded failure at the bind rather
+than joining this exit.
+
+**Why validation, not a bind-path fix.** An unbounded `port` reached
+`sock.bind()`, which raises `OverflowError` ("bind(): port must be 0-65535")
+rather than `OSError`, so neither `_bind_face`'s `except OSError` nor
+`bind_server_socket`'s errno-classifying one caught it. Bounding the field
+turns the same input into a `ValidationError`, which `main()`'s existing
+configuration handler already converts into the curated "Configuration error:
+could not load `<path>` -- copy example.toml to config.toml." exit. The
+collapsed one-message design is unchanged: the ranges are stated in
+`example.toml`, where the user is already looking when they edit the setting.
+
+**Why configured `0` is refused.** Port `0` is valid to the socket layer and
+still supported there: `bind_server_socket(0)` asks the OS for a free port and
+is unchanged, which direct callers and the socket tests rely on. It is not a
+usable configured endpoint, though, because the installed launcher reads the
+configured port before startup (`Get-ConfiguredEndpoint`), polls
+`http://<probe>:<port>/health` on that exact port to decide the app is ready,
+and opens the browser on it. An OS-chosen port is one the launcher cannot
+discover, so the app would serve while the launcher declared a readiness
+timeout.
+
+**Why `polling_interval` is bounded at both ends.** The value is handed
+straight to `window.setInterval` -- Dash 4.4.1's Interval calls
+`setInterval(this.reportInterval, props.interval)` with no clamping -- and that
+delay is a signed 32-bit int. Both ends of the range therefore produce the same
+silent request flood: a non-positive period, and one above `2147483647`, which
+overflows and fires immediately. Measured in Chromium, `2147483647` never
+fired and `2147483648` fired at 0 ms.
+
+The upper bound is browser representability, not a product cap. A *product*
+cap -- one tight enough to keep the run-event freshness window small -- stays
+rejected on the PB-celebration proposal's reasoning: that window already
+absorbs an arbitrarily slow poll by adding the configured period to its cap,
+and a tight cap would refuse config files that load today for the sake of a
+toast. `2147483647` ms is about 24.8 days, so it refuses only values the
+browser could not have honoured anyway.
+
+## 2026-08-31: Repeatable Toasts Replace In Place With A Visible Re-Entry
+
+Status: Accepted
+
+Every toast that answers one thing you did now replaces its own previous copy
+with a visible re-entry, instead of stacking a duplicate or being dropped in
+silence. Importing a second playlist while the first import's toast was still up
+used to show nothing at all; both toasts now stand, because reports about
+different playlists are different toasts. A retry of the same action pops its
+answer back onto the screen with a fresh eight seconds, and a success clears the
+failure message it answers. The one deliberate exception is the background
+report that folds several unreadable run files into a single message, which
+keeps batching exactly as it did.
+
+Provenance: distilled from `docs/toast_policy_proposal.md` (three decisions
+ratified 2026-08-30), committed in PR #257 and deleted in this shipping PR --
+git history holds the full text, including the design-system and UX survey the
+policy rests on and the live POC that measured the mechanism.
+
+**The policy.** Every toast is classified before it is written, by two
+questions. First: can the reported fact recur inside one toast lifetime, judged
+against the complete supported workflow *including inverse actions that make
+the same subject eligible again*? A fact that cannot recur is an **event
+toast** -- unique id per emission, plain `show`, occurrences stack, no registry
+wiring. A fact that can recur is a **channel**. Applying that test to today's
+inventory leaves the event bucket empty: every current toast's fact can recur
+through some supported cycle, so the rule exists to classify future toasts, and
+any claim that a fact cannot recur must survive the inverse-action check
+(delete-then-re-import defeats the naive claim for import success).
+
+Second: what is the channel's identity? Identity follows the semantic lane. An
+operation's **problem lane** is one channel: its mutually exclusive outcome
+flavors (a red hard failure, a yellow served-stale) share one key with a
+differing payload, so two contradictory claims about the same latest attempt can
+never be on screen together. **Success lanes** and **standing-condition lanes**
+are their own channels, keyed by subject when independent subjects can be in
+flight at once -- one success channel per scenario, one per playlist code. The
+mutual-exclusion clause is deliberately problem-lane-only: success flavors of
+one operation (a green full success, an orange partial one) may keep distinct
+channels, accepting the narrow cross-flavor window a re-attempt can open. Lanes
+interact only through explicit **cross-clears**: a success hides its operation's
+problem channel and any standing-condition channel it falsifies.
+
+A third pattern survives untouched: a **burst toast** folds many same-type
+events into one summary carrying a count and points at where the individual
+events are recorded. And persistence (`auto_close=False`, process- or
+session-gated) stays orthogonal to all three.
+
+**The mechanism: hide-and-reshow.** A channel emission shows a *fresh instance
+id* -- the logical channel key plus a per-emission unique suffix -- and lists
+the channel's previous instance id, plus any cross-clear targets' current ids,
+in the container's separate `hideNotifications` prop. Why a new id: DMC 2.8.0
+ignores a `show` whose id is already on screen, so a stable id answers a retry
+with nothing. Why the pairing works in one response: the container declares its
+hide effect *after* its send effect, so the fresh instance enters with the full
+animation while the outgoing one animates out. The POC measured the result on
+2026-08-29 against the installed DMC (harness under
+`ignore/scripts/toast_hide_reshow_poc/`, findings on PR #257): first paint about
+31 ms after the click, a ~135 ms entry slide, a ~250 ms crossfade with
+complementary opacities that reads as replacement rather than as two toasts,
+and a structurally fresh ~8.0 s lifetime even when replacing at 7.5 s. Hiding an
+absent or already-closed id is a clean no-op with a clean console. Accepted
+cosmetics: a toast that arrived as a replacement auto-closes without its own
+exit fade, and bystander toasts bounce upward for roughly 280 ms during a
+replacement.
+
+**The registry.** The store beside the container is now
+`toast-channel-registry`: a dict mapping each logical channel key to its current
+instance id, read as `State` and written as an `allow_duplicate` `Output` by
+every emitting callback. It sits in the app shell, not a page layout, for the
+reason the counter it replaces did: a toast outlives the page that emitted it,
+and a page-scoped store would reset on navigation and leave a visible toast with
+no id to replace it by. **Writes are per-key `dash.Patch` assignments, never
+whole-dict replacements.** This is load-bearing, not tidiness: a response that
+rewrote the whole dict would carry a stale value for every channel it did not
+emit, so two responses landing out of order could resurrect an obsolete instance
+id -- leaving two toasts of one channel on screen, or a problem toast beside the
+success that cleared it. What remains is only same-operation concurrency, which
+the renderer covers rather than loading guards: every channel has exactly one
+producing callback, and Dash 4.4.1 marks an older in-flight invocation with the
+same output set outdated and discards its response.
+
+**The conversions (13).** Subject-keyed channels, keyed by the canonical stored
+code and never the pasted input: `imported-playlist-successful-{code}`,
+`imported-playlist-visibility-failed-{code}`,
+`deleted-playlist-successful-{code}`, plus `rank-refresh-success-{scenario}`
+keyed by the scenario name verbatim (toast ids are internal, never parsed apart
+and never rendered, so identity is the stable collision-free derivation and a
+hash would only add a collision it cannot have). Single-identity channels: the
+three per-action failure toasts, the two refusals, the constant-copy cleanup
+success, and username-unset, whose uuid suffix goes. `rank-refresh-failed` and
+`rank-refresh-stale` merge into one `rank-refresh-problem` channel whose payload
+carries the red or yellow outcome. `run-verdict` rides the same helper.
+Cross-clears: each import outcome clears the import failure, delete success
+clears delete failure, cleanup success clears cleanup failure, and refresh
+success clears both the problem channel and username-unset. No user-facing
+string is added or edited; titles, messages, colors, and icons carry over
+verbatim.
+
+**Both upsert helpers are deleted.** With every channel on hide-and-reshow,
+the `update`-plus-`show` pair with its alternating 8000/8001 ms durations
+existed for one toast only, so `run-verdict` migrates and the trick goes with
+its sequence store. The ratified run-verdict contract is preserved -- one run,
+one toast, the newest verdict replacing what is on screen with a full lifetime,
+per browser client and across navigation -- with one qualifier: during the
+~250 ms replacement crossfade the outgoing instance is still animating out, and
+each new verdict now re-enters with the pop animation instead of morphing in
+place. `upsert_sticky_toast` goes with it, because `channel_toast` carries the
+payload's `autoClose` through untouched instead of stamping a lifetime, which
+is the only thing the sticky sibling existed to avoid.
+
+**The personal best celebration is reconciled onto this policy.** PR #261
+landed the `pb-celebration` toast through `upsert_sticky_toast` while this
+proposal was still under review, so it arrived as the one family the standing
+rule had not been applied to. It is a channel by the classifier -- a second
+personal best inside one lifetime is plainly reachable -- so it moves to
+`channel_toast` as a **persistent channel**: its own key, still distinct from
+`run-verdict`, a fresh rendered instance per celebration, the previous instance
+hidden with it, and `auto_close=False` passed at its builder so it still stays
+until dismissed. Its ratified product contract is untouched: a dedicated lane
+that an ordinary run verdict lands beside rather than replacing, the newest
+celebration replacing the previous one, and no lifetime. What changes is only
+the mechanism, and one visible detail that follows from it -- a second personal
+best now re-enters with the pop animation instead of morphing in place, which
+is the same visible re-entry every other channel gets and the reason it is
+wanted. This is a mechanism conformance change, not new celebration scope; the
+in-flight personal best celebration proposal is updated in step.
+
+**What this supersedes.** The
+[2026-08-03 notification-layer entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)
+loses three clauses: its per-click-id exception to the stable-id rule (the green
+refresh confirmation and, via the 2026-08-09 entry, the blue unset-username
+notice are now subject-keyed and single-identity channels, so nothing needs a
+per-click id), its rationale for keeping the two refresh-failure outcomes under
+distinct ids (they are one channel now, which is what stops them contradicting
+each other), and the absolute reading of "at most one run-verdict toast is
+visible at a time" (true once a response has been applied, with the crossfade
+qualifier above). Its "`hide` cannot substitute" note stands as written and is
+exactly why this works: the hide effect running *after* the send effect is what
+lets a differing id pair show-and-hide in one response. The
+[2026-08-09 unset-username entry](#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)
+loses only its per-click-id mechanism; its ruling -- that an unset username is
+configuration state answered blue, never a red failure -- is untouched.
+
+**Deliberately out of scope.** `run-import-failure` keeps its own cross-tick
+swallowing: a second batch inside 8 s is dropped. It is a background burst
+channel where anti-flood wins, its folded copy already points at `debug.log`,
+and no user report exists; if it ever surfaces, the fix is a replacement
+channel, not uuids. The research's broader position that error toasts should be
+banners or inline messages is a much larger re-platforming question, deliberately
+not opened. Mantine's visible-toast `limit` and queueing defaults stay untouched
+as the flood backstop.
+
+## 2026-08-30: One Severity Color Language For Inline Notices
+
+Status: Accepted
+
+The app's inline notices each picked their own look, so the surfaces that most
+needed attention were the faintest things on the page. They now speak the same
+severity colors the toasts already do, and every one of them carries a leading
+icon. The first-run setup card is tinted like the rest instead of being a white
+card on a white page, and the leftover-playlist-files notice became a plain
+panel so screen readers are no longer told that a panel of buttons is an alert.
+No wording changed anywhere.
+
+Decision: one severity scale governs every notification surface, inline and
+toast alike. Blue is informational and any action it offers is optional; yellow
+is caution, an attention-worthy negative outcome or a state that needs the user
+without anything having failed; red is an error, an operation that failed;
+green is a positive outcome; orange is partial success, where the action
+committed but a follow-up write did not. Green and orange stay toast-only:
+no inline success or split-outcome panel exists, and none is added. Yellow
+deliberately spans both configuration states and coaching outcomes such as a
+below-threshold run, because a narrower warning-only reading would leave the
+shipped threshold verdicts outside the scale.
+
+Why: the severity information already existed in the code and did not reach the
+eye. Three of the four alerts were `color="yellow"` with Mantine's `light`
+variant, whose yellow tint is the palest token in the palette and reads as
+near-white in light mode, and none of them had an icon; the fourth hard-coded
+`#ff6b6b`, a red tint on a purely informational banner. The setup card, the
+first notice a fresh install ever shows, was an untinted `dmc.Paper` on the
+untinted page body. In a live render the icon, not the background, was the
+dominant legibility fix.
+
+The component rule: which component a notice uses follows its content model,
+not its look. Mantine renders `Alert`'s root with `role="alert"` and the dmc
+2.8.0 wrapper exposes no role override. Per
+[WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria-1.2/#alert) that role is an
+assertive, atomic live region for important, usually time-sensitive messages,
+and [MDN's guidance](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Roles/alert_role)
+draws the consequences this rule applies: the role is for text content rather
+than interactive elements like links or buttons, and for content that appears
+dynamically rather than with the page. So a text-only notice may be a
+`dmc.Alert`, and a notice holding interactive controls is a `dmc.Paper` wearing
+the alert anatomy through the shared `.alert-panel` classes in
+`assets/stylesheet.css`. Should an interactive notice ever need announcing, the
+shape is a separate polite status message, or an alert dialog for a workflow
+that requires a response, never `role="alert"` around controls.
+
+The five inline surfaces as shipped: the Settings store alert and the Playlists
+visibility alert stay yellow `dmc.Alert`s and gain
+`material-symbols:warning-outline`; the Aim Training Journey work-in-progress
+banner becomes blue with `material-symbols:info-outline`, deleting the hex; the
+Playlists leftover-files notice becomes a blue `dmc.Paper`, keeping its id, its
+callbacks, and its hidden-class reveal; the Home setup card keeps its
+`dmc.Paper` and takes the blue treatment for the identity offer and the yellow
+one for the blocking stats-folder state, with the matching icon beside its
+title. Both icons were already vendored, so no assets were added. Mantine
+defines the `-light` tokens per color scheme, so dark mode needs no separate
+rules.
+
+Rejected: one accent color for every inline notice, which is calmer and uniform
+but makes "your saved choices are silently not applying" look identical to an
+FYI and splits the app into two color vocabularies, one for toasts and another
+for panels. Rejected for the setup card: one color for both states, which hides
+that the first state blocks every plot on the page while the second is a
+skippable offer. Rejected for the leftover-files notice: yellow, which keeps
+housekeeping louder than the problem warrants and dilutes the two yellow alerts
+that earn it. Rejected as variants: `filled`, far too loud for a persistent
+panel and poorly contrasted in yellow, and `outline` or `default`, both whiter
+than what shipped before. Rejected as a component: rebuilding the setup card as
+a `dmc.Alert`, which would entrench the role mislabel permanently rather than
+merely start from the wrong place. The `dmc.Paper` anatomy carries one ongoing
+cost, accepted knowingly: it tracks Mantine's `Alert` look by hand across
+upgrades.
+
+Extends the toast layer specified by the
+[2026-08-03 notification entry](#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy),
+which stays authoritative for toasts, including their white-card-with-icon
+anatomy: an icon suppresses Mantine's colored side bar, so a toast's color is a
+circle rather than a stripe, and nothing here changes that. Orange keeps the
+meaning the
+[2026-08-02 committed-side-effect entry](#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)
+gave it and stays a distinct severity rather than folding into yellow.
+
+Deferred: strengthening the pale yellow tint with a scoped CSS override. The
+icons are expected to be enough, and the override is a one-line follow-up if
+they are not.
+
 ## 2026-08-22: The Playlist Fill Reports Degradation In Place Only
 
 Status: Accepted
@@ -282,6 +925,14 @@ Rejected alternatives:
   with its own product questions, and this change forecloses none of it: the
   guard sits at toast production wherever that later runs, and Dash
   persistence survives a same-id component move.
+
+**Superseded in part (2026-09-02).** The catch-up digest above no longer
+exists, so the gate covers the threshold verdict and the placement alone, and
+the help text gained a second sentence naming the celebration's own setting.
+The last rejected alternative's deferral of the queue-to-UI redesign also
+falls, for the drain alone; the product question it protected, app-wide
+verdict toasts, stays deferred. Both are recorded in
+[A New Personal Best Celebrates On Every Page](#2026-09-02-a-new-personal-best-celebrates-on-every-page).
 
 Shipped in PR #245; design discussion in #240. Distilled from
 `docs/run_notifications_switch_proposal.md`, now deleted.
@@ -1026,8 +1677,14 @@ pages cannot import `app`, and the literal should exist once.
 
 ## 2026-08-09: An Unset Username Is Stated In Place, Never Reported As A Failure
 
-Status: Accepted; the configured-but-wrong-username case the Scope note below
-defers is now half settled by the 2026-08-22
+Status: Accepted, except that the per-click-id mechanism described below is
+superseded by the 2026-08-31
+["Repeatable Toasts Replace In Place With A Visible Re-Entry"](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+entry: the blue notice is now a single-identity channel that re-pops by showing
+a fresh instance id. The ruling — an unset username is configuration state
+answered blue, never a red failure — is untouched. The
+configured-but-wrong-username case the Scope note below defers is now half
+settled by the 2026-08-22
 ["The Playlist Fill Reports Degradation In Place Only"](#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)
 entry, which deleted the playlist fill's aggregate toast — and with it
 `_fill_summary_notification`, described below as untouched. Only the Refresh
@@ -1070,8 +1727,10 @@ click, so it cannot produce any perceptible response to the click itself, and
 a user who clicks Refresh beside the hint plausibly clicked because they had
 not read it. To keep every click answerable the toast carries a fresh
 per-click id, the same mechanism the green confirmation uses — a stable id
-would be swallowed by DMC's `show` while the previous toast is still up. Blue,
-not yellow: yellow means degraded data (stale serve, threshold miss, Steam
+would be swallowed by DMC's `show` while the previous toast is still up.
+*(Superseded 2026-08-31: the toast is a channel whose fresh instance id per
+emission does the same job, and hides the instance it replaces so repeats do not
+stack.)* Blue, not yellow: yellow means degraded data (stale serve, threshold miss, Steam
 mismatch), and nothing here is degraded.
 
 Why skipping the fill is safe without a compensating cancel call: skipping
@@ -1515,7 +2174,13 @@ Consequences and constraints:
 
 ## 2026-08-03: One Quiet Notification Layer With Verdict-Carrying Copy
 
-Status: Accepted
+Status: Accepted; three clauses are superseded by the 2026-08-31
+["Repeatable Toasts Replace In Place With A Visible Re-Entry"](#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)
+entry -- the per-click-id exception to the stable-id rule, the distinct-ids
+rationale for the two refresh-failure toasts, and the absolute reading of "at
+most one run-verdict toast is visible at a time". Each is marked in place below.
+Everything else here stands, including the routing policy that decides which
+events toast at all.
 
 The dashboard now stays quiet during normal play. Toasts are reserved for
 things the user did, achievements worth interrupting for, and failures they
@@ -1583,7 +2248,9 @@ detail; a run that earns neither emits nothing, because the new point on the
 plot is the confirmation that it landed. Four behaviors are normative, and the
 mechanism is not:
 
-- at most one run-verdict toast is visible at a time;
+- at most one run-verdict toast is visible at a time (as amended 2026-08-31:
+  true once a response has been applied -- during the ~250 ms replacement
+  crossfade the outgoing instance is still animating out);
 - a later verdict replaces the visible one, the backlog digest included;
 - the replacement receives a full toast lifetime, never the remainder of the
   old timer;
@@ -1612,7 +2279,9 @@ future DMC versions.
 - Stable, semantic notification ids; dedupe or replace by id. One named
   exception: repeatable user-action results use a **per-click id** — the
   manual-refresh confirmation, where `show` with a reused id would swallow the
-  second of two deliberate back-to-back results.
+  second of two deliberate back-to-back results. *(Superseded 2026-08-31: the
+  confirmation is a per-scenario channel and every repeatable result re-pops by
+  showing a fresh instance id, so no toast carries a per-click id.)*
 - **The title carries the verdict.** Title plus color tell the whole story from
   across the room; never the literal word "Notification".
 - **The message leads with the scenario.** Sensitivity is a trailing qualifier:
@@ -1632,9 +2301,12 @@ Two manual-refresh failure toasts deliberately share the title "Position
 refresh failed" under distinct ids (red when nothing usable came back, yellow
 when a cached position was served). They are mutually exclusive outcomes of one
 click, and the distinct ids keep a later result from being swallowed by `show`'s
-dedupe. Softening the red to yellow is coupled to giving the served-stale toast
-a title of its own — without that, only the color separates them — and is left
-open in [tech_debt.md](./tech_debt.md).
+dedupe. *(Superseded 2026-08-31: being mutually exclusive is exactly why they
+are now one `rank-refresh-problem` channel — under distinct ids a hard failure
+followed by a served-stale retry left both on screen contradicting each other
+about the same attempt.)* Softening the red to yellow is coupled to giving the
+served-stale toast a title of its own — without that, only the color separates
+them — and is left open in [tech_debt.md](./tech_debt.md).
 
 **Deliberately left open: do background rank events deserve a real toast?**
 "Your rank updated after that PB" and "Position update timed out" are

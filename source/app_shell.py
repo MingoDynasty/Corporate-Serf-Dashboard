@@ -1,14 +1,59 @@
 """Build the shared Dash application shell and navigation."""
 
+import tomllib
+from datetime import datetime
+from typing import Any, TypedDict
+
 import dash
 import dash_mantine_components as dmc
-from dash import Input, Output, State, clientside_callback, dcc
+from dash import Input, Output, State, callback, clientside_callback, dcc, no_update
+from pydantic import ValidationError
 
 from source.components.local_icon import local_icon
+from source.config.config_service import ConfigData, get_config
+from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.utilities.notifications import (
+    CELEBRATION_CHANNEL,
     NOTIFICATION_CONTAINER_ID,
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
+    channel_toast,
+    toast,
 )
+
+# The batch the shell's drain publishes for every page, and the interval that
+# drives it. Both live in the shell because the drain is app-wide: a personal
+# best is worth announcing whatever page happens to be open.
+RUN_EVENTS_BATCH_STORE_ID = "run-events-batch"
+PB_CELEBRATION_INTERVAL_ID = "pb-celebration-interval"
+
+# The celebration setting itself: one browser-local string, "off" or a style
+# name. It is the authoritative value rather than a mirror of the Settings
+# control, so the control initializes from it and writes to it and carries no
+# persistence of its own. Shell-hosted because both readers are here -- the
+# drain and the animation -- and because the setting is app-wide.
+PB_CELEBRATION_STYLE_STORE_ID = "pb-celebration-style"
+CELEBRATION_STYLE_OFF = "off"
+CELEBRATION_STYLE_CONFETTI = "confetti"
+# Only the exact off value silences the celebration. Every other reading of the
+# store -- a value this build does not know, a browser that cleared its site
+# data -- falls through to celebrating, which is the direction browser-local
+# storage should fail in.
+DEFAULT_CELEBRATION_STYLE = CELEBRATION_STYLE_CONFETTI
+
+# A clientside callback needs an output, and the animation has nothing to
+# write: this store is that output and never holds anything.
+PB_CELEBRATION_SIGNAL_STORE_ID = "pb-celebration-signal"
+
+# How much older than one delivery a run may be and still count as news.
+# Freshness needs no drain bookkeeping -- every drain empties the queue, so a
+# message a drain finds was never seen by an earlier one -- and this wall-clock
+# cap is all that remains. It sits two orders of magnitude above the default
+# poll interval and comfortably above Chromium's intensive throttling, which
+# slows a hidden tab's interval to about one tick per minute; the tab is
+# occluded during play, so a tighter window would drop the mid-session personal
+# bests this exists for. It also bounds replay: a queue that accumulated with
+# no tab open announces nothing older than the window on the next visit.
+RUN_EVENT_FRESHNESS_CAP_SECONDS = 120
 
 APP_INDEX_STRING = """<!DOCTYPE html>
 <html lang="en">
@@ -69,6 +114,224 @@ APP_INDEX_STRING = """<!DOCTYPE html>
     </body>
 </html>
 """
+
+
+class RunEventData(TypedDict):
+    """One drained run, as JSON-safe facts plus the drain's liveness stamp."""
+
+    run_id: str
+    scenario_name: str
+    sensitivity: str
+    nth_score: int
+    score: float
+    scenario_previous_best: float | None
+    is_new_sensitivity: bool
+    is_live: bool
+
+
+class RunEventBatch(TypedDict):
+    """One drain's runs, in order, with the decision the drain made on them."""
+
+    runs: list[RunEventData]
+    celebrated_run_id: str | None
+    animation_sequence: int
+
+
+def _drain_interval_ms() -> int:
+    """Return the drain's poll period without making a bad config fatal here.
+
+    This layout is built while ``source.app`` is imported, which is before
+    startup validates the config file and exits with one actionable line. A
+    config problem has to reach that path, not surface as an import traceback,
+    so an unloadable file falls back to the field's own default and startup
+    reports it a moment later.
+    """
+    try:
+        return get_config().polling_interval
+    except OSError, UnicodeDecodeError, tomllib.TOMLDecodeError, ValidationError:
+        return ConfigData.polling_interval
+
+
+def _run_event_freshness_seconds() -> float:
+    """Return the freshness window: the cap plus one poll period.
+
+    A run can be a whole poll period old through nothing but the drain's
+    cadence, so a window shorter than that period would stamp every run stale
+    and silently retire the toasts liveness gates. Adding the period says what
+    the cap means -- how much staleness is tolerated *beyond* one delivery --
+    and leaves the default 1000 ms interval at an indistinguishable 121 s.
+    """
+    return RUN_EVENT_FRESHNESS_CAP_SECONDS + _drain_interval_ms() / 1000
+
+
+def _run_event_data(
+    message: NewFileMessage,
+    now: datetime,
+    freshness_seconds: float,
+) -> RunEventData:
+    """Project one queued message into the batch, stamping its liveness."""
+    age_seconds = (now - message.datetime_created).total_seconds()
+    return {
+        "run_id": message.run_id,
+        "scenario_name": message.scenario_name,
+        "sensitivity": message.sensitivity,
+        "nth_score": message.nth_score,
+        "score": message.score,
+        "scenario_previous_best": message.scenario_previous_best,
+        "is_new_sensitivity": message.is_new_sensitivity,
+        "is_live": age_seconds <= freshness_seconds,
+    }
+
+
+def _drain_message_queue(now: datetime, freshness_seconds: float) -> list[RunEventData]:
+    """Empty the run-event queue into one ordered batch."""
+    runs: list[RunEventData] = []
+    while True:
+        try:
+            message = message_queue.popleft()
+        except IndexError:
+            return runs
+        runs.append(_run_event_data(message, now, freshness_seconds))
+
+
+def _celebrated_run(runs: list[RunEventData]) -> RunEventData | None:
+    """Name the newest live run that beat its scenario's personal best.
+
+    Strictly greater, so a tie never celebrates, and a scenario's first run
+    (no previous best at all) only sets the baseline. An older qualifying run
+    in the same batch is not named: one drain decides one celebration, because
+    one response drives one animation.
+    """
+    for run in reversed(runs):
+        previous_best = run["scenario_previous_best"]
+        if (
+            run["is_live"]
+            and previous_best is not None
+            and run["score"] > previous_best
+        ):
+            return run
+    return None
+
+
+def _celebration_toast(run: RunEventData) -> dict[str, Any]:
+    """Build the personal best toast, sticky and green with a trophy.
+
+    ``auto_close=False`` is passed explicitly because ``channel_toast`` carries
+    the payload's lifetime through untouched. The celebration is a channel like
+    any other -- a later personal best replaces the one on screen -- it is just
+    the one channel with no timer, because the run that earned it was played in
+    a fullscreen game and the news should still be there on alt-tab.
+    """
+    previous_best = run["scenario_previous_best"]
+    # Guaranteed by _celebrated_run: a run with no previous best is never
+    # celebrated, so there is always a figure to report here.
+    assert previous_best is not None
+    headline = f"{run['scenario_name']}: {run['score']:.2f}."
+    if previous_best > 0:
+        gain = (run["score"] / previous_best - 1) * 100
+        message = (
+            f"{headline} Up {gain:.1f}% on your previous best of {previous_best:.2f}."
+        )
+    else:
+        # A previous best of zero has no percentage to give and a negative one
+        # would read backwards -- the same division the threshold verdict
+        # declines, for the same reason.
+        message = f"{headline} Your previous best was {previous_best:.2f}."
+    return toast(
+        CELEBRATION_CHANNEL,
+        "New personal best",
+        message,
+        color="green",
+        icon=local_icon("material-symbols:trophy"),
+        auto_close=False,
+    )
+
+
+def _next_animation_sequence(
+    previous_batch: RunEventBatch | None,
+    celebrated: RunEventData | None,
+) -> int:
+    """Advance the animation sequence only when this batch celebrates.
+
+    Monotonic so two identical personal bests back to back both play, and
+    unchanged otherwise so a batch that celebrates nothing plays nothing.
+    """
+    previous = previous_batch["animation_sequence"] if previous_batch else 0
+    return previous + 1 if celebrated is not None else previous
+
+
+@callback(
+    Output(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    Output(NOTIFICATION_CONTAINER_ID, "sendNotifications", allow_duplicate=True),
+    Output(NOTIFICATION_CONTAINER_ID, "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
+    Input(PB_CELEBRATION_INTERVAL_ID, "n_intervals"),
+    State(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
+def publish_run_events(_n_intervals, previous_batch, toast_channels, celebration_style):
+    """Drain the run-event queue and publish one batch for the whole app.
+
+    The single consumer of ``message_queue``. Facts travel and only this
+    callback decides: it stamps each run's liveness and names at most one
+    celebrated run, and the pages read those stamps instead of re-deriving
+    them. A page callback triggered by the batch store necessarily runs after
+    this one wrote it, so there is no race to coordinate.
+    The celebration rides the same channel mechanism every other replaceable
+    toast uses: a second personal best shows a fresh instance and hides the one
+    it replaces, so the family keeps its ratified contract -- its own lane
+    beside the run verdict, the newest celebration replacing the previous one,
+    and no lifetime at all.
+    :param _n_intervals: poll tick. Its actual value is not used.
+    :param previous_batch: the batch this client last received, for its
+        animation sequence.
+    :param toast_channels: this client's toast channel instance registry.
+    :param celebration_style: this browser's celebration setting. Off stamps no
+        decision and sends no toast; the batch is published either way, because
+        the plot is every run's record whatever the setting says.
+    :return: the new batch, and the celebration emission when one is earned
+    """
+    runs = _drain_message_queue(datetime.now(), _run_event_freshness_seconds())
+    if not runs:
+        return no_update, no_update, no_update, no_update
+
+    celebrated = (
+        None if celebration_style == CELEBRATION_STYLE_OFF else _celebrated_run(runs)
+    )
+    batch: RunEventBatch = {
+        "runs": runs,
+        "celebrated_run_id": celebrated["run_id"] if celebrated else None,
+        "animation_sequence": _next_animation_sequence(previous_batch, celebrated),
+    }
+    if celebrated is None:
+        return batch, no_update, no_update, no_update
+    return batch, *channel_toast(_celebration_toast(celebrated), toast_channels)
+
+
+# The animation, driven entirely in the browser: the burst is a canvas effect
+# with nothing to tell the server, so a round trip here would only add latency
+# to the one moment that is supposed to feel immediate. ``celebrate`` holds
+# every guard -- the decision, the monotonic sequence that stops one payload
+# playing twice, Off, reduced motion, and the hidden-tab hold -- in
+# ``assets/pbCelebration.js``. The style is ``State``: changing the setting
+# must not replay the batch already on screen.
+clientside_callback(
+    """
+    (batch, style) => {
+        if (window.pbCelebration) {
+            window.pbCelebration.celebrate(batch, style);
+        }
+        return window.dash_clientside.no_update;
+    }
+    """,
+    Output(PB_CELEBRATION_SIGNAL_STORE_ID, "data"),
+    Input(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    State(PB_CELEBRATION_STYLE_STORE_ID, "data"),
+    prevent_initial_call=True,
+)
+
 
 discord_component = dmc.Tooltip(
     dmc.Anchor(
@@ -140,9 +403,31 @@ def layout(**kwargs):  # noqa: ARG001
                 children=[
                     dmc.NotificationContainer(id=NOTIFICATION_CONTAINER_ID),
                     # Beside the container on purpose: a toast outlives the
-                    # page that emitted it, so the counter that keeps its
-                    # replacement lifetimes honest has to outlive it too.
-                    dcc.Store(id=TOAST_LIFETIME_STORE_ID, data=0),
+                    # page that emitted it, so the registry that knows which
+                    # instance to replace has to outlive it too. The shell's
+                    # own celebration channel is written from here as well.
+                    dcc.Store(id=TOAST_CHANNEL_REGISTRY_STORE_ID, data={}),
+                    # The app-wide run-event channel. The drain and its batch
+                    # live here rather than on Scenario Performance so a run
+                    # reaches the screen whatever page is open; that page
+                    # listens to the store instead of popping the queue.
+                    dcc.Store(id=RUN_EVENTS_BATCH_STORE_ID),
+                    # The celebration setting, and the output the animation's
+                    # clientside callback needs but never writes. The setting
+                    # is browser-local rather than a key in the app's settings
+                    # store: a cosmetic preference should not be the thing
+                    # that forces that file's first schema migration.
+                    dcc.Store(
+                        id=PB_CELEBRATION_STYLE_STORE_ID,
+                        storage_type="local",
+                        data=DEFAULT_CELEBRATION_STYLE,
+                    ),
+                    dcc.Store(id=PB_CELEBRATION_SIGNAL_STORE_ID),
+                    dcc.Interval(
+                        id=PB_CELEBRATION_INTERVAL_ID,
+                        interval=_drain_interval_ms(),
+                        n_intervals=0,
+                    ),
                     dmc.AppShellHeader(
                         dmc.Grid(
                             children=[

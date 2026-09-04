@@ -2,6 +2,7 @@
 Provides business logic for Kovaak's API.
 """
 
+import hashlib
 import json
 import logging
 import os
@@ -442,7 +443,7 @@ def _read_json(cache_file: Path) -> dict | list | None:
         try:
             with open(cache_file, encoding="utf-8") as file:
                 return json.load(file)
-        except OSError, json.JSONDecodeError:
+        except OSError, json.JSONDecodeError, UnicodeDecodeError:
             logger.warning("Failed to read cache file: %s", cache_file, exc_info=True)
             return None
 
@@ -466,10 +467,20 @@ def _write_json(cache_file: Path, data: dict | list) -> None:
 
 
 def _safe_cache_key(value: str) -> str:
-    """Normalize user-provided values before embedding them in cache paths."""
-    return "".join(
+    """Normalize user-provided values before embedding them in cache paths.
+
+    Sanitizing alone is lossy: every character outside the preserved set folds
+    to `_`, so distinct usernames like `a.b` and `a_b` produced one key and
+    silently shared (and overwrote) each other's cache files. The sanitized
+    prefix stays so cache directories remain human-readable, and a short digest
+    of the raw value makes distinct values distinct. sha256 is used rather than
+    `hash()` because the key must be stable across runs.
+    """
+    sanitized = "".join(
         char if char.isalnum() or char in ("-", "_") else "_" for char in value
     )
+    digest = hashlib.sha256(value.encode("utf-8")).hexdigest()[:8]
+    return f"{sanitized}-{digest}"
 
 
 def _user_scenario_total_play_cache_file(username: str) -> Path:
@@ -593,6 +604,22 @@ def _load_leaderboard_mapping() -> dict:
         return _leaderboard_mapping_cache
 
 
+def _coerce_leaderboard_id(value: object) -> int | None:
+    """
+    Coerce a cached leaderboard ID, returning None for an unusable value.
+
+    `OverflowError` is caught alongside `ValueError` because JSON accepts
+    out-of-range literals: `1e309` parses to `float("inf")`, which `int()`
+    rejects with `OverflowError` rather than `ValueError`.
+    """
+    if not isinstance(value, int | float | str):
+        return None
+    try:
+        return int(value)
+    except ValueError, OverflowError:
+        return None
+
+
 def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     """Return the stored leaderboard ID for an exact scenario name."""
     scenario_data = _load_leaderboard_mapping().get(scenario_name)
@@ -602,7 +629,15 @@ def get_cached_leaderboard_id(scenario_name: str) -> int | None:
     leaderboard_id = scenario_data.get("leaderboard_id")
     if leaderboard_id is None:
         return None
-    return int(leaderboard_id)
+
+    coerced = _coerce_leaderboard_id(leaderboard_id)
+    if coerced is None:
+        logger.warning(
+            "Ignoring non-numeric cached leaderboard id for scenario %s: %r",
+            scenario_name,
+            leaderboard_id,
+        )
+    return coerced
 
 
 def save_leaderboard_id(
@@ -616,15 +651,20 @@ def save_leaderboard_id(
         cache_data = _read_json(cache_file)
         mappings = cache_data if isinstance(cache_data, dict) else {}
 
+        # An unusable stored value counts as absent, not as a conflict. Blocking
+        # the write on it would strand the entry: every lookup reads it as a
+        # miss, refetches, and is then refused here, so the malformed row would
+        # drive API calls forever until the file was deleted by hand.
         existing = mappings.get(scenario_name)
-        if isinstance(existing, dict) and existing.get("leaderboard_id") not in (
-            None,
-            leaderboard_id,
-        ):
+        existing_raw = (
+            existing.get("leaderboard_id") if isinstance(existing, dict) else None
+        )
+        existing_id = _coerce_leaderboard_id(existing_raw)
+        if existing_id is not None and existing_id != leaderboard_id:
             logger.warning(
                 "Conflicting leaderboard id for scenario %s: existing=%s new=%s source=%s",
                 scenario_name,
-                existing.get("leaderboard_id"),
+                existing_raw,
                 leaderboard_id,
                 source,
             )
@@ -710,6 +750,54 @@ def merge_seed_leaderboard_ids(
         )
 
 
+def _validated_total_play_cache(
+    cache_data: dict | list | None,
+    username: str,
+    freshness: str,
+) -> UserScenarioTotalPlayAPIResponse | None:
+    """Validate a cached total-play payload, degrading to a miss on a bad shape."""
+    try:
+        return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
+    except ValidationError:
+        logger.warning(
+            "Ignoring schema-invalid %s total-play cache for %s",
+            freshness,
+            username,
+            exc_info=True,
+        )
+        return None
+
+
+def _fresh_total_play_cache(
+    username: str,
+    cache_file: Path,
+    cache_ttl_hours: int,
+    max_results: int,
+) -> UserScenarioTotalPlayAPIResponse | None:
+    """
+    Return the merged cache when it is fresh, complete, and schema-valid.
+
+    Use the merged cache only when it has enough evidence that all pages were
+    fetched. This avoids getting stuck forever with a page-0-only cache file
+    from an earlier buggy or interrupted run. An incomplete or schema-invalid
+    cache is a miss, so the caller refetches.
+    """
+    if not _is_cache_fresh(cache_file, cache_ttl_hours):
+        return None
+
+    cache_data = _read_json(cache_file)
+    if _is_unknown_username_total_play_response(cache_data):
+        raise UnknownKovaaksUserError(f"KovaaK's username '{username}' was not found.")
+    if not _is_complete_paginated_response(
+        cache_data,
+        max_results,
+        _has_terminal_user_scenario_total_play_page(username, max_results),
+    ):
+        logger.warning("Ignoring incomplete total-play cache for %s", username)
+        return None
+    return _validated_total_play_cache(cache_data, username, "fresh")
+
+
 def get_user_scenario_total_play(
     username: str,
     cache_ttl_hours: int = 24,
@@ -730,22 +818,10 @@ def get_user_scenario_total_play(
     max_results = 100
     cache_file = _user_scenario_total_play_cache_file(username)
 
-    # Fast path: use the merged cache only when it has enough evidence that all
-    # pages were fetched. This avoids getting stuck forever with a page-0-only
-    # cache file from an earlier buggy or interrupted run.
-    if _is_cache_fresh(cache_file, cache_ttl_hours):
-        cache_data = _read_json(cache_file)
-        if _is_unknown_username_total_play_response(cache_data):
-            raise UnknownKovaaksUserError(
-                f"KovaaK's username '{username}' was not found."
-            )
-        if _is_complete_paginated_response(
-            cache_data,
-            max_results,
-            _has_terminal_user_scenario_total_play_page(username, max_results),
-        ):
-            return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
-        logger.warning("Ignoring incomplete total-play cache for %s", username)
+    # Fast path.
+    cached = _fresh_total_play_cache(username, cache_file, cache_ttl_hours, max_results)
+    if cached is not None:
+        return cached
 
     page = 0
     data = []
@@ -819,7 +895,9 @@ def get_user_scenario_total_play(
                 request_exception_summary(exc),
             )
             if isinstance(cache_data, dict):
-                return UserScenarioTotalPlayAPIResponse.model_validate(cache_data)
+                cached = _validated_total_play_cache(cache_data, username, "stale")
+                if cached is not None:
+                    return cached
         raise
 
     # The merged cache is the app-facing snapshot. Individual page files are
@@ -964,9 +1042,17 @@ def get_cached_scenario_rank(
     cache_data = _read_json(cache_file)
     if not isinstance(cache_data, dict):
         return None
-    return ScenarioRankInfo.model_validate(cache_data).model_copy(
-        update={"total_players": None, "percentile": None}
-    )
+    try:
+        return ScenarioRankInfo.model_validate(cache_data).model_copy(
+            update={"total_players": None, "percentile": None}
+        )
+    except ValidationError:
+        logger.warning(
+            "Failed to validate rank cache file: %s",
+            cache_file,
+            exc_info=True,
+        )
+        return None
 
 
 def save_scenario_rank(
@@ -1775,6 +1861,3 @@ def get_scenario_rank_info(  # noqa: PLR0911, PLR0912, PLR0913, PLR0915
         leaderboard_total_cache_ttl_hours,
     )
     return _with_derived_rank_warning(rank_info, username, steam_id)
-
-
-make_cache()

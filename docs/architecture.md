@@ -70,23 +70,31 @@ UI — the server side (pull-based reads):
 
 ```mermaid
 flowchart TD
+    subgraph Shell["Server threads (app_shell.py, mounted on every page)"]
+        ShellTick["dcc.Interval tick<br/>pb-celebration-interval"]
+        Drain["publish_run_events<br/>empties the queue, stamps each run live<br/>or stale, names at most one celebrated<br/>run and sends its toast"]
+        ShellTick --> Drain
+    end
+
     subgraph Server["Server threads (Waitress or Flask, home.py callbacks)"]
         Tick["dcc.Interval tick"]
         Check["check_for_new_data<br/>may auto-switch scenario"]
         Graph["generate_graph<br/>rebuilds the plot via plot_service"]
         Rank["get_scenario_rank<br/>interval-only calls are cache-only and<br/>surface Timer writes within ~1s"]
         Refresh["refresh_rank<br/>runs when the user clicks Refresh"]
-        Tick --> Check
         Check -->|"run-events summary"| Graph
         Tick --> Rank
     end
 
     Queue[["message_queue (deque of NewFileMessage)"]]
+    Batch[("run-events-batch dcc.Store")]
     Stores[("data_service module-global stores")]
     Cache[("JSON cache under data/cache/")]
     API["KovaaK's HTTP API"]
 
-    Check -->|"drains and summarizes"| Queue
+    Drain -->|"drains and stamps"| Queue
+    Drain -->|"one batch per tick"| Batch
+    Batch -->|"triggers"| Check
     Graph -->|"reads runs"| Stores
     Rank -->|"reads via get_scenario_rank_info"| Cache
     Refresh -->|"authoritative fetch"| API
@@ -97,9 +105,10 @@ The watchdog and UI share two channels: `message_queue` (a `deque`) carries
 *notifications* that new data exists, while the run data itself is shared through
 the `data_service.py` module-global stores the UI reads directly. Note the order
 above — the run is loaded into the stores before its message becomes visible.
-The UI is pull-based: a `dcc.Interval` on the Scenario Performance page drains
-the entire queue each tick and publishes one scenario-specific summary.
-`generate_graph` reads that summary and never accesses the queue directly.
+The UI is pull-based: a `dcc.Interval` in the app shell drains the entire queue
+each tick and publishes one batch for whatever page is open. The page reads that
+batch and never accesses the queue directly, so run delivery no longer depends
+on Scenario Performance being mounted.
 
 ### Background threads never drive UI outputs
 
@@ -113,8 +122,10 @@ for the judgment of whether an event is worth interrupting someone for.
 
 The sanctioned channels, each typed and single-purpose:
 
-- `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only; its
-  consumer assumes run-specific fields.
+- `my_queue/message_queue.py` — `deque[NewFileMessage]`, run events only,
+  drained by the app shell's `publish_run_events` on every page. It carries
+  facts about a run and no decision field, so each consumer derives its own
+  verdict and two of them can never disagree about one run.
 - `data_service.playlist_startup_warning_queue` — boot-time playlist warnings,
   drained by a dedicated Scenario Performance interval callback.
 - `file_watchdog.run_import_failure_queue` — run files the watchdog thread
@@ -233,10 +244,10 @@ flowchart LR
     App --> FileWatchdog
 
     Shell --> LocalIcon
+    Shell --> Queue
     Home --> DataService
     Home --> ApiService
     Home --> PlotService
-    Home --> Queue
     Home --> LocalIcon
     Playlists --> OverviewService
     Playlists --> WarmupService
@@ -271,20 +282,47 @@ flowchart LR
 - `source/app_shell.py` — top-level layout (`layout`): navbar (`nav_link`; burger
   collapse applied by a clientside callback), theme toggle, Dash `page_container`,
   and the notification host — the one `dmc.NotificationContainer`, plus the
-  toast-lifetime `dcc.Store` beside it, shell-hosted so its lifecycle matches
-  the toasts' rather than resetting when a page remounts.
+  `toast-channel-registry` `dcc.Store` beside it, holding each toast channel's
+  current instance id so the next emission knows which one to hide,
+  shell-hosted so its lifecycle matches the toasts' rather than resetting when
+  a page remounts.
+  It also hosts the app-wide run-event drain: `pb-celebration-interval` (period
+  `polling_interval`), the `run-events-batch` `dcc.Store`, and the
+  `publish_run_events` callback that is `message_queue`'s only consumer.
+  Beside them sit the celebration's two other stores: `pb-celebration-style`
+  (`storage_type="local"`, default `"confetti"`), which *is* the setting the
+  Settings page edits and the drain reads as `State`, and
+  `pb-celebration-signal`, a dead-end output that exists only because the
+  clientside callback driving the animation needs one. That callback takes the
+  batch store as its `Input` and the style store as `State` and calls
+  `window.pbCelebration.celebrate` in `assets/pbCelebration.js`, so the burst
+  costs no server round trip. That
+  interval polls on every page for the life of the tab, so roughly one request
+  a second is what idle looks like in devtools and in the waitress log —
+  accepted for a local single-user app, and recorded here so nobody reads the
+  traffic as a bug. Folding the Scenario Performance interval's other
+  consumers into this one is a refactor for another day.
+  The layout is built while `source/app.py` is imported, before startup
+  validates the config file, so `_drain_interval_ms` falls back to the field
+  default rather than turning a bad config into an import traceback.
 
 ### Pages (`source/pages/`, Dash Pages — one file per route)
 - `home.py` (`/`) — the Scenario Performance page (the module and route keep
   their names; the rename was labels-only): sensitivity/time plots, high score,
   rank, and the chart options inspector. Owns the live-update callbacks
-  (`check_for_new_data` drains `message_queue`; `generate_graph` consumes the
-  resulting `run-events` summary).
+  (`check_for_new_data` takes the shell's `run-events-batch` store as its only
+  `Input` and summarizes it for the shown scenario; `generate_graph` consumes
+  the resulting `run-events` summary). The follow switch and the scenario
+  dropdown are `State` there, not `Input`: a Store replays its last value, so a
+  control flip would otherwise re-forward a batch already processed.
   As the landing page it also carries the first-run setup card
-  (`_setup_card_children`), which renders while a settings key has never been
+  (`_setup_card_children`), which is suppressed while a stats-directory change
+  awaits a restart. It asks the store's read state before anything else: an
+  `ERROR` or `FUTURE` settings file gets a card of its own, because those
+  states read as no keys and the key-absence states below would take them for
+  a fresh install. Otherwise it renders while a settings key has never been
   written — an absent `stats_dir`, or an absent `kovaaks_username` once the
-  directory exists — and is suppressed while a stats-directory change awaits a
-  restart. It only links to `/settings`; its Skip button calls
+  directory exists. It only links to `/settings`; its Skip button calls
   `settings_service.decline_identity` and removes the card. Key *presence* is
   the line between it and `_stats_dir_hint`, which explains a directory that
   is configured and unusable.
@@ -346,8 +384,9 @@ flowchart LR
   Delete action cell (user playlists only; bundled rows render nothing) opens a
   confirmation modal, then `delete_user_playlist` unlinks the file and the same
   refresh store rebuilds the grid. When the loader recorded user files
-  superseded by bundled benchmarks, an alert above the grid offers a one-click
-  cleanup (`delete_superseded_user_playlist_files`).
+  superseded by bundled benchmarks, a notice above the grid offers a one-click
+  cleanup (`delete_superseded_user_playlist_files`). It is a `dmc.Paper`
+  rather than a `dmc.Alert` because it holds a button (see decision log).
 - `playlist_scenarios.py` (`/playlists/<playlist_code>`) — per-playlist scenario
   overview (AG Grid). `load_playlist_scenario_rows` is driven by a layout-bound
   mounted-route store, not the URL directly (see decision log). It paints
@@ -389,7 +428,20 @@ flowchart LR
   detection's report replaces it; it keeps the conclusive no-match message for
   the one outcome that ruled everything out, while unchecked probes and
   unreadable account lists each say so in their own words.
-  Below the form, a static version section names the running build from
+  Below the form and outside it, a **Celebrations** section holds the personal
+  best celebration's style select — Off, Confetti, Fireworks, Cannons, Stars —
+  its description, and a Preview button. The authoritative value is the shell's
+  `pb-celebration-style` store, not the control: a one-shot `dcc.Interval`
+  initializes the select from it (read as `State`, because the store-as-`Input`
+  pair would be a dependency cycle) and that same tick gates the write
+  direction, since mounting the page fires the write callback with the select's
+  layout default despite `prevent_initial_call` and with the select as
+  `triggered_id`. A stored value that is none of the options leaves the select
+  on its Confetti default and is not written back. Preview is a clientside
+  callback into the same `assets/pbCelebration.js` entry a real celebration
+  uses, so it obeys the reduced-motion guard and shows no toast; a second
+  clientside callback disables it while Off is selected.
+  Below that, a static version section names the running build from
   `utilities/build_info.py` — release label, then short SHA and commit date —
   with no callback and no network. The same section carries the bug-report
   affordance: a "Report a bug" anchor whose href `bug_report_url()` builds as
@@ -471,7 +523,7 @@ flowchart LR
   push `NewFileMessage`, and schedule the bounded rank freshness poll on a new
   high score.
 - `my_queue/message_queue.py` — `message_queue` (`deque[NewFileMessage]`): the
-  watchdog-to-UI hand-off.
+  watchdog-to-UI hand-off, drained by the app shell.
 - `config/config_service.py` — loads `config.toml` into `config` (`ConfigData`).
   Unknown keys are named in one warning and ignored, so a config carrying keys
   a release has retired still loads.
@@ -531,17 +583,21 @@ flowchart LR
   titles as callables, so the flag is read per request rather than at import
   time, when the config is not yet loaded).
 - `utilities/` — `notifications` (`NOTIFICATION_CONTAINER_ID` plus `toast()`,
-  the one builder for `sendNotifications` payloads: stable semantic id, title,
+  the one builder for `sendNotifications` payloads: semantic id, title,
   message, color, optional icon, and the shared auto-close duration —
   `auto_close=False` for the conditions that must survive until dismissed;
-  `upsert_toast()` pairs the `update`+`show` actions and alternates the
-  duration so a replacement under a reused id starts a full lifetime, keyed off
-  the per-client `TOAST_LIFETIME_STORE_ID` counter),
+  `channel_toast()` turns one payload into the show/hide/registry triple that
+  replaces a toast in place, minting a fresh instance id under the payload's
+  logical channel key, hiding the instance it replaces plus any channels it
+  `clears`, and returning a per-key `dash.Patch` for the per-client
+  `TOAST_CHANNEL_REGISTRY_STORE_ID` store, and carrying the payload's
+  `autoClose` through untouched so the until-dismissed personal best
+  celebration rides the same one helper),
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
-  performs, with an optional `before_replace` hook the playlist writer uses for
-  its destination point-check),
+  performs, with an optional `before_replace` hook the playlist, visibility,
+  and settings writers use for their destination point-checks),
   `store_schema` (the `schema_version` marker, the four-state read machine, the
   per-store v1 validators, and `back_up_unusable_store()` — see State above),
   `paths` (`state_dir()` / `package_root()` — see State above — plus
@@ -561,16 +617,31 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
+- `assets/pbCelebration.js` — the personal best celebration's animation:
+  a name-keyed style registry (`confetti`, `fireworks`, `cannons`, `stars`)
+  behind `window.pbCelebration.play(style)` and `celebrate(batch, style)`. It
+  owns every animation guard: Off, reduced motion, the hidden-tab hold that
+  replays on `visibilitychange`, cancelling a burst still in flight, the
+  unknown-name fallback, and the batch's monotonic `animation_sequence`, which
+  is what stops one payload playing twice. Cancellation is centralized: a style
+  returns a cancel closure, the module holds exactly one, and it runs before
+  any new play — `confetti.reset()` clears particles but does not stop a loop.
+  It resolves `window.confetti` at call time, so asset load order is not
+  load-bearing.
 - `assets/stylesheet.css` — shared semantic presentation rules, including the
   explicit pending-cell ellipsis animation used by playlist progressive fill.
 - `assets/icons/` — vendored SVGs consumed by `components/local_icon.py`.
+- `assets/vendor/` — third-party browser libraries, copied in unminified with
+  their license and an exact version pin (`assets/vendor/README.md` holds the
+  table and the update recipe). One entry today: `canvas-confetti` 1.9.4
+  (ISC), which defines `window.confetti`.
 
 ## Where to look first
 
 | To change... | Start in |
 | --- | --- |
 | What a shipped capability does today (its behavior contract) | `docs/specs/<capability>.md` — read it before changing the behavior, update it in the same PR |
-| The live-update / auto-refresh mechanism | `pages/home.py` callbacks + `my_queue/message_queue.py` |
+| The live-update / auto-refresh mechanism | `app_shell.py` (`publish_run_events`, the one drain) + `pages/home.py` callbacks + `my_queue/message_queue.py` |
 | CSV parsing or the in-memory stores | `kovaaks/data_service.py` |
 | A KovaaK's endpoint, rank logic, or caching | `kovaaks/api_service.py` (+ `docs/kovaaks_api_notes.md`) |
 | Background playlist percentile cache warming | `kovaaks/percentile_warmup_service.py` + status/interval wiring in `pages/playlists.py` |
@@ -579,6 +650,7 @@ flowchart LR
 | Playlist show/hide visibility, or which playlists appear in dropdowns | `kovaaks/playlist_visibility_service.py` (+ the overview page's visibility controls in `pages/playlists.py`) |
 | The per-playlist scenario table, or its column sorting/formatting | `pages/playlist_scenarios.py` + `kovaaks/playlist_scenarios_service.py`; client-side grid functions in `assets/dashAgGridFunctions.js` |
 | Navbar, theme, or page chrome | `source/app_shell.py` |
+| The personal best celebration (the burst, its styles, or the setting that gates it) | `assets/pbCelebration.js` + `assets/vendor/canvas-confetti.js` for the animation; `app_shell.py` (`publish_run_events`, the `pb-celebration-style` store, the clientside callback) for the decision; `pages/settings.py` for the control |
 | Shared UI icons or vendored SVGs | `components/local_icon.py` + `assets/icons/` |
 | Config / settings | `config/config_service.py` (+ `example.toml`) for human-owned boot facts and escape hatches; `config/settings_service.py` (+ `data/settings.json`) for app-owned user settings: the stats directory and the KovaaK's identity; `pages/settings.py` for the page that edits them; `config/stats_dir_detection.py` for the Steam walk that seeds the stats directory at startup and suggests candidates on the page; `config/identity_detection.py` for verifying local Steam accounts against KovaaK's profiles, which the page runs behind its Detect button |
 | Whether a settings change applies live or waits for a restart | `config/settings_service.py` — the `stats_dir` boot pin (`resolve_stats_dir`), the identity pin (`get_identity`), and the notice they derive (`is_restart_pending`) |

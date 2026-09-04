@@ -2,11 +2,13 @@
 
 The app is told a few things by hand in a configuration file, such as the
 port, that an update never asks anyone to edit, and works the rest out for
-itself. Where the KovaaK's runs live and who the player is on the
-leaderboards live in a small file the app owns, shown and changed on a
-Settings page that also offers what the machine already knows. A setting the
-running app cannot pick up live is frozen at startup, and the page says when
-a restart is needed.
+itself. A number outside the range it can work with is refused as that file
+is read, with one line naming the file. Where the KovaaK's runs live and who
+the player is on the leaderboards live in a small file the app owns, shown and
+changed on a Settings page that also offers what the machine already knows and
+holds one preference the browser remembers instead, how a personal best
+celebrates. A setting the running app cannot pick up live is frozen at startup,
+and the page says when a restart is needed.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives
@@ -28,13 +30,20 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   app-read-only from then on: the app never writes it, and an update never
   touches it
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
-  `ConfigData` holds `port` (required, no default), `host` (`"127.0.0.1"`),
-  `polling_interval` (`1000` ms), `sens_round_decimal_places` (`1`), `debug`
-  (`False`), `scenario_metadata_cache_ttl_hours` (`24`),
+  `ConfigData` holds `port` (required, no default, `1` to `65535`), `host`
+  (`"127.0.0.1"`), `polling_interval` (`1000` ms, `1` to `2147483647`),
+  `sens_round_decimal_places` (`1`), `debug` (`False`),
+  `scenario_metadata_cache_ttl_hours` (`24`),
   `scenario_rank_cache_ttl_hours` (`168`),
   `leaderboard_total_cache_ttl_hours` (`168`), `percentile_warmup_enabled`
   (`True`), `kovaaks_api_timeout_seconds` (`30`, must be above `0`), and
-  `show_version_in_title` (`False`).
+  `show_version_in_title` (`False`). The port and poll-interval bounds are set
+  by
+  [2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load);
+  a configured `0` port is refused even though `bind_server_socket(0)` still
+  asks the OS for a free port, and the poll interval's upper bound is the
+  largest delay `window.setInterval` can hold rather than a product cap on how
+  slow a poll may be. `example.toml` states both ranges beside the settings.
 - The app owns no default port. `example.toml` ships `port = 8050`, and an
   existing install keeps whatever its file says
   ([2026-07-19](../decision_log.md#2026-07-19-default-port-is-8050-not-8080)).
@@ -58,6 +67,10 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   `<path>` -- copy example.toml to config.toml.", and exit code 1, before
   playlists load or any service starts
   ([2026-07-09](../decision_log.md#2026-07-09-load-configuration-lazily-at-application-startup)).
+  An out-of-range `port` or `polling_interval` takes that same exit rather than
+  reaching the bind; `host` is not part of that check and fails later, at the
+  bind, with its own message
+  ([2026-09-01](../decision_log.md#2026-09-01-configured-ports-and-poll-intervals-are-bounded-at-load)).
   The same line is written to the log files.
 - Unknown keys are named once in a warning, "Ignoring unknown key(s) in
   `<path>`: `<keys>`. Remove them when convenient.", and ignored; a file
@@ -229,7 +242,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   Before any detection the button sits beside the hint "Checks the Steam
   accounts on this machine against KovaaK's.", which a detection's report
   replaces.
-- An alert titled "Your saved settings are not being used" carries the
+- A yellow alert with a warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices))
+  titled "Your saved settings are not being used" carries the
   store's message in the error and future states and is re-derived after a
   save that repairs the file
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
@@ -241,12 +255,75 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   pre-filled from the same label, and "Logs `<log directory>`" names where
   `debug.log` is
   ([2026-08-10](../decision_log.md#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)).
-- Every state-writing callback on the page guards on `n_clicks` and the
-  triggering id
+- Every callback that writes `data/settings.json` or spends a KovaaK's call
+  guards on its trigger: Save and Detect on `n_clicks` and the triggering id,
+  the picker on a chosen value and the triggering id
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
+  The Celebrations select below is the one state-writing callback that does
+  neither, and deliberately: its write is browser-local, and the spurious call
+  it has to survive arrives *with* the select as the triggering id, so it gates
+  on the initialization tick instead
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+
+## Celebrations
+
+- A "Celebrations" section sits between the Save form and the version section,
+  outside the form: the select "Personal best celebration", described as
+  "Plays a short animation and shows a toast when a run beats your personal
+  best in any scenario. Works on every page, and does not depend on Run
+  Notifications. Takes effect right away.", with a "Preview" button beside it.
+  Nothing here goes through Save, and nothing here touches the restart notice
+  or the store alert, which speak for the form's three keys
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- The select offers five options in this order: "Off", "Confetti",
+  "Fireworks", "Cannons", "Stars", carrying the values `"off"`, `"confetti"`,
+  `"fireworks"`, `"cannons"`, `"stars"`. Deselecting is disabled, so the
+  control always holds one of them; Off is a value like any other rather than
+  a second control. The four style names have to name entries in the animation
+  registry, which a test asserts
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- The setting is the shell-hosted `dcc.Store(id="pb-celebration-style",
+  storage_type="local")`, not the control: one browser-local string, `"off"`
+  or a style name, defaulting to `"confetti"`. The select initializes from it
+  and writes its value straight back to it, and carries no Dash persistence of
+  its own. What the setting governs is in
+  [notifications.md](notifications.md#run-notifications)
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- The value is per browser, is cleared with site data, and is never written to
+  `data/settings.json`; a browser that has never visited the page celebrates.
+  Anything but the exact `"off"` reads as on, so a value this build does not
+  know still celebrates rather than silently disabling the family
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- A one-shot `dcc.Interval` initializes the select from the store, which reads
+  as `State` there; the store-as-`Input` pair would be a dependency cycle. The
+  same tick gates the write direction, because mounting the page fires that
+  callback with the select's layout default despite `prevent_initial_call` and
+  with the select as the triggering id, which would otherwise write that
+  default over a stored choice on every visit
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- A stored value that is none of the five options — a cleared store, or a
+  style a later version wrote — leaves the select on its layout default, which
+  is Confetti. That mirrors the animation's own fallback, and the stored value
+  is not rewritten: showing the default changes nothing, so nothing travels
+  back to the store
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
+- Preview plays the currently selected style through the same clientside path
+  a real celebration takes, so it obeys the reduced-motion guard, and it shows
+  no toast. It is `disabled` while Off is selected. Both rules read the
+  select's value rather than the store, so the button is enabled exactly when
+  clicking it plays what the select shows
+  ([2026-09-02](../decision_log.md#2026-09-02-the-celebration-setting-is-browser-local-on-the-settings-page)).
 
 ## The setup card
 
+- A store the app cannot read gets its own card first. In the `ERROR` and
+  `FUTURE` states the card shows "Your settings can't be read" with no Skip,
+  and the key-absence states below never run: both states read as no keys, so
+  they would report a fresh install for a store that is configured on disk.
+  One card covers both, because the Settings page's store alert is where they
+  are told apart and where the remedy lives
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  Copy and treatment belong to the Scenario Performance spec.
 - The landing page's card is keyed to key absence in the stored view: an
   absent `stats_dir` shows "Finish setting up" with no Skip and wins when both
   keys are absent; a present `stats_dir` with an absent `kovaaks_username`
@@ -259,9 +336,18 @@ configuration is owned by [release_and_install.md](release_and_install.md).
 - Skip calls `decline_identity`: the username becomes `""`, nothing else
   changes, no worker starts, nothing pins, and the card never returns
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
-  A future-state store refuses it and the card stays up
-  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp));
-  the red toast "Skip was not saved" explains.
+  Two things stop the write and neither takes the card away, because nothing
+  was recorded: a future-state store refuses it
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)),
+  and an unwritable `data/` fails it. Both report on the red toast "Skip was
+  not saved", the refusal with "The settings file was written by a newer
+  version of this app. Update the app to change settings." and the failure
+  with "Nothing was written. Try again, or see data/logs/debug.log for
+  details."; the failure is logged. They share one channel, so a second Skip
+  click re-pops the current answer instead of clicking into silence, and a
+  retry that fails differently replaces the first explanation rather than
+  sitting beside it
+  ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
 - The landing page's in-place hint "No stats directory configured — set it in
   Settings" speaks only for a `stats_dir` key that exists and is unusable;
   while a set directory awaits a restart it reads "Restart the app to apply
@@ -300,8 +386,11 @@ exempt
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
 - Automatic writers never touch an error- or future-state store. A
   user-initiated write owns an error-state file: the incumbent is copied, never
-  moved, to `<name>.corrupt-<n>.bak` with exclusive create before the
-  replace, and the write is refused if the copy fails. The owning surface
+  moved, to `<name>.corrupt-<n>.bak` before the replace. The bytes are made
+  durable in a temp file first and each candidate name is claimed by hard link,
+  which fails on an existing target, so a backup name never appears until it
+  holds the whole file. The write is refused if the copy fails, including on a
+  filesystem that refuses hard links. The owning surface
   states the error and future states in its own register: the Settings page
   alert and statuses, the Playlists page for visibility, the startup warning
   queue for playlist files

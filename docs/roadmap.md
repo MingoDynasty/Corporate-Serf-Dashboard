@@ -28,14 +28,40 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Personal best celebration** — a run that beats a scenario's personal best
+  now gets a short burst of confetti and a toast that says so, on whatever page
+  is open and for every scenario rather than only the one being watched. The
+  toast stays until it is dismissed, because the run that earned it was played
+  in a fullscreen game, and if the window was covered when the run landed the
+  animation waits for the tab to come back. A Settings control picks the
+  animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
+  off, with a Preview button beside it, and it is independent of Run
+  Notifications. Run delivery moved into the app shell to make that possible,
+  which retired the "While you were away" catch-up digest: a run no longer
+  waits for a Scenario Performance visit to be announced. (PRs #261, #268,
+  #272; design in #248) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md); the follow-up that turned the switch
+  into the choice of styles landed in #272, which closes the arc.
+- **Alert color language** — the notices printed into the page now speak one
+  severity scale, the same one the toasts already spoke: blue for
+  information, yellow for caution, red for errors, each with a leading icon.
+  The first-run setup card used to be a white card on a white page and is now
+  tinted like the rest, turning yellow in the state where nothing can be
+  plotted until it is answered. The leftover-playlist-files notice became a
+  plain panel, so a screen reader is no longer told that a panel of buttons is
+  an alert. No wording changed anywhere. (PR #260; design in #256, rulings in
+  #259) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Run notifications master switch** — run toasts can now be turned off. One
-  Chart options switch, Run Notifications, silences the whole per-run toast
-  family: the threshold verdict, the placement, and the catch-up digest after
-  time away. The chart keeps updating either way, and a run file that failed
-  to import still says so. The switch that used to read "Score Threshold
-  Notification" never gated toasts at all, so it is now "Score Threshold
-  Verdict" and says what it does. (PR #245; design in #240) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
+  Chart options switch, Run Notifications, silences the per-run toast family:
+  the threshold verdict and the placement. The chart keeps updating either
+  way, and a run file that failed to import still says so. The switch that
+  used to read "Score Threshold Notification" never gated toasts at all, so it
+  is now "Score Threshold Verdict" and says what it does. (PR #245; design in
+  #240) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md). The catch-up digest this switch also
+  gated has since been retired, and the personal best celebration is a
+  separate family the switch does not reach (PR #261).
 - **Scenario Performance point customization** — the raw run points can now be
   made smaller, larger, or a color of your choosing, from a Run Data Points
   group in Chart options. Eight curated swatches read on both the light and the
@@ -52,24 +78,6 @@ sequence.
   and never asks again. The playlists overview explains its N/A percentile
   columns in the same words. (PRs #235, #236; design in #231) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Feedback and bug-report intake** — the app has a defined place to send
-  feedback and bug reports: GitHub Issues, with a bug form and a feature form
-  and no blank-issue option. The bug form asks almost nothing — what happened,
-  the version, and one attached log — and says plainly, before the upload box,
-  that the issue and its attachments are public and what the log contains. The
-  Settings page pre-fills the version into the form and shows where the log
-  lives, so filing a report is a click instead of a hunt. (PRs #228, #229;
-  design in #226) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
-- **Chart options inspector** — the Scenario Performance graph's display
-  preferences left the blocking "Settings" modal for a collapsible panel beside
-  the chart, so an overlay is tuned against the live chart instead of through an
-  open-close-open loop behind a dimmed page. On a narrow window the panel stacks
-  above the chart instead. The page itself is now named Scenario Performance in
-  the navbar and the browser tab, so only the Settings page answers to
-  "Settings". No preference changed what it does or where it is stored. (PRs
-  #209, #215; design in #206) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md).
 ---
 
 ## Upcoming milestones
@@ -96,6 +104,16 @@ sequence.
 Listed so they aren't forgotten, but not yet actively planned. Each will be
 expanded into its own roadmap entry when it becomes the next thing up.
 
+- **Per-family celebration staleness** — the run-event freshness window
+  applies the quiet-return rule to celebrations and ordinary run toasts alike,
+  so a personal best set with no tab open celebrates only if the dashboard is
+  opened within a couple of minutes of it, while a hidden tab's celebration is
+  delivered however late. Whether the celebration deserves its own longer or
+  unbounded window is a question for real usage: whether the missed
+  celebration in the play-then-open-the-dashboard flow grates, and how the late
+  delivery feels when it fires. Nothing shipped forecloses the change; it is
+  one conditional in the drain's decision rule plus an amendment to the
+  digest ruling.
 - **Score trend verdict** — *improving / plateauing / declining* classification
   per scenario, answering "is my current training working?" Likely shipped
   against raw score data first; richer rank-trend analysis would need rank

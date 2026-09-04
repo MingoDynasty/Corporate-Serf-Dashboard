@@ -2,7 +2,6 @@
 
 import json
 import logging
-import uuid
 from datetime import datetime
 from typing import NamedTuple, TypedDict
 
@@ -20,6 +19,11 @@ from dash import (
     no_update,
 )
 
+from source.app_shell import (
+    RUN_EVENTS_BATCH_STORE_ID,
+    RunEventBatch,
+    RunEventData,
+)
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import (
@@ -29,6 +33,7 @@ from source.config.settings_service import (
     get_identity,
     get_kovaaks_username,
     get_settings,
+    get_settings_store_state,
     get_usable_stats_dir,
     is_stats_dir_change_pending,
 )
@@ -49,7 +54,6 @@ from source.kovaaks.data_service import (
 from source.kovaaks.playlist_visibility_service import (
     get_visible_playlist_selector_options,
 )
-from source.my_queue.message_queue import NewFileMessage, message_queue
 from source.my_watchdog.file_watchdog import drain_run_import_failures
 from source.pages.page_title import page_title
 from source.pages.playlist_selector import PLAYLIST_SELECTOR_PRESET
@@ -67,11 +71,11 @@ from source.plot.plot_service import (
     generated_point_color,
 )
 from source.utilities.notifications import (
-    TOAST_LIFETIME_STORE_ID,
+    TOAST_CHANNEL_REGISTRY_STORE_ID,
+    channel_toast,
     toast,
-    upsert_toast,
 )
-from source.utilities.store_schema import UnsupportedSchemaError
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 from source.utilities.utilities import format_absolute_timestamp, ordinal
 
 logger = logging.getLogger(__name__)
@@ -107,8 +111,8 @@ SETTINGS_HELP_TEXT = {
         "judged against the score threshold. Needs Run Notifications turned on."
     ),
     "run-notification": (
-        "Controls the threshold, placement, and catch-up notifications for "
-        "your runs. Turn this off to update the chart silently."
+        "Controls threshold verdict and placement notifications for your runs. "
+        "Personal best celebrations use their own setting."
     ),
     "top-n-scores": (
         "How many of your best scores to plot per sensitivity — or per day in "
@@ -197,15 +201,31 @@ SETUP_CARD_STATS_DIR_BODY = (
     "No KovaaK's stats folder was found, so the dashboard can't read your runs "
     "yet. Set it in Settings."
 )
+# Shown when the settings file exists but cannot be used. The key-absence
+# states below cannot speak for it: an unusable store reads as no keys at all,
+# so they would claim a fresh install when a configured one is sitting on disk.
+SETUP_CARD_STORE_TITLE = "Your settings can't be read"
+SETUP_CARD_STORE_BODY = (
+    "A settings file exists, but this version of the app can't use it, so the "
+    "dashboard started without your settings. Open Settings to see what's "
+    "wrong and how to fix it."
+)
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
-# Shown when Skip cannot be recorded because the settings file belongs to a
-# newer build. The card has to stay up (nothing was written), so the toast is
-# what explains why the click appeared to do nothing.
+# Shown when Skip cannot be recorded, either because the settings file belongs
+# to a newer build or because the write itself failed. The card has to stay up
+# (nothing was written), so the toast is what explains why the click appeared
+# to do nothing. The two outcomes are mutually exclusive answers to the same
+# click, so they share one channel: a second attempt replaces whatever the
+# first one said instead of stacking a contradiction beside it.
+SETUP_CARD_SKIP_PROBLEM_CHANNEL = "setup-card-skip-problem"
 SETUP_CARD_SKIP_REFUSED_TITLE = "Skip was not saved"
 SETUP_CARD_SKIP_REFUSED_MESSAGE = (
     "The settings file was written by a newer version of this app. Update the "
     "app to change settings."
+)
+SETUP_CARD_SKIP_FAILED_MESSAGE = (
+    "Nothing was written. Try again, or see data/logs/debug.log for details."
 )
 # The primary action navigates, so it ships as one link wearing the button's
 # styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
@@ -214,6 +234,14 @@ SETUP_CARD_SKIP_REFUSED_MESSAGE = (
 # escape hatch (``component="a"``) is not exposed by the dmc 2.8.0 wrapper, so
 # the styling lives in ``assets/stylesheet.css`` instead.
 SETUP_CARD_CTA_CLASS = "setup-card-cta"
+# The card wears the shared alert anatomy on the ``dmc.Paper`` it already is.
+# Blue is the informational default; the caution modifier swaps in the yellow
+# tokens for the stats-folder state, which blocks every plot on the page and
+# cannot be dismissed.
+SETUP_CARD_CLASS = "alert-panel setup-card"
+SETUP_CARD_CAUTION_CLASS = f"{SETUP_CARD_CLASS} alert-panel-caution"
+SETUP_CARD_CAUTION_ICON = "material-symbols:warning-outline"
+SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -232,13 +260,21 @@ _RANK_HINT_USERNAME_UNSET = "username_unset"
 _RANK_HINT_LOOKUP_FAILED = "lookup_failed"
 _RANK_HINT_SERVED_STALE = "served_stale"
 _STEAM_MISMATCH_NOTIFICATION_ID = "steam-id-mismatch"
-_RANK_REFRESH_FAILED_NOTIFICATION_ID = "rank-refresh-failed"
-_RANK_REFRESH_STALE_NOTIFICATION_ID = "rank-refresh-stale"
+# One channel for the whole refresh problem lane. The hard failure and the
+# served-stale serve are mutually exclusive verdicts on the same attempt, so
+# under separate ids a stale retry after a hard failure would leave both on
+# screen contradicting each other about the latest click.
+_RANK_REFRESH_PROBLEM_CHANNEL = "rank-refresh-problem"
+# The standing condition a Refresh click can report, and its own channel: a
+# repeat click reproduces byte-identical copy, which is the stacking the policy
+# forbids.
+_RANK_REFRESH_USERNAME_UNSET_CHANNEL = "rank-refresh-username-unset"
 _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
-# One run, one toast: every run verdict and the catch-up digest share this id,
-# so the newest verdict replaces whatever is on screen instead of stacking.
-_RUN_VERDICT_NOTIFICATION_ID = "run-verdict"
-_BACKLOG_NOTIFICATION_TITLE = "While you were away"
+# One run, one toast: every run verdict shares this channel key, so the newest
+# one replaces whatever is on screen instead of stacking. The celebration toast
+# is deliberately not in this lane -- it has its own id and stays until
+# dismissed.
+_RUN_VERDICT_CHANNEL = "run-verdict"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
 # Both refresh-failure paths leave the displayed value alone, so one line
 # covers them: the hard failure keeps whatever was on screen, and the
@@ -274,21 +310,11 @@ def _placeholder_plot_json() -> str:
     return generate_placeholder_plot().to_json()
 
 
-class RunEventData(TypedDict):
-    """JSON-safe fields from the latest run event in a drained batch."""
-
-    scenario_name: str
-    sensitivity: str
-    nth_score: int
-    score: float
-    previous_high_score: float | None
-
-
 class RunEventsPayload(TypedDict):
-    """Summary passed from the queue consumer to Home's other callbacks."""
+    """Summary passed from the batch-store consumer to Home's callbacks."""
 
-    count: int
     latest: RunEventData
+    celebrated_run_id: str | None
 
 
 def _settings_help_label(label: str, help_text: str) -> dmc.Group:
@@ -346,59 +372,57 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
     return "N/A"
 
 
-def _drain_run_events(
+def _summarize_run_events(
+    batch: RunEventBatch,
     selected_scenario: str | None,
     automatically_change_scenario: bool,
 ) -> tuple[str | None, RunEventsPayload | None]:
-    """Drain pending run messages and summarize the landing scenario."""
-    drained: list[NewFileMessage] = []
-    while True:
-        try:
-            drained.append(message_queue.popleft())
-        except IndexError:
-            break
-
-    if not drained:
+    """Summarize one shell batch for the scenario this page should show."""
+    runs = batch["runs"]
+    if not runs:
         return selected_scenario, None
 
     target_scenario = (
-        drained[-1].scenario_name
+        runs[-1]["scenario_name"]
         if automatically_change_scenario
         else selected_scenario
     )
     if target_scenario is None:
         return None, None
 
-    matching_messages = [
-        message for message in drained if message.scenario_name == target_scenario
-    ]
-    if not matching_messages:
+    matching_runs = [run for run in runs if run["scenario_name"] == target_scenario]
+    if not matching_runs:
         return target_scenario, None
 
-    latest = matching_messages[-1]
+    # Coalescing, as before: several runs rebuild the plot once and only the
+    # latest matching one is narrated. The drain's decision travels with it,
+    # because the celebrated run may belong to another scenario entirely.
     return target_scenario, {
-        "count": len(matching_messages),
-        "latest": {
-            "scenario_name": latest.scenario_name,
-            "sensitivity": latest.sensitivity,
-            "nth_score": latest.nth_score,
-            "score": latest.score,
-            "previous_high_score": latest.previous_high_score,
-        },
+        "latest": matching_runs[-1],
+        "celebrated_run_id": batch["celebrated_run_id"],
     }
 
 
 @callback(
     Output("run-events", "data"),
     Output("scenario-dropdown-selection", "value"),
-    Input("interval-component", "n_intervals"),
-    Input("automatically-change-scenario-switch", "checked"),
-    Input("scenario-dropdown-selection", "value"),
+    Input(RUN_EVENTS_BATCH_STORE_ID, "data"),
+    # State, not Input: the old drain was destructive, so a control-triggered
+    # rerun found nothing. A Store replays its last value instead, and a
+    # control flip must not re-forward a batch already processed. The same
+    # reason keeps prevent_initial_call on: navigating back here remounts the
+    # page against a retained store value, and a mount must not replay it.
+    State("automatically-change-scenario-switch", "checked"),
+    State("scenario-dropdown-selection", "value"),
     prevent_initial_call=True,
 )
-def check_for_new_data(_, automatically_change_scenario, selected_scenario):
-    """Drain pending run events and forward one summary to Home callbacks."""
-    target_scenario, run_events = _drain_run_events(
+def check_for_new_data(batch, automatically_change_scenario, selected_scenario):
+    """Forward the shell's run-event batch as one summary for this page."""
+    if not batch:
+        return no_update, no_update
+
+    target_scenario, run_events = _summarize_run_events(
+        batch,
         selected_scenario,
         automatically_change_scenario,
     )
@@ -711,26 +735,43 @@ def get_scenario_rank(_, selected_scenario, _n_intervals):
     return display, notifications or no_update
 
 
-def _rank_refresh_failed_notification() -> dict[str, object]:
-    """Report a manual refresh that came back with nothing usable."""
+def _rank_refresh_problem_notification(*, served_stale: bool) -> dict[str, object]:
+    """Report what went wrong with the latest manual refresh.
+
+    One channel, two flavors: the hard failure came back with nothing usable,
+    the served-stale one re-served the cached position. They are the mutually
+    exclusive verdicts on one attempt, so they replace each other rather than
+    stacking two contradictory claims about the same click.
+    """
     return toast(
-        _RANK_REFRESH_FAILED_NOTIFICATION_ID,
+        _RANK_REFRESH_PROBLEM_CHANNEL,
         _RANK_REFRESH_FAILED_TITLE,
-        _RANK_REFRESH_FAILED_MESSAGE,
-        color="red",
+        _RANK_REFRESH_STALE_MESSAGE if served_stale else _RANK_REFRESH_FAILED_MESSAGE,
+        color="yellow" if served_stale else "red",
         icon=local_icon("material-symbols:refresh-rounded"),
     )
+
+
+def _rank_refresh_success_channel(selected_scenario: str) -> str:
+    """Name the success channel for one scenario.
+
+    The scenario name goes in verbatim. Toast ids are internal -- never parsed
+    back apart, never rendered -- so the identity function is the stable,
+    collision-free derivation the policy asks for, and a hash would only add a
+    collision it cannot have.
+    """
+    return f"rank-refresh-success-{selected_scenario}"
 
 
 def _rank_refresh_success_notification(selected_scenario: str) -> dict[str, object]:
     """Confirm a genuinely fresh manual refresh.
 
-    Fresh id per refresh: ``show`` silently ignores a duplicate id while the
-    previous toast is still visible, which would eat the "done" cue on
-    back-to-back refreshes.
+    A channel per scenario: repeat refreshes of one scenario carry identical
+    copy and replace each other, while refreshes of different scenarios are
+    distinct facts and stack.
     """
     return toast(
-        f"rank-refresh-notification-{uuid.uuid4()}",
+        _rank_refresh_success_channel(selected_scenario),
         "Position refreshed",
         f"Refreshed position for {selected_scenario}.",
         color="green",
@@ -742,13 +783,10 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
     """Answer a Refresh click that has no identity to look anything up with.
 
     Blue, not red: nothing failed and no data is degraded -- the username is
-    simply not configured yet, and the title carries that verdict. Fresh id per
-    click for the same reason the success confirmation carries one: ``show``
-    ignores a duplicate id while the previous toast is still up, which would
-    leave a repeat click with no visible answer at all.
+    simply not configured yet, and the title carries that verdict.
     """
     return toast(
-        f"rank-refresh-username-unset-{uuid.uuid4()}",
+        _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
         "KovaaK's username not set",
         "Set your KovaaK's username in Settings to see your leaderboard position.",
         color="blue",
@@ -759,8 +797,11 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
 @callback(
     Output("scenario_rank", "children", allow_duplicate=True),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     Input("rank-refresh-button", "n_clicks"),
     State("scenario-dropdown-selection", "value"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     # Show the button's spinner for the duration of the fetch. Mantine's
     # loading state also swallows clicks, so the button cannot be spammed
     # into repeat KovaaK's calls while one refresh is in flight.
@@ -769,7 +810,11 @@ def _rank_refresh_username_unset_notification() -> dict[str, object]:
 )
 # One return per outcome the click can have -- three guards and four verdicts.
 # Collapsing any pair would only hide which answer a reader is looking at.
-def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
+def refresh_rank(  # noqa: PLR0911
+    n_clicks,
+    selected_scenario: str | None,
+    toast_channels,
+):
     """Fetch and display authoritative board truth after an explicit user request.
 
     The user asked, so every outcome answers on this callback's own
@@ -788,18 +833,26 @@ def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
     so whatever was on screen stays put -- usually the cached position -- and
     the red toast's "position unchanged" is true either way.
 
+    Every verdict is a channel emission, so a repeat click always re-pops its
+    answer instead of being swallowed by ``show``'s dedupe. A fresh position
+    also clears the two claims it falsifies: the problem channel, whose latest
+    attempt just succeeded, and the unset-username channel, since a lookup that
+    returned cannot have run without a username.
+
     Guard on ``n_clicks``: under DashProxy an ``allow_duplicate`` callback can
     fire once on initial page load despite ``prevent_initial_call``, and a
     page load must not force a network refresh or pop a stray toast.
     """
     if not n_clicks:
-        return no_update, no_update
+        return no_update, no_update, no_update, no_update
     if not selected_scenario:
-        return "N/A", no_update
+        return "N/A", no_update, no_update, no_update
     if not get_kovaaks_username():
         # ``no_update``: the field already reads "N/A — set your KovaaK's
         # username in Settings", so only the toast is new.
-        return no_update, [_rank_refresh_username_unset_notification()]
+        return no_update, *channel_toast(
+            _rank_refresh_username_unset_notification(), toast_channels
+        )
 
     try:
         rank_info = get_scenario_rank_info(
@@ -809,7 +862,9 @@ def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
         )
     except Exception:  # noqa: BLE001
         logger.exception("Manual rank refresh failed for %s", selected_scenario)
-        return no_update, [_rank_refresh_failed_notification()]
+        return no_update, *channel_toast(
+            _rank_refresh_problem_notification(served_stale=False), toast_channels
+        )
 
     if rank_info.error_message:
         # The console/file record the log bridge used to keep, kept here now.
@@ -818,7 +873,9 @@ def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
             selected_scenario,
             rank_info.error_message,
         )
-        return no_update, [_rank_refresh_failed_notification()]
+        return no_update, *channel_toast(
+            _rank_refresh_problem_notification(served_stale=False), toast_channels
+        )
 
     # A manual refresh is a network verdict too, so the interval path must not
     # go on repeating what the last passive render concluded.
@@ -832,16 +889,17 @@ def refresh_rank(n_clicks, selected_scenario: str | None):  # noqa: PLR0911
             selected_scenario,
             rank_info.warning_message,
         )
-        return display, [
-            toast(
-                _RANK_REFRESH_STALE_NOTIFICATION_ID,
-                _RANK_REFRESH_FAILED_TITLE,
-                _RANK_REFRESH_STALE_MESSAGE,
-                color="yellow",
-                icon=local_icon("material-symbols:refresh-rounded"),
-            )
-        ]
-    return display, [_rank_refresh_success_notification(selected_scenario)]
+        return display, *channel_toast(
+            _rank_refresh_problem_notification(served_stale=True), toast_channels
+        )
+    return display, *channel_toast(
+        _rank_refresh_success_notification(selected_scenario),
+        toast_channels,
+        clears=(
+            _RANK_REFRESH_PROBLEM_CHANNEL,
+            _RANK_REFRESH_USERNAME_UNSET_CHANNEL,
+        ),
+    )
 
 
 def _run_events_were_triggered(triggered: list[dict[str, str]]) -> bool:
@@ -880,21 +938,24 @@ def _threshold_verdict(
     """Judge a run against the threshold, or return None when nothing judges it.
 
     A run goes unjudged when the switch is off, the goal percentage is blank,
-    or the scenario/sensitivity has no previous high score to be a percentage
-    of -- there is no denominator, not a failing one.
+    the run is the first at its sensitivity, or the scenario has no positive
+    previous best to be a percentage of -- there is no denominator, not a
+    failing one. The message carries the facts and this derives the gate; the
+    two used to be bundled into one nullable field that meant both.
     """
     goal_percentage = _normalize_score_threshold_percentage(score_threshold_percentage)
-    previous_high_score = latest["previous_high_score"]
+    scenario_previous_best = latest["scenario_previous_best"]
     if (
         not score_threshold_notification_switch
         or not goal_percentage
-        or previous_high_score is None
-        or previous_high_score <= 0
+        or latest["is_new_sensitivity"]
+        or scenario_previous_best is None
+        or scenario_previous_best <= 0
     ):
         return None
     return _ThresholdVerdict(
-        passed=latest["score"] >= previous_high_score * goal_percentage / 100,
-        percentage=latest["score"] / previous_high_score * 100,
+        passed=latest["score"] >= scenario_previous_best * goal_percentage / 100,
+        percentage=latest["score"] / scenario_previous_best * 100,
         goal_percentage=goal_percentage,
     )
 
@@ -927,7 +988,7 @@ def _build_live_run_notification(
         if not placed:
             return None
         return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
+            _RUN_VERDICT_CHANNEL,
             f"New {_placement_phrase(latest['nth_score'])} score",
             f"{score} at {latest['sensitivity']}.",
             color="green",
@@ -937,7 +998,7 @@ def _build_live_run_notification(
     if verdict.passed:
         detail = f"Also {placement}." if placed else "Ready to move on."
         return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
+            _RUN_VERDICT_CHANNEL,
             "Threshold passed",
             f"{score}, {verdict.percentage:.1f}% of PB. {detail}",
             color="green",
@@ -949,50 +1010,9 @@ def _build_live_run_notification(
     if placed:
         shortfall += f" Still {placement}."
     return toast(
-        _RUN_VERDICT_NOTIFICATION_ID,
+        _RUN_VERDICT_CHANNEL,
         "Below threshold",
         f"{shortfall} Keep grinding...",
-        color="yellow",
-        icon=local_icon("material-symbols:warning-outline"),
-    )
-
-
-def _build_backlog_notification(
-    run_events: RunEventsPayload,
-    selected_scenario: str,
-    verdict: _ThresholdVerdict | None,
-) -> dict[str, object]:
-    """Summarize runs that accrued while Home was closed.
-
-    Shares the live run's id, so playing again replaces this digest with the
-    fresher verdict rather than stacking beside it.
-    """
-    latest = run_events["latest"]
-    summary = (
-        f"{run_events['count']} new {selected_scenario} runs. "
-        f"Latest: {latest['score']:.2f}"
-    )
-    if verdict is None:
-        return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
-            _BACKLOG_NOTIFICATION_TITLE,
-            f"{summary} at {latest['sensitivity']}.",
-            color="blue",
-            icon=local_icon("fontisto:line-chart"),
-        )
-    if verdict.passed:
-        return toast(
-            _RUN_VERDICT_NOTIFICATION_ID,
-            _BACKLOG_NOTIFICATION_TITLE,
-            f"{summary} — {verdict.percentage:.1f}% of PB, passed threshold.",
-            color="green",
-            icon=local_icon("material-symbols:check"),
-        )
-    return toast(
-        _RUN_VERDICT_NOTIFICATION_ID,
-        _BACKLOG_NOTIFICATION_TITLE,
-        f"{summary} — {verdict.percentage:.1f}% of PB, below the "
-        f"{verdict.goal_percentage:.1f}% threshold.",
         color="yellow",
         icon=local_icon("material-symbols:warning-outline"),
     )
@@ -1006,10 +1026,16 @@ def _build_run_event_notification(  # noqa: PLR0913
     score_threshold_notification_switch: bool,
     run_notification_switch: bool,
 ) -> dict[str, object] | None:
-    """Build the at-most-one toast a batch of run events earned.
+    """Build the at-most-one toast this page's latest matching run earned.
 
-    The master switch is checked first, and so gates the whole family: the
-    live toast and the backlog digest are both born here.
+    Nothing here predicts or re-derives: the drain stamped the celebration and
+    each run's liveness, and this reads the stamps. The master switch is
+    checked first, so it gates the whole page-built family, and the yield to
+    the celebration comes second -- with celebrations reporting a run, that
+    run's one notification is the celebration toast.
+
+    A batch's other runs earn nothing: the plot is their record, which is what
+    retires the "While you were away" digest.
     """
     if not run_notification_switch:
         return None
@@ -1017,13 +1043,16 @@ def _build_run_event_notification(  # noqa: PLR0913
         return None
 
     latest = run_events["latest"]
+    if run_events["celebrated_run_id"] == latest["run_id"]:
+        return None
+    if not latest["is_live"]:
+        return None
+
     verdict = _threshold_verdict(
         latest,
         score_threshold_percentage,
         score_threshold_notification_switch,
     )
-    if run_events["count"] > 1:
-        return _build_backlog_notification(run_events, selected_scenario, verdict)
     return _build_live_run_notification(
         latest,
         selected_scenario,
@@ -1032,9 +1061,12 @@ def _build_run_event_notification(  # noqa: PLR0913
     )
 
 
-def _empty_state_graph_response(title: str, message: str) -> tuple[str, object, object]:
+def _empty_state_graph_response(
+    title: str,
+    message: str,
+) -> tuple[str, object, object, object]:
     """Return a cached empty-state plot with notifications left unchanged."""
-    return _empty_plot_json(title, message), no_update, no_update
+    return _empty_plot_json(title, message), no_update, no_update, no_update
 
 
 def _build_scenario_figure(  # noqa: PLR0913
@@ -1139,7 +1171,8 @@ def _build_scenario_figure(  # noqa: PLR0913
 @callback(
     Output("cached-plot", "data"),
     Output("notification-container", "sendNotifications"),
-    Output(TOAST_LIFETIME_STORE_ID, "data"),
+    Output("notification-container", "hideNotifications"),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     Input("run-events", "data"),
     Input("scenario-dropdown-selection", "value"),
     Input("top_n_scores", "value"),
@@ -1156,7 +1189,7 @@ def _build_scenario_figure(  # noqa: PLR0913
     # rebuild the plot or reread the scenario's runs.
     State("run-notification-switch", "checked"),
     State("playlist-dropdown-selection", "value"),
-    State(TOAST_LIFETIME_STORE_ID, "data"),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
 )
 # This callback coordinates the page's graph controls and notification states.
 def generate_graph(  # noqa: PLR0913
@@ -1173,7 +1206,7 @@ def generate_graph(  # noqa: PLR0913
     score_threshold_notification_switch,
     run_notification_switch,
     selected_playlist,
-    toast_lifetime_sequence,
+    toast_channels,
 ):
     """
     Updates to the graph.
@@ -1188,8 +1221,9 @@ def generate_graph(  # noqa: PLR0913
     :param run_notification_switch: run notifications master switch.
         False=this run's toast is not built at all.
     :param selected_playlist: user-selected playlist code.
-    :param toast_lifetime_sequence: this client's run-verdict emission counter.
-    :return: Figure serialized to JSON, Notification, next emission counter
+    :param toast_channels: this client's toast channel instance registry.
+    :return: Figure serialized to JSON, the toasts to show, the instance ids to
+        hide, and the registry patch that records the rotation
     """
     if not selected_scenario:
         return _empty_state_graph_response(
@@ -1226,7 +1260,8 @@ def generate_graph(  # noqa: PLR0913
     )
 
     notifications = no_update
-    next_toast_lifetime_sequence = no_update
+    hide_notifications = no_update
+    next_toast_channels = no_update
     if supports_overlays:
         high_score = get_high_score(selected_scenario)
         if high_score_overlay_switch:
@@ -1240,6 +1275,7 @@ def generate_graph(  # noqa: PLR0913
             plot = add_score_threshold_overlay(plot, score_threshold)
 
         notifications = []
+        hide_notifications = []
         if _run_events_were_triggered(ctx.triggered):
             run_verdict = _build_run_event_notification(
                 run_events,
@@ -1250,9 +1286,10 @@ def generate_graph(  # noqa: PLR0913
                 run_notification_switch,
             )
             if run_verdict is not None:
-                notifications = upsert_toast(run_verdict, toast_lifetime_sequence)
-                next_toast_lifetime_sequence = (toast_lifetime_sequence or 0) + 1
-    return plot.to_json(), notifications, next_toast_lifetime_sequence
+                notifications, hide_notifications, next_toast_channels = channel_toast(
+                    run_verdict, toast_channels
+                )
+    return plot.to_json(), notifications, hide_notifications, next_toast_channels
 
 
 @callback(
@@ -1435,7 +1472,13 @@ def _stats_dir_hint() -> list:
     ]
 
 
-def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
+def _setup_card(
+    title: str,
+    body: str,
+    *,
+    offer_skip: bool,
+    caution: bool,
+) -> dmc.Paper:
     """Build one state of the setup card: a heading, a reason, and a way out.
 
     Navigation and dismissal only. The primary action is a link to the settings
@@ -1446,6 +1489,12 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
 
     The two actions are deliberately different elements: one navigates and is a
     link, the other acts on this page and is a button.
+
+    ``caution`` picks the severity treatment rather than being read off
+    ``offer_skip``: the two happen to agree today, but one is about how loud the
+    card is and the other about whether it can be dismissed. It stays a
+    ``dmc.Paper`` wearing the alert anatomy through CSS, because the card holds
+    a link and a button and ``role="alert"`` is for text content.
     """
     actions = [
         dmc.Anchor(
@@ -1466,7 +1515,17 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
             )
         )
     children = [
-        dmc.Text(title, className="setup-card-title"),
+        dmc.Group(
+            [
+                local_icon(
+                    SETUP_CARD_CAUTION_ICON if caution else SETUP_CARD_INFO_ICON,
+                    className="alert-panel-icon",
+                ),
+                dmc.Text(title, className="alert-panel-title"),
+            ],
+            gap="xs",
+            align="center",
+        ),
         dmc.Text(body),
         dmc.Group(actions, gap="sm"),
     ]
@@ -1476,7 +1535,7 @@ def _setup_card(title: str, body: str, *, offer_skip: bool) -> dmc.Paper:
         )
     return dmc.Paper(
         dmc.Stack(children, gap="xs"),
-        className="setup-card",
+        className=SETUP_CARD_CAUTION_CLASS if caution else SETUP_CARD_CLASS,
         withBorder=True,
     )
 
@@ -1499,9 +1558,26 @@ def _setup_card_children() -> list:
     stacking the identity ask on top of it would be two banners for one
     unfinished action. The card comes back after the restart if identity is
     still unasked.
+
+    Key absence only means "never asked" for a store the app can read. An
+    unusable one -- a hand-edited typo, or a file stamped by a newer build --
+    yields no keys either, and startup detection declines to run against it, so
+    the key-absence states below would report a fresh install and a search that
+    never happened. That state gets its own card, which does nothing but route
+    to the Settings page, where the store alert already names the real problem
+    and distinguishes the two ways a store can be unusable.
     """
     if is_stats_dir_change_pending():
         return []
+    if get_settings_store_state() in (StoreState.ERROR, StoreState.FUTURE):
+        return [
+            _setup_card(
+                SETUP_CARD_STORE_TITLE,
+                SETUP_CARD_STORE_BODY,
+                offer_skip=False,
+                caution=True,
+            )
+        ]
     settings = get_settings()
     if STATS_DIR_KEY not in settings:
         return [
@@ -1509,6 +1585,7 @@ def _setup_card_children() -> list:
                 SETUP_CARD_STATS_DIR_TITLE,
                 SETUP_CARD_STATS_DIR_BODY,
                 offer_skip=False,
+                caution=True,
             )
         ]
     if KOVAAKS_USERNAME_KEY not in settings:
@@ -1517,6 +1594,7 @@ def _setup_card_children() -> list:
                 SETUP_CARD_IDENTITY_TITLE,
                 SETUP_CARD_IDENTITY_BODY,
                 offer_skip=True,
+                caution=False,
             )
         ]
     return []
@@ -1525,14 +1603,17 @@ def _setup_card_children() -> list:
 @callback(
     Output(SETUP_CARD_ID, "children"),
     Output("notification-container", "sendNotifications", allow_duplicate=True),
+    Output("notification-container", "hideNotifications", allow_duplicate=True),
+    Output(TOAST_CHANNEL_REGISTRY_STORE_ID, "data", allow_duplicate=True),
     # ``allow_optional``: Skip renders only in the identity state, while the
     # container it writes to is always mounted. Without it, every other state
     # of the page -- the stats-folder card, and every configured install --
     # logs "ID not found in layout" for this input on each load.
     Input(SETUP_CARD_SKIP_ID, "n_clicks", allow_optional=True),
+    State(TOAST_CHANNEL_REGISTRY_STORE_ID, "data"),
     prevent_initial_call=True,
 )
-def skip_identity_setup(n_clicks):
+def skip_identity_setup(n_clicks, toast_channels):
     """Record the declined identity ask and take the card away.
 
     The write goes through the settings service's decline operation rather than
@@ -1548,26 +1629,47 @@ def skip_identity_setup(n_clicks):
     once on page load with nothing having triggered it, and a page load must
     never answer a question the user has not been asked yet.
 
-    A settings file stamped by a newer build refuses the write. The card then
-    has to stay up -- taking it away would claim a decline that was never
+    Two things can stop the write. A settings file stamped by a newer build
+    refuses it, and the write itself can fail on an unwritable ``data/``. Both
+    leave the card up -- taking it away would claim a decline that was never
     recorded, and it would be back on the next load anyway -- so the toast is
-    what explains why the click appeared to do nothing.
+    what explains why the click appeared to do nothing. Without the ``OSError``
+    guard the callback 500s instead, and the click reads as nothing at all.
+
+    Both report on one channel, so a second Skip click re-pops the current
+    answer instead of clicking into silence, and a retry that fails differently
+    replaces the first explanation rather than sitting beside it.
     """
     if not n_clicks or ctx.triggered_id != SETUP_CARD_SKIP_ID:
-        return no_update, no_update
+        return no_update, no_update, no_update, no_update
     try:
         decline_identity()
     except UnsupportedSchemaError:
         logger.warning("Refused to record the declined identity ask")
         notification = toast(
-            "setup-card-skip-refused-notification",
+            SETUP_CARD_SKIP_PROBLEM_CHANNEL,
             SETUP_CARD_SKIP_REFUSED_TITLE,
             SETUP_CARD_SKIP_REFUSED_MESSAGE,
             color="red",
             icon=local_icon("material-symbols:warning-outline"),
         )
-        return no_update, [notification]
-    return [], no_update
+        return no_update, *channel_toast(notification, toast_channels)
+    except OSError:
+        # A locked, full, or read-only ``data/`` leaves the store exactly as it
+        # was: the write is a temp file plus an atomic replace, so there is
+        # nothing to clean up and nothing to undo. Separate from the refusal
+        # above because the remedy is the opposite -- retrying, not updating
+        # the app.
+        logger.exception("Failed to record the declined identity ask")
+        notification = toast(
+            SETUP_CARD_SKIP_PROBLEM_CHANNEL,
+            SETUP_CARD_SKIP_REFUSED_TITLE,
+            SETUP_CARD_SKIP_FAILED_MESSAGE,
+            color="red",
+            icon=local_icon("material-symbols:warning-outline"),
+        )
+        return no_update, *channel_toast(notification, toast_channels)
+    return [], no_update, no_update, no_update
 
 
 def _home_initial_selection(

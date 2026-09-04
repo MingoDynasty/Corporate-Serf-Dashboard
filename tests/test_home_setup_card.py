@@ -5,6 +5,8 @@ key: a key that exists -- with any value -- has been asked about already and
 must never bring the card back.
 """
 
+import json
+import logging
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -16,7 +18,7 @@ from dash._callback import GLOBAL_CALLBACK_MAP
 
 from source.config import settings_service
 from source.kovaaks import percentile_warmup_service
-from source.utilities.store_schema import UnsupportedSchemaError
+from source.utilities.store_schema import StoreState, UnsupportedSchemaError
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -72,6 +74,16 @@ def _anchors(component):
     ]
 
 
+def _icon_mask(component):
+    """The card's leading icon, identified by the SVG its mask points at."""
+    icon = next(
+        child
+        for child in _walk_components(component)
+        if getattr(child, "className", None) == "alert-panel-icon"
+    )
+    return icon.style["mask"]
+
+
 @pytest.fixture(autouse=True)
 def quiet_home(monkeypatch):
     """Keep the rest of the page out of the way of the card."""
@@ -88,6 +100,21 @@ def stats_dir():
 def _store(**values):
     """Save exactly these keys and pin the directory the way startup would."""
     settings_service.save_settings(values)
+    settings_service.resolve_stats_dir()
+
+
+def _unusable_store(document):
+    """Leave an unreadable settings file behind and boot the way startup does.
+
+    Written raw rather than through ``save_settings``, which refuses to produce
+    either state, and followed by the same pin startup takes: an unusable store
+    reads as no keys, so the pin lands on None and no stats-directory change is
+    left looking pending.
+    """
+    settings_service.SETTINGS_FILE_PATH.write_text(
+        json.dumps(document), encoding="utf-8"
+    )
+    settings_service.clear_settings_cache()
     settings_service.resolve_stats_dir()
 
 
@@ -132,6 +159,67 @@ def test_a_never_configured_stats_folder_wins_and_offers_no_skip(identity):
     ]
     assert _button_labels(card) == []
     assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+
+
+@pytest.mark.parametrize(
+    ("document", "state"),
+    [
+        ({"kovaaks_username": "MingoDynasty"}, StoreState.ERROR),
+        (
+            {"schema_version": 2, "kovaaks_username": "MingoDynasty"},
+            StoreState.FUTURE,
+        ),
+    ],
+    ids=["error", "future"],
+)
+def test_an_unusable_store_gets_its_own_card_instead_of_a_fresh_install_one(
+    document,
+    state,
+):
+    """No keys is not the same claim as never asked.
+
+    A store the app cannot read yields no keys, so the key-absence states would
+    announce a missing stats folder that is configured on disk. One card covers
+    both unusable states: the Settings page's alert is what tells them apart.
+    """
+    _unusable_store(document)
+    assert settings_service.get_settings_store_state() is state
+
+    card = _card(home.layout())
+
+    assert card is not None
+    assert _texts(card) == [
+        home.SETUP_CARD_STORE_TITLE,
+        home.SETUP_CARD_STORE_BODY,
+    ]
+    assert home.SETUP_CARD_STATS_DIR_TITLE not in _texts(card)
+    assert _button_labels(card) == []
+    assert _anchors(card)[0].children == home.SETUP_CARD_OPEN_SETTINGS_LABEL
+    assert _anchors(card)[0].href == "/settings"
+    assert card.className == home.SETUP_CARD_CAUTION_CLASS
+    assert "material-symbols-warning-outline.svg" in _icon_mask(card)
+
+
+def test_each_card_state_wears_its_own_severity_treatment(stats_dir):
+    """Blocking setup is caution; the account offer is information.
+
+    The stats-folder state cannot be dismissed and leaves every plot on the
+    page empty, so it takes the yellow treatment and the warning icon. The
+    identity state is an optional offer, so it stays blue with the info icon.
+    """
+    _store()
+    blocked = _card(home.layout())
+
+    _store(**{STATS_DIR_KEY: str(stats_dir)})
+    offered = _card(home.layout())
+
+    assert blocked is not None
+    assert blocked.className == home.SETUP_CARD_CAUTION_CLASS
+    assert "material-symbols-warning-outline.svg" in _icon_mask(blocked)
+
+    assert offered is not None
+    assert offered.className == home.SETUP_CARD_CLASS
+    assert "material-symbols-info-outline.svg" in _icon_mask(offered)
 
 
 @pytest.mark.parametrize("stats_dir_value", ["", "no-such-stats-dir"])
@@ -181,10 +269,12 @@ def test_skip_records_the_decline_and_takes_the_card_away(monkeypatch, stats_dir
     )
     _store(**{STATS_DIR_KEY: str(stats_dir), STEAM_ID_KEY: "76561197986713986"})
 
-    card, notifications = home.skip_identity_setup(1)
+    card, notifications, hidden, toast_channels = home.skip_identity_setup(1, {})
 
     assert card == []
     assert notifications is no_update
+    assert hidden is no_update
+    assert toast_channels is no_update
 
     assert settings_service.get_settings() == {
         STATS_DIR_KEY: str(stats_dir),
@@ -201,7 +291,7 @@ def test_skip_leaves_a_missing_stats_folder_for_the_next_boot_to_find(monkeypatc
     )
     _store()
 
-    home.skip_identity_setup(1)
+    home.skip_identity_setup(1, {})
 
     assert settings_service.get_settings() == {USERNAME_KEY: ""}
 
@@ -221,7 +311,7 @@ def test_skip_starts_no_warmup_worker_and_needs_no_restart(monkeypatch, stats_di
     assert not hasattr(home, "start_percentile_warmup_worker")
     _store(**{STATS_DIR_KEY: str(stats_dir)})
 
-    home.skip_identity_setup(1)
+    home.skip_identity_setup(1, {})
 
     assert settings_service.is_restart_pending() is False
 
@@ -291,7 +381,12 @@ def test_a_skip_nobody_clicked_declines_nothing(monkeypatch, n_clicks, triggered
         lambda: pytest.fail("a page load answered the identity ask"),
     )
 
-    assert home.skip_identity_setup(n_clicks) == (no_update, no_update)
+    assert home.skip_identity_setup(n_clicks, {}) == (
+        no_update,
+        no_update,
+        no_update,
+        no_update,
+    )
 
 
 def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
@@ -305,8 +400,85 @@ def test_a_refused_skip_says_so_and_leaves_the_card_up(monkeypatch):
 
     monkeypatch.setattr(home, "decline_identity", refuse)
 
-    card, notifications = home.skip_identity_setup(1)
+    first_card, first, first_hidden, first_patch = home.skip_identity_setup(1, {})
+
+    assert first_card is no_update
+    assert first[0]["color"] == "red"
+    assert first[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
+    assert first[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_PROBLEM_CHANNEL}-")
+    assert first_hidden == []
+
+    # A second refused click re-pops the same answer instead of clicking into
+    # silence: a fresh instance shown, the first one hidden with it.
+    registry = {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in first_patch._operations
+    }
+    _card, second, second_hidden, _patch = home.skip_identity_setup(2, registry)
+
+    assert second[0]["id"] != first[0]["id"]
+    assert second_hidden == [first[0]["id"]]
+
+
+def test_a_skip_whose_write_fails_says_so_and_leaves_the_card_up(
+    monkeypatch,
+    caplog,
+):
+    """An unwritable ``data/`` used to 500 the callback: no toast, no card change.
+
+    The write is a temp file plus an atomic replace, so a failure leaves the
+    store exactly as it was and the card has to stay up.
+    """
+    monkeypatch.setattr(
+        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+    )
+
+    def fail():
+        raise OSError("data directory is read-only")
+
+    monkeypatch.setattr(home, "decline_identity", fail)
+
+    with caplog.at_level(logging.ERROR, logger=home.logger.name):
+        card, notifications, hidden, _patch = home.skip_identity_setup(1, {})
 
     assert card is no_update
     assert notifications[0]["color"] == "red"
     assert notifications[0]["title"] == home.SETUP_CARD_SKIP_REFUSED_TITLE
+    assert notifications[0]["message"] == home.SETUP_CARD_SKIP_FAILED_MESSAGE
+    assert notifications[0]["id"].startswith(f"{home.SETUP_CARD_SKIP_PROBLEM_CHANNEL}-")
+    assert hidden == []
+    assert "Failed to record the declined identity ask" in caplog.text
+
+
+@pytest.mark.parametrize("reversed_order", [False, True], ids=["refusal", "failure"])
+def test_the_two_skip_problems_replace_each_other_rather_than_stack(
+    monkeypatch,
+    reversed_order,
+):
+    """One click has one answer, so a retry must not leave two on screen."""
+    monkeypatch.setattr(
+        home, "ctx", SimpleNamespace(triggered_id=home.SETUP_CARD_SKIP_ID)
+    )
+
+    def refuse():
+        raise UnsupportedSchemaError("written by a newer version of this app")
+
+    def fail():
+        raise OSError("data directory is read-only")
+
+    first_raise, second_raise = (fail, refuse) if reversed_order else (refuse, fail)
+
+    monkeypatch.setattr(home, "decline_identity", first_raise)
+    _first_card, first, _first_hidden, first_patch = home.skip_identity_setup(1, {})
+
+    registry = {
+        operation["location"][0]: operation["params"]["value"]
+        for operation in first_patch._operations
+    }
+    monkeypatch.setattr(home, "decline_identity", second_raise)
+    second_card, second, second_hidden, _patch = home.skip_identity_setup(2, registry)
+
+    assert second_card is no_update
+    assert second[0]["message"] != first[0]["message"]
+    assert second[0]["id"] != first[0]["id"]
+    assert second_hidden == [first[0]["id"]]

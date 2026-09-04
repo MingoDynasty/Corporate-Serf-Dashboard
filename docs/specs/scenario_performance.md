@@ -6,8 +6,9 @@ playlist rank thresholds available as overlay lines. A collapsible Chart
 options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
 reaches the chart automatically once its file is imported, and the page can
-follow the scenario just played. The page also hosts the first-run surfaces that
-point a fresh install at Settings.
+follow the scenario just played. The page also hosts the setup surfaces that
+point you at Settings, whether something has never been set or saved settings
+cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
@@ -175,21 +176,26 @@ of scope here.
 
 ## Run delivery
 
-- The page polls on one interval, `polling_interval` (default 1000 ms). Its
-  `check_for_new_data` callback is the sole consumer of the process-wide
-  run-event deque the watchdog feeds — a run is enqueued only after it is
-  loaded into the stores — and each tick drains the whole backlog, lands on
-  the most recently played scenario when the follow switch is on, and
-  changes the dropdown at most once. The supported usage model is one active
-  Scenario Performance tab
+- The page no longer drains the run-event deque. The app shell does, on its
+  own interval and on every page, and publishes one batch per tick; this
+  page's `check_for_new_data` consumes that batch store as its only `Input`,
+  lands on the most recently played scenario when the follow switch is on, and
+  changes the dropdown at most once. The follow switch and the scenario
+  dropdown are `State` there, so flipping either forwards nothing on its own.
+  The supported usage model is one active tab
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
   The drain semantics and the toasts the summary produces are specified in
   [notifications.md](notifications.md#run-notifications).
-- The graph rebuild consumes the drained summary, so a backlog becomes one
-  rebuild rather than a replay
+- The graph rebuild consumes the forwarded summary, so a batch of several runs
+  becomes one rebuild and one auto-switch rather than a replay
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
-- Each poll tick fires three callbacks at once; Waitress's 8 worker threads
-  absorb that burst, and the interval keeps ticking while the tab is hidden
+  Its other rebuild triggers are unchanged: any Chart options control that
+  feeds it, a scenario change, and the date and axis controls.
+- The page still polls on `polling_interval` (default 1000 ms), now for two
+  callbacks rather than three: the run-import failure flush and the rank read.
+  The shell's drain is the third poll, on its own interval, and it runs on
+  every page. Waitress's 8 worker threads absorb the burst, and both intervals
+  keep ticking while the tab is hidden
   ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
 - The page is also where two background queues reach the screen: run-import
   failures on the next poll tick, and the startup playlist warnings on a
@@ -214,7 +220,12 @@ of scope here.
 ## Hosted setup surfaces
 
 - The setup card renders above the controls row, one state at a time. The
-  stats-folder state shows "Finish setting up" over "No KovaaK's stats
+  unusable-store state shows "Your settings can't be read" over "A settings
+  file exists, but this version of the app can't use it, so the dashboard
+  started without your settings. Open Settings to see what's wrong and how to
+  fix it.", with "Open Settings" as its one action
+  ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  The stats-folder state shows "Finish setting up" over "No KovaaK's stats
   folder was found, so the dashboard can't read your runs yet. Set it in
   Settings." with "Open Settings" as its one action. The identity state
   shows "Add your KovaaK's account" over "See your leaderboard position and
@@ -222,6 +233,10 @@ of scope here.
   fine print "Skipping username disables rank lookups. You can set it
   anytime in Settings."
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  The card is a panel wearing the shared alert treatment rather than a
+  `dmc.Alert`, because it holds a link and a button: the unusable-store and
+  stats-folder states are yellow with a warning icon beside the title, and the
+  identity state blue with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
 - The stats-folder hint is a single line above the controls: "No stats
