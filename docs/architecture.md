@@ -593,8 +593,8 @@ flowchart LR
   `stopwatch`, `utilities` (`ordinal`, `format_decimal`),
   `atomic_write` (Windows-lock-tolerant `os.replace` with retry, plus
   `atomic_write_text()`: the temp-file/fsync/replace dance every durable store
-  performs, with an optional `before_replace` hook the playlist writer uses for
-  its destination point-check),
+  performs, with an optional `before_replace` hook the playlist, visibility,
+  and settings writers use for their destination point-checks),
   `store_schema` (the `schema_version` marker, the four-state read machine, the
   per-store v1 validators, and `back_up_unusable_store()` — see State above),
   `paths` (`state_dir()` / `package_root()` — see State above — plus

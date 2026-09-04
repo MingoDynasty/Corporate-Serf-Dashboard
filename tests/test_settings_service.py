@@ -1,5 +1,7 @@
 import json
 import logging
+import os
+import threading
 
 import pytest
 
@@ -568,6 +570,104 @@ def test_a_backup_never_replaces_an_earlier_backup(settings_path):
     ) == "second corruption"
 
 
+def test_a_backup_holds_the_incumbent_byte_for_byte(tmp_path):
+    """Bytes, not text: an undecodable file is exactly what a backup is for."""
+    path = tmp_path / "settings.json"
+    path.write_bytes(b"\xff\xfe\x00garbage")
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-1.bak"
+    assert backup.read_bytes() == b"\xff\xfe\x00garbage"
+    assert path.read_bytes() == b"\xff\xfe\x00garbage"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_backup_skips_a_name_that_already_exists_on_disk(tmp_path):
+    """The claim is exclusive, so a stray backup is never overwritten."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+    incumbent_backup = tmp_path / "settings.json.corrupt-1.bak"
+    incumbent_backup.write_text("an earlier corruption", encoding="utf-8")
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-2.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+    assert incumbent_backup.read_text(encoding="utf-8") == "an earlier corruption"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_filesystem_that_refuses_hard_links_refuses_the_backup(tmp_path, monkeypatch):
+    """The claim is how the bytes get their name, so failing it refuses the write."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+
+    def refuse_every_claim(_source, _destination):
+        # What a volume without hard-link support returns.
+        raise PermissionError(1, "Incorrect function")
+
+    monkeypatch.setattr(store_schema.os, "link", refuse_every_claim)
+
+    with pytest.raises(OSError):
+        store_schema.back_up_unusable_store(path)
+
+    assert path.read_text(encoding="utf-8") == "not json"
+    assert not list(tmp_path.glob("*.bak"))
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def _backup_temp_name(path):
+    """The temp name ``back_up_unusable_store`` derives for this call site."""
+    return path.with_name(
+        f".{path.name}.corrupt.{os.getpid()}.{threading.get_ident()}.tmp"
+    )
+
+
+def test_a_leftover_temp_never_truncates_the_backup_it_links_to(tmp_path):
+    """The temp name is fixed per store, process, and thread, and threads recur.
+
+    A leftover of that name is a second link to a backup an earlier call
+    claimed, so reopening it blind would rewrite that backup through the other
+    name -- the one thing the exclusive claim exists to prevent.
+    """
+    path = tmp_path / "settings.json"
+    path.write_text("first incumbent", encoding="utf-8")
+    earlier_backup = store_schema.back_up_unusable_store(path)
+    # Stands in for a previous call whose cleanup unlink the OS refused.
+    os.link(earlier_backup, _backup_temp_name(path))
+    path.write_text("second incumbent", encoding="utf-8")
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert earlier_backup.read_text(encoding="utf-8") == "first incumbent"
+    assert backup.name == "settings.json.corrupt-2.bak"
+    assert backup.read_text(encoding="utf-8") == "second incumbent"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_a_temp_that_cannot_be_removed_does_not_fail_a_claimed_backup(
+    tmp_path,
+    monkeypatch,
+):
+    """Bytes already durable under their own name must not refuse the write."""
+    path = tmp_path / "settings.json"
+    path.write_text("not json", encoding="utf-8")
+    real_remove = store_schema.os.unlink
+
+    def refuse_to_remove_an_existing_temp(target):
+        if str(target).endswith(".tmp") and os.path.exists(target):
+            raise PermissionError(32, "held open by the indexer")
+        real_remove(target)
+
+    monkeypatch.setattr(store_schema.os, "unlink", refuse_to_remove_an_existing_temp)
+
+    backup = store_schema.back_up_unusable_store(path)
+
+    assert backup.name == "settings.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "not json"
+
+
 def test_a_failed_replace_after_a_backup_leaves_the_original_in_place(
     settings_path,
     monkeypatch,
@@ -724,3 +824,39 @@ def test_a_newer_store_refuses_the_decline_and_keeps_its_bytes(settings_path):
 
     assert settings_path.read_text(encoding="utf-8") == stored
     assert not list(settings_path.parent.glob("*.bak"))
+
+
+def test_a_save_backs_up_a_file_corrupted_since_the_cached_read(settings_path):
+    """The guard reads disk, not the cache the action was decided on.
+
+    A settings file hand-mangled while the app runs used to be replaced on the
+    strength of what it was at the last read, so the corrupt bytes went out
+    with the write no backup was taken for.
+    """
+    _write(settings_path, {"kovaaks_username": "MingoDynasty"})
+    assert settings.get_settings() == {"kovaaks_username": "MingoDynasty"}
+
+    _write_raw(settings_path, "corrupted after the read")
+    settings.save_settings({"steam_id": "76561197986713986"})
+
+    backup = settings_path.parent / "settings.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "corrupted after the read"
+    assert settings.get_settings() == {"steam_id": "76561197986713986"}
+
+
+def test_a_decline_is_refused_by_a_future_file_written_since_the_cached_read(
+    settings_path,
+):
+    """The newer-build promise has to hold against the file, not the cache."""
+    _write(settings_path, {"steam_id": "76561197986713986"})
+    assert settings.get_settings() == {"steam_id": "76561197986713986"}
+
+    stored = json.dumps({"schema_version": 2, "kovaaks_username": "FromTheFuture"})
+    _write_raw(settings_path, stored)
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        settings.decline_identity()
+
+    assert settings_path.read_text(encoding="utf-8") == stored
+    assert not list(settings_path.parent.glob("*.bak"))
+    assert not list(settings_path.parent.glob(".*.tmp"))

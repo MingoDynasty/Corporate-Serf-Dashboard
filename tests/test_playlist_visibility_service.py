@@ -275,3 +275,51 @@ def test_a_show_over_an_error_state_file_backs_it_up_then_owns_it(
     backup = visibility_path.parent / "playlist_visibility.json.corrupt-1.bak"
     assert backup.read_text(encoding="utf-8") == "not json"
     assert visibility.is_playlist_shown("KovaaKsBrandNewCode")
+
+
+def test_a_write_backs_up_a_file_corrupted_since_the_cached_read(
+    monkeypatch,
+    tmp_path,
+):
+    """The guard reads disk, not the boot-time cache.
+
+    A visibility file hand-mangled while the app runs used to be replaced on
+    the strength of what it was at boot, so the corrupt bytes went out with the
+    write no backup was taken for.
+    """
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_visibility(visibility_path, {"shown_playlists": ["KovaaKsSomething"]})
+    assert visibility.get_shown_playlist_codes() == {"KovaaKsSomething"}
+
+    _write_raw_visibility(visibility_path, "corrupted after the read")
+    visibility.show_playlist("KovaaKsBrandNewCode")
+
+    backup = visibility_path.parent / "playlist_visibility.json.corrupt-1.bak"
+    assert backup.read_text(encoding="utf-8") == "corrupted after the read"
+    payload = json.loads(visibility_path.read_text(encoding="utf-8"))
+    assert payload["shown_playlists"] == ["KovaaKsBrandNewCode", "KovaaKsSomething"]
+
+
+def test_a_write_is_refused_by_a_future_file_written_since_the_cached_read(
+    monkeypatch,
+    tmp_path,
+):
+    """The newer-build promise has to hold against the file, not the cache."""
+    visibility_path = _use_tmp_visibility(monkeypatch, tmp_path)
+    _write_visibility(visibility_path, {"shown_playlists": ["KovaaKsSomething"]})
+    assert visibility.get_shown_playlist_codes() == {"KovaaKsSomething"}
+
+    _write_raw_visibility(
+        visibility_path,
+        json.dumps({"schema_version": 2, "shown_playlists": ["FromTheFuture"]}),
+    )
+
+    with pytest.raises(store_schema.UnsupportedSchemaError):
+        visibility.show_playlist("KovaaKsBrandNewCode")
+
+    assert json.loads(visibility_path.read_text(encoding="utf-8")) == {
+        "schema_version": 2,
+        "shown_playlists": ["FromTheFuture"],
+    }
+    assert not list(visibility_path.parent.glob(".*.tmp"))
+    assert not list(visibility_path.parent.glob("*.bak"))

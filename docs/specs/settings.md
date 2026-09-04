@@ -371,8 +371,11 @@ exempt
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
 - Automatic writers never touch an error- or future-state store. A
   user-initiated write owns an error-state file: the incumbent is copied, never
-  moved, to `<name>.corrupt-<n>.bak` with exclusive create before the
-  replace, and the write is refused if the copy fails. The owning surface
+  moved, to `<name>.corrupt-<n>.bak` before the replace. The bytes are made
+  durable in a temp file first and each candidate name is claimed by hard link,
+  which fails on an existing target, so a backup name never appears until it
+  holds the whole file. The write is refused if the copy fails, including on a
+  filesystem that refuses hard links. The owning surface
   states the error and future states in its own register: the Settings page
   alert and statuses, the Playlists page for visibility, the startup warning
   queue for playlist files

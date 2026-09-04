@@ -266,6 +266,37 @@ def test_invalid_utf8_is_preserved_and_reported_for_every_store(
     assert path.read_bytes() == b"\xff\xfe\x00garbage"
 
 
+def test_a_store_that_cannot_be_written_is_reported_and_the_run_continues(
+    state_root, store_root, monkeypatch
+):
+    """The write is the one step whose failure could discard the whole report.
+
+    One unwritable file (a read-only attribute, a sync client's hold) used to
+    abort the run with a traceback, losing the record of everything already
+    stamped. The write is atomic, so the file is exactly as it was either way.
+    """
+    settings_path = store_root / "settings.json"
+    visibility_path = store_root / "playlist_visibility.json"
+    _write(settings_path, json.dumps({"kovaaks_username": "MingoDynasty"}))
+    _write(visibility_path, json.dumps({"shown_playlists": ["KovaaKsSomething"]}))
+    real_write = script.atomic_write_text
+
+    def refuse_one(destination, text, **keywords):
+        if destination == settings_path:
+            raise PermissionError("held open by another process")
+        real_write(destination, text, **keywords)
+
+    monkeypatch.setattr(script, "atomic_write_text", refuse_one)
+
+    report = script.run(state_root)
+
+    assert report.stamped == [visibility_path]
+    assert [path for path, _reason in report.skipped] == [settings_path]
+    assert "could not be written" in report.skipped[0][1]
+    assert _read(settings_path) == {"kovaaks_username": "MingoDynasty"}
+    assert _read(visibility_path)["schema_version"] == 1
+
+
 def test_the_exit_code_reports_whether_anything_was_left_alone(
     state_root, store_root, capsys
 ):
