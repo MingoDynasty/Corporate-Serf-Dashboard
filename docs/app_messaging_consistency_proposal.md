@@ -117,18 +117,20 @@ cost of the overview naming a column it does not have.
 
 Status: Open
 
-Three run-toast fragments are tone, not information: "Keep grinding..." on a
-below-threshold run, "Ready to move on." on a passed run that did not place,
-and the "While you were away" digest title. They are the only places the app
-has a personality, and the product's name suggests it wants one.
+Two run-toast fragments are tone, not information: "Keep grinding..." on a
+below-threshold run and "Ready to move on." on a passed run that did not
+place. They are the only places the app has a personality, and the
+product's name suggests it wants one. (A third, the "While you were away"
+digest title, left with the digest when the celebration arc retired it: the
+2026-09-02 celebrates-on-every-page entry.)
 
-**Recommendation: keep all three, and fix only their typography.** "Keep
+**Recommendation: keep both, and fix only the typography.** "Keep
 grinding..." becomes "Keep grinding…" with the single ellipsis character, so
 the app has one ellipsis form; rule 4 names this line as the one place
 outside a progress readout the character appears, so a later reviewer can
 tell it is deliberate. "Keep grinding." with a period is the alternative if
 the ellipsis reads as a wink too many; it needs no exception in the rule.
-The other two are already correct sentences.
+"Ready to move on." is already a correct sentence.
 
 Decide this with the launch visual in mind, not only the running app: the
 launch prep notes want the announcement post to lead with a clip of a run
@@ -177,9 +179,23 @@ shipped in `b288b9f` and is not repeated here.
 Re-verified against `16f9afd` (main, 2026-08-23) after the capability-spec
 pass and PR #253 merged. The one copy-bearing change was #253 deleting the
 playlist fill's two summary toasts (the 2026-08-22 in-place-only entry), so
-their Copy-block entries are gone and the counts below are restated for the
+their Copy-block entries are gone and the counts are restated for the
 new base; the fill's status-line strings survive unchanged and stay in the
 block.
+
+Re-verified again against `1878659` (main, 2026-09-04) after the
+celebration, alert-color, and toast-channel arcs merged. Three changes bear
+on copy. The celebration arc (the 2026-09-02 celebrates-on-every-page
+entry) added the personal-best toast and the Settings Celebrations section,
+both already in the target style except one control-name quote D2 renames,
+and retired the "While you were away" digest, so the digest's two
+Copy-block entries give way to a note and D4 shrinks to two flourishes. PR
+#265's setup card gained an unreadable-store state whose title and body use
+contractions and "the dashboard" (the vocabulary the 2026-08-21 launcher
+entry ruled out) plus a Skip-failure line with a nonstandard log pointer;
+all three join the Copy block. The toast id-to-channel migration (the
+2026-08-31 replace-in-place entry) changed no user-facing strings. The
+counts below are restated for `1878659`.
 
 The same condition, four shapes, is the seed symptom:
 
@@ -194,7 +210,7 @@ Only the first postdates the 2026-08-11 no-em-dash ruling and is already in
 the target style. Reading the whole surface found eight further kinds of
 drift, each small, together the "vibe-coded" feel:
 
-1. **Em dashes.** 23 sites. 21 join clauses in prose; 2 are typographic
+1. **Em dashes.** 22 sites. 20 join clauses in prose; 2 are typographic
    (the `—` empty-value glyph under Last played, ratified 2026-06-30, and
    the scenario/score separator in run-toast bodies).
 2. **Terminal punctuation.** Most sentences end with a period; the four
@@ -202,9 +218,10 @@ drift, each small, together the "vibe-coded" feel:
    sentences with a semicolon (an AST sweep of every non-docstring string
    constant under `source/` finds no others that reach the screen); one
    ends with an exclamation mark.
-3. **Contractions.** "Couldn't refresh", "can't read your runs" beside
-   "Could not save", "could not be checked", "cannot look one up". Full
-   forms are the majority by nine sites to three.
+3. **Contractions.** "Couldn't refresh", "can't read your runs", and the
+   unreadable-store card's "can't be read", "can't use it", and "what's
+   wrong" beside "Could not save", "could not be checked", "cannot look
+   one up". Full forms are the majority by nine sites to five.
 4. **Ellipses, three ways.** `Keep grinding...` and every placeholder use
    three periods; the fill status uses the `…` character; one tooltip uses
    `, ...` inside parentheses, and the stats folder description elides a
@@ -213,7 +230,8 @@ drift, each small, together the "vibe-coded" feel:
 6. **Quoting control names.** `Toggle "Show hidden"` in two places, bare
    `press Detect my accounts again`, `then Save`, `Needs Rank Thresholds
    turned on` everywhere else.
-7. **Vocabulary.** "the dashboard" in the setup card against "this app" and
+7. **Vocabulary.** "the dashboard" in the setup card (both its
+   stats-folder and unreadable-store bodies) against "this app" and
    "the app" on Settings and in every store message; "Stats directory" as a
    field label against "stats folder" in its own description and the setup
    card. (A fourth split, "served from cache" in the fill toasts against
@@ -320,6 +338,20 @@ separate child.
   requires this one: "Skipping username" drops its article and reads
   clipped, and "turn rank lookups off" is the phrase the username field's
   own description uses (rule 7, one vocabulary).
+- Setup card, unreadable-store title: `Your settings can't be read` →
+  `Your settings cannot be read`
+- Setup card, unreadable-store body: `A settings file exists, but this
+  version of the app can't use it, so the dashboard started without your
+  settings. Open Settings to see what's wrong and how to fix it.` → `A
+  settings file exists, but this version of the app cannot use it, so the
+  app started without your settings. Open Settings to see what is wrong
+  and how to fix it.` (rule 5, and "the dashboard" is the vocabulary the
+  2026-08-21 launcher entry ruled out; this card shipped in #265 after the
+  proposal opened)
+- Setup card, Skip write failed: `Nothing was written. Try again, or see
+  data/logs/debug.log for details.` → `Nothing was written. Try again. See
+  data/logs/debug.log.` (the rule-7 pointer form; "for details" adds
+  nothing)
 
 **Scenario Performance: controls and help text** (D2 unless noted)
 
@@ -367,16 +399,16 @@ separate child.
   left open; the color question there stays open, and the red hard-failure
   toast keeps its title.
 - Run verdict, scenario/score separator in all three live bodies:
-  `1w4ts Reload — 125.00` → `1w4ts Reload: 125.00`
+  `1w4ts Reload — 125.00` → `1w4ts Reload: 125.00` (the colon the
+  2026-09-02 celebration toast already uses for the same pair)
 - Run verdict, below threshold: `…, 92.1% of PB — need 95.0%. Still your
   3rd-best at 0.35 cm/360. Keep grinding...` → `…, 92.1% of PB (need 95.0%).
   Still your 3rd-best at 0.35 cm/360. Keep grinding…` (D4)
-- Backlog digest, passed: `3 new X runs. Latest: 120.00 — 96.2% of PB,
-  passed threshold.` → `3 new X runs. Latest: 120.00, 96.2% of PB, met your
-  95.0% threshold.` ("met", not "above": the verdict passes at equality)
-- Backlog digest, below: `3 new X runs. Latest: 120.00 — 92.1% of PB, below
-  the 95.0% threshold.` → `3 new X runs. Latest: 120.00, 92.1% of PB, below
-  your 95.0% threshold.`
+- The "While you were away" backlog digest, whose two bodies were
+  redlined in an earlier draft, was retired wholesale by the celebration
+  arc before this proposal shipped (the 2026-09-02 celebrates-on-every-page
+  entry): a batch's other runs earn nothing and the plot is their record,
+  so there is nothing left to reword.
 - Run import failure, single: `Could not process a new run file. See
   debug.log for details.` → `Could not process a new run file. See
   data/logs/debug.log.`; batch: `3 new run files could not be processed. See
@@ -542,6 +574,9 @@ separate child.
   Press Detect my accounts again to retry.`
 - Picker description: `Choosing one fills the fields above; Save applies
   it.` → `Choosing one fills the fields above. Save applies it.`
+- Celebration description, the control-name quote (D2): `…and does not
+  depend on Run Notifications.` → `…and does not depend on Run
+  notifications.` (the rest of the description is unchanged)
 
 **Aim Training Journey**
 
@@ -554,6 +589,12 @@ separate child.
 **Unchanged on purpose**
 
 - The `—` empty-value glyph under Last played (rule 2).
+- The personal-best celebration surfaces (the two 2026-09-02 entries): the
+  New personal best toast title and body, the Celebrations heading, the
+  Personal best celebration label, its style names, and Preview are
+  already in the target style — the toast's scenario/score colon is the
+  separator rule 2 adopts — except the one control-name quote listed under
+  Settings.
 - Every toast title not listed: they are already sentence case and carry the
   verdict.
 - The store messages in `store_schema.py` (`{path} has no "schema_version"
@@ -575,9 +616,9 @@ docstrings (the first statement of a module, class, or function body), and
 fail on any `—` outside an explicit allowlist holding the one ratified glyph
 site. Comments never reach the AST, so the check cannot misfire on them.
 
-The guard covers the em dash only. Walking `source/` this way at `16f9afd`
-finds 23 non-docstring string constants containing `—` (24 occurrences; the
-Top N help text has two): the 22 Copy-block sites and the allowlisted glyph,
+The guard covers the em dash only. Walking `source/` this way at `1878659`
+finds 21 non-docstring string constants containing `—` (22 occurrences; the
+Top N help text has two): the 20 Copy-block sites and the allowlisted glyph,
 and no log line or other non-UI string, so
 the gate passes the moment the Copy block ships and needs no UI-versus-log
 distinction it cannot make. The three-period ellipsis is deliberately not
@@ -618,7 +659,8 @@ contractions, and the renderers are review territory, not a gate.
 - The AST guard described in Design, as a new test module under `tests/`.
 - Every existing test that pins a changed string is updated, never loosened
   to a substring match: the page modules `test_home_rank_format.py`,
-  `test_home_run_events.py`, `test_home_stats_dir_hint.py`,
+  `test_home_run_events.py`, `test_home_setup_card.py`,
+  `test_home_stats_dir_hint.py`,
   `test_playlist_pages.py`, `test_settings_page.py`, `test_ui_presentation.py`,
   and the service modules `test_data_service_extract.py`,
   `test_playlist_visibility_service.py`, plus whatever `rg` finds for each
@@ -641,8 +683,9 @@ contractions, and the renderers are review territory, not a gate.
    (source and AGENTS.md), the tests and AST guard, then the docs. The docs
    commit carries the full shipping checklist: the decision-log entry with
    the rules and their rationale, "superseded in part, for copy" notes on the
-   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-21, and 2026-08-22 entries
-   whose quoted strings change, the `tech_debt.md` edit for the
+   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-21, 2026-08-22, and
+   2026-09-02 entries whose quoted strings change (the celebration entry
+   quotes the Run Notifications control name), the `tech_debt.md` edit for the
    refresh-toast title, a
    `product.md` line, the roadmap milestone moved to Shipped, and the
    deletion of this file. The current-behavior docs that quote changed
