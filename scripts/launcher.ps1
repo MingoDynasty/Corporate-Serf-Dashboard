@@ -122,9 +122,20 @@ function Get-ConfiguredEndpoint {
         }
         $python = Join-Path $InstallRoot "versions\$tag\.venv\Scripts\python.exe"
         $env:CSD_STATE_DIR = $InstallRoot
+        $callerPreference = $ErrorActionPreference
         try {
+            # While the preference is Stop, 5.1 turns a native command's
+            # redirected stderr into a terminating NativeCommandError on its
+            # first line -- so the loader's own unknown-key warning, the very
+            # thing the "last line wins" parse exists to survive, would reach
+            # the catch-all instead and send a healthy config to the fallback.
+            # One typo in config.toml would then ignore the browser setting
+            # and, on a non-default port, kill the running app as "failed to
+            # start". Restored in the finally, and function-local either way.
+            $ErrorActionPreference = 'Continue'
             $endpointText = @(& $python -c $EndpointProbeSnippet 2>&1)
         } finally {
+            $ErrorActionPreference = $callerPreference
             Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
         }
         if ($LASTEXITCODE -eq 0) {
