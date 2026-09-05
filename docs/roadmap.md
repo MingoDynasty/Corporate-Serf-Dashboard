@@ -90,6 +90,14 @@ sequence.
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./proposals/run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
+- **Cross-scale sensitivity conversion** — runs recorded under a per-game
+  sensitivity scale (Valorant, Overwatch) plot under their raw number, so an
+  old Valorant run lands at the far left of the Score vs Sensitivity axis
+  instead of beside the cm/360 value it corresponds to. Normalize them to
+  cm/360 at parse time using the conversion fields newer stats files already
+  carry, so they sort and group correctly and the PB cm/360 column fills in;
+  runs too old to carry the fields keep their original label. Design in
+  [`proposals/sensitivity_conversion_proposal.md`](./proposals/sensitivity_conversion_proposal.md).
 
 ---
 
