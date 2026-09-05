@@ -135,6 +135,8 @@ def test_tuning_fields_default_when_omitted() -> None:
     assert config.sens_round_decimal_places == 1
     # Every config predating the key parses as opted out.
     assert config.show_version_in_title is False
+    # Every config predating the key opens the browser, as it always has.
+    assert config.open_browser_on_launch is True
 
 
 @pytest.mark.parametrize("configured", [True, False])
@@ -152,6 +154,28 @@ def test_show_version_in_title_round_trips_through_the_config_file(
     monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
 
     assert load_config().show_version_in_title is configured
+
+
+@pytest.mark.parametrize("configured", [True, False])
+def test_open_browser_on_launch_round_trips_through_the_config_file(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    configured: bool,
+) -> None:
+    """An explicit setting survives the TOML round trip either way.
+
+    Only the installed launcher reads this key, through the same loader call
+    that gives it the port and host, so the loader is the whole app-side
+    contract.
+    """
+    config_path = tmp_path / "config.toml"
+    config_path.write_text(
+        f"port = 8050\nopen_browser_on_launch = {str(configured).lower()}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(STATE_DIR_ENV_VAR, str(tmp_path))
+
+    assert load_config().open_browser_on_launch is configured
 
 
 def _load_from(

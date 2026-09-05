@@ -347,6 +347,9 @@ toasts under, and it applies to every toast the app adds from here on
   open a batch lands in whichever drain runs first. Extra tabs are crash-safe
   but unsynchronized
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
+  `open_browser_on_launch` is how a user stops the installed launcher adding
+  one tab per start
+  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
   The interval keeps ticking while the tab is hidden
   ([2026-07-17](../decision_log.md#2026-07-17-absorb-poll-tick-bursts-with-threads-not-visibility-gating)).
 - `generate_graph` builds the toast from the summary only when `run-events`
