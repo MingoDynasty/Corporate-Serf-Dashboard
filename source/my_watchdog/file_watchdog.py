@@ -53,7 +53,7 @@ def drain_run_import_failures() -> list[str]:
 # below. This is an interim, developer-facing stand-in for reviewing runs
 # within a session: unlike the ephemeral toast, the log keeps a scrollable
 # per-run record. Retained until the Run History feature supersedes it
-# (see docs/run_history_proposal.md).
+# (see docs/proposals/run_history_proposal.md).
 #
 # Known limitation: the real threshold is a live UI control this watchdog
 # thread can't read, so this constant only matches the UI verdict when the UI
