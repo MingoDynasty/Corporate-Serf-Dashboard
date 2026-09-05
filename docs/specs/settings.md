@@ -31,7 +31,8 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   touches it
   ([2026-08-02](../decision_log.md#2026-08-02-user-settings-live-in-an-app-owned-store-with-a-settings-page)).
   `ConfigData` holds `port` (required, no default, `1` to `65535`), `host`
-  (`"127.0.0.1"`), `polling_interval` (`1000` ms, `1` to `2147483647`),
+  (`"127.0.0.1"`), `open_browser_on_launch` (`True`), `polling_interval`
+  (`1000` ms, `1` to `2147483647`),
   `sens_round_decimal_places` (`1`), `debug` (`False`),
   `scenario_metadata_cache_ttl_hours` (`24`),
   `scenario_rank_cache_ttl_hours` (`168`),
@@ -61,6 +62,12 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   `show_version_in_title` is read per request and prefixes every page title
   with the release label; the surfaces are listed in
   [release_and_install.md](release_and_install.md#build-identity).
+- `open_browser_on_launch` is the one key the app never reads. The installed
+  launcher reads it, through the same `load_config()` call that gives it the
+  `port` and `host`, and a source checkout opens no browser whatever the key
+  says. What the launcher does with it is specified in
+  [release_and_install.md](release_and_install.md#starting)
+  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
 - The file is loaded lazily and cached through `get_config()`; `main()` owns
   the first load and turns a missing, undecodable, unparseable, or invalid
   file into one stderr line, "Configuration error: could not load

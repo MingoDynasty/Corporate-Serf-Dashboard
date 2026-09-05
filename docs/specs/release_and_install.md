@@ -187,17 +187,30 @@ lines quoted here are plain console output, not app notifications.
   `ERROR: ...`, the reinstall one-liner, and waits on "Press Enter to close"
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
 - The launcher holds a named mutex `Local\CorporateSerfDashboard-<hash of
-  root>` for its own and the app's lifetime. A second launch prints
-  "Corporate Serf Dashboard is already running; opening it in the browser.",
-  opens the browser at the configured endpoint, and exits 0 without
+  root>` for its own and the app's lifetime. A second launch exits 0 without
   updating or touching the manifest
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+  It opens the browser only when `open_browser_on_launch` is on, printing
+  "Corporate Serf Dashboard is already running; opening it in the browser.";
+  with the setting off it prints "Corporate Serf Dashboard is already running
+  at http://<browser>:<port>/." and opens nothing. This branch prints no
+  "Dashboard running at" line and does not wait, so its console window closes
+  at once
+  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
 - `Get-ConfiguredEndpoint` asks the selected version's own `load_config()`
-  for `port` and `host`, with `CSD_STATE_DIR` set to the root; any failure
-  yields `8050` and `127.0.0.1`. `Get-ProbeAddress` maps `0.0.0.0` to
-  `127.0.0.1`, `::` to `[::1]`, and any other host to its literal (IPv6
-  bracketed). `Get-BrowserAddress` returns `localhost` only for the default
-  host `127.0.0.1` and the probe address otherwise
+  for `port`, `host`, and `open_browser_on_launch`, with `CSD_STATE_DIR` set
+  to the root; it takes the last stdout line, requires exactly three
+  whitespace-separated fields, and reads the third as the flag when it is the
+  literal `True`. Any failure yields `8050`, `127.0.0.1`, and open. The
+  snippet it runs as `python -c` carries no double quote, because Windows
+  PowerShell 5.1 (which the desktop shortcut runs) drops the double quotes
+  inside a native command's argument, and every launch would then take the
+  fallback
+  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
+- `Get-ProbeAddress` maps `0.0.0.0` to `127.0.0.1`, `::` to `[::1]`, and any
+  other host to its literal (IPv6 bracketed). `Get-BrowserAddress` returns
+  `localhost` only for the default host `127.0.0.1` and the probe address
+  otherwise
   ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001),
   [2026-08-14](../decision_log.md#2026-08-14-the-listen-address-is-configurable-loopback-by-default)).
 - `Start-AppVersion` runs `versions\<tag>\.venv\Scripts\python.exe
@@ -233,12 +246,14 @@ lines quoted here are plain console output, not app notifications.
   config.toml in <root> and the app error output above.", the reinstall
   one-liner, and "Press Enter to close"
   ([2026-08-21](../decision_log.md#2026-08-21-the-launcher-narrates-a-slow-start-and-keeps-its-120-second-ceiling)).
-- After ready, the browser opens at `http://<browser>:<port>/`, old versions
-  are pruned, the bootstrap is updated, and "Dashboard running at
-  http://<browser>:<port>/ -- close this window (or press Ctrl+C) to stop
-  it." prints; a failed post-start step prints a `WARNING:` and leaves the
-  app running. The launcher then waits on the app and exits with its code
-  ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001)).
+- After ready, the browser opens at `http://<browser>:<port>/` when
+  `open_browser_on_launch` is on, old versions are pruned, the bootstrap is
+  updated, and "Dashboard running at http://<browser>:<port>/ -- close this
+  window (or press Ctrl+C) to stop it." prints either way; a failed
+  post-start step prints a `WARNING:` and leaves the app running. The
+  launcher then waits on the app and exits with its code
+  ([2026-08-09](../decision_log.md#2026-08-09-human-facing-urls-say-localhost-machine-probes-stay-on-127001),
+  [2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
 - A port already taken is the app's failure, not the launcher's: the app
   binds exclusively and exits, which the launcher reports as `exited`
   ([2026-07-19](../decision_log.md#2026-07-19-the-app-binds-its-port-exclusively-and-exits-if-it-is-taken)).
@@ -268,8 +283,9 @@ lines quoted here are plain console output, not app notifications.
   token and `Wait-AppReady` gates it on that release's `sha`
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
 - On `ready` the manifest is rewritten atomically to the new tag, SHA, and
-  date with policy `latest`, "Updated to <tag>." prints, the browser opens,
-  the previous version is kept and every other version directory pruned,
+  date with policy `latest`, "Updated to <tag>." prints, the browser opens
+  when `open_browser_on_launch` is on, the previous version is kept and
+  every other version directory pruned,
   and the bootstrap is updated. On `exited` or `timeout` the pending process
   is killed, "WARNING: release <tag> failed to start (<state>); starting
   <old> instead." prints with the stderr tail, the manifest is untouched,
@@ -278,6 +294,11 @@ lines quoted here are plain console output, not app notifications.
   the installed version."; after promotion it prints "WARNING: a
   post-update step failed (<reason>); the update itself succeeded."
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
+- The launcher that performs an update is the previous release's: the
+  bootstrap picked it from the manifest before the check ran. A change to
+  launcher behavior therefore takes effect from the launch after the one
+  that installed it, not on that launch
+  ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
 - A release that fails its gate is retried in full on every launch until a
   newer release appears
   ([2026-07-19](../decision_log.md#2026-07-19-updates-are-staged-reversible-and-speak-a-frozen-wire-contract)).
