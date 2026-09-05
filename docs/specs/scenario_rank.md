@@ -39,6 +39,14 @@ benchmark tier) — see the
   ([2026-07-18](../decision_log.md#2026-07-18-leaderboard-mapping-reads-through-an-mtime-revalidated-in-memory-mirror)).
   `/scenario/popular` is the exact-name fallback for names the cache and
   `total-play` hydration cannot resolve.
+- A mapping upsert writes nothing when the stored row already carries both the
+  same leaderboard ID and the same `source`, so repeat hydration of an
+  unchanged mapping costs no disk I/O; an entry's `fetched_at` therefore
+  records when that row last changed, not when it was last re-asserted. A
+  seed-owned row the live API confirms is still rewritten, taking live
+  ownership so a later corpus release that stops asserting the name cannot
+  remove it
+  ([2026-09-04](../decision_log.md#2026-09-04-re-asserting-an-unchanged-leaderboard-id-writes-nothing)).
 - When `steam_id` is configured it is preferred for leaderboard identity
   matching; if Steam ID matching fails but exact username matching succeeds,
   the rank result is kept and a transient (never cached) warning is attached

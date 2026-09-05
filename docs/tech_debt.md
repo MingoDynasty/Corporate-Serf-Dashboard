@@ -166,18 +166,58 @@ fix. The graph-settings modal that held the other `Space(h="xs")` is gone
 and `_write_json` themselves, so every cache read and write in the app
 serializes through it: the percentile warmup worker, the `playlist-fill-*`
 threads, rank-freshness refresh timers, the watchdog, and every request thread.
-Two holds are notably fat. `_write_json` spans an `fsync`. `save_leaderboard_id`
-does a full read-modify-write of the 434 KB, ~3,000-entry name-to-ID mapping on
-every call even when the stored ID is unchanged, because it still refreshes
-`fetched_at` (measured 2.3 ms parse + 11.6 ms write on a fast SSD; roughly 12x
-that on a slow one, once per warmed scenario).
+`_write_json` spans an `fsync`, so a burst of writes stalls every request
+thread that touches any cache file — which is exactly how the hydration defect
+fixed by the 2026-09-04 decision-log entry produced a 38-second first page
+render.
 
-Each individual hold is a single file operation, so this cannot stall a page the
-way the warmup lock-scope defect could (see the 2026-09-02 decision-log entry).
-Found during that investigation and deliberately deferred: folding an app-wide
-cache-locking change into a targeted concurrency fix would have made the diff
-much harder to review. The cheap first step, if this is ever picked up, is
-making `save_leaderboard_id` a no-op when the stored ID already matches.
+Each individual hold is a single file operation, so one hold cannot stall a page
+the way the warmup lock-scope defect did (see the 2026-09-02 decision-log
+entry); a tight burst of holds from one thread still can, as the 2026-09-04
+entry shows. Found during that investigation and deliberately deferred: folding
+an app-wide cache-locking change into a targeted concurrency fix would have made
+the diff much harder to review.
+
+### Hydration upserts the leaderboard mapping one call at a time
+
+`hydrate_leaderboard_id_cache` calls `save_leaderboard_id` once per scenario in
+the total-play response (~2,500 for one beta tester). Since the 2026-09-04
+entry a call whose ID and source are both unchanged writes nothing, which
+removed the startup cost, but a first run — or any run that genuinely learns new
+IDs — still does one full read-modify-write of the whole ~416 KB mapping per new
+entry.
+
+A learning run now also **parses that mapping twice per new entry**: the fast
+path's check revalidates the in-memory mirror, the previous call's write has
+already moved the file's signature, so `_load_leaderboard_mapping` re-parses,
+and the slow path then parses again through `_read_json`. Measured at a
+3,000-entry / 426 KB mapping: 300 promotions produce 600 `_read_json` calls at
+16.5 ms per call, against 0.06 ms and zero reads on the fast path. So the first
+startup after a fresh install — where every seeded row the user has played is
+promoted — is a one-off ~20% *slower* than before that entry (44.9s versus
+36.9s on the same 2,500-call workload), the price of making every later startup
+free.
+
+The fix for both is a batch upsert taking the whole dict and writing once, as
+`merge_seed_leaderboard_ids` already does for the bundled seed. Reusing the
+just-revalidated mirror as the read-modify-write base would remove the second
+parse more cheaply but is **not** the fix: under the mirror's accepted
+forged-mtime blind spot that would clobber the file, where today the same blind
+spot costs at most a skipped `fetched_at` refresh.
+
+### The playlists overview re-reads the same cache files many times per render
+
+`build_playlist_overview_rows` reads a rank file and a totals file per played
+scenario per row, with no in-process memo and no dedup across rows. Measured on
+a beta tester's profile (379 unique played scenarios, 797 played entries across
+the 230 bundled playlists): 1,595 file opens and 6,377 filesystem operations
+for one "show hidden" render, of which 836 opens — 52% — are re-reads of a file
+already opened in that same render. With "show hidden" off it is 844 opens.
+`WARMUP_REFRESH_INTERVAL_MS = 1_000` in `source/pages/playlists.py` repeats the
+whole build once per second while the warmup worker is active. Cheap on a fast
+disk, and it was not the cause of the 2026-09-04 startup defect, so it is
+recorded rather than fixed. The pattern to copy is `_load_leaderboard_mapping`'s
+mtime-revalidated mirror.
 
 ## Documentation
 
