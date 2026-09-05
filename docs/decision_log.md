@@ -58,15 +58,23 @@ that entry records still stands on its own merits and is not superseded; only
 its supporting attribution was wrong.
 
 **Provenance is part of "unchanged".** The skip requires the stored `source` to
-match as well as the ID. `merge_seed_leaderboard_ids` removes seed-owned rows
-the corpus stops asserting and never touches learned ones (2026-07-20 entry),
-so a seed-owned row that `total-play` confirms must still be rewritten to take
-live ownership — otherwise a later corpus release could delete a mapping the
-live API had confirmed. An ID-only check shipped in review and was caught
-there. Promotion costs one write per row, once: the first hydration after an
-install promotes the seeded rows, and a corpus release promotes only the newly
-seeded names that `total-play` also covers. Every later startup is the steady
-state, measured at 0.09s and zero writes.
+match as well as the ID. `merge_seed_leaderboard_ids` refreshes seed-owned rows
+whose asserted ID changed and deletes those the corpus stops asserting, while
+never touching learned ones (2026-07-20 entry), so a seed-owned row that
+`total-play` confirms must still be rewritten to take live ownership —
+otherwise a later corpus release could overwrite the ID of a live-confirmed
+mapping, or drop the row outright. An ID-only check shipped in review and was
+caught there.
+
+Promotion costs one write per row, once: the first hydration after an install
+promotes the seeded rows, and a corpus release promotes only the newly seeded
+names that `total-play` also covers. That one-off run is about 20% slower than
+the old unconditional rewrite, because a promoting call parses the mapping
+twice — the fast-path check revalidates the mirror against a signature the
+previous write already moved, and the slow path then parses again (44.9s versus
+36.9s on a 2,500-call workload; recorded in `docs/tech_debt.md`, and removed by
+the batch upsert). Every later startup is the steady state, measured at 0.09s
+and zero writes.
 
 **The stored value is authoritative.** The check reads the mtime-revalidated
 in-memory mirror (2026-07-18 entry) rather than the file, so it inherits that
@@ -109,7 +117,10 @@ skip-drain, which reads two cache files per candidate. This only bites when the
 cache is warm: nothing returns early, so the loop walks the entire queue.
 Measured at 0.13s for 317 scenarios on a fast SSD and about 60s on a
 beta tester's disk, where per-file antivirus scanning makes small random reads
-roughly 400x slower. A direct callback measurement, taken on the fast SSD with
+roughly 400x slower. (Attribution corrected by the 2026-09-04 entry: that
+tester's reads measure 0.029 ms per open, so the ~60s was not read latency — it
+was the hydration write storm running inside the same `elapsed` window. The
+lock-scope decision below is unaffected.) A direct callback measurement, taken on the fast SSD with
 per-candidate latency injected into `_freshly_satisfied` to model the tester's
 disk, recorded 45.1s blocked versus 0.2s once the drain finished. That isolates
 the lock and only the lock: the overview's own row build reads two cache files

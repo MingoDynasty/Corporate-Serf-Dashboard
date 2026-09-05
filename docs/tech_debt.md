@@ -171,21 +171,39 @@ thread that touches any cache file — which is exactly how the hydration defect
 fixed by the 2026-09-04 decision-log entry produced a 38-second first page
 render.
 
-Each individual hold is a single file operation, so this cannot stall a page the
-way the warmup lock-scope defect could (see the 2026-09-02 decision-log entry).
-Found during that investigation and deliberately deferred: folding an app-wide
-cache-locking change into a targeted concurrency fix would have made the diff
-much harder to review.
+Each individual hold is a single file operation, so one hold cannot stall a page
+the way the warmup lock-scope defect did (see the 2026-09-02 decision-log
+entry); a tight burst of holds from one thread still can, as the 2026-09-04
+entry shows. Found during that investigation and deliberately deferred: folding
+an app-wide cache-locking change into a targeted concurrency fix would have made
+the diff much harder to review.
 
 ### Hydration upserts the leaderboard mapping one call at a time
 
 `hydrate_leaderboard_id_cache` calls `save_leaderboard_id` once per scenario in
 the total-play response (~2,500 for one beta tester). Since the 2026-09-04
-entry a call whose ID is unchanged writes nothing, which removed the startup
-cost, but a first run — or any run that genuinely learns new IDs — still does
-one full read-modify-write of the whole ~416 KB mapping per new entry. The fix
-is a batch upsert taking the whole dict and writing once, as
-`merge_seed_leaderboard_ids` already does for the bundled seed.
+entry a call whose ID and source are both unchanged writes nothing, which
+removed the startup cost, but a first run — or any run that genuinely learns new
+IDs — still does one full read-modify-write of the whole ~416 KB mapping per new
+entry.
+
+A learning run now also **parses that mapping twice per new entry**: the fast
+path's check revalidates the in-memory mirror, the previous call's write has
+already moved the file's signature, so `_load_leaderboard_mapping` re-parses,
+and the slow path then parses again through `_read_json`. Measured at a
+3,000-entry / 426 KB mapping: 300 promotions produce 600 `_read_json` calls at
+16.5 ms per call, against 0.06 ms and zero reads on the fast path. So the first
+startup after a fresh install — where every seeded row the user has played is
+promoted — is a one-off ~20% *slower* than before that entry (44.9s versus
+36.9s on the same 2,500-call workload), the price of making every later startup
+free.
+
+The fix for both is a batch upsert taking the whole dict and writing once, as
+`merge_seed_leaderboard_ids` already does for the bundled seed. Reusing the
+just-revalidated mirror as the read-modify-write base would remove the second
+parse more cheaply but is **not** the fix: under the mirror's accepted
+forged-mtime blind spot that would clobber the file, where today the same blind
+spot costs at most a skipped `fetched_at` refresh.
 
 ### The playlists overview re-reads the same cache files many times per render
 

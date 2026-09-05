@@ -656,12 +656,13 @@ def save_leaderboard_id(
         #
         # `source` must match too, not just the ID. A seed-owned row that
         # total-play confirms has to be promoted to the live source even though
-        # its ID is unchanged: `merge_seed_leaderboard_ids` deletes seed-owned
-        # rows the corpus stops asserting and never touches learned ones, so
-        # skipping that write would let a later corpus release drop a mapping
-        # the live API had confirmed (2026-07-20 entry, and the merge contract
-        # in docs/specs/playlists.md). Promotion happens once, then every later
-        # run takes the fast path.
+        # its ID is unchanged: `merge_seed_leaderboard_ids` refreshes seed-owned
+        # rows whose asserted ID changed and deletes those the corpus stops
+        # asserting, while never touching learned ones. Skipping that write
+        # would leave a live-confirmed mapping exposed to both -- a later corpus
+        # release could overwrite its ID or drop the row outright (2026-07-20
+        # entry, and the merge contract in docs/specs/playlists.md). Promotion
+        # happens once, then every later run takes the fast path.
         #
         # The check reads the same mtime-revalidated mirror every rank lookup
         # resolves through, so it inherits that mirror's one accepted blind
