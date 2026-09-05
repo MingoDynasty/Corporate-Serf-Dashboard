@@ -90,8 +90,14 @@ function Get-ConfiguredEndpoint {
     # the installed app's own loader; fall back to the defaults when anything
     # is unreadable, the same recovery as a missing config.
     #
-    # Port and host come back on one line so that the "last line wins" parse
-    # stays robust against a config warning the loader may log first.
+    # Port, host, and the browser flag come back on one line so that the
+    # "last line wins" parse stays robust against a config warning the loader
+    # may log first. getattr defends only a hand-mixed install: the bootstrap
+    # runs the launcher out of the same version directory it reads the loader
+    # from, so a launcher never meets an app predating the key through a
+    # supported path. Without it that mismatch would exit nonzero and lose the
+    # port and host too -- the launcher's worst failure, a healthy app declared
+    # dead on the wrong port.
     try {
         $manifest = [System.IO.File]::ReadAllText((Join-Path $InstallRoot 'install.json')) | ConvertFrom-Json
         $tag = [string]$manifest.tag
@@ -101,18 +107,18 @@ function Get-ConfiguredEndpoint {
         $python = Join-Path $InstallRoot "versions\$tag\.venv\Scripts\python.exe"
         $env:CSD_STATE_DIR = $InstallRoot
         try {
-            $endpointText = @(& $python -c 'from source.config.config_service import load_config; c = load_config(); print(f"{c.port} {c.host}")' 2>&1)
+            $endpointText = @(& $python -c 'from source.config.config_service import load_config; c = load_config(); o = getattr(c, "open_browser_on_launch", True); print(f"{c.port} {c.host} {o}")' 2>&1)
         } finally {
             Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
         }
         if ($LASTEXITCODE -eq 0) {
-            $fields = ([string]$endpointText[-1]).Trim() -split '\s+', 2
-            if ($fields.Count -eq 2) {
-                return @{ Port = [int]$fields[0]; Host = $fields[1] }
+            $fields = ([string]$endpointText[-1]).Trim() -split '\s+', 3
+            if ($fields.Count -eq 3) {
+                return @{ Port = [int]$fields[0]; Host = $fields[1]; OpenBrowser = ($fields[2] -eq 'True') }
             }
         }
     } catch { }
-    return @{ Port = $DefaultPort; Host = $DefaultHost }
+    return @{ Port = $DefaultPort; Host = $DefaultHost; OpenBrowser = $true }
 }
 
 function Format-UrlHost([string]$Address) {
@@ -426,9 +432,16 @@ try {
     $mutexAcquired = $true
 }
 if (-not $mutexAcquired) {
-    Write-Host 'Corporate Serf Dashboard is already running; opening it in the browser.'
     $running = Get-ConfiguredEndpoint
-    Open-Dashboard $running.Port (Get-BrowserAddress $running.Host)
+    $runningAddress = Get-BrowserAddress $running.Host
+    if ($running.OpenBrowser) {
+        Write-Host 'Corporate Serf Dashboard is already running; opening it in the browser.'
+        Open-Dashboard $running.Port $runningAddress
+    } else {
+        # No browser and no wait: this console closes the moment we exit, so
+        # the address is the only thing this branch can still give the user.
+        Write-Host "Corporate Serf Dashboard is already running at http://${runningAddress}:$($running.Port)/."
+    }
     exit 0
 }
 
@@ -457,6 +470,7 @@ try {
     # from this machine, for the readiness probe and for the browser.
     $probeAddress = Get-ProbeAddress $endpoint.Host
     $browserAddress = Get-BrowserAddress $endpoint.Host
+    $openBrowser = $endpoint.OpenBrowser
 
     $appProcess = $null
 
@@ -507,7 +521,7 @@ try {
                             -CommitDate ([string]$release.commit_date) -Policy 'latest' -PinnedTag ''
                         $appProcess = $pending   # promoted: from here on, never kill it
                         Write-Host "Updated to $latestTag."
-                        Open-Dashboard $port $browserAddress
+                        if ($openBrowser) { Open-Dashboard $port $browserAddress }
                         Remove-PrunedVersions -ActiveTag $latestTag -PreviousTag $runTag
                         Update-Bootstrap $newDir
                     } else {
@@ -550,7 +564,7 @@ try {
         }
         $appProcess = $current
         try {
-            Open-Dashboard $port $browserAddress
+            if ($openBrowser) { Open-Dashboard $port $browserAddress }
             Remove-PrunedVersions -ActiveTag $runTag -PreviousTag ''
             Update-Bootstrap $versionDir
         } catch {
