@@ -3,14 +3,16 @@
 import json
 import logging
 from datetime import datetime
-from typing import NamedTuple, TypedDict
+from typing import Any, NamedTuple, TypedDict
 
 import dash
 import dash_mantine_components as dmc
 import plotly.graph_objects as go
 from dash import (
     Input,
+    NoUpdate,
     Output,
+    Patch,
     State,
     callback,
     clientside_callback,
@@ -1259,9 +1261,9 @@ def generate_graph(  # noqa: PLR0913
         selected_playlist,
     )
 
-    notifications = no_update
-    hide_notifications = no_update
-    next_toast_channels = no_update
+    notifications: list[dict[str, Any]] | NoUpdate = no_update
+    hide_notifications: list[str] | NoUpdate = no_update
+    next_toast_channels: Patch | NoUpdate = no_update
     if supports_overlays:
         high_score = get_high_score(selected_scenario)
         if high_score_overlay_switch:
