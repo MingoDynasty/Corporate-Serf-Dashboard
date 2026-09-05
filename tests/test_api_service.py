@@ -1072,16 +1072,25 @@ def test_save_leaderboard_id_skips_the_write_when_the_id_is_unchanged(
     assert api_service.get_cached_leaderboard_id("Scenario A") == 111
 
 
-def test_save_leaderboard_id_still_writes_a_changed_id(monkeypatch, tmp_path):
-    """The unchanged-ID fast path must not swallow a genuine correction."""
-    _reset_mapping_cache(monkeypatch, tmp_path)
-    api_service.save_leaderboard_id("Scenario A", 111, "test")
-    # A conflicting automatic upsert is still refused, so prove the fast path
-    # on the one shape that does write: a name the mapping does not hold yet.
-    api_service.save_leaderboard_id("Scenario B", 222, "test")
+def test_save_leaderboard_id_repairs_an_unusable_value_under_a_matching_source(
+    monkeypatch, tmp_path
+):
+    """Pin the fast path's ID condition, which no other test reaches.
 
-    assert api_service.get_cached_leaderboard_id("Scenario A") == 111
-    assert api_service.get_cached_leaderboard_id("Scenario B") == 222
+    `test_save_leaderboard_id_replaces_an_unusable_stored_value` stores a row
+    with no `source`, so it leaves the fast path at the source check and never
+    exercises the ID comparison. With a matching source the ID condition is the
+    only thing standing between an unusable stored value and a skipped repair.
+    """
+    _reset_mapping_cache(monkeypatch, tmp_path)
+    api_service._write_json(
+        api_service._leaderboard_mapping_file(),
+        {"Some Scenario": {"leaderboard_id": "abc", "source": "total-play"}},
+    )
+
+    api_service.save_leaderboard_id("Some Scenario", 98330, "total-play")
+
+    assert api_service.get_cached_leaderboard_id("Some Scenario") == 98330
 
 
 def test_save_leaderboard_id_promotes_a_seed_row_the_live_api_confirms(
