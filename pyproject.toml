@@ -85,6 +85,7 @@ max-line-length = 120  # hard ceiling; formatter wraps at 88
 "tests/**" = ["D1", "PLR09", "ARG"]
 
 [tool.mypy]
+check_untyped_defs = true
 disable_error_code = ["import-untyped"]
 files = ["source"]
 
