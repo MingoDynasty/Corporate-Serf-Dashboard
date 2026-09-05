@@ -6,8 +6,10 @@ version number. Installing is one PowerShell command that brings its own
 Python and package manager under one folder, asks nothing, and leaves a
 desktop shortcut. Each launch checks for a newer release, stages it beside
 the current one, and only records it as the install once it has actually
-started and identified itself. Removing the app is deleting that folder and
-the shortcut.
+started and identified itself. A launch opens the dashboard in a browser
+tab by default, and one config setting turns that off; either way the
+console window prints the address it is serving. Removing the app is
+deleting that folder and the shortcut.
 
 Statements below describe what the scripts, the CI job, and the app do today
 and link the [decision log](../decision_log.md) entries that set them;
@@ -201,11 +203,14 @@ lines quoted here are plain console output, not app notifications.
   for `port`, `host`, and `open_browser_on_launch`, with `CSD_STATE_DIR` set
   to the root; it takes the last stdout line, requires exactly three
   whitespace-separated fields, and reads the third as the flag when it is the
-  literal `True`. Any failure yields `8050`, `127.0.0.1`, and open. The
-  snippet it runs as `python -c` carries no double quote, because Windows
-  PowerShell 5.1 (which the desktop shortcut runs) drops the double quotes
-  inside a native command's argument, and every launch would then take the
-  fallback
+  literal `True`. Any failure yields `8050`, `127.0.0.1`, and open. Two
+  properties keep 5.1, the shell the desktop shortcut runs, from making every
+  launch a failure: the snippet it runs as `python -c` carries no double
+  quote, because 5.1 drops the double quotes inside a native command's
+  argument; and the capture runs under a function-local
+  `$ErrorActionPreference = 'Continue'`, because under `Stop` 5.1 turns that
+  command's first redirected stderr line into a terminating error, which the
+  loader's own unknown-key warning would trigger
   ([2026-09-04](../decision_log.md#2026-09-04-the-launchers-browser-open-is-a-config-knob-tab-reuse-is-not-achievable)).
 - `Get-ProbeAddress` maps `0.0.0.0` to `127.0.0.1`, `::` to `[::1]`, and any
   other host to its literal (IPv6 bracketed). `Get-BrowserAddress` returns

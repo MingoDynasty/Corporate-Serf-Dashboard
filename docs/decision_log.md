@@ -85,17 +85,43 @@ declared dead on the wrong port.
 the desktop shortcut runs, re-quotes a native command's argument without
 escaping the double quotes inside it, so the previous
 `print(f"{c.port} {c.host}")` form arrived at python as `print(f{c.port}` and
-exited with a `SyntaxError`. `Get-ConfiguredEndpoint` had therefore been
-taking its fallback on every launch since it was written, probing `8050` on
-`127.0.0.1` whatever `config.toml` said, and any install with a non-default
-port or host would have been reported as a dashboard that failed to start.
-Backslash-escaping the quotes fixes 5.1 and breaks PowerShell 7, which passes
-the backslashes through to python; both were measured. The snippet now lives
-in a `$EndpointProbeSnippet` here-string, uses `print` with commas instead of
-an f-string, and quotes the attribute name with Python's single quotes, which
-survive both shells unchanged. A test asserts the snippet carries no double
-quote, because the subprocess test beside it cannot catch this: Python quotes
-its own arguments properly.
+exited with a `SyntaxError`. `Get-ConfiguredEndpoint` was therefore taking
+its fallback on every launch, probing `8050` on `127.0.0.1` whatever
+`config.toml` said, and any install with a non-default port or host would
+have been reported as a dashboard that failed to start. The probe's first
+form, `Get-ConfiguredPort` (`print(load_config().port)`, no double quote),
+worked; the breakage arrived with the rename to `Get-ConfiguredEndpoint` and
+its f-string, so the affected releases are `v2026.08.18` through the last one
+cut before this fix. Backslash-escaping the quotes fixes 5.1 and breaks
+PowerShell 7, which passes the backslashes through to python; both were
+measured. The snippet now lives in a `$EndpointProbeSnippet` here-string,
+uses `print` with commas instead of an f-string, and quotes the attribute
+name with Python's single quotes, which survive both shells unchanged.
+
+One consequence worth recording against
+[2026-08-14](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+that entry's launcher half, deriving the probe and browser addresses from the
+configured `host`, was inert in every installed launcher over that window,
+because the fallback always reported `127.0.0.1`.
+
+**The stderr capture must not run under `Stop`.** The launcher sets
+`$ErrorActionPreference = 'Stop'` at the top of the script, and 5.1 turns a
+native command's redirected stderr into a terminating `NativeCommandError` on
+its first line while that preference holds. The one line the loader is known
+to write is the unknown-key warning, so any typo in `config.toml` reached the
+catch-all and took the fallback -- the exact case the "last line wins" parse
+was written to survive. Paired with `2>&1` since the probe was first written,
+and masked from `v2026.08.18` onward by the quoting bug above, so fixing that
+unmasked it. The capture now runs under a function-local `Continue`, restored
+in the `finally`.
+
+**These are 5.1-only failures, so a Python test cannot see them.** Both bugs
+were invisible to a subprocess test, which quotes its arguments properly and
+inherits no PowerShell preference. `windows-latest` ships Windows PowerShell
+5.1, so the suite now dot-sources the real `Get-ConfiguredEndpoint` through
+the PowerShell AST and calls it against a temporary install root, pinning the
+three-field contract, the browser flag, and the unknown-key case in the shell
+the shortcut actually runs.
 
 **One launch of lag.** The launcher that performs an update is the previous
 release's, selected by the bootstrap from the manifest before the update
