@@ -2,15 +2,15 @@
 
 The app is told a few things by hand in a configuration file, such as the
 port, that an update never asks anyone to edit, and works the rest out for
-itself. One setting in that file is not for the app at all: it tells the
-desktop shortcut whether to open a browser tab on launch. A number outside
-the range it can work with is refused as that file is read, with one line
-naming the file. Where the KovaaK's runs live and who
-the player is on the leaderboards live in a small file the app owns, shown and
-changed on a Settings page that also offers what the machine already knows and
-holds one preference the browser remembers instead, how a personal best
-celebrates. A setting the running app cannot pick up live is frozen at startup,
-and the page says when a restart is needed.
+itself; one of those settings is not for the app at all, and tells the
+desktop shortcut whether to open a browser tab. A number outside the range
+it can work with is refused as that file is read, with one line naming the
+file. Where the KovaaK's runs live and who the player is on the
+leaderboards live in a small file the app owns, shown and changed on a
+Settings page that also offers what the machine already knows and holds one
+preference the browser remembers instead, how a personal best celebrates. A
+setting the running app cannot pick up live is frozen at startup, and the
+page says when a restart is needed.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives

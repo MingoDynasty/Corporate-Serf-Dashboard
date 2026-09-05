@@ -104,16 +104,25 @@ that entry's launcher half, deriving the probe and browser addresses from the
 configured `host`, was inert in every installed launcher over that window,
 because the fallback always reported `127.0.0.1`.
 
-**The stderr capture must not run under `Stop`.** The launcher sets
+**Only stdout is captured, and not under `Stop`.** Two separate traps sit on
+the same line. The first is ordering: stdout and stderr are separate pipes,
+so merging them with `2>&1` gives no guaranteed order, and the "last line
+wins" parse the original comment described as robust against a config warning
+was not. Measured at roughly one run in sixty, the unknown-key warning
+arrived after the print line, so the parse read the warning and fell back --
+an intermittent wrong-port kill for anyone with a typo in `config.toml`.
+Nothing read the stderr text, so it is discarded rather than ordered.
+
+The second is the preference. The launcher sets
 `$ErrorActionPreference = 'Stop'` at the top of the script, and 5.1 turns a
 native command's redirected stderr into a terminating `NativeCommandError` on
 its first line while that preference holds. The one line the loader is known
 to write is the unknown-key warning, so any typo in `config.toml` reached the
-catch-all and took the fallback -- the exact case the "last line wins" parse
-was written to survive. Paired with `2>&1` since the probe was first written,
-and masked from `v2026.08.18` onward by the quoting bug above, so fixing that
-unmasked it. The capture now runs under a function-local `Continue`, restored
-in the `finally`.
+catch-all and took the fallback. Paired with the redirect since the probe was
+first written, and masked from `v2026.08.18` onward by the quoting bug above,
+so fixing that unmasked it. Discarding stderr is still a redirect, so the
+preference fix is needed either way. The capture now runs under a
+function-local `Continue`, restored in the `finally`.
 
 **These are 5.1-only failures, so a Python test cannot see them.** Both bugs
 were invisible to a subprocess test, which quotes its arguments properly and
