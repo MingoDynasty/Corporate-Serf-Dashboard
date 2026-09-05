@@ -66,6 +66,24 @@ def _endpoint_probe_script() -> str:
     return match.group(1)
 
 
+def test_launcher_endpoint_capture_takes_stdout_only() -> None:
+    """Merging stderr into the capture makes the parse a coin flip.
+
+    The loader's warning and its print line travel on separate pipes, so the
+    order they merge in is not guaranteed. Measured at roughly one run in
+    sixty, the unknown-key warning arrived last, and a "last line wins" parse
+    then read the warning and fell back to `8050` -- an intermittent
+    wrong-port kill for anyone with a typo in `config.toml`. Nothing reads the
+    stderr text, so it is discarded rather than ordered.
+    """
+    launcher = (REPO_ROOT / "scripts" / "launcher.ps1").read_text(encoding="utf-8")
+    match = re.search(r"^\s*[$]endpointText = .*$", launcher, flags=re.MULTILINE)
+    assert match is not None, "launcher.ps1 has no $endpointText capture"
+    capture = match.group(0)
+    assert "2>$null" in capture, capture
+    assert "2>&1" not in capture, capture
+
+
 def test_launcher_endpoint_snippet_carries_no_double_quote() -> None:
     """Windows PowerShell 5.1 silently eats them, and the shortcut runs 5.1.
 

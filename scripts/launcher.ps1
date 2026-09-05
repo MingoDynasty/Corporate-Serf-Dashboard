@@ -104,9 +104,13 @@ function Get-ConfiguredEndpoint {
     # is unreadable, the same recovery as a missing config.
     #
     # Port, host, and the browser flag come back on one line (see
-    # $EndpointProbeSnippet) so that the "last line wins" parse stays robust
-    # against a config warning the loader may log first. print's default
-    # separator is the single space this splits on.
+    # $EndpointProbeSnippet); print's default separator is the single space
+    # this splits on. Only stdout is captured. Merging stderr in was measured
+    # racy: the loader's unknown-key warning and the print line travel on
+    # separate pipes, and about one run in sixty the warning arrives second,
+    # so a "last line wins" parse reads the warning and falls back to the
+    # defaults -- an intermittent wrong-port kill for anyone with a typo in
+    # config.toml. Nothing read the stderr text anyway.
     #
     # getattr defends only a hand-mixed install: the bootstrap runs the
     # launcher out of the same version directory it reads the loader from, so
@@ -126,14 +130,14 @@ function Get-ConfiguredEndpoint {
         try {
             # While the preference is Stop, 5.1 turns a native command's
             # redirected stderr into a terminating NativeCommandError on its
-            # first line -- so the loader's own unknown-key warning, the very
-            # thing the "last line wins" parse exists to survive, would reach
-            # the catch-all instead and send a healthy config to the fallback.
+            # first line -- so the loader's own unknown-key warning would
+            # reach the catch-all and send a healthy config to the fallback.
             # One typo in config.toml would then ignore the browser setting
             # and, on a non-default port, kill the running app as "failed to
-            # start". Restored in the finally, and function-local either way.
+            # start". Discarding stderr is still a redirect, so this is
+            # needed either way. Restored in the finally, and function-local.
             $ErrorActionPreference = 'Continue'
-            $endpointText = @(& $python -c $EndpointProbeSnippet 2>&1)
+            $endpointText = @(& $python -c $EndpointProbeSnippet 2>$null)
         } finally {
             $ErrorActionPreference = $callerPreference
             Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
