@@ -42,6 +42,19 @@ $HealthTimeoutSec = 120
 $DefaultPort = 8050
 $DefaultHost = '127.0.0.1'
 
+# The one-liner Get-ConfiguredEndpoint hands to the app's own loader. It must
+# contain no double quote: Windows PowerShell 5.1, which the desktop shortcut
+# runs, drops embedded double quotes when it re-quotes a native command's
+# argument, so an f-string form arrives at python as `print(f{c.port}` and
+# exits with a SyntaxError -- silently sending every launch to the fallback
+# defaults, which is the wrong-port kill this function exists to prevent.
+# Escaping them as \" fixes 5.1 and breaks PowerShell 7, which passes the
+# backslashes through; Python's own single quotes survive both unchanged.
+# Keep `$` and backtick out of here too, or a future edit would expand them.
+$EndpointProbeSnippet = @'
+from source.config.config_service import load_config; c = load_config(); print(c.port, c.host, getattr(c, 'open_browser_on_launch', True))
+'@
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -90,14 +103,17 @@ function Get-ConfiguredEndpoint {
     # the installed app's own loader; fall back to the defaults when anything
     # is unreadable, the same recovery as a missing config.
     #
-    # Port, host, and the browser flag come back on one line so that the
-    # "last line wins" parse stays robust against a config warning the loader
-    # may log first. getattr defends only a hand-mixed install: the bootstrap
-    # runs the launcher out of the same version directory it reads the loader
-    # from, so a launcher never meets an app predating the key through a
-    # supported path. Without it that mismatch would exit nonzero and lose the
-    # port and host too -- the launcher's worst failure, a healthy app declared
-    # dead on the wrong port.
+    # Port, host, and the browser flag come back on one line (see
+    # $EndpointProbeSnippet) so that the "last line wins" parse stays robust
+    # against a config warning the loader may log first. print's default
+    # separator is the single space this splits on.
+    #
+    # getattr defends only a hand-mixed install: the bootstrap runs the
+    # launcher out of the same version directory it reads the loader from, so
+    # a launcher never meets an app predating the key through a supported
+    # path. Without it that mismatch would exit nonzero and lose the port and
+    # host too -- the launcher's worst failure, a healthy app declared dead on
+    # the wrong port.
     try {
         $manifest = [System.IO.File]::ReadAllText((Join-Path $InstallRoot 'install.json')) | ConvertFrom-Json
         $tag = [string]$manifest.tag
@@ -107,7 +123,7 @@ function Get-ConfiguredEndpoint {
         $python = Join-Path $InstallRoot "versions\$tag\.venv\Scripts\python.exe"
         $env:CSD_STATE_DIR = $InstallRoot
         try {
-            $endpointText = @(& $python -c 'from source.config.config_service import load_config; c = load_config(); o = getattr(c, "open_browser_on_launch", True); print(f"{c.port} {c.host} {o}")' 2>&1)
+            $endpointText = @(& $python -c $EndpointProbeSnippet 2>&1)
         } finally {
             Remove-Item Env:\CSD_STATE_DIR -ErrorAction SilentlyContinue
         }

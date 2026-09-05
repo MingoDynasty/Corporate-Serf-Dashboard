@@ -52,14 +52,30 @@ def _endpoint_probe_script() -> str:
 
     The launcher's only parsing contract with the app is the last line this
     prints, so the test drives the real snippet out of the real script rather
-    than a copy that could drift. The snippet quotes with double quotes only,
-    which is what keeps it inside the PowerShell single-quoted argument and
-    makes this regex sufficient.
+    than a copy that could drift. It lives in a here-string, which is what
+    lets it carry Python's single quotes with no escaping.
     """
     launcher = (REPO_ROOT / "scripts" / "launcher.ps1").read_text(encoding="utf-8")
-    matches = re.findall(r"-c '([^']*)'", launcher)
-    assert len(matches) == 1, f"expected one `python -c` snippet, found {len(matches)}"
-    return matches[0]
+    match = re.search(
+        r"^[$]EndpointProbeSnippet = @'\r?\n(.*?)\r?\n'@$",
+        launcher,
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    assert match is not None, "launcher.ps1 has no $EndpointProbeSnippet here-string"
+    return match.group(1)
+
+
+def test_launcher_endpoint_snippet_carries_no_double_quote() -> None:
+    """Windows PowerShell 5.1 silently eats them, and the shortcut runs 5.1.
+
+    5.1 re-quotes a native command's argument without escaping the double
+    quotes inside it, so ``print(f"{c.port} {c.host}")`` reached python as
+    ``print(f{c.port}`` and exited with a SyntaxError. The launcher then took
+    its fallback and probed 8050 on 127.0.0.1 whatever the config said. The
+    subprocess call below cannot catch this -- Python quotes its arguments
+    properly -- so the shape of the snippet is asserted directly.
+    """
+    assert '"' not in _endpoint_probe_script()
 
 
 @pytest.mark.parametrize(
