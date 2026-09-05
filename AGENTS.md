@@ -39,14 +39,14 @@ uv run python -m compileall source tests
   hand-edit)
 - `docs/` — living docs (architecture, `decision_log.md`, `product.md`),
   current-behavior capability specs (`docs/specs/`), plus proposals for
-  in-flight work. One file per proposal (git is the version
-  history — no `_v2`/`_v3` filename suffixes); when a proposal ships, distill
-  it into a `decision_log.md` entry and delete the file **in the shipping
-  PR** — full checklist in "Shipping a proposal" below. `tests/test_docs.py`
-  enforces proposal `Status:` lines (and their absence from specs) and fails
-  on dangling doc links, including heading-anchor links. Review
-  handoff docs are ephemeral and never land on main (see the `/pr-review`
-  skill).
+  in-flight work (`docs/proposals/`). One file per proposal (git is the
+  version history — no `_v2`/`_v3` filename suffixes); when a proposal
+  ships, distill it into a `decision_log.md` entry and delete the file **in
+  the shipping PR** — full checklist in "Shipping a proposal" below.
+  `tests/test_docs.py` enforces proposal placement and `Status:` lines (and
+  their absence from specs) and fails on dangling doc links, including
+  heading-anchor links. Review handoff docs are ephemeral and never land on
+  main (see the `/pr-review` skill).
 
 ## Workflow
 
@@ -83,8 +83,8 @@ Codex <codex@local>
 ## Documentation Habits
 
 - Use `AGENTS.md` for repo-local workflow rules, conventions, and recurring gotchas.
-- Use proposal docs under `docs/` for feature design that is in flight or
-  planned, following the template below. The maintainer reads `Status:`,
+- Use proposal docs under `docs/proposals/` for feature design that is in
+  flight or planned, following the template below. The maintainer reads `Status:`,
   **TL;DR**, and **Decisions needed** by default and the dense body on
   demand — so a judgment call buried in the body is a process bug, and so
   is a mechanical choice escalated into Decisions needed.

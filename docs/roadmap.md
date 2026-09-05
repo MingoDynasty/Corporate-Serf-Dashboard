@@ -88,7 +88,7 @@ sequence.
   vs warmed-up comparisons). Gap-based *sessions* are a later
   quality-of-life layer on top; this supersedes the interim console-log
   stopgap in `file_watchdog.py`. Design in
-  [`run_history_proposal.md`](./run_history_proposal.md), against the
+  [`run_history_proposal.md`](./proposals/run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
 
 ---
