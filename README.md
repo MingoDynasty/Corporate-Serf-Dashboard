@@ -167,7 +167,7 @@ caches stay on your PC. This is every network connection the app or its launcher
 | Every launch from the shortcut, unless the install is pinned | Asks whether a newer release exists | `api.github.com` |
 | Installing or updating | Downloads the release zip, and, when they are not already present, uv, a Python build, and the app's packages | `github.com`, `astral.sh`, `pypi.org`, `files.pythonhosted.org` |
 | While running, only with a KovaaK's username set | Looks up your leaderboard position, percentile, and the player total; slowly fills the playlist percentile cache in the background (`percentile_warmup_enabled` in `config.toml` turns that off) | `kovaaks.com` |
-| You click **Detect my accounts** or **Import** on a page | Checks the Steam accounts on this machine against KovaaK's; fetches a playlist by share code, asking Evxl when KovaaK's has no record of it | `kovaaks.com`, `api.evxl.app` |
+| You click **Detect my accounts** (Settings) or **Import** (Playlists) | Checks the Steam accounts on this machine against KovaaK's; fetches a playlist by share code, asking Evxl when KovaaK's has no record of it | `kovaaks.com`, `api.evxl.app` |
 
 With no KovaaK's username set, the running app makes no network requests on its own. Requests to
 KovaaK's identify themselves with the app's name, its version, and this repository's address.
