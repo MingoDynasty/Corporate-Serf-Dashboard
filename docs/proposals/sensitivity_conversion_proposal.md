@@ -12,8 +12,9 @@ Newer stats files carry enough information to convert those runs to cm/360
 exactly, using KovaaK's own conversion numbers. This proposal normalizes
 sensitivities to cm/360 at the moment a stats file is parsed, so converted
 runs sort, group, display, and earn run notifications like native cm/360
-runs everywhere, the PB cm/360 column on the playlist pages included. Runs too old to carry the
-needed fields keep their original label and are never dropped.
+runs everywhere, the PB cm/360 column on the playlist pages included.
+Runs too old to carry the needed fields keep their original label and are
+never dropped.
 
 ## Decisions needed
 
