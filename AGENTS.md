@@ -263,14 +263,21 @@ in the same PR — do not leave it for later:
 
 ## Comment and Docstring Conventions
 
+These rules govern new and edited comments and docstrings. Existing ones are
+not swept to match; bring one into line when a change touches it anyway.
+
 - A comment earns its place by saying what the code cannot: the failure it
   prevents, the alternative that looks right and is not, or the external
   fact (an API quirk, a library behavior) it depends on. Do not narrate
   what the code does.
-- Say it once, where it is durable. Rationale that has a decision-log entry
-  gets a one-line pointer, not a restatement. Library or platform behavior
-  that takes more than a few lines to explain goes in `docs/decision_log.md`
-  or `docs/kovaaks_api_notes.md`, with a pointer beside the code.
+- Keep the failure-preventing reason beside the code it protects, even when
+  fuller rationale exists elsewhere: a bare pointer hides the constraint
+  from the edit that would break it. What moves one layer up, with a link
+  beside the code, is the evidence, the investigation, and the trade-off
+  history, and only into a document whose scope already fits (durable
+  decisions in `docs/decision_log.md`, endpoint behavior in
+  `docs/kovaaks_api_notes.md`). Length is not a reason to relocate;
+  shorten instead.
 - Write for the next maintainer, not the reviewer who asked. A comment that
   only makes sense as the reply to a review question belongs in the PR
   thread, which already holds it.
@@ -278,11 +285,12 @@ in the same PR — do not leave it for later:
   and the names of neighboring functions unless the comment is about them.
   A change in behavior updates the comments that describe it, in the same
   commit.
-- Docstrings open with an imperative summary on the first line, then an
-  optional paragraph for the contract the signature cannot carry (units,
-  side effects, failure behavior, lifecycle). No Args/Returns/Raises
-  sections. Identifiers in docstrings and comments take two backticks on
-  each side, reStructuredText style.
+- Docstrings open with a one-line summary: imperative for functions and
+  methods, descriptive for classes and modules. Contract text the signature
+  cannot carry (units, side effects, failure behavior, lifecycle, merge
+  rules) follows as prose or a short list, as long as it needs to be. No
+  Args/Returns/Raises sections. Identifiers in docstrings and comments take
+  two backticks on each side, reStructuredText style.
 - Lint suppressions stay narrow and name the reason when the rule code does
   not say it. A blind-except suppression always names what the catch
   protects.

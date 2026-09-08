@@ -22,8 +22,8 @@ it is the useful kind, but the rules that shaped it were never written down.
 A fresh session had to learn the house style by imitation, and the two places
 it tended to go wrong were narrating what code already says and writing a
 comment as a reply to whoever asked in review. The agent instructions now
-state what earns a comment, where longer rationale belongs, and the shape a
-docstring takes. The enforced lint and type gates do not change.
+state what earns a comment, what stays beside the code when fuller rationale
+also lives elsewhere, and the shape a docstring takes. The enforced lint and type gates do not change.
 
 **What was measured (2026-09-04, 44 files under `source/`).** Comment-only
 lines are 12% of code lines and docstring lines 23%; the test tree sits at
@@ -38,28 +38,40 @@ commits exist only to correct a stale comment or docstring.
 
 **Why a written bar rather than a trim.** The volume sits in the newest code
 and is rationale, not narration, so removing narration barely moves it. The
-costs that do recur are placement and rot: library and platform facts
-explained beside the code instead of one layer up (three comments in
-`source/` point at this log; most restate it), comments written as the
-answer to a review question that then outlive the thread, and comments that
-cite a relative position, a measured count, or a neighbor's name and go
-stale when the neighbor moves. The rule set in AGENTS.md ("Comment and
-Docstring Conventions") names each of those directly, states the docstring
-shape the code already follows so a new session does not default to
-Google-style sections, and adds the two cheap hygiene rules the code mostly
-follows already (a reason on suppressions the rule code does not explain, a
-concrete problem behind every TODO). It sits beside the 2026-08-01 two-layer
+costs that do recur are placement and rot: local explanations that carry
+the evidence and investigation along with the constraint they protect
+(three comments in `source/` point at this log; most restate it), comments
+written as the answer to a review question that then outlive the thread,
+and comments that cite a relative position, a measured count, or a
+neighbor's name and go stale when the neighbor moves. The rule set in
+AGENTS.md ("Comment and Docstring Conventions") names each of those
+directly. On placement it keeps the failure-preventing reason beside the
+code and moves only evidence and history up, into a document whose scope
+already fits, so a bare pointer never stands where the constraint was and
+this log is not widened into a store of library detail; length alone is
+never the trigger. It states the docstring shape the code already follows
+(imperative summaries for functions, descriptive ones for classes and
+modules, contract text of whatever length, no Args/Returns/Raises sections)
+so a new session does not default to Google-style sections, and adds the
+two cheap hygiene rules the code mostly follows already (a reason on
+suppressions the rule code does not explain, a concrete problem behind
+every TODO). It sits beside the 2026-08-01 two-layer
 doc-style entry as the code-side counterpart: that one governs prose in the
 docs, this one governs prose in the code.
 
 **What is deliberately not enforced.** No lint rule judges comment quality.
-The docstring shape could be enforced by ruff's `pydocstyle` `pep257`
-convention at roughly 90 findings, 45 of them auto-fixable; deferred to its
-own change. Annotations are not required: under mypy's `disallow_untyped_defs`
-60 functions in 12 files lack them, nearly all Dash callbacks and page
-layouts whose parameters are whatever Dash passes, so the honest options are
-a sweep plus the mypy flag or nothing, and a prose rule no gate checks was
-rejected because it would drift. The `N` naming family stays off: its 35
+Ruff's `pydocstyle` `pep257` convention would check only part of the
+docstring shape (summary placement, the blank line after it, mood, terminal
+period): 39 findings on 2026-09-08 under the locked ruff, none safely
+auto-fixable, and it does not see Args/Returns/Raises sections,
+single-backtick identifiers, or a summary that starts below the opening
+quotes. Deferred, and not a substitute for the written rule. Annotations
+are not required: under mypy's `disallow_untyped_defs`, 59 diagnostics
+across 56 definitions in 12 files (2026-09-08, after `check_untyped_defs`
+landed), nearly all Dash callbacks and page layouts whose parameters are
+whatever Dash passes, so the honest options are a sweep plus the mypy flag
+or nothing, and a prose rule no gate checks was rejected because it would
+drift. The `N` naming family stays off: its 35
 hits are API models mirroring KovaaK's field names. The 2026-07-03 ruff
 consolidation entry is unchanged.
 
