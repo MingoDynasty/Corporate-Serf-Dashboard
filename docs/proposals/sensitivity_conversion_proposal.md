@@ -11,8 +11,8 @@ Sensitivity axis instead of beside the cm/360 value it corresponds to.
 Newer stats files carry enough information to convert those runs to cm/360
 exactly, using KovaaK's own conversion numbers. This proposal normalizes
 sensitivities to cm/360 at the moment a stats file is parsed, so converted
-runs sort, group, and display like native cm/360 runs everywhere, the PB
-cm/360 column on the playlist pages included. Runs too old to carry the
+runs sort, group, display, and earn run notifications like native cm/360
+runs everywhere, the PB cm/360 column on the playlist pages included. Runs too old to carry the
 needed fields keep their original label and are never dropped.
 
 ## Decisions needed
@@ -205,7 +205,14 @@ Normalization happens in one place: `extract_data_from_file` in
 Everything downstream inherits the normalization: the three
 sensitivity-key builders, the `SortedDict` ordering, the plot axis and
 hover, run notifications, and the PB cm/360 column all consume
-`RunData.horizontal_sens` / `RunData.sens_scale`. `RunData`'s shape is
+`RunData.horizontal_sens` / `RunData.sens_scale`. That includes the
+watchdog's placement facts: `_import_created_file` in
+`source/my_watchdog/file_watchdog.py` computes `nth_score` and
+`is_new_sensitivity` against the scenario's runs at the same sensitivity
+key, so after conversion the normalized group is the unit for placement
+and for first-sensitivity detection. That is accepted as designed: no
+separate raw-scale notification history is kept, and the notification
+rules themselves do not change. `RunData`'s shape is
 unchanged; the original scale value is not retained in v1 (see Future). The
 run database is in-memory and rebuilt from the stats directory at every
 start, so historical runs convert retroactively on the next launch and the
@@ -234,8 +241,21 @@ The complete list; anything not here is a defect of the implementation.
    scenarios whose PB is a converted run, and `N/A` still for the 61 whose
    PB is a legacy run. Four of the 72 read 163.4 (D2).
 4. Run notification text renders a converted run's sensitivity as e.g.
-   `40.8 cm/360` instead of `0.2 Valorant`; the notification contract itself
-   is unchanged.
+   `40.8 cm/360` instead of `0.2 Valorant`; the notification rules
+   themselves are unchanged.
+5. Placement and first-sensitivity detection judge a new run against its
+   normalized group. Where a converted group shares a rounded value with a
+   native group, the merged history is the denominator: a run that would
+   have placed within Top N among the raw-scale runs alone can fall
+   outside it and earn no placement, which with the threshold verdict off
+   means no toast at all. And a first native run at a converted group's
+   value is not a new sensitivity, so it receives a threshold verdict
+   instead of the placement-only toast. In the maintainer's corpus today no
+   converted group coincides with a native one (native values are whole
+   centimeters; the converted values are 27.2, 32.7, 40.8, 51.1, 130.7,
+   and 163.4), so for existing data this is a contract statement rather
+   than a visible change; it is reachable by any future native run at one
+   of those values, and by another user's data.
 
 ### Spec statements to update (PR 2)
 
@@ -248,15 +268,24 @@ The complete list; anything not here is a defect of the implementation.
   the cm/360 scale" becomes "PB cm/360 is known when the PB run's
   sensitivity is in cm/360, natively or by conversion; a legacy run without
   DPI and increment keeps `N/A`", linking the same entry.
-- `docs/specs/notifications.md`: no statement changes; the `{sensitivity}`
-  placeholder's value changes, its contract does not.
+- `docs/specs/notifications.md`, "Run notifications": the statement that
+  defines `nth_score` and `is_new_sensitivity` gains that "the same
+  sensitivity" means the normalized sensitivity-and-scale group, linking
+  the scenario-performance normalization statement. The `{sensitivity}`
+  placeholder's contract is otherwise unchanged.
 
 ### Copy
 
 None. No user-facing string is added or edited. Strings whose rendered
 value changes without editing: the Score vs Sensitivity axis categories and
 hover x value, the run toast's `{sensitivity}` placeholder, and the PB
-cm/360 cell (`N/A` → a number). The PB cm/360 header tooltip ("Mouse
+cm/360 cell (`N/A` → a number). Through the existing placement and
+threshold rules applied to normalized groups (Observable behavior changes,
+item 5), which run toast appears and which of the existing titles and
+placement phrasings it carries can also change ("New best score" versus
+"New Nth-best score", the trailing "Also your Nth-best at" sentence, a
+threshold pass or fail in place of a placement-only toast); every such
+string exists today. The PB cm/360 header tooltip ("Mouse
 sensitivity of your personal-best run, in centimeters of mouse travel per
 full 360-degree turn (higher = lower sensitivity).") stays accurate for
 converted runs and is unchanged.
@@ -313,6 +342,11 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
   (the corpus has no such runs).
 - `tests/test_playlist_scenarios_service.py`: a converted-PB case asserting
   a numeric PB cm/360, beside the existing legacy case that keeps `N/A`.
+- Integration coverage through the watchdog and the notification helpers
+  for the two placement outcomes: a run whose rank in the merged group
+  falls outside Top N earns no placement (and no toast with the threshold
+  verdict off), and a first native run at a converted group's value is not
+  a new sensitivity and receives a threshold verdict.
 - Existing parser/grouping tests updated where labels change.
 - Standard gates (ruff format, ruff check, mypy, pytest, compileall).
 
@@ -352,8 +386,9 @@ maintainer against the live stats directory.
 This document supersedes the 2026-08-03 draft reviewed on PR #197, which
 was parked as `Future` and closed unmerged in favor of this one. Its
 evidence and settled decisions carry over; the reviews' findings are folded
-in: the PB cm/360 consumer and its census (gpt-5.6-sol, 2026-08-12), the
+in: the PB cm/360 consumer and its census (2026-08-12 review), the
 corrected D1 alternative and the UE4, in/360, and counts/360
-corroborations (claude-opus-5, 2026-08-08, confirmed 2026-08-12), the third
-key builder, and the non-universal rounding fix. All numbers were
-re-verified on 2026-09-05.
+corroborations (2026-08-08 review, confirmed 2026-08-12), the third key
+builder, and the non-universal rounding fix. All numbers were re-verified
+on 2026-09-05; the notification-placement consequence was added after the
+2026-09-08 review.
