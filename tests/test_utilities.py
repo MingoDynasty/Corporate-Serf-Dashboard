@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import pytest
 
+from source.utilities.stopwatch import Stopwatch
 from source.utilities.utilities import (
     format_absolute_timestamp,
     format_approximate_duration,
@@ -76,3 +77,19 @@ def test_format_absolute_timestamp_include_seconds() -> None:
 )
 def test_format_approximate_duration(seconds: float, expected: str) -> None:
     assert format_approximate_duration(seconds) == expected
+
+
+def test_stopwatch_elapsed_after_start_and_stop() -> None:
+    stopwatch = Stopwatch()
+    stopwatch.start()
+    stopwatch.stop()
+    assert stopwatch.elapsed() >= 0.0
+
+
+def test_stopwatch_elapsed_before_stop_raises() -> None:
+    stopwatch = Stopwatch()
+    with pytest.raises(RuntimeError, match=r"start\(\) and stop\(\)"):
+        stopwatch.elapsed()
+    stopwatch.start()
+    with pytest.raises(RuntimeError, match=r"start\(\) and stop\(\)"):
+        stopwatch.elapsed()

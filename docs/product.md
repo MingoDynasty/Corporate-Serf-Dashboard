@@ -340,6 +340,16 @@ list in the roadmap.)
   evidence — and they will only do that if what they are handing over, and to
   whom, is stated honestly rather than buried.
 
+**The browser tab is optional.** The desktop shortcut opens the dashboard in
+a browser tab every time it starts, which is right the first time and wrong
+for anyone who keeps that tab where they want it and restarts the app often.
+One setting in `config.toml` turns the tab off; the console window still
+prints the address. *Problem solved:* a beta tester who restarts the app
+several times a session was collecting a new tab on each restart, and the
+app cannot reuse a tab it did not open — nothing in Windows or the browsers
+will focus a tab already showing a URL. So the honest fix is to stop making
+new ones rather than to promise a reuse that does not exist.
+
 **The dashboard can be opened from another device.** By default the app serves
 only the machine it runs on. One setting in `config.toml` widens that to the
 whole network, so the dashboard opens on a phone or a second PC at that
