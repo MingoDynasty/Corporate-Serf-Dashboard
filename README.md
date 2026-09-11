@@ -246,7 +246,7 @@ edit:
 - **From source:** copy `example.toml` to `config.toml` in your checkout.
 
 `example.toml` documents every setting (an installed copy keeps it at
-`%LOCALAPPDATA%\CorporateSerfDashboard\versions\<tag>\example.toml`); two are worth knowing
+`%LOCALAPPDATA%\CorporateSerfDashboard\versions\<tag>\example.toml`); three are worth knowing
 about:
 
 - `port` — change this if something else on your machine already uses 8050. The
@@ -260,6 +260,14 @@ about:
   alone is not enough. **The dashboard has no login,** so anything that can
   reach that address can read your stats and change your settings — only do
   this on a network you trust.
+- `open_browser_on_launch` — on by default. Set it to `false` and the desktop
+  shortcut stops opening a browser tab every time you start the dashboard,
+  which is what you want if you keep its tab somewhere and would rather switch
+  to it yourself. The console window still prints the address. This one is
+  read by the shortcut, not by the app, so running from a source checkout
+  never opens a browser either way. With the setting off, double-clicking the
+  shortcut while the dashboard is already running prints the address and closes
+  again, so nothing visible happens — switch to the tab you already have.
 
 Everything else you might want to change lives on the dashboard's own
 **Settings** page: where your KovaaK's stats live, and who you are on the

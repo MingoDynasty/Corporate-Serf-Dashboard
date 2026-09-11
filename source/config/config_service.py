@@ -46,6 +46,11 @@ class ConfigData:
     # every device that can reach it. Must be an IP literal, not a name --
     # source.app rejects anything else.
     host: str = DEFAULT_HOST
+    # On by default: a first launch has to land somewhere, and the shortcut is
+    # the only way most users reach the app. Off is for a user who keeps a tab
+    # open and would rather switch to it than collect a new one per start.
+    # Only the installed launcher reads this -- the app never opens a browser.
+    open_browser_on_launch: bool = True
     # gt=0/le=2**31-1: this is handed straight to window.setInterval, whose
     # delay is a signed 32-bit int. Either end of the range turns into the
     # same silent request flood -- a non-positive period, and one above the

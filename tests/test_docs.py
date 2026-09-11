@@ -1,12 +1,13 @@
 """Documentation hygiene checks.
 
 Enforces the docs lifecycle from AGENTS.md "Shipping a proposal" and
-"Documentation Habits": proposal files declare a Status line and lead with
-the TL;DR / Decisions needed / Problem sections in that order, capability
-specs under docs/specs/ do not declare a Status line (they are current-state
-docs, not lifecycle docs), no markdown doc links to a file that has been
-deleted (e.g. a proposal distilled into the decision log), and
-heading-anchor links point at headings that exist in the target document.
+"Documentation Habits": proposal files live under docs/proposals/, declare a
+Status line, and lead with the TL;DR / Decisions needed / Problem sections
+in that order, capability specs under docs/specs/ do not declare a Status
+line (they are current-state docs, not lifecycle docs), no markdown doc
+links to a file that has been deleted (e.g. a proposal distilled into the
+decision log), and heading-anchor links point at headings that exist in the
+target document.
 """
 
 import re
@@ -17,6 +18,7 @@ from markdown_it import MarkdownIt
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SPECS_DIR = REPO_ROOT / "docs" / "specs"
+PROPOSALS_DIR = REPO_ROOT / "docs" / "proposals"
 
 DOC_FILES = sorted(
     [
@@ -213,9 +215,26 @@ def test_heading_anchors_slug_rendered_text(tmp_path):
     }
 
 
+def test_proposal_docs_live_in_proposals_dir():
+    """The directory is the classifier: a lifecycle doc anywhere else under
+    docs/ is misplaced, whether its name says proposal or only its Status
+    line does. Specs are current-state docs and carry no Status line."""
+    misplaced = []
+    for doc in (REPO_ROOT / "docs").rglob("*.md"):
+        if doc.is_relative_to(PROPOSALS_DIR) or doc.is_relative_to(SPECS_DIR):
+            continue
+        lines = doc.read_text(encoding="utf-8").splitlines()[:STATUS_SEARCH_LINES]
+        if "proposal" in doc.name or any(STATUS_PATTERN.search(line) for line in lines):
+            misplaced.append(str(doc.relative_to(REPO_ROOT)))
+    assert not misplaced, (
+        "Proposal docs live under docs/proposals/ (see AGENTS.md "
+        f'"Documentation Habits"): {misplaced}'
+    )
+
+
 def test_proposal_docs_declare_status():
     missing = []
-    for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
+    for doc in PROPOSALS_DIR.rglob("*.md"):
         lines = doc.read_text(encoding="utf-8").splitlines()[:STATUS_SEARCH_LINES]
         if not any(STATUS_PATTERN.search(line) for line in lines):
             missing.append(str(doc.relative_to(REPO_ROOT)))
@@ -228,7 +247,7 @@ def test_proposal_docs_declare_status():
 def test_proposal_docs_lead_with_required_sections():
     """Placement, not just presence: the maintainer read-path comes first."""
     bad = []
-    for doc in (REPO_ROOT / "docs").rglob("*proposal*.md"):
+    for doc in PROPOSALS_DIR.rglob("*.md"):
         headings = _visible_h2_headings(doc.read_text(encoding="utf-8"))
         leading = tuple(headings[: len(REQUIRED_LEADING_SECTIONS)])
         if leading != REQUIRED_LEADING_SECTIONS:
