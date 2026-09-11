@@ -50,23 +50,24 @@ edits come from fresh agent sessions, and AGENTS.md is the only channel that
 reaches a session on every edit. The case for the section is transmission: it
 writes down what is already there so a new session does not default to
 Google-style sections or narrating comments. One cost does recur and has a
-number: comments that cite a relative position, a count of things in the tree,
-or a neighbor's name go stale when the neighbor moves, and the fifteen repair
-commits above are that cost. A second is first-hand rather than measured: from
-the sessions that wrote this code, comments authored as the answer to a review
-question that then outlive the thread. On placement the rule keeps the
-failure-preventing reason beside the code and moves only evidence and history
-up, into a document whose scope already fits, so a bare pointer never stands
-where the constraint was and this log is not widened into a store of library
-detail; length alone is never the trigger. The three comments in `source/`
-that point at this log already do exactly this. The two hygiene rules are new
-rather than transcribed: a reason on suppressions the rule code does not
-explain is already the norm, but a blind-except suppression that names what
-the catch protects is four of fourteen, and none of the four legacy TODOs
-names a concrete problem; both ride on the same no-sweep scope as the rest.
-The section sits beside the 2026-08-01 two-layer doc-style entry as the
-code-side counterpart: that one governs prose in the docs, this one governs
-prose in the code.
+number: comments go stale, a few because they cite a relative position, a
+count of things in the tree, or a neighbor's name and the neighbor moves, and
+more often because the behavior they describe changed. The fifteen repair
+commits above are that cost, and the rule addresses both halves. A second is
+first-hand rather than measured: from the sessions that wrote this code,
+comments authored as the answer to a review question that then outlive the
+thread. On placement the rule keeps the failure-preventing reason beside the
+code and moves only evidence and history up, into a document whose scope
+already fits, so a bare pointer never stands where the constraint was and this
+log is not widened into a store of library detail; length alone is never the
+trigger. The three comments in `source/` that point at this log already do
+exactly this. The two hygiene rules are new rather than transcribed: a reason
+on suppressions the rule code does not explain is already the norm, but a
+blind-except suppression that names what the catch protects is four of
+fourteen, and none of the four legacy TODOs names a concrete problem; both
+ride on the same no-sweep scope as the rest. The section sits beside the
+2026-08-01 two-layer doc-style entry as the code-side counterpart: that one
+governs prose in the docs, this one governs prose in the code.
 
 **What is deliberately not enforced.** No lint rule judges comment quality.
 Ruff's `pydocstyle` `pep257` convention would check only part of the docstring
