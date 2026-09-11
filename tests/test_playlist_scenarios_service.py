@@ -792,3 +792,49 @@ def test_new_fill_cancels_synchronously_and_banks_inflight_fetch(
     assert all(row["rank_pending"] is False for row in drain.updates)
     assert all(row["total_pending"] is False for row in drain.updates)
     assert all(row["percentile_pending"] is False for row in drain.updates)
+
+
+def test_format_playlist_scenario_rank_row_fills_pb_cm360_for_a_converted_run(
+    monkeypatch,
+    tmp_path,
+):
+    # The four "N/A" cases above build a non-cm/360 RunData directly, which at
+    # this layer is exactly a legacy run. A converted PB only exists downstream
+    # of the parser, so this one goes through it: a real Valorant-era stats
+    # file, whose increment and DPI make its sensitivity 40.8 cm/360.
+    monkeypatch.setattr(
+        data_service.get_config(),
+        "sens_round_decimal_places",
+        1,
+    )
+    file_path = tmp_path / "Converted PB - Challenge - 2025.03.04-21.30.00 Stats.csv"
+    file_path.write_text(
+        "\n".join(
+            [
+                "Score:,1000",
+                "Sens Scale:,Valorant",
+                "Sens Increment:,0.199886",
+                "Horiz Sens:,0.2",
+                "Vert Sens:,0.2",
+                "DPI:,1600",
+                "Scenario:,Converted PB",
+                data_service.POSSIBLE_SUB_CSV_HEADERS[0],
+                "Rifle,100,50,75,100,,Valorant,0.2,0.2,103,0,0,0,0,0,0,0,0",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    personal_best_run = data_service.extract_data_from_file(str(file_path))
+    assert personal_best_run is not None
+    assert personal_best_run.sens_scale == "cm/360"
+
+    row = format_playlist_scenario_rank_row(
+        "Converted PB",
+        0,
+        ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN),
+        personal_best_run=personal_best_run,
+    )
+
+    assert row["pb_cm360_sort"] == 40.8
+    assert row["pb_cm360_display"] == "40.8"

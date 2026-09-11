@@ -117,8 +117,10 @@ def _get_personal_best_run(scenario_name: str) -> RunData | None:
 
 
 def _personal_best_cm360(run_data: RunData | None) -> float | None:
-    # Local CSVs only expose cm360 directly when the run was recorded with the
-    # cm/360 sensitivity scale. Other scales stay unknown instead of mislabeled.
+    # A run's sensitivity is cm/360 either natively or by the parser's
+    # conversion from the file's own increment and DPI. It stays unknown only
+    # for a legacy run that carries neither field, and those stay unknown
+    # instead of mislabeled.
     if run_data is None or run_data.sens_scale != "cm/360":
         return None
     return run_data.horizontal_sens

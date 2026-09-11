@@ -62,6 +62,11 @@ POSSIBLE_SUB_CSV_HEADERS = [
 ]
 logger = logging.getLogger(__name__)
 
+# Yaw of KovaaK's internal base sensitivity scale (UE4), in degrees per mouse
+# count. Every `Sens Increment` a stats file records is the run's sensitivity
+# expressed on this scale, whatever per-game scale the run was played on.
+BASE_SCALE_YAW = 0.07
+
 # Deliberately unsynchronized: after startup the watchdog thread is the only
 # writer, and raced reads self-heal on re-render (the home page's polling
 # tick, or the next interaction on pages without a data-driving interval).
@@ -582,7 +587,49 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(unique_scenarios)
 
 
-def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912
+def _cm360_from_increment(increment: float, dpi: float) -> float:
+    """Convert a stats file's own `Sens Increment` and `DPI` into cm/360.
+
+    `Sens Increment` is the run's sensitivity re-expressed in KovaaK's internal
+    base scale, UE4, whose yaw is 0.07 degrees per mouse count. So the run
+    turns `0.07 * increment` degrees per count and `0.07 * increment * dpi`
+    degrees per inch, and a full turn takes `360 / that` inches. The result is
+    unrounded on purpose: callers round it, and the tests assert the exact
+    value, which is what separates this from a recomputation out of the raw
+    sensitivity with the community yaw constants.
+    """
+    return 360 * 2.54 / (BASE_SCALE_YAW * increment * dpi)
+
+
+def _optional_field_value(line: str) -> str | None:
+    """Return an optional key-value line's first value column, or None.
+
+    Never raises: a mid-write `DPI:` with no value column yet must cost the
+    conversion only, where the required fields' own `IndexError` costs the run.
+    """
+    _key, separator, rest = line.partition(",")
+    if not separator:
+        return None
+    return rest.split(",")[0].strip()
+
+
+def _parse_optional_positive(raw_value: str | None) -> float | None:
+    """Read one optional numeric stats-file field, tolerating anything odd.
+
+    Missing, empty, zero, negative, or malformed all read as "not available".
+    These fields never join the required-field check, and a bad value must cost
+    the conversion only -- never the run, and never the scan that hit it.
+    """
+    if not raw_value:
+        return None
+    try:
+        value = float(raw_value)
+    except ValueError:
+        return None
+    return value if value > 0 else None
+
+
+def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
     """
     Extracts data from a scenario CSV file.
     :param full_file_path: full file path of the file to extract data from.
@@ -594,6 +641,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     scenario = None
     score = None
     sens_scale = None
+    raw_sens_increment = None
+    raw_dpi = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -635,13 +684,14 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 score = float(line.split(",")[1].strip())
             elif line.startswith("Sens Scale:"):
                 sens_scale = line.split(",")[1].strip()
+            elif line.startswith("Sens Increment:"):
+                raw_sens_increment = _optional_field_value(line)
             elif line.startswith("Horiz Sens:"):
-                str_horizontal_sens = line.split(",")[1].strip()
-                # sometimes the sens looks like 20.123456789, so round it to look cleaner
-                horizontal_sens = round(
-                    float(str_horizontal_sens),
-                    get_config().sens_round_decimal_places,
-                )
+                # Rounded after the loop, because the converting branch rounds
+                # the cm/360 result instead of this raw number.
+                horizontal_sens = float(line.split(",")[1].strip())
+            elif line.startswith("DPI:"):
+                raw_dpi = _optional_field_value(line)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
     except OSError, ValueError, IndexError:
@@ -666,6 +716,28 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     ):
         logger.warning("Missing data from file: %s", full_file_path)
         return None
+
+    # Normalization runs here, not inline above: `DPI:` follows `Horiz Sens:`
+    # in the file, so the converting inputs are only complete once the whole
+    # key-value tail has been read.
+    sens_increment = _parse_optional_positive(raw_sens_increment)
+    dpi = _parse_optional_positive(raw_dpi)
+    if sens_scale != "cm/360" and sens_increment is not None and dpi is not None:
+        # A run recorded on a game's own scale converts exactly, so it joins the
+        # cm/360 axis instead of sorting by a number from another scale.
+        horizontal_sens = round(
+            _cm360_from_increment(sens_increment, dpi),
+            get_config().sens_round_decimal_places,
+        )
+        sens_scale = "cm/360"
+    else:
+        # Already cm/360, or too old to carry both fields: keep the recorded
+        # value and scale. Sometimes the sens looks like 20.123456789, so round
+        # it to look cleaner.
+        horizontal_sens = round(
+            horizontal_sens,
+            get_config().sens_round_decimal_places,
+        )
 
     return RunData(
         datetime_object=datetime_object,
