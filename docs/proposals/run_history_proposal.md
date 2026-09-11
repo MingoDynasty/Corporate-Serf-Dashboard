@@ -95,9 +95,9 @@ capture is required.
   panel, which claimed no exclusive tenancy of it and expects a history
   panel hosted there to compose into the same column rather than to add a
   second one (see the 2026-08-09
-  ["The Graph Page Is Scenario Performance…"](decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
+  ["The Graph Page Is Scenario Performance…"](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)
   entry, which delegates the question here, and the
-  ["Chart Options Live In A Collapsible Panel…"](decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)
+  ["Chart Options Live In A Collapsible Panel…"](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)
   entry for the column's layout constraints). Whether the two share the
   column, stack in it, or the history re-hosts the options panel
   entirely is decided here.
