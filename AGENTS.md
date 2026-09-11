@@ -281,10 +281,11 @@ not swept to match; bring one into line when a change touches it anyway.
 - Write for the next maintainer, not the reviewer who asked. A comment that
   only makes sense as the reply to a review question belongs in the PR
   thread, which already holds it.
-- Avoid what rots: relative positions ("above", "below"), measured counts,
-  and the names of neighboring functions unless the comment is about them.
-  A change in behavior updates the comments that describe it, in the same
-  commit.
+- Avoid what rots: relative positions ("above", "below"), counts of things
+  in the tree (call sites, fields, neighbors), and the names of neighboring
+  functions unless the comment is about them. A measured external fact
+  stays, with its source or date. A change in behavior updates the comments
+  that describe it, in the same commit.
 - Docstrings open with a one-line summary: imperative for functions and
   methods, descriptive for classes and modules. Contract text the signature
   cannot carry (units, side effects, failure behavior, lifecycle, merge
