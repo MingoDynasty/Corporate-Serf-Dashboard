@@ -1,6 +1,6 @@
 # Cross-Scale Sensitivity Conversion
 
-Status: Proposed
+Status: In progress
 Date: 2026-09-05
 
 ## TL;DR
@@ -18,19 +18,17 @@ never dropped.
 
 ## Decisions needed
 
-Two decisions. Nothing is ratified: the maintainer's position on D1 is
-recorded as a lean, which is non-binding and stays open to challenge, and
-D2 has no recorded position yet. Two further choices were settled in the
-2026-08-03 design conversation at the severity they were made at; they are
-restated under "Settled decisions" in Design, and D2 asks whether one of
-them extends to a surface that did not exist then.
+Both decisions were ruled by the maintainer on 2026-09-11, each accepting
+the recommendation; implementation may proceed against them. Two further
+choices were settled in the 2026-08-03 design conversation at the severity
+they were made at; they are restated under "Settled decisions" in Design,
+and D2 extends the second of them to a surface that did not exist then.
 
 ### D1 — Conversion mechanism: the stats file's `Sens Increment` field, or a formula evaluator over KovaaK's scale definitions
 
-Status: Proposed
-Maintainer lean (2026-09-05, non-binding): the increment path.
+Status: Ruled — the increment path (2026-09-11).
 
-**Recommended: derive cm/360 from the stats file's own `Sens Increment` and
+**Decision: derive cm/360 from the stats file's own `Sens Increment` and
 `DPI` fields.** Every post-2024 stats file records `Sens Increment`, which
 is the sensitivity re-expressed in KovaaK's internal base scale (UE4, yaw
 0.07°/count; see Verified facts). That makes the conversion
@@ -39,7 +37,8 @@ KovaaK's supports converts with zero per-scale knowledge, including scales
 added in future game updates, and the result is exactly what KovaaK's
 itself displays.
 
-**Alternative: a formula evaluator over KovaaK's scale definitions.** The
+**Rejected alternative: a formula evaluator over KovaaK's scale
+definitions.** The
 repository carries `resources/sensitivity converter/response.json`, a
 capture of the kovaaks.com `game-settings` endpoint, whose per-scale
 `IncrementFormula` entries reproduce KovaaK's UI exactly. This alternative
@@ -61,14 +60,14 @@ The risk of the recommended path is reliance on an undocumented stats-file
 field. It is mitigated by the field's consistency across every one of the
 7,494 files that carry it, by the capture's own UE4 entry
 (`IncrementFormula: "Sens * 0.07"`) that explains the divisor structurally,
-and by regression fixtures taken from real files (see Testing). Choosing
-the alternative means a materially larger implementation plus a dependency
-on a capture that goes stale.
+and by regression fixtures taken from real files (see Testing). The
+alternative would have meant a materially larger implementation plus a
+dependency on a capture that goes stale.
 
 ### D2 — Trusting recorded DPI now reaches a headline stat
 
-Status: Proposed
-Maintainer lean: none recorded.
+Status: Ruled — accept, with the escape hatch on the data side
+(2026-09-11).
 
 The 2026-08-03 conversation settled that the DPI a stats file records is
 trusted as-is. That ruling was made against one artifact: a mis-grouped
@@ -81,15 +80,15 @@ misrecorded at 400 DPI and would read 163.4 cm/360, sorting to the extreme
 of a user-sortable column (Leapcorn Pure, VT Frogtagon Novice S5, VT
 Midrange Long Strafes Novice, VT Midrange Short Strafes Novice).
 
-**Recommended: accept the consequence and keep the escape hatch on the data
+**Decision: accept the consequence and keep the escape hatch on the data
 side.** The app cannot detect a mismatch between recorded and physical DPI;
 any in-app override (a config knob, a per-era DPI map) is a second source
 of truth that hides a data error instead of fixing it. The maintainer's own
 four cells are fixed by a one-time edit of the `DPI:,400` lines in the 368
-files, offered on 2026-08-03 and still open; a beta tester's misrecorded
-runs are theirs to fix the same way. Choosing differently means either
-keeping the column at `N/A` for converted PBs, which withholds 68 correct
-values to hide 4 wrong ones, or building the override.
+files, offered on 2026-08-03 and accepted on 2026-09-11; a beta tester's
+misrecorded runs are theirs to fix the same way. The rejected alternatives
+were keeping the column at `N/A` for converted PBs, which withholds 68
+correct values to hide 4 wrong ones, and building the override.
 
 ## Problem
 
@@ -302,8 +301,8 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
   whatever the user typed into KovaaK's settings; a mismatch with the
   mouse's physical DPI is undetectable from the data. The known instance,
   368 Valorant runs misrecorded at 400 DPI converting to about 163.4 cm/360
-  instead of about 40.8, is accepted as a chart-grouping artifact. Whether
-  the same acceptance extends to the PB cm/360 column is D2.
+  instead of about 40.8, is accepted as a chart-grouping artifact. D2
+  extends the same acceptance to the PB cm/360 column.
 
 ## Out of scope
 
@@ -355,7 +354,8 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
 
 1. **PR 1 — this proposal**, with the `docs/proposals/` convention it
    inaugurates. No code.
-2. **PR 2 — implementation.** Gated on D1 and D2 flipping to Ratified.
+2. **PR 2 — implementation.** D1 and D2 are ruled (2026-09-11), so it may
+   proceed.
    Parser change and tests; the `_personal_best_cm360` comment rewrite; the
    two spec statement updates above; a decision-log entry carrying the
    `Sens Increment` / `DPI` field semantics and the empirical invariant
@@ -368,12 +368,13 @@ Ratified by the maintainer in the 2026-08-03 design conversation:
 
 Single implementation PR; the blast radius is one parser function, one
 comment, tests, and docs. Recommended kickoff: Opus 5 at high effort. The
-spec is complete and the change is mechanical once D1 and D2 are ruled, so
-more model capacity would not improve the PR.
+spec is complete and the change is mechanical now that D1 and D2 are
+ruled, so more model capacity would not improve the PR.
 
-Optional, outside the repo: the one-time script that rewrites the
-`DPI:,400` lines in the 368 misrecorded files (see D2), run by the
-maintainer against the live stats directory.
+Outside the repo, accepted by the maintainer on 2026-09-11: the one-time
+script that rewrites the `DPI:,400` lines in the 368 misrecorded files (see
+D2), kept under the gitignored `ignore/scripts/` and run by the maintainer
+against the live stats directory.
 
 ## Future / optional
 
