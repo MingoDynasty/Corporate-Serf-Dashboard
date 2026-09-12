@@ -251,7 +251,11 @@ toasts under, and it applies to every toast the app adds from here on
   only for a scenario's very first run
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb));
   `is_new_sensitivity` is true for a scenario's first run and for the first
-  run at a new sensitivity; `run_id` is the run CSV's file name.
+  run at a new sensitivity; `run_id` is the run CSV's file name. "The same
+  sensitivity" and "a new sensitivity" both mean the normalized
+  sensitivity-and-scale group, so a run recorded on a game's own scale is
+  judged against the runs its converted value lands beside
+  ([scenario_performance.md](scenario_performance.md#the-graph)).
 - The app shell's `publish_run_events` is the deque's sole consumer. On each
   `pb-celebration-interval` tick (`polling_interval`, default 1000 ms) it
   drains every pending message and publishes one `run-events-batch` payload:

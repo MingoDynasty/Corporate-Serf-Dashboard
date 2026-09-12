@@ -32,6 +32,12 @@ list in the roadmap.)
   runs grouped by sensitivity. *Problem solved:* "is my current sensitivity
   actually better?" and "am I trending up on this scenario?" are answered
   visually instead of by gut feel.
+- **Older runs land on the same sensitivity axis.** Runs recorded on a game's
+  own sensitivity scale are shown in cm/360 like everything else, and the
+  playlist tables' PB cm/360 column fills in for them. *Problem solved:* a run
+  from the Valorant-scale era used to sort as `0.2` among centimeters and sit
+  at the wrong end of the axis, so the history could not be compared across
+  the switch. Runs too old to convert keep their original label.
 - **Run notifications.** A run earns at most one toast, and its title is the
   verdict. A score-threshold pass or miss against the run's previous high
   score headlines whenever the threshold switch is on and a previous high

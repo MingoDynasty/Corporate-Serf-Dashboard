@@ -28,6 +28,18 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Cross-scale sensitivity conversion** — a run recorded on a game's own
+  sensitivity scale, like `0.2 Valorant`, used to plot under that raw number,
+  so it sorted as 0.2 among centimeters and sat at the far left of the Score
+  vs Sensitivity axis instead of beside the 40.8 cm/360 it actually is. Those
+  runs now convert to cm/360 the moment their file is read, using two fields
+  every stats file has carried since 2024, so they group, sort, and earn run
+  notifications like every other run, and the playlist tables' PB cm/360
+  column fills in for them. Sensitivities that one-decimal rounding used to
+  collapse into one group separate correctly. Runs from 2019 to 2021 predate
+  the fields and keep their original label rather than being dropped. (PR
+  #280; design in #277, rulings in #279) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Personal best celebration** — a run that beats a scenario's personal best
   now gets a short burst of confetti and a toast that says so, on whatever page
   is open and for every scenario rather than only the one being watched. The
@@ -69,15 +81,7 @@ sequence.
   Default keep the chart exactly as it was. Nothing else about the chart became
   customizable, which is the point. (PR #241; design in #238) Design rationale
   distilled into [`decision_log.md`](./decision_log.md).
-- **Initial setup flow** — a fresh install now says what it could not set up
-  for itself. The Scenario Performance page carries a small setup card while
-  something has never been asked about: no KovaaK's stats folder was found, or
-  the account that turns leaderboard positions and percentiles on has never
-  been offered. The card links to Settings and nothing else — no wizard, no
-  modal — and the account offer can be skipped, which turns rank lookups off
-  and never asks again. The playlists overview explains its N/A percentile
-  columns in the same words. (PRs #235, #236; design in #231) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
+
 ---
 
 ## Upcoming milestones
@@ -96,14 +100,6 @@ sequence.
   changed string listed up front, and a test that keeps the em dash out for
   good. No new surface, no behavior change. Design in
   [`proposals/app_messaging_consistency_proposal.md`](./proposals/app_messaging_consistency_proposal.md).
-- **Cross-scale sensitivity conversion** — runs recorded under a per-game
-  sensitivity scale (Valorant, Overwatch) plot under their raw number, so an
-  old Valorant run lands at the far left of the Score vs Sensitivity axis
-  instead of beside the cm/360 value it corresponds to. Normalize them to
-  cm/360 at parse time using the conversion fields newer stats files already
-  carry, so they sort and group correctly and the PB cm/360 column fills in;
-  runs too old to carry the fields keep their original label. Design in
-  [`proposals/sensitivity_conversion_proposal.md`](./proposals/sensitivity_conversion_proposal.md).
 
 ---
 
