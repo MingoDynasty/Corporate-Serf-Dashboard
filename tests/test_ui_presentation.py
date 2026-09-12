@@ -10,6 +10,7 @@ from pathlib import Path
 
 import dash
 import dash_mantine_components as dmc
+from dash import dcc
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 # The Journey layout builds a placeholder figure, which resolves the
@@ -110,3 +111,23 @@ def test_field_labels_are_bolded_by_the_class_they_all_share():
     css = CSS_COMMENT.sub("", STYLESHEET.read_text(encoding="utf-8"))
 
     assert set(LABEL_WEIGHT_RULE.findall(css)) == {"InputWrapper"}
+
+
+def test_every_graph_keeps_the_share_to_plotly_cloud_button_off():
+    """plotly.js 4.0.0 flipped ``showSendToCloud`` to true, so a graph left
+    unconfigured offers a "Share chart..." modebar button that uploads the
+    chart to Plotly Cloud. Walking the pages rather than naming two ids is
+    the point: the next graph added is the one that would ship it."""
+    graphs = [
+        component
+        for page in (home.layout(), journey.layout())
+        for component in _walk_components(page)
+        if isinstance(component, dcc.Graph)
+    ]
+
+    assert graphs, "no dcc.Graph found on either page"
+    for graph in graphs:
+        config = getattr(graph, "config", None) or {}
+        assert config.get("showSendToCloud") is False, (
+            f"{getattr(graph, 'id', graph)} would render the Plotly Cloud button"
+        )
