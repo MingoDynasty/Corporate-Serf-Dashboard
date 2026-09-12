@@ -181,10 +181,10 @@ With no KovaaK's username set, the running app makes no network requests on its 
 KovaaK's identify themselves with the app's name, its version, and this repository's address.
 The GitHub, Discord, and **Report a bug** links in the app open in your browser; the app itself
 does not contact those sites. Sharing a chart is per click and never automatic: the toolbar
-button opens a confirmation naming Plotly Cloud before anything is uploaded, and **Download plot
-as a PNG** beside it saves to your PC instead. Without a connection, the launcher starts the
-version you already have, and a leaderboard position shows its cached value or says the lookup
-failed.
+button opens a confirmation naming Plotly Cloud, confirming opens Plotly Cloud in a new browser
+tab, and the chart is handed over only once you are signed in there. **Download plot as a PNG**
+beside it saves to your PC instead. Without a connection, the launcher starts the version you
+already have, and a leaderboard position shows its cached value or says the lookup failed.
 
 ## Troubleshooting
 
