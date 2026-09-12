@@ -210,13 +210,16 @@ folder on a slow disk takes a while. The launcher waits up to 120 seconds. If it
 logs (below).
 
 **A card says "Your settings can't be read", and the Settings page says `settings.json` has no
-`"schema_version"` line.** Installs made before `v2026.08.11.5` wrote their settings without a
-format stamp, and newer versions refuse to guess. Nothing was deleted or changed. Close the
-dashboard, then either add the line `"schema_version": 1` to
-`%LOCALAPPDATA%\CorporateSerfDashboard\data\settings.json` (and to `data\playlist_visibility.json`
-and each file under `data\playlists\`), or run `scripts\stamp_schema_version.py` from the
-installed version folder with its own `.venv\Scripts\python.exe` — the script's header carries
-the exact commands. Then launch again.
+`"schema_version"` line.** Installs made before `v2026.08.11.5` wrote their durable files without
+a format stamp, and newer versions refuse to guess. Nothing was deleted or changed. The release
+ships a converter that stamps all of them in one pass, and its order matters: **copy your `data`
+folder somewhere safe**, close the dashboard, then run `scripts\stamp_schema_version.py` from the
+installed version folder with its own `.venv\Scripts\python.exe` — the script's header carries the
+exact command — and launch again. Seeing this message means the update half of that order has
+already happened. Running it a second time changes nothing. Adding the `"schema_version": 1` line
+by hand is a last resort: it skips the converter's validation and atomic writes, it fixes only
+the file you edit, and the files under `data\playlists\` are machine-written rather than a
+hand-edit surface.
 
 **The browser did not open, or the console says a post-start step failed.** The dashboard is
 running anyway. Open <http://localhost:8050/> yourself — the console's "Dashboard running at"
