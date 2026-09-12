@@ -98,6 +98,12 @@ sequence.
   carry, so they sort and group correctly and the PB cm/360 column fills in;
   runs too old to carry the fields keep their original label. Design in
   [`proposals/sensitivity_conversion_proposal.md`](./proposals/sensitivity_conversion_proposal.md).
+- **Setup hints become notices** — the three plain-text lines that tell the
+  user something is blocking the app (the stats-folder hint on Scenario
+  Performance, its restart-pending twin, and the Settings page's restart
+  notice) take the tint and icon every other notice already has. No wording
+  changes; the Position field's inline hints stay as they are. Design in
+  [`proposals/setup_hints_become_notices_proposal.md`](./proposals/setup_hints_become_notices_proposal.md).
 
 ---
 
