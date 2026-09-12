@@ -36,11 +36,11 @@ def _write_stats_file(
 ) -> None:
     """Write a synthetic stats file in the key-value order KovaaK's uses.
 
-    `Sens Increment:` comes before `Horiz Sens:` and `DPI:` after it, as real
+    ``Sens Increment:`` comes before ``Horiz Sens:`` and ``DPI:`` after it, as real
     post-2024 files have them, so a conversion really has to wait for the
     whole key-value tail instead of running inline on the sensitivity line.
     Omitting both optional fields writes a legacy (2019-2021) file.
-    `extra_line` appends one raw line verbatim, for the malformed shapes a
+    ``extra_line`` appends one raw line verbatim, for the malformed shapes a
     mid-write file has.
     """
     lines = ["Score:,123.45", f"Sens Scale:,{sens_scale}"]
@@ -295,7 +295,7 @@ def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
 def one_decimal_place(monkeypatch):
     """Round sensitivities to one place, the way the shipped config does.
 
-    `example.toml` ships `sens_round_decimal_places = 1`, so one place is what
+    ``example.toml`` ships ``sens_round_decimal_places = 1``, so one place is what
     the axis labels and the PB cm/360 cells really show. The suite-wide config
     fixture uses two, which would hide that rounding here.
     """
@@ -389,7 +389,7 @@ def test_the_conversion_is_derived_from_the_increment_not_the_raw_sensitivity():
 
 
 def test_the_conversion_matches_kovaaks_own_valorant_formula():
-    # `resources/sensitivity converter/response.json` is a capture of
+    # ``resources/sensitivity converter/response.json`` is a capture of
     # kovaaks.com/webapp-backend/game-settings. Pinning the formula string
     # first makes the provenance of the constant part of the assertion.
     capture = json.loads(
@@ -409,7 +409,7 @@ def test_the_conversion_matches_kovaaks_own_valorant_formula():
     assert valorant["Sens"]["IncrementFormula"] == "Sens * 0.06996"
 
     # The capture's own numbers for 0.2 Valorant at 1600 DPI, within the
-    # precision the six-decimal `Sens Increment` field can record.
+    # precision the six-decimal ``Sens Increment`` field can record.
     assert data_service._cm360_from_increment(0.199886, 1600) == pytest.approx(
         2.54 * 360 / (0.2 * 0.06996 * 1600), rel=1e-5
     )
@@ -460,14 +460,14 @@ def test_an_already_normalized_scale_converts_to_the_same_centimeters(
         ("zero-increment", {"sens_increment": "0", "dpi": "1600"}),
         ("malformed-dpi", {"sens_increment": "0.199886", "dpi": "abc"}),
         ("malformed-increment", {"sens_increment": "abc", "dpi": "1600"}),
-        # `float()` accepts these, so "parses as a number" is not the test.
+        # ``float()`` accepts these, so "parses as a number" is not the test.
         # An infinite increment would otherwise convert to 0.0 cm/360 and be
         # stored as if it were a real reading.
         ("infinite-dpi", {"sens_increment": "0.199886", "dpi": "inf"}),
         ("infinite-increment", {"sens_increment": "inf", "dpi": "1600"}),
         ("nan-dpi", {"sens_increment": "0.199886", "dpi": "nan"}),
         ("nan-increment", {"sens_increment": "nan", "dpi": "1600"}),
-        # Finite and positive, but `0.07 * increment * dpi` underflows to zero
+        # Finite and positive, but ``0.07 * increment * dpi`` underflows to zero
         # and the division raises outside the parser's exception handler.
         ("underflowing-increment", {"sens_increment": "5e-324", "dpi": "1600"}),
         ("underflowing-dpi", {"sens_increment": "0.199886", "dpi": "5e-324"}),
@@ -519,8 +519,8 @@ def test_an_unusable_conversion_field_cannot_abort_the_startup_scan(
 ):
     """A run the formula cannot use costs that conversion, not the whole scan.
 
-    `initialize_kovaaks_data` has no guard of its own around
-    `extract_data_from_file`, so an exception raised past the parser's own
+    ``initialize_kovaaks_data`` has no guard of its own around
+    ``extract_data_from_file``, so an exception raised past the parser's own
     handler ends the scan and every run after the bad file is lost, not just
     the one that provoked it.
     """

@@ -64,7 +64,7 @@ POSSIBLE_SUB_CSV_HEADERS = [
 logger = logging.getLogger(__name__)
 
 # Yaw of KovaaK's internal base sensitivity scale (UE4), in degrees per mouse
-# count. Every `Sens Increment` a stats file records is the run's sensitivity
+# count. Every ``Sens Increment`` a stats file records is the run's sensitivity
 # expressed on this scale, whatever per-game scale the run was played on.
 BASE_SCALE_YAW = 0.07
 
@@ -589,12 +589,12 @@ def get_unique_scenarios(_dir: str) -> list:
 
 
 def _cm360_from_increment(increment: float, dpi: float) -> float:
-    """Convert a stats file's own `Sens Increment` and `DPI` into cm/360.
+    """Convert a stats file's own ``Sens Increment`` and ``DPI`` into cm/360.
 
-    `Sens Increment` is the run's sensitivity re-expressed in KovaaK's internal
+    ``Sens Increment`` is the run's sensitivity re-expressed in KovaaK's internal
     base scale, UE4, whose yaw is 0.07 degrees per mouse count. So the run
-    turns `0.07 * increment` degrees per count and `0.07 * increment * dpi`
-    degrees per inch, and a full turn takes `360 / that` inches. The result is
+    turns ``0.07 * increment`` degrees per count and ``0.07 * increment * dpi``
+    degrees per inch, and a full turn takes ``360 / that`` inches. The result is
     unrounded on purpose: callers round it, and the tests assert the exact
     value, which is what separates this from a recomputation out of the raw
     sensitivity with the community yaw constants.
@@ -606,11 +606,11 @@ def _converted_cm360(increment: float, dpi: float) -> float | None:
     """Convert to cm/360, or return None when the inputs cannot produce one.
 
     Finite positive inputs are not enough on their own. An increment small
-    enough that `0.07 * increment * dpi` underflows to zero divides by zero,
+    enough that ``0.07 * increment * dpi`` underflows to zero divides by zero,
     and one large enough that the same product overflows to infinity returns
     0.0 centimeters. Both must cost the conversion only -- never the run, and
     never the startup scan that hit it, which has no guard of its own around
-    `extract_data_from_file`.
+    ``extract_data_from_file``.
     """
     try:
         cm360 = _cm360_from_increment(increment, dpi)
@@ -622,8 +622,8 @@ def _converted_cm360(increment: float, dpi: float) -> float | None:
 def _optional_field_value(line: str) -> str | None:
     """Return an optional key-value line's first value column, or None.
 
-    Never raises: a mid-write `DPI:` with no value column yet must cost the
-    conversion only, where the required fields' own `IndexError` costs the run.
+    Never raises: a mid-write ``DPI:`` with no value column yet must cost the
+    conversion only, where the required fields' own ``IndexError`` costs the run.
     """
     _key, separator, rest = line.partition(",")
     if not separator:
@@ -644,7 +644,7 @@ def _parse_optional_positive(raw_value: str | None) -> float | None:
         value = float(raw_value)
     except ValueError:
         return None
-    # `float()` also accepts "inf" and "nan", which are float-shaped but not
+    # ``float()`` also accepts "inf" and "nan", which are float-shaped but not
     # sensitivities: an infinite increment would convert to 0.0 cm/360 and be
     # stored as a real reading.
     if not math.isfinite(value) or value <= 0:
@@ -710,8 +710,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
             elif line.startswith("Sens Increment:"):
                 raw_sens_increment = _optional_field_value(line)
             elif line.startswith("Horiz Sens:"):
-                # Rounded after the loop, because the converting branch rounds
-                # the cm/360 result instead of this raw number.
+                # Left unrounded here: a converted run rounds its cm/360
+                # result instead, and rounding twice would compound.
                 horizontal_sens = float(line.split(",")[1].strip())
             elif line.startswith("DPI:"):
                 raw_dpi = _optional_field_value(line)
@@ -740,9 +740,9 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
         logger.warning("Missing data from file: %s", full_file_path)
         return None
 
-    # Normalization runs here, not inline above: `DPI:` follows `Horiz Sens:`
-    # in the file, so the converting inputs are only complete once the whole
-    # key-value tail has been read.
+    # Converting needs the whole key-value tail, not just the sensitivity
+    # line: ``DPI:`` follows ``Horiz Sens:`` in the file, so the second input
+    # is still unread when the first one arrives.
     sens_increment = _parse_optional_positive(raw_sens_increment)
     dpi = _parse_optional_positive(raw_dpi)
     converted_cm360 = (
