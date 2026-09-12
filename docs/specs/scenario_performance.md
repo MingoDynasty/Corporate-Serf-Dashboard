@@ -64,9 +64,11 @@ of scope here.
   200px floor before the row wraps
   ([2026-08-03](../decision_log.md#2026-08-03-homes-controls-row-measures-the-content-area-not-the-window)).
 - The scenario list comes from the selected playlist when one is chosen, and
-  otherwise from the stats directory's CSV files; without a usable stats
-  directory that local fallback is empty, while a selected playlist still
-  lists its scenarios.
+  otherwise from the scenarios with at least one run loaded from the stats
+  directory, named by each file's own `Scenario:` field
+  ([2026-09-12](../decision_log.md#2026-09-12-the-local-scenario-list-comes-from-the-run-store));
+  without a usable stats directory that local fallback is empty, while a
+  selected playlist still lists its scenarios.
 
 ## The graph
 
