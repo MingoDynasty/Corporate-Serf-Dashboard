@@ -687,8 +687,10 @@ separate child.
     \`code\` field.` → `The playlist file has no playlist code. Add a "code"
     field to it. File: {file}`
   - `Skipping playlist file {file}: playlist code {code} already loaded from
-    {source}.` → `Skipped the playlist file {file}. Its playlist code {code}
-    is already loaded from {source}.`
+    {source}.` → `Skipped a duplicate playlist file. Its playlist code {code}
+    is already loaded from another file. Skipped file: {file} · Loaded
+    file: {source}` (both values are full paths, so both follow the
+    diagnosis as labeled readouts, chained with the rule-2 separator)
   - `Skipping playlist file: {store message}` → `{store message}` (the store
     message is a full sentence that names the file by kind and ends with
     its path; see the store messages group). Two of the fragments composed
@@ -788,7 +790,8 @@ separate child.
     `The playlist code {code} isn't one you imported, so it can't be
     deleted.` (D6, D7)
   - `Failed to delete playlist file: {path}` → `Couldn't delete the playlist
-    file {path}. See data/logs/debug.log.` (D7 names the value)
+    file. See data/logs/debug.log. File: {path}` (D7: the log pointer is
+    supplemental text, so the path follows it as a readout)
 
 **Playlist scenario table**
 
@@ -885,12 +888,12 @@ other kinds substitute their noun.)
   The file is intact. Update the app to use it.` → `The settings file was
   written by a newer version of this app (schema_version {n}). It is
   intact. Update the app to use it. File: {path}`
-- `{path} is not valid JSON.` → `The settings file isn't valid JSON. The
-  file is {path}.`
+- `{path} is not valid JSON.` → `The settings file isn't valid JSON. File:
+  {path}`
 - `{path} must hold a JSON object.` → `The settings file must hold a JSON
   object. File: {path}`
 - `{path} could not be read. See data/logs/debug.log.` → `Couldn't read the
-  settings file {path}. See data/logs/debug.log.`
+  settings file. See data/logs/debug.log. File: {path}`
 - The composed form for a validator's refusal, `{path} {fragment}` → `The
   settings file {fragment} File: {path}` The settings and visibility
   fragments (`has an unknown setting "X".`, `must hold text values for every
