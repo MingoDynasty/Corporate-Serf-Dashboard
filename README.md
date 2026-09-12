@@ -159,8 +159,8 @@ Remove-Item "$env:TEMP\csd-install-*.ps1"
 ## What it talks to
 
 The dashboard does not collect or send usage or crash analytics. Your runs, settings, and
-caches stay on your PC. These are the outside services it reaches, and what makes it reach
-them:
+caches stay on your PC unless you share a chart yourself. These are the outside services it
+reaches, and what makes it reach them:
 
 | When | What | Service |
 |---|---|---|
@@ -169,6 +169,7 @@ them:
 | Installing or updating | Asks which release is the latest, unless the installer was handed a tag; downloads the release zip, and, when they are not already present, uv, a Python build, and the app's packages | GitHub, Astral, PyPI |
 | While running, only with a KovaaK's username set | Looks up your leaderboard position, percentile, and the player total; slowly fills the playlist percentile cache in the background (`percentile_warmup_enabled` in `config.toml` turns that off) | KovaaK's |
 | You click **Detect my accounts** (Settings) or **Import** (Playlists) | Checks the Steam accounts on this machine against KovaaK's; fetches a playlist by share code, asking Evxl when KovaaK's has no record of it | KovaaK's, Evxl |
+| You click **Share chart...** on a chart's toolbar and confirm | Uploads that chart, including the run data drawn in it, to create a sharing link | Plotly |
 
 Services, not a firewall allowlist. A request that starts at a name like `github.com`,
 `astral.sh`, or `pypi.org` is handed on to whatever delivery host that service uses, and those
@@ -179,8 +180,11 @@ updates working.
 With no KovaaK's username set, the running app makes no network requests on its own. Requests to
 KovaaK's identify themselves with the app's name, its version, and this repository's address.
 The GitHub, Discord, and **Report a bug** links in the app open in your browser; the app itself
-does not contact those sites. Without a connection, the launcher starts the version you already
-have, and a leaderboard position shows its cached value or says the lookup failed.
+does not contact those sites. Sharing a chart is per click and never automatic: the toolbar
+button opens a confirmation naming Plotly Cloud before anything is uploaded, and **Download plot
+as a PNG** beside it saves to your PC instead. Without a connection, the launcher starts the
+version you already have, and a leaderboard position shows its cached value or says the lookup
+failed.
 
 ## Troubleshooting
 

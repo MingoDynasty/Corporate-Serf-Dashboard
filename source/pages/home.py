@@ -2197,13 +2197,6 @@ def layout(
                         dcc.Graph(
                             id="graph-content",
                             figure=generate_placeholder_plot().to_plotly_json(),
-                            # plotly.js 4.0.0 changed the
-                            # ``showSendToCloud`` default to true, which adds
-                            # a "Share chart..." modebar button that uploads
-                            # the rendered chart to Plotly Cloud. The app
-                            # reaches no service the README does not name, so
-                            # it stays off.
-                            config={"showSendToCloud": False},
                             className="home-graph",
                             # Redraw the plot whenever the flex container
                             # resizes, not just on window resize.
