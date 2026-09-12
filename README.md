@@ -163,9 +163,9 @@ caches stay on your PC. This is every network connection the app or its launcher
 
 | When | What | Where |
 |---|---|---|
-| You run the install one-liner | Fetches `get.ps1`, then the release's own `install.ps1` | `raw.githubusercontent.com` |
+| You run the install one-liner | Fetches `get.ps1`, asks which release is the latest, then fetches that release's own `install.ps1` | `raw.githubusercontent.com`, `api.github.com` |
 | Every launch from the shortcut, unless the install is pinned | Asks whether a newer release exists | `api.github.com` |
-| Installing or updating | Downloads the release zip, and, when they are not already present, uv, a Python build, and the app's packages | `github.com`, `astral.sh`, `pypi.org`, `files.pythonhosted.org` |
+| Installing or updating | Asks which release is the latest, unless the installer was handed a tag; downloads the release zip, and, when they are not already present, uv, a Python build, and the app's packages | `api.github.com`, `github.com`, `astral.sh`, `pypi.org`, `files.pythonhosted.org` |
 | While running, only with a KovaaK's username set | Looks up your leaderboard position, percentile, and the player total; slowly fills the playlist percentile cache in the background (`percentile_warmup_enabled` in `config.toml` turns that off) | `kovaaks.com` |
 | You click **Detect my accounts** (Settings) or **Import** (Playlists) | Checks the Steam accounts on this machine against KovaaK's; fetches a playlist by share code, asking Evxl when KovaaK's has no record of it | `kovaaks.com`, `api.evxl.app` |
 
