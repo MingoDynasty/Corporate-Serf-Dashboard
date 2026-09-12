@@ -261,6 +261,42 @@ in the same PR — do not leave it for later:
 
 - Prefer simple production APIs that reflect the app's real behavior. Do not add parameters, classes, or abstractions only for tests. Tests should usually adapt with fixtures, monkeypatching, or small fakes. Add explicit test seams only when they also improve the production design, or when testing would otherwise require brittle, slow, or unreliable workarounds.
 
+## Comment and Docstring Conventions
+
+These rules govern new and edited comments and docstrings. Existing ones are
+not swept to match; bring one into line when a change touches it anyway.
+
+- A comment earns its place by saying what the code cannot: the failure it
+  prevents, the alternative that looks right and is not, or the external
+  fact (an API quirk, a library behavior) it depends on. Do not narrate
+  what the code does.
+- Keep the failure-preventing reason beside the code it protects, even when
+  fuller rationale exists elsewhere: a bare pointer hides the constraint
+  from the edit that would break it. What moves one layer up, with a link
+  beside the code, is the evidence, the investigation, and the trade-off
+  history, and only into a document whose scope already fits (durable
+  decisions in `docs/decision_log.md`, endpoint behavior in
+  `docs/kovaaks_api_notes.md`). Length is not a reason to relocate;
+  shorten instead.
+- Write for the next maintainer, not the reviewer who asked. A comment that
+  only makes sense as the reply to a review question belongs in the PR
+  thread, which already holds it.
+- Avoid what rots: relative positions ("above", "below"), counts of things
+  in the tree (call sites, fields, neighbors), and the names of neighboring
+  functions unless the comment is about them. A measured external fact
+  stays, with its source or date. A change in behavior updates the comments
+  that describe it, in the same commit.
+- Docstrings open with a one-line summary: imperative for functions and
+  methods, descriptive for classes and modules. Contract text the signature
+  cannot carry (units, side effects, failure behavior, lifecycle, merge
+  rules) follows as prose or a short list, as long as it needs to be. No
+  Args/Returns/Raises sections. Identifiers in docstrings and comments take
+  two backticks on each side, reStructuredText style.
+- Lint suppressions stay narrow and name the reason when the rule code does
+  not say it. A blind-except suppression always names what the catch
+  protects.
+- A TODO names a concrete unresolved problem, not a wish.
+
 ## Styling Conventions
 
 - New user-facing copy avoids em dashes; use short sentences instead. Copy
