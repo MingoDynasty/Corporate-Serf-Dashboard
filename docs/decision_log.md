@@ -2037,11 +2037,15 @@ whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
 `assets/icons/README.md`. `assets/` is in the release archive contract, so
 those notices travel inside every published zip and have to be preserved on
 redistribution. Vendoring anything new means confirming its license and
-recording it the same way.
+recording it the same way. `resources/` ships under the same contract but is
+imported data, not vendored code: the benchmark library, a snapshot of Evxl's
+benchmark index, and a KovaaK's game-settings response. No license is recorded
+for any of it, and this entry does not settle whether one should be.
 
 **Why this license.** The priority is that derivatives stay free and open
 source. AGPL binds anyone who conveys a modified version, or offers one to
-users over a network, to publish that version's source under the same terms.
+users over a network, to make that version's source available to those
+recipients or users under the same terms.
 
 **Why no CLA.** At this scale the friction a CLA puts in front of a first-time
 contributor costs more than the flexibility it buys. What it would have bought
