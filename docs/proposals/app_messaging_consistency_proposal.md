@@ -348,6 +348,15 @@ all three join the Copy block. The toast id-to-channel migration (the
 2026-08-31 replace-in-place entry) changed no user-facing strings. The
 counts below are restated for `1878659`.
 
+Re-verified against `5be84bf` (main, 2026-09-11) after the hydration write
+fix, the launcher browser knob, the comment and docstring conventions, and
+the cm/360 sensitivity proposal merged. None of them changed a user-facing
+string: the source diff touches typing, the leaderboard-ID upsert, the
+launcher, and the stopwatch, and the three decision-log entries added quote
+no app copy. The counts below still hold at `5be84bf`. One placement
+change: main now keeps proposals under `docs/proposals/`, so this file moved
+there with the merge.
+
 The same condition, four shapes, is the seed symptom:
 
 | Surface | Current text |
