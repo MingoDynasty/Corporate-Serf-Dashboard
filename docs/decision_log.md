@@ -39,8 +39,11 @@ once the whole tail has been read. A run already on the cm/360 scale keeps
 its recorded value untouched. A run missing either field, or carrying one the
 conversion cannot use, keeps its original value and scale. "Cannot use" is
 wider than "not a number": empty, zero, and negative, but also the non-finite
-values `float()` accepts (`inf`, `nan`), and magnitudes that make
-`0.07 x increment x DPI` underflow to zero or overflow to infinity. Neither
+values `float()` accepts (`inf`, `nan`), magnitudes that make
+`0.07 x increment x DPI` underflow to zero or overflow to infinity, and a
+conversion that rounds away to zero at the configured precision. The rounding
+happens inside the same guard that validates, so the value checked is the
+value stored and no gap between them can record a false `0.0 cm/360`. Neither
 field joins the parser's required-field check: legacy files lack them and
 must still load, and an unusable value costs the conversion, never the run --
 and never the startup scan, which has no guard of its own around the parser.

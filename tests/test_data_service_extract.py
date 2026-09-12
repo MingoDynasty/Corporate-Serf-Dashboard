@@ -473,6 +473,10 @@ def test_an_already_normalized_scale_converts_to_the_same_centimeters(
         ("underflowing-dpi", {"sens_increment": "0.199886", "dpi": "5e-324"}),
         # The same product overflowing the other way returns 0.0 centimeters.
         ("overflowing-increment", {"sens_increment": "1e308", "dpi": "1e308"}),
+        # Finite, positive, and convertible, but 0.0130 cm rounds away at the
+        # shipped one decimal place. Storing that would invent a 0.0 cm/360
+        # group rather than keep the run's recorded sensitivity.
+        ("rounds-to-zero", {"sens_increment": "1000", "dpi": "1000"}),
     ],
 )
 def test_an_unusable_conversion_field_costs_the_conversion_not_the_run(
@@ -557,10 +561,15 @@ def test_an_unusable_conversion_field_cannot_abort_the_startup_scan(
 
 def test_the_guarded_conversion_reports_unusable_inputs_as_none():
     # The pure helper still divides; the guard is what turns an arithmetic
-    # failure into "no conversion available".
-    assert data_service._converted_cm360(0.199886, 1600) == pytest.approx(40.8447)
-    assert data_service._converted_cm360(5e-324, 1600) is None
-    assert data_service._converted_cm360(1e308, 1e308) is None
+    # failure, or a result that cannot be stored, into "no conversion".
+    assert data_service._converted_cm360(0.199886, 1600, 1) == 40.8
+    assert data_service._converted_cm360(5e-324, 1600, 1) is None
+    assert data_service._converted_cm360(1e308, 1e308, 1) is None
+    # Rounds inside the guard, so a result that rounds away is rejected rather
+    # than stored as a real 0.0 cm/360 reading.
+    assert data_service._converted_cm360(1000, 1000, 1) is None
+    # The same inputs are usable at a precision that can represent them.
+    assert data_service._converted_cm360(1000, 1000, 3) == 0.013
 
 
 @pytest.mark.parametrize("raw_value", ["inf", "-inf", "nan", "0", "-1", "abc", ""])

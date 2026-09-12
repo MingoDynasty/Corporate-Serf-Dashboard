@@ -602,18 +602,28 @@ def _cm360_from_increment(increment: float, dpi: float) -> float:
     return 360 * 2.54 / (BASE_SCALE_YAW * increment * dpi)
 
 
-def _converted_cm360(increment: float, dpi: float) -> float | None:
-    """Convert to cm/360, or return None when the inputs cannot produce one.
+def _converted_cm360(
+    increment: float,
+    dpi: float,
+    decimal_places: int,
+) -> float | None:
+    """Return the cm/360 to store, or None when the inputs cannot produce one.
+
+    Rounds here rather than leaving it to the caller, so the value this
+    validates is the value that gets stored. Validating the unrounded result
+    and rounding afterwards leaves a gap: a conversion of 0.013 cm passes a
+    positive check and then rounds to 0.0, which would be recorded as a real
+    sensitivity group.
 
     Finite positive inputs are not enough on their own. An increment small
     enough that ``0.07 * increment * dpi`` underflows to zero divides by zero,
     and one large enough that the same product overflows to infinity returns
-    0.0 centimeters. Both must cost the conversion only -- never the run, and
-    never the startup scan that hit it, which has no guard of its own around
-    ``extract_data_from_file``.
+    0.0 centimeters. Every such case must cost the conversion only -- never the
+    run, and never the startup scan that hit it, which has no guard of its own
+    around ``extract_data_from_file``.
     """
     try:
-        cm360 = _cm360_from_increment(increment, dpi)
+        cm360 = round(_cm360_from_increment(increment, dpi), decimal_places)
     except ZeroDivisionError:
         return None
     return cm360 if math.isfinite(cm360) and cm360 > 0 else None
@@ -746,17 +756,18 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     sens_increment = _parse_optional_positive(raw_sens_increment)
     dpi = _parse_optional_positive(raw_dpi)
     converted_cm360 = (
-        _converted_cm360(sens_increment, dpi)
+        _converted_cm360(
+            sens_increment,
+            dpi,
+            get_config().sens_round_decimal_places,
+        )
         if sens_scale != "cm/360" and sens_increment is not None and dpi is not None
         else None
     )
     if converted_cm360 is not None:
         # A run recorded on a game's own scale converts exactly, so it joins the
         # cm/360 axis instead of sorting by a number from another scale.
-        horizontal_sens = round(
-            converted_cm360,
-            get_config().sens_round_decimal_places,
-        )
+        horizontal_sens = converted_cm360
         sens_scale = "cm/360"
     else:
         # Already cm/360, or too old to carry both fields: keep the recorded
