@@ -367,8 +367,7 @@ def get_sensitivities_vs_runs_filtered(
     :param top_n_scores: the number of top scores to filter by.
     :param oldest_date: oldest date to filter by (inclusive).
     """
-    # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
-    #  Besides, this logic might get blown away if/when we migrate to SQLite.
+    # This logic might get blown away if/when we migrate to SQLite.
     filtered_data: dict[str, list[RunData]] = {}
     for key, runs_data in kovaaks_database[scenario_name][
         "sensitivities_vs_runs"
@@ -395,8 +394,7 @@ def get_time_vs_runs(
     oldest_date: datetime,
 ) -> dict[date, list[RunData]]:
     """Group a scenario's top runs by date within the selected time range."""
-    # TODO: dictionary comprehension is technically Pythonic, but I'm too lazy to figure out the optimal syntax.
-    #  Besides, this logic might get blown away if/when we migrate to SQLite.
+    # This logic might get blown away if/when we migrate to SQLite.
 
     # 1. Build a dictionary with <Date, [RunData]>
     data: dict[date, list[RunData]] = {}
