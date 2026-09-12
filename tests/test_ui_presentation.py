@@ -114,10 +114,13 @@ def test_field_labels_are_bolded_by_the_class_they_all_share():
 
 
 def test_every_graph_keeps_the_share_to_plotly_cloud_button_off():
-    """plotly.js 4.0.0 flipped ``showSendToCloud`` to true, so a graph left
-    unconfigured offers a "Share chart..." modebar button that uploads the
-    chart to Plotly Cloud. Walking the pages rather than naming two ids is
-    the point: the next graph added is the one that would ship it."""
+    """Keep the Plotly Cloud share button off every chart in the app.
+
+    plotly.js 4.0.0 changed the ``showSendToCloud`` default to true, so a
+    graph left unconfigured offers a "Share chart..." modebar button that
+    uploads the chart to Plotly Cloud. Walking the pages rather than naming
+    two ids is the point: the next graph added is the one that would ship it.
+    """
     graphs = [
         component
         for page in (home.layout(), journey.layout())

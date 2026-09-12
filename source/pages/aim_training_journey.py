@@ -160,10 +160,10 @@ def layout(**kwargs):  # noqa: ARG001
             dcc.Graph(
                 id="aim-training-journey-graph",
                 figure=generate_placeholder_plot(),
-                # plotly.js 4.0.0 flipped showSendToCloud's default to true,
-                # which adds a "Share chart..." modebar button that uploads
-                # the rendered chart to Plotly Cloud. The app reaches no
-                # service the README does not name, so it stays off.
+                # plotly.js 4.0.0 changed the ``showSendToCloud`` default to
+                # true, which adds a "Share chart..." modebar button that
+                # uploads the rendered chart to Plotly Cloud. The app reaches
+                # no service the README does not name, so it stays off.
                 config={"showSendToCloud": False},
                 style={"height": "80vh"},
             ),
