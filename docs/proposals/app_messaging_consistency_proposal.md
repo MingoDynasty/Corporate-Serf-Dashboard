@@ -292,37 +292,38 @@ path never opens a sentence, and a noun names it before it appears
 (`Couldn't read the playlist file {file}.`, `The playlist code {code} is
 already imported as "{name}".`). A count or a score may lead. A
 one-sentence failure carries its full path inline at the end, which the
-Windows guide allows when the message needs no supplemental text. A
-message with more to say, a fix or a second clause, names the file by its
-kind, says what is wrong, and gives the full path last as a labeled
-readout: `The settings file has no "schema_version" line. Add
+Windows guide allows when the message needs no supplemental text. If any
+sentence follows the one that would carry the path, the message names the
+file by its kind, says what is wrong, and gives the full path last as a
+labeled readout: `The settings file has no "schema_version" line. Add
 "schema_version": 1 to it, or delete the file to start over. File: {path}`.
 The label is the single-string form of the Windows supplemental line: the
-diagnosis is a complete sentence before it, the label tags the value's
-role so its edges are visible, and no period follows a path. It is not the
-log idiom rule 8 keeps off the screen, where the diagnosis itself sits
-behind the colon. User-typed free text keeps its quotes under rule 6.
+diagnosis is a complete sentence before it, and the label marks where the
+value starts so its edges are visible. It is not the log idiom rule 8 keeps
+off the screen, where the diagnosis itself sits behind the colon.
+User-typed free text keeps its quotes under rule 6.
 
 Consequence: ten Copy entries restructure (the five startup playlist
 warnings, the store-message pass-through, the duplicate-import refusal, the
 newer-version save refusal, the not-yours delete refusal, and the delete
 failure), and the store messages join the sweep instead of standing as
-unchanged. Every store message names its file by kind, so the store layer's
-`decode_store_document` and `read_store_document` take the kind as a
-parameter ("settings file", "playlist visibility file", "playlist file"),
-threaded from their three callers; the fragments the validators raise are
-unchanged and now follow the kind noun. The 2026-08-11 schema entry's quoted
-messages get a "superseded in part, for copy" note; the stamp script prints
-the same messages to its console and follows along, because it calls the
-same function.
+unchanged. Every store message names its file by kind, so
+`read_store_document` takes the kind as a parameter ("settings file",
+"playlist visibility file", "playlist file"), supplied at its four call
+sites in three services, and hands it to `decode_store_document`, whose only
+caller it is. The settings and visibility fragments the validators raise
+are unchanged and now follow the kind noun; the two playlist fragments
+change as the startup warnings list. The stamp script shares only the
+validators with the store layer and composes its own console lines, so its
+output changes only where a playlist fragment changes.
 
 Choosing differently: the first draft's absolute rule, which would rewrite
 the count-led toasts ("The app couldn't process 3 new run files.") for no
 gain in clarity; exempting the store messages as the named exception, which
-keeps the Settings page's store alert and the stamp script's console output
-byte-identical at the cost of one message family that opens with a Windows
-path; or writing the supplemental path as a sentence (`The file is
-{path}.`), which reads stilted and ends a path with a period. A true second
+keeps the Settings and Playlists store alerts byte-identical at the cost of
+one message family that opens with a Windows path; or writing the
+supplemental path as a sentence (`The file is {path}.`), which reads
+stilted and buries the value's start in prose. A true second
 line for the path in the alert and toast components would be closer still
 to the Windows layout; it is a component change rather than copy, and the
 labeled readout degrades into it without changing a word.
@@ -536,16 +537,19 @@ time, replacing the current one-line em-dash convention.
    data/logs/debug.log.`
 8. **A message that reaches the screen is user copy wherever it is built.**
    Service-layer strings that a page shows verbatim follow every rule above;
-   the diagnostic detail stays in the log line beside them.
+   the diagnostic detail stays in the log line beside them. An accessible
+   name (`aria-label`) reaches the user through a screen reader and counts
+   too.
 9. **Error copy says what happened first, then what to do when there is
    something to do.** A failure with no useful recovery step says only what
    happened and does not invent one (`Couldn't read the playlist file
    {file}.`, `The settings file isn't valid JSON. File: {path}`). An object
    name or a path never opens a sentence: a noun names it before it appears,
    and a count or a score may lead. A one-sentence failure carries its full
-   path inline at the end; a message with more to say names the file by kind
-   and gives the path last as the labeled readout `File: {path}` (D7). The
-   toast title carries the verdict (unchanged from 2026-08-03).
+   path inline at the end; if any sentence follows the one that would carry
+   the path, the message names the file by kind and gives the path last as
+   the labeled readout `File: {path}` (D7). The toast title carries the
+   verdict (unchanged from 2026-08-03).
 
 Basis. Rules 1, 2, 4, and 8, the structure half of rule 9, the sentence-case
 half of rule 3, and D1 to D3 match the Microsoft Writing Style Guide, the
@@ -584,12 +588,13 @@ separate child.
   read your runs yet. Set it in Settings.` (rule 7; the contraction stays
   under D6)
 - Setup card fine print *(ratified 2026-08-11)*: `Skipping username disables
-  rank lookups. You can set it anytime in Settings.` → `Skipping keeps rank
-  lookups off. You can add your username anytime in Settings.` "Skipping
-  username" drops its article and reads clipped, and "set it" has nothing to
-  refer to; "keeps rank lookups off" is the on/off state idiom rule 7 adopts
-  and the phrase the username field's own description already uses (rule 7,
-  one vocabulary).
+  rank lookups. You can set it anytime in Settings.` → `Skipping keeps
+  position lookups off. You can add your username anytime in Settings.`
+  "Skipping username" drops its article and reads clipped, and "set it" has
+  nothing to refer to; "keeps … off" is the on/off state idiom rule 7
+  adopts; and "position" is rule 7's word for leaderboard placement, since
+  the 2026-07-06 entry keeps *Rank* for the benchmark tier, which the shipped
+  line and the username field's description both got wrong.
 - Setup card, unreadable-store body: `A settings file exists, but this
   version of the app can't use it, so the dashboard started without your
   settings. Open Settings to see what's wrong and how to fix it.` → `A
@@ -832,6 +837,11 @@ separate child.
   unchanged)
 - Store alert title: `Your saved settings are not being used` → `Your saved
   settings aren't being used` (D6)
+- Username description: `Your KovaaK's account name, used to look up your
+  leaderboard rank. Leave it empty to turn rank lookups off.` → `Your
+  KovaaK's account name, used to look up your leaderboard position. Leave it
+  empty to turn position lookups off.` (rule 7: *Rank* is the benchmark
+  tier, and "leaderboard position" is the run toast's own phrase)
 - Steam ID error: `Enter a 17-digit SteamID64 — it starts with 7656119.` →
   `Enter a 17-digit SteamID64. It starts with 7656119.`
 - Steam ID description: `Your 17-digit SteamID64. Optional; it disambiguates
@@ -869,6 +879,17 @@ separate child.
   Checkpoint Hour value to plot progress.` → `Set a checkpoint hour to plot
   progress.`
 
+**App header** (in `app_shell.py`; the tooltip and the two accessible names
+a screen reader announces are copy under rule 8)
+
+- Theme switch tooltip: `Toggle light and dark theme` → `Change theme`
+  (rule 7: *toggle* is never a verb)
+- Theme switch accessible name: `Toggle color scheme` → `Change theme`
+- Navigation button accessible name: `Toggle navigation` → `Navigation
+  menu` (the common accessible name for a menu button: it says what the
+  control is, and the open or closed state is the control's own to
+  announce)
+
 **Store messages** (built in `store_schema.py` for the settings,
 visibility, and playlist stores; shown in the Settings and Playlists store
 alerts and under "Playlist not loaded". Under D7 each message names the
@@ -900,8 +921,9 @@ other kinds substitute their noun.)
   setting.`, `has an unknown key "X".`, `is missing "shown_playlists".`,
   `must hold "shown_playlists" as a list of text codes.`) are unchanged; the
   two playlist fragments are listed under the startup warnings above. The
-  stamp script prints the same messages to its console and follows along,
-  because it calls the same function.
+  stamp script shares only the validators with the store layer and composes
+  its own console lines, so its output changes only where a playlist
+  fragment changes.
 
 
 **Unchanged on purpose**
@@ -921,7 +943,7 @@ other kinds substitute their noun.)
 - The unreadable-store card's title, `Your settings can't be read`, and the
   Skip-refused toast body: correct as they stand under D6.
 - The Settings version section, the bug-report link, the navbar, and the
-  header tooltips.
+  app header's Discord and GitHub tooltips.
 - The launcher's and installer's console output, which the 2026-08-21
   launcher entry governs, and every `logging` line: neither is app copy.
   Log lines keep their full forms; D6's never-mix clause governs what the
@@ -930,7 +952,7 @@ other kinds substitute their noun.)
 ### Testing the rule, not just the strings
 
 Most of these strings are module-level constants, but the riskiest ones (run
-verdicts, backlog digests, fill statuses, the import refusals) are built
+verdicts, fill statuses, the import refusals) are built
 inline in f-strings, which a constant-list check would miss. The guard should
 therefore walk the AST: for every module under `source/`, visit every
 `ast.Constant` whose value is a `str` (f-string literal parts arrive as
@@ -939,7 +961,7 @@ docstrings (the first statement of a module, class, or function body), and
 fail on any `—` outside an explicit allowlist holding the one ratified glyph
 site. Comments never reach the AST, so the check cannot misfire on them.
 
-The guard covers the em dash only. Walking `source/` this way at `1878659`
+The guard covers the em dash only. Walking `source/` this way at `7eecae3`
 finds 21 non-docstring string constants containing `—` (22 occurrences; the
 Top N help text has two): the 20 Copy-block sites and the allowlisted glyph,
 and no log line or other non-UI string, so
@@ -1013,10 +1035,10 @@ the screen, and log lines are outside it.
    commit carries the full shipping checklist: the decision-log entry with
    the rules and their rationale, "superseded in part, for copy" notes on the
    2026-08-03, 2026-08-09, 2026-08-11, 2026-08-21, 2026-08-22, and
-   2026-09-02 entries whose quoted strings change (both 2026-08-11 entries,
-   the setup card and the schema stamp whose store messages D7 reshapes; the
-   celebration entry quotes the Run Notifications control name), the
-   `tech_debt.md` edit for the refresh-toast title, a
+   2026-09-02 entries whose quoted strings change (the 2026-08-11 setup-card
+   entry quotes the fine print, and the celebration entry quotes the Run
+   Notifications control name), the `tech_debt.md` edit for the refresh-toast
+   title, a
    `product.md` line, the roadmap milestone moved to Shipped, and the
    deletion of this file. The current-behavior docs that quote changed
    strings are updated in the same commit, because a spec that names the
@@ -1034,8 +1056,9 @@ the screen, and log lines are outside it.
    names D2 renames, the toast bodies, and the setup card's unreadable-store
    body, stats-folder body, and fine print), and `notifications.md` (the
    control names D2 renames, the toast bodies, and the Skip-refused title) —
-   plus `docs/product.md` (the unset-username status, the refresh toast, and
-   the Run Notifications control name), `docs/architecture.md` and
+   plus `docs/product.md` (the unset-username status, the refresh toast, the
+   Run Notifications control name, and two "rank lookups" paraphrases a
+   string search will miss), `docs/architecture.md` and
    `docs/roadmap.md` (the control names D2 renames), and the README wherever
    the same `rg` finds a changed string. No new capability spec is created:
    app copy as a whole has no spec, and the strings that do live in one live
