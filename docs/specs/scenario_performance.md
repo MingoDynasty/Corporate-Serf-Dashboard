@@ -6,9 +6,10 @@ playlist rank thresholds available as overlay lines. A collapsible Chart
 options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
 reaches the chart automatically once its file is imported, and the page can
-follow the scenario just played. The page also hosts the setup surfaces that
-point you at Settings, whether something has never been set or saved settings
-cannot be read.
+follow the scenario just played. Older runs recorded on a game's own
+sensitivity scale sit on the same cm/360 axis as everything else. The page
+also hosts the setup surfaces that point you at Settings, whether something
+has never been set or saved settings cannot be read.
 
 Statements below describe what the app does today and link the
 [decision log](../decision_log.md) entries that set them — rationale lives in
@@ -75,6 +76,14 @@ of scope here.
   scores are kept per sensitivity, or per day in Score vs Time. The date
   range is inclusive of the selected date; the plot title reads
   `{scenario} (updated: {timestamp})`.
+- A run recorded under a game's own sensitivity scale is normalized to cm/360
+  when its file is parsed, from the file's own `Sens Increment` and `DPI`
+  fields, by `cm/360 = 360 x 2.54 / (0.07 x increment x DPI)` rounded to
+  `sens_round_decimal_places`; a run whose file lacks either field, or carries
+  one the conversion cannot use, keeps its recorded value and scale. Every consumer reads the normalized fields, so the
+  normalized sensitivity-and-scale group is the unit for grouping, for run
+  placement, and for first-sensitivity detection
+  ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
 - Point hover shows the run's timestamp with seconds kept — the one surface
   that keeps them, cross-referencing KovaaK's second-stamped CSV filenames —
   plus score, the x value, and accuracy

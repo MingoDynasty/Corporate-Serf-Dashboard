@@ -4,6 +4,7 @@ Provides business logic for managing Kovaaks data.
 
 import json
 import logging
+import math
 import os
 import re
 import threading
@@ -61,6 +62,11 @@ POSSIBLE_SUB_CSV_HEADERS = [
     "ADS Sens,ADS Zoom Scale",
 ]
 logger = logging.getLogger(__name__)
+
+# Yaw of KovaaK's internal base sensitivity scale (UE4), in degrees per mouse
+# count. Every ``Sens Increment`` a stats file records is the run's sensitivity
+# expressed on this scale, whatever per-game scale the run was played on.
+BASE_SCALE_YAW = 0.07
 
 # Deliberately unsynchronized: after startup the watchdog thread is the only
 # writer, and raced reads self-heal on re-render (the home page's polling
@@ -582,7 +588,81 @@ def get_unique_scenarios(_dir: str) -> list:
     return sorted(unique_scenarios)
 
 
-def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912
+def _cm360_from_increment(increment: float, dpi: float) -> float:
+    """Convert a stats file's own ``Sens Increment`` and ``DPI`` into cm/360.
+
+    ``Sens Increment`` is the run's sensitivity re-expressed in KovaaK's internal
+    base scale, UE4, whose yaw is 0.07 degrees per mouse count. So the run
+    turns ``0.07 * increment`` degrees per count and ``0.07 * increment * dpi``
+    degrees per inch, and a full turn takes ``360 / that`` inches. The result is
+    unrounded on purpose: callers round it, and the tests assert the exact
+    value, which is what separates this from a recomputation out of the raw
+    sensitivity with the community yaw constants.
+    """
+    return 360 * 2.54 / (BASE_SCALE_YAW * increment * dpi)
+
+
+def _converted_cm360(
+    increment: float,
+    dpi: float,
+    decimal_places: int,
+) -> float | None:
+    """Return the cm/360 to store, or None when the inputs cannot produce one.
+
+    Rounds here rather than leaving it to the caller, so the value this
+    validates is the value that gets stored. Validating the unrounded result
+    and rounding afterwards leaves a gap: a conversion of 0.013 cm passes a
+    positive check and then rounds to 0.0, which would be recorded as a real
+    sensitivity group.
+
+    Finite positive inputs are not enough on their own. An increment small
+    enough that ``0.07 * increment * dpi`` underflows to zero divides by zero,
+    and one large enough that the same product overflows to infinity returns
+    0.0 centimeters. Every such case must cost the conversion only -- never the
+    run, and never the startup scan that hit it, which has no guard of its own
+    around ``extract_data_from_file``.
+    """
+    try:
+        cm360 = round(_cm360_from_increment(increment, dpi), decimal_places)
+    except ZeroDivisionError:
+        return None
+    return cm360 if math.isfinite(cm360) and cm360 > 0 else None
+
+
+def _optional_field_value(line: str) -> str | None:
+    """Return an optional key-value line's first value column, or None.
+
+    Never raises: a mid-write ``DPI:`` with no value column yet must cost the
+    conversion only, where the required fields' own ``IndexError`` costs the run.
+    """
+    _key, separator, rest = line.partition(",")
+    if not separator:
+        return None
+    return rest.split(",")[0].strip()
+
+
+def _parse_optional_positive(raw_value: str | None) -> float | None:
+    """Read one optional numeric stats-file field, tolerating anything odd.
+
+    Missing, empty, zero, negative, or malformed all read as "not available".
+    These fields never join the required-field check, and a bad value must cost
+    the conversion only -- never the run, and never the scan that hit it.
+    """
+    if not raw_value:
+        return None
+    try:
+        value = float(raw_value)
+    except ValueError:
+        return None
+    # ``float()`` also accepts "inf" and "nan", which are float-shaped but not
+    # sensitivities: an infinite increment would convert to 0.0 cm/360 and be
+    # stored as a real reading.
+    if not math.isfinite(value) or value <= 0:
+        return None
+    return value
+
+
+def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
     """
     Extracts data from a scenario CSV file.
     :param full_file_path: full file path of the file to extract data from.
@@ -594,6 +674,8 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     scenario = None
     score = None
     sens_scale = None
+    raw_sens_increment = None
+    raw_dpi = None
 
     try:
         splits = Path(full_file_path).stem.split(" Stats")[0].split(" - ")
@@ -635,13 +717,14 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
                 score = float(line.split(",")[1].strip())
             elif line.startswith("Sens Scale:"):
                 sens_scale = line.split(",")[1].strip()
+            elif line.startswith("Sens Increment:"):
+                raw_sens_increment = _optional_field_value(line)
             elif line.startswith("Horiz Sens:"):
-                str_horizontal_sens = line.split(",")[1].strip()
-                # sometimes the sens looks like 20.123456789, so round it to look cleaner
-                horizontal_sens = round(
-                    float(str_horizontal_sens),
-                    get_config().sens_round_decimal_places,
-                )
+                # Left unrounded here: a converted run rounds its cm/360
+                # result instead, and rounding twice would compound.
+                horizontal_sens = float(line.split(",")[1].strip())
+            elif line.startswith("DPI:"):
+                raw_dpi = _optional_field_value(line)
             elif line.startswith("Scenario:"):
                 scenario = line.split(",", 1)[1].strip()
     except OSError, ValueError, IndexError:
@@ -666,6 +749,34 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     ):
         logger.warning("Missing data from file: %s", full_file_path)
         return None
+
+    # Converting needs the whole key-value tail, not just the sensitivity
+    # line: ``DPI:`` follows ``Horiz Sens:`` in the file, so the second input
+    # is still unread when the first one arrives.
+    sens_increment = _parse_optional_positive(raw_sens_increment)
+    dpi = _parse_optional_positive(raw_dpi)
+    converted_cm360 = (
+        _converted_cm360(
+            sens_increment,
+            dpi,
+            get_config().sens_round_decimal_places,
+        )
+        if sens_scale != "cm/360" and sens_increment is not None and dpi is not None
+        else None
+    )
+    if converted_cm360 is not None:
+        # A run recorded on a game's own scale converts exactly, so it joins the
+        # cm/360 axis instead of sorting by a number from another scale.
+        horizontal_sens = converted_cm360
+        sens_scale = "cm/360"
+    else:
+        # Already cm/360, or too old to carry both fields: keep the recorded
+        # value and scale. Sometimes the sens looks like 20.123456789, so round
+        # it to look cleaner.
+        horizontal_sens = round(
+            horizontal_sens,
+            get_config().sens_round_decimal_places,
+        )
 
     return RunData(
         datetime_object=datetime_object,

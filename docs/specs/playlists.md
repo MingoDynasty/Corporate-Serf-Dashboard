@@ -199,8 +199,12 @@ section and [product.md](../product.md). Leaderboard placement is worded
   ellipsis. PB columns take `N/A` as null sentinel, PB Date included; Last
   Played keeps "Never"; the 30-second tick refreshes both timestamp columns
   ([2026-08-09](../decision_log.md#2026-08-09-pb-columns-keep-their-na-sentinel-even-for-timestamps)).
-  PB cm/360 is known only when the PB run used the cm/360 scale; PB Accuracy
-  prefers damage accuracy, falling back to hit accuracy.
+  PB cm/360 is known when the PB run's sensitivity is in cm/360, natively or
+  by parse-time conversion
+  ([scenario_performance.md](scenario_performance.md#the-graph)); a legacy run
+  without DPI and increment keeps `N/A`
+  ([2026-09-11](../decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  PB Accuracy prefers damage accuracy, falling back to hit accuracy.
 - Opening the route has two phases. Phase 1 paints every row from local
   stats and TTL-ignored caches with explicit pending flags per unresolved
   Position, Total Players, and Percentile cell. Phase 2 hydrates leaderboard
