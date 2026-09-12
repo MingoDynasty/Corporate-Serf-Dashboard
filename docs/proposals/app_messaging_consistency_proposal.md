@@ -390,6 +390,14 @@ no app copy. The counts below still hold at `5be84bf`. One placement
 change: main now keeps proposals under `docs/proposals/`, so this file moved
 there with the merge.
 
+Re-verified against `7eecae3` (main, 2026-09-12) after the README rework
+and the cm/360 sensitivity conversion merged. Neither changed a user-facing
+string: the conversion is parse-time code, and its 2026-09-11 decision-log
+entry and spec updates quote stats-file keys, not app copy. The reworked
+README names "Run Notifications" and the toggle "Show hidden" phrasing, so
+the sweep's README pass has two hits. The counts below still hold at
+`7eecae3`.
+
 The same condition, four shapes, is the seed symptom:
 
 | Surface | Current text |
