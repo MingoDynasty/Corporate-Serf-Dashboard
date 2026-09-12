@@ -460,6 +460,19 @@ def test_an_already_normalized_scale_converts_to_the_same_centimeters(
         ("zero-increment", {"sens_increment": "0", "dpi": "1600"}),
         ("malformed-dpi", {"sens_increment": "0.199886", "dpi": "abc"}),
         ("malformed-increment", {"sens_increment": "abc", "dpi": "1600"}),
+        # `float()` accepts these, so "parses as a number" is not the test.
+        # An infinite increment would otherwise convert to 0.0 cm/360 and be
+        # stored as if it were a real reading.
+        ("infinite-dpi", {"sens_increment": "0.199886", "dpi": "inf"}),
+        ("infinite-increment", {"sens_increment": "inf", "dpi": "1600"}),
+        ("nan-dpi", {"sens_increment": "0.199886", "dpi": "nan"}),
+        ("nan-increment", {"sens_increment": "nan", "dpi": "1600"}),
+        # Finite and positive, but `0.07 * increment * dpi` underflows to zero
+        # and the division raises outside the parser's exception handler.
+        ("underflowing-increment", {"sens_increment": "5e-324", "dpi": "1600"}),
+        ("underflowing-dpi", {"sens_increment": "0.199886", "dpi": "5e-324"}),
+        # The same product overflowing the other way returns 0.0 centimeters.
+        ("overflowing-increment", {"sens_increment": "1e308", "dpi": "1e308"}),
     ],
 )
 def test_an_unusable_conversion_field_costs_the_conversion_not_the_run(
@@ -497,3 +510,59 @@ def test_a_mid_write_dpi_line_costs_the_conversion_not_the_run(one_decimal_place
     assert run is not None
     assert run.horizontal_sens == 0.2
     assert run.sens_scale == "Valorant"
+
+
+def test_an_unusable_conversion_field_cannot_abort_the_startup_scan(
+    monkeypatch,
+    tmp_path,
+    one_decimal_place,
+):
+    """A run the formula cannot use costs that conversion, not the whole scan.
+
+    `initialize_kovaaks_data` has no guard of its own around
+    `extract_data_from_file`, so an exception raised past the parser's own
+    handler ends the scan and every run after the bad file is lost, not just
+    the one that provoked it.
+    """
+    _write_stats_file(
+        tmp_path / "underflow - Challenge - 2025.01.01-10.00.00 Stats.csv",
+        DAMAGE_SUB_CSV_ROW,
+        sens_scale="Valorant",
+        horizontal_sens="0.2",
+        sens_increment="5e-324",
+        dpi="1600",
+    )
+    _write_stats_file(
+        tmp_path / "good - Challenge - 2025.01.01-11.00.00 Stats.csv",
+        DAMAGE_SUB_CSV_ROW,
+        sens_scale="Valorant",
+        horizontal_sens="0.2",
+        sens_increment="0.199886",
+        dpi="1600",
+    )
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service,
+        "run_database",
+        SortedList([], key=lambda item: item.datetime_object),
+    )
+
+    data_service.initialize_kovaaks_data(str(tmp_path))
+
+    # Both runs land: the unusable one keeps its recorded sensitivity.
+    assert data_service.get_scenario_stats(SCENARIO_NAME).number_of_runs == 2
+    keys = set(data_service.get_sensitivities_vs_runs(SCENARIO_NAME))
+    assert keys == {"0.2 Valorant", "40.8 cm/360"}
+
+
+def test_the_guarded_conversion_reports_unusable_inputs_as_none():
+    # The pure helper still divides; the guard is what turns an arithmetic
+    # failure into "no conversion available".
+    assert data_service._converted_cm360(0.199886, 1600) == pytest.approx(40.8447)
+    assert data_service._converted_cm360(5e-324, 1600) is None
+    assert data_service._converted_cm360(1e308, 1e308) is None
+
+
+@pytest.mark.parametrize("raw_value", ["inf", "-inf", "nan", "0", "-1", "abc", ""])
+def test_an_optional_field_only_accepts_a_finite_positive_number(raw_value):
+    assert data_service._parse_optional_positive(raw_value) is None

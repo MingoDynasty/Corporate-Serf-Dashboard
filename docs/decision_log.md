@@ -36,10 +36,14 @@ and after the key-value loop computes
 `sens_scale` set to `cm/360`. It runs after the loop and not inline because
 `DPI:` follows `Horiz Sens:` in the file, so the inputs are only complete
 once the whole tail has been read. A run already on the cm/360 scale keeps
-its recorded value untouched. A run missing either field, or carrying an
-empty, zero, or malformed one, keeps its original value and scale. Neither
+its recorded value untouched. A run missing either field, or carrying one the
+conversion cannot use, keeps its original value and scale. "Cannot use" is
+wider than "not a number": empty, zero, and negative, but also the non-finite
+values `float()` accepts (`inf`, `nan`), and magnitudes that make
+`0.07 x increment x DPI` underflow to zero or overflow to infinity. Neither
 field joins the parser's required-field check: legacy files lack them and
-must still load, and a malformed value costs the conversion, never the run.
+must still load, and an unusable value costs the conversion, never the run --
+and never the startup scan, which has no guard of its own around the parser.
 Normalizing here means every consumer inherits it with no change of its
 own -- the three sensitivity-key builders, the `SortedDict` ordering, the
 plot axis and hover, run notifications, and the PB cm/360 column all read

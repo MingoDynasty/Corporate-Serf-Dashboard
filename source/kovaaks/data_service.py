@@ -4,6 +4,7 @@ Provides business logic for managing Kovaaks data.
 
 import json
 import logging
+import math
 import os
 import re
 import threading
@@ -601,6 +602,23 @@ def _cm360_from_increment(increment: float, dpi: float) -> float:
     return 360 * 2.54 / (BASE_SCALE_YAW * increment * dpi)
 
 
+def _converted_cm360(increment: float, dpi: float) -> float | None:
+    """Convert to cm/360, or return None when the inputs cannot produce one.
+
+    Finite positive inputs are not enough on their own. An increment small
+    enough that `0.07 * increment * dpi` underflows to zero divides by zero,
+    and one large enough that the same product overflows to infinity returns
+    0.0 centimeters. Both must cost the conversion only -- never the run, and
+    never the startup scan that hit it, which has no guard of its own around
+    `extract_data_from_file`.
+    """
+    try:
+        cm360 = _cm360_from_increment(increment, dpi)
+    except ZeroDivisionError:
+        return None
+    return cm360 if math.isfinite(cm360) and cm360 > 0 else None
+
+
 def _optional_field_value(line: str) -> str | None:
     """Return an optional key-value line's first value column, or None.
 
@@ -626,7 +644,12 @@ def _parse_optional_positive(raw_value: str | None) -> float | None:
         value = float(raw_value)
     except ValueError:
         return None
-    return value if value > 0 else None
+    # `float()` also accepts "inf" and "nan", which are float-shaped but not
+    # sensitivities: an infinite increment would convert to 0.0 cm/360 and be
+    # stored as a real reading.
+    if not math.isfinite(value) or value <= 0:
+        return None
+    return value
 
 
 def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0912, PLR0915
@@ -722,11 +745,16 @@ def extract_data_from_file(full_file_path: str) -> RunData | None:  # noqa: PLR0
     # key-value tail has been read.
     sens_increment = _parse_optional_positive(raw_sens_increment)
     dpi = _parse_optional_positive(raw_dpi)
-    if sens_scale != "cm/360" and sens_increment is not None and dpi is not None:
+    converted_cm360 = (
+        _converted_cm360(sens_increment, dpi)
+        if sens_scale != "cm/360" and sens_increment is not None and dpi is not None
+        else None
+    )
+    if converted_cm360 is not None:
         # A run recorded on a game's own scale converts exactly, so it joins the
         # cm/360 axis instead of sorting by a number from another scale.
         horizontal_sens = round(
-            _cm360_from_increment(sens_increment, dpi),
+            converted_cm360,
             get_config().sens_round_decimal_places,
         )
         sens_scale = "cm/360"
