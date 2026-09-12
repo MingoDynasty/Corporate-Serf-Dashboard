@@ -1402,9 +1402,11 @@ def toggle_chart_options(n_clicks, panel_class):
 def _local_scenario_options() -> list:
     """List the scenarios with local runs, or none without a usable stats directory.
 
-    The directory check stays even though the names come from the store: the
-    store keeps its runs after the directory disappears, and a populated list
-    would contradict the page's missing-directory hint.
+    The directory check stays even though the names come from the store. The
+    pin is restart-scoped and the store is only ever filled behind a usable
+    pin, so today the check never trims a populated list; it makes "no usable
+    directory, no local list" a property of this function rather than of the
+    startup order.
     """
     return get_scenario_names() if get_usable_stats_dir() else []
 

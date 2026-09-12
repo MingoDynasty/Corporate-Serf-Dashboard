@@ -21,8 +21,8 @@ With no playlist selected, the Scenario Performance dropdown listed scenarios
 by reading the stats file names, and it cut each name at its first hyphen. A
 scenario like "Anti-Centering Easy" showed up as "Anti", and choosing it said
 there were no local runs. The list now comes from the runs the app has
-already loaded, named the way each stats file names its own scenario. A scenario none
-of whose files could be read no longer appears.
+already loaded, named the way each stats file names its own scenario. A
+scenario none of whose files could be read no longer appears.
 
 **The defect.** `get_unique_scenarios` listed the stats directory and took
 `file.split("-")[0].strip()` as the name, splitting at the first hyphen
@@ -43,14 +43,16 @@ naming no scenario (`Anti`, `Reflex Flick`, `Reflex Flick Wide`, `cA x`,
 **The store is the single authority for which scenarios exist locally.**
 `get_scenario_names()` returns `sorted(kovaaks_database)`; it takes no
 directory. `_local_scenario_options()` in the home page keeps its
-`get_usable_stats_dir()` guard, so the fallback stays empty without a usable
-directory even though the store outlives a directory that disappears after
-startup. The store is populated at startup before the server serves, and the
-watchdog adds newly played scenarios to it, so the list is complete on first
-render. Rejected: fixing the split to cut at ` - Challenge - `. It works for
-today's names, re-breaks on the next naming quirk, and still would not be
-guaranteed to agree with the store's keys; the file's own field is the only
-authority and the store already holds it.
+`get_usable_stats_dir()` guard. The pin that guard reads is restart-scoped,
+and the store is only ever filled behind a usable pin, so today the guard
+never trims a populated list; it keeps the spec's promise (no usable
+directory, no local list) a property of this function rather than of the
+startup order. The store is populated at startup before the server serves,
+and the watchdog adds newly played scenarios to it, so the list is complete
+on first render. Rejected: fixing the split to cut at ` - Challenge - `. It
+works for today's names, re-breaks on the next naming quirk, and still would
+not be guaranteed to agree with the store's keys; the file's own field is the
+only authority and the store already holds it.
 
 **Accepted consequence: a scenario with no parseable run leaves the list.**
 Before, such a scenario contributed a filename-derived entry that already
