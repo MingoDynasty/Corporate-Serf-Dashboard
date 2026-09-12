@@ -94,7 +94,7 @@ def _walk_components(component):
 def _layout_components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     return {
         getattr(component, "id", None): component
@@ -134,7 +134,7 @@ def test_home_playlist_filter_dropdown_scrollbar_is_always_visible(monkeypatch):
         "get_visible_playlist_selector_options",
         lambda: [{"label": "Voltaic Benchmarks", "value": "KovaaKsTestCode"}],
     )
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda *_args: ["1wall6targets"])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: ["1wall6targets"])
 
     playlist_filter = next(
         component
@@ -162,7 +162,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
         "get_scenarios_from_playlist_code",
         lambda code: [f"{code} Scenario"],
     )
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: ["All"])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
     page = home.layout(
         scenario="KovaaKsTestCode Scenario",
@@ -189,7 +189,7 @@ def test_home_layout_initializes_from_playlist_scenario_query(monkeypatch):
 
 def test_home_top_n_input_uses_compact_width(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     page = home.layout()
     top_n_scores = next(
@@ -214,7 +214,7 @@ def test_home_top_n_input_uses_compact_width(monkeypatch):
 
 def test_home_last_played_initial_state_has_no_tooltip_affordance(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     components = list(_walk_components(home.layout()))
     last_played = next(
@@ -275,7 +275,7 @@ def test_home_select_playlist_ignores_stale_persisted_names(monkeypatch):
         "get_scenarios_from_playlist_code",
         lambda code: [f"{code} Scenario"],
     )
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: ["All"])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
     assert home.select_playlist("Old Playlist Name") == ["All"]
     assert home.select_playlist("ValidCode") == ["ValidCode Scenario"]
@@ -296,7 +296,7 @@ def test_home_section_titles_keep_visual_size_with_accessible_heading_order(
     monkeypatch,
 ):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     titles = {
         component.children: component
@@ -451,7 +451,7 @@ def test_chart_options_toggle_ignores_a_fire_no_click_caused():
 def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
     """It is stacked with the selector, not spread across the controls row."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     scenario_field = next(
         component
@@ -471,7 +471,7 @@ def test_follow_switch_sits_under_the_scenario_selector_it_governs(monkeypatch):
 
 def test_rank_refresh_button_has_tooltip(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     tooltips = [
         component
@@ -1378,7 +1378,7 @@ def test_manual_rank_refresh_without_scenario_skips_fetch_and_toast(monkeypatch)
 
 def test_scenario_rank_loading_is_delayed_and_not_shown_initially(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     page = home.layout()
     rank_loading = next(

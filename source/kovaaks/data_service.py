@@ -302,6 +302,18 @@ def is_scenario_in_database(scenario_name: str) -> bool:
     return scenario_name in kovaaks_database
 
 
+def get_scenario_names() -> list[str]:
+    """List the scenarios that have local runs, sorted.
+
+    Names come from the store, which is keyed by each file's own ``Scenario:``
+    field. Stats filenames are not a substitute: a name can contain hyphens,
+    even the spaced hyphen the filename uses as its separator, so no split of
+    the filename reliably recovers it. Iterating the dict is a single C-level
+    operation, so a concurrent watchdog insert cannot break it.
+    """
+    return sorted(kovaaks_database)
+
+
 def get_scenario_stats(scenario_name: str) -> ScenarioStats:
     """Get scenario statistics for a scenario."""
     return kovaaks_database[scenario_name]["scenario_stats"]
@@ -568,24 +580,6 @@ def load_csv_file_into_database(csv_file: str) -> bool:
         # Add to time_vs_runs
         kovaaks_database[run_data.scenario]["time_vs_runs"].add(run_data)
     return True
-
-
-# TODO: simply pull this from the database instead of rescanning files again.
-def get_unique_scenarios(_dir: str) -> list:
-    """
-    Gets the list of unique scenarios from a directory.
-    :param _dir: directory to search for scenarios.
-    :return: list of unique scenarios
-    """
-    unique_scenarios = set()
-    files = [
-        file for file in os.listdir(_dir) if os.path.isfile(os.path.join(_dir, file))
-    ]
-    csv_files = [file for file in files if file.endswith(".csv")]
-    for file in csv_files:
-        scenario_name = file.split("-")[0].strip()
-        unique_scenarios.add(scenario_name)
-    return sorted(unique_scenarios)
 
 
 def _cm360_from_increment(increment: float, dpi: float) -> float:
