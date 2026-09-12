@@ -13,6 +13,287 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-04: Comment And Docstring Conventions
+
+Status: Accepted
+
+The application code carries a lot of explanatory prose, and nearly all of it
+is the useful kind, but the rules that shaped it were never written down. A
+fresh session had to learn the house style by imitation, and the two places it
+tended to go wrong were narrating what code already says and writing a comment
+as a reply to whoever asked in review. The agent instructions now state what
+earns a comment, what stays beside the code when fuller rationale also lives
+elsewhere, and the shape a docstring takes. The enforced lint and type gates
+do not change.
+
+**What was measured (2026-09-04, 44 files under `source/`; later additions
+dated).** Comment-only lines are 12% of code lines and docstring lines 23%;
+the test tree sits at 4% and 6%. Of 385 comment blocks, 58 run five lines or
+more and 12 run eight or more. Nearly every definition has a docstring; 352
+open in the imperative against 9 in the third person, and none carries an
+Args/Returns/Raises section. Identifier spans in docstrings and comments run
+383 double-backtick against 32 single (2026-09-08). `X | None` appears 217
+times against one `Optional[]`. 42 of 47 `# noqa` markers give no reason, and
+of the 14 blind-except suppressions 4 name what the catch protects
+(2026-09-08). Narration is confined to the oldest modules: 17 label-style and
+36 trailing comments in the whole tree, plus four legacy TODOs in
+`kovaaks/data_service.py`, none of which names a concrete problem. Fifteen of
+1143 non-merge commits exist only to correct a stale comment or docstring.
+
+**Why a written bar rather than a trim.** The volume sits in the newest code
+and is rationale, not narration, so removing narration barely moves it. Nearly
+every measured dimension shows a style the code already follows: no
+Args/Returns/Raises sections, imperative summaries, double-backtick
+identifiers at better than nine spans in ten, one `Optional[]` in the tree.
+That style existed only as a pattern to imitate, in a repository where most
+edits come from fresh agent sessions, and AGENTS.md is the only channel that
+reaches a session on every edit. The case for the section is transmission: it
+writes down what is already there so a new session does not default to
+Google-style sections or narrating comments. One cost does recur and has a
+number: comments go stale, a few because they cite a relative position, a
+count of things in the tree, or a neighbor's name and the neighbor moves, and
+more often because the behavior they describe changed. The fifteen repair
+commits above are that cost, and the rule addresses both halves. A second is
+first-hand rather than measured: from the sessions that wrote this code,
+comments authored as the answer to a review question that then outlive the
+thread. On placement the rule keeps the failure-preventing reason beside the
+code and moves only evidence and history up, into a document whose scope
+already fits, so a bare pointer never stands where the constraint was and this
+log is not widened into a store of library detail; length alone is never the
+trigger. The three comments in `source/` that point at this log already do
+exactly this. The two hygiene rules are new rather than transcribed: a reason
+on suppressions the rule code does not explain is already the norm, but a
+blind-except suppression that names what the catch protects is four of
+fourteen, and none of the four legacy TODOs names a concrete problem; both
+ride on the same no-sweep scope as the rest. The section sits beside the
+2026-08-01 two-layer doc-style entry as the code-side counterpart: that one
+governs prose in the docs, this one governs prose in the code.
+
+**What is deliberately not enforced.** No lint rule judges comment quality.
+Ruff's `pydocstyle` `pep257` convention would check only part of the docstring
+shape (summary placement, the blank line after it, mood, terminal period): 39
+findings on 2026-09-08 under the locked ruff, none safely auto-fixable, and it
+does not see Args/Returns/Raises sections, single-backtick identifiers, or a
+summary that starts below the opening quotes. Deferred, and not a substitute
+for the written rule. Annotations are not required: under mypy's
+`disallow_untyped_defs`, 59 diagnostics across 56 definitions in 12 files
+(2026-09-08, after `check_untyped_defs` landed), 39 of them Dash callbacks and
+page layouts whose parameters are whatever Dash passes and 17 ordinary
+functions. The options are nothing, annotating the seventeen, or a sweep plus
+the mypy flag; a prose rule no gate checks was rejected because it would
+drift. The `N` naming family stays off: its 35 hits are API models mirroring
+KovaaK's field names. The 2026-07-03 ruff consolidation entry is unchanged.
+
+**No sweep.** Existing comments are not rewritten to match. The rule governs
+new and edited comments, the same no-backfill convention the layer-1 summaries
+follow. The legacy TODOs and label comments in the oldest modules are a
+separate drive-by when someone is in those files anyway.
+
+## 2026-09-04: The Launcher's Browser Open Is A Config Knob; Tab Reuse Is Not Achievable
+
+Status: Accepted
+
+The desktop shortcut opened a browser tab every time the dashboard started,
+and a tester who keeps that tab in a browser folder and restarts the app often
+was collecting a new one each time. There is no way for a launcher to reuse
+the tab that is already open, so the app now takes a config setting,
+`open_browser_on_launch`, that stops it opening one at all. It is on by
+default and the console still prints the address, so the only person affected
+is the one who turns it off.
+
+**Tab reuse is not achievable from a launcher.** `Open-Dashboard` is
+`Start-Process "http://<address>:<port>/"`, and shell-executing a URL always
+creates a new tab. Neither Windows nor the browsers expose "focus the tab
+already showing this URL", and `window.focus()` from a background tab is
+blocked without user activation. The request as posed ("open only if the tab
+is not there") has no API behind it. Suppressing the open is the only lever
+that exists.
+
+**What this protects, and what it does not.** Every stale tab is a live
+hazard, not just clutter: the supported model is one active tab
+([specs/notifications.md](specs/notifications.md)), because `message_queue` is
+process-wide and each drain's payload reaches one client, so with two tabs
+open a run toast or a PB celebration lands in whichever drain runs first. The
+knob lets a user stop accumulating tabs, but it only helps the user who finds
+it. The hazard still reaches everyone else, so this is the interim, not the
+fix.
+
+**Live-client detection is the eventual fix, and is deferred.** The server
+always knows whether a tab is watching, since every open tab polls
+continuously, so "skip the browser when a client is already connected" is
+detectable. It does not serve the case that prompted this. Restarting the app
+means closing the console, which kills the app and releases the mutex, so the
+relaunch is a cold start and the surviving tab is a dead tab from the previous
+session: at the moment the server becomes ready that tab has not checked in
+yet, and it reconnects only on its next timer tick. Chromium throttles timers
+in long-hidden tabs to roughly once a minute, so the launcher would have to
+wait up to a minute after readiness before it could decide, on every cold
+start, to serve a minority case. The knob has none of that cost.
+
+**Rejected alternatives.** `data/settings.json` with a Settings-page control:
+app-owned with a frozen three-key schema, and it would put a control on the
+Settings page for something the app never does. A flag on the desktop
+shortcut: passing it needs a bootstrap version bump, and the shortcut is
+rewritten on every reinstall. Parsing `config.toml` in PowerShell: exactly
+what `Get-ConfiguredEndpoint` exists to refuse, because TOML integer forms
+(`8_051`, `0x1F73`) and pydantic coercion would make the launcher probe a port
+the server did not bind. Two knobs (one for cold start, one for the
+already-running branch): over-configuration for one behavior.
+
+**The accepted smell.** `ConfigData` now carries a key the app never reads.
+That is deliberate. `config.toml` is the only user-owned file both sides of
+the install already agree on, and the launcher already asks the app's loader
+to read it.
+
+**The `Get-ConfiguredEndpoint` contract.** The one-line answer grew a third
+field: `print(c.port, c.host, getattr(c, 'open_browser_on_launch', True))`.
+The launcher splits the last stdout line into exactly three fields and reads
+the third as on when it is the literal `True`; a two-field line is not
+accepted, because a launcher never meets an older loader through a supported
+path (the bootstrap runs `versions\<tag>\scripts\launcher.ps1` from the same
+tag it reads the loader from) and a lenient parse would hide a broken
+contract. The `getattr` is belt-and-braces against a hand-mixed install, kept
+because the failure mode without it is this function's worst: a nonzero exit
+takes the fallback and loses the port and host too, and a healthy app is then
+declared dead on the wrong port.
+
+**The snippet must contain no double quote.** Windows PowerShell 5.1, which
+the desktop shortcut runs, re-quotes a native command's argument without
+escaping the double quotes inside it, so the previous
+`print(f"{c.port} {c.host}")` form arrived at python as `print(f{c.port}` and
+exited with a `SyntaxError`. `Get-ConfiguredEndpoint` was therefore taking
+its fallback on every launch, probing `8050` on `127.0.0.1` whatever
+`config.toml` said, and any install with a non-default port or host would
+have been reported as a dashboard that failed to start. The probe's first
+form, `Get-ConfiguredPort` (`print(load_config().port)`, no double quote),
+worked; the breakage arrived with the rename to `Get-ConfiguredEndpoint` and
+its f-string, so the affected releases are `v2026.08.18` through the last one
+cut before this fix. Backslash-escaping the quotes fixes 5.1 and breaks
+PowerShell 7, which passes the backslashes through to python; both were
+measured. The snippet now lives in a `$EndpointProbeSnippet` here-string,
+uses `print` with commas instead of an f-string, and quotes the attribute
+name with Python's single quotes, which survive both shells unchanged.
+
+One consequence worth recording against
+[2026-08-14](#2026-08-14-the-listen-address-is-configurable-loopback-by-default):
+that entry's launcher half, deriving the probe and browser addresses from the
+configured `host`, was inert in every installed launcher over that window,
+because the fallback always reported `127.0.0.1`.
+
+**Only stdout is captured, and not under `Stop`.** Two separate traps sit on
+the same line. The first is ordering: stdout and stderr are separate pipes,
+so merging them with `2>&1` gives no guaranteed order, and the "last line
+wins" parse the original comment described as robust against a config warning
+was not. Measured at roughly one run in sixty, the unknown-key warning
+arrived after the print line, so the parse read the warning and fell back --
+an intermittent wrong-port kill for anyone with a typo in `config.toml`.
+Nothing read the stderr text, so it is discarded rather than ordered.
+
+The second is the preference. The launcher sets
+`$ErrorActionPreference = 'Stop'` at the top of the script, and 5.1 turns a
+native command's redirected stderr into a terminating `NativeCommandError` on
+its first line while that preference holds. The one line the loader is known
+to write is the unknown-key warning, so any typo in `config.toml` reached the
+catch-all and took the fallback. Paired with the redirect since the probe was
+first written, and masked from `v2026.08.18` onward by the quoting bug above,
+so fixing that unmasked it. Discarding stderr is still a redirect, so the
+preference fix is needed either way. The capture now runs under a
+function-local `Continue`, restored in the `finally`.
+
+**These are 5.1-only failures, so a Python test cannot see them.** Both bugs
+were invisible to a subprocess test, which quotes its arguments properly and
+inherits no PowerShell preference. `windows-latest` ships Windows PowerShell
+5.1, so the suite now dot-sources the real `Get-ConfiguredEndpoint` through
+the PowerShell AST and calls it against a temporary install root, pinning the
+three-field contract, the browser flag, and the unknown-key case in the shell
+the shortcut actually runs.
+
+**One launch of lag.** The launcher that performs an update is the previous
+release's, selected by the bootstrap from the manifest before the update
+check ran. The launch that installs the release carrying this change
+therefore still opens a browser, and the setting takes effect from the next
+one. Setting the key before that update is harmless: an older app names it in
+the existing unknown-key warning and starts normally.
+
+## 2026-09-04: Re-Asserting An Unchanged Leaderboard ID Writes Nothing
+
+Status: Accepted
+
+Starting the app took over a minute on a beta tester's machine before any page
+would draw, and restarting did not help. Every startup rewrote the same 400 KB
+file about 2,500 times over, once for each scenario it had ever played, to
+store IDs that were already correct. It now checks first and writes only when
+something actually changed. On the measured workload that step drops from 37
+seconds to under a tenth of a second, and the app stops writing roughly a
+gigabyte to disk on every launch.
+
+**The waste.** `hydrate_leaderboard_id_cache` calls `save_leaderboard_id` once
+per scenario in the user's `/user/scenario/total-play` response (26 pages of
+100 for the reporting tester, so about 2,500 calls). Each call was a full
+read-modify-write of the entire `scenarioName -> leaderboardId` mapping, ending
+in an `fsync` and an atomic replace, and it ran even when the stored ID already
+matched, because `fetched_at` was refreshed unconditionally. Measured on a
+Samsung 990 PRO NVMe with a 3,000-entry, 416 KB mapping: **36.9s, ~1 GB
+written, 2,500 fsyncs**. The fast path measures 0.09s and writes nothing.
+
+**Why it was invisible.** The step logs nothing on success, so it appears in
+`debug.log` only as a silent gap. A fresh total-play cache skips the network
+but not the writes, so the affected sessions show no API calls at all. Its cost
+lands inside the warmup worker's batch window, so it is reported as part of
+`Percentile warmup complete: ... elapsed=67.1s` — a line whose `processed=0
+skipped=379` invites reading the whole elapsed as drain cost. It is not: the
+drain is a few thousand cheap reads. **Do not derive per-operation disk latency
+from that line.**
+
+**It also stalled every request thread.** `save_leaderboard_id` holds
+`_CACHE_IO_LOCK` across its fsync, so for the whole hydration any waitress
+thread touching any cache file blocked behind it. That is what produced the
+`waitress.queue | Task queue depth` warnings in the tester's logs, a 38-second
+first Home render, and Playlists times of 26-74 seconds that barely moved when
+"show hidden" was toggled — both settings sat on the same fixed floor.
+
+**Correcting the 2026-09-02 entry.** That entry attributed the tester's ~60s to
+per-file antivirus scanning making small random reads "roughly 400x slower".
+A probe on the reporting machine measured **0.029 ms per cache-file open** —
+reads are fine there; the cost was fsync-heavy writes. The lock-scope decision
+that entry records still stands on its own merits and is not superseded; only
+its supporting attribution was wrong.
+
+**Provenance is part of "unchanged".** The skip requires the stored `source` to
+match as well as the ID. `merge_seed_leaderboard_ids` refreshes seed-owned rows
+whose asserted ID changed and deletes those the corpus stops asserting, while
+never touching learned ones (2026-07-20 entry), so a seed-owned row that
+`total-play` confirms must still be rewritten to take live ownership —
+otherwise a later corpus release could overwrite the ID of a live-confirmed
+mapping, or drop the row outright. An ID-only check shipped in review and was
+caught there.
+
+Promotion costs one write per row, once: the first hydration after an install
+promotes the seeded rows, and a corpus release promotes only the newly seeded
+names that `total-play` also covers. That one-off run is about 20% slower than
+the old unconditional rewrite, because a promoting call parses the mapping
+twice — the fast-path check revalidates the mirror against a signature the
+previous write already moved, and the slow path then parses again (44.9s versus
+36.9s on a 2,500-call workload; recorded in `docs/tech_debt.md`, and removed by
+the batch upsert). Every later startup is the steady state, measured at 0.09s
+and zero writes.
+
+**The stored value is authoritative.** The check reads the mtime-revalidated
+in-memory mirror (2026-07-18 entry) rather than the file, so it inherits that
+mirror's one accepted blind spot and no other. A stale hit skips a write whose
+only effect would have been a `fetched_at` refresh; nothing reads `fetched_at`
+on these entries. Conflict refusal, malformed-value replacement, and every
+write path are unchanged — the fast path is purely additive.
+
+**Not fixed here.** Hydration still makes one call per scenario; a batch upsert
+folding all of them into a single atomic read-modify-write, as
+`merge_seed_leaderboard_ids` already does for the bundled seed, is left as
+follow-up. `_CACHE_IO_LOCK` still serializes every cache file operation
+app-wide, and the Playlists overview still reads two cache files per played
+scenario per row with no memo and no dedup across rows (measured 1,595 file
+opens with "show hidden" on, 52% of them re-reads within one render). Both
+remain in `docs/tech_debt.md` under Performance.
+
 ## 2026-09-02: Warmup Locks Are Never Held Across Cache I/O
 
 Status: Accepted
@@ -38,7 +319,10 @@ skip-drain, which reads two cache files per candidate. This only bites when the
 cache is warm: nothing returns early, so the loop walks the entire queue.
 Measured at 0.13s for 317 scenarios on a fast SSD and about 60s on a
 beta tester's disk, where per-file antivirus scanning makes small random reads
-roughly 400x slower. A direct callback measurement, taken on the fast SSD with
+roughly 400x slower. (Attribution corrected by the 2026-09-04 entry: that
+tester's reads measure 0.029 ms per open, so the ~60s was not read latency — it
+was the hydration write storm running inside the same `elapsed` window. The
+lock-scope decision below is unaffected.) A direct callback measurement, taken on the fast SSD with
 per-candidate latency injected into `_freshly_satisfied` to model the tester's
 disk, recorded 45.1s blocked versus 0.2s once the drain finished. That isolates
 the lock and only the lock: the overview's own row build reads two cache files

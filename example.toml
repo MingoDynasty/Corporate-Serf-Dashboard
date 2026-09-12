@@ -18,6 +18,12 @@ port = 8050
 # stats and change your settings. Only do this on a network you trust.
 host = "127.0.0.1"
 
+# Open the dashboard in your browser when it starts. Set this to false if you
+# keep a tab open and would rather switch to it yourself. The address is
+# printed in the console either way. Only the desktop shortcut reads this;
+# running from source never opens a browser.
+open_browser_on_launch = true
+
 # Whether to enable the Dash/Flask debug server. Keep this off unless developing locally.
 # With host set to anything other than the default, this also puts the debug
 # console on that network, which can run code on this machine.

@@ -647,6 +647,36 @@ def save_leaderboard_id(
 ) -> None:
     """Upsert a scenario-name to leaderboard-ID mapping unless it conflicts."""
     with _CACHE_IO_LOCK:
+        # Re-asserting a row this source already owns writes nothing. Startup
+        # hydration upserts one entry per total-play scenario -- thousands of
+        # them, all unchanged from the second run on -- and each call otherwise
+        # rewrote and fsynced the whole mapping file, which dominated startup
+        # (see the 2026-09-04 decision log entry). Only `fetched_at` would have
+        # changed, and nothing reads it.
+        #
+        # `source` must match too, not just the ID. A seed-owned row that
+        # total-play confirms has to be promoted to the live source even though
+        # its ID is unchanged: `merge_seed_leaderboard_ids` refreshes seed-owned
+        # rows whose asserted ID changed and deletes those the corpus stops
+        # asserting, while never touching learned ones. Skipping that write
+        # would leave a live-confirmed mapping exposed to both -- a later corpus
+        # release could overwrite its ID or drop the row outright (2026-07-20
+        # entry, and the merge contract in docs/specs/playlists.md). Promotion
+        # happens once, then every later run takes the fast path.
+        #
+        # The check reads the same mtime-revalidated mirror every rank lookup
+        # resolves through, so it inherits that mirror's one accepted blind
+        # spot (a same-size rewrite forging the old mtime) and nothing else. A
+        # stale hit there skips a write whose sole effect would have been a
+        # `fetched_at` refresh; a miss simply falls through to the slow path.
+        mirrored = _load_leaderboard_mapping().get(scenario_name)
+        if (
+            isinstance(mirrored, dict)
+            and mirrored.get("source") == source
+            and _coerce_leaderboard_id(mirrored.get("leaderboard_id")) == leaderboard_id
+        ):
+            return
+
         cache_file = _leaderboard_mapping_file()
         cache_data = _read_json(cache_file)
         mappings = cache_data if isinstance(cache_data, dict) else {}
