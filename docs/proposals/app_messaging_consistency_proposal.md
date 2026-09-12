@@ -144,9 +144,10 @@ cost of the overview naming a column it does not have.
 
 ### D4 — The coaching flourishes
 
-Status: Open. Maintainer lean (2026-09-04): keep the line, with the period.
-Contested in review on 2026-09-12 with the alternative below; the
-maintainer rules.
+Status: ruled (user), 2026-09-12. Keep "Ready to move on."; drop "Keep
+grinding" from the below-threshold toast. Ruled in the PR #247 discussion
+after the 2026-09-12 review contested the earlier recommendation to keep
+it.
 
 Two run-toast fragments are tone, not information: "Keep grinding..." on a
 below-threshold run and "Ready to move on." on a passed run that did not
@@ -155,33 +156,36 @@ product's name suggests it wants one. (A third, the "While you were away"
 digest title, left with the digest when the celebration arc retired it: the
 2026-09-02 celebrates-on-every-page entry.)
 
-**Recommendation: keep both; "Keep grinding..." becomes "Keep grinding."
-with a period.** "Ready to move on." is already a correct sentence. The
-period rather than the single ellipsis character is the 2026-09-04
-conventions survey's finding: Polaris and Google reject an ellipsis that
-trails off for tone and Microsoft merely permits it, so the period is the
-form every guide accepts, and it leaves rule 4 with no named exception. The
-earlier recommendation, "Keep grinding…", would need that exception back.
-Whether the miss line survives at all is taste: Atlassian and the Nielsen
-Norman Group warn that a flourish on a repeated miss wears out, and a user
-grinding one scenario sees this toast many times in a session; Apple's own
-streak copy shows coaching lines work in success moments, and no guide
-covers a miss. Maintainer lean (2026-09-04): keep the line, with the period.
+**Ruling: keep "Ready to move on." and drop the miss line.** "Ready to
+move on." fires on a passed run that did not place, a success-adjacent
+moment where the guides accept a flourish, and it is already a correct
+sentence. "Keep grinding..." fires only on a below-threshold run. That
+toast already states the score, the shortfall against the threshold, and
+any placement, so the line adds no information, and it repeats on every
+miss in a grinding session, which is where Atlassian and the Nielsen Norman
+Group say a flourish wears out. No guide covers a flourish on a miss, so
+the ruling applies that general guidance rather than a measured result; a
+short repeated-run comparison with a few intended users is the way to
+measure it if the question is ever reopened. Rule 4 keeps no exception.
 
-Decide this with the launch visual in mind, not only the running app: the
-launch prep notes want the announcement post to lead with a clip of a run
-landing and its notification, so whichever way D4 goes, a run toast is the
-first copy a cold reader sees.
+Material consequence: the below-threshold body ends after its placement
+sentence (`…, 92.1% of PB (need 95.0%). Still your 3rd-best at 0.35
+cm/360.`), the Copy entry "Run verdict, below threshold" says so, and the
+run-verdict test that pins the body updates with it. In the launch clip,
+a miss toast now reads as a plain readout and a passed run's toast still
+carries "Ready to move on."
 
-Choosing differently: keep "Ready to move on." and drop "Keep grinding."
-from the below-threshold toast. The case for it: the miss toast already
-reports the shortfall and any placement, so the imperative adds no
-information, and it repeats on every miss in a grinding session, which is
-the moment the guides say to keep practical; the cost is some personality
-on misses, and a period alone does not answer the repetition concern.
-Dropping both makes the run toasts strictly factual, which is cleaner but
-colder; the 2026-08-03 notification policy files run toasts under
-"achievement / coaching", so a flourish is in policy either way.
+Rejected alternative: keep the line as "Keep grinding." with a period, the
+earlier recommendation and the maintainer's 2026-09-04 lean. Its case was
+voice, the product's name, and the 2026-08-03 policy that files run toasts
+under "achievement / coaching"; that is taste and permission, with no
+comprehension argument, and a period does not answer the repetition
+concern. The original "Keep grinding…" with the single ellipsis was weaker
+still: Polaris and Google reject a trailing-off ellipsis, and it needed a
+rule-4 exception.
+
+Also rejected: dropping both lines, which makes the run toasts strictly
+factual and forgoes the one success-moment flourish the guides endorse.
 
 ### D5 — Does the sweep gate the launch post?
 
@@ -639,7 +643,8 @@ separate child.
   2026-09-02 celebration toast already uses for the same pair)
 - Run verdict, below threshold: `…, 92.1% of PB — need 95.0%. Still your
   3rd-best at 0.35 cm/360. Keep grinding...` → `…, 92.1% of PB (need 95.0%).
-  Still your 3rd-best at 0.35 cm/360. Keep grinding.` (D4)
+  Still your 3rd-best at 0.35 cm/360.` (D4, ruled 2026-09-12: the coaching
+  line is dropped; "Ready to move on." on a passed run is unchanged)
 - The "While you were away" backlog digest, whose two bodies were
   redlined in an earlier draft, was retired wholesale by the celebration
   arc before this proposal shipped (the 2026-09-02 celebrates-on-every-page
