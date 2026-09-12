@@ -15,7 +15,7 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 
 ## 2026-09-04: Comment And Docstring Conventions
 
-Status: Proposed
+Status: Accepted
 
 The application code carries a lot of explanatory prose, and nearly all of it
 is the useful kind, but the rules that shaped it were never written down. A
