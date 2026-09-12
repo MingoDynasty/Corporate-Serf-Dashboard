@@ -2021,12 +2021,23 @@ License v3.0, and contributors are not asked to sign a contributor agreement.
 Anyone may use, change, and redistribute it, but a version they pass on has to
 stay free and open source under the same terms. The choice was confirmed
 deliberately on 2026-08-10, before the public launch, because it is the one
-launch decision that cannot be taken back later. The README has stated it
-since PR #278; this entry records why.
+launch decision that cannot be taken back later. A few assets the app bundles
+from other projects keep their own terms, so this is not a whole-tree claim.
 
-**What was chosen.** AGPL-3.0 as the repository's only license, whole text in
+**What was chosen.** AGPL-3.0 for this project's own code, whole text in
 `LICENSE`. No contributor license agreement, no copyright assignment: a pull
-request is accepted on its merits, and its author keeps their copyright.
+request is accepted on its merits, and its author keeps their copyright. The
+ruling is from 2026-08-10; the README's `## License` section has stated the
+license publicly since PR #278, and this entry is the record of why.
+
+**Bundled third-party assets keep their own licenses**, and this is not a
+whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
+(`assets/vendor/canvas-confetti.LICENSE`), and the vendored SVGs under
+`assets/icons/` are MIT, Apache-2.0 and CC0 by collection, tabulated in
+`assets/icons/README.md`. `assets/` is in the release archive contract, so
+those notices travel inside every published zip and have to be preserved on
+redistribution. Vendoring anything new means confirming its license and
+recording it the same way.
 
 **Why this license.** The priority is that derivatives stay free and open
 source. AGPL binds anyone who conveys a modified version, or offers one to
