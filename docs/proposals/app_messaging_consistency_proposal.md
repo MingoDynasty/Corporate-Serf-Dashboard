@@ -144,7 +144,9 @@ cost of the overview naming a column it does not have.
 
 ### D4 — The coaching flourishes
 
-Status: Open
+Status: Open. Maintainer lean (2026-09-04): keep the line, with the period.
+Contested in review on 2026-09-12 with the alternative below; the
+maintainer rules.
 
 Two run-toast fragments are tone, not information: "Keep grinding..." on a
 below-threshold run and "Ready to move on." on a passed run that did not
@@ -171,10 +173,15 @@ launch prep notes want the announcement post to lead with a clip of a run
 landing and its notification, so whichever way D4 goes, a run toast is the
 first copy a cold reader sees.
 
-Choosing differently: dropping them makes the run toasts strictly factual.
-That is cleaner but colder, and the 2026-08-03 notification policy already
-files run toasts under "achievement / coaching", so the flourishes are in
-policy.
+Choosing differently: keep "Ready to move on." and drop "Keep grinding."
+from the below-threshold toast. The case for it: the miss toast already
+reports the shortfall and any placement, so the imperative adds no
+information, and it repeats on every miss in a grinding session, which is
+the moment the guides say to keep practical; the cost is some personality
+on misses, and a period alone does not answer the repetition concern.
+Dropping both makes the run toasts strictly factual, which is cleaner but
+colder; the 2026-08-03 notification policy files run toasts under
+"achievement / coaching", so a flourish is in policy either way.
 
 ### D5 — Does the sweep gate the launch post?
 
@@ -211,9 +218,13 @@ Atlassian, and Polaris all say to use common contractions; Windows warns
 that avoiding them makes an app read "too formal or even stilted". The
 survey also looked at what makes prose read as machine-written, which is
 the concern behind the 2026-08-11 no-em-dash ruling: the sources that name
-a register tell name formality, and the one study with a measured result
-separated machine text from human text by its lack of contractions. Nothing
-found implicates contractions the other way.
+a register tell name formality, and the one corpus study found (a 2026
+comparison of human and AI-generated academic abstracts) reports that the
+AI text lacked the informality features it measured, contractions among
+them. That is a frequency difference in one genre, not an authorship
+detector and not a reading of app copy, so it corroborates the style guides
+rather than carrying the case. Nothing found implicates contractions the
+other way.
 
 **Recommendation: reverse rule 5.** Use the common contractions (can't,
 couldn't, doesn't, isn't, wasn't, aren't, you're) and adopt Microsoft's
@@ -241,10 +252,11 @@ the block's earlier draft (every "Couldn't" expanded) shows what it looks
 like. It should then be recorded as taste, because the claim that it is the
 convention does not survive the survey.
 
-### D7 — A sentence never opens with a runtime value
+### D7 — A sentence never opens with an object name or a path
 
 Status: Open. Maintainer lean (2026-09-04): adopt, pending the review's
-stance.
+stance. Narrowed on 2026-09-12 to the rule below, adopted from the review's
+counter-proposal; the amendment awaits the reviewer's confirmation.
 
 Several rewritten messages began with a value the app fills in at runtime:
 `{file} could not be read.`, `{code} is already imported as "{name}".`, and
@@ -255,30 +267,51 @@ guide behind the colon form (it is the log-line idiom rule 8 exists to keep
 off the screen) but a direct Windows rule against the current shape, "Avoid
 starting sentences with object names": a sentence that opens with a path or
 a code may begin with a lowercase letter, a digit, or a backslash, and has
-no visible start. Windows and Polaris both embed the value in the sentence
-with a noun in front of it, and Atlassian's example does the same.
+no visible start. The same guide keeps a full path out of the main sentence
+and gives it as supplemental text after the diagnosis. Windows and Polaris
+both embed a short value in the sentence with a noun in front of it, and
+Atlassian's example does the same.
 
-**Recommendation: add the clause to rule 9.** A noun names the value before
-it appears (`Couldn't read the playlist file {file}.`), a long path goes
-last in its sentence or in a sentence of its own, and user-typed free text
-keeps its quotes under rule 6. This delivers the redline's "verdict first,
-edges visible" without the colon.
+The first draft of this row banned every runtime value from opening a
+sentence. That was wider than the evidence: the Windows rule targets object
+names, and the block's count-led sentences (`3 new run files couldn't be
+processed.`, `2 Steam accounts couldn't be checked.`) are clear at a glance,
+as are the score readouts, which rule 1 classes as readouts rather than
+sentences. The draft also put the store messages' full path before the
+diagnosis (`The file {path} has no "schema_version" line.`), so a reader
+takes in the whole path before learning what is wrong with it.
 
-Consequence: eight Copy entries restructure (four startup playlist warnings,
-the store-message pass-through, the duplicate-import refusal, the
-newer-version save refusal, and the not-yours delete refusal), and the
-store messages join the sweep instead of standing as unchanged: every
-`{path} …` message gains "The file" in front of the path, one change at the
-six composition sites in `store_schema.py`, with the fragments the
-validators raise left as they are. The 2026-08-11 schema entry's quoted
+**Recommendation: add the narrower clause to rule 9.** An object name or a
+path never opens a sentence, and a noun names it before it appears
+(`Couldn't read the playlist file {file}.`, `The playlist code {code} is
+already imported as "{name}".`). A count or a score may lead. A full path
+comes after the diagnosis: the sentence names the file by its kind and says
+what is wrong, and the path follows in a sentence of its own (`The settings
+file has no "schema_version" line. Add "schema_version": 1 to it, or delete
+the file to start over. The file is {path}.`). User-typed free text keeps
+its quotes under rule 6. This delivers the redline's "verdict first, edges
+visible" without the colon.
+
+Consequence: ten Copy entries restructure (the five startup playlist
+warnings, the store-message pass-through, the duplicate-import refusal, the
+newer-version save refusal, the not-yours delete refusal, and the delete
+failure), and the store messages join the sweep instead of standing as
+unchanged. Every store message names its file by kind, so the store layer's
+`decode_store_document` and `read_store_document` take the kind as a
+parameter ("settings file", "playlist visibility file", "playlist file"),
+threaded from their three callers; the fragments the validators raise are
+unchanged and now follow the kind noun. The 2026-08-11 schema entry's quoted
 messages get a "superseded in part, for copy" note; the stamp script prints
 the same messages to its console and follows along, because it calls the
 same function.
 
-Choosing differently: exempt the store messages as the named exception,
+Choosing differently: the first draft's absolute rule, which would rewrite
+the count-led toasts ("The app couldn't process 3 new run files.") for no
+gain in clarity; or exempting the store messages as the named exception,
 which keeps the Settings page's store alert and the stamp script's console
-output byte-identical, at the cost of one sentence family that starts with a
+output byte-identical at the cost of one message family that opens with a
 Windows path.
+
 
 ### D8 — Control names in prose carry their type
 
@@ -483,10 +516,11 @@ time, replacing the current one-line em-dash convention.
 9. **Error copy says what happened first, then what to do when there is
    something to do.** A failure with no useful recovery step says only what
    happened and does not invent one (`Couldn't read the playlist file
-   {file}.`, `The file {path} isn't valid JSON.`). A sentence never opens
-   with a runtime value: a noun names the value before it appears, and a
-   long path goes last in its sentence or in one of its own (D7). The toast
-   title carries the verdict (unchanged from 2026-08-03).
+   {file}.`, `The settings file isn't valid JSON. The file is {path}.`). An
+   object name or a path never opens a sentence: a noun names it before it
+   appears, a count or a score may lead, and a full path comes after the
+   diagnosis in a sentence of its own (D7). The toast title carries the
+   verdict (unchanged from 2026-08-03).
 
 Basis. Rules 1, 2, 4, and 8, the structure half of rule 9, the sentence-case
 half of rule 3, and D1 to D3 match the Microsoft Writing Style Guide, the
@@ -614,27 +648,30 @@ separate child.
   is user-typed free text and keeps double quotes under rule 6; the two IDs
   are tokens and stay bare)
 - Startup playlist warnings (built in `data_service.py`, shown under
-  "Playlist not loaded"; D7 puts a noun in front of every value):
-  - `Playlist directory is missing: {root}` → `The playlist folder {root} is
-    missing.`
+  "Playlist not loaded"; `{file}` and `{root}` are full paths, so under D7
+  the diagnosis comes first and a path that would otherwise precede it
+  moves to a sentence of its own):
+  - `Playlist directory is missing: {root}` → `Couldn't find the playlist
+    folder {root}.`
   - `Failed to read playlist file: {file}` → `Couldn't read the playlist
     file {file}.`
   - `Invalid JSON format in playlist file: {file}` → `The playlist file
-    {file} isn't valid JSON.`
+    isn't valid JSON. The file is {file}.`
   - `Skipping playlist file {file}: missing or blank playlist code; add a
-    \`code\` field.` → `The playlist file {file} has no playlist code. Add a
-    "code" field to it.`
+    \`code\` field.` → `The playlist file has no playlist code. Add a "code"
+    field to it. The file is {file}.`
   - `Skipping playlist file {file}: playlist code {code} already loaded from
     {source}.` → `Skipped the playlist file {file}. Its playlist code {code}
     is already loaded from {source}.`
   - `Skipping playlist file: {store message}` → `{store message}` (the store
-    message is a full sentence naming the file, and under D7 every one of
-    them now opens with "The file"; see the store messages group). Two of
-    the fragments composed after the file name change: the playlist-payload
-    check's `has a missing or blank playlist code; add a \`code\` field.` →
-    `has no playlist code. Add a "code" field to it.`, mirroring the
-    bundled-root sibling above, and its neighbour `is not valid playlist
-    data.` → `isn't valid playlist data.` (D6).
+    message is a full sentence that names the file by kind and ends with
+    its path; see the store messages group). Two of the fragments composed
+    after the kind noun change: the playlist-payload check's `has a missing
+    or blank playlist code; add a \`code\` field.` → `has no playlist code.
+    Add a "code" field to it.`, mirroring the bundled-root sibling above,
+    and its neighbour `is not valid playlist data.` → `isn't valid playlist
+    data.` (D6).
+
 
 **Playlists overview**
 
@@ -679,7 +716,11 @@ separate child.
   show it.` (D6, D8)
 - Duplicate-and-hidden hint: ` It is currently hidden — toggle "Show hidden"
   on this page to unhide it.` → ` It is currently hidden. Turn on the Show
-  hidden switch on this page to unhide it.` (D8)
+  hidden switch on this page, then click the eye icon on its row to show
+  it.` (D8, and a correctness fix under rule 9: Show hidden only reveals
+  hidden rows, and the eye icon is what changes the saved visibility, so
+  the shipped hint stopped one step short of the recovery it promised; the
+  wording mirrors the import-success hint above)
 - Import refusals (built in `data_service.py`, shown under "Playlist import
   failed"; the diagnostic detail stays in the log line each already writes):
   - `Failed to look up playlist code {code}: KovaaK's API error.` →
@@ -720,8 +761,8 @@ separate child.
   - `Playlist code cannot be deleted: {code} is not a user playlist.` →
     `The playlist code {code} isn't one you imported, so it can't be
     deleted.` (D6, D7)
-  - `Failed to delete playlist file: {path}` → `Couldn't delete {path}. See
-    data/logs/debug.log.`
+  - `Failed to delete playlist file: {path}` → `Couldn't delete the playlist
+    file {path}. See data/logs/debug.log.` (D7 names the value)
 
 **Playlist scenario table**
 
@@ -801,32 +842,38 @@ separate child.
 
 **Store messages** (built in `store_schema.py` for the settings,
 visibility, and playlist stores; shown in the Settings and Playlists store
-alerts and under "Playlist not loaded"; D7 puts "The file" before the path
-and D6 contracts two of them)
+alerts and under "Playlist not loaded". Under D7 each message names the
+file by its kind, "settings file", "playlist visibility file", or "playlist
+file", supplied by the caller, and gives the full path last in a sentence
+of its own; D6 contracts two of them. The settings-file form is shown; the
+other kinds substitute their noun.)
 
 - `{path} has no "schema_version" line. Add "schema_version": 1 to it, or
-  delete the file to start over.` → `The file {path} has no "schema_version"
-  line. Add "schema_version": 1 to it, or delete the file to start over.`
+  delete the file to start over.` → `The settings file has no
+  "schema_version" line. Add "schema_version": 1 to it, or delete the file
+  to start over. The file is {path}.`
 - `{path} has an invalid "schema_version" value ({value}). It must be the
-  whole number 1.` → `The file {path} has an invalid "schema_version" value
-  ({value}). It must be the whole number 1.`
+  whole number 1.` → `The settings file has an invalid "schema_version"
+  value ({value}). It must be the whole number 1. The file is {path}.`
 - `{path} was written by a newer version of this app (schema_version {n}).
-  The file is intact. Update the app to use it.` → `The file {path} was
-  written by a newer version of this app (schema_version {n}). The file is
-  intact. Update the app to use it.`
-- `{path} is not valid JSON.` → `The file {path} isn't valid JSON.`
-- `{path} must hold a JSON object.` → `The file {path} must hold a JSON
-  object.`
-- `{path} could not be read. See data/logs/debug.log.` → `The file {path}
-  couldn't be read. See data/logs/debug.log.`
+  The file is intact. Update the app to use it.` → `The settings file was
+  written by a newer version of this app (schema_version {n}). It is
+  intact. Update the app to use it. The file is {path}.`
+- `{path} is not valid JSON.` → `The settings file isn't valid JSON. The
+  file is {path}.`
+- `{path} must hold a JSON object.` → `The settings file must hold a JSON
+  object. The file is {path}.`
+- `{path} could not be read. See data/logs/debug.log.` → `Couldn't read the
+  settings file {path}. See data/logs/debug.log.`
 - The composed form for a validator's refusal, `{path} {fragment}` → `The
-  file {path} {fragment}`. The settings and visibility fragments (`has an
-  unknown setting "X".`, `must hold text values for every setting.`, `has an
-  unknown key "X".`, `is missing "shown_playlists".`, `must hold
-  "shown_playlists" as a list of text codes.`) are unchanged; the two
-  playlist fragments are listed under the startup warnings above. The stamp
-  script prints the same messages to its console and follows along, because
-  it calls the same function.
+  settings file {fragment} The file is {path}.` The settings and visibility
+  fragments (`has an unknown setting "X".`, `must hold text values for every
+  setting.`, `has an unknown key "X".`, `is missing "shown_playlists".`,
+  `must hold "shown_playlists" as a list of text codes.`) are unchanged; the
+  two playlist fragments are listed under the startup warnings above. The
+  stamp script prints the same messages to its console and follows along,
+  because it calls the same function.
+
 
 **Unchanged on purpose**
 
@@ -924,8 +971,8 @@ the screen, and log lines are outside it.
 
 ## Delivery plan
 
-1. **This PR**: the proposal. Nothing ships until D1 to D5 are ruled and the
-   Copy block has had its redline pass.
+1. **This PR**: the proposal. Nothing ships until every open decision, D1
+   to D8, is ruled and the Copy block has had its redline pass.
 2. **One implementation PR**, after ratification, from a kickoff prompt that
    hands the implementer the ratified Copy block verbatim. One PR rather than
    one per surface because the rules are one ruling: splitting them would
