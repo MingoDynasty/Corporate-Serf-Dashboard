@@ -258,9 +258,11 @@ convention does not survive the survey.
 
 ### D7 — A sentence never opens with an object name or a path
 
-Status: Open. Maintainer lean (2026-09-04): adopt, pending the review's
-stance. Narrowed on 2026-09-12 to the rule below, adopted from the review's
-counter-proposal; the amendment awaits the reviewer's confirmation.
+Status: Open. Maintainer lean (2026-09-12): adopt the rule below, with the
+supplemental path written as a labeled readout, `File: {path}`. Narrowed on
+2026-09-12 from the review's counter-proposal; the amendment awaits the
+reviewer's confirmation, and this lean supersedes the 2026-09-04 lean given
+on the wider first draft.
 
 Several rewritten messages began with a value the app fills in at runtime:
 `{file} could not be read.`, `{code} is already imported as "{name}".`, and
@@ -288,13 +290,18 @@ takes in the whole path before learning what is wrong with it.
 **Recommendation: add the narrower clause to rule 9.** An object name or a
 path never opens a sentence, and a noun names it before it appears
 (`Couldn't read the playlist file {file}.`, `The playlist code {code} is
-already imported as "{name}".`). A count or a score may lead. A full path
-comes after the diagnosis: the sentence names the file by its kind and says
-what is wrong, and the path follows in a sentence of its own (`The settings
-file has no "schema_version" line. Add "schema_version": 1 to it, or delete
-the file to start over. The file is {path}.`). User-typed free text keeps
-its quotes under rule 6. This delivers the redline's "verdict first, edges
-visible" without the colon.
+already imported as "{name}".`). A count or a score may lead. A
+one-sentence failure carries its full path inline at the end, which the
+Windows guide allows when the message needs no supplemental text. A
+message with more to say, a fix or a second clause, names the file by its
+kind, says what is wrong, and gives the full path last as a labeled
+readout: `The settings file has no "schema_version" line. Add
+"schema_version": 1 to it, or delete the file to start over. File: {path}`.
+The label is the single-string form of the Windows supplemental line: the
+diagnosis is a complete sentence before it, the label tags the value's
+role so its edges are visible, and no period follows a path. It is not the
+log idiom rule 8 keeps off the screen, where the diagnosis itself sits
+behind the colon. User-typed free text keeps its quotes under rule 6.
 
 Consequence: ten Copy entries restructure (the five startup playlist
 warnings, the store-message pass-through, the duplicate-import refusal, the
@@ -311,10 +318,14 @@ same function.
 
 Choosing differently: the first draft's absolute rule, which would rewrite
 the count-led toasts ("The app couldn't process 3 new run files.") for no
-gain in clarity; or exempting the store messages as the named exception,
-which keeps the Settings page's store alert and the stamp script's console
-output byte-identical at the cost of one message family that opens with a
-Windows path.
+gain in clarity; exempting the store messages as the named exception, which
+keeps the Settings page's store alert and the stamp script's console output
+byte-identical at the cost of one message family that opens with a Windows
+path; or writing the supplemental path as a sentence (`The file is
+{path}.`), which reads stilted and ends a path with a period. A true second
+line for the path in the alert and toast components would be closer still
+to the Windows layout; it is a component change rather than copy, and the
+labeled readout degrades into it without changing a word.
 
 
 ### D8 — Control names in prose carry their type
@@ -475,8 +486,9 @@ time, replacing the current one-line em-dash convention.
 1. **If it has a subject and a verb, it ends with a period. Status readouts
    do not.** `Settings saved.` and `No such folder.` are sentences.
    `Updating positions from KovaaK's… 12/40`, `Update interrupted · 8 of 40
-   refreshed`, `3 of 40 positions unavailable`, and the Position hint (D1)
-   are readouts and stay bare. A semicolon never joins two sentences; they
+   refreshed`, `3 of 40 positions unavailable`, the Position hint (D1), and
+   the `File: {path}` line that closes a store message (D7) are readouts and
+   stay bare. A semicolon never joins two sentences; they
    are two sentences. A sentence that ends on an inline link puts
    its period in a **separate child after the anchor**, or it renders
    underlined as part of the link; `_username_unset_status()` in
@@ -528,11 +540,12 @@ time, replacing the current one-line em-dash convention.
 9. **Error copy says what happened first, then what to do when there is
    something to do.** A failure with no useful recovery step says only what
    happened and does not invent one (`Couldn't read the playlist file
-   {file}.`, `The settings file isn't valid JSON. The file is {path}.`). An
-   object name or a path never opens a sentence: a noun names it before it
-   appears, a count or a score may lead, and a full path comes after the
-   diagnosis in a sentence of its own (D7). The toast title carries the
-   verdict (unchanged from 2026-08-03).
+   {file}.`, `The settings file isn't valid JSON. File: {path}`). An object
+   name or a path never opens a sentence: a noun names it before it appears,
+   and a count or a score may lead. A one-sentence failure carries its full
+   path inline at the end; a message with more to say names the file by kind
+   and gives the path last as the labeled readout `File: {path}` (D7). The
+   toast title carries the verdict (unchanged from 2026-08-03).
 
 Basis. Rules 1, 2, 4, and 8, the structure half of rule 9, the sentence-case
 half of rule 3, and D1 to D3 match the Microsoft Writing Style Guide, the
@@ -663,16 +676,16 @@ separate child.
 - Startup playlist warnings (built in `data_service.py`, shown under
   "Playlist not loaded"; `{file}` and `{root}` are full paths, so under D7
   the diagnosis comes first and a path that would otherwise precede it
-  moves to a sentence of its own):
+  moves to a `File:` readout at the end):
   - `Playlist directory is missing: {root}` → `Couldn't find the playlist
     folder {root}.`
   - `Failed to read playlist file: {file}` → `Couldn't read the playlist
     file {file}.`
   - `Invalid JSON format in playlist file: {file}` → `The playlist file
-    isn't valid JSON. The file is {file}.`
+    isn't valid JSON. File: {file}`
   - `Skipping playlist file {file}: missing or blank playlist code; add a
     \`code\` field.` → `The playlist file has no playlist code. Add a "code"
-    field to it. The file is {file}.`
+    field to it. File: {file}`
   - `Skipping playlist file {file}: playlist code {code} already loaded from
     {source}.` → `Skipped the playlist file {file}. Its playlist code {code}
     is already loaded from {source}.`
@@ -857,29 +870,29 @@ separate child.
 visibility, and playlist stores; shown in the Settings and Playlists store
 alerts and under "Playlist not loaded". Under D7 each message names the
 file by its kind, "settings file", "playlist visibility file", or "playlist
-file", supplied by the caller, and gives the full path last in a sentence
-of its own; D6 contracts two of them. The settings-file form is shown; the
+file", supplied by the caller, and gives the full path last as a `File:`
+readout; D6 contracts two of them. The settings-file form is shown; the
 other kinds substitute their noun.)
 
 - `{path} has no "schema_version" line. Add "schema_version": 1 to it, or
   delete the file to start over.` → `The settings file has no
   "schema_version" line. Add "schema_version": 1 to it, or delete the file
-  to start over. The file is {path}.`
+  to start over. File: {path}`
 - `{path} has an invalid "schema_version" value ({value}). It must be the
   whole number 1.` → `The settings file has an invalid "schema_version"
-  value ({value}). It must be the whole number 1. The file is {path}.`
+  value ({value}). It must be the whole number 1. File: {path}`
 - `{path} was written by a newer version of this app (schema_version {n}).
   The file is intact. Update the app to use it.` → `The settings file was
   written by a newer version of this app (schema_version {n}). It is
-  intact. Update the app to use it. The file is {path}.`
+  intact. Update the app to use it. File: {path}`
 - `{path} is not valid JSON.` → `The settings file isn't valid JSON. The
   file is {path}.`
 - `{path} must hold a JSON object.` → `The settings file must hold a JSON
-  object. The file is {path}.`
+  object. File: {path}`
 - `{path} could not be read. See data/logs/debug.log.` → `Couldn't read the
   settings file {path}. See data/logs/debug.log.`
 - The composed form for a validator's refusal, `{path} {fragment}` → `The
-  settings file {fragment} The file is {path}.` The settings and visibility
+  settings file {fragment} File: {path}` The settings and visibility
   fragments (`has an unknown setting "X".`, `must hold text values for every
   setting.`, `has an unknown key "X".`, `is missing "shown_playlists".`,
   `must hold "shown_playlists" as a list of text codes.`) are unchanged; the
@@ -944,6 +957,8 @@ the screen, and log lines are outside it.
 
 - Console, launcher, and installer output, `logging` text, docstrings, code
   comments, and documentation prose. The rules govern what the browser shows.
+  How log lines delimit the values they interpolate (the `%r` question) is a
+  separate follow-up after this PR ships, not part of the sweep.
 - Softening the red hard-failure refresh toast to yellow: the `tech_debt.md`
   entry's color question stays open; this proposal resolves only the title
   half it depended on.
