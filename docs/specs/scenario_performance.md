@@ -20,7 +20,7 @@ that no decision-log entry governs. Runtime structure is mapped in
 [architecture.md](../architecture.md), the user-facing rationale in
 [product.md](../product.md). The Aim Training Journey page
 (`/aim-training-journey`, reachable by URL only) is work in progress and out
-of scope here.
+of scope here, apart from its chart toolbar, noted under The graph.
 
 ## Identity
 
@@ -146,7 +146,10 @@ of scope here.
   everything plotted: the title, each plotted run's timestamp, score,
   accuracy, and x value, the Average Score line, and the label and value of
   each overlay line drawn. Neither the button nor the flow is app code: the
-  graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose
+  graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
+  The Aim Training Journey graph passes no `config` either and carries the
+  same toolbar and flow; its figure is the playlist lines, their dates and
+  progress percentages, and the aim-training-hours checkpoint labels
   ([2026-09-12](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
 
 ## Chart options panel
