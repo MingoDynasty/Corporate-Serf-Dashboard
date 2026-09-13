@@ -260,9 +260,10 @@ convention does not survive the survey.
 
 Status: Open. Maintainer lean (2026-09-12): adopt the rule below, with the
 supplemental path written as a labeled readout, `File: {path}`. Narrowed on
-2026-09-12 from the review's counter-proposal; the amendment awaits the
-reviewer's confirmation, and this lean supersedes the 2026-09-04 lean given
-on the wider first draft.
+2026-09-12 from the review's counter-proposal, which the review confirmed
+the same day; the row is unanimous as amended and awaits the maintainer's
+ruling. This lean supersedes the 2026-09-04 lean given on the wider first
+draft.
 
 Several rewritten messages began with a value the app fills in at runtime:
 `{file} could not be read.`, `{code} is already imported as "{name}".`, and
@@ -291,12 +292,13 @@ takes in the whole path before learning what is wrong with it.
 path never opens a sentence, and a noun names it before it appears
 (`Couldn't read the playlist file {file}.`, `The playlist code {code} is
 already imported as "{name}".`). A count or a score may lead. A
-one-sentence failure carries its full path inline at the end, which the
-Windows guide allows when the message needs no supplemental text. If any
-sentence follows the one that would carry the path, the message names the
-file by its kind, says what is wrong, and gives the full path last as a
-labeled readout: `The settings file has no "schema_version" line. Add
-"schema_version": 1 to it, or delete the file to start over. File: {path}`.
+path goes inline only as the last words of the message's only sentence
+(`Couldn't read the playlist file {file}.`), which the Windows guide allows
+when the message needs no supplemental text. Otherwise the message names
+the file by its kind, finishes its sentences, and gives the full path last
+as a labeled readout: `The settings file isn't valid JSON. File: {path}`,
+`The settings file has no "schema_version" line. Add "schema_version": 1 to
+it, or delete the file to start over. File: {path}`.
 The label is the single-string form of the Windows supplemental line: the
 diagnosis is a complete sentence before it, and the label marks where the
 value starts so its edges are visible. It is not the log idiom rule 8 keeps
@@ -412,7 +414,8 @@ string: the conversion is parse-time code, and its 2026-09-11 decision-log
 entry and spec updates quote stats-file keys, not app copy. The reworked
 README names "Run Notifications" and the toggle "Show hidden" phrasing, so
 the sweep's README pass has two hits. The counts below still hold at
-`7eecae3`.
+`7eecae3`, and at `ec758e4` (main, 2026-09-13), whose only addition is the
+AGPL decision-log entry, which quotes no app copy.
 
 The same condition, four shapes, is the seed symptom:
 
@@ -545,11 +548,11 @@ time, replacing the current one-line em-dash convention.
    happened and does not invent one (`Couldn't read the playlist file
    {file}.`, `The settings file isn't valid JSON. File: {path}`). An object
    name or a path never opens a sentence: a noun names it before it appears,
-   and a count or a score may lead. A one-sentence failure carries its full
-   path inline at the end; if any sentence follows the one that would carry
-   the path, the message names the file by kind and gives the path last as
-   the labeled readout `File: {path}` (D7). The toast title carries the
-   verdict (unchanged from 2026-08-03).
+   and a count or a score may lead. A path goes inline only as the last
+   words of the message's only sentence; otherwise the message names the
+   file by kind, finishes its sentences, and gives the path last as the
+   labeled readout `File: {path}` (D7). The toast title carries the verdict
+   (unchanged from 2026-08-03).
 
 Basis. Rules 1, 2, 4, and 8, the structure half of rule 9, the sentence-case
 half of rule 3, and D1 to D3 match the Microsoft Writing Style Guide, the
@@ -679,9 +682,9 @@ separate child.
   is user-typed free text and keeps double quotes under rule 6; the two IDs
   are tokens and stay bare)
 - Startup playlist warnings (built in `data_service.py`, shown under
-  "Playlist not loaded"; `{file}` and `{root}` are full paths, so under D7
-  the diagnosis comes first and a path that would otherwise precede it
-  moves to a `File:` readout at the end):
+  "Playlist not loaded"; `{file}` and `{root}` are full paths, placed by
+  rule 9's path test: inline only as the last words of a lone sentence,
+  otherwise a `File:` readout at the end):
   - `Playlist directory is missing: {root}` → `Couldn't find the playlist
     folder {root}.`
   - `Failed to read playlist file: {file}` → `Couldn't read the playlist
@@ -841,7 +844,8 @@ separate child.
   leaderboard rank. Leave it empty to turn rank lookups off.` → `Your
   KovaaK's account name, used to look up your leaderboard position. Leave it
   empty to turn position lookups off.` (rule 7: *Rank* is the benchmark
-  tier, and "leaderboard position" is the run toast's own phrase)
+  tier, and "leaderboard position" is the phrase the Refresh button's
+  username-unset toast and the setup card's account body already use)
 - Steam ID error: `Enter a 17-digit SteamID64 — it starts with 7656119.` →
   `Enter a 17-digit SteamID64. It starts with 7656119.`
 - Steam ID description: `Your 17-digit SteamID64. Optional; it disambiguates
@@ -885,10 +889,20 @@ a screen reader announces are copy under rule 8)
 - Theme switch tooltip: `Toggle light and dark theme` → `Change theme`
   (rule 7: *toggle* is never a verb)
 - Theme switch accessible name: `Toggle color scheme` → `Change theme`
-- Navigation button accessible name: `Toggle navigation` → `Navigation
-  menu` (the common accessible name for a menu button: it says what the
-  control is, and the open or closed state is the control's own to
-  announce)
+- Navigation button accessible name: `Toggle navigation` → `Show or hide
+  navigation` (the control announces no open or closed state, so the name
+  keeps the action without *toggle* as a verb; exposing the state is a
+  component change outside the sweep)
+
+**Playlist grid renderers** (accessible names in
+`assets/dashAgGridComponentFunctions.js`, in scope under rule 8)
+
+- Eye icon, hidden row: `Unhide` → `Show` (the icon's own tooltip and the
+  hidden-playlist hints say "show"; after the sweep this would be the only
+  "unhide" left in the app)
+- Unchanged: `Hide` on the eye icon of a shown row and `Delete` on the
+  trash icon; the Scenario Performance help icons' names, `{label} help`,
+  take D2's casing through their labels with no string of their own.
 
 **Store messages** (built in `store_schema.py` for the settings,
 visibility, and playlist stores; shown in the Settings and Playlists store
@@ -1013,8 +1027,9 @@ the screen, and log lines are outside it.
   `test_home_stats_dir_hint.py`,
   `test_playlist_pages.py`, `test_settings_page.py`, `test_ui_presentation.py`,
   and the service modules `test_data_service_extract.py`,
-  `test_playlist_visibility_service.py`, and `test_settings_service.py`,
-  which asserts the store layer's "is not valid JSON" through the log, plus
+  `test_playlist_visibility_service.py`, `test_settings_service.py`, which
+  asserts the store layer's "is not valid JSON" through the log, and
+  `test_app_shell.py`, which pins the two header accessible names, plus
   whatever `rg` finds for each quoted string at implementation time.
 - The standard local gates (`pytest`, `ruff format --check`, `ruff check`,
   `mypy`, `compileall`).
