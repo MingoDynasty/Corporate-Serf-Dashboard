@@ -2012,6 +2012,66 @@ which gives the overview grid the same unset-username explanation the
 drill-down page already had) and #236 (the card); the proposal file is deleted
 in the shipping PR and git history holds its full text.
 
+## 2026-08-10: The Project Is AGPL-3.0, And Contributors Sign Nothing
+
+Status: Accepted
+
+Corporate Serf Dashboard is licensed under the GNU Affero General Public
+License v3.0, and contributors are not asked to sign a contributor agreement.
+Anyone may use, change, and redistribute it, but a version they pass on has to
+stay free and open source under the same terms. The choice was confirmed
+deliberately on 2026-08-10, before the public launch, because it is the one
+launch decision that cannot be taken back later. A few assets the app bundles
+from other projects keep their own terms, so this is not a whole-tree claim.
+
+**What was chosen.** AGPL-3.0 for this project's own code, whole text in
+`LICENSE`. No contributor license agreement, no copyright assignment: a pull
+request is accepted on its merits, and its author keeps their copyright. The
+ruling is from 2026-08-10; the README's `## License` section has stated the
+license publicly since PR #278, and this entry is the record of why.
+
+**Bundled third-party assets keep their own licenses**, and this is not a
+whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
+(`assets/vendor/canvas-confetti.LICENSE`), and the vendored SVGs under
+`assets/icons/` are MIT, Apache-2.0 and CC0 by collection, tabulated in
+`assets/icons/README.md`. `assets/` is in the release archive contract, so
+those notices travel inside every published zip and have to be preserved on
+redistribution. Vendoring anything new means confirming its license and
+recording it the same way. `resources/` ships under the same contract but is
+imported data, not vendored code: the benchmark library, a snapshot of Evxl's
+benchmark index, and a KovaaK's game-settings response. No license is recorded
+for any of it, and this entry does not settle whether one should be.
+
+**Why this license.** The priority is that derivatives stay free and open
+source. AGPL binds anyone who conveys a modified version, or offers one to
+users over a network, to make that version's source available to those
+recipients or users under the same terms.
+
+**Why no CLA.** At this scale the friction a CLA puts in front of a first-time
+contributor costs more than the flexibility it buys. What it would have bought
+is the ability to relicense later without hunting down every contributor, and
+that is the price being paid knowingly.
+
+**The relicensing window closes at the first outside contribution, on
+purpose.** Relicensing needs the consent of every copyright holder. Today that
+is one person, so the license could still be changed unilaterally. The moment
+an outside pull request is merged, it cannot. A public launch invites exactly
+that, which is why the question was answered before launching rather than
+after.
+
+**Rejected alternatives.**
+
+- **MIT or Apache-2.0.** Permissive terms would allow a closed commercial fork
+  of the app, which is the outcome the choice exists to prevent.
+- **AGPL plus a CLA, or copyright assignment.** Keeps the relicensing option
+  open, at the cost of asking every contributor to sign before their first
+  patch. Judged not worth it here.
+
+**Where the terms travel.** `LICENSE` is named in `REQUIRED_ARCHIVE_ENTRIES`
+in `scripts/release_job.py`, so a release whose zip lost it fails the draft
+rather than shipping: every published copy carries the terms. The README's
+`## License` section states them for readers who never open the file.
+
 ## 2026-08-10: Bug Reports Land On GitHub Issues, With The Log Attached Unredacted And Disclosed
 
 Status: Accepted
