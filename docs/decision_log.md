@@ -64,6 +64,71 @@ live imports.
 **Incidental.** The per-render `os.listdir` of the stats directory is gone.
 That was not the motivation, and no caching was restructured for it.
 
+## 2026-09-12: Charts Keep plotly.js 4's Share Chart Button
+
+Status: Accepted
+
+Upgrading plotly put a "Share chart..." button on both of the app's charts,
+because the new plotly.js turns that button on by default. The button stays
+rather than being hidden. Sharing happens only when a user presses it,
+confirms a dialog that names Plotly Cloud, and is signed in there, so it is
+an export the user chooses and not data the app sends on its own. Users see it
+beside the existing PNG download, and the README lists Plotly Cloud among the
+services the app can reach.
+
+**What changed.** plotly 7.0.0 bundles plotly.js 4.0.0, and Dash serves
+plotly.js from the plotly package (`package_data/plotly.min.js`), so the
+upgrade changes the browser runtime and not only the Python API. plotly.js
+4.0.0 changed the `showSendToCloud` config default from `false` to `true`.
+Neither `dcc.Graph` passes `config` (`graph-content` in
+`source/pages/home.py`, `aim-training-journey-graph` in
+`source/pages/aim_training_journey.py`), so both render the button. Ruled on
+2026-09-12 (PR #283): ship it, do not suppress it. There is no config line to
+carry this reason beside the code, because the behavior is a library default;
+this entry is the only record that it is deliberate.
+
+**What pressing it does**, verified against the bundled plotly.js 4.0.0. The
+button opens plotly.js's own dialog naming Plotly Cloud, with Cancel and
+Share; nothing is sent before Share. Share runs `sendDataToCloud`: it
+serializes the figure with `graphJson` (data arrays and layout), opens
+`plotlyServerURL` (default `https://cloud.plotly.com/newchart`; Dash sets no
+`PLOTLYENV.BASE_URL`) in a new tab with the dashboard's
+`window.location.origin` as an `origin` query parameter, and listens for a
+`CHART_AUTH_SUCCESS` message from that origin, which Plotly Cloud sends once
+the user is signed in there (the dialog offers account creation to anyone
+without one). Only then does it `postMessage` the figure to that tab. Whether
+an existing Plotly Cloud session skips the sign-in step is Plotly Cloud's
+behavior, not visible in plotly.js. The app makes no request itself, and a
+blocked popup ends the flow with nothing sent. The figure carries, on
+Scenario Performance: the scenario
+name and render time in the title; every plotted run's timestamp, score, and
+accuracy, and its x value (sensitivity or date); the average-score line; and
+the label and value of any rank, PB score, or score-threshold overlay shown.
+On Aim Training Journey: playlist names, dates, progress percentages, and the
+aim-training-hours checkpoint labels.
+
+**Why it stays.** The flow is user-initiated, gated by a dialog that names
+its destination, and completes in a Plotly Cloud tab the user can see, which
+makes it an export in the same class as saving the PNG. That is what
+separates it from crash telemetry, which the
+[2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
+rejects as privacy-hostile for a local tool. The README's outside-services
+table carries a Plotly row as the disclosure.
+
+**Rejected alternative.** `config={"showSendToCloud": False}` on both graphs,
+holding the plotly.js 3 default. PR #283 shipped that hold first and backed it
+out on the ruling: it guarded against a hidden data flow that does not exist,
+and the one real gap, the README's list of services, was cheaper to close by
+updating the README.
+
+**Reversing it.** Pass `config={"showSendToCloud": False}` to every
+`dcc.Graph`, including any added later (a layout test that walks all graphs,
+rather than naming ids, is the guard that holds), and remove the Plotly row
+from the README. **Revisit trigger:** plotly.js changing the flow so data
+leaves before the dialog or without the Plotly Cloud tab, or changing the
+default `plotlyServerURL`; or a user report of the button being mistaken for
+a local save.
+
 ## 2026-09-11: Sensitivities Normalize To cm/360 At Parse Time From The File's Own Increment And DPI
 
 Status: Accepted
@@ -2062,6 +2127,66 @@ Provenance: distilled from `docs/initial_setup_proposal.md` (proposed in PR
 which gives the overview grid the same unset-username explanation the
 drill-down page already had) and #236 (the card); the proposal file is deleted
 in the shipping PR and git history holds its full text.
+
+## 2026-08-10: The Project Is AGPL-3.0, And Contributors Sign Nothing
+
+Status: Accepted
+
+Corporate Serf Dashboard is licensed under the GNU Affero General Public
+License v3.0, and contributors are not asked to sign a contributor agreement.
+Anyone may use, change, and redistribute it, but a version they pass on has to
+stay free and open source under the same terms. The choice was confirmed
+deliberately on 2026-08-10, before the public launch, because it is the one
+launch decision that cannot be taken back later. A few assets the app bundles
+from other projects keep their own terms, so this is not a whole-tree claim.
+
+**What was chosen.** AGPL-3.0 for this project's own code, whole text in
+`LICENSE`. No contributor license agreement, no copyright assignment: a pull
+request is accepted on its merits, and its author keeps their copyright. The
+ruling is from 2026-08-10; the README's `## License` section has stated the
+license publicly since PR #278, and this entry is the record of why.
+
+**Bundled third-party assets keep their own licenses**, and this is not a
+whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
+(`assets/vendor/canvas-confetti.LICENSE`), and the vendored SVGs under
+`assets/icons/` are MIT, Apache-2.0 and CC0 by collection, tabulated in
+`assets/icons/README.md`. `assets/` is in the release archive contract, so
+those notices travel inside every published zip and have to be preserved on
+redistribution. Vendoring anything new means confirming its license and
+recording it the same way. `resources/` ships under the same contract but is
+imported data, not vendored code: the benchmark library, a snapshot of Evxl's
+benchmark index, and a KovaaK's game-settings response. No license is recorded
+for any of it, and this entry does not settle whether one should be.
+
+**Why this license.** The priority is that derivatives stay free and open
+source. AGPL binds anyone who conveys a modified version, or offers one to
+users over a network, to make that version's source available to those
+recipients or users under the same terms.
+
+**Why no CLA.** At this scale the friction a CLA puts in front of a first-time
+contributor costs more than the flexibility it buys. What it would have bought
+is the ability to relicense later without hunting down every contributor, and
+that is the price being paid knowingly.
+
+**The relicensing window closes at the first outside contribution, on
+purpose.** Relicensing needs the consent of every copyright holder. Today that
+is one person, so the license could still be changed unilaterally. The moment
+an outside pull request is merged, it cannot. A public launch invites exactly
+that, which is why the question was answered before launching rather than
+after.
+
+**Rejected alternatives.**
+
+- **MIT or Apache-2.0.** Permissive terms would allow a closed commercial fork
+  of the app, which is the outcome the choice exists to prevent.
+- **AGPL plus a CLA, or copyright assignment.** Keeps the relicensing option
+  open, at the cost of asking every contributor to sign before their first
+  patch. Judged not worth it here.
+
+**Where the terms travel.** `LICENSE` is named in `REQUIRED_ARCHIVE_ENTRIES`
+in `scripts/release_job.py`, so a release whose zip lost it fails the draft
+rather than shipping: every published copy carries the terms. The README's
+`## License` section states them for readers who never open the file.
 
 ## 2026-08-10: Bug Reports Land On GitHub Issues, With The Log Attached Unredacted And Disclosed
 
