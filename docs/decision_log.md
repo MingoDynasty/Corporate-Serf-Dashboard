@@ -47,8 +47,9 @@ serializes the figure with `graphJson` (data arrays and layout), opens
 the user is signed in there (the dialog offers account creation to anyone
 without one). Only then does it `postMessage` the figure to that tab. Whether
 an existing Plotly Cloud session skips the sign-in step is Plotly Cloud's
-behavior, not visible in plotly.js. The app makes no request itself, and a blocked popup ends the flow
-with nothing sent. The figure carries, on Scenario Performance: the scenario
+behavior, not visible in plotly.js. The app makes no request itself, and a
+blocked popup ends the flow with nothing sent. The figure carries, on
+Scenario Performance: the scenario
 name and render time in the title; every plotted run's timestamp, score, and
 accuracy, and its x value (sensitivity or date); the average-score line; and
 the label and value of any rank, PB score, or score-threshold overlay shown.
@@ -57,8 +58,8 @@ aim-training-hours checkpoint labels.
 
 **Why it stays.** The flow is user-initiated, gated by a dialog that names
 its destination, and completes in a Plotly Cloud tab the user can see, which
-makes it an export in the same class as saving the PNG. That is what separates it from
-crash telemetry, which the
+makes it an export in the same class as saving the PNG. That is what
+separates it from crash telemetry, which the
 [2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
 rejects as privacy-hostile for a local tool. The README's outside-services
 table carries a Plotly row as the disclosure.
@@ -73,9 +74,9 @@ updating the README.
 `dcc.Graph`, including any added later (a layout test that walks all graphs,
 rather than naming ids, is the guard that holds), and remove the Plotly row
 from the README. **Revisit trigger:** plotly.js changing the flow so data
-leaves before the dialog or without the Plotly Cloud tab, or changing the default
-`plotlyServerURL`; or a user report of the button being mistaken for a local
-save.
+leaves before the dialog or without the Plotly Cloud tab, or changing the
+default `plotlyServerURL`; or a user report of the button being mistaken for
+a local save.
 
 ## 2026-09-11: Sensitivities Normalize To cm/360 At Parse Time From The File's Own Increment And DPI
 
