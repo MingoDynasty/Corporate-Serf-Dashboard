@@ -417,6 +417,17 @@ the sweep's README pass has two hits. The counts below still hold at
 `7eecae3`, and at `ec758e4` (main, 2026-09-13), whose only addition is the
 AGPL decision-log entry, which quotes no app copy.
 
+Re-verified against `750af53` (main, 2026-09-13) after the plotly 7
+toolchain upgrade merged. It changes no file under `source/`, `assets/`, or
+`scripts/`, so no app string moved and the counts below still hold. What
+changed is the browser: plotly.js 4 draws its own `Share chart...` command
+and confirmation dialog on both charts' toolbars, kept by the 2026-09-12
+decision-log entry, and neither chart passes a `config`. That text is the
+library's, not the app's, so rules 4 and 8 now say they govern text this
+app authors, and Out of scope names library-drawn text. The README's
+outbound-services table quotes the command's label as documentation prose,
+which the sweep leaves alone.
+
 The same condition, four shapes, is the seed symptom:
 
 | Surface | Current text |
@@ -508,8 +519,10 @@ time, replacing the current one-line em-dash convention.
    and only where something is still going on: the in-progress fill
    readout. Placeholders are bare noun phrases (`Select a scenario`, `Filter
    playlists`), a path is never elided with one, and no line trails off for
-   tone (D4). The app has no command that opens a further dialog, so the
-   desktop convention of an ellipsis on such a command has no site.
+   tone (D4). The app authors no command that opens a further dialog, so
+   the desktop convention of an ellipsis on such a command has no site in
+   its copy; the chart toolbar's `Share chart...` is plotly.js's own label
+   and dialog, outside the rules (see Out of scope).
 5. **Contractions, consistently (D6).** The common ones: `can't`,
    `couldn't`, `doesn't`, `isn't`, `wasn't`, `aren't`, `you're`. A
    contraction and its full form never both appear in the app; `do not` is
@@ -538,11 +551,14 @@ time, replacing the current one-line em-dash convention.
    *toggle* is never a verb. An open-ended list uses *such as* with an
    example or two, never *etc.* The pointer to the log is always `See
    data/logs/debug.log.`
-8. **A message that reaches the screen is user copy wherever it is built.**
-   Service-layer strings that a page shows verbatim follow every rule above;
-   the diagnostic detail stays in the log line beside them. An accessible
-   name (`aria-label`) reaches the user through a screen reader and counts
-   too.
+8. **A message that reaches the screen is user copy wherever this app
+   builds it.** Service-layer strings that a page shows verbatim follow
+   every rule above; the diagnostic detail stays in the log line beside
+   them. An accessible name (`aria-label`) reaches the user through a
+   screen reader and counts too. Text a bundled library draws on its own
+   (plotly.js's chart toolbar and dialogs, AG Grid's overlays, Mantine's
+   built-in text) is not app copy; text the app hands a library (a column
+   header, a placeholder, an accessible name) is.
 9. **Error copy says what happened first, then what to do when there is
    something to do.** A failure with no useful recovery step says only what
    happened and does not invent one (`Couldn't read the playlist file
@@ -960,8 +976,8 @@ other kinds substitute their noun.)
   app header's Discord and GitHub tooltips.
 - The launcher's and installer's console output, which the 2026-08-21
   launcher entry governs, and every `logging` line: neither is app copy.
-  Log lines keep their full forms; D6's never-mix clause governs what the
-  browser shows.
+  Log lines keep their full forms; D6's never-mix clause governs the app's
+  own on-screen copy.
 
 ### Testing the rule, not just the strings
 
@@ -995,9 +1011,18 @@ the screen, and log lines are outside it.
 ## Out of scope
 
 - Console, launcher, and installer output, `logging` text, docstrings, code
-  comments, and documentation prose. The rules govern what the browser shows.
-  How log lines delimit the values they interpolate (the `%r` question) is a
-  separate follow-up after this PR ships, not part of the sweep.
+  comments, and documentation prose. The rules govern the text this app's
+  own code puts on the screen. How log lines delimit the values they
+  interpolate (the `%r` question) is a separate follow-up after this PR
+  ships, not part of the sweep.
+- Text a bundled library draws on its own: plotly.js's chart toolbar, with
+  the `Share chart...` command and its confirmation dialog that the
+  2026-09-12 decision-log entry keeps by ruling, AG Grid's built-in
+  overlays, and Mantine's built-in text. The app authors none of it and
+  passes no override (no plotly `config`, no grid `localeText`), so the
+  rules do not govern it and the sweep's completeness is not measured
+  against it. Should the app ever supply such text itself, that text is app
+  copy under rule 8.
 - Softening the red hard-failure refresh toast to yellow: the `tech_debt.md`
   entry's color question stays open; this proposal resolves only the title
   half it depended on.
@@ -1015,8 +1040,10 @@ the screen, and log lines are outside it.
   notes' enumeration of what the app talks to: every in-app string that makes
   a network claim (the username description, the setup card's fine print, the
   Detect hint, the Refresh tooltip, the import help) agrees with it, and none
-  carries the enumeration itself. The "What it talks to" statement stays a
-  README job, and its same-PR maintenance rule does not reach app copy.
+  carries the enumeration itself. Re-checked at `750af53`: the Share chart
+  flow's only wording is plotly.js's own dialog, and no app string describes
+  it. The "What it talks to" statement stays a README job, and its same-PR
+  maintenance rule does not reach app copy.
 
 ## Testing
 
@@ -1075,7 +1102,9 @@ the screen, and log lines are outside it.
    Run Notifications control name, and two "rank lookups" paraphrases a
    string search will miss), `docs/architecture.md` and
    `docs/roadmap.md` (the control names D2 renames), and the README wherever
-   the same `rg` finds a changed string. No new capability spec is created:
+   the same `rg` finds a changed string (its outbound-services table quotes
+   plotly's `Share chart...`, library text the sweep leaves as is). No new
+   capability spec is created:
    app copy as a whole has no spec, and the strings that do live in one live
    in the spec of the capability they belong to. No hard dependency on other
    in-flight work. Under D5 it is sequenced before the release the
