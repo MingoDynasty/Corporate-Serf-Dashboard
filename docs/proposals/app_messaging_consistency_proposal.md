@@ -100,8 +100,9 @@ This is the direction the most recent rulings already lean: the ratified Run
 Data Points group pairs a Title Case heading with sentence-case fields. The
 consequence is renaming six Title Case switch labels, two of them ratified on
 2026-08-21 ("Run Notifications", "Score Threshold Verdict"), plus three modal
-titles and the chart's "PB Score" and "Score Threshold" annotations, which
-follow their switches.
+titles, the chart's "PB Score" and "Score Threshold" annotations, which
+follow their switches, and the chart's two legend entries, "Run Data Point"
+and "Average Score", which sit beside them.
 
 The 2026-09-04 conventions survey endorses this row. The Microsoft style
 guide, the Windows app writing guidance, Material, Atlassian, Polaris,
@@ -372,8 +373,9 @@ user-facing string in `source/pages/`, `source/app_shell.py`, the service
 messages that reach a toast or alert (`source/kovaaks/data_service.py`,
 `source/kovaaks/api_service.py`, `source/utilities/store_schema.py`,
 `source/kovaaks/percentile_warmup_service.py` and the fatal reasons it
-relays, `source/my_watchdog/file_watchdog.py`), the chart annotations in
-`source/plot/plot_service.py`, and the grid renderers in `assets/`. It
+relays, `source/my_watchdog/file_watchdog.py`), the chart annotations and
+legend entries in `source/plot/plot_service.py`, and the grid renderers in
+`assets/`. It
 supersedes the 2026-08-11 design note that seeded it; that note's one
 "carry-along fix" (the Home restart hint saying "the dashboard") has already
 shipped in `b288b9f` and is not repeated here.
@@ -427,6 +429,13 @@ library's, not the app's, so rules 4 and 8 now say they govern text this
 app authors, and Out of scope names library-drawn text. The README's
 outbound-services table quotes the command's label as documentation prose,
 which the sweep leaves alone.
+
+Re-read at `0ea190b` (2026-09-13): the chart's two legend entries, `Run
+Data Point` and `Average Score`, and the average line's hover label had
+escaped every inventory pass, which had read the overlay `name` arguments
+as the legend when only their annotations are visible. Both entries and
+the label now sit in the Copy block under D2, beside the annotations they
+share the chart with.
 
 The same condition, four shapes, is the seed symptom:
 
@@ -662,8 +671,13 @@ separate child.
   label, the one place the block knowingly does so)
 - Empty chart, date range: `Choose an older start date or play more runs.` →
   `Choose an older date or play more runs.`
-- Chart annotations and legend names: `PB Score (123.00)` → `PB score
-  (123.00)`; `Score Threshold (118.00)` → `Score threshold (118.00)`
+- Chart annotations and legend entries: `PB Score (123.00)` → `PB score
+  (123.00)`; `Score Threshold (118.00)` → `Score threshold (118.00)`; the
+  legend entries `Run Data Point` → `Run data point` and `Average Score` →
+  `Average score`; the average line's hover label `<b>Average Score</b>` →
+  `<b>Average score</b>` (the options group heading *Run Data Points* is a
+  section heading and keeps its capitals under D2; rank overlays carry the
+  tier's own name)
 
 **Scenario Performance: toasts**
 
@@ -1053,7 +1067,10 @@ the screen, and log lines are outside it.
   `test_home_run_events.py`, `test_home_setup_card.py`,
   `test_home_stats_dir_hint.py`,
   `test_playlist_pages.py`, `test_settings_page.py`, `test_ui_presentation.py`,
-  and the service modules `test_data_service_extract.py`,
+  the chart modules `test_plot_service.py`,
+  `test_home_build_scenario_figure.py`, and `test_home_point_appearance.py`,
+  which pin the legend entries and the hover label, and the service modules
+  `test_data_service_extract.py`,
   `test_playlist_visibility_service.py`, `test_settings_service.py`, which
   asserts the store layer's "is not valid JSON" through the log, and
   `test_app_shell.py`, which pins the two header accessible names, plus
@@ -1076,10 +1093,12 @@ the screen, and log lines are outside it.
    (source and AGENTS.md), the tests and AST guard, then the docs. The docs
    commit carries the full shipping checklist: the decision-log entry with
    the rules and their rationale, "superseded in part, for copy" notes on the
-   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-21, 2026-08-22, and
-   2026-09-02 entries whose quoted strings change (the 2026-08-11 setup-card
-   entry quotes the fine print, and the celebration entry quotes the Run
-   Notifications control name), the `tech_debt.md` edit for the refresh-toast
+   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-20, 2026-08-21, 2026-08-22,
+   and 2026-09-02 entries whose quoted strings change (the 2026-08-11
+   setup-card entry quotes the fine print, the celebration entry quotes the
+   Run Notifications control name, and the 2026-08-20 run-points entry and
+   the 2026-08-21 empty-point-color entry name the Average Score line), the
+   `tech_debt.md` edit for the refresh-toast
    title, a
    `product.md` line, the roadmap milestone moved to Shipped, and the
    deletion of this file. The current-behavior docs that quote changed
@@ -1095,8 +1114,9 @@ the screen, and log lines are outside it.
    delete refusals), `settings.md` (the field label, the Steam ID error, the
    save-failed status, the detection copy, the store alert title, and the
    setup card's Skip-failure line), `scenario_performance.md` (the control
-   names D2 renames, the toast bodies, and the setup card's unreadable-store
-   body, stats-folder body, and fine print), and `notifications.md` (the
+   names D2 renames, the toast bodies, the "Average Score" line named three
+   times, and the setup card's unreadable-store body, stats-folder body, and
+   fine print), and `notifications.md` (the
    control names D2 renames, the toast bodies, and the Skip-refused title) —
    plus `docs/product.md` (the unset-username status, the refresh toast, the
    Run Notifications control name, and two "rank lookups" paraphrases a
