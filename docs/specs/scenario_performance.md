@@ -7,7 +7,9 @@ options panel tunes how the chart looks and which run notifications fire, and
 every preference in it is remembered by the browser. A newly played run
 reaches the chart automatically once its file is imported, and the page can
 follow the scenario just played. Older runs recorded on a game's own
-sensitivity scale sit on the same cm/360 axis as everything else. The page
+sensitivity scale sit on the same cm/360 axis as everything else. The chart's
+toolbar can save it as a PNG, or share it to Plotly Cloud once you confirm
+and are signed in there. The page
 also hosts the setup surfaces that point you at Settings, whether something
 has never been set or saved settings cannot be read.
 
@@ -135,6 +137,17 @@ of scope here.
   placeholder and empty figures pass through untouched. Nothing else on the
   chart is customizable, and that boundary is deliberate
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)).
+- The chart keeps plotly.js's default modebar, which offers "Download plot as
+  a PNG", a save to this PC, and "Share chart...". Pressing "Share chart..."
+  opens plotly.js's confirmation naming Plotly Cloud, and nothing is sent
+  before its Share button. Share opens Plotly Cloud in a new browser tab and
+  hands that tab the figure only once Plotly Cloud reports the user signed in
+  there; a blocked popup ends the flow with nothing sent. The figure is
+  everything plotted: the title, each plotted run's timestamp, score,
+  accuracy, and x value, the Average Score line, and the label and value of
+  each overlay line drawn. Neither the button nor the flow is app code: the
+  graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose
+  ([2026-09-12](../decision_log.md#2026-09-12-charts-keep-plotlyjs-4s-share-chart-button)).
 
 ## Chart options panel
 
