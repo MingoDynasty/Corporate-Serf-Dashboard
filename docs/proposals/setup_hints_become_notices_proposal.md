@@ -42,9 +42,10 @@ field reads "N/A — set your KovaaK's username in Settings" on every visit for
 good. As a quiet qualifier beside a stat that is correct, and the card's fine
 print already said rank lookups would be off. As a panel it is a permanent
 notice nagging about a choice the user made, on the page whose card they just
-dismissed. [PR #247](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/247)'s
-D1 is also trimming these hints to bare fragments, which is the opposite
-direction from a notice.
+dismissed. The
+[messaging-consistency proposal](app_messaging_consistency_proposal.md)'s
+D1 (PR #247, ratified 2026-09-14) also trims these hints to bare
+fragments, which is the opposite direction from a notice.
 
 Choosing differently: promoting them puts a third panel on the page (beside
 the setup card and the promoted stats-folder hint) and needs an answer for
@@ -279,7 +280,7 @@ No string is added or changed. Every string this proposal touches is carried
 verbatim:
 
 - Home, unconfigured: `No stats directory configured — set it in [Settings]`
-  (the anchor is a separate child). PR #247's Copy block rewrites this line
+  (the anchor is a separate child). PR #247's ratified Copy block rewrites this line
   to `No stats folder configured. Set it in [Settings].`; whichever
   implementation lands second rebases the one test string.
 - Home, restart pending: `Restart the app to apply your saved settings.`
