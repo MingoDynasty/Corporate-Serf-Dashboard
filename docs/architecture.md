@@ -46,7 +46,7 @@ flowchart TD
     Game["KovaaK's writes a new run CSV into stats_dir"]
 
     subgraph Watchdog["Watchdog observer thread"]
-        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>classify the score"]
+        Handler["NewFileHandler<br/>(my_watchdog/<br/>file_watchdog.py)<br/>extract_data_from_file:<br/>parse CSV to RunData,<br/>normalize sensitivity to cm/360,<br/>classify the score"]
     end
 
     subgraph Timers["Rank-freshness timer chain (daemon threading.Timer)"]
@@ -467,9 +467,13 @@ flowchart LR
 ### KovaaK's domain (`source/kovaaks/`)
 - `data_service.py` — in-memory data layer + CSV ingest. Key: `initialize_kovaaks_data`,
   `load_csv_file_into_database`, `extract_data_from_file`, `get_high_score`,
-  `get_sensitivities_vs_runs`, and the playlist loaders/getters. `load_playlists`
-  records each winning user-root code's actual file path (so deletion targets
-  the real file, not a reconstructed name) and the user files it skips because
+  `get_sensitivities_vs_runs`, and the playlist loaders/getters.
+  `extract_data_from_file` normalizes a run's sensitivity to cm/360 when the
+  file carries `Sens Increment` and `DPI`, so every downstream consumer of
+  `RunData.horizontal_sens` / `RunData.sens_scale` reads one scale
+  ([decision_log.md](decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi)).
+  `load_playlists` records each winning user-root code's actual file path
+  (so deletion targets the real file, not a reconstructed name) and the user files it skips because
   a bundled code already won; `delete_user_playlist` and
   `delete_superseded_user_playlist_files` are the write paths that unlink those
   files under the playlist I/O lock, keeping startup itself read-only.

@@ -270,7 +270,7 @@ def test_a_verdict_after_navigating_away_and_back_gets_a_full_lifetime(
     plotting, monkeypatch
 ):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
     client = _Client()
     client.play(score=812.4)
     client.container.advance(DEFAULT_AUTO_CLOSE_MS - 500)
@@ -309,7 +309,7 @@ def test_a_page_scoped_registry_would_leave_two_verdicts_on_screen(plotting):
 
 def test_the_toast_channel_registry_is_hosted_by_the_app_shell(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     assert TOAST_CHANNEL_REGISTRY_STORE_ID in _component_ids(app_shell.layout())
     assert TOAST_CHANNEL_REGISTRY_STORE_ID not in _component_ids(home.layout())

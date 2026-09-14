@@ -13,6 +13,250 @@ When a decision changes, keep the old entry and mark it `Superseded`. Add a new 
 - `Superseded`: replaced by a newer decision.
 - `Rejected`: considered and intentionally not chosen.
 
+## 2026-09-12: The Local Scenario List Comes From The Run Store
+
+Status: Accepted
+
+With no playlist selected, the Scenario Performance dropdown listed scenarios
+by reading the stats file names, and it cut each name at its first hyphen. A
+scenario like "Anti-Centering Easy" showed up as "Anti", and choosing it said
+there were no local runs. The list now comes from the runs the app has
+already loaded, named the way each stats file names its own scenario. A
+scenario none of whose files could be read no longer appears.
+
+**The defect.** `get_unique_scenarios` listed the stats directory and took
+`file.split("-")[0].strip()` as the name, splitting at the first hyphen
+rather than at the ` - Challenge - ` separator. The run store
+(`kovaaks_database`) is keyed by `RunData.scenario`, which
+`extract_data_from_file` reads from the file's `Scenario:` line
+(`Anti-Centering Easy - Challenge - ... Stats.csv` carries
+`Scenario:,Anti-Centering Easy`; `Reflex Flick - Easy - ... Stats.csv`
+carries `Scenario:,Reflex Flick - Easy`). The two sources disagreed for every
+hyphenated name, and `is_scenario_in_database` is a plain membership test, so
+a truncated entry fell to the "No local runs found" empty state. Measured on
+the maintainer's corpus (8,066 files, 2026-09-12, names as the parser strips
+them): 866 scenarios in the store against 838 dropdown entries, 13 entries
+naming no scenario (`Anti`, `Reflex Flick`, `Reflex Flick Wide`, `cA x`,
+`TSK`, and others), and 41 scenarios with no entry at all, among them the 23
+`TSK - ...` scenarios collapsed into the single dead `TSK` entry.
+
+**The store is the single authority for which scenarios exist locally.**
+`get_scenario_names()` returns `sorted(kovaaks_database)`; it takes no
+directory. `_local_scenario_options()` in the home page keeps its
+`get_usable_stats_dir()` guard. The pin that guard reads is restart-scoped,
+and the store is only ever filled behind a usable pin, so today the guard
+never trims a populated list; it keeps the spec's promise (no usable
+directory, no local list) a property of this function rather than of the
+startup order. The store is populated at startup before the server serves,
+and the watchdog adds newly played scenarios to it, so the list is complete
+on first render. Rejected: fixing the split to cut at ` - Challenge - `. It
+works for today's names, re-breaks on the next naming quirk, and still would
+not be guaranteed to agree with the store's keys; the file's own field is the
+only authority and the store already holds it.
+
+**Accepted consequence: a scenario with no parseable run leaves the list.**
+Before, such a scenario contributed a filename-derived entry that already
+showed "No local runs found" when selected, so dropping it removes a dead
+entry rather than hiding data. Its failed files are still reported the way
+they were: the startup load's counted log line, and the watchdog's toast for
+live imports.
+
+**Incidental.** The per-render `os.listdir` of the stats directory is gone.
+That was not the motivation, and no caching was restructured for it.
+
+## 2026-09-12: Charts Keep plotly.js 4's Share Chart Button
+
+Status: Accepted
+
+Upgrading plotly put a "Share chart..." button on both of the app's charts,
+because the new plotly.js turns that button on by default. The button stays
+rather than being hidden. Sharing happens only when a user presses it,
+confirms a dialog that names Plotly Cloud, and is signed in there, so it is
+an export the user chooses and not data the app sends on its own. Users see it
+beside the existing PNG download, and the README lists Plotly Cloud among the
+services the app can reach.
+
+**What changed.** plotly 7.0.0 bundles plotly.js 4.0.0, and Dash serves
+plotly.js from the plotly package (`package_data/plotly.min.js`), so the
+upgrade changes the browser runtime and not only the Python API. plotly.js
+4.0.0 changed the `showSendToCloud` config default from `false` to `true`.
+Neither `dcc.Graph` passes `config` (`graph-content` in
+`source/pages/home.py`, `aim-training-journey-graph` in
+`source/pages/aim_training_journey.py`), so both render the button. Ruled on
+2026-09-12 (PR #283): ship it, do not suppress it. There is no config line to
+carry this reason beside the code, because the behavior is a library default;
+this entry is the only record that it is deliberate.
+
+**What pressing it does**, verified against the bundled plotly.js 4.0.0. The
+button opens plotly.js's own dialog naming Plotly Cloud, with Cancel and
+Share; nothing is sent before Share. Share runs `sendDataToCloud`: it
+serializes the figure with `graphJson` (data arrays and layout), opens
+`plotlyServerURL` (default `https://cloud.plotly.com/newchart`; Dash sets no
+`PLOTLYENV.BASE_URL`) in a new tab with the dashboard's
+`window.location.origin` as an `origin` query parameter, and listens for a
+`CHART_AUTH_SUCCESS` message from that origin, which Plotly Cloud sends once
+the user is signed in there (the dialog offers account creation to anyone
+without one). Only then does it `postMessage` the figure to that tab. Whether
+an existing Plotly Cloud session skips the sign-in step is Plotly Cloud's
+behavior, not visible in plotly.js. The app makes no request itself, and a
+blocked popup ends the flow with nothing sent. The figure carries, on
+Scenario Performance: the scenario
+name and render time in the title; every plotted run's timestamp, score, and
+accuracy, and its x value (sensitivity or date); the average-score line; and
+the label and value of any rank, PB score, or score-threshold overlay shown.
+On Aim Training Journey: playlist names, dates, progress percentages, and the
+aim-training-hours checkpoint labels.
+
+**Why it stays.** The flow is user-initiated, gated by a dialog that names
+its destination, and completes in a Plotly Cloud tab the user can see, which
+makes it an export in the same class as saving the PNG. That is what
+separates it from crash telemetry, which the
+[2026-08-10 bug-reports entry](#2026-08-10-bug-reports-land-on-github-issues-with-the-log-attached-unredacted-and-disclosed)
+rejects as privacy-hostile for a local tool. The README's outside-services
+table carries a Plotly row as the disclosure.
+
+**Rejected alternative.** `config={"showSendToCloud": False}` on both graphs,
+holding the plotly.js 3 default. PR #283 shipped that hold first and backed it
+out on the ruling: it guarded against a hidden data flow that does not exist,
+and the one real gap, the README's list of services, was cheaper to close by
+updating the README.
+
+**Reversing it.** Pass `config={"showSendToCloud": False}` to every
+`dcc.Graph`, including any added later (a layout test that walks all graphs,
+rather than naming ids, is the guard that holds), and remove the Plotly row
+from the README. **Revisit trigger:** plotly.js changing the flow so data
+leaves before the dialog or without the Plotly Cloud tab, or changing the
+default `plotlyServerURL`; or a user report of the button being mistaken for
+a local save.
+
+## 2026-09-11: Sensitivities Normalize To cm/360 At Parse Time From The File's Own Increment And DPI
+
+Status: Accepted
+
+Runs from older stats files were plotted under whatever sensitivity number
+the game they were played on used, so a Valorant-era run sat at the far left
+of the sensitivity axis instead of next to the centimeters it actually
+equals. Those runs are now converted to cm/360 the moment their file is read,
+using two fields KovaaK's has written into every stats file since 2024. They
+sort, group, and earn run notifications exactly like runs recorded in cm/360,
+and the playlist tables' PB cm/360 column fills in for them. Runs from 2019
+to 2021, whose files predate those fields, keep their original label and are
+never dropped.
+
+**The conversion, and where it runs.** `extract_data_from_file` in
+`source/kovaaks/data_service.py` reads the stats file's `Sens Increment:` and
+`DPI:` lines alongside the `Sens Scale:` and `Horiz Sens:` it already read,
+and after the key-value loop computes
+`cm/360 = 360 x 2.54 / (0.07 x increment x DPI)`, rounded to
+`sens_round_decimal_places`, storing it as `horizontal_sens` with
+`sens_scale` set to `cm/360`. It runs after the loop and not inline because
+`DPI:` follows `Horiz Sens:` in the file, so the inputs are only complete
+once the whole tail has been read. A run already on the cm/360 scale keeps
+its recorded value untouched. A run missing either field, or carrying one the
+conversion cannot use, keeps its original value and scale. "Cannot use" is
+wider than "not a number": empty, zero, and negative, but also the non-finite
+values `float()` accepts (`inf`, `nan`), magnitudes that make
+`0.07 x increment x DPI` underflow to zero or overflow to infinity, and a
+conversion that rounds away to zero at the configured precision. The rounding
+happens inside the same guard that validates, so the value checked is the
+value stored and no gap between them can record a false `0.0 cm/360`. Neither
+field joins the parser's required-field check: legacy files lack them and
+must still load, and an unusable value costs the conversion, never the run --
+and never the startup scan, which has no guard of its own around the parser.
+Normalizing here means every consumer inherits it with no change of its
+own -- the three sensitivity-key builders, the `SortedDict` ordering, the
+plot axis and hover, run notifications, and the PB cm/360 column all read
+`RunData.horizontal_sens` and `RunData.sens_scale`. `RunData`'s shape is
+unchanged, so the original scale value is not retained. The run database is
+in-memory and rebuilt from the stats directory at every start, so historical
+runs convert retroactively on the next launch and the choice is fully
+reversible: there is no cache to invalidate or migrate.
+
+**What `Sens Increment` and `DPI` mean.** These are now relied-upon fields,
+so their semantics are recorded here. `Sens Increment` is the run's
+sensitivity re-expressed in KovaaK's internal base scale, which
+`resources/sensitivity converter/response.json` names UE4
+(`IncrementFormula: "Sens * 0.07"`, yaw 0.07 degrees per mouse count),
+whatever per-game scale the run was played on. The empirical invariant, over
+the 7,494 corpus files that carry the field: the recorded increment equals
+that scale's own formula value divided by 0.07. All 17 distinct cm/360
+`(sens, DPI)` combinations satisfy
+`increment = 360 x 2.54 / (0.07 x cm x DPI)` with a largest deviation of
+4.4e-7 across 6,266 files, consistent with six-decimal recording, which pins
+the base yaw to 0.07 exactly. For game scales the increment carries no DPI
+term and is DPI-independent, as the capture's game formulas require:
+`0.2 Valorant` records `0.199886` at both 400 and 1600 DPI. The
+already-normalized scales fall out of the same formula: in/360
+(`360 / (Sens * DPI)`) yields `2.54 x Sens` cm and counts/360
+(`360 / Sens`) yields `2.54 x Sens / DPI` cm. `DPI` is whatever the user
+typed into KovaaK's settings, not a measurement.
+
+**KovaaK's Valorant yaw is 0.06996, not the community 0.07.** The capture's
+Valorant entry records `IncrementFormula: "Sens * 0.06996"` and
+`InchesFormula: "360 / (Inches * 0.06996 * DPI)"`, and the corpus measurement
+agrees (increment/sens is 0.99943 across all five Valorant sensitivities).
+The difference is 0.06%, invisible at one decimal place, but it means the
+increment path reproduces KovaaK's own displayed numbers where a
+community-yaw table would not. Rounded test expectations alone cannot pin
+this, so the parser tests also assert the unrounded value at `rel=1e-5`: a
+regression that recomputes from the raw sensitivity with the community
+constants lands a relative 5.7e-4 away and fails.
+
+**Rejected: a formula evaluator over KovaaK's scale definitions.** The
+alternative was to evaluate the capture's per-scale `IncrementFormula`
+entries directly. Of its roughly 35 scales, Splitgate, Paladins, and PUBG
+multiply by the run's FOV (PUBG is also exponential in the sensitivity),
+Battlefield V/1/Hardline, GTA 5, and Battlefield 6 are affine, and
+counts/360 and in/360 invert the sensitivity, so reproducing the capture
+faithfully needs an expression evaluator, the run's FOV as an input, a
+mapping from the stats file's `Sens Scale` string onto the capture's
+`ScaleName`, and a refresh whenever KovaaK's adds a scale. It offers nothing
+over the increment the file already records, which converts every scale --
+including scales added in future game updates -- with zero per-scale
+knowledge. A fixed per-scale yaw table, a weaker version of the same idea,
+would convert the FOV-dependent and affine scales silently wrong.
+
+**Settled: legacy runs keep their label, and recorded DPI is trusted
+as-is.** The 570 DPI-less runs from 2019 to 2021 stay grouped under e.g.
+`5.0 Overwatch`. Data is never excluded because its DPI is unknown, and no
+legacy-DPI config knob is added. Separately, the app cannot detect a mismatch
+between the DPI a file records and the mouse's physical DPI, so the recorded
+value is trusted wherever it is read -- on the chart and, since this change,
+in the PB cm/360 column. The known instance, 368 Valorant runs misrecorded at
+400 DPI that convert to about 163.4 cm/360 instead of about 40.8, is
+accepted; four of them are scenario personal bests and sort to the extreme of
+that user-sortable column. Any in-app override (a config knob, a per-era DPI
+map) would be a second source of truth that hides a data error instead of
+fixing it, and withholding the column for converted PBs would hide 4 wrong
+values by dropping 68 correct ones. The escape hatch stays on the data side:
+a one-time edit of the `DPI:,400` lines in the affected files.
+
+**Notifications judge the normalized group.** The watchdog computes
+`nth_score` and `is_new_sensitivity` against the scenario's runs at the same
+sensitivity key, so after conversion the normalized group is the unit for
+placement and for first-sensitivity detection. Where a converted group shares
+a rounded value with a native one, the merged history is the denominator: a
+run that would have placed within Top N among the raw-scale runs alone can
+fall outside it, and a first native run at a converted group's value is not a
+new sensitivity. No separate raw-scale notification history is kept, and the
+notification rules themselves do not change.
+
+**The rounding fix does not reach legacy runs.** Rounding the raw sensitivity
+to one decimal place collapsed `0.16`, `0.2`, and `0.25 Valorant` into one
+`0.2 Valorant` group. Converting first moves the rounding onto the cm/360
+result, where one decimal place is the right precision, and those three
+separate into 51.1, 40.8, and 32.7 cm/360. The fallback branch keeps today's
+raw-sensitivity rounding, so the 95 legacy `0.32 Valorant` runs still display
+as `0.3 Valorant`.
+
+**Provenance.** Proposed and merged as
+`docs/proposals/sensitivity_conversion_proposal.md` (PR #277); both decisions
+ruled on 2026-09-11 (PR #279), each accepting the recommendation. It
+supersedes a 2026-08-03 draft reviewed on PR #197, which was parked and
+closed unmerged. Corpus numbers were verified against the live stats
+directory on 2026-09-05: 8,064 parseable files, of which 7,494 carry both
+fields and 570 carry neither, with no file carrying only one.
+
 ## 2026-09-04: Comment And Docstring Conventions
 
 Status: Accepted
@@ -1883,6 +2127,66 @@ Provenance: distilled from `docs/initial_setup_proposal.md` (proposed in PR
 which gives the overview grid the same unset-username explanation the
 drill-down page already had) and #236 (the card); the proposal file is deleted
 in the shipping PR and git history holds its full text.
+
+## 2026-08-10: The Project Is AGPL-3.0, And Contributors Sign Nothing
+
+Status: Accepted
+
+Corporate Serf Dashboard is licensed under the GNU Affero General Public
+License v3.0, and contributors are not asked to sign a contributor agreement.
+Anyone may use, change, and redistribute it, but a version they pass on has to
+stay free and open source under the same terms. The choice was confirmed
+deliberately on 2026-08-10, before the public launch, because it is the one
+launch decision that cannot be taken back later. A few assets the app bundles
+from other projects keep their own terms, so this is not a whole-tree claim.
+
+**What was chosen.** AGPL-3.0 for this project's own code, whole text in
+`LICENSE`. No contributor license agreement, no copyright assignment: a pull
+request is accepted on its merits, and its author keeps their copyright. The
+ruling is from 2026-08-10; the README's `## License` section has stated the
+license publicly since PR #278, and this entry is the record of why.
+
+**Bundled third-party assets keep their own licenses**, and this is not a
+whole-tree AGPL claim. `assets/vendor/canvas-confetti.js` is ISC
+(`assets/vendor/canvas-confetti.LICENSE`), and the vendored SVGs under
+`assets/icons/` are MIT, Apache-2.0 and CC0 by collection, tabulated in
+`assets/icons/README.md`. `assets/` is in the release archive contract, so
+those notices travel inside every published zip and have to be preserved on
+redistribution. Vendoring anything new means confirming its license and
+recording it the same way. `resources/` ships under the same contract but is
+imported data, not vendored code: the benchmark library, a snapshot of Evxl's
+benchmark index, and a KovaaK's game-settings response. No license is recorded
+for any of it, and this entry does not settle whether one should be.
+
+**Why this license.** The priority is that derivatives stay free and open
+source. AGPL binds anyone who conveys a modified version, or offers one to
+users over a network, to make that version's source available to those
+recipients or users under the same terms.
+
+**Why no CLA.** At this scale the friction a CLA puts in front of a first-time
+contributor costs more than the flexibility it buys. What it would have bought
+is the ability to relicense later without hunting down every contributor, and
+that is the price being paid knowingly.
+
+**The relicensing window closes at the first outside contribution, on
+purpose.** Relicensing needs the consent of every copyright holder. Today that
+is one person, so the license could still be changed unilaterally. The moment
+an outside pull request is merged, it cannot. A public launch invites exactly
+that, which is why the question was answered before launching rather than
+after.
+
+**Rejected alternatives.**
+
+- **MIT or Apache-2.0.** Permissive terms would allow a closed commercial fork
+  of the app, which is the outcome the choice exists to prevent.
+- **AGPL plus a CLA, or copyright assignment.** Keeps the relicensing option
+  open, at the cost of asking every contributor to sign before their first
+  patch. Judged not worth it here.
+
+**Where the terms travel.** `LICENSE` is named in `REQUIRED_ARCHIVE_ENTRIES`
+in `scripts/release_job.py`, so a release whose zip lost it fails the draft
+rather than shipping: every published copy carries the terms. The README's
+`## License` section states them for readers who never open the file.
 
 ## 2026-08-10: Bug Reports Land On GitHub Issues, With The Log Attached Unredacted And Disclosed
 

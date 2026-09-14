@@ -49,7 +49,7 @@ def quiet_playlists(monkeypatch):
 
 def test_hint_is_absent_while_the_pinned_directory_is_usable(monkeypatch):
     """The autouse fixtures pin the fixture stats folder, as startup would."""
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: ["All"])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: ["All"])
 
     page = home.layout()
 
@@ -66,8 +66,8 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     page = home.layout()
@@ -89,8 +89,8 @@ def test_hint_cedes_the_never_configured_case_to_the_setup_card(monkeypatch):
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     page = home.layout()
@@ -107,8 +107,8 @@ def test_hint_defers_to_the_restart_after_a_post_boot_save(monkeypatch, tmp_path
     settings_service.save_settings({settings_service.STATS_DIR_KEY: str(tmp_path)})
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     page = home.layout()
@@ -139,8 +139,8 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
     assert settings_service.is_stats_dir_change_pending() is False
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     page = home.layout()
@@ -162,8 +162,8 @@ def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
     assert settings_service.is_stats_dir_change_pending() is True
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     page = home.layout()
@@ -180,8 +180,8 @@ def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):
     settings_service.resolve_stats_dir()
     monkeypatch.setattr(
         home,
-        "get_unique_scenarios",
-        lambda _stats_dir: pytest.fail("scanned a directory the app cannot use"),
+        "get_scenario_names",
+        lambda: pytest.fail("listed scenarios without a usable stats directory"),
     )
 
     assert home.select_playlist(None) == []

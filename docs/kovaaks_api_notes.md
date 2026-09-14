@@ -51,6 +51,7 @@ Client identification:
 | `/scenario/popular` | Exact-name fallback for leaderboard ID resolution | No | Search can return many variants; require exact `scenarioName` match. |
 | `/benchmarks/player-progress-rank-benchmark` | Existing benchmark progress flow | For benchmark playlists only | Requires benchmark ID, so it does not cover all playlists. |
 | `/playlist/playlists` | Playlist discovery/metadata inspection | No | Does not include leaderboard IDs in observed responses. |
+| `/game-settings` | Provenance for the in-repo sensitivity-scale capture; not called at runtime | No | Per-scale conversion formulas. Captured to `resources/sensitivity converter/response.json`. |
 
 ## `/leaderboard/scores/global`
 
@@ -319,6 +320,29 @@ The app consumes only `playlist_name`, `playlist_code`, and
 `scenario_list[].scenario_name` (see `api_service.get_evxl_playlist` and the
 `Evxl*` models in `api_models.py`). The stored code is Evxl's canonical
 `playlist_code`, never the pasted input.
+
+## `/game-settings`
+
+Not called at runtime. The app carries a capture of it instead:
+
+```text
+GET https://kovaaks.com/webapp-backend/game-settings
+```
+
+- `resources/sensitivity converter/response.json` is that capture (its
+  `readme.md` records the source URL). Nothing in `source/` reads it; it is
+  provenance for the sensitivity conversion, and the parser tests assert
+  against it.
+- Shape: one top-level key, `SensitivityAndFov`, holding a list of about 35
+  scale entries. Each has `ScaleName` (e.g. `Valorant`, `cm/360`, `in/360`,
+  `UE4`), a `Sens` object with `IncrementFormula` and `InchesFormula` (the
+  formula strings KovaaK's own UI evaluates, plus `TypicalMinCM` /
+  `TypicalMaxCM`), and an `FOV` object with `FILMS` and the `SliderMin` /
+  `SliderMax` bounds.
+- The stats file's `Sens Increment` equals the scale's `IncrementFormula`
+  value divided by 0.07, the yaw of KovaaK's UE4 base scale. That relation is
+  what the parser converts with; the field semantics are specified in
+  [decision_log.md](decision_log.md#2026-09-11-sensitivities-normalize-to-cm360-at-parse-time-from-the-files-own-increment-and-dpi).
 
 ## Derived Data
 

@@ -8,7 +8,18 @@ from dash._callback import GLOBAL_CALLBACK_LIST, GLOBAL_CALLBACK_MAP
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
-from source.app_shell import RunEventBatch, RunEventData  # noqa: E402
+from datetime import datetime, timedelta  # noqa: E402
+
+from sortedcontainers import SortedList  # noqa: E402
+
+from source.app_shell import (  # noqa: E402
+    RunEventBatch,
+    RunEventData,
+    _run_event_data,
+)
+from source.kovaaks import data_service  # noqa: E402
+from source.kovaaks.data_models import RunData  # noqa: E402
+from source.my_watchdog import file_watchdog  # noqa: E402
 from source.pages import home  # noqa: E402
 
 
@@ -82,7 +93,7 @@ def _assert_placeholder_figure(figure) -> None:
 
 def test_home_layout_initial_graph_has_placeholder(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     page = home.layout()
     graph = next(
@@ -778,3 +789,168 @@ def test_generate_graph_sends_no_toast_when_run_notifications_are_off(monkeypatc
     assert notifications == []
     assert hidden == []
     assert toast_channels is no_update
+
+
+# --- Normalized sensitivity groups, watchdog to toast ------------------------
+
+NORMALIZED_SCENARIO = "Normalized Scenario"
+NORMALIZED_KEY = "40.8 cm/360"
+
+
+def _stats_file(tmp_path, name, *, sens_scale, horizontal_sens, score):
+    """Write one real stats file the parser will read, and return its path."""
+    file_path = tmp_path / f"{name} - Challenge - 2025.03.04-21.30.00 Stats.csv"
+    file_path.write_text(
+        "\n".join(
+            [
+                f"Score:,{score}",
+                f"Sens Scale:,{sens_scale}",
+                # 0.2 Valorant and 40.8 cm/360 are the same physical
+                # sensitivity at 1600 DPI, so both files record this increment.
+                "Sens Increment:,0.199886",
+                f"Horiz Sens:,{horizontal_sens}",
+                f"Vert Sens:,{horizontal_sens}",
+                "DPI:,1600",
+                f"Scenario:,{NORMALIZED_SCENARIO}",
+                data_service.POSSIBLE_SUB_CSV_HEADERS[0],
+                "Rifle,100,50,75,100,,Valorant,0.2,0.2,103,0,0,0,0,0,0,0,0",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    return file_path
+
+
+def _existing_runs(*scores):
+    """The score-ascending SortedKeyList the production stores hold."""
+    return SortedList(
+        [
+            RunData(
+                datetime_object=datetime(2025, 3, 1, 12) + timedelta(minutes=index),
+                score=score,
+                sens_scale="cm/360",
+                horizontal_sens=40.8,
+                scenario=NORMALIZED_SCENARIO,
+                accuracy=0.5,
+            )
+            for index, score in enumerate(scores)
+        ],
+        key=lambda item: item.score,
+    )
+
+
+def _import_through_watchdog(monkeypatch, file_path, *, group_scores, high_score):
+    """Import one real file and return the run event Home would receive."""
+    monkeypatch.setattr(data_service.get_config(), "sens_round_decimal_places", 1)
+    messages = []
+    monkeypatch.setattr(file_watchdog.time, "sleep", lambda _seconds: None)
+    monkeypatch.setattr(
+        file_watchdog, "message_queue", SimpleNamespace(append=messages.append)
+    )
+    monkeypatch.setattr(
+        file_watchdog, "load_csv_file_into_database", lambda _file: True
+    )
+    monkeypatch.setattr(
+        file_watchdog, "schedule_rank_freshness_refresh", lambda *_args: None
+    )
+    monkeypatch.setattr(file_watchdog, "is_scenario_in_database", lambda _name: True)
+    monkeypatch.setattr(file_watchdog, "get_high_score", lambda _name: high_score)
+    monkeypatch.setattr(
+        file_watchdog,
+        "get_sensitivities_vs_runs",
+        lambda _name: {NORMALIZED_KEY: _existing_runs(*group_scores)},
+    )
+
+    file_watchdog.NewFileHandler().on_created(
+        SimpleNamespace(is_directory=False, src_path=str(file_path))
+    )
+
+    assert len(messages) == 1
+    return messages[0]
+
+
+def _payload_from_message(message) -> home.RunEventsPayload:
+    """Project the queued message the way the app shell's drain does."""
+    return {
+        "latest": _run_event_data(message, message.datetime_created, 120.0),
+        "celebrated_run_id": None,
+    }
+
+
+def test_a_converted_run_is_placed_against_the_group_it_normalizes_into(
+    monkeypatch,
+    tmp_path,
+):
+    # The converted run joins a group that already holds five native runs, so
+    # its place is counted against the merged history. Against the converted
+    # runs alone it would have been the best; here it is sixth, which is
+    # outside Top N, and with the threshold verdict off that means no toast.
+    message = _import_through_watchdog(
+        monkeypatch,
+        _stats_file(
+            tmp_path,
+            "converted-into-native-group",
+            sens_scale="Valorant",
+            horizontal_sens="0.2",
+            score=95,
+        ),
+        group_scores=(90, 100, 101, 102, 103, 104),
+        high_score=104,
+    )
+
+    assert message.sensitivity == NORMALIZED_KEY
+    assert message.is_new_sensitivity is False
+    assert message.nth_score == 6
+
+    assert (
+        home._build_run_event_notification(
+            _payload_from_message(message),
+            NORMALIZED_SCENARIO,
+            5,
+            100.0,
+            False,
+            True,
+        )
+        is None
+    )
+
+
+def test_a_native_run_at_a_converted_groups_value_is_not_a_new_sensitivity(
+    monkeypatch,
+    tmp_path,
+):
+    # The group exists only because converted runs landed on it, so this native
+    # run is not the scenario's first at 40.8 cm/360. It therefore gets a
+    # threshold verdict instead of the placement-only first-run toast.
+    message = _import_through_watchdog(
+        monkeypatch,
+        _stats_file(
+            tmp_path,
+            "native-into-converted-group",
+            sens_scale="cm/360",
+            horizontal_sens="40.8",
+            score=85,
+        ),
+        group_scores=(80, 85, 90),
+        high_score=90,
+    )
+
+    assert message.sensitivity == NORMALIZED_KEY
+    assert message.is_new_sensitivity is False
+    assert message.scenario_previous_best == 90
+
+    notification = home._build_run_event_notification(
+        _payload_from_message(message),
+        NORMALIZED_SCENARIO,
+        5,
+        95.0,
+        True,
+        True,
+    )
+
+    assert notification["title"] == "Below threshold"
+    assert notification["message"] == (
+        f"{NORMALIZED_SCENARIO} — 85.00, 94.4% of PB — need 95.0%. "
+        f"Still your 2nd-best at {NORMALIZED_KEY}. Keep grinding..."
+    )

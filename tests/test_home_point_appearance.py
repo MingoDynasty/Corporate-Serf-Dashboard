@@ -52,7 +52,7 @@ def _walk_components(component):
 def components(monkeypatch) -> dict:
     """Render Home without touching disk and index the tree by component id."""
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     return {
         getattr(component, "id", None): component
