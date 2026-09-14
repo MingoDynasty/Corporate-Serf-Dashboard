@@ -33,6 +33,7 @@ def _write_stats_file(
     sens_increment: str | None = None,
     dpi: str | None = None,
     extra_line: str | None = None,
+    scenario: str = SCENARIO_NAME,
 ) -> None:
     """Write a synthetic stats file in the key-value order KovaaK's uses.
 
@@ -52,7 +53,7 @@ def _write_stats_file(
         lines.append(f"DPI:,{dpi}")
     if extra_line is not None:
         lines.append(extra_line)
-    lines += [f"Scenario:,{SCENARIO_NAME}", SUB_CSV_HEADER, sub_csv_row, ""]
+    lines += [f"Scenario:,{scenario}", SUB_CSV_HEADER, sub_csv_row, ""]
     file_path.write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -286,6 +287,86 @@ def test_initialize_kovaaks_data_logs_loaded_and_failed_counts(
     # the whole report. Only the watchdog's live path toasts, so a rescan of a
     # directory full of unreadable CSVs must not queue a toast per file.
     assert file_watchdog.drain_run_import_failures() == []
+
+
+# --- Scenario names ----------------------------------------------------------
+
+
+@pytest.fixture
+def empty_store(monkeypatch):
+    monkeypatch.setattr(data_service, "kovaaks_database", {})
+    monkeypatch.setattr(
+        data_service,
+        "run_database",
+        SortedList([], key=lambda item: item.datetime_object),
+    )
+
+
+def _load_scenario_files(stats_dir: Path, *scenarios: str) -> None:
+    """Write one stats file per scenario, named the way KovaaK's names them."""
+    for scenario in scenarios:
+        _write_stats_file(
+            stats_dir / f"{scenario} - Challenge - 2025.01.01-10.00.00 Stats.csv",
+            DAMAGE_SUB_CSV_ROW,
+            scenario=scenario,
+        )
+    data_service.initialize_kovaaks_data(str(stats_dir))
+
+
+def test_a_hyphenated_scenario_is_listed_in_full(empty_store, tmp_path) -> None:
+    _load_scenario_files(tmp_path, "Anti-Centering Easy")
+
+    names = data_service.get_scenario_names()
+
+    assert names == ["Anti-Centering Easy"]
+    assert "Anti" not in names
+
+
+def test_scenarios_sharing_a_stem_stay_distinct(empty_store, tmp_path) -> None:
+    _load_scenario_files(
+        tmp_path,
+        "Reflex Flick - Easy",
+        "Reflex Flick - Fair",
+        "Reflex Flick Wide - Easy",
+    )
+
+    assert data_service.get_scenario_names() == [
+        "Reflex Flick - Easy",
+        "Reflex Flick - Fair",
+        "Reflex Flick Wide - Easy",
+    ]
+
+
+def test_every_listed_scenario_has_local_runs(empty_store, tmp_path) -> None:
+    # The defect was a list entry the store could not resolve, which the page
+    # reported as "No local runs found" for a scenario that had runs.
+    _load_scenario_files(
+        tmp_path,
+        "Anti-Centering Easy",
+        "Reflex Flick - Easy",
+        "cA x-axis",
+        "1w4ts",
+    )
+
+    names = data_service.get_scenario_names()
+
+    assert len(names) == 4
+    assert all(data_service.is_scenario_in_database(name) for name in names)
+
+
+def test_a_scenario_with_no_parseable_run_is_not_listed(
+    empty_store,
+    tmp_path,
+) -> None:
+    broken_file = tmp_path / "Broken - Challenge - 2025.01.01-11.00.00 Stats.csv"
+    broken_file.write_text("Score:\n", encoding="utf-8")
+    _load_scenario_files(tmp_path, "1w4ts")
+
+    assert data_service.get_scenario_names() == ["1w4ts"]
+
+
+def test_an_empty_store_lists_no_scenarios(empty_store) -> None:
+    assert data_service.get_scenario_names() == []
 
 
 # --- Sensitivity normalization to cm/360 -------------------------------------

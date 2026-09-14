@@ -46,11 +46,11 @@ from source.kovaaks.data_service import (
     get_high_score,
     get_playlist_by_code,
     get_rank_data_from_playlist_code,
+    get_scenario_names,
     get_scenario_stats,
     get_scenarios_from_playlist_code,
     get_sensitivities_vs_runs_filtered,
     get_time_vs_runs,
-    get_unique_scenarios,
     is_scenario_in_database,
 )
 from source.kovaaks.playlist_visibility_service import (
@@ -1400,9 +1400,15 @@ def toggle_chart_options(n_clicks, panel_class):
 
 
 def _local_scenario_options() -> list:
-    """List the scenarios in the stats directory, or none without a usable one."""
-    stats_dir = get_usable_stats_dir()
-    return get_unique_scenarios(stats_dir) if stats_dir else []
+    """List the scenarios with local runs, or none without a usable stats directory.
+
+    The directory check stays even though the names come from the store. The
+    pin is restart-scoped and the store is only ever filled behind a usable
+    pin, so today the check never trims a populated list; it makes "no usable
+    directory, no local list" a property of this function rather than of the
+    startup order.
+    """
+    return get_scenario_names() if get_usable_stats_dir() else []
 
 
 @callback(
