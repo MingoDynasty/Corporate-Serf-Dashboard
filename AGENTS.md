@@ -100,6 +100,15 @@ Codex <codex@local>
   must have a spec: a new capability gets its spec in the PR that ships it,
   and a PR that changes specified behavior updates the spec in the same PR
   (this is step 2 of "Shipping a proposal" below).
+- Use the README's [What it talks to](README.md#what-it-talks-to) section for
+  the public disclosure of outbound network use. A PR that adds an outbound
+  service, or a new trigger for an existing one, updates that section in the
+  same PR. The section lists services and what makes the app reach them,
+  never hostnames: delivery hosts change under a service's name (a release
+  download redirects from `github.com` to GitHub's asset storage), so a
+  hostname list cannot be kept complete (the
+  [#278 D2 thread](https://github.com/MingoDynasty/Corporate-Serf-Dashboard/pull/278#discussion_r3995058401)
+  has the evidence).
 - Use `docs/decision_log.md` for durable decisions that are cross-cutting, costly to reverse, based on external constraints, or likely to be questioned later.
 - Use `docs/kovaaks_api_notes.md` for KovaaK's endpoint behavior, quirks, relied-upon fields, and failure semantics.
 - Gitignored scratch (review handoffs, kickoff prompts, one-off scripts, data

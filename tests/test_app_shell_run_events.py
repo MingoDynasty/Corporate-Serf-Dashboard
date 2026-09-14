@@ -404,7 +404,7 @@ def test_the_animation_is_driven_clientside_from_the_batch():
 def test_the_shell_hosts_the_drain_interval_and_the_batch_store(monkeypatch):
     ids = _component_ids(app_shell.layout())
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     assert app_shell.PB_CELEBRATION_INTERVAL_ID in ids
     assert app_shell.RUN_EVENTS_BATCH_STORE_ID in ids

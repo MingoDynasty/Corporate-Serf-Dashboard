@@ -93,7 +93,7 @@ def _assert_placeholder_figure(figure) -> None:
 
 def test_home_layout_initial_graph_has_placeholder(monkeypatch):
     monkeypatch.setattr(home, "get_visible_playlist_selector_options", lambda: [])
-    monkeypatch.setattr(home, "get_unique_scenarios", lambda _stats_dir: [])
+    monkeypatch.setattr(home, "get_scenario_names", lambda: [])
 
     page = home.layout()
     graph = next(
