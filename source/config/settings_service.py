@@ -102,6 +102,7 @@ def _read_settings_document() -> StoreDocument:
     return read_store_document(
         SETTINGS_FILE_PATH,
         encoding="utf-8-sig",
+        kind="settings file",
         validate=validate_settings_v1,
     )
 

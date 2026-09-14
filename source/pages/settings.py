@@ -37,6 +37,7 @@ from source.app_shell import (
     CELEBRATION_STYLE_OFF,
     PB_CELEBRATION_STYLE_STORE_ID,
 )
+from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.config.identity_detection import (
     IdentityCandidate,
@@ -71,7 +72,7 @@ dash.register_page(
 
 _STATS_DIR_PURPOSE = (
     "The KovaaK's stats folder this app reads runs from, usually "
-    "...\\FPSAimTrainer\\FPSAimTrainer\\stats."
+    "FPSAimTrainer\\FPSAimTrainer\\stats inside your Steam library."
 )
 _STATS_DIR_EMPTY_MEANS = "Leave it empty to run without run data."
 # Said only when detection actually found something: the field renders as a
@@ -88,11 +89,11 @@ STATS_DIR_DESCRIPTION_WITH_SUGGESTIONS = (
     f"{_STATS_DIR_PURPOSE} {STATS_DIR_SUGGESTIONS_HINT} {_STATS_DIR_EMPTY_MEANS}"
 )
 USERNAME_DESCRIPTION = (
-    "Your KovaaK's account name, used to look up your leaderboard rank. Leave "
-    "it empty to turn rank lookups off."
+    "Your KovaaK's account name, used to look up your leaderboard position. "
+    "Leave it empty to turn position lookups off."
 )
 STEAM_ID_DESCRIPTION = (
-    "Your 17-digit SteamID64. Optional; it disambiguates accounts that share a "
+    "Your 17-digit SteamID64. Optional. It tells apart accounts that share a "
     "KovaaK's username."
 )
 
@@ -102,8 +103,8 @@ STEAM_ID_DESCRIPTION = (
 # here; this names the replacement.
 SHOW_EVERY_CANDIDATE = {"function": "allOptions"}
 
-STATS_DIR_ERROR = "No such directory."
-STEAM_ID_ERROR = "Enter a 17-digit SteamID64 — it starts with 7656119."
+STATS_DIR_ERROR = "No such folder."
+STEAM_ID_ERROR = "Enter a 17-digit SteamID64. It starts with 7656119."
 
 # The first SteamID64 of Steam's public universe: every real account ID is at
 # or above it. Anything smaller with 17 digits is a typo, not an account.
@@ -119,7 +120,7 @@ RESTART_NOTICE = (
 )
 SAVED_STATUS = "Settings saved."
 SAVE_FAILED_STATUS = (
-    "Could not save settings — nothing was written. See data/logs/debug.log."
+    "Couldn't save settings, so nothing was written. See data/logs/debug.log."
 )
 
 SAVE_REFUSED_STATUS = (
@@ -130,7 +131,7 @@ SAVE_REFUSED_STATUS = (
 SAVE_STATUS_CLASS = "app-settings-save-status"
 SAVE_STATUS_FAILED_CLASS = f"{SAVE_STATUS_CLASS} app-settings-save-status-failed"
 
-STORE_ALERT_TITLE = "Your saved settings are not being used"
+STORE_ALERT_TITLE = "Your saved settings aren't being used"
 STORE_ALERT_CLASS = "app-settings-store-alert"
 # Like the restart notice, the alert ships hidden and the layout drops this
 # modifier when the store is in a state the user has to know about.
@@ -162,7 +163,7 @@ PICKER_HIDDEN_CLASS = f"{PICKER_CLASS} app-settings-identity-picker-hidden"
 # reserved for the one result that has ruled everything else out.
 NO_MATCH_STATUS = (
     "No Steam account on this machine has a KovaaK's profile. Type your "
-    "username in yourself — KovaaK's cannot look one up from a Steam ID."
+    "username in yourself. KovaaK's can't look one up from a Steam ID."
 )
 # The same empty-handed result from a run that did not finish. Deliberately not
 # the message above: an account that went unchecked may be the answer.
@@ -170,7 +171,7 @@ NOTHING_VERIFIED_STATUS = (
     "No KovaaK's profile matched the Steam accounts that could be checked."
 )
 DISCOVERY_FAILED_STATUS = (
-    "Steam's account list could not be read, so accounts on this machine may "
+    "Steam's account list couldn't be read, so accounts on this machine may "
     "have been missed. See data/logs/debug.log."
 )
 
@@ -178,11 +179,12 @@ CELEBRATIONS_HEADING = "Celebrations"
 CELEBRATION_LABEL = "Personal best celebration"
 # The last sentence keeps this section's instant model from blurring into the
 # Save-then-restart model of the form above it.
-CELEBRATION_DESCRIPTION = (
+CELEBRATION_DESCRIPTION = [
     "Plays a short animation and shows a toast when a run beats your personal "
-    "best in any scenario. Works on every page, and does not depend on Run "
-    "Notifications. Takes effect right away."
-)
+    "best in any scenario. Works on every page, and doesn't depend on ",
+    control_name("Run notifications"),
+    ". Takes effect right away.",
+]
 PREVIEW_LABEL = "Preview"
 
 # The offered styles, in order. Off is one value among five rather than a
@@ -440,43 +442,59 @@ def _can_auto_fill(result: IdentityDetectionResult) -> bool:
     )
 
 
-def _unchecked_status(count: int) -> str:
+def _unchecked_status(count: int) -> list:
     """Say how much of the machine detection could not answer for.
 
-    Names the button exactly as the page shows it, the way the picker's
-    description names Save: a retry instruction that points at a label nobody
-    can find is worse than none.
+    Names the button exactly as the page shows it, in bold, the way the
+    picker's description names Save: a retry instruction that points at a
+    label nobody can find is worse than none.
     """
-    return (
-        f"{count} Steam account{'' if count == 1 else 's'} could not be checked; "
-        "press Detect my accounts again to retry."
-    )
+    return [
+        f"{count} Steam account{'' if count == 1 else 's'} couldn't be checked. "
+        "Press the ",
+        control_name("Detect my accounts"),
+        " button again to retry.",
+    ]
 
 
-def _detect_status(result: IdentityDetectionResult) -> str:
+def _detect_status(result: IdentityDetectionResult) -> list:
     """Say what a detection found, never dressing an unfinished run as final.
 
     The lead says what came back and the caveats say what did not, so an
     incomplete run always reads as incomplete — the conclusive no-match message
     is only reachable when nothing was left unresolved.
+
+    Children rather than one joined string: the found and unchecked sentences
+    each name a control in bold, and one line can carry both, so a joined
+    string would drop the bold spans.
     """
-    parts = []
+    sentences: list[list] = []
     count = len(result.candidates)
     if count:
-        parts.append(
-            f"Found {count} KovaaK's account{'' if count == 1 else 's'}. "
-            "Choose the one to use, then Save."
+        sentences.append(
+            [
+                f"Found {count} KovaaK's account{'' if count == 1 else 's'}. "
+                "Choose the one to use, then ",
+                control_name("Save"),
+                ".",
+            ]
         )
     elif result.unchecked_count or not result.discovery_complete:
-        parts.append(NOTHING_VERIFIED_STATUS)
+        sentences.append([NOTHING_VERIFIED_STATUS])
     else:
-        parts.append(NO_MATCH_STATUS)
+        sentences.append([NO_MATCH_STATUS])
 
     if not result.discovery_complete:
-        parts.append(DISCOVERY_FAILED_STATUS)
+        sentences.append([DISCOVERY_FAILED_STATUS])
     if result.unchecked_count:
-        parts.append(_unchecked_status(result.unchecked_count))
-    return " ".join(parts)
+        sentences.append(_unchecked_status(result.unchecked_count))
+
+    children: list = []
+    for sentence in sentences:
+        if children:
+            children.append(" ")
+        children.extend(sentence)
+    return children
 
 
 @callback(
@@ -523,7 +541,11 @@ def detect_identity(n_clicks):
         return (
             candidate.username,
             candidate.steam_id,
-            f"Found {candidate.username}. Save to apply it.",
+            [
+                f"Found {candidate.username}. ",
+                control_name("Save"),
+                " to apply it.",
+            ],
             _picker_rows(()),
             PICKER_HIDDEN_CLASS,
             None,
@@ -670,7 +692,7 @@ def _stats_dir_input(value: str, candidates: list[str]) -> dmc.Autocomplete:
     suggested = bool(candidates)
     return dmc.Autocomplete(
         id="app-settings-stats-dir",
-        label="Stats directory",
+        label="Stats folder",
         description=(
             STATS_DIR_DESCRIPTION_WITH_SUGGESTIONS
             if suggested
@@ -736,7 +758,11 @@ def _identity_detection() -> dmc.Stack:
                 id="app-settings-identity-picker",
                 children=[],
                 label="Detected KovaaK's accounts",
-                description="Choosing one fills the fields above; Save applies it.",
+                description=[
+                    "Choosing one fills the fields above. ",
+                    control_name("Save"),
+                    " applies it.",
+                ],
                 className=PICKER_HIDDEN_CLASS,
             ),
             # What the picker's rows mean, so a pick needs no second detection.

@@ -27,9 +27,7 @@ from source.utilities.utilities import ordinal
 
 logger = logging.getLogger(__name__)
 
-RUN_IMPORT_FAILURE_MESSAGE = (
-    "Could not process a new run file. See debug.log for details."
-)
+RUN_IMPORT_FAILURE_MESSAGE = "Couldn't process a new run file. See data/logs/debug.log."
 
 # Run files this thread failed to import. The watchdog runs outside any Dash
 # callback context, so it publishes here instead of driving a UI output, and a

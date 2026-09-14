@@ -34,7 +34,7 @@ dagcomponentfuncs.VisibilityAction = function (props) {
       "visibility-action " +
       (hidden ? "visibility-action-hidden" : "visibility-action-visible"),
     role: "img",
-    "aria-label": hidden ? "Unhide" : "Hide",
+    "aria-label": hidden ? "Show" : "Hide",
   });
 };
 

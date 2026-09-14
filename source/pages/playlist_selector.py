@@ -29,7 +29,7 @@ PLAYLIST_SELECTOR_PRESET = {
     # Explicit rather than the flex-item default of ``auto``: a min-content
     # floor above 200px would quietly raise the wrap threshold again.
     "miw": "min(200px, 100%)",
-    "placeholder": "Select a playlist...",
+    "placeholder": "Select a playlist",
     "scrollAreaProps": {"type": "always"},
     "searchable": True,
 }
