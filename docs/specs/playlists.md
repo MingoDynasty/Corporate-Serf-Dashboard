@@ -247,7 +247,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - `resources/benchmarks/` ships flat, is scanned in full at startup, and is
   machine-generated, never hand-edited
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface));
-  230 files as of 2026-08-22. User playlists live under `data/playlists/`,
+  253 files as of 2026-09-14. User playlists live under `data/playlists/`,
   created on first import. Files load in `(filename.casefold(), filename)`
   order per root, bundled root first; the first file for a code wins, and a
   shadowed one is skipped with a startup warning buffered for the UI

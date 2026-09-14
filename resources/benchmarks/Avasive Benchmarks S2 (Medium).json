@@ -1,0 +1,1027 @@
+{
+  "name": "Avasive Benchmarks S2 (Medium)",
+  "code": "KovaaKsChokingAfkCinematic",
+  "scenarios": [
+    {
+      "name": "Pasu Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 900.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1400.0
+        }
+      ],
+      "leaderboard_id": 203362
+    },
+    {
+      "name": "AbyssClick Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 780.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 860.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 960.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1140.0
+        }
+      ],
+      "leaderboard_id": 203363
+    },
+    {
+      "name": "BounceClick Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 680.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 780.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 870.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 960.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1040.0
+        }
+      ],
+      "leaderboard_id": 203364
+    },
+    {
+      "name": "JennClick Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 480.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 580.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 660.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 740.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 820.0
+        }
+      ],
+      "leaderboard_id": 203555
+    },
+    {
+      "name": "1w2ts Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 840.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 940.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1160.0
+        }
+      ],
+      "leaderboard_id": 203366
+    },
+    {
+      "name": "Clustershot Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1290.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1580.0
+        }
+      ],
+      "leaderboard_id": 203367
+    },
+    {
+      "name": "ww4t Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 990.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1210.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1280.0
+        }
+      ],
+      "leaderboard_id": 203368
+    },
+    {
+      "name": "Odd-Angleshot Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 940.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1360.0
+        }
+      ],
+      "leaderboard_id": 203369
+    },
+    {
+      "name": "SmoothBot Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3325.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3950.0
+        }
+      ],
+      "leaderboard_id": 203370
+    },
+    {
+      "name": "PTI Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3675.0
+        }
+      ],
+      "leaderboard_id": 203552
+    },
+    {
+      "name": "PreciseTrack Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3825.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 4125.0
+        }
+      ],
+      "leaderboard_id": 203371
+    },
+    {
+      "name": "Leapstrafes Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3775.0
+        }
+      ],
+      "leaderboard_id": 203372
+    },
+    {
+      "name": "AirXYZ Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1525.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2575.0
+        }
+      ],
+      "leaderboard_id": 203504
+    },
+    {
+      "name": "PasuXYZ Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 2675.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2875.0
+        }
+      ],
+      "leaderboard_id": 203465
+    },
+    {
+      "name": "Plaza Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3900.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 203376
+    },
+    {
+      "name": "Thin Strafes Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 1525.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2100.0
+        }
+      ],
+      "leaderboard_id": 203377
+    },
+    {
+      "name": "Pokeball Wide Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 900.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 980.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1130.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1200.0
+        }
+      ],
+      "leaderboard_id": 203378
+    },
+    {
+      "name": "PoleTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 860.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 940.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1140.0
+        }
+      ],
+      "leaderboard_id": 203379
+    },
+    {
+      "name": "DollTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 830.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 910.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 980.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1100.0
+        }
+      ],
+      "leaderboard_id": 203380
+    },
+    {
+      "name": "psalmTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 870.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 950.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 1030.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1180.0
+        }
+      ],
+      "leaderboard_id": 203381
+    },
+    {
+      "name": "SmoothTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 320.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 360.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 400.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 440.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 480.0
+        }
+      ],
+      "leaderboard_id": 203382
+    },
+    {
+      "name": "BounceTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 610.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 680.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 740.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 800.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 850.0
+        }
+      ],
+      "leaderboard_id": 203383
+    },
+    {
+      "name": "AngelTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 370.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 410.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 450.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 490.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 530.0
+        }
+      ],
+      "leaderboard_id": 203384
+    },
+    {
+      "name": "AbyssTS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 590.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 650.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 710.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 760.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 800.0
+        }
+      ],
+      "leaderboard_id": 203385
+    },
+    {
+      "name": "HeadClick Dodge Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 720.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 810.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 890.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 960.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1020.0
+        }
+      ],
+      "leaderboard_id": 203386
+    },
+    {
+      "name": "BounceClick Dodge Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 660.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 750.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 830.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 900.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 960.0
+        }
+      ],
+      "leaderboard_id": 203387
+    },
+    {
+      "name": "Ground Dodge Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 2725.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3525.0
+        }
+      ],
+      "leaderboard_id": 203388
+    },
+    {
+      "name": "AirTS Dodge Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 460.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 520.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 570.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 610.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 650.0
+        }
+      ],
+      "leaderboard_id": 203389
+    },
+    {
+      "name": "AMS Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 440.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 560.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 660.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 760.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 840.0
+        }
+      ],
+      "leaderboard_id": 203390
+    },
+    {
+      "name": "AngelClick Revolving Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 420.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 540.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 640.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 740.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 820.0
+        }
+      ],
+      "leaderboard_id": 203807
+    },
+    {
+      "name": "Bounce House Precise Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3500.0
+        }
+      ],
+      "leaderboard_id": 203392
+    },
+    {
+      "name": "Smoothsphere Revolving Avasive Medium",
+      "ranks": [
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3175.0
+        },
+        {
+          "name": "Entice",
+          "color": "#a25069",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Allure",
+          "color": "#4f5ea9",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Delight",
+          "color": "#8d4fa9",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 203810
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsChokingAfkCinematic",
+    "kovaaks_benchmark_id": 2844,
+    "rank_colors": [
+      [
+        "Charm",
+        "#5b9dab"
+      ],
+      [
+        "Entice",
+        "#a25069"
+      ],
+      [
+        "Allure",
+        "#4f5ea9"
+      ],
+      [
+        "Delight",
+        "#8d4fa9"
+      ],
+      [
+        "Tranquility",
+        "#8df97b"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:05:36.348340+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

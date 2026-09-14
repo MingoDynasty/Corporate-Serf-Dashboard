@@ -1,0 +1,655 @@
+{
+  "name": "Jade Palace Dynamic Benchmark - Hard",
+  "code": "KovaaKsBottingCaffeinatedSecret",
+  "scenarios": [
+    {
+      "name": "Pasu Palace",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 101.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 113.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 124.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 135.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 157.0
+        }
+      ],
+      "leaderboard_id": 181289
+    },
+    {
+      "name": "Pasu Voltaic",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 92.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 104.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 115.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 126.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 144.0
+        }
+      ],
+      "leaderboard_id": 6
+    },
+    {
+      "name": "pasu small reload",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 98.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 112.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 124.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 136.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 156.0
+        }
+      ],
+      "leaderboard_id": 95
+    },
+    {
+      "name": "CombinedClick",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 78.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 94.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 108.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 120.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 142.0
+        }
+      ],
+      "leaderboard_id": 201114
+    },
+    {
+      "name": "Controlswitch Click",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 80.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 92.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 104.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 115.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 138.0
+        }
+      ],
+      "leaderboard_id": 200238
+    },
+    {
+      "name": "Pasu VP",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1340.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1560.0
+        }
+      ],
+      "leaderboard_id": 196550
+    },
+    {
+      "name": "Popcorn Palace",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 620.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 740.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 840.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 940.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1140.0
+        }
+      ],
+      "leaderboard_id": 192391
+    },
+    {
+      "name": "Popcorn MV Advanced",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 350.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 440.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 520.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 600.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 740.0
+        }
+      ],
+      "leaderboard_id": 76966
+    },
+    {
+      "name": "Aimerz+ hopClick Hard S1",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 970.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1160.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1520.0
+        }
+      ],
+      "leaderboard_id": 68378
+    },
+    {
+      "name": "Leapcorn Pure",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 68.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 78.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 88.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 98.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 120.0
+        }
+      ],
+      "leaderboard_id": 13220
+    },
+    {
+      "name": "VT Bounceshot Viscose Expert",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 840.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 960.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1440.0
+        }
+      ],
+      "leaderboard_id": 185236
+    },
+    {
+      "name": "Leap 180 Avasive",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 76.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 88.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 98.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 108.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 135.0
+        }
+      ],
+      "leaderboard_id": 202790
+    },
+    {
+      "name": "Flow",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1470.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1680.0
+        }
+      ],
+      "leaderboard_id": 192629
+    },
+    {
+      "name": "1w4t Pasu Raspberry Master",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 86.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 102.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 118.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 132.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 162.0
+        }
+      ],
+      "leaderboard_id": 15338
+    },
+    {
+      "name": "cAt purrClick Hard",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 950.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1100.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1390.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1610.0
+        }
+      ],
+      "leaderboard_id": 83380
+    },
+    {
+      "name": "SnowClick Revosect",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 750.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 880.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1330.0
+        }
+      ],
+      "leaderboard_id": 142723
+    },
+    {
+      "name": "BeanClick Wide 8 Bots",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 145.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 160.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 175.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 188.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 220.0
+        }
+      ],
+      "leaderboard_id": 40920
+    },
+    {
+      "name": "beanClick Euphoric",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 148.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 162.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 172.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 182.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 206.0
+        }
+      ],
+      "leaderboard_id": 197634
+    },
+    {
+      "name": "psalmTS Viscose Click Expert",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 76.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 88.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 100.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 112.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 135.0
+        }
+      ],
+      "leaderboard_id": 185607
+    },
+    {
+      "name": "VT Floating Heads Advanced S5 Hard",
+      "ranks": [
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 580.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 700.0
+        },
+        {
+          "name": "Astra",
+          "color": "#c4065b",
+          "threshold": 800.0
+        },
+        {
+          "name": "Celestial",
+          "color": "#56e4fe",
+          "threshold": 900.0
+        },
+        {
+          "name": "Transcendent",
+          "color": "#faa0fc",
+          "threshold": 1070.0
+        }
+      ],
+      "leaderboard_id": 104678
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBottingCaffeinatedSecret",
+    "kovaaks_benchmark_id": 2828,
+    "rank_colors": [
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ],
+      [
+        "Astra",
+        "#c4065b"
+      ],
+      [
+        "Celestial",
+        "#56e4fe"
+      ],
+      [
+        "Transcendent",
+        "#faa0fc"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:32.464945+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
