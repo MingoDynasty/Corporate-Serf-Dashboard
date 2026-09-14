@@ -341,7 +341,10 @@ my accounts button again to retry.` becomes `Press the **Detect my
 accounts** button again to retry.`, because a lowercased verb-phrase label
 inside a sentence is not obviously a name even with the type word beside
 it. The alternative is spelled out under "Choosing differently" below; the
-Copy block keeps the plain form until the row is ruled.
+Copy block keeps the plain form until the row is ruled. The re-review
+(2026-09-14) answered for the alternative, applied to every control name in
+prose, and the author's lean moved with it; the row awaits the maintainer's
+ruling.
 
 Rule 6 named a control in prose bare, in its on-screen casing: "Turn on
 Show hidden to manage them." The redline pass observed that once D2
@@ -368,22 +371,39 @@ Consequence: four Copy entries change (the all-hidden status, the two
 hidden-playlist hints, and the unchecked-accounts detection line).
 
 Choosing differently: bold is the Atlassian answer and the one the redline
-pass reached for. Its concrete form keeps the type word and bolds the name:
-`Press the **Detect my accounts** button again to retry.`, `Turn on the
-**Show hidden** switch to manage them.`, and the same in the two
-hidden-playlist hints. Four strings carry a control name in prose today,
-and every one of their surfaces can render it: the detection status line
-and the all-hidden status line are text components, the visibility alert is
-a component tree, and a toast body accepts components. In-app practice
-supports it (Slack, GitHub, and Discord bold names inside their own
-messages), and it gives the app a three-way marker system: bold for a
+pass reached for. Its concrete form keeps the type word where the label
+reads as prose and bolds the name: `Press the **Detect my accounts** button
+again to retry.`, `Turn on the **Show hidden** switch to manage them.`.
+Bold means "a control" only if every control named in prose gets it, so
+the alternative covers all eleven such strings, not only the four that take
+the type word: those four (the all-hidden status, the two hidden-playlist
+hints, the unchecked-accounts detection line), the two detection-found
+lines (`Found {count} KovaaK's accounts. Choose the one to use, then
+Save.`, `Found {username}. Save to apply it.`), the picker description
+(`Save applies it.`), the celebration description (`…doesn't depend on Run
+notifications.`), the two dependent help texts (`Needs Rank thresholds
+turned on.`, `Needs Run notifications turned on.`), and the import field's
+description (`…press Import to add that playlist to this list.`). Eight of
+the eleven are Copy entries already; the two detection-found lines and the
+import description are not, and would join the block. Every one of their
+surfaces can render bold: the detection and all-hidden status lines are
+text components, the help texts are tooltip labels, the descriptions are
+field-description props, and the two hints are toast bodies, which the
+notification container renders as components; the app's `toast()` helper
+types its message as a string and would widen. Where bold cannot render, a
+toast title (already bold) or an accessible name, the name stays plain and
+the type word alone carries it. Bolding only the four would put a bold and
+a plain control name on one line when detection finds one account and
+leaves another unchecked, so the choice is all eleven or none. In-app
+practice supports it (Slack, GitHub, and Discord bold names inside their
+own messages), and it gives the app a three-way marker system: bold for a
 control, double quotes for what the user typed, nothing for a token. The
-costs: the four strings stop being single constants and are composed from
-parts, the Copy block needs a bold-marker convention (`**…**`) for the
-implementer, the tests that pin those sentences assert joined text, and
-Microsoft's in-UI guidance prefers wording that sets the name off over
-formatting. Quotes stay the last resort either way, since rule 6 reserves
-them for user-typed text.
+costs: the eleven strings stop being single constants and are composed
+from parts, the Copy block needs a bold-marker convention (`**…**`) for the
+implementer, the tests that pin those sentences by equality (the all-hidden
+status has two) assert joined text, and Microsoft's in-UI guidance prefers
+wording that sets the name off over formatting. Quotes stay the last resort
+either way, since rule 6 reserves them for user-typed text.
 
 ## Problem
 
@@ -461,7 +481,8 @@ fix and the AGENTS.md follow-ups merged. Neither changed a user-facing
 string: the fix replaces a filename scan with a read of the run store
 (docstrings and a comment only), and its 2026-09-12 decision-log entry
 quotes the existing "No local runs found" empty state, which the sweep
-does not touch. The counts below still hold at `0830f3e`.
+does not touch. The counts below still hold at `0830f3e`, and at
+`fd812fd` (main, 2026-09-14), whose only change is `ignore/README.md`.
 
 The same condition, four shapes, is the seed symptom:
 
@@ -683,11 +704,14 @@ separate child.
 - Score threshold percentage help text: `…The overlay line tracks your
   current personal best; notifications judge the run against the personal
   best it was chasing.` → `…The overlay line tracks your current personal
-  best. Notifications judge each run against the personal best you had
-  before the run.` (maintainer lean, 2026-09-13, open to the reviewers: the
-  verdict uses the PB that stood before the run, per the 2026-07-08 entry;
-  "previous personal best" would read as the second-best score on a run
-  that set no PB, and "current" is the overlay line's word)
+  best. Notifications judge a run against the personal best you had
+  before the run.` ("before the run" is the maintainer's lean of
+  2026-09-13, endorsed on re-review: the verdict uses the PB that stood
+  before the run, per the 2026-07-08 entry; "previous personal best" would
+  read as the second-best score on a run that set no PB, and "current" is
+  the overlay line's word. "A run", not "each run": the verdict skips the
+  first run at a sensitivity, a scenario with no previous best, a blank
+  goal, and the switch being off, so no run is promised one)
 - Top N scores help text: `How many of your best scores to plot per
   sensitivity — or per day in Score vs Time — within the selected date range.
   A new run that lands in the top N also triggers a notification.` → `How
@@ -985,7 +1009,10 @@ other kinds substitute their noun.)
 - `{path} has an invalid "schema_version" value ({value}). It must be the
   whole number 1.` → `The settings file's "schema_version" is {value}. It
   must be the whole number 1. File: {path}` (rule 7: the specific problem
-  in place of *invalid*)
+  in place of *invalid*; `{value}` is written as JSON, `json.dumps`, so the
+  message shows what the file holds, `"1"`, `true`, or `null`, where the
+  current source formats it with `repr` and would show `'1'`, `True`, or
+  `None`)
 - `{path} was written by a newer version of this app (schema_version {n}).
   The file is intact. Update the app to use it.` → `The settings file was
   written by a newer version of this app (schema_version {n}). It is
