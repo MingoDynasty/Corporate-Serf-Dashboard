@@ -6,8 +6,14 @@ domain as this dashboard. File references below are paths inside the refleks
 repo unless prefixed with `source/` or `docs/`.
 
 **License caveat:** refleks is GPL-3.0. Concepts, file-format knowledge, and
-API observations are free to use; verbatim code is not (this project is not
-GPL). Everything below is described at the idea/format level for that reason.
+API observations are free to use. Its code is not copied or ported here.
+That is a bookkeeping choice, not a license conflict: this project is
+AGPL-3.0, whose section 13 permits combining with GPL-3.0 work, but any file
+taken from refleks would stay GPL-3.0 and need recording like the vendored
+assets (see the
+[AGPL decision](decision_log.md#2026-08-10-the-project-is-agpl-30-and-contributors-sign-nothing)),
+and this tree keeps its own code under one license. Everything below is
+described at the idea/format level for that reason.
 
 ## What refleks is
 
