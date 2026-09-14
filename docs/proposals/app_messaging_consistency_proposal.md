@@ -1,0 +1,1244 @@
+# App Messaging Consistency
+
+Status: Proposed
+Date: 2026-08-21
+
+## TL;DR
+
+The app's user-facing text was written one feature at a time, and it shows.
+The same condition is worded four different ways on four pages, punctuation
+and casing drift from surface to surface, and some toasts still carry the
+developer's voice. This proposal writes down one short set of copy rules,
+lists every string the rules change, and ships the whole sweep in one
+implementation PR so the app reads as if one person wrote it.
+
+## Decisions needed
+
+Seven product rulings and one workflow ruling. D1 to D5 are the original
+rows. D6 to D8 were added on 2026-09-04, after the maintainer's redline pass
+asked whether the rules follow standard convention rather than taste and
+commissioned a survey of the mainstream style guides and of current apps
+(the copy conventions research note,
+`ignore/design-notes/copy-conventions-research.md` in the main checkout,
+dated 2026-09-04). The survey confirmed nine of the thirteen conventions it
+tested and found the proposal against the guides on three, which are the
+three new rows; its smaller findings are folded into the rules and the Copy
+block as author redlines. Every row is ruled: D4 on 2026-09-12, D8 on
+2026-09-14, and D1 to D3 and D5 to D7 ratified on 2026-09-14. Everything
+else in this proposal is
+author-owned copy, gathered in the Design section's Copy block for the
+maintainer's redline pass.
+
+### D1 — Shape of the Scenario Stats Position hint
+
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
+
+The Position field on Scenario Performance glues a short hint to its value,
+in three variants that share one slot:
+
+```
+N/A — set your KovaaK's username in Settings
+4,022 of 8,461 (52.47% Percentile) — lookup failed, Refresh to retry
+4,022 of 8,461 (52.47% Percentile) — from cache, Refresh to update
+```
+
+Measured at the running app (2026-08-21, 300 px stats box, 14 px value, the
+hint dimmed at the xs size): a full position value is 208 px wide. Any hint
+that keeps an instruction ("Refresh to update") wraps to a second line and
+pushes the adjacent Refresh button onto a third. A short qualifier stays on
+one line.
+
+**Recommendation: middle-dot fragments, instruction halves dropped.**
+
+```
+N/A · set your KovaaK's username in Settings
+4,022 of 8,461 (52.47% percentile) · lookup failed
+4,022 of 8,461 (52.47% percentile) · from cache
+```
+
+The hint is a status readout glued to a value, so under the punctuation rule
+it stays a bare fragment, and the middle dot is the separator the app already
+uses for fragment chains in the grid status lines. The Refresh button sits
+beside the value with the same icon, and its tooltip already explains that a
+displayed value can come from a local cache, so the instruction half repeats
+what is on screen. The unset variant keeps its Settings link because there is
+no adjacent control for it. The 2026-09-04 conventions survey found no guide
+that prescribes a separator for a fragment chain and the middle dot in use
+as the web's metadata separator; its one caution, that a screen reader may
+skip the glyph, is met because each hint reads correctly without it.
+
+Choosing differently: keeping the instruction halves (`· from cache, Refresh
+to update`) preserves the explicit affordance at the cost of a two-line field
+that reflows the Refresh button on every stale render. Full sentences
+(`N/A. Set your KovaaK's username in Settings.` / `…Percentile). From cache.
+Refresh to update.`) put two periods beside a parenthesised value and wrap the
+same way.
+
+### D2 — Casing of control labels
+
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
+
+Control labels mix two conventions with no rule behind them. In the Chart
+options panel alone: "Rank Thresholds", "PB Score", "Score Threshold
+Overlay", "Score Threshold Percentage", "Score Threshold Verdict", and "Run
+Notifications" are Title Case; "Show all ranks", "Point size", "Point color",
+"Use default", "Top N scores", and "Follow newly played scenario" are
+sentence case. Modal titles are Title Case ("Import Playlist", "Delete
+Leftover Files") while the alert beside them is sentence case ("Leftover
+playlist files") and every toast title is sentence case.
+
+**Recommendation: sentence case for everything except page titles, section
+headings, and grid column headers.** Controls (labels, switches, buttons,
+placeholders), toast and alert titles, modal titles, status lines, and
+tooltips all take sentence case; "Scenario Performance", "Scenario Stats",
+"Run Data Points", "Median Percentile" and their kind keep Title Case as the
+headings they are. Proper names keep their own capitals (KovaaK's, Steam ID,
+PB, SteamID64). The two chart modes "Score vs Sensitivity" and "Score vs Time"
+are treated as named modes and keep their capitals; help text that quotes a
+control repeats the control's on-screen casing.
+
+This is the direction the most recent rulings already lean: the ratified Run
+Data Points group pairs a Title Case heading with sentence-case fields. The
+consequence is renaming six Title Case switch labels, two of them ratified on
+2026-08-21 ("Run Notifications", "Score Threshold Verdict"), plus three modal
+titles, the chart's "PB Score" and "Score Threshold" annotations, which
+follow their switches, and the chart's two legend entries, "Run Data Point"
+and "Average Score", which sit beside them.
+
+The 2026-09-04 conventions survey endorses this row. The Microsoft style
+guide, the Windows app writing guidance, Material, Atlassian, Polaris,
+GitHub's Primer, Obsidian's plugin guidelines, and the Mantine docs all use
+sentence case for controls, modal titles, and notification titles, and none
+endorses capitalizing terminology that is not a proper noun; macOS is the
+one platform that title-cases controls, and this is a Windows app. KovaaK's
+own copy draws the same line, lowercasing generic nouns (scenario, playlist,
+leaderboard) and capitalizing only named modes and products. One honesty
+note for the decision-log entry: the same guides also lowercase page titles,
+section headings, and column headers, so this proposal's Title Case
+exception for those is house style, not convention. Extending sentence case
+to them would rename surfaces the README, the specs, and the launch material
+already name, and is left as a separate scope question.
+
+Choosing differently: Title Case for all controls renames the six sentence-case
+labels instead, and long switch labels read heavy ("Follow Newly Played
+Scenario"). Leaving casing unruled keeps today's mix, which is the visible
+symptom this proposal exists to remove.
+
+### D3 — Noun on the two playlist status lines
+
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
+
+With no username set, the Playlists overview says "Percentiles unavailable"
+and the per-playlist scenario table says "Positions unavailable". The note
+that seeded this proposal asked for a deliberate ruling rather than an
+accident.
+
+**Recommendation: keep the split.** Each line names the column family it
+explains: the overview's empty cells are the Median and Lowest Percentile
+columns, the drill-down's are Position, Total Players, and Percentile. One
+noun for both would be wrong on one page. Only the punctuation is aligned.
+The 2026-09-04 conventions survey endorses the split: Windows asks a label
+to say what it describes, and each line names the columns on its own page.
+
+Choosing differently: one noun ("Positions unavailable" on both) buys a
+verbatim match between two lines that are never on screen together, at the
+cost of the overview naming a column it does not have.
+
+### D4 — The coaching flourishes
+
+Status: ruled (user), 2026-09-12. Keep "Ready to move on."; drop "Keep
+grinding" from the below-threshold toast. Ruled in the PR #247 discussion
+after the 2026-09-12 review contested the earlier recommendation to keep
+it.
+
+Two run-toast fragments are tone, not information: "Keep grinding..." on a
+below-threshold run and "Ready to move on." on a passed run that did not
+place. They are the only places the app has a personality, and the
+product's name suggests it wants one. (A third, the "While you were away"
+digest title, left with the digest when the celebration arc retired it: the
+2026-09-02 celebrates-on-every-page entry.)
+
+**Ruling: keep "Ready to move on." and drop the miss line.** "Ready to
+move on." fires on a passed run that did not place, a success-adjacent
+moment where the guides accept a flourish, and it is already a correct
+sentence. "Keep grinding..." fires only on a below-threshold run. That
+toast already states the score, the shortfall against the threshold, and
+any placement, so the line adds no information, and it repeats on every
+miss in a grinding session, which is where Atlassian and the Nielsen Norman
+Group say a flourish wears out. No guide covers a flourish on a miss, so
+the ruling applies that general guidance rather than a measured result; a
+short repeated-run comparison with a few intended users is the way to
+measure it if the question is ever reopened. Rule 4 keeps no exception.
+
+Material consequence: the below-threshold body ends after its placement
+sentence (`…, 92.1% of PB (need 95.0%). Still your 3rd-best at 0.35
+cm/360.`), the Copy entry "Run verdict, below threshold" says so, and the
+run-verdict test that pins the body updates with it. In the launch clip,
+a miss toast now reads as a plain readout and a passed run's toast still
+carries "Ready to move on."
+
+Rejected alternative: keep the line as "Keep grinding." with a period, the
+earlier recommendation and the maintainer's 2026-09-04 lean. Its case was
+voice, the product's name, and the 2026-08-03 policy that files run toasts
+under "achievement / coaching"; that is taste and permission, with no
+comprehension argument, and a period does not answer the repetition
+concern. The original "Keep grinding…" with the single ellipsis was weaker
+still: Polaris and Google reject a trailing-off ellipsis, and it needed a
+rule-4 exception.
+
+Also rejected: dropping both lines, which makes the run toasts strictly
+factual and forgoes the one success-moment flourish the guides endorse.
+
+### D5 — Does the sweep gate the launch post?
+
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
+
+The launch prep notes plan an announcement post led by a clip of a new run
+updating the chart and its notification, with the leaderboard standing in
+view. Both surfaces carry strings this proposal changes: the run-toast body
+is an em-dash site, and the Position hint is D1. The same notes record that
+"was this AI-written" was the first community question on a comparable
+launch, and the no-em-dash ruling exists because the old copy reads that way.
+
+**Recommendation: yes.** The implementation PR lands before the release the
+post promotes, and the launch prep notes' pre-post checklist carries it as an
+item. The cost is one more PR in front of the post; the sweep is a day of
+mechanical work once the Copy block is ratified.
+
+Choosing differently: the post's visual shows the old copy, and the rules
+govern only strings written after launch. The app would be answering the
+authorship question beside a screenshot of the copy the rule was written
+against.
+
+### D6 — Contractions
+
+Status: Ratified (user), 2026-09-14: adopt. The maintainer leaned to adopt
+on 2026-09-04, pending the review's stance, and the review endorsed on
+every pass.
+
+Rule 5 as first drafted banned contractions: "Could not", "cannot", "does
+not" everywhere, on the reasoning that full forms read terse and deliberate.
+The 2026-09-04 conventions survey found this the one place the proposal is
+unanimously against the guides. The Microsoft style guide, the Windows app
+writing guidance, Google's developer style, Material, Apple's style guide,
+Atlassian, and Polaris all say to use common contractions; Windows warns
+that avoiding them makes an app read "too formal or even stilted". The
+survey also looked at what makes prose read as machine-written, which is
+the concern behind the 2026-08-11 no-em-dash ruling: the sources that name
+a register tell name formality, and the one corpus study found (a 2026
+comparison of human and AI-generated academic abstracts) reports that the
+AI text lacked the informality features it measured, contractions among
+them. That is a frequency difference in one genre, not an authorship
+detector and not a reading of app copy, so it corroborates the style guides
+rather than carrying the case. Nothing found implicates contractions the
+other way.
+
+**Recommendation: reverse rule 5.** Use the common contractions (can't,
+couldn't, doesn't, isn't, wasn't, aren't, you're) and adopt Microsoft's
+consistency clause: a contraction and its full form never both appear in
+the app, so "can't" and "cannot" do not coexist. "Do not" survives only in
+a warning the user must not skip, which is Material's carve-out; the app
+has no such string today.
+
+Consequence: the five Copy entries that expanded a contraction revert to
+the contracted form (the two refresh-toast bodies, the setup card's
+stats-folder body, and its unreadable-store title and body, the title
+dropping out of the block because nothing else in it changes), and every
+full-form negation on screen contracts: the seventeen block entries whose
+rewritten text used a full form, plus eight strings the block had left
+unchanged or uninventoried (the two store-alert titles, the "Skip was not
+saved" toast title, the account-list detection line, the warmup's
+"KovaaK's username is not configured." reason, the playlist-payload
+neighbour "is not valid playlist data.", and the store layer's "is not
+valid JSON." and "could not be read."). The Copy block below is written in
+the contracted form; AGENTS.md's operative convention gains the never-mix
+line.
+
+Choosing differently: keeping full forms is a legitimate house voice, and
+the block's earlier draft (every "Couldn't" expanded) shows what it looks
+like. It should then be recorded as taste, because the claim that it is the
+convention does not survive the survey.
+
+### D7 — A sentence never opens with an object name or a path
+
+Status: Ratified (user), 2026-09-14: adopt the rule below, with the
+supplemental path written as a labeled readout, `File: {path}`. The
+maintainer leaned to it on 2026-09-12, narrowed that day from the review's
+counter-proposal, which the review confirmed the same day; it supersedes
+the 2026-09-04 lean given on the wider first draft.
+
+Several rewritten messages began with a value the app fills in at runtime:
+`{file} could not be read.`, `{code} is already imported as "{name}".`, and
+every store message in `store_schema.py` (`{path} has no "schema_version"
+line. …`). The redline pass asked for the value to come last, after a colon,
+so the verdict leads and the value's edges are visible. The survey found no
+guide behind the colon form (it is the log-line idiom rule 8 exists to keep
+off the screen) but a direct Windows rule against the current shape, "Avoid
+starting sentences with object names": a sentence that opens with a path or
+a code may begin with a lowercase letter, a digit, or a backslash, and has
+no visible start. The same guide keeps a full path out of the main sentence
+and gives it as supplemental text after the diagnosis. Windows and Polaris
+both embed a short value in the sentence with a noun in front of it, and
+Atlassian's example does the same.
+
+The first draft of this row banned every runtime value from opening a
+sentence. That was wider than the evidence: the Windows rule targets object
+names, and the block's count-led sentences (`3 new run files couldn't be
+processed.`, `2 Steam accounts couldn't be checked.`) are clear at a glance,
+as are the score readouts, which rule 1 classes as readouts rather than
+sentences. The draft also put the store messages' full path before the
+diagnosis (`The file {path} has no "schema_version" line.`), so a reader
+takes in the whole path before learning what is wrong with it.
+
+**Recommendation: add the narrower clause to rule 9.** An object name or a
+path never opens a sentence, and a noun names it before it appears
+(`Couldn't read the playlist file {file}.`, `The playlist code {code} is
+already imported as "{name}".`). A count or a score may lead. A
+path goes inline only as the last words of the message's only sentence
+(`Couldn't read the playlist file {file}.`), which the Windows guide allows
+when the message needs no supplemental text. Otherwise the message names
+the file by its kind, finishes its sentences, and gives the full path last
+as a labeled readout: `The settings file isn't valid JSON. File: {path}`,
+`The settings file has no "schema_version" line. Add "schema_version": 1 to
+it, or delete the file to start over. File: {path}`.
+The label is the single-string form of the Windows supplemental line: the
+diagnosis is a complete sentence before it, and the label marks where the
+value starts so its edges are visible. It is not the log idiom rule 8 keeps
+off the screen, where the diagnosis itself sits behind the colon.
+User-typed free text keeps its quotes under rule 6.
+
+Consequence: ten Copy entries restructure (the five startup playlist
+warnings, the store-message pass-through, the duplicate-import refusal, the
+newer-version save refusal, the not-yours delete refusal, and the delete
+failure), and the store messages join the sweep instead of standing as
+unchanged. Every store message names its file by kind, so
+`read_store_document` takes the kind as a parameter ("settings file",
+"playlist visibility file", "playlist file"), supplied at its four call
+sites in three services, and hands it to `decode_store_document`, whose only
+caller it is. The settings and visibility fragments the validators raise
+are unchanged and now follow the kind noun; the two playlist fragments
+change as the startup warnings list. The stamp script shares only the
+validators with the store layer and composes its own console lines, so its
+output changes only where a playlist fragment changes.
+
+Choosing differently: the first draft's absolute rule, which would rewrite
+the count-led toasts ("The app couldn't process 3 new run files.") for no
+gain in clarity; exempting the store messages as the named exception, which
+keeps the Settings and Playlists store alerts byte-identical at the cost of
+one message family that opens with a Windows path; or writing the
+supplemental path as a sentence (`The file is {path}.`), which reads
+stilted and buries the value's start in prose. A true second
+line for the path in the alert and toast components would be closer still
+to the Windows layout; it is a component change rather than copy, and the
+labeled readout degrades into it without changing a word.
+
+
+### D8 — Control names in prose are bold and carry their type
+
+Status: Ruled (user), 2026-09-14: choose the alternative. A control named
+in prose is bold, in its on-screen casing, and takes its type when the
+label reads as prose: `Press the **Detect my accounts** button again to
+retry.` The 2026-09-04 lean was the type word alone; the question of bold
+was put to the review on 2026-09-13, which answered for it on every row,
+and the ruling followed.
+
+Rule 6 named a control in prose bare, in its on-screen casing: "Turn on
+Show hidden to manage them." The redline pass observed that once D2
+lowercases the labels, a verb-phrase label disappears into the sentence
+around it, and asked for the name to be set off, for instance in bold. The
+survey found the guides split on the marker but agreed on the need: Apple's
+rule is precisely that sentence-style element names need marking where
+title-style ones do not; Atlassian bolds element names in app copy;
+Microsoft's in-UI guidance says to avoid bold and italic in the UI itself
+and instead choose "wording that clearly sets off the name of the element",
+its examples adding the element type ("the Create my database button"),
+with quotation marks as the sparing last resort. The type word alone left
+a lowercased verb-phrase label reading as part of the sentence; bold gives
+it a visible edge for sighted readers, and the type word stays because a
+screen reader does not announce bold.
+
+**Ruling: amend rule 6.** Bold means "a control", so it covers every
+control named in prose, or none. Counted against the Copy block, that is
+fourteen strings today:
+
+- the four that take the type word: the all-hidden status, the two
+  hidden-playlist hints, and the unchecked-accounts detection line;
+- the two detection-found lines (`Found 2 KovaaK's accounts. Choose the
+  one to use, then **Save**.`, `Found {username}. **Save** to apply it.`),
+  the picker description (`**Save** applies it.`), the celebration
+  description (`…doesn't depend on **Run notifications**.`), the two
+  dependent help texts (`Needs **Rank thresholds** turned on.`, `Needs
+  **Run notifications** turned on.`), and the import field's description
+  (`…press **Import** to add that playlist to this list.`);
+- the incomplete-controls chart message (`Set **Top N scores** and the
+  oldest date…`), the Top N scores help (`…or per day in **Score vs
+  Time**`), and the chart shown for an unexpected mode value (`Choose
+  **Score vs Sensitivity** or **Score vs Time**.`): the two chart modes
+  keep their capitals as named modes under D2, and prose that names one
+  names a control.
+
+Two boundaries: a message that paraphrases a value rather than naming the
+control stays plain (`the oldest date` for the Oldest date to consider
+field, `a checkpoint hour` in the Journey's empty chart, which the block
+rewrites as a value on purpose), and a page name stays plain (`Set it in
+Settings.`, `Open Settings to see what's wrong and how to fix it.` name a
+destination, not a control). Every surface renders it in one of two ways,
+and the block's `**…**` marker maps to both: in a component tree it
+becomes a bold span (the detection and all-hidden status lines are text
+components, the help texts are tooltip labels, the descriptions are
+field-description props, and the two hints are toast bodies, which the
+notification container renders as components), and in a chart annotation
+it becomes `<b>…</b>` inside the string, which plotly draws and the
+empty-state title already uses, so the two chart messages stay single
+strings. Where bold cannot render, a toast title (already bold) or an
+accessible name, the name stays plain and the type word alone carries it.
+The app gains a three-way marker system: bold for a control, double quotes
+for what the user typed, nothing for a token.
+
+Material consequence: fourteen Copy entries carry the `**name**` marker,
+four of them new (the two detection-found lines, the import description,
+and the unexpected-mode message); the twelve component-rendered strings
+stop being single constants and are composed from parts, with one helper
+producing the bold span so no site hand-rolls it; the `toast()` helper's
+message type widens to accept components; the two chart messages carry
+`<b>…</b>`; the tests that pin those sentences by equality (the all-hidden
+status twice, the unexpected-mode message once) compare flattened or
+marked-up text; and the manual pass covers the Settings detection states
+and both chart empty states.
+
+Rejected: the type word alone (`Press the Detect my accounts button again
+to retry.`), Microsoft's in-UI convention and the cheaper form, because in
+this app's copy a lowercased verb-phrase label still reads as part of the
+sentence with the type word beside it; bolding only the four type-word
+strings, because it would put a bold and a plain control name on one line
+when detection finds one account and leaves another unchecked; quotation
+marks, which rule 6 reserves for user-typed text; and dropping the name
+where the line sits beside its button, because "the button" is ambiguous
+on a page with more than one. The precedent for bold is narrower than for
+the type word: it is every guide's convention for documentation and
+Atlassian's for app copy, while the consumer apps the survey reached name
+controls in plain text or avoid naming them, and the in-app bold they do
+use marks objects such as a channel or a repository rather than a control.
+The choice is a product judgment for this app's sentence-case verb-phrase
+labels, not a convention.
+
+## Problem
+
+The inventory was taken against `39f96d4` (main, 2026-08-21) by reading every
+user-facing string in `source/pages/`, `source/app_shell.py`, the service
+messages that reach a toast or alert (`source/kovaaks/data_service.py`,
+`source/kovaaks/api_service.py`, `source/utilities/store_schema.py`,
+`source/kovaaks/percentile_warmup_service.py` and the fatal reasons it
+relays, `source/my_watchdog/file_watchdog.py`), the chart annotations and
+legend entries in `source/plot/plot_service.py`, and the grid renderers in
+`assets/`. It
+supersedes the 2026-08-11 design note that seeded it; that note's one
+"carry-along fix" (the Home restart hint saying "the dashboard") has already
+shipped in `b288b9f` and is not repeated here.
+
+Re-verified against `16f9afd` (main, 2026-08-23) after the capability-spec
+pass and PR #253 merged. The one copy-bearing change was #253 deleting the
+playlist fill's two summary toasts (the 2026-08-22 in-place-only entry), so
+their Copy-block entries are gone and the counts are restated for the
+new base; the fill's status-line strings survive unchanged and stay in the
+block.
+
+Re-verified again against `1878659` (main, 2026-09-04) after the
+celebration, alert-color, and toast-channel arcs merged. Three changes bear
+on copy. The celebration arc (the 2026-09-02 celebrates-on-every-page
+entry) added the personal-best toast and the Settings Celebrations section,
+both already in the target style except one control-name quote D2 renames,
+and retired the "While you were away" digest, so the digest's two
+Copy-block entries give way to a note and D4 shrinks to two flourishes. PR
+#265's setup card gained an unreadable-store state whose title and body use
+contractions and "the dashboard" (the vocabulary the 2026-08-21 launcher
+entry ruled out) plus a Skip-failure line with a nonstandard log pointer;
+all three join the Copy block. The toast id-to-channel migration (the
+2026-08-31 replace-in-place entry) changed no user-facing strings. The
+counts below are restated for `1878659`.
+
+Re-verified against `5be84bf` (main, 2026-09-11) after the hydration write
+fix, the launcher browser knob, the comment and docstring conventions, and
+the cm/360 sensitivity proposal merged. None of them changed a user-facing
+string: the source diff touches typing, the leaderboard-ID upsert, the
+launcher, and the stopwatch, and the three decision-log entries added quote
+no app copy. The counts below still hold at `5be84bf`. One placement
+change: main now keeps proposals under `docs/proposals/`, so this file moved
+there with the merge.
+
+Re-verified against `7eecae3` (main, 2026-09-12) after the README rework
+and the cm/360 sensitivity conversion merged. Neither changed a user-facing
+string: the conversion is parse-time code, and its 2026-09-11 decision-log
+entry and spec updates quote stats-file keys, not app copy. The reworked
+README names "Run Notifications" and the toggle "Show hidden" phrasing, so
+the sweep's README pass has two hits. The counts below still hold at
+`7eecae3`, and at `ec758e4` (main, 2026-09-13), whose only addition is the
+AGPL decision-log entry, which quotes no app copy.
+
+Re-verified against `750af53` (main, 2026-09-13) after the plotly 7
+toolchain upgrade merged. It changes no file under `source/`, `assets/`, or
+`scripts/`, so no app string moved and the counts below still hold. What
+changed is the browser: plotly.js 4 draws its own `Share chart...` command
+and confirmation dialog on both charts' toolbars, kept by the 2026-09-12
+decision-log entry, and neither chart passes a `config`. That text is the
+library's, not the app's, so rules 4 and 8 now say they govern text this
+app authors, and Out of scope names library-drawn text. The README's
+outbound-services table quotes the command's label as documentation prose,
+which the sweep leaves alone.
+
+Re-read at `0ea190b` (2026-09-13): the chart's two legend entries, `Run
+Data Point` and `Average Score`, and the average line's hover label had
+escaped every inventory pass, which had read the overlay `name` arguments
+as the legend when only their annotations are visible. Both entries and
+the label now sit in the Copy block under D2, beside the annotations they
+share the chart with.
+
+Re-verified against `0830f3e` (main, 2026-09-13) after the scenario-list
+fix and the AGENTS.md follow-ups merged. Neither changed a user-facing
+string: the fix replaces a filename scan with a read of the run store
+(docstrings and a comment only), and its 2026-09-12 decision-log entry
+quotes the existing "No local runs found" empty state, which the sweep
+does not touch. The counts below still hold at `0830f3e`, and at
+`fd812fd` (main, 2026-09-14), whose only change is `ignore/README.md`.
+
+The same condition, four shapes, is the seed symptom:
+
+| Surface | Current text |
+| --- | --- |
+| Playlists overview | `Percentiles unavailable. Set your KovaaK's username in Settings.` |
+| Playlist scenario table | `Positions unavailable — set your KovaaK's username in Settings` |
+| Scenario Performance, stats folder | `No stats directory configured — set it in Settings` |
+| Scenario Performance, Position | `N/A — set your KovaaK's username in Settings` |
+
+Only the first postdates the 2026-08-11 no-em-dash ruling and is already in
+the target style. Reading the whole surface found eight further kinds of
+drift, each small, together the "vibe-coded" feel:
+
+1. **Em dashes.** 22 sites. 20 join clauses in prose; 2 are typographic
+   (the `—` empty-value glyph under Last played, ratified 2026-06-30, and
+   the scenario/score separator in run-toast bodies).
+2. **Terminal punctuation.** Most sentences end with a period; the four
+   above and a handful of grid tooltips do not. Nine messages join two
+   sentences with a semicolon (an AST sweep of every non-docstring string
+   constant under `source/` finds no others that reach the screen); one
+   ends with an exclamation mark.
+3. **Contractions, mixed.** "Couldn't refresh", "can't read your runs", and
+   the unreadable-store card's "can't be read", "can't use it", and "what's
+   wrong" beside "Could not save", "could not be checked", "cannot look
+   one up". Counting every string constant under `source/` that reaches the
+   screen, full forms outnumber contractions 26 to 5 (21 distinct messages
+   to 5). The mix is the defect; D6 picks the side.
+4. **Ellipses, three ways.** `Keep grinding...` and every placeholder use
+   three periods; the fill status uses the `…` character; one tooltip uses
+   `, ...` inside parentheses, and the stats folder description elides a
+   path with `...\`.
+5. **Casing.** See D2.
+6. **Quoting control names.** `Toggle "Show hidden"` in three places, bare
+   `press Detect my accounts again`, `then Save`, `Needs Rank Thresholds
+   turned on` everywhere else.
+7. **Vocabulary.** "the dashboard" in the setup card (both its
+   stats-folder and unreadable-store bodies) against "this app" and
+   "the app" on Settings and in every store message; "Stats directory" as a
+   field label against "stats folder" in its own description and the setup
+   card. (A fourth split, "served from cache" in the fill toasts against
+  "from cache" in the status lines, resolved itself when #253 deleted the
+  toasts.)
+8. **Developer voice reaching the screen.** Import refusals and startup
+   playlist warnings are built in `data_service.py` and shown verbatim:
+   `Failed to load playlist data for playlist code: X`, `Invalid playlist
+   data returned by API for playlist code: X`, `Skipping playlist file X:
+   missing or blank playlist code; add a \`code\` field.` (backticks render
+   literally). The Steam-ID mismatch toast and the warmup's unknown-username
+   reason quote their values in single quotes; nothing else does.
+9. **A stray capital.** The Position value reads `(52.47% Percentile)`
+   mid-phrase.
+
+Why now: the no-em-dash ruling explicitly deferred the shipped-copy sweep to
+"a future review of all app messaging" rather than letting each PR fix what
+it touched, and the last three feature PRs have each shipped copy in the new
+style beside old copy in the old one. The longer the sweep waits, the more
+the review tail of every PR spends on per-line style questions that one
+ruling would settle. There is also a concrete deadline: the launch prep notes
+plan an announcement post whose lead visual is a run toast beside the
+Scenario Stats block, so the promoted release is the copy a cold reader
+judges the app by (D5).
+
+## Design
+
+### The rules
+
+These are the durable record. The decision-log entry carries them with the
+rationale; AGENTS.md carries the operative form an implementer needs at write
+time, replacing the current one-line em-dash convention.
+
+1. **If it has a subject and a verb, it ends with a period. Status readouts
+   do not.** `Settings saved.` and `No such folder.` are sentences.
+   `Updating positions from KovaaK's… 12/40`, `Update interrupted · 8 of 40
+   refreshed`, `3 of 40 positions unavailable`, the Position hint (D1), and
+   the `File: {path}` line that closes a store message (D7) are readouts and
+   stay bare. A semicolon never joins two sentences; they
+   are two sentences. A sentence that ends on an inline link puts
+   its period in a **separate child after the anchor**, or it renders
+   underlined as part of the link; `_username_unset_status()` in
+   `source/pages/playlists.py` is the pattern.
+2. **No em dashes.** Prose breaks into two sentences. A readout that chains
+   fragments joins them with ` · ` (space, middle dot, space), which the grid
+   status lines already use. One exception, named so a later sweep does not
+   delete it: the `—` empty-value glyph under Last played when no scenario
+   is selected (ratified 2026-06-30). The run-toast scenario/score separator
+   becomes a colon.
+3. **Casing** per D2.
+4. **One ellipsis form.** The single `…` character, never three periods,
+   and only where something is still going on: the in-progress fill
+   readout. Placeholders are bare noun phrases (`Select a scenario`, `Filter
+   playlists`), a path is never elided with one, and no line trails off for
+   tone (D4). The app authors no command that opens a further dialog, so
+   the desktop convention of an ellipsis on such a command has no site in
+   its copy; the chart toolbar's `Share chart...` is plotly.js's own label
+   and dialog, outside the rules (see Out of scope).
+5. **Contractions, consistently (D6).** The common ones: `can't`,
+   `couldn't`, `doesn't`, `isn't`, `wasn't`, `aren't`, `you're`. A
+   contraction and its full form never both appear in the app; `do not` is
+   reserved for a warning the user must not skip, and no string uses it
+   today.
+6. **Control names are bold, unquoted, carry their on-screen casing, and
+   take their type when the label reads as prose (D8).** `then **Save**`,
+   `Needs **Rank thresholds** turned on`, `Turn on the **Show hidden**
+   switch`, and `press the **Detect my accounts** button again`: bold marks
+   a control wherever prose names one, and the type word gives a lowercased
+   verb phrase its edge. In the Copy block `**name**` is the marker; a
+   component renders it as a bold span, a chart annotation as `<b>name</b>`
+   inside the string, and where bold cannot render (a toast title, which is
+   already bold, or an accessible name) the name stays plain and the type
+   word alone carries it. A page name (`Settings`) and a paraphrased value
+   (`the oldest date`) are not control names and stay plain. Quotation
+   marks are the last resort for an ambiguity that survives rewording.
+   User-entered free text keeps double
+   straight quotes: imported playlist names and KovaaK's usernames can
+   contain anything, so `"{name}"` and `KovaaK's username "X"`. Tokens stay
+   bare: Steam IDs, playlist codes, counts, and full paths. A literal file
+   key keeps double quotes too (`a "code" field`, as the store messages
+   already do).
+7. **Vocabulary.** The software is *this app* or *the app*, never *the
+   dashboard* (the 2026-08-21 launcher ruling: it reads as the browser page).
+   The run source is the *stats folder*. A position that came from a local
+   cache is *from cache*. *Position*, *Rank*, and *PB* keep the 2026-07-06
+   meanings; KovaaK's itself says "rank" for a leaderboard position, and the
+   app does not echo that, because *Rank* here is the benchmark tier. A
+   playlist's identifier is its *playlist code*; the import help introduces
+   KovaaK's own name for it, *share code*, once. Instructions say *turn on*
+   and *turn off*, states say *on* and *off*, the control is a *switch*, and
+   *toggle* is never a verb. An open-ended list uses *such as* with an
+   example or two, never *etc.* Data the app can't use is *not valid*,
+   never *invalid*, and a message names the specific problem where it can.
+   The pointer to the log is always `See data/logs/debug.log.`
+8. **A message that reaches the screen is user copy wherever this app
+   builds it.** Service-layer strings that a page shows verbatim follow
+   every rule above; the diagnostic detail stays in the log line beside
+   them. An accessible name (`aria-label`) reaches the user through a
+   screen reader and counts too. Text a bundled library draws on its own
+   (plotly.js's chart toolbar and dialogs, AG Grid's overlays, Mantine's
+   built-in text) is not app copy; text the app hands a library (a column
+   header, a placeholder, an accessible name) is.
+9. **Error copy says what happened first, then what to do when there is
+   something to do.** A failure with no useful recovery step says only what
+   happened and does not invent one (`Couldn't read the playlist file
+   {file}.`, `The settings file isn't valid JSON. File: {path}`). An object
+   name or a path never opens a sentence: a noun names it before it appears,
+   and a count or a score may lead. A path goes inline only as the last
+   words of the message's only sentence; otherwise the message names the
+   file by kind, finishes its sentences, and gives the path last as the
+   labeled readout `File: {path}` (D7). The toast title carries the verdict
+   (unchanged from 2026-08-03).
+
+Basis. Rules 1, 2, 4, and 8, the structure half of rule 9, the sentence-case
+half of rule 3, and D1 to D3 match the Microsoft Writing Style Guide, the
+Windows app writing guidance, Google's developer style and Material, Apple's
+style guide, Atlassian, Polaris, and GitHub's Primer as read on 2026-09-04;
+rule 5, the quoting and type-word halves of rule 6, the verb and list items
+in rule 7, and rule 9's value clause were changed on that date to match
+them. Rule 7's *not valid* line follows the Microsoft Writing Style Guide's
+entry on the pair and the Windows error-message word list, read on
+2026-09-13. The bold half of rule 6 is the 2026-09-14 ruling on D8:
+Atlassian's rule for app copy and every guide's convention for
+documentation, chosen as a product judgment for this app's labels. The
+research note records each guide's position with its URL,
+and the decision-log entry carries the citations at ship time.
+
+### Copy
+
+Every user-facing string this proposal adds or edits, grouped by surface.
+`→` separates before and after. *(ratified YYYY-MM-DD)* marks copy a
+decision-log entry fixed; changing it here is deliberate and the shipping PR
+adds a "superseded in part, for copy" note to that entry. Strings not listed
+are unchanged. `[Settings]` is the inline anchor; its trailing period is a
+separate child.
+
+**Scenario Performance: hints, stats, and the setup card**
+
+- Stats folder hint: `No stats directory configured — set it in [Settings]`
+  → `No stats folder configured. Set it in [Settings].`
+- Position hint, unset *(ratified 2026-08-09)*: `N/A — set your KovaaK's
+  username in [Settings]` → `N/A · set your KovaaK's username in [Settings]`
+  (D1)
+- Position hint, lookup failed: ` — lookup failed, Refresh to retry` →
+  ` · lookup failed` (D1)
+- Position hint, stale: ` — from cache, Refresh to update` → ` · from cache`
+  (D1)
+- Position value: `4,022 of 8,461 (52.47% Percentile)` → `4,022 of 8,461
+  (52.47% percentile)`
+- Setup card body, stats folder state *(ratified 2026-08-11)*: `No KovaaK's
+  stats folder was found, so the dashboard can't read your runs yet. Set it
+  in Settings.` → `No KovaaK's stats folder was found, so this app can't
+  read your runs yet. Set it in Settings.` (rule 7; the contraction stays
+  under D6)
+- Setup card fine print *(ratified 2026-08-11)*: `Skipping username disables
+  rank lookups. You can set it anytime in Settings.` → `Skipping keeps
+  position lookups off. You can add your username anytime in Settings.`
+  "Skipping username" drops its article and reads clipped, and "set it" has
+  nothing to refer to; "keeps … off" is the on/off state idiom rule 7
+  adopts; and "position" is rule 7's word for leaderboard placement, since
+  the 2026-07-06 entry keeps *Rank* for the benchmark tier, which the shipped
+  line and the username field's description both got wrong.
+- Setup card, unreadable-store body: `A settings file exists, but this
+  version of the app can't use it, so the dashboard started without your
+  settings. Open Settings to see what's wrong and how to fix it.` → `A
+  settings file exists, but this version of the app can't use it, so the
+  app started without your settings. Open Settings to see what's wrong and
+  how to fix it.` ("the dashboard" is the vocabulary the 2026-08-21 launcher
+  entry ruled out; this card shipped in #265 after the proposal opened, and
+  its title, `Your settings can't be read`, is already correct under D6)
+- Setup card, Skip write failed: `Nothing was written. Try again, or see
+  data/logs/debug.log for details.` → `Nothing was written. Try again. See
+  data/logs/debug.log.` (the rule-7 pointer form; "for details" adds
+  nothing)
+- Setup card, Skip refused, toast title: `Skip was not saved` → `Skip wasn't
+  saved` (D6; its body, `The settings file was written by a newer version of
+  this app. Update the app to change settings.`, is unchanged)
+
+**Scenario Performance: controls and help text** (D2 unless noted)
+
+- `Rank Thresholds` → `Rank thresholds`; its dependent help text `Needs Rank
+  Thresholds turned on.` → `Needs **Rank thresholds** turned on.` (D8)
+- `PB Score` (switch) → `PB score`
+- `Score Threshold Overlay` → `Score threshold overlay`
+- `Score Threshold Percentage` → `Score threshold percentage`
+- `Score Threshold Verdict` *(ratified 2026-08-21)* → `Score threshold
+  verdict`
+- `Run Notifications` *(ratified 2026-08-21)* → `Run notifications`; its
+  dependent help text `Needs Run Notifications turned on.` → `Needs **Run
+  notifications** turned on.` (D8)
+- Score threshold percentage help text: `…The overlay line tracks your
+  current personal best; notifications judge the run against the personal
+  best it was chasing.` → `…The overlay line tracks your current personal
+  best. Notifications judge a run against the personal best you had
+  before the run.` ("before the run" is the maintainer's lean of
+  2026-09-13, endorsed on re-review: the verdict uses the PB that stood
+  before the run, per the 2026-07-08 entry; "previous personal best" would
+  read as the second-best score on a run that set no PB, and "current" is
+  the overlay line's word. "A run", not "each run": the verdict skips the
+  first run at a sensitivity, a scenario with no previous best, a blank
+  goal, and the switch being off, so no run is promised one)
+- Top N scores help text: `How many of your best scores to plot per
+  sensitivity — or per day in Score vs Time — within the selected date range.
+  A new run that lands in the top N also triggers a notification.` → `How
+  many of your best scores to plot per sensitivity within the selected date
+  range, or per day in **Score vs Time**. A new run that lands in the top N
+  also triggers a notification.` (D8: the mode is a control)
+- Placeholders: `Select a scenario...` → `Select a scenario`; `Select a
+  playlist...` → `Select a playlist` (shared with Aim Training Journey);
+  `Score Percentage...` → `Percentage`
+- Empty chart, incomplete controls: `Choose a Top N value and start date to
+  plot this scenario.` → `Set **Top N scores** and the oldest date to plot
+  this scenario.` (D8; `the oldest date` paraphrases the `Oldest date to
+  consider` label, the one place the block knowingly does so, and a
+  paraphrased value stays plain)
+- Empty chart, date range: `Choose an older start date or play more runs.` →
+  `Choose an older date or play more runs.`
+- Empty chart, unexpected mode: `Choose Score vs Sensitivity or Score vs
+  Time.` → `Choose **Score vs Sensitivity** or **Score vs Time**.` (D8; a
+  defensive branch the run-events tests reach; in a chart annotation the
+  marker is `<b>…</b>` in the string)
+- Chart annotations and legend entries: `PB Score (123.00)` → `PB score
+  (123.00)`; `Score Threshold (118.00)` → `Score threshold (118.00)`; the
+  legend entries `Run Data Point` → `Run data point` and `Average Score` →
+  `Average score`; the average line's hover label `<b>Average Score</b>` →
+  `<b>Average score</b>` (the options group heading *Run Data Points* is a
+  section heading and keeps its capitals under D2; rank overlays carry the
+  tier's own name)
+
+**Scenario Performance: toasts**
+
+- Refresh failed, body: `Couldn't refresh — position unchanged.` →
+  `Couldn't refresh. The position shown is unchanged.`
+- Refresh served stale, title: `Position refresh failed` → `Refresh failed
+  · position from cache` (rule 2's readout form: the verdict, then the
+  fallback); body: `Couldn't refresh — showing the cached position.` →
+  `Couldn't refresh. The position shown is from cache.` This gives the
+  served-stale toast the title of its own that the 2026-08-03 entry and
+  `tech_debt.md` left open; the color question there stays open, and the
+  red hard-failure toast keeps its title.
+- Run verdict, scenario/score separator in all three live bodies:
+  `1w4ts Reload — 125.00` → `1w4ts Reload: 125.00` (the colon the
+  2026-09-02 celebration toast already uses for the same pair)
+- Run verdict, below threshold: `…, 92.1% of PB — need 95.0%. Still your
+  3rd-best at 0.35 cm/360. Keep grinding...` → `…, 92.1% of PB (need 95.0%).
+  Still your 3rd-best at 0.35 cm/360.` (D4, ruled 2026-09-12: the coaching
+  line is dropped; "Ready to move on." on a passed run is unchanged)
+- The "While you were away" backlog digest, whose two bodies were
+  redlined in an earlier draft, was retired wholesale by the celebration
+  arc before this proposal shipped (the 2026-09-02 celebrates-on-every-page
+  entry): a batch's other runs earn nothing and the plot is their record,
+  so there is nothing left to reword.
+- Run import failure, single: `Could not process a new run file. See
+  debug.log for details.` → `Couldn't process a new run file. See
+  data/logs/debug.log.`; batch: `3 new run files could not be processed. See
+  debug.log for details.` → `3 new run files couldn't be processed. See
+  data/logs/debug.log.`
+- Steam ID mismatch body: `Configured Steam ID '7656…' does not match
+  KovaaK's user 'X' (actual Steam ID: 7656…).` → `The saved Steam ID 7656…
+  doesn't match KovaaK's user "X", whose Steam ID is 7656….` (the username
+  is user-typed free text and keeps double quotes under rule 6; the two IDs
+  are tokens and stay bare)
+- Startup playlist warnings (built in `data_service.py`, shown under
+  "Playlist not loaded"; `{file}` and `{root}` are full paths, placed by
+  rule 9's path test: inline only as the last words of a lone sentence,
+  otherwise a `File:` readout at the end):
+  - `Playlist directory is missing: {root}` → `Couldn't find the playlist
+    folder {root}.`
+  - `Failed to read playlist file: {file}` → `Couldn't read the playlist
+    file {file}.`
+  - `Invalid JSON format in playlist file: {file}` → `The playlist file
+    isn't valid JSON. File: {file}`
+  - `Skipping playlist file {file}: missing or blank playlist code; add a
+    \`code\` field.` → `The playlist file has no playlist code. Add a "code"
+    field to it. File: {file}`
+  - `Skipping playlist file {file}: playlist code {code} already loaded from
+    {source}.` → `Skipped a duplicate playlist file. Its playlist code {code}
+    is already loaded from another file. Skipped file: {file} · Loaded
+    file: {source}` (both values are full paths, so both follow the
+    diagnosis as labeled readouts, chained with the rule-2 separator)
+  - `Skipping playlist file: {store message}` → `{store message}` (the store
+    message is a full sentence that names the file by kind and ends with
+    its path; see the store messages group). Two of the fragments composed
+    after the kind noun change: the playlist-payload check's `has a missing
+    or blank playlist code; add a \`code\` field.` → `has no playlist code.
+    Add a "code" field to it.`, mirroring the bundled-root sibling above,
+    and its neighbour `is not valid playlist data.` → `isn't valid playlist
+    data.` (D6).
+
+
+**Playlists overview**
+
+- Status, all hidden: `All playlists are hidden. Toggle "Show hidden" to
+  manage them.` → `All playlists are hidden. Turn on the **Show hidden**
+  switch to manage them.` (D8)
+- Store alert title: `Playlist visibility is not being used` → `Playlist
+  visibility isn't being used` (D6)
+- Warmup stopped, the reason relayed after `Percentile update stopped:`:
+  `KovaaK's username 'X' was not found.` → `KovaaK's username "X" wasn't
+  found.` (a mistyped username; double quotes under rule 6, D6), and the
+  other fixed reason `KovaaK's username is not configured.` → `KovaaK's
+  username isn't configured.` (D6). The combined line renders as a readout
+  label followed by the reason sentence, which is accepted: the label says
+  what stopped and the sentence says why.
+- Warmup status, paused: `Updating percentile data: 8 remaining · paused;
+  retrying at 3:05 PM` → `Updating percentile data: 8 remaining · paused
+  until 3:05 PM`
+- Lowest Percentile header tooltip: `…Shown once every played scenario has
+  enough cached leaderboard data; hover a value to see which scenario.` →
+  `…Shown once every played scenario has enough cached leaderboard data.
+  Hover a value to see which scenario.`
+- Type header tooltip: `Benchmarks carry rank thresholds (Bronze, Silver,
+  ...) for their scenarios; playlists are plain scenario lists.` →
+  `Benchmarks carry rank thresholds such as Bronze and Silver for their
+  scenarios. Playlists are plain scenario lists.` ("such as" is the open-list
+  form rule 7 adopts)
+- Percentile placeholder tooltip: `Shown once all N played scenarios have
+  data — open the playlist to fetch now` → `Shown once all N played scenarios
+  have data. Open the playlist to fetch it now.`
+- Modal titles: `Import Playlist` → `Import playlist`; `Delete Playlist` →
+  `Delete playlist`; `Delete Leftover Files` → `Delete leftover files` (D2)
+- Placeholders: `Filter playlists...` → `Filter playlists`; `KovaaK's
+  playlist code...` → `KovaaK's playlist code` (the import help beside it
+  already introduces KovaaK's own name, "share code", and keeps it)
+- Import help: `Paste a KovaaK's playlist share code and press Import to add
+  that playlist to this list.` → `Paste a KovaaK's playlist share code and
+  press **Import** to add that playlist to this list.` (D8)
+- Import succeeded but hidden, title: `Playlist imported — not shown` →
+  `Playlist imported but hidden`; appended hint: ` It could not be marked
+  visible, so it may be missing from playlist selectors — toggle "Show hidden"
+  on this page, then click its row's eye icon to show it.` → ` It couldn't
+  be marked visible, so it may be missing from playlist selectors. Turn on
+  the **Show hidden** switch on this page, then click the eye icon on its
+  row to show it.` (D6, D8)
+- Duplicate-and-hidden hint: ` It is currently hidden — toggle "Show hidden"
+  on this page to unhide it.` → ` It is currently hidden. Turn on the
+  **Show hidden** switch on this page, then click the eye icon on its row
+  to show it.` (D8, and a correctness fix under rule 9: Show hidden only reveals
+  hidden rows, and the eye icon is what changes the saved visibility, so
+  the shipped hint stopped one step short of the recovery it promised; the
+  wording mirrors the import-success hint above)
+- Import refusals (built in `data_service.py`, shown under "Playlist import
+  failed"; the diagnostic detail stays in the log line each already writes):
+  - `Failed to look up playlist code {code}: KovaaK's API error.` →
+    `Couldn't look up {code} on KovaaK's. Check the code and try again.`
+    (covers both causes: a slow spell and a code KovaaK's rejects outright)
+  - `Failed to load playlist data for playlist code: {code}` → `Couldn't
+    load a playlist for the code {code}. Check the code and try again.`
+    Outcome-neutral on purpose: this branch is reached when KovaaK's search
+    returns no usable record *and* the Evxl by-code fallback then fails,
+    whether with a 400 for an unknown code or with a connection error or an
+    invalid payload, so it cannot claim that no playlist matches.
+  - `Found more than one playlist from code: {code}` → the same `Couldn't
+    load a playlist for the code {code}. Check the code and try again.`, for
+    the same reason: the ambiguous-search branch also returns its message
+    only after the Evxl fallback fails, and a 400 there means no playlist
+    has that exact code. The log lines beside the two branches keep the
+    zero-versus-many diagnostic.
+  - `Invalid playlist data returned by API for playlist code: {code}` and
+    `Invalid playlist data returned by API: {name} ({code})` → `The
+    playlist data for {code} is unusable.` (no source named: the second
+    original fires on local filename sanitization, and the data may have
+    come from Evxl)
+  - `Playlist code already exists: {code} is already imported as {name}
+    ({code}).` → `The playlist code {code} is already imported as
+    "{name}".` (both codes in the original are the same canonical code, so
+    one is enough; D7)
+  - `Failed to save playlist data: {name} ({code})` → `Couldn't save the
+    playlist file for "{name}" ({code}). See data/logs/debug.log.`
+  - `Cannot save this playlist: {name} ({code}) would replace a playlist
+    file written by a newer version of this app.` → `The playlist "{name}"
+    ({code}) would replace a playlist file written by a newer version of
+    this app. Update the app to import it.` (D7)
+  - `Cannot save this playlist: {file} already holds {name} ({code}). Delete
+    that playlist first, then import again.` → `The file for this playlist
+    already holds "{name}" ({code}). Delete that playlist first, then import
+    again.`
+- Delete refusals (shown under "Playlist delete failed" / "Cleanup failed"):
+  - `Playlist code cannot be deleted: {code} is not a user playlist.` →
+    `The playlist code {code} isn't one you imported, so it can't be
+    deleted.` (D6, D7)
+  - `Failed to delete playlist file: {path}` → `Couldn't delete the playlist
+    file. See data/logs/debug.log. File: {path}` (D7: the log pointer is
+    supplemental text, so the path follows it as a readout)
+
+**Playlist scenario table**
+
+- Status, unset username *(ratified 2026-08-09)*: `Positions unavailable —
+  set your KovaaK's username in [Settings]` → `Positions unavailable. Set
+  your KovaaK's username in [Settings].` (D3 keeps the noun)
+- Status, unknown code: `Playlist code is not imported: {code}` → `No
+  imported playlist has the code {code}.`
+- Placeholder: `Filter scenarios...` → `Filter scenarios`
+- Settled fill status, both shapes: ` · 5 from cache — KovaaK's unreachable`
+  → ` · 5 from cache · KovaaK's unreachable`; `5 of 40 positions from cache —
+  KovaaK's unreachable` → `5 of 40 positions from cache · KovaaK's
+  unreachable`
+- The fill's two summary toasts ("Position update incomplete" and
+  "Positions served from cache"), redlined in an earlier draft, were deleted
+  wholesale by PR #253 under the 2026-08-22 in-place-only ruling before this
+  proposal shipped; the status line above is now the fill's only report and
+  there is nothing left to reword.
+- Percentile header tooltip: `Your percentile on the scenario's global
+  leaderboard — the share of players you place above (higher is better).` →
+  `Your percentile on the scenario's global leaderboard: the share of players
+  you place above. Higher is better.`
+- PB cm/360 header tooltip: `Mouse sensitivity of your personal-best run, in
+  centimeters of mouse travel per full 360-degree turn (higher = lower
+  sensitivity).` → `Mouse sensitivity of your personal-best run, in
+  centimeters of mouse travel per full 360-degree turn. Higher is slower.`
+  (the percentile tooltip's "Higher is better." shape; "higher means lower"
+  put two directions in one sentence)
+
+**Settings**
+
+- Field label `Stats directory` → `Stats folder`; its error `No such
+  directory.` → `No such folder.`
+- Stats folder description, the path example: `The KovaaK's stats folder
+  this app reads runs from, usually ...\FPSAimTrainer\FPSAimTrainer\stats.`
+  → `The KovaaK's stats folder this app reads runs from, usually
+  FPSAimTrainer\FPSAimTrainer\stats inside your Steam library.` (the rest
+  of the description, in both its with- and without-suggestions forms, is
+  unchanged)
+- Store alert title: `Your saved settings are not being used` → `Your saved
+  settings aren't being used` (D6)
+- Username description: `Your KovaaK's account name, used to look up your
+  leaderboard rank. Leave it empty to turn rank lookups off.` → `Your
+  KovaaK's account name, used to look up your leaderboard position. Leave it
+  empty to turn position lookups off.` (rule 7: *Rank* is the benchmark
+  tier, and "leaderboard position" is the phrase the Refresh button's
+  username-unset toast and the setup card's account body already use)
+- Steam ID error: `Enter a 17-digit SteamID64 — it starts with 7656119.` →
+  `Enter a 17-digit SteamID64. It starts with 7656119.`
+- Steam ID description: `Your 17-digit SteamID64. Optional; it disambiguates
+  accounts that share a KovaaK's username.` → `Your 17-digit SteamID64.
+  Optional. It tells apart accounts that share a KovaaK's username.` The
+  semicolon split is rule 1; "tells apart" for "disambiguates" is a plain
+  word for a jargon one and needs no rule.
+- Save failed: `Could not save settings — nothing was written. See
+  data/logs/debug.log.` → `Couldn't save settings, so nothing was written.
+  See data/logs/debug.log.`
+- Detection, found: `Found 2 KovaaK's accounts. Choose the one to use, then
+  Save.` → `Found 2 KovaaK's accounts. Choose the one to use, then **Save**.`;
+  `Found {username}. Save to apply it.` → `Found {username}. **Save** to
+  apply it.` (D8; the wording is unchanged)
+- Detection, no match: `No Steam account on this machine has a KovaaK's
+  profile. Type your username in yourself — KovaaK's cannot look one up from
+  a Steam ID.` → `No Steam account on this machine has a KovaaK's profile.
+  Type your username in yourself. KovaaK's can't look one up from a Steam
+  ID.`
+- Detection, unchecked: `2 Steam accounts could not be checked; press Detect
+  my accounts again to retry.` → `2 Steam accounts couldn't be checked.
+  Press the **Detect my accounts** button again to retry.` (D6, D8)
+- Detection, account list unreadable: `Steam's account list could not be
+  read, so accounts on this machine may have been missed. See
+  data/logs/debug.log.` → `Steam's account list couldn't be read, so
+  accounts on this machine may have been missed. See data/logs/debug.log.`
+  (D6)
+- Picker description: `Choosing one fills the fields above; Save applies
+  it.` → `Choosing one fills the fields above. **Save** applies it.` (D8)
+- Celebration description, the control-name quote and one full form: `…and
+  does not depend on Run Notifications.` → `…and doesn't depend on **Run
+  notifications**.` (D2, D6, D8; the rest of the description is unchanged)
+
+**Aim Training Journey**
+
+- Banner: `This page is still a work in progress!` → `This page is a work in
+  progress.`
+- Label `Checkpoint Hour` → `Checkpoint hour` (D2); empty chart: `Choose a
+  Checkpoint Hour value to plot progress.` → `Set a checkpoint hour to plot
+  progress.`
+
+**App header** (in `app_shell.py`; the tooltip and the two accessible names
+a screen reader announces are copy under rule 8)
+
+- Theme switch tooltip: `Toggle light and dark theme` → `Switch between
+  light and dark mode` (rule 7: *toggle* is never a verb; "theme" alone
+  reads as a palette picker, and *mode* is the word Windows uses)
+- Theme switch accessible name: `Toggle color scheme` → `Switch between
+  light and dark mode`
+- Navigation button accessible name: `Toggle navigation` → `Show or hide
+  navigation` (the control announces no open or closed state, so the name
+  keeps the action without *toggle* as a verb; exposing the state is a
+  component change outside the sweep)
+
+**Playlist grid renderers** (accessible names in
+`assets/dashAgGridComponentFunctions.js`, in scope under rule 8)
+
+- Eye icon, hidden row: `Unhide` → `Show` (the icon's own tooltip and the
+  hidden-playlist hints say "show"; after the sweep this would be the only
+  "unhide" left in the app)
+- Unchanged: `Hide` on the eye icon of a shown row and `Delete` on the
+  trash icon; the Scenario Performance help icons' names, `{label} help`,
+  take D2's casing through their labels with no string of their own.
+
+**Store messages** (built in `store_schema.py` for the settings,
+visibility, and playlist stores; shown in the Settings and Playlists store
+alerts and under "Playlist not loaded". Under D7 each message names the
+file by its kind, "settings file", "playlist visibility file", or "playlist
+file", supplied by the caller, and gives the full path last as a `File:`
+readout; D6 contracts two of them. The settings-file form is shown; the
+other kinds substitute their noun.)
+
+- `{path} has no "schema_version" line. Add "schema_version": 1 to it, or
+  delete the file to start over.` → `The settings file has no
+  "schema_version" line. Add "schema_version": 1 to it, or delete the file
+  to start over. File: {path}`
+- `{path} has an invalid "schema_version" value ({value}). It must be the
+  whole number 1.` → `The settings file's "schema_version" is {value}. It
+  must be the whole number 1. File: {path}` (rule 7: the specific problem
+  in place of *invalid*; `{value}` is written as JSON, `json.dumps`, so the
+  message shows what the file holds, `"1"`, `true`, or `null`, where the
+  current source formats it with `repr` and would show `'1'`, `True`, or
+  `None`)
+- `{path} was written by a newer version of this app (schema_version {n}).
+  The file is intact. Update the app to use it.` → `The settings file was
+  written by a newer version of this app (schema_version {n}). It is
+  intact. Update the app to use it. File: {path}`
+- `{path} is not valid JSON.` → `The settings file isn't valid JSON. File:
+  {path}`
+- `{path} must hold a JSON object.` → `The settings file must hold a JSON
+  object. File: {path}`
+- `{path} could not be read. See data/logs/debug.log.` → `Couldn't read the
+  settings file. See data/logs/debug.log. File: {path}`
+- The composed form for a validator's refusal, `{path} {fragment}` → `The
+  settings file {fragment} File: {path}` The settings and visibility
+  fragments (`has an unknown setting "X".`, `must hold text values for every
+  setting.`, `has an unknown key "X".`, `is missing "shown_playlists".`,
+  `must hold "shown_playlists" as a list of text codes.`) are unchanged; the
+  two playlist fragments are listed under the startup warnings above. The
+  stamp script shares only the validators with the store layer and composes
+  its own console lines, so its output changes only where a playlist
+  fragment changes.
+
+
+**Unchanged on purpose**
+
+- The `—` empty-value glyph under Last played (rule 2).
+- The personal-best celebration surfaces (the two 2026-09-02 entries): the
+  New personal best toast title and body, the Celebrations heading, the
+  Personal best celebration label, its style names, and Preview are
+  already in the target style — the toast's scenario/score colon is the
+  separator rule 2 adopts — except the one control-name quote listed under
+  Settings.
+- Every toast title not listed: they are already sentence case and carry the
+  verdict. The "… failed" titles stay: the guides split on the form
+  (Atlassian endorses "Upload failed", the legacy Windows guide bans "failed
+  to"), and the 2026-08-03 policy that the title carries the verdict is not
+  reopened.
+- The unreadable-store card's title, `Your settings can't be read`, and the
+  Skip-refused toast body: correct as they stand under D6.
+- The Settings version section, the bug-report link, the navbar, and the
+  app header's Discord and GitHub tooltips.
+- The launcher's and installer's console output, which the 2026-08-21
+  launcher entry governs, and every `logging` line: neither is app copy.
+  Log lines keep their full forms; D6's never-mix clause governs the app's
+  own on-screen copy.
+
+### Testing the rule, not just the strings
+
+Most of these strings are module-level constants, but the riskiest ones (run
+verdicts, fill statuses, the import refusals) are built
+inline in f-strings, which a constant-list check would miss. The guard should
+therefore walk the AST: for every module under `source/`, visit every
+`ast.Constant` whose value is a `str` (f-string literal parts arrive as
+constants inside `ast.JoinedStr`, so inline bodies are covered), skip
+docstrings (the first statement of a module, class, or function body), and
+fail on any `—` outside an explicit allowlist holding the one ratified glyph
+site. Comments never reach the AST, so the check cannot misfire on them.
+
+The guard covers the em dash only. Walking `source/` this way at `7eecae3`
+finds 21 non-docstring string constants containing `—` (22 occurrences; the
+Top N help text has two): the 20 Copy-block sites and the allowlisted glyph,
+and no log line or other non-UI string, so
+the gate passes the moment the Copy block ships and needs no UI-versus-log
+distinction it cannot make. The three-period ellipsis is deliberately not
+gated: the same walk finds it in the JavaScript spread operator inside a
+clientside-callback source string (`...navbar` in `app_shell.py`) and in a
+logging-only line in `file_watchdog.py`, neither of which is app copy, and
+any future `...args` in callback JavaScript would trip it again. The walk
+also does not see `assets/`: a `—` typed into a grid renderer there would
+pass (today there are none in user-facing text). Ellipses, casing,
+contractions, and the renderers are review territory, not a gate; D6's
+never-mix clause is one `rg` for the full forms (`cannot`, `could not`,
+`does not`, `is not`, `was not`, `are not`) over the strings that reach
+the screen, and log lines are outside it.
+
+## Out of scope
+
+- Console, launcher, and installer output, `logging` text, docstrings, code
+  comments, and documentation prose. The rules govern the text this app's
+  own code puts on the screen. How log lines delimit the values they
+  interpolate (the `%r` question) is a separate follow-up after this PR
+  ships, not part of the sweep.
+- Text a bundled library draws on its own: plotly.js's chart toolbar, with
+  the `Share chart...` command and its confirmation dialog that the
+  2026-09-12 decision-log entry keeps by ruling, AG Grid's built-in
+  overlays, and Mantine's built-in text. The app authors none of it and
+  passes no override (no plotly `config`, no grid `localeText`), so the
+  rules do not govern it and the sweep's completeness is not measured
+  against it. Should the app ever supply such text itself, that text is app
+  copy under rule 8.
+- Softening the red hard-failure refresh toast to yellow: the `tech_debt.md`
+  entry's color question stays open; this proposal resolves only the title
+  half it depended on.
+- A configured-but-wrong username, deferred by the 2026-08-09 entry.
+- Restructuring the Steam-ID mismatch toast beyond its wording.
+- Two empty-state messages inside `plot_service.py` (`No sensitivity data is
+  available for this scenario yet.` and its Score vs Time twin): the page
+  callbacks return their own empty chart before these paths are reached, so
+  they are unreachable from the UI and are left alone rather than edited
+  blind.
+- The Aim Training Journey page beyond its banner and one label; its polish
+  is a separate roadmap item.
+- Any new string. This is a sweep; it adds no surface.
+- Network and privacy wording. Checked 2026-08-21 against the launch prep
+  notes' enumeration of what the app talks to: every in-app string that makes
+  a network claim (the username description, the setup card's fine print, the
+  Detect hint, the Refresh tooltip, the import help) agrees with it, and none
+  carries the enumeration itself. Re-checked at `750af53`: the Share chart
+  flow's only wording is plotly.js's own dialog, and no app string describes
+  it. The "What it talks to" statement stays a README job, and its same-PR
+  maintenance rule does not reach app copy.
+
+## Testing
+
+- The AST guard described in Design, as a new test module under `tests/`.
+- Every existing test that pins a changed string is updated, never loosened
+  to a substring match: the page modules `test_home_rank_format.py`,
+  `test_home_run_events.py`, `test_home_setup_card.py`,
+  `test_home_stats_dir_hint.py`,
+  `test_playlist_pages.py`, `test_settings_page.py`, `test_ui_presentation.py`,
+  the chart modules `test_plot_service.py`,
+  `test_home_build_scenario_figure.py`, and `test_home_point_appearance.py`,
+  which pin the legend entries and the hover label, and the service modules
+  `test_data_service_extract.py`,
+  `test_playlist_visibility_service.py`, `test_settings_service.py`, which
+  asserts the store layer's "is not valid JSON" through the log, and
+  `test_app_shell.py`, which pins the two header accessible names, plus
+  whatever `rg` finds for each quoted string at implementation time.
+- The D8 bold spans: a test that pins a composed sentence (the all-hidden
+  status, the detection status) compares the flattened text of the
+  children through one small helper, never a substring, and a chart
+  message asserts the `<b>` string.
+- The standard local gates (`pytest`, `ruff format --check`, `ruff check`,
+  `mypy`, `compileall`).
+- One manual pass at the running app over every surface in the Copy block,
+  including the D1 field with a real position value, the Settings
+  detection states, and both chart empty states, to confirm nothing wraps,
+  renders a period inside a link, or shows a bold marker as text.
+
+## Delivery plan
+
+1. **This PR**: the proposal. Every decision, D1 to D8, was ruled by
+   2026-09-14 and the Copy block had its redline pass, so the
+   implementation may start once this PR merges.
+2. **One implementation PR**, after ratification, from a kickoff prompt that
+   hands the implementer the ratified Copy block verbatim (`**name**` marks
+   a bold control name, composed as rule 6 says with one helper for the
+   span; the `toast()` helper's message type widens to accept components;
+   a bolded string's `rg` pass searches its fragments). One PR rather than
+   one per surface because the rules are one ruling: splitting them would
+   leave the app mid-style across a review window, which is the state this
+   proposal exists to end. Suggested commit split: the copy and the rules
+   (source and AGENTS.md), the tests and AST guard, then the docs. The docs
+   commit carries the full shipping checklist: the decision-log entry with
+   the rules and their rationale, "superseded in part, for copy" notes on the
+   2026-08-03, 2026-08-09, 2026-08-11, 2026-08-20, 2026-08-21, 2026-08-22,
+   and 2026-09-02 entries whose quoted strings change (the 2026-08-11
+   setup-card entry quotes the fine print, the celebration entry quotes the
+   Run Notifications control name, and the 2026-08-20 run-points entry and
+   the 2026-08-21 empty-point-color entry name the Average Score line), the
+   `tech_debt.md` edit for the refresh-toast
+   title, a
+   `product.md` line, the roadmap milestone moved to Shipped, and the
+   deletion of this file. The current-behavior docs that quote changed
+   strings are updated in the same commit, because a spec that names the
+   old copy is wrong the moment the new copy ships. The capability-spec
+   layer that landed 2026-08-22 quotes current strings throughout, so the
+   sweep runs `rg` for every changed string across `docs/specs/` and updates
+   each hit — today that is `scenario_rank.md` (the unset-username status
+   line, the three Position hints under D1, and the refresh toast's title
+   and body), `playlists.md` (the overview status lines, the import modal
+   title and toasts, the Show hidden phrasing, the percentile tooltip, and
+   the fill status lines, the visibility alert title, and the import and
+   delete refusals), `settings.md` (the field label, the Steam ID error, the
+   save-failed status, the detection copy, the store alert title, and the
+   setup card's Skip-failure line), `scenario_performance.md` (the control
+   names D2 renames, the toast bodies, the "Average Score" line named three
+   times, and the setup card's unreadable-store body, stats-folder body, and
+   fine print), and `notifications.md` (the
+   control names D2 renames, the toast bodies, and the Skip-refused title) —
+   plus `docs/product.md` (the unset-username status, the refresh toast, the
+   Run Notifications control name, and two "rank lookups" paraphrases a
+   string search will miss), `docs/architecture.md` and
+   `docs/roadmap.md` (the control names D2 renames), and the README wherever
+   the same `rg` finds a changed string (its outbound-services table quotes
+   plotly's `Share chart...`, library text the sweep leaves as is). No new
+   capability spec is created:
+   app copy as a whole has no spec, and the strings that do live in one live
+   in the spec of the capability they belong to. No hard dependency on other
+   in-flight work. Under D5 it is sequenced before the release the
+   announcement post promotes, and the shipping PR ticks the matching item
+   off the launch prep notes' pre-post checklist.
