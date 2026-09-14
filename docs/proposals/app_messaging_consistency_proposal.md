@@ -558,8 +558,9 @@ time, replacing the current one-line em-dash convention.
    KovaaK's own name for it, *share code*, once. Instructions say *turn on*
    and *turn off*, states say *on* and *off*, the control is a *switch*, and
    *toggle* is never a verb. An open-ended list uses *such as* with an
-   example or two, never *etc.* The pointer to the log is always `See
-   data/logs/debug.log.`
+   example or two, never *etc.* Data the app can't use is *not valid*,
+   never *invalid*, and a message names the specific problem where it can.
+   The pointer to the log is always `See data/logs/debug.log.`
 8. **A message that reaches the screen is user copy wherever this app
    builds it.** Service-layer strings that a page shows verbatim follow
    every rule above; the diagnostic detail stays in the log line beside
@@ -585,8 +586,10 @@ Windows app writing guidance, Google's developer style and Material, Apple's
 style guide, Atlassian, Polaris, and GitHub's Primer as read on 2026-09-04;
 rule 5, the quoting and type-word halves of rule 6, the verb and list items
 in rule 7, and rule 9's value clause were changed on that date to match
-them. The research note records each guide's position with its URL, and the
-decision-log entry carries the citations at ship time.
+them. Rule 7's *not valid* line follows the Microsoft Writing Style Guide's
+entry on the pair and the Windows error-message word list, read on
+2026-09-13. The research note records each guide's position with its URL,
+and the decision-log entry carries the citations at ship time.
 
 ### Copy
 
@@ -654,8 +657,10 @@ separate child.
 - Score threshold percentage help text: `…The overlay line tracks your
   current personal best; notifications judge the run against the personal
   best it was chasing.` → `…The overlay line tracks your current personal
-  best. Notifications judge the run against the personal best it was
-  chasing.`
+  best. Notifications judge each run against the personal best you had
+  before it.` (the verdict uses the PB that stood before the run, per the
+  2026-07-08 entry; "previous personal best" would read as the second-best
+  score on a run that set no PB, and "current" is the overlay line's word)
 - Top N scores help text: `How many of your best scores to plot per
   sensitivity — or per day in Score vs Time — within the selected date range.
   A new run that lands in the top N also triggers a notification.` → `How
@@ -683,8 +688,9 @@ separate child.
 
 - Refresh failed, body: `Couldn't refresh — position unchanged.` →
   `Couldn't refresh. The position shown is unchanged.`
-- Refresh served stale, title: `Position refresh failed` → `Cached position
-  shown`; body: `Couldn't refresh — showing the cached position.` →
+- Refresh served stale, title: `Position refresh failed` → `Refresh failed
+  · position from cache` (rule 2's readout form: the verdict, then the
+  fallback); body: `Couldn't refresh — showing the cached position.` →
   `Couldn't refresh. The position shown is from cache.` This gives the
   served-stale toast the title of its own that the 2026-08-03 entry and
   `tech_debt.md` left open; the color question there stays open, and the
@@ -855,8 +861,9 @@ separate child.
 - PB cm/360 header tooltip: `Mouse sensitivity of your personal-best run, in
   centimeters of mouse travel per full 360-degree turn (higher = lower
   sensitivity).` → `Mouse sensitivity of your personal-best run, in
-  centimeters of mouse travel per full 360-degree turn. Higher means lower
-  sensitivity.`
+  centimeters of mouse travel per full 360-degree turn. Higher is slower.`
+  (the percentile tooltip's "Higher is better." shape; "higher means lower"
+  put two directions in one sentence)
 
 **Settings**
 
@@ -916,9 +923,11 @@ separate child.
 **App header** (in `app_shell.py`; the tooltip and the two accessible names
 a screen reader announces are copy under rule 8)
 
-- Theme switch tooltip: `Toggle light and dark theme` → `Change theme`
-  (rule 7: *toggle* is never a verb)
-- Theme switch accessible name: `Toggle color scheme` → `Change theme`
+- Theme switch tooltip: `Toggle light and dark theme` → `Switch between
+  light and dark mode` (rule 7: *toggle* is never a verb; "theme" alone
+  reads as a palette picker, and *mode* is the word Windows uses)
+- Theme switch accessible name: `Toggle color scheme` → `Switch between
+  light and dark mode`
 - Navigation button accessible name: `Toggle navigation` → `Show or hide
   navigation` (the control announces no open or closed state, so the name
   keeps the action without *toggle* as a verb; exposing the state is a
@@ -947,8 +956,9 @@ other kinds substitute their noun.)
   "schema_version" line. Add "schema_version": 1 to it, or delete the file
   to start over. File: {path}`
 - `{path} has an invalid "schema_version" value ({value}). It must be the
-  whole number 1.` → `The settings file has an invalid "schema_version"
-  value ({value}). It must be the whole number 1. File: {path}`
+  whole number 1.` → `The settings file's "schema_version" is {value}. It
+  must be the whole number 1. File: {path}` (rule 7: the specific problem
+  in place of *invalid*)
 - `{path} was written by a newer version of this app (schema_version {n}).
   The file is intact. Update the app to use it.` → `The settings file was
   written by a newer version of this app (schema_version {n}). It is
