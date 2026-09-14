@@ -334,8 +334,14 @@ labeled readout degrades into it without changing a word.
 
 ### D8 — Control names in prose carry their type
 
-Status: Open. Maintainer lean (2026-09-04): adopt, pending the review's
-stance.
+Status: Open. Maintainer lean (2026-09-04): adopt the type word. Maintainer
+question (2026-09-13), put to the reviewers for a stance in their next
+re-review: whether the name should also be bold, so that `Press the Detect
+my accounts button again to retry.` becomes `Press the **Detect my
+accounts** button again to retry.`, because a lowercased verb-phrase label
+inside a sentence is not obviously a name even with the type word beside
+it. The alternative is spelled out under "Choosing differently" below; the
+Copy block keeps the plain form until the row is ruled.
 
 Rule 6 named a control in prose bare, in its on-screen casing: "Turn on
 Show hidden to manage them." The redline pass observed that once D2
@@ -362,9 +368,22 @@ Consequence: four Copy entries change (the all-hidden status, the two
 hidden-playlist hints, and the unchecked-accounts detection line).
 
 Choosing differently: bold is the Atlassian answer and the one the redline
-pass reached for; it needs the affected surfaces to become component trees
-(status lines and alerts already are; help text and toast bodies are plain
-strings today) and a rule for the surfaces that cannot render it.
+pass reached for. Its concrete form keeps the type word and bolds the name:
+`Press the **Detect my accounts** button again to retry.`, `Turn on the
+**Show hidden** switch to manage them.`, and the same in the two
+hidden-playlist hints. Four strings carry a control name in prose today,
+and every one of their surfaces can render it: the detection status line
+and the all-hidden status line are text components, the visibility alert is
+a component tree, and a toast body accepts components. In-app practice
+supports it (Slack, GitHub, and Discord bold names inside their own
+messages), and it gives the app a three-way marker system: bold for a
+control, double quotes for what the user typed, nothing for a token. The
+costs: the four strings stop being single constants and are composed from
+parts, the Copy block needs a bold-marker convention (`**…**`) for the
+implementer, the tests that pin those sentences assert joined text, and
+Microsoft's in-UI guidance prefers wording that sets the name off over
+formatting. Quotes stay the last resort either way, since rule 6 reserves
+them for user-typed text.
 
 ## Problem
 
