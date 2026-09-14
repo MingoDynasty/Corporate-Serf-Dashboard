@@ -437,6 +437,13 @@ as the legend when only their annotations are visible. Both entries and
 the label now sit in the Copy block under D2, beside the annotations they
 share the chart with.
 
+Re-verified against `0830f3e` (main, 2026-09-13) after the scenario-list
+fix and the AGENTS.md follow-ups merged. Neither changed a user-facing
+string: the fix replaces a filename scan with a read of the run store
+(docstrings and a comment only), and its 2026-09-12 decision-log entry
+quotes the existing "No local runs found" empty state, which the sweep
+does not touch. The counts below still hold at `0830f3e`.
+
 The same condition, four shapes, is the seed symptom:
 
 | Surface | Current text |
@@ -658,9 +665,10 @@ separate child.
   current personal best; notifications judge the run against the personal
   best it was chasing.` → `…The overlay line tracks your current personal
   best. Notifications judge each run against the personal best you had
-  before it.` (the verdict uses the PB that stood before the run, per the
-  2026-07-08 entry; "previous personal best" would read as the second-best
-  score on a run that set no PB, and "current" is the overlay line's word)
+  before the run.` (maintainer lean, 2026-09-13, open to the reviewers: the
+  verdict uses the PB that stood before the run, per the 2026-07-08 entry;
+  "previous personal best" would read as the second-best score on a run
+  that set no PB, and "current" is the overlay line's word)
 - Top N scores help text: `How many of your best scores to plot per
   sensitivity — or per day in Score vs Time — within the selected date range.
   A new run that lands in the top N also triggers a notification.` → `How
