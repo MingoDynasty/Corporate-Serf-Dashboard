@@ -23,8 +23,9 @@ commissioned a survey of the mainstream style guides and of current apps
 dated 2026-09-04). The survey confirmed nine of the thirteen conventions it
 tested and found the proposal against the guides on three, which are the
 three new rows; its smaller findings are folded into the rules and the Copy
-block as author redlines. The maintainer's leans on D6 to D8 are recorded
-as leans: non-binding until ruled. Everything else in this proposal is
+block as author redlines. D4 and D8 are ruled; the maintainer's leans on
+D6 and D7 are recorded as leans, non-binding until ruled. Everything else
+in this proposal is
 author-owned copy, gathered in the Design section's Copy block for the
 maintainer's redline pass.
 
@@ -332,19 +333,14 @@ to the Windows layout; it is a component change rather than copy, and the
 labeled readout degrades into it without changing a word.
 
 
-### D8 — Control names in prose carry their type
+### D8 — Control names in prose are bold and carry their type
 
-Status: Open. Maintainer lean (2026-09-04): adopt the type word. Maintainer
-question (2026-09-13), put to the reviewers for a stance in their next
-re-review: whether the name should also be bold, so that `Press the Detect
-my accounts button again to retry.` becomes `Press the **Detect my
-accounts** button again to retry.`, because a lowercased verb-phrase label
-inside a sentence is not obviously a name even with the type word beside
-it. The alternative is spelled out under "Choosing differently" below; the
-Copy block keeps the plain form until the row is ruled. The re-review
-(2026-09-14) answered for the alternative, applied to every control name in
-prose, and the author's lean moved with it; the row awaits the maintainer's
-ruling.
+Status: Ruled (user), 2026-09-14: choose the alternative. A control named
+in prose is bold, in its on-screen casing, and takes its type when the
+label reads as prose: `Press the **Detect my accounts** button again to
+retry.` The 2026-09-04 lean was the type word alone; the question of bold
+was put to the review on 2026-09-13, which answered for it on every row,
+and the ruling followed.
 
 Rule 6 named a control in prose bare, in its on-screen casing: "Turn on
 Show hidden to manage them." The redline pass observed that once D2
@@ -356,81 +352,75 @@ title-style ones do not; Atlassian bolds element names in app copy;
 Microsoft's in-UI guidance says to avoid bold and italic in the UI itself
 and instead choose "wording that clearly sets off the name of the element",
 its examples adding the element type ("the Create my database button"),
-with quotation marks as the sparing last resort. Bold also costs markup in
-every string and is unavailable inside a toast title that is already bold.
+with quotation marks as the sparing last resort. The type word alone left
+a lowercased verb-phrase label reading as part of the sentence; bold gives
+it a visible edge for sighted readers, and the type word stays because a
+screen reader does not announce bold.
 
-**Recommendation: amend rule 6.** A control name stays unquoted in its
-on-screen casing, and when the label reads as prose (a verb phrase such as
-Show hidden or Detect my accounts) the sentence adds the control's type:
-`Turn on the Show hidden switch to manage them.`, `Press the Detect my
-accounts button again to retry.` Noun-phrase labels (Rank thresholds, Top N
-scores, Run notifications) stay bare. Quotes remain the last resort for an
-ambiguity that survives rewording.
-
-Consequence: four Copy entries change (the all-hidden status, the two
-hidden-playlist hints, and the unchecked-accounts detection line).
-
-Choosing differently: bold is the Atlassian answer and the one the redline
-pass reached for. Its concrete form keeps the type word where the label
-reads as prose and bolds the name: `Press the **Detect my accounts** button
-again to retry.`, `Turn on the **Show hidden** switch to manage them.`,
-`Set **Top N scores** and the oldest date to plot this scenario.`. The
-scope is a principle, not a count: bold means "a control", so it covers
-every control named in prose, or none. Counted against the proposed final
-copy, that is fourteen strings today:
+**Ruling: amend rule 6.** Bold means "a control", so it covers every
+control named in prose, or none. Counted against the Copy block, that is
+fourteen strings today:
 
 - the four that take the type word: the all-hidden status, the two
   hidden-playlist hints, and the unchecked-accounts detection line;
-- the two detection-found lines (`Found {count} KovaaK's accounts. Choose
-  the one to use, then Save.`, `Found {username}. Save to apply it.`), the
-  picker description (`Save applies it.`), the celebration description
-  (`…doesn't depend on Run notifications.`), the two dependent help texts
-  (`Needs Rank thresholds turned on.`, `Needs Run notifications turned
-  on.`), and the import field's description (`…press Import to add that
-  playlist to this list.`);
-- the incomplete-controls chart message (`Set Top N scores and the oldest
-  date…`), the Top N scores help (`…or per day in Score vs Time`), and the
-  chart shown for an unexpected mode value (`Choose Score vs Sensitivity or
-  Score vs Time.`): the two chart modes keep their capitals as named modes
-  under D2, and prose that names one names a control.
+- the two detection-found lines (`Found 2 KovaaK's accounts. Choose the
+  one to use, then **Save**.`, `Found {username}. **Save** to apply it.`),
+  the picker description (`**Save** applies it.`), the celebration
+  description (`…doesn't depend on **Run notifications**.`), the two
+  dependent help texts (`Needs **Rank thresholds** turned on.`, `Needs
+  **Run notifications** turned on.`), and the import field's description
+  (`…press **Import** to add that playlist to this list.`);
+- the incomplete-controls chart message (`Set **Top N scores** and the
+  oldest date…`), the Top N scores help (`…or per day in **Score vs
+  Time**`), and the chart shown for an unexpected mode value (`Choose
+  **Score vs Sensitivity** or **Score vs Time**.`): the two chart modes
+  keep their capitals as named modes under D2, and prose that names one
+  names a control.
 
-Ten of the fourteen are Copy entries already; the two detection-found
-lines, the import description, and the unexpected-mode message are not,
-and would join the block. Two boundaries: a message that paraphrases a
-value rather than naming the control stays plain (`the oldest date` for
-the Oldest date to consider field, `a checkpoint hour` in the Journey's
-empty chart, which the block rewrites as a value on purpose), and a page
-name stays plain (`Set it in Settings.`, `Open Settings to see what's wrong
-and how to fix it.` name a destination, not a control). Every surface can
-render it, in one of two ways, and the block's `**…**` marker maps to
-both: in a component tree it becomes a bold span (the detection and
-all-hidden status lines are text components, the help texts are tooltip
-labels, the descriptions are field-description props, and the two hints
-are toast bodies, which the notification container renders as components;
-the app's `toast()` helper types its message as a string and would widen),
-and in a chart annotation it becomes `<b>…</b>` inside the string, which
-plotly draws and the empty-state title already uses, so the two chart
-messages stay single strings. Where bold cannot render, a toast title
-(already bold) or an accessible name, the name stays plain and the type
-word alone carries it. Bolding only the four would put a bold and a plain
-control name on one line when detection finds one account and leaves
-another unchecked, so the choice is all fourteen or none. The precedent is
-narrower than for the type word: bold is every guide's convention for
-documentation, and Atlassian's for app copy, but the consumer apps the
-survey reached name controls in plain text or avoid naming them, and the
-in-app bold they do use marks objects such as a channel, a user, or a
-repository rather than a control. Choosing it is a product judgment for
-this app's sentence-case verb-phrase labels, not a convention. It gives
-the app a three-way marker system: bold for a control, double quotes for
-what the user typed, nothing for a token. The
-costs: the twelve component-rendered strings stop being single constants
-and are composed from parts, the Copy block carries the `**…**` marker for
-the implementer, the tests that pin those sentences by equality assert
-joined or marked-up text (the all-hidden status twice, the unexpected-mode
-message once), the manual pass covers both chart empty states, and
-Microsoft's in-UI guidance prefers wording that sets the name off over
-formatting. Quotes stay the last resort either way, since rule 6 reserves
-them for user-typed text.
+Two boundaries: a message that paraphrases a value rather than naming the
+control stays plain (`the oldest date` for the Oldest date to consider
+field, `a checkpoint hour` in the Journey's empty chart, which the block
+rewrites as a value on purpose), and a page name stays plain (`Set it in
+Settings.`, `Open Settings to see what's wrong and how to fix it.` name a
+destination, not a control). Every surface renders it in one of two ways,
+and the block's `**…**` marker maps to both: in a component tree it
+becomes a bold span (the detection and all-hidden status lines are text
+components, the help texts are tooltip labels, the descriptions are
+field-description props, and the two hints are toast bodies, which the
+notification container renders as components), and in a chart annotation
+it becomes `<b>…</b>` inside the string, which plotly draws and the
+empty-state title already uses, so the two chart messages stay single
+strings. Where bold cannot render, a toast title (already bold) or an
+accessible name, the name stays plain and the type word alone carries it.
+The app gains a three-way marker system: bold for a control, double quotes
+for what the user typed, nothing for a token.
+
+Material consequence: fourteen Copy entries carry the `**name**` marker,
+four of them new (the two detection-found lines, the import description,
+and the unexpected-mode message); the twelve component-rendered strings
+stop being single constants and are composed from parts, with one helper
+producing the bold span so no site hand-rolls it; the `toast()` helper's
+message type widens to accept components; the two chart messages carry
+`<b>…</b>`; the tests that pin those sentences by equality (the all-hidden
+status twice, the unexpected-mode message once) compare flattened or
+marked-up text; and the manual pass covers the Settings detection states
+and both chart empty states.
+
+Rejected: the type word alone (`Press the Detect my accounts button again
+to retry.`), Microsoft's in-UI convention and the cheaper form, because in
+this app's copy a lowercased verb-phrase label still reads as part of the
+sentence with the type word beside it; bolding only the four type-word
+strings, because it would put a bold and a plain control name on one line
+when detection finds one account and leaves another unchecked; quotation
+marks, which rule 6 reserves for user-typed text; and dropping the name
+where the line sits beside its button, because "the button" is ambiguous
+on a page with more than one. The precedent for bold is narrower than for
+the type word: it is every guide's convention for documentation and
+Atlassian's for app copy, while the consumer apps the survey reached name
+controls in plain text or avoid naming them, and the in-app bold they do
+use marks objects such as a channel or a repository rather than a control.
+The choice is a product judgment for this app's sentence-case verb-phrase
+labels, not a convention.
 
 ## Problem
 
@@ -611,12 +601,19 @@ time, replacing the current one-line em-dash convention.
    contraction and its full form never both appear in the app; `do not` is
    reserved for a warning the user must not skip, and no string uses it
    today.
-6. **Control names are unquoted, carry their on-screen casing, and take
-   their type when the label reads as prose (D8).** `then Save`, `Needs
-   Rank thresholds turned on`, but `Turn on the Show hidden switch` and
-   `press the Detect my accounts button again`, because a lowercased verb
-   phrase has no other edge. Quotation marks are the last resort for an
-   ambiguity that survives rewording. User-entered free text keeps double
+6. **Control names are bold, unquoted, carry their on-screen casing, and
+   take their type when the label reads as prose (D8).** `then **Save**`,
+   `Needs **Rank thresholds** turned on`, `Turn on the **Show hidden**
+   switch`, and `press the **Detect my accounts** button again`: bold marks
+   a control wherever prose names one, and the type word gives a lowercased
+   verb phrase its edge. In the Copy block `**name**` is the marker; a
+   component renders it as a bold span, a chart annotation as `<b>name</b>`
+   inside the string, and where bold cannot render (a toast title, which is
+   already bold, or an accessible name) the name stays plain and the type
+   word alone carries it. A page name (`Settings`) and a paraphrased value
+   (`the oldest date`) are not control names and stay plain. Quotation
+   marks are the last resort for an ambiguity that survives rewording.
+   User-entered free text keeps double
    straight quotes: imported playlist names and KovaaK's usernames can
    contain anything, so `"{name}"` and `KovaaK's username "X"`. Tokens stay
    bare: Steam IDs, playlist codes, counts, and full paths. A literal file
@@ -662,7 +659,10 @@ rule 5, the quoting and type-word halves of rule 6, the verb and list items
 in rule 7, and rule 9's value clause were changed on that date to match
 them. Rule 7's *not valid* line follows the Microsoft Writing Style Guide's
 entry on the pair and the Windows error-message word list, read on
-2026-09-13. The research note records each guide's position with its URL,
+2026-09-13. The bold half of rule 6 is the 2026-09-14 ruling on D8:
+Atlassian's rule for app copy and every guide's convention for
+documentation, chosen as a product judgment for this app's labels. The
+research note records each guide's position with its URL,
 and the decision-log entry carries the citations at ship time.
 
 ### Copy
@@ -719,15 +719,15 @@ separate child.
 **Scenario Performance: controls and help text** (D2 unless noted)
 
 - `Rank Thresholds` → `Rank thresholds`; its dependent help text `Needs Rank
-  Thresholds turned on.` → `Needs Rank thresholds turned on.`
+  Thresholds turned on.` → `Needs **Rank thresholds** turned on.` (D8)
 - `PB Score` (switch) → `PB score`
 - `Score Threshold Overlay` → `Score threshold overlay`
 - `Score Threshold Percentage` → `Score threshold percentage`
 - `Score Threshold Verdict` *(ratified 2026-08-21)* → `Score threshold
   verdict`
 - `Run Notifications` *(ratified 2026-08-21)* → `Run notifications`; its
-  dependent help text `Needs Run Notifications turned on.` → `Needs Run
-  notifications turned on.`
+  dependent help text `Needs Run Notifications turned on.` → `Needs **Run
+  notifications** turned on.` (D8)
 - Score threshold percentage help text: `…The overlay line tracks your
   current personal best; notifications judge the run against the personal
   best it was chasing.` → `…The overlay line tracks your current personal
@@ -743,17 +743,22 @@ separate child.
   sensitivity — or per day in Score vs Time — within the selected date range.
   A new run that lands in the top N also triggers a notification.` → `How
   many of your best scores to plot per sensitivity within the selected date
-  range, or per day in Score vs Time. A new run that lands in the top N also
-  triggers a notification.`
+  range, or per day in **Score vs Time**. A new run that lands in the top N
+  also triggers a notification.` (D8: the mode is a control)
 - Placeholders: `Select a scenario...` → `Select a scenario`; `Select a
   playlist...` → `Select a playlist` (shared with Aim Training Journey);
   `Score Percentage...` → `Percentage`
 - Empty chart, incomplete controls: `Choose a Top N value and start date to
-  plot this scenario.` → `Set Top N scores and the oldest date to plot this
-  scenario.` (`the oldest date` paraphrases the `Oldest date to consider`
-  label, the one place the block knowingly does so)
+  plot this scenario.` → `Set **Top N scores** and the oldest date to plot
+  this scenario.` (D8; `the oldest date` paraphrases the `Oldest date to
+  consider` label, the one place the block knowingly does so, and a
+  paraphrased value stays plain)
 - Empty chart, date range: `Choose an older start date or play more runs.` →
   `Choose an older date or play more runs.`
+- Empty chart, unexpected mode: `Choose Score vs Sensitivity or Score vs
+  Time.` → `Choose **Score vs Sensitivity** or **Score vs Time**.` (D8; a
+  defensive branch the run-events tests reach; in a chart annotation the
+  marker is `<b>…</b>` in the string)
 - Chart annotations and legend entries: `PB Score (123.00)` → `PB score
   (123.00)`; `Score Threshold (118.00)` → `Score threshold (118.00)`; the
   legend entries `Run Data Point` → `Run data point` and `Average Score` →
@@ -826,8 +831,8 @@ separate child.
 **Playlists overview**
 
 - Status, all hidden: `All playlists are hidden. Toggle "Show hidden" to
-  manage them.` → `All playlists are hidden. Turn on the Show hidden switch
-  to manage them.` (D8)
+  manage them.` → `All playlists are hidden. Turn on the **Show hidden**
+  switch to manage them.` (D8)
 - Store alert title: `Playlist visibility is not being used` → `Playlist
   visibility isn't being used` (D6)
 - Warmup stopped, the reason relayed after `Percentile update stopped:`:
@@ -857,17 +862,20 @@ separate child.
 - Placeholders: `Filter playlists...` → `Filter playlists`; `KovaaK's
   playlist code...` → `KovaaK's playlist code` (the import help beside it
   already introduces KovaaK's own name, "share code", and keeps it)
+- Import help: `Paste a KovaaK's playlist share code and press Import to add
+  that playlist to this list.` → `Paste a KovaaK's playlist share code and
+  press **Import** to add that playlist to this list.` (D8)
 - Import succeeded but hidden, title: `Playlist imported — not shown` →
   `Playlist imported but hidden`; appended hint: ` It could not be marked
   visible, so it may be missing from playlist selectors — toggle "Show hidden"
   on this page, then click its row's eye icon to show it.` → ` It couldn't
   be marked visible, so it may be missing from playlist selectors. Turn on
-  the Show hidden switch on this page, then click the eye icon on its row to
-  show it.` (D6, D8)
+  the **Show hidden** switch on this page, then click the eye icon on its
+  row to show it.` (D6, D8)
 - Duplicate-and-hidden hint: ` It is currently hidden — toggle "Show hidden"
-  on this page to unhide it.` → ` It is currently hidden. Turn on the Show
-  hidden switch on this page, then click the eye icon on its row to show
-  it.` (D8, and a correctness fix under rule 9: Show hidden only reveals
+  on this page to unhide it.` → ` It is currently hidden. Turn on the
+  **Show hidden** switch on this page, then click the eye icon on its row
+  to show it.` (D8, and a correctness fix under rule 9: Show hidden only reveals
   hidden rows, and the eye icon is what changes the saved visibility, so
   the shipped hint stopped one step short of the recovery it promised; the
   wording mirrors the import-success hint above)
@@ -971,6 +979,10 @@ separate child.
 - Save failed: `Could not save settings — nothing was written. See
   data/logs/debug.log.` → `Couldn't save settings, so nothing was written.
   See data/logs/debug.log.`
+- Detection, found: `Found 2 KovaaK's accounts. Choose the one to use, then
+  Save.` → `Found 2 KovaaK's accounts. Choose the one to use, then **Save**.`;
+  `Found {username}. Save to apply it.` → `Found {username}. **Save** to
+  apply it.` (D8; the wording is unchanged)
 - Detection, no match: `No Steam account on this machine has a KovaaK's
   profile. Type your username in yourself — KovaaK's cannot look one up from
   a Steam ID.` → `No Steam account on this machine has a KovaaK's profile.
@@ -978,17 +990,17 @@ separate child.
   ID.`
 - Detection, unchecked: `2 Steam accounts could not be checked; press Detect
   my accounts again to retry.` → `2 Steam accounts couldn't be checked.
-  Press the Detect my accounts button again to retry.` (D6, D8)
+  Press the **Detect my accounts** button again to retry.` (D6, D8)
 - Detection, account list unreadable: `Steam's account list could not be
   read, so accounts on this machine may have been missed. See
   data/logs/debug.log.` → `Steam's account list couldn't be read, so
   accounts on this machine may have been missed. See data/logs/debug.log.`
   (D6)
 - Picker description: `Choosing one fills the fields above; Save applies
-  it.` → `Choosing one fills the fields above. Save applies it.`
+  it.` → `Choosing one fills the fields above. **Save** applies it.` (D8)
 - Celebration description, the control-name quote and one full form: `…and
-  does not depend on Run Notifications.` → `…and doesn't depend on Run
-  notifications.` (D2, D6; the rest of the description is unchanged)
+  does not depend on Run Notifications.` → `…and doesn't depend on **Run
+  notifications**.` (D2, D6, D8; the rest of the description is unchanged)
 
 **Aim Training Journey**
 
@@ -1166,18 +1178,26 @@ the screen, and log lines are outside it.
   asserts the store layer's "is not valid JSON" through the log, and
   `test_app_shell.py`, which pins the two header accessible names, plus
   whatever `rg` finds for each quoted string at implementation time.
+- The D8 bold spans: a test that pins a composed sentence (the all-hidden
+  status, the detection status) compares the flattened text of the
+  children through one small helper, never a substring, and a chart
+  message asserts the `<b>` string.
 - The standard local gates (`pytest`, `ruff format --check`, `ruff check`,
   `mypy`, `compileall`).
 - One manual pass at the running app over every surface in the Copy block,
-  including the D1 field with a real position value, to confirm nothing
-  wraps or renders a period inside a link.
+  including the D1 field with a real position value, the Settings
+  detection states, and both chart empty states, to confirm nothing wraps,
+  renders a period inside a link, or shows a bold marker as text.
 
 ## Delivery plan
 
 1. **This PR**: the proposal. Nothing ships until every open decision, D1
    to D8, is ruled and the Copy block has had its redline pass.
 2. **One implementation PR**, after ratification, from a kickoff prompt that
-   hands the implementer the ratified Copy block verbatim. One PR rather than
+   hands the implementer the ratified Copy block verbatim (`**name**` marks
+   a bold control name, composed as rule 6 says with one helper for the
+   span; the `toast()` helper's message type widens to accept components;
+   a bolded string's `rg` pass searches its fragments). One PR rather than
    one per surface because the rules are one ruling: splitting them would
    leave the app mid-style across a review window, which is the state this
    proposal exists to end. Suggested commit split: the copy and the rules
