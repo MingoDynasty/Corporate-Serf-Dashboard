@@ -621,6 +621,13 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
+- `assets/homeGraphZoomFit.js` — refits the Scenario Performance graph's
+  score axis to the runs in view when the x axis is zoomed. It listens for
+  `plotly_relayout` on each `.home-graph` plot div, acts only on events that
+  carry an x range, and fits trace points only, never the overlay shapes. The
+  fit's relayout re-sends the current x range: dcc.Graph copies every
+  relayout into its `figure` prop from props that can predate the user's
+  zoom, so a y-only relayout would snap x back to the full range.
 - `assets/pbCelebration.js` — the personal best celebration's animation:
   a name-keyed style registry (`confetti`, `fireworks`, `cannons`, `stars`)
   behind `window.pbCelebration.play(style)` and `celebrate(batch, style)`. It
