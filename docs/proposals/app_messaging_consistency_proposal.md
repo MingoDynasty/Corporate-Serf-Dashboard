@@ -23,15 +23,15 @@ commissioned a survey of the mainstream style guides and of current apps
 dated 2026-09-04). The survey confirmed nine of the thirteen conventions it
 tested and found the proposal against the guides on three, which are the
 three new rows; its smaller findings are folded into the rules and the Copy
-block as author redlines. D4 and D8 are ruled; the maintainer's leans on
-D6 and D7 are recorded as leans, non-binding until ruled. Everything else
-in this proposal is
+block as author redlines. Every row is ruled: D4 on 2026-09-12, D8 on
+2026-09-14, and D1 to D3 and D5 to D7 ratified on 2026-09-14. Everything
+else in this proposal is
 author-owned copy, gathered in the Design section's Copy block for the
 maintainer's redline pass.
 
 ### D1 — Shape of the Scenario Stats Position hint
 
-Status: Open
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
 
 The Position field on Scenario Performance glues a short hint to its value,
 in three variants that share one slot:
@@ -76,7 +76,7 @@ same way.
 
 ### D2 — Casing of control labels
 
-Status: Open
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
 
 Control labels mix two conventions with no rule behind them. In the Chart
 options panel alone: "Rank Thresholds", "PB Score", "Score Threshold
@@ -126,7 +126,7 @@ symptom this proposal exists to remove.
 
 ### D3 — Noun on the two playlist status lines
 
-Status: Open
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
 
 With no username set, the Playlists overview says "Percentiles unavailable"
 and the per-playlist scenario table says "Positions unavailable". The note
@@ -191,7 +191,7 @@ factual and forgoes the one success-moment flourish the guides endorse.
 
 ### D5 — Does the sweep gate the launch post?
 
-Status: Open
+Status: Ratified (user), 2026-09-14: accept the recommendation below.
 
 The launch prep notes plan an announcement post led by a clip of a new run
 updating the chart and its notification, with the leaderboard standing in
@@ -212,8 +212,9 @@ against.
 
 ### D6 — Contractions
 
-Status: Open. Maintainer lean (2026-09-04): adopt, pending the review's
-stance.
+Status: Ratified (user), 2026-09-14: adopt. The maintainer leaned to adopt
+on 2026-09-04, pending the review's stance, and the review endorsed on
+every pass.
 
 Rule 5 as first drafted banned contractions: "Could not", "cannot", "does
 not" everywhere, on the reasoning that full forms read terse and deliberate.
@@ -260,12 +261,11 @@ convention does not survive the survey.
 
 ### D7 — A sentence never opens with an object name or a path
 
-Status: Open. Maintainer lean (2026-09-12): adopt the rule below, with the
-supplemental path written as a labeled readout, `File: {path}`. Narrowed on
-2026-09-12 from the review's counter-proposal, which the review confirmed
-the same day; the row is unanimous as amended and awaits the maintainer's
-ruling. This lean supersedes the 2026-09-04 lean given on the wider first
-draft.
+Status: Ratified (user), 2026-09-14: adopt the rule below, with the
+supplemental path written as a labeled readout, `File: {path}`. The
+maintainer leaned to it on 2026-09-12, narrowed that day from the review's
+counter-proposal, which the review confirmed the same day; it supersedes
+the 2026-09-04 lean given on the wider first draft.
 
 Several rewritten messages began with a value the app fills in at runtime:
 `{file} could not be read.`, `{code} is already imported as "{name}".`, and
@@ -1191,8 +1191,9 @@ the screen, and log lines are outside it.
 
 ## Delivery plan
 
-1. **This PR**: the proposal. Nothing ships until every open decision, D1
-   to D8, is ruled and the Copy block has had its redline pass.
+1. **This PR**: the proposal. Every decision, D1 to D8, was ruled by
+   2026-09-14 and the Copy block had its redline pass, so the
+   implementation may start once this PR merges.
 2. **One implementation PR**, after ratification, from a kickoff prompt that
    hands the implementer the ratified Copy block verbatim (`**name**` marks
    a bold control name, composed as rule 6 says with one helper for the
