@@ -414,10 +414,15 @@ messages stay single strings. Where bold cannot render, a toast title
 (already bold) or an accessible name, the name stays plain and the type
 word alone carries it. Bolding only the four would put a bold and a plain
 control name on one line when detection finds one account and leaves
-another unchecked, so the choice is all fourteen or none. In-app practice
-supports it (Slack, GitHub, and Discord bold names inside their own
-messages), and it gives the app a three-way marker system: bold for a
-control, double quotes for what the user typed, nothing for a token. The
+another unchecked, so the choice is all fourteen or none. The precedent is
+narrower than for the type word: bold is every guide's convention for
+documentation, and Atlassian's for app copy, but the consumer apps the
+survey reached name controls in plain text or avoid naming them, and the
+in-app bold they do use marks objects such as a channel, a user, or a
+repository rather than a control. Choosing it is a product judgment for
+this app's sentence-case verb-phrase labels, not a convention. It gives
+the app a three-way marker system: bold for a control, double quotes for
+what the user typed, nothing for a token. The
 costs: the twelve component-rendered strings stop being single constants
 and are composed from parts, the Copy block carries the `**…**` marker for
 the implementer, the tests that pin those sentences by equality assert
