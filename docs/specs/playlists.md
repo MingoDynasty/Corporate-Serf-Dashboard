@@ -105,9 +105,9 @@ section and [product.md](../product.md). Leaderboard placement is worded
   ([2026-09-02](../decision_log.md#2026-09-02-warmup-locks-are-never-held-across-cache-io)).
 - Visibility is a per-code show-list in `data/playlist_visibility.json`,
   uniform for bundled and user playlists. A missing or unusable file yields
-  the first-run seed (eleven Voltaic S5 and Viscose codes plus every
-  user-root code) without writing; a usable file is authoritative, even
-  empty. Hidden playlists still load, route, and draw rank overlays
+  the first-run seed (fourteen Voltaic S5, Voltaic S5.5, and Viscose codes
+  plus every user-root code) without writing; a usable file is
+  authoritative, even empty. Hidden playlists still load, route, and draw rank overlays
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
