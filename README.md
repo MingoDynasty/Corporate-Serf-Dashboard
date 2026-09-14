@@ -18,16 +18,16 @@ new personal best. It runs on your own PC and opens in your browser.
 - **Run notifications** — one toast as each run lands, titled with its verdict: score-threshold
   pass/fail against your personal best, or the top-N placement it earned. Playing again replaces
   it rather than stacking a second one beside it, and a run that earns neither says nothing. One
-  Chart options switch, Run Notifications, turns these off, leaving the chart to update silently.
+  Chart options switch, Run notifications, turns these off, leaving the chart to update silently.
 - **Personal best celebration** — a run that beats your scenario best gets a short burst of
   confetti and its own toast, on whatever page you have open, and the toast stays until you
   dismiss it so the news survives a fullscreen session. If the window was covered when the run
   landed, the animation waits until you come back to it. A Settings control picks the animation,
   Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with a Preview button
-  beside it, and it is its own family, so Run Notifications does not silence it.
+  beside it, and it is its own family, so Run notifications does not silence it.
   A reduced-motion preference keeps the toast and drops the animation.
 - **Leaderboard standing** — your global position and percentile for the selected scenario, e.g.
-  `Position: 11,290 of 63,892 (82.33% Percentile)`, with a bounded background refresh after a new
+  `Position: 11,290 of 63,892 (82.33% percentile)`, with a bounded background refresh after a new
   personal best and a manual Refresh button for when the leaderboard lags.
 - **Playlist scenarios table** — every scenario in a playlist with position, percentile, last
   played, runs, and personal-best stats (PB Score, PB Date, PB cm/360, PB Accuracy); sort by
@@ -340,8 +340,8 @@ benchmark library in `resources/benchmarks` — built with the help of
 [Evxl.app](https://evxl.app)'s author by combining his benchmark rank data with
 playlist data from the KovaaK's API — and loads all of it at startup. The most
 popular benchmarks (Voltaic, Viscose) are visible by default; to enable any
-other, toggle "Show hidden" on the Playlists page and unhide it — no file
-copying needed.
+other, turn on the **Show hidden** switch on the Playlists page and click the
+playlist's eye icon — no file copying needed.
 
 You can also import any playlist by share code: on the Playlists page, click
 **Import** and enter the code, and the app fetches the playlist from the

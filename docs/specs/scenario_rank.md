@@ -75,10 +75,11 @@ benchmark tier) — see the
   Every surface that depends on the username treats an empty one as
   persistent configuration state rather than a failure. The playlist
   scenarios page skips its progressive position
-  fill entirely and says so in place — "Positions unavailable — set your
-  KovaaK's username in Settings", with Settings linked — so no lookup runs
-  over a pass that would fetch nothing
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  fill entirely and says so in place — "Positions unavailable. Set your
+  KovaaK's username in Settings.", with Settings linked and the period outside
+  the link — so no lookup runs over a pass that would fetch nothing
+  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure);
+  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   The playlists overview, whose percentile columns empty for the same reason,
   states it in its own status line as well: "Percentiles unavailable. Set your
   KovaaK's username in Settings.", again with Settings linked, and only when
@@ -167,10 +168,13 @@ benchmark tier) — see the
   to in-place UI
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
   The Scenario Performance Position field carries its own
-  explanation instead: `N/A` plus a link to the Settings page when no
-  username is configured, `N/A` plus "lookup failed, Refresh to retry" when
-  the lookup failed with nothing cached, and the cached value plus "from
-  cache, Refresh to update" when a failed fetch was served from cache. The
+  explanation instead: `N/A` plus " · set your KovaaK's username in Settings",
+  with Settings linked, when no username is configured, `N/A` plus
+  " · lookup failed" when the lookup failed with nothing cached, and the
+  cached value plus " · from cache" when a failed fetch was served from cache.
+  Each hint is a middle-dot readout with no instruction half, because the
+  Refresh button beside the value is the affordance
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The
   hint the last network-backed render concluded is reused by the cache-only
   interval path, which cannot see a failure that already happened, so the
   affordance does not blink off between ticks. That hint is tied to the value
@@ -184,11 +188,13 @@ benchmark tier) — see the
   field to `N/A` and toasts nothing. A hard failure (an `error_message`
   result or a raised exception) is
   red, titled "Position refresh failed", and leaves the displayed value
-  untouched rather than flashing `N/A`, so its copy "Couldn't refresh —
-  position unchanged." is true whether a cached position was on screen or
-  not. A served-stale result is yellow under that same title, and its value
-  carries the same "from cache, Refresh to update" affordance a passive render
-  would give it. The two share one `rank-refresh-problem` channel: they are
+  untouched rather than flashing `N/A`, so its copy "Couldn't refresh. The
+  position shown is unchanged." is true whether a cached position was on
+  screen or not. A served-stale result is yellow, titled "Refresh failed ·
+  position from cache" with "Couldn't refresh. The position shown is from
+  cache.", and its value carries the same " · from cache" hint a passive
+  render would give it ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). The two share one
+  `rank-refresh-problem` channel: they are
   mutually exclusive verdicts on one attempt, so a stale retry after a hard
   failure replaces it instead of leaving both on screen contradicting each
   other

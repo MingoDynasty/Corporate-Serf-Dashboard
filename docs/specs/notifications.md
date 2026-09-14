@@ -65,7 +65,9 @@ their full behavior.
   console and file record and never reaches the screen
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
 - A payload carries `action: "show"`, the id, title, message, color, and
-  `autoClose`, plus an optional icon. Ids are semantic. DMC's `show` ignores a
+  `autoClose`, plus an optional icon. The message is a string or a children
+  list, which is how a toast body names a control in bold
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Ids are semantic. DMC's `show` ignores a
   payload whose id is already on screen
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)), which is why every
   toast that can recur is emitted through `channel_toast` under a rotating
@@ -361,7 +363,7 @@ toasts under, and it applies to every toast the app adds from here on
   ([2026-07-06](../decision_log.md#2026-07-06-coalesce-pending-home-run-events)).
   A summary whose latest run belongs to another scenario earns nothing, and
   a render that resolves to an empty-state plot skips the toast.
-- A run is judged only when Score Threshold Verdict is on, the threshold
+- A run is judged only when Score threshold verdict is on, the threshold
   percentage is a usable non-zero number, the run is not the first at its
   sensitivity, and `scenario_previous_best` is positive. It passes when
   `score >= scenario_previous_best × goal / 100`; the message shows
@@ -376,12 +378,14 @@ toasts under, and it applies to every toast the app adds from here on
   trails it; a run that is neither judged nor placed emits nothing
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
   Pass: green, "Threshold passed",
-  `{scenario} — {score:.2f}, {pct:.1f}% of PB. Also your {best|Nth-best} at {sensitivity}.`
-  when placed, else `... Ready to move on.` Fail: yellow, "Below threshold",
-  `{scenario} — {score:.2f}, {pct:.1f}% of PB — need {goal:.1f}%. Still your {best|Nth-best} at {sensitivity}. Keep grinding...`,
-  the "Still" sentence only when placed. Unjudged and placed: green,
-  "New best score" or "New {Nth}-best score",
-  `{scenario} — {score:.2f} at {sensitivity}.`
+  `{scenario}: {score:.2f}, {pct:.1f}% of PB. Also your {best|Nth-best} at {sensitivity}.`
+  when placed, else `{scenario}: {score:.2f}, {pct:.1f}% of PB. Ready to move on.`
+  Fail: yellow, "Below threshold",
+  `{scenario}: {score:.2f}, {pct:.1f}% of PB (need {goal:.1f}%). Still your {best|Nth-best} at {sensitivity}.`,
+  the "Still" sentence only when placed, and no coaching line after it.
+  Unjudged and placed: green, "New best score" or "New {Nth}-best score",
+  `{scenario}: {score:.2f} at {sensitivity}.`
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out))
 - Every other run in a batch earns nothing; its new point on the plot is its
   record. There is no catch-up digest: a batch of several runs rebuilds the
   graph once, auto-switches once, and toasts exactly as a single run would
@@ -406,7 +410,7 @@ toasts under, and it applies to every toast the app adds from here on
   a run verdict and outlives it. It is not an exception to the mechanism —
   it replaces its own previous instance the same way
   ([2026-08-31](../decision_log.md#2026-08-31-repeatable-toasts-replace-in-place-with-a-visible-re-entry)).
-- The Run Notifications master switch (`run-notification-switch`, on by
+- The Run notifications master switch (`run-notification-switch`, on by
   default; help text "Controls threshold verdict and placement notifications
   for your runs. Personal best celebrations use their own setting.") gates the
   page-built shapes through one early return at the top of the producing
@@ -421,10 +425,11 @@ toasts under, and it applies to every toast the app adds from here on
   auto-switching, or the rank, Steam ID, and playlist toast families either. It is
   read as `State`, so flipping it never rebuilds the plot
   ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
-- The Score Threshold Verdict switch (`score-threshold-notification-switch`,
+- The Score threshold verdict switch (`score-threshold-notification-switch`,
   on by default; help text "Adds a pass or fail verdict to run notifications
-  when the run can be judged against the score threshold. Needs Run
-  Notifications turned on.") decides only whether a run is judged and is an
+  when the run can be judged against the score threshold. Needs **Run
+  notifications** turned on.", the control name bold
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out))) decides only whether a run is judged and is an
   `Input` to the graph callback. Master off is silence whatever it says;
   master on with it off gives placement toasts only
   ([2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
@@ -435,12 +440,12 @@ toasts under, and it applies to every toast the app adds from here on
 
 - When the watchdog cannot import a run file — a CSV that will not parse, a
   handler exception, or a store load that fails after a successful parse — it
-  appends "Could not process a new run file. See debug.log for details." to
+  appends "Couldn't process a new run file. See data/logs/debug.log." to
   `run_import_failure_queue`, and the observer thread survives. On each
   `interval-component` tick `flush_run_import_failures` drains the queue into
   one red toast, id `run-import-failure`, title "Run not recorded": the
   message above for one failure, or
-  `{n} new run files could not be processed. See debug.log for details.` for
+  `{n} new run files couldn't be processed. See data/logs/debug.log.` for
   a batch; a drained batch never toasts again
   ([2026-08-03](../decision_log.md#2026-08-03-one-quiet-notification-layer-with-verdict-carrying-copy)).
   It is the one burst toast, and the one accepted exception to the identity
@@ -498,12 +503,12 @@ container actually renders is that key plus a per-emission suffix, and the row's
 | `run-import-failure` | burst, fixed id | "Run not recorded" | red | — | `flush_run_import_failures`; this spec |
 | `startup-playlist-warning-{n}` | fixed id per warning, sticky | "Playlist not loaded" | yellow, until dismissed | — | `flush_startup_playlist_warnings`; this spec |
 | `steam-id-mismatch` | fixed id, sticky, once per process | "Steam ID mismatch" | yellow, until dismissed | — | `get_scenario_rank`; rank spec |
-| `rank-refresh-problem` | channel | "Position refresh failed" | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
+| `rank-refresh-problem` | channel | "Position refresh failed" (hard) / "Refresh failed · position from cache" (served stale) | red (hard) / yellow (served stale) | — | `refresh_rank`; rank spec |
 | `rank-refresh-success-{scenario}` | channel per scenario | "Position refreshed" | green | `rank-refresh-problem`, `rank-refresh-username-unset` | `refresh_rank`; rank spec |
 | `rank-refresh-username-unset` | channel | "KovaaK's username not set" | blue | — | `refresh_rank`; rank spec |
-| `setup-card-skip-problem` | channel | "Skip was not saved" | red | — | `skip_identity_setup`; settings spec |
+| `setup-card-skip-problem` | channel | "Skip wasn't saved" | red | — | `skip_identity_setup`; settings spec |
 | `imported-playlist-successful-{code}` | channel per playlist code | "Playlist imported" | green | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
-| `imported-playlist-visibility-failed-{code}` | channel per playlist code | "Playlist imported — not shown" | orange | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
+| `imported-playlist-visibility-failed-{code}` | channel per playlist code | "Playlist imported but hidden" | orange | `imported-playlist-failed-notification` | `import_playlist`; playlists spec |
 | `imported-playlist-failed-notification` | channel | "Playlist import failed" | red | — | `import_playlist`; playlists spec |
 | `deleted-playlist-successful-{code}` | channel per playlist code | "Playlist deleted" | green | `deleted-playlist-failed-notification` | `confirm_delete_playlist`; playlists spec |
 | `deleted-playlist-failed-notification` | channel | "Playlist delete failed" | red | — | `confirm_delete_playlist`; playlists spec |

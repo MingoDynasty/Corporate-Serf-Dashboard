@@ -31,11 +31,15 @@ of scope here, apart from its chart toolbar, noted under The graph.
   ([2026-08-09](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)).
 - The preference panel and its disclosure button are named "Chart options",
   and the controls inside carry the vocabulary the app's own chart
-  annotations and the aim-training community already use — "PB Score",
-  "Score Threshold" — rather than invented terms
+  annotations and the aim-training community already use — "PB score",
+  "Score threshold" — rather than invented terms
   ([2026-08-09](../decision_log.md#2026-08-09-the-graph-page-is-scenario-performance-its-panel-is-chart-options)).
+  Control labels, placeholders, tooltips, and toast titles are sentence case;
+  the page title, the group headings, and the named chart modes "Score vs
+  Sensitivity" and "Score vs Time" keep their capitals
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - Page copy says "Position" for leaderboard placement and reserves "Rank"
-  for benchmark tiers, as in the "Rank Thresholds" overlay; the rule lives in
+  for benchmark tiers, as in the "Rank thresholds" overlay; the rule lives in
   [scenario_rank.md](scenario_rank.md)
   ([2026-07-06](../decision_log.md#2026-07-06-one-word-per-concept-in-leaderboard-verbiage)).
 - With `show_version_in_title` enabled, the tab title is prefixed with the
@@ -49,7 +53,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
 ## The controls row
 
 - The row holds, in order: the "Playlist filter" select, the "Selected
-  scenario" searchable select (placeholder "Select a scenario..."), the
+  scenario" searchable select (placeholder "Select a scenario"), the
   "Follow newly played scenario" switch beneath it, the "Top N scores"
   number input (default `5`, minimum 1), the "Oldest date to consider" date
   picker (defaults to January 1 of the current year; no future dates), and
@@ -74,7 +78,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
 
 ## The graph
 
-- Both modes plot each kept run as a point, with one "Average Score" line
+- Both modes plot each kept run as a point, legend "Run data point", with
+  one "Average score" line (hover label "Average score")
   through each group's average score: Score vs Sensitivity groups by the
   run's sensitivity-and-scale string, Score vs Time by calendar day. Within the date range, the top N
   scores are kept per sensitivity, or per day in Score vs Time. The date
@@ -92,12 +97,13 @@ of scope here, apart from its chart toolbar, noted under The graph.
   that keeps them, cross-referencing KovaaK's second-stamped CSV filenames —
   plus score, the x value, and accuracy
   ([2026-07-11](../decision_log.md#2026-07-11-humanize-the-absolute-timestamp-format)).
-- Three overlay families, all dashed labelled lines. "PB Score" and "Score
-  Threshold" draw at the current post-run personal best and at the
+- Three overlay families, all dashed labelled lines. "PB score ({value})"
+  and "Score threshold ({value})" draw at the current post-run personal best
+  and at the
   configured percentage of it — while the verdict in run notifications
   judges against the PB the run was chasing
   ([2026-07-08](../decision_log.md#2026-07-08-judge-score-threshold-notifications-against-the-previous-pb)).
-  "Rank Thresholds" draws the selected playlist's rank lines, in ladder
+  "Rank thresholds" draws the selected playlist's rank lines, in ladder
   order and color: the ranks whose thresholds land inside the plotted score
   range plus every rank tied at the nearest threshold below and at the
   nearest above, or the whole ladder with
@@ -112,13 +118,17 @@ of scope here, apart from its chart toolbar, noted under The graph.
   empty state instead
   ([2026-07-16](../decision_log.md#2026-07-16-keep-pre-hydration-states-honest)):
   "No scenario selected" / "Select a scenario to see your score history.",
-  "Graph settings incomplete" / "Choose a Top N value and start date to plot
-  this scenario.", "No local runs found" / "Play this scenario once and the
-  graph will fill in.", and "No runs in this date range" / "Choose an older
-  start date or play more runs."
+  "Graph settings incomplete" / "Set <b>Top N scores</b> and the oldest date
+  to plot this scenario.", "No local runs found" / "Play this scenario once
+  and the graph will fill in.", and "No runs in this date range" / "Choose an
+  older date or play more runs."; an unexpected mode value gets "Unsupported
+  graph option" / "Choose <b>Score vs Sensitivity</b> or <b>Score vs
+  Time</b>.". A control named in an empty-state message is bold through
+  `<b>` in the annotation string
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - The figure takes the Mantine light or dark template with the app theme.
   With no point color chosen the run points draw in the template's own blue —
-  `#228be6` light, `#1971c2` dark — while the Average Score line keeps its
+  `#228be6` light, `#1971c2` dark — while the Average score line keeps its
   baked `#636efa` in both themes
   ([2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
   as amended by
@@ -146,7 +156,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
   hands that tab the figure only once Plotly Cloud reports the user signed in
   there; a blocked popup ends the flow with nothing sent. The figure is
   everything plotted: the title, each plotted run's timestamp, score,
-  accuracy, and x value, the Average Score line, and the label and value of
+  accuracy, and x value, the Average score line, and the label and value of
   each overlay line drawn. Neither the button nor the flow is app code: the
   graph passes no `config`, so both are plotly.js 4 defaults, kept on purpose.
   The Aim Training Journey graph passes no `config` either and carries the
@@ -163,14 +173,19 @@ of scope here, apart from its chart toolbar, noted under The graph.
   width — not the window's — drops to 62em, the same panel stacks above the
   chart
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph)).
-- Four groups in order: **Overlays** ("Rank Thresholds" on, "Show all ranks"
-  off, "PB Score" on), **Run Data Points** ("Point size" Default, "Point
-  color" empty), **Score Threshold** ("Score Threshold Overlay" on, "Score
-  Threshold Percentage" 95, minimum 1, "Score Threshold Verdict" on), and
-  **Notifications** ("Run Notifications" on)
+- Four groups in order: **Overlays** ("Rank thresholds" on, "Show all ranks"
+  off, "PB score" on), **Run Data Points** ("Point size" Default, "Point
+  color" empty), **Score Threshold** ("Score threshold overlay" on, "Score
+  threshold percentage" 95, minimum 1, placeholder "Percentage", "Score
+  threshold verdict" on), and **Notifications** ("Run notifications" on)
   ([2026-08-09](../decision_log.md#2026-08-09-chart-options-live-in-a-collapsible-panel-beside-the-graph),
   [2026-08-20](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there),
-  [2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed)).
+  [2026-08-21](../decision_log.md#2026-08-21-run-notifications-have-a-master-switch-and-the-threshold-switch-is-renamed);
+  label casing as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
+  A help text that names another control renders the name bold: "Needs
+  **Rank thresholds** turned on.", "Needs **Run notifications** turned on.",
+  and the Top N scores help's "or per day in **Score vs Time**"
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - Every control in the panel persists via Dash persistence in the browser's
   local storage, so preferences are per browser and per origin — which is
   why every human-facing URL says `localhost`
@@ -183,7 +198,7 @@ of scope here, apart from its chart toolbar, noted under The graph.
 ## Scenario Stats
 
 - The block shows "Last played:", "Number of runs:", and "Position:" for the
-  selected scenario; the personal best appears on the chart as the PB Score
+  selected scenario; the personal best appears on the chart as the PB score
   overlay, not as a stats row.
 - "Last played" is a relative, single-unit humanized string ("5 minutes
   ago"), self-updating on its own 30-second interval
@@ -248,18 +263,19 @@ of scope here, apart from its chart toolbar, noted under The graph.
 
 - The setup card renders above the controls row, one state at a time. The
   unusable-store state shows "Your settings can't be read" over "A settings
-  file exists, but this version of the app can't use it, so the dashboard
-  started without your settings. Open Settings to see what's wrong and how to
-  fix it.", with "Open Settings" as its one action
+  file exists, but this version of the app can't use it, so the app started
+  without your settings. Open Settings to see what's wrong and how to fix
+  it.", with "Open Settings" as its one action
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
   The stats-folder state shows "Finish setting up" over "No KovaaK's stats
-  folder was found, so the dashboard can't read your runs yet. Set it in
+  folder was found, so this app can't read your runs yet. Set it in
   Settings." with "Open Settings" as its one action. The identity state
   shows "Add your KovaaK's account" over "See your leaderboard position and
   percentiles for every scenario.", with "Open Settings", "Skip", and the
-  fine print "Skipping username disables rank lookups. You can set it
+  fine print "Skipping keeps position lookups off. You can add your username
   anytime in Settings."
-  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence);
+  card copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   The card is a panel wearing the shared alert treatment rather than a
   `dmc.Alert`, because it holds a link and a button: the unusable-store and
   stats-folder states are yellow with a warning icon beside the title, and the
@@ -267,7 +283,8 @@ of scope here, apart from its chart toolbar, noted under The graph.
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
 - The stats-folder hint is a single line above the controls: "No stats
-  directory configured — set it in Settings" with Settings linked, or
+  folder configured. Set it in Settings." with Settings linked and the period
+  outside the link ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)), or
   "Restart the app to apply your saved settings." while a saved directory
   awaits a restart. Its key-presence semantics are specified in
   [settings.md](settings.md#the-setup-card)
