@@ -2150,8 +2150,8 @@ license publicly since PR #278, and this entry is the record of why.
 **Amended 2026-09-13: the holder is named and the version form is chosen.**
 The maintainer ruled both on 2026-09-13. The copyright holder is
 MingoDynasty, the maintainer's commit and GitHub handle, and it is the sole
-holder: `git shortlog -sne --all` at `fd812fd`, the amending PR's base, lists
-only the maintainer's own identity and the maintainer's Codex and Claude agent
+holder: `git shortlog -sne fd812fd`, run on the amending PR's base, lists only
+the maintainer's own identity and the maintainer's Codex and Claude agent
 sessions. The license form is AGPL-3.0-or-later. Until this amendment the
 README said "v3.0" with no "or any later version" wording, and section 14 of
 the license applies only the named version in that case, so the project was
