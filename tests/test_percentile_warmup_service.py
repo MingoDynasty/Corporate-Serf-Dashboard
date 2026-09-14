@@ -595,6 +595,41 @@ def test_rank_read_timeout_is_terminal_and_trips_global_backoff(monkeypatch):
     assert context.outcomes["Scenario"].transient_attempts == 0
 
 
+def test_unresolvable_leaderboard_is_terminal(monkeypatch, caplog):
+    monkeypatch.setattr(warmup, "resolve_leaderboard_id", lambda *_a, **_k: None)
+    context = warmup.WarmupContext(_config())
+
+    with caplog.at_level(logging.WARNING, logger=warmup.__name__):
+        result = warmup.process_warmup_item("Scenario", context)
+
+    assert result.disposition == warmup.StepDisposition.TERMINAL
+    assert result.reason == "leaderboard could not be resolved"
+    assert context.outcomes["Scenario"].terminal is True
+    assert caplog.messages == ["Percentile warmup could not resolve Scenario"]
+
+
+def test_rank_endpoint_without_a_usable_state_is_terminal(monkeypatch):
+    monkeypatch.setattr(warmup, "resolve_leaderboard_id", lambda *_a, **_k: 42)
+    monkeypatch.setattr(warmup, "get_cached_scenario_rank", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        warmup,
+        "fetch_scenario_rank",
+        lambda *_a, **_k: ScenarioRankInfo(status=ScenarioRankStatus.UNKNOWN),
+    )
+    monkeypatch.setattr(
+        warmup,
+        "_save_rank_monotonic",
+        lambda *_a, **_k: pytest.fail("an UNKNOWN rank must not be written"),
+    )
+    context = warmup.WarmupContext(_config())
+
+    result = warmup.process_warmup_item("Scenario", context)
+
+    assert result.disposition == warmup.StepDisposition.TERMINAL
+    assert result.reason == "rank endpoint returned no usable state"
+    assert context.outcomes["Scenario"].terminal is True
+
+
 @pytest.mark.parametrize(
     ("status_code", "expected", "trip_backoff"),
     [
@@ -673,6 +708,80 @@ def test_interactive_activity_does_not_wake_backoff():
     worker._wait_for_backoff()
 
     assert sleeps == [10.0, 10.0, 10.0]
+
+
+def test_interactive_quiet_wait_returns_at_once_without_interactive_activity():
+    sleeps: list[float] = []
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        sleep=sleeps.append,
+        activity_timestamps=lambda: (0.0, 50.0),
+    )
+
+    worker._wait_for_interactive_quiet()
+
+    assert sleeps == []
+
+
+def test_interactive_quiet_wait_sleeps_in_poll_slices_until_quiet():
+    now = [100.0]
+    last_interactive = 98.5
+    sleeps = []
+
+    def sleep(seconds):
+        sleeps.append(seconds)
+        now[0] += seconds
+
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        sleep=sleep,
+        clock=lambda: now[0],
+        activity_timestamps=lambda: (last_interactive, 0.0),
+    )
+
+    worker._wait_for_interactive_quiet()
+
+    # 1.5 s of the quiet window had already passed, so the last slice is only
+    # the half second that remained.
+    assert sleeps == [1.0, 1.0, 1.0, 0.5]
+    assert max(sleeps) <= warmup.INTERACTIVE_POLL_SECONDS
+    assert now[0] - last_interactive == warmup.INTERACTIVE_QUIET_SECONDS
+
+
+def test_successful_hydration_result_resets_backoff():
+    worker = warmup.PercentileWarmupWorker(_config(), ["A"])
+    worker._backoff_level = 3
+
+    assert worker._apply_hydration_result(
+        warmup.WarmupStepResult(warmup.StepDisposition.COMPLETE, success=True)
+    )
+
+    assert worker._backoff_level == 0
+    assert worker._hydration_pending is False
+
+
+def test_fatal_hydration_result_stops_the_worker():
+    worker = warmup.PercentileWarmupWorker(_config(), ["A"])
+
+    assert not worker._apply_hydration_result(
+        warmup.WarmupStepResult(warmup.StepDisposition.FATAL, "unknown user")
+    )
+
+    assert worker._fatal_state == "unknown user"
+    assert worker._hydration_pending is False
+
+
+def test_backoff_tripping_hydration_result_waits_out_the_backoff(monkeypatch):
+    worker = warmup.PercentileWarmupWorker(_config(), ["A"])
+    waits = []
+    monkeypatch.setattr(worker, "_wait_for_backoff", lambda: waits.append(True))
+
+    assert worker._apply_hydration_result(
+        warmup.WarmupStepResult(warmup.StepDisposition.RETRY, trip_backoff=True)
+    )
+
+    assert waits == [True]
+    assert worker._hydration_pending is False
 
 
 def test_set_fatal_logs_a_warning(caplog):
@@ -814,6 +923,97 @@ def test_all_skip_drain_counts_each_unique_scenario_once(monkeypatch, caplog):
         )
         for message in messages
     )
+
+
+def test_run_stops_on_a_fatal_hydration_result(monkeypatch):
+    monkeypatch.setattr(
+        warmup,
+        "process_warmup_hydration",
+        lambda _context: warmup.WarmupStepResult(
+            warmup.StepDisposition.FATAL, "unknown user"
+        ),
+    )
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A"],
+        activity_timestamps=lambda: (0.0, 0.0),
+    )
+
+    worker._run()
+
+    assert worker._fatal_state == "unknown user"
+    assert not worker._queue
+
+
+def test_run_stops_when_hydration_raises(monkeypatch, caplog):
+    def explode(_context):
+        raise RuntimeError("hydration exploded")
+
+    monkeypatch.setattr(warmup, "process_warmup_hydration", explode)
+    worker = warmup.PercentileWarmupWorker(
+        _config(),
+        ["A"],
+        activity_timestamps=lambda: (0.0, 0.0),
+    )
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        worker._run()
+
+    assert worker._fatal_state == "hydration exploded"
+    assert not worker._queue
+    [record] = [
+        record
+        for record in caplog.records
+        if record.getMessage() == "Unexpected percentile warmup hydration failure"
+    ]
+    assert record.levelno == logging.ERROR
+    assert record.exc_info is not None
+
+
+def test_run_stops_when_item_processing_raises(monkeypatch, caplog):
+    def explode(_scenario_name, _context):
+        raise RuntimeError("item exploded")
+
+    monkeypatch.setattr(warmup, "_freshly_satisfied", lambda _name, _config: False)
+    monkeypatch.setattr(warmup, "process_warmup_item", explode)
+    worker = _drain_worker(["A"])
+
+    with caplog.at_level(logging.INFO, logger=warmup.__name__):
+        worker._run()
+
+    assert worker._fatal_state == "item exploded"
+    [record] = [
+        record
+        for record in caplog.records
+        if record.getMessage() == "Unexpected percentile warmup failure for A"
+    ]
+    assert record.levelno == logging.ERROR
+    assert record.exc_info is not None
+
+
+def test_run_counts_a_completed_item_before_parking(monkeypatch):
+    monkeypatch.setattr(warmup, "_freshly_satisfied", lambda _name, _config: False)
+    monkeypatch.setattr(
+        warmup,
+        "process_warmup_item",
+        lambda _name, _context: warmup.WarmupStepResult(
+            warmup.StepDisposition.COMPLETE, success=True
+        ),
+    )
+    worker = _drain_worker(["A"])
+    processed_at_park = []
+
+    # The emptied queue parks the loop on the condition; have the wait stop the
+    # worker so _run returns instead of blocking.
+    def _stop_worker(timeout=None):
+        processed_at_park.append(worker._batch_processed)
+        worker._fatal_state = "stop"
+
+    monkeypatch.setattr(worker._condition, "wait", _stop_worker)
+
+    worker._run()
+
+    assert processed_at_park == [1]
 
 
 def test_startup_enumeration_runs_outside_the_worker_lock(monkeypatch):
