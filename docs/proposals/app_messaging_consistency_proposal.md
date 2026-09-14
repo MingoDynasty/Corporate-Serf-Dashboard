@@ -373,37 +373,59 @@ hidden-playlist hints, and the unchecked-accounts detection line).
 Choosing differently: bold is the Atlassian answer and the one the redline
 pass reached for. Its concrete form keeps the type word where the label
 reads as prose and bolds the name: `Press the **Detect my accounts** button
-again to retry.`, `Turn on the **Show hidden** switch to manage them.`.
-Bold means "a control" only if every control named in prose gets it, so
-the alternative covers all eleven such strings, not only the four that take
-the type word: those four (the all-hidden status, the two hidden-playlist
-hints, the unchecked-accounts detection line), the two detection-found
-lines (`Found {count} KovaaK's accounts. Choose the one to use, then
-Save.`, `Found {username}. Save to apply it.`), the picker description
-(`Save applies it.`), the celebration description (`…doesn't depend on Run
-notifications.`), the two dependent help texts (`Needs Rank thresholds
-turned on.`, `Needs Run notifications turned on.`), and the import field's
-description (`…press Import to add that playlist to this list.`). Eight of
-the eleven are Copy entries already; the two detection-found lines and the
-import description are not, and would join the block. Every one of their
-surfaces can render bold: the detection and all-hidden status lines are
-text components, the help texts are tooltip labels, the descriptions are
-field-description props, and the two hints are toast bodies, which the
-notification container renders as components; the app's `toast()` helper
-types its message as a string and would widen. Where bold cannot render, a
-toast title (already bold) or an accessible name, the name stays plain and
-the type word alone carries it. Bolding only the four would put a bold and
-a plain control name on one line when detection finds one account and
-leaves another unchecked, so the choice is all eleven or none. In-app
-practice supports it (Slack, GitHub, and Discord bold names inside their
-own messages), and it gives the app a three-way marker system: bold for a
+again to retry.`, `Turn on the **Show hidden** switch to manage them.`,
+`Set **Top N scores** and the oldest date to plot this scenario.`. The
+scope is a principle, not a count: bold means "a control", so it covers
+every control named in prose, or none. Counted against the proposed final
+copy, that is fourteen strings today:
+
+- the four that take the type word: the all-hidden status, the two
+  hidden-playlist hints, and the unchecked-accounts detection line;
+- the two detection-found lines (`Found {count} KovaaK's accounts. Choose
+  the one to use, then Save.`, `Found {username}. Save to apply it.`), the
+  picker description (`Save applies it.`), the celebration description
+  (`…doesn't depend on Run notifications.`), the two dependent help texts
+  (`Needs Rank thresholds turned on.`, `Needs Run notifications turned
+  on.`), and the import field's description (`…press Import to add that
+  playlist to this list.`);
+- the incomplete-controls chart message (`Set Top N scores and the oldest
+  date…`), the Top N scores help (`…or per day in Score vs Time`), and the
+  chart shown for an unexpected mode value (`Choose Score vs Sensitivity or
+  Score vs Time.`): the two chart modes keep their capitals as named modes
+  under D2, and prose that names one names a control.
+
+Ten of the fourteen are Copy entries already; the two detection-found
+lines, the import description, and the unexpected-mode message are not,
+and would join the block. Two boundaries: a message that paraphrases a
+value rather than naming the control stays plain (`the oldest date` for
+the Oldest date to consider field, `a checkpoint hour` in the Journey's
+empty chart, which the block rewrites as a value on purpose), and a page
+name stays plain (`Set it in Settings.`, `Open Settings to see what's wrong
+and how to fix it.` name a destination, not a control). Every surface can
+render it, in one of two ways, and the block's `**…**` marker maps to
+both: in a component tree it becomes a bold span (the detection and
+all-hidden status lines are text components, the help texts are tooltip
+labels, the descriptions are field-description props, and the two hints
+are toast bodies, which the notification container renders as components;
+the app's `toast()` helper types its message as a string and would widen),
+and in a chart annotation it becomes `<b>…</b>` inside the string, which
+plotly draws and the empty-state title already uses, so the two chart
+messages stay single strings. Where bold cannot render, a toast title
+(already bold) or an accessible name, the name stays plain and the type
+word alone carries it. Bolding only the four would put a bold and a plain
+control name on one line when detection finds one account and leaves
+another unchecked, so the choice is all fourteen or none. In-app practice
+supports it (Slack, GitHub, and Discord bold names inside their own
+messages), and it gives the app a three-way marker system: bold for a
 control, double quotes for what the user typed, nothing for a token. The
-costs: the eleven strings stop being single constants and are composed
-from parts, the Copy block needs a bold-marker convention (`**…**`) for the
-implementer, the tests that pin those sentences by equality (the all-hidden
-status has two) assert joined text, and Microsoft's in-UI guidance prefers
-wording that sets the name off over formatting. Quotes stay the last resort
-either way, since rule 6 reserves them for user-typed text.
+costs: the twelve component-rendered strings stop being single constants
+and are composed from parts, the Copy block carries the `**…**` marker for
+the implementer, the tests that pin those sentences by equality assert
+joined or marked-up text (the all-hidden status twice, the unexpected-mode
+message once), the manual pass covers both chart empty states, and
+Microsoft's in-UI guidance prefers wording that sets the name off over
+formatting. Quotes stay the last resort either way, since rule 6 reserves
+them for user-typed text.
 
 ## Problem
 
