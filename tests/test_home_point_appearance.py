@@ -230,7 +230,7 @@ def test_size_and_color_reach_only_the_run_trace_in_both_graph_modes(cached_plot
     assert run_trace.marker.size == POINT_SIZE_PRESET_PX["Large"]
     assert run_trace.marker.color == "#f03e3e"
 
-    average = next(trace for trace in figure.data if trace.name == "Average Score")
+    average = next(trace for trace in figure.data if trace.name == "Average score")
     assert average.marker.size is None
     assert average.marker.color is None
 

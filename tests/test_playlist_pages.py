@@ -15,6 +15,7 @@ from source.kovaaks import percentile_warmup_service as warmup
 from source.kovaaks.data_models import PlaylistData, Scenario
 from source.kovaaks.percentile_warmup_service import PercentileWarmupSnapshot
 from source.utilities.store_schema import UnsupportedSchemaError
+from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -287,8 +288,10 @@ def test_warmup_status_formats_eta_pause_and_fatal_state(monkeypatch):
         enqueue_generation=1,
     )
     _disabled, status, _generation = playlists._playlist_overview_warmup_state(1)
-    assert status.startswith("Updating percentile data: 1 remaining · paused;")
-    assert "retrying at" in status
+    assert status == (
+        "Updating percentile data: 1 remaining · paused until "
+        f"{playlists._format_retry_time(state[0])}"
+    )
 
     state[0] = _warmup_snapshot(fatal_state="unknown username")
     disabled, status, _generation = playlists._playlist_overview_warmup_state(0)
@@ -390,7 +393,9 @@ def test_playlists_overview_page_reports_all_hidden(monkeypatch):
     rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
     assert rows == []
-    assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
+    assert rendered_text(status) == (
+        "All playlists are hidden. Turn on the **Show hidden** switch to manage them."
+    )
 
 
 def _assert_percentiles_unavailable_status(status):
@@ -465,7 +470,9 @@ def test_playlists_overview_empty_grid_messages_outrank_percentiles(monkeypatch)
 
     _rows, status, *_ = playlists.load_playlist_overview_rows(True, False, None, 0, 0)
 
-    assert status == 'All playlists are hidden. Toggle "Show hidden" to manage them.'
+    assert rendered_text(status) == (
+        "All playlists are hidden. Turn on the **Show hidden** switch to manage them."
+    )
 
 
 def test_playlists_overview_name_column_uses_link_renderer():
@@ -894,9 +901,24 @@ def test_playlists_overview_layout_includes_quick_filter_input():
     )
     sink_ids = {getattr(child, "id", None) for child in page.children}
 
-    assert quick_filter.placeholder == "Filter playlists..."
+    assert quick_filter.placeholder == "Filter playlists"
     # The client-side callback needs a sink store to output into.
     assert "playlists-overview-quick-filter-sink" in sink_ids
+
+
+def test_import_modal_help_names_the_import_button_in_bold():
+    components = {
+        getattr(component, "id", None): component
+        for component in _walk_components(playlists.layout())
+    }
+    field = components["playlists-import-textinput"]
+
+    assert components["playlists-import-modal"].title == "Import playlist"
+    assert field.placeholder == "KovaaK's playlist code"
+    assert rendered_text(field.description) == (
+        "Paste a KovaaK's playlist share code and press **Import** to add that "
+        "playlist to this list."
+    )
 
 
 def test_import_playlist_shows_the_canonical_stored_code(monkeypatch):
@@ -1003,8 +1025,7 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
         playlists,
         "load_playlist_from_code",
         lambda _code: (
-            "Playlist code already exists: ExistingCode is already imported "
-            "as Same Name (ExistingCode).",
+            'The playlist code ExistingCode is already imported as "Same Name".',
             "ExistingCode",
         ),
     )
@@ -1020,7 +1041,11 @@ def test_import_playlist_duplicate_of_hidden_appends_unhide_hint(monkeypatch):
     )
 
     assert notifications[0]["color"] == "red"
-    assert notifications[0]["message"].endswith(playlists.HIDDEN_DUPLICATE_HINT)
+    assert rendered_text(notifications[0]["message"]) == (
+        'The playlist code ExistingCode is already imported as "Same Name". It is '
+        "currently hidden. Turn on the **Show hidden** switch on this page, then "
+        "click the eye icon on its row to show it."
+    )
     assert import_refresh is no_update
     assert opened is no_update
     assert value is no_update
@@ -1033,8 +1058,7 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
         playlists,
         "load_playlist_from_code",
         lambda _code: (
-            "Playlist code already exists: ExistingCode is already imported "
-            "as Same Name (ExistingCode).",
+            'The playlist code ExistingCode is already imported as "Same Name".',
             "ExistingCode",
         ),
     )
@@ -1042,7 +1066,9 @@ def test_import_playlist_duplicate_of_visible_omits_hint(monkeypatch):
 
     notifications, *_rest = playlists.import_playlist(1, "ExistingCode", 0, {})
 
-    assert playlists.HIDDEN_DUPLICATE_HINT not in notifications[0]["message"]
+    assert notifications[0]["message"] == (
+        'The playlist code ExistingCode is already imported as "Same Name".'
+    )
 
 
 @pytest.mark.parametrize("submitted", ["", "   "])
@@ -1135,8 +1161,13 @@ def test_import_playlist_reports_a_failed_visibility_write(monkeypatch):
     }
     # Never generic "import failed" wording: the import succeeded, and the
     # message names what landed plus the eye-toggle recovery.
-    assert notification["message"].startswith('Imported "My Playlist" (CanonicalCode).')
-    assert notification["message"].endswith(playlists.IMPORT_VISIBILITY_FAILED_HINT)
+    assert notification["title"] == "Playlist imported but hidden"
+    assert rendered_text(notification["message"]) == (
+        'Imported "My Playlist" (CanonicalCode). '
+        "It couldn't be marked visible, so it may be missing from playlist "
+        "selectors. Turn on the **Show hidden** switch on this page, then click "
+        "the eye icon on its row to show it."
+    )
     # Every other output matches the success path.
     assert import_refresh == 1
     assert opened is False
@@ -1344,7 +1375,7 @@ def test_playlists_overview_percentile_placeholders_are_dimmed_and_explained():
         assert "playlist-overview-percentile-placeholder" in cell_class
         tooltip = column["tooltipValueGetter"]["function"]
         assert "played_count" in tooltip
-        assert "open the playlist to fetch now" in tooltip
+        assert "have data. Open the playlist to fetch it now." in tooltip
 
     assert columns["median_percentile_sort"]["cellClass"] == {
         "function": playlists.PERCENTILE_CELL_CLASS
@@ -1514,7 +1545,7 @@ def test_aim_training_journey_missing_checkpoint_returns_themed_empty_state(
 
     assert figure.layout.annotations[0].text == "<b>Graph settings incomplete</b>"
     assert figure.layout.annotations[1].text == (
-        "Choose a Checkpoint Hour value to plot progress."
+        "Set a checkpoint hour to plot progress."
     )
     assert figure.layout.template.layout.paper_bgcolor == "#ffffff"
 
@@ -1711,7 +1742,7 @@ def test_playlist_scenarios_layout_includes_quick_filter_input():
     )
     sink_ids = {getattr(child, "id", None) for child in page.children}
 
-    assert quick_filter.placeholder == "Filter scenarios..."
+    assert quick_filter.placeholder == "Filter scenarios"
     # The client-side callback needs a sink store to output into.
     assert "playlist-scenarios-quick-filter-sink" in sink_ids
 
@@ -1787,7 +1818,7 @@ def test_playlist_scenarios_page_handles_unknown_playlist(monkeypatch):
     )
 
     assert rows == []
-    assert status == "Playlist code is not imported: MissingCode"
+    assert status == "No imported playlist has the code MissingCode."
     assert generation is None
     assert disabled is True
 
@@ -1885,10 +1916,12 @@ def test_playlist_scenarios_without_a_username_skips_the_fill_and_says_so(monkey
     assert rows[0]["percentile_pending"] is False
     assert generation is None
     assert disabled is True
-    assert status[0] == "Positions unavailable — set your KovaaK's username in "
-    anchor = next(child for child in status if isinstance(child, dmc.Anchor))
+    text, anchor, period = status
+    assert text == "Positions unavailable. Set your KovaaK's username in "
+    assert isinstance(anchor, dmc.Anchor)
     assert anchor.href == "/settings"
     assert anchor.children == "Settings"
+    assert period == "."
 
 
 def test_playlist_scenarios_without_a_username_registers_no_fill(monkeypatch):
@@ -1976,7 +2009,7 @@ def test_playlist_fill_terminal_tick_applies_updates_and_status_reasserts(
 
     assert first[0] == {"update": [{"scenario": "First"}]}
     assert first[1] == (
-        "1 of 3 positions unavailable · 1 from cache — KovaaK's unreachable"
+        "1 of 3 positions unavailable · 1 from cache · KovaaK's unreachable"
     )
     assert second[0] is no_update
     assert second[1] == first[1]
@@ -2213,13 +2246,18 @@ def test_render_visibility_alert_shows_the_store_message(monkeypatch):
     monkeypatch.setattr(
         playlists,
         "get_visibility_store_message",
-        lambda: "playlist_visibility.json is not valid JSON.",
+        lambda: (
+            "The playlist visibility file isn't valid JSON. File: playlist_visibility.json"
+        ),
     )
 
     class_name, text = playlists.render_visibility_alert(True, 1)
 
     assert class_name == ""
-    assert text == "playlist_visibility.json is not valid JSON."
+    assert (
+        text
+        == "The playlist visibility file isn't valid JSON. File: playlist_visibility.json"
+    )
 
 
 def test_a_refused_visibility_toggle_reports_and_leaves_the_rows_alone(monkeypatch):
@@ -2279,7 +2317,7 @@ def test_an_import_still_lands_when_the_visibility_write_is_refused(monkeypatch)
     )
 
     assert notifications[0]["color"] == "orange"
-    assert notifications[0]["title"] == "Playlist imported — not shown"
+    assert notifications[0]["title"] == "Playlist imported but hidden"
     assert rows_refresh == 3
     assert (opened, value, error) == (False, "", None)
 
