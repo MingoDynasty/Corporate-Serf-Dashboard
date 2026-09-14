@@ -17,6 +17,8 @@ a subdirectory — don't drop them at the top level.
 | Data samples: API responses, stats CSVs, tool test outputs | `data/` |
 | Downloaded playlist JSONs | `playlists/` |
 | Playlist-generator output | `Playlist Generator - generated/` |
+| Pseudo-proposal briefs + co-design round responses (process changes reviewed without a PR) | `proposals/` — the live queue holds only briefs still in co-design/awaiting ratification |
+| Ratified / completed pseudo-proposal briefs and their round responses | `proposals/done/` — move the whole set once ratified (or the relevant PR merged); move, never delete |
 | Superseded / abandoned proposal drafts | `superseded-proposals/` |
 | pytest basetemp (`--basetemp=ignore/pt`) | `pt/` — disposable; parallel sessions may create `pt2/`, `pt-audit/`, etc., all safe to delete anytime |
 
