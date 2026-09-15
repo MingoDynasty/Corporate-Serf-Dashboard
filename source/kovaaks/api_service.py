@@ -817,7 +817,7 @@ def _fresh_total_play_cache(
 
     cache_data = _read_json(cache_file)
     if _is_unknown_username_total_play_response(cache_data):
-        raise UnknownKovaaksUserError(f"KovaaK's username '{username}' was not found.")
+        raise UnknownKovaaksUserError(f"KovaaK's username \"{username}\" wasn't found.")
     if not _is_complete_paginated_response(
         cache_data,
         max_results,
@@ -891,7 +891,7 @@ def get_user_scenario_total_play(
                 )
                 _write_json(cache_file, unknown_user_response)
                 raise UnknownKovaaksUserError(
-                    f"KovaaK's username '{username}' was not found."
+                    f"KovaaK's username \"{username}\" wasn't found."
                 )
             _write_json(
                 _user_scenario_total_play_page_cache_file(username, page),
@@ -917,7 +917,7 @@ def get_user_scenario_total_play(
             cache_data = _read_json(cache_file)
             if _is_unknown_username_total_play_response(cache_data):
                 raise UnknownKovaaksUserError(
-                    f"KovaaK's username '{username}' was not found."
+                    f"KovaaK's username \"{username}\" wasn't found."
                 )
             logger.warning(
                 "Using stale total-play cache for %s after failed request: %s",
@@ -1359,8 +1359,8 @@ def steam_id_mismatch_warning(
         return None
 
     return (
-        f"Configured Steam ID '{configured_steam_id}' does not match "
-        f"KovaaK's user '{username}' (actual Steam ID: {matched_steam_id})."
+        f"The saved Steam ID {configured_steam_id} doesn't match KovaaK's user "
+        f'"{username}", whose Steam ID is {matched_steam_id}.'
     )
 
 

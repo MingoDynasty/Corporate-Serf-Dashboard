@@ -62,9 +62,12 @@ def test_theme_toggle_is_wrapped_in_tooltip():
     ]
 
     assert len(tooltips) == 1
-    assert tooltips[0].label
+    assert tooltips[0].label == "Switch between light and dark mode"
     toggle = _find_component_by_id(tooltips[0], "color-scheme-switch")
-    assert toggle.to_plotly_json()["props"]["aria-label"] == "Toggle color scheme"
+    assert (
+        toggle.to_plotly_json()["props"]["aria-label"]
+        == "Switch between light and dark mode"
+    )
 
 
 def test_github_tooltip_is_a_plain_link_label():
@@ -136,4 +139,4 @@ def test_navbar_burger_open_state_persists_across_refresh():
     assert burger.persistence is True
     assert burger.persistence_type == "local"
     assert burger.persisted_props == ["opened"]
-    assert burger.to_plotly_json()["props"]["aria-label"] == "Toggle navigation"
+    assert burger.to_plotly_json()["props"]["aria-label"] == "Show or hide navigation"

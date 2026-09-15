@@ -372,9 +372,9 @@ theme_switch_component = dmc.Tooltip(
         color="gray",
         size="lg",
         mr="xl",
-        **{"aria-label": "Toggle color scheme"},
+        **{"aria-label": "Switch between light and dark mode"},
     ),
-    label="Toggle light and dark theme",
+    label="Switch between light and dark mode",
 )
 
 
@@ -441,7 +441,9 @@ def layout(**kwargs):  # noqa: ARG001
                                                 persisted_props=["opened"],
                                                 persistence=True,
                                                 persistence_type="local",
-                                                **{"aria-label": "Toggle navigation"},
+                                                **{
+                                                    "aria-label": "Show or hide navigation"
+                                                },
                                             ),
                                             dmc.Anchor(
                                                 children=[

@@ -1453,7 +1453,7 @@ def test_get_user_scenario_total_play_rejects_stale_unknown_username_marker(
     with pytest.raises(api_service.UnknownKovaaksUserError) as exc_info:
         api_service.get_user_scenario_total_play("UnknownUser")
 
-    assert str(exc_info.value) == "KovaaK's username 'UnknownUser' was not found."
+    assert str(exc_info.value) == "KovaaK's username \"UnknownUser\" wasn't found."
     shutil.rmtree(TEST_CACHE_DIR, ignore_errors=True)
 
 
@@ -2177,7 +2177,7 @@ def test_get_scenario_rank_info_returns_unknown_for_unknown_username(monkeypatch
 
     assert rank_info.status == ScenarioRankStatus.UNKNOWN
     assert rank_info.rank is None
-    assert rank_info.error_message == "KovaaK's username 'UnknownUser' was not found."
+    assert rank_info.error_message == "KovaaK's username \"UnknownUser\" wasn't found."
 
     rank_cache_file = api_service._rank_cache_file(98330, "UnknownUser")
     assert not rank_cache_file.exists()
@@ -2531,7 +2531,7 @@ def test_resolve_leaderboard_id_does_not_hide_unknown_username(monkeypatch):
 
     def fail_hydrate(*_args, **_kwargs):
         raise api_service.UnknownKovaaksUserError(
-            "KovaaK's username 'UnknownUser' was not found."
+            "KovaaK's username \"UnknownUser\" wasn't found."
         )
 
     def fail_search(*_args, **_kwargs):
@@ -2662,8 +2662,8 @@ def test_get_scenario_rank_info_derives_warning_from_cached_identity(monkeypatch
     assert rank_info.status == ScenarioRankStatus.RANKED
     assert rank_info.rank == 11266
     assert rank_info.warning_message == (
-        "Configured Steam ID 'wrong-steam-id' does not match "
-        "KovaaK's user 'MingoDynasty' (actual Steam ID: actual-steam-id)."
+        "The saved Steam ID wrong-steam-id doesn't match KovaaK's user "
+        '"MingoDynasty", whose Steam ID is actual-steam-id.'
     )
 
     cache_file = api_service._rank_cache_file(98330, "MingoDynasty")

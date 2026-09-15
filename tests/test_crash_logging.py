@@ -97,7 +97,7 @@ def test_on_created_survives_unexpected_error(monkeypatch, caplog):
     # The watchdog thread has no callback context, so it publishes the failure
     # for Home's interval callback to drain rather than driving a UI output.
     assert file_watchdog.drain_run_import_failures() == [
-        "Could not process a new run file. See debug.log for details."
+        "Couldn't process a new run file. See data/logs/debug.log."
     ]
     assert file_watchdog.drain_run_import_failures() == []
 
@@ -117,6 +117,6 @@ def test_on_created_reports_contained_parse_failure(monkeypatch, caplog):
     # The failure never reaches on_created's handler, so this path has to
     # publish the toast itself -- once.
     assert file_watchdog.drain_run_import_failures() == [
-        "Could not process a new run file. See debug.log for details."
+        "Couldn't process a new run file. See data/logs/debug.log."
     ]
     assert file_watchdog.drain_run_import_failures() == []

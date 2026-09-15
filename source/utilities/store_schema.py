@@ -78,7 +78,7 @@ class SchemaPayloadError(ValueError):
     """A payload that does not match its stamped version's definition.
 
     The message is a predicate about the file (``has an unknown setting "x".``)
-    so the caller can compose it after the path.
+    so the caller can compose it after the noun that names the file.
     """
 
 
@@ -132,51 +132,61 @@ def stamped_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _unstamped_message(path: Path) -> str:
+def _unstamped_message(path: Path, kind: str) -> str:
     return (
-        f'{path} has no "{SCHEMA_VERSION_KEY}" line. Add '
+        f'The {kind} has no "{SCHEMA_VERSION_KEY}" line. Add '
         f'"{SCHEMA_VERSION_KEY}": {CURRENT_SCHEMA_VERSION} to it, or delete the '
-        "file to start over."
+        f"file to start over. File: {path}"
     )
 
 
-def _bad_marker_message(path: Path, value: Any) -> str:
+def _bad_marker_message(path: Path, kind: str, value: Any) -> str:
+    # JSON rather than ``repr``, so the message shows what the file holds:
+    # ``"1"``, ``true``, or ``null``, not Python's ``'1'``, ``True``, or ``None``.
     return (
-        f'{path} has an invalid "{SCHEMA_VERSION_KEY}" value ({value!r}). It '
-        f"must be the whole number {CURRENT_SCHEMA_VERSION}."
+        f'The {kind}\'s "{SCHEMA_VERSION_KEY}" is {json.dumps(value)}. It must be '
+        f"the whole number {CURRENT_SCHEMA_VERSION}. File: {path}"
     )
 
 
-def _future_message(path: Path, value: int) -> str:
+def _future_message(path: Path, kind: str, value: int) -> str:
     return (
-        f"{path} was written by a newer version of this app "
-        f"({SCHEMA_VERSION_KEY} {value}). The file is intact. Update the app to "
-        "use it."
+        f"The {kind} was written by a newer version of this app "
+        f"({SCHEMA_VERSION_KEY} {value}). It is intact. Update the app to use it. "
+        f"File: {path}"
     )
 
 
-def _parse_stamped_object(text: str, path: Path) -> dict[str, Any] | StoreDocument:
+def _parse_stamped_object(
+    text: str, path: Path, kind: str
+) -> dict[str, Any] | StoreDocument:
     """Parse the text into a stamped JSON object, or say why it is not one."""
     try:
         payload = json.loads(text)
     except json.JSONDecodeError:
-        return _error(f"{path} is not valid JSON.")
+        return _error(f"The {kind} isn't valid JSON. File: {path}")
     if not isinstance(payload, dict):
-        return _error(f"{path} must hold a JSON object.")
+        return _error(f"The {kind} must hold a JSON object. File: {path}")
     if not has_schema_marker(payload):
-        return _error(_unstamped_message(path))
+        return _error(_unstamped_message(path, kind))
     return payload
 
 
-def decode_store_document(text: str, *, path: Path, validate) -> StoreDocument:
+def decode_store_document(
+    text: str, *, path: Path, kind: str, validate
+) -> StoreDocument:
     """Run the four-state machine over one store file's text.
 
     ``validate`` receives the payload with the stamp already removed and either
     returns the domain value or raises ``SchemaPayloadError``. It is the single
     definition of what that store's version 1 means, shared by the runtime
     readers and the conversion script.
+
+    ``kind`` names the file in the message (``"settings file"``), because a
+    message never opens with the path: the diagnosis comes first and the path
+    closes it as a ``File:`` readout.
     """
-    payload = _parse_stamped_object(text, path)
+    payload = _parse_stamped_object(text, path, kind)
     if isinstance(payload, StoreDocument):
         return payload
 
@@ -184,32 +194,40 @@ def decode_store_document(text: str, *, path: Path, validate) -> StoreDocument:
     # A non-positive stamp is garbage, not the future: refusing every write on
     # the strength of ``"schema_version": 0`` would strand the store forever.
     if type(version) is not int or version < 1:
-        return _error(_bad_marker_message(path, version))
+        return _error(_bad_marker_message(path, kind, version))
     if version > _HIGHEST_SUPPORTED_SCHEMA_VERSION:
-        message = _future_message(path, version)
+        message = _future_message(path, kind, version)
         logger.warning(message)
         return StoreDocument(StoreState.FUTURE, message=message)
     if version not in SUPPORTED_SCHEMA_VERSIONS:
         # A retired version inside the supported range: unreadable, not newer.
-        return _error(_bad_marker_message(path, version))
+        return _error(_bad_marker_message(path, kind, version))
 
     try:
         value = validate(strip_schema_marker(payload))
     except SchemaPayloadError as exc:
-        return _error(f"{path} {exc}")
+        return _error(f"The {kind} {exc} File: {path}")
     return StoreDocument(StoreState.SUPPORTED, value=value)
 
 
-def read_store_document(path: Path, *, encoding: str, validate) -> StoreDocument:
-    """Read one store file from disk and classify it. Never mutates the file."""
+def read_store_document(
+    path: Path, *, encoding: str, kind: str, validate
+) -> StoreDocument:
+    """Read one store file from disk and classify it. Never mutates the file.
+
+    ``kind`` is how the user-facing message names the file, such as
+    ``"settings file"``; see ``decode_store_document``.
+    """
     try:
         text = path.read_text(encoding=encoding)
     except FileNotFoundError:
         return StoreDocument(StoreState.MISSING)
     except OSError, UnicodeDecodeError:
         logger.warning("Failed to read %s.", path, exc_info=True)
-        return _error(f"{path} could not be read. See data/logs/debug.log.")
-    return decode_store_document(text, path=path, validate=validate)
+        return _error(
+            f"Couldn't read the {kind}. See data/logs/debug.log. File: {path}"
+        )
+    return decode_store_document(text, path=path, kind=kind, validate=validate)
 
 
 def _error(message: str) -> StoreDocument:

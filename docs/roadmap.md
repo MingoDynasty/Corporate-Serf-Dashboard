@@ -28,6 +28,14 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **App messaging consistency** — every string the app shows now follows one
+  short set of copy rules, so the same condition reads the same way on every
+  page: whole sentences with periods, one vocabulary, everyday contractions,
+  control names in bold, and no em dashes, which a test now keeps out of the
+  source. Some toasts that sounded like log lines now say what happened and
+  what to do. No new surface and no behavior change. (PR #291; design in
+  #247) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **Cross-scale sensitivity conversion** — a run recorded on a game's own
   sensitivity scale, like `0.2 Valorant`, used to plot under that raw number,
   so it sorted as 0.2 among centimeters and sat at the far left of the Score
@@ -48,7 +56,7 @@ sequence.
   animation waits for the tab to come back. A Settings control picks the
   animation — Confetti, Fireworks, Cannons, or Stars — or turns the whole thing
   off, with a Preview button beside it, and it is independent of Run
-  Notifications. Run delivery moved into the app shell to make that possible,
+  notifications. Run delivery moved into the app shell to make that possible,
   which retired the "While you were away" catch-up digest: a run no longer
   waits for a Scenario Performance visit to be announced. (PRs #261, #268,
   #272; design in #248) Design rationale distilled into
@@ -65,22 +73,15 @@ sequence.
   #259) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
 - **Run notifications master switch** — run toasts can now be turned off. One
-  Chart options switch, Run Notifications, silences the per-run toast family:
+  Chart options switch, Run notifications, silences the per-run toast family:
   the threshold verdict and the placement. The chart keeps updating either
   way, and a run file that failed to import still says so. The switch that
   used to read "Score Threshold Notification" never gated toasts at all, so it
-  is now "Score Threshold Verdict" and says what it does. (PR #245; design in
+  is now "Score threshold verdict" and says what it does. (PR #245; design in
   #240) Design rationale distilled into
   [`decision_log.md`](./decision_log.md). The catch-up digest this switch also
   gated has since been retired, and the personal best celebration is a
   separate family the switch does not reach (PR #261).
-- **Scenario Performance point customization** — the raw run points can now be
-  made smaller, larger, or a color of your choosing, from a Run Data Points
-  group in Chart options. Eight curated swatches read on both the light and the
-  dark chart; a picker and a hex field cover everything else; Automatic and
-  Default keep the chart exactly as it was. Nothing else about the chart became
-  customizable, which is the point. (PR #241; design in #238) Design rationale
-  distilled into [`decision_log.md`](./decision_log.md).
 
 ---
 
@@ -94,12 +95,6 @@ sequence.
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./proposals/run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **App messaging consistency** — a one-time sweep of every string the app
-  shows, so the same condition reads the same way on every page: one set of
-  copy rules (punctuation, casing, no em dashes, one vocabulary), every
-  changed string listed up front, and a test that keeps the em dash out for
-  good. No new surface, no behavior change. Design in
-  [`proposals/app_messaging_consistency_proposal.md`](./proposals/app_messaging_consistency_proposal.md).
 
 ---
 

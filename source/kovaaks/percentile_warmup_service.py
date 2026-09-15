@@ -178,7 +178,7 @@ def _username_validation_result(context: WarmupContext) -> WarmupStepResult:
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
-            "KovaaK's username is not configured.",
+            "KovaaK's username isn't configured.",
         )
     try:
         get_user_scenario_total_play(
@@ -211,7 +211,7 @@ def process_warmup_hydration(context: WarmupContext) -> WarmupStepResult:
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
-            "KovaaK's username is not configured.",
+            "KovaaK's username isn't configured.",
         )
     try:
         hydrate_leaderboard_id_cache(
@@ -258,7 +258,7 @@ def process_warmup_item(  # noqa: PLR0911, PLR0912
     if not username:
         return WarmupStepResult(
             StepDisposition.FATAL,
-            "KovaaK's username is not configured.",
+            "KovaaK's username isn't configured.",
         )
 
     logger.debug("Percentile warmup processing %s", scenario_name)

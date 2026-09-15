@@ -20,6 +20,7 @@ from source.config.identity_detection import (
 from source.utilities.build_info import BuildInfo
 from source.utilities.paths import log_dir
 from source.utilities.utilities import format_absolute_timestamp
+from tests.rendered_text import rendered_text
 
 dash.Dash(__name__, use_pages=True, pages_folder="")
 
@@ -600,8 +601,7 @@ def test_one_certain_account_fills_the_identity_fields(detect_clicked, detects):
     # The canonical webapp username, never the persona that found it.
     assert outcome.username == "MingoDynasty"
     assert outcome.steam_id == MAIN_ACCOUNT_ID
-    assert "MingoDynasty" in outcome.status
-    assert "Save" in outcome.status
+    assert rendered_text(outcome.status) == "Found MingoDynasty. **Save** to apply it."
     # Nothing to choose between, so nothing is offered.
     assert _offered(outcome) == []
     assert outcome.picker_class == settings_page.PICKER_HIDDEN_CLASS
@@ -627,7 +627,9 @@ def test_several_accounts_are_offered_instead_of_filled(detect_clicked, detects)
         {"username": "Newest", "steam_id": MAIN_ACCOUNT_ID},
         {"username": "Older", "steam_id": OTHER_ACCOUNT_ID},
     ]
-    assert "2" in outcome.status
+    assert rendered_text(outcome.status) == (
+        "Found 2 KovaaK's accounts. Choose the one to use, then **Save**."
+    )
 
 
 @pytest.mark.parametrize(
@@ -652,6 +654,30 @@ def test_a_sole_account_from_an_unfinished_run_is_never_filled(
     assert (outcome.username, outcome.steam_id) == (no_update, no_update)
     assert _offered(outcome) == [("MingoDynasty", MAIN_ACCOUNT_ID)]
     assert outcome.picker_class == settings_page.PICKER_CLASS
+
+
+def test_a_found_account_and_an_unchecked_one_bold_both_control_names(
+    detect_clicked,
+    detects,
+):
+    """One line names two controls, so neither may render plain beside the other."""
+    detects(_candidate(), unchecked=1)
+
+    outcome = _detect()
+
+    assert rendered_text(outcome.status) == (
+        "Found 1 KovaaK's account. Choose the one to use, then **Save**. "
+        "1 Steam account couldn't be checked. Press the **Detect my accounts** "
+        "button again to retry."
+    )
+
+
+def test_the_picker_description_names_save_in_bold():
+    picker = _component_by_id(settings_page.layout(), "app-settings-identity-picker")
+
+    assert rendered_text(picker.description) == (
+        "Choosing one fills the fields above. **Save** applies it."
+    )
 
 
 def test_a_picker_row_names_the_steam_account_behind_the_name(
@@ -680,7 +706,10 @@ def test_finding_nothing_with_nothing_unresolved_is_conclusive(
 
     outcome = _detect()
 
-    assert outcome.status == settings_page.NO_MATCH_STATUS
+    assert rendered_text(outcome.status) == (
+        "No Steam account on this machine has a KovaaK's profile. Type your "
+        "username in yourself. KovaaK's can't look one up from a Steam ID."
+    )
     assert _offered(outcome) == []
     assert outcome.picker_class == settings_page.PICKER_HIDDEN_CLASS
 
@@ -691,8 +720,11 @@ def test_an_unreadable_account_list_never_reads_as_no_match(detect_clicked, dete
 
     outcome = _detect()
 
-    assert settings_page.DISCOVERY_FAILED_STATUS in outcome.status
-    assert settings_page.NO_MATCH_STATUS not in outcome.status
+    assert rendered_text(outcome.status) == (
+        "No KovaaK's profile matched the Steam accounts that could be checked. "
+        "Steam's account list couldn't be read, so accounts on this machine may "
+        "have been missed. See data/logs/debug.log."
+    )
 
 
 def test_the_status_names_how_many_accounts_went_unchecked(detect_clicked, detects):
@@ -700,8 +732,11 @@ def test_the_status_names_how_many_accounts_went_unchecked(detect_clicked, detec
 
     outcome = _detect()
 
-    assert "2 Steam accounts could not be checked" in outcome.status
-    assert settings_page.NO_MATCH_STATUS not in outcome.status
+    assert rendered_text(outcome.status) == (
+        "No KovaaK's profile matched the Steam accounts that could be checked. "
+        "2 Steam accounts couldn't be checked. Press the **Detect my accounts** "
+        "button again to retry."
+    )
 
 
 def test_choosing_a_detected_account_fills_both_fields(picked):
@@ -995,7 +1030,11 @@ def test_the_section_renders_its_heading_control_and_preview():
 
     assert headings == [settings_page.CELEBRATIONS_HEADING]
     assert select.label == settings_page.CELEBRATION_LABEL
-    assert select.description == settings_page.CELEBRATION_DESCRIPTION
+    assert rendered_text(select.description) == (
+        "Plays a short animation and shows a toast when a run beats your personal "
+        "best in any scenario. Works on every page, and doesn't depend on "
+        "**Run notifications**. Takes effect right away."
+    )
     assert [option["label"] for option in select.data] == [
         "Off",
         "Confetti",

@@ -133,8 +133,8 @@ TABLE_COLUMN_DEFS = [
         "headerName": "Percentile",
         "field": "percentile_sort",
         "headerTooltip": (
-            "Your percentile on the scenario's global leaderboard — the share "
-            "of players you place above (higher is better)."
+            "Your percentile on the scenario's global leaderboard: the share "
+            "of players you place above. Higher is better."
         ),
         "valueFormatter": {
             "function": (
@@ -179,8 +179,7 @@ TABLE_COLUMN_DEFS = [
         "field": "pb_cm360_sort",
         "headerTooltip": (
             "Mouse sensitivity of your personal-best run, in centimeters of "
-            "mouse travel per full 360-degree turn (higher = lower "
-            "sensitivity)."
+            "mouse travel per full 360-degree turn. Higher is slower."
         ),
         "valueFormatter": {"function": "params.data.pb_cm360_display"},
         "comparator": {"function": "nullsLastComparator"},
@@ -230,7 +229,7 @@ def load_playlist_scenario_rows(playlist_code):
 
     playlist = get_playlist_by_code(playlist_code)
     if playlist is None:
-        return [], f"Playlist code is not imported: {playlist_code}", None, True
+        return [], f"No imported playlist has the code {playlist_code}.", None, True
 
     generation_token = uuid4().hex
     rows = build_playlist_scenario_rank_rows(playlist_code, generation_token)
@@ -271,8 +270,9 @@ def _username_unset_status() -> list:
     requests.
     """
     return [
-        "Positions unavailable — set your KovaaK's username in ",
+        "Positions unavailable. Set your KovaaK's username in ",
         dmc.Anchor("Settings", href="/settings", refresh=False),
+        ".",
     ]
 
 
@@ -286,11 +286,11 @@ def _settled_fill_status(fill: PlaylistScenarioFillDrain) -> str:
     if fill.unknown_count:
         status = f"{fill.unknown_count} of {fill.total} positions unavailable"
         if fill.stale_count:
-            status += f" · {fill.stale_count} from cache — KovaaK's unreachable"
+            status += f" · {fill.stale_count} from cache · KovaaK's unreachable"
         return status
     if fill.stale_count:
         return (
-            f"{fill.stale_count} of {fill.total} positions from cache — "
+            f"{fill.stale_count} of {fill.total} positions from cache · "
             "KovaaK's unreachable"
         )
     return ""
@@ -407,7 +407,7 @@ def layout(playlist_code: str | None = None, **kwargs):  # noqa: ARG001
                 children=[
                     dmc.TextInput(
                         id="playlist-scenarios-quick-filter",
-                        placeholder="Filter scenarios...",
+                        placeholder="Filter scenarios",
                         size="sm",
                         w=240,
                     ),

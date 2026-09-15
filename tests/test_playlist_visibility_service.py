@@ -230,7 +230,11 @@ def test_a_newer_stamp_falls_back_to_the_seed_and_refuses_writes(
     )
 
     assert visibility.get_shown_playlist_codes() == _seed()
-    assert "newer version of this app" in visibility.get_visibility_store_message()
+    assert visibility.get_visibility_store_message() == (
+        "The playlist visibility file was written by a newer version of this app "
+        "(schema_version 2). It is intact. Update the app to use it. "
+        f"File: {visibility_path}"
+    )
 
     with pytest.raises(store_schema.UnsupportedSchemaError):
         visibility.hide_playlist(sorted(visibility.DEFAULT_VISIBLE_CODES)[0])

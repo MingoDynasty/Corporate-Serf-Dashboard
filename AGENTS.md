@@ -318,12 +318,50 @@ not swept to match; bring one into line when a change touches it anyway.
 
 ## Styling Conventions
 
-- New user-facing copy avoids em dashes; use short sentences instead. Copy
-  the app shows a user reads as machine-written with them. This governs new
-  and edited copy only — sweeping the shipped strings is deferred to a future
-  review of all app messaging, so old-versus-new inconsistency is expected
-  and is not a defect to fix in passing. Docs, code comments, and commit
-  messages are unaffected.
+- User-facing copy follows nine rules. The rationale and the guide citations
+  live in the decision-log entry "App Copy Follows One Set Of Rules, And The
+  Em Dash Is Gated Out". Docs, code comments, log lines, console output, and
+  commit messages are unaffected.
+  1. A sentence ends with a period; a status readout (`3 of 40 positions
+     unavailable`, `File: {path}`) does not. A semicolon never joins two
+     sentences. A sentence that ends on an inline link puts its period in a
+     separate child after the anchor (`_username_unset_status()` in
+     `source/pages/playlists.py`).
+  2. No em dashes. Split prose into sentences, and chain readout fragments
+     with ` · `. The one exception is the `—` empty value under Last played;
+     `tests/test_em_dash_guard.py` gates everything else under `source/`.
+  3. Sentence case for controls, placeholders, tooltips, status lines, chart
+     annotations, legend entries, and toast, alert, and modal titles. Page
+     titles, section headings, and grid column headers keep Title Case, as do
+     proper names and the chart modes `Score vs Sensitivity` and
+     `Score vs Time`.
+  4. The only ellipsis is the single `…` character, and only for work still
+     in progress. Placeholders are bare noun phrases; never elide a path.
+  5. Use the common contractions (can't, couldn't, doesn't, isn't, wasn't,
+     aren't, you're). A contraction and its full form never both appear on
+     screen; `do not` is reserved for a warning the user must not skip.
+  6. A control named in prose is bold, in its on-screen casing, and takes its
+     type word when the label reads as prose: `Turn on the **Show hidden**
+     switch`. Build the span with `control_name()`; a chart annotation writes
+     `<b>name</b>`; a toast title or an accessible name stays plain. Page
+     names (`Settings`) and paraphrased values (`the oldest date`) are not
+     control names. User-typed text takes double quotes (`"{name}"`); tokens
+     (Steam IDs, playlist codes, counts, paths) stay bare.
+  7. Vocabulary: *this app* or *the app*, never *the dashboard*; *stats
+     folder*; *from cache*; *position* for a leaderboard placement (*Rank* is
+     the benchmark tier); *playlist code*; *turn on* and *turn off* a
+     *switch*, never *toggle* as a verb; *such as*, never *etc.*; *not
+     valid*, never *invalid*. The log pointer is always
+     `See data/logs/debug.log.`
+  8. Copy is every string this app's code puts in front of a user: page
+     text, service messages a page shows verbatim, and accessible names. Text
+     a bundled library draws itself (plotly's toolbar, AG Grid overlays,
+     Mantine built-ins) is not.
+  9. Error copy says what happened, then what to do when there is something
+     to do. An object name or a path never opens a sentence; a noun names it
+     first, and a count or a score may lead. A path goes inline only as the
+     last words of a message's only sentence; otherwise name the file by kind
+     and end with `File: {path}`.
 
 - Prefer semantic CSS classes in `assets/stylesheet.css` for static presentation rules, especially styles that callbacks conditionally enable or disable.
 - Keep inline style dictionaries for values that are genuinely computed at runtime or for small, highly local layout adjustments where a named class would add more indirection than clarity.

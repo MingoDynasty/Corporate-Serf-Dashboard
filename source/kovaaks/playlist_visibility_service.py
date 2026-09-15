@@ -89,6 +89,7 @@ def _visibility_document() -> StoreDocument:
             document = read_store_document(
                 VISIBILITY_FILE_PATH,
                 encoding="utf-8",
+                kind="playlist visibility file",
                 validate=validate_visibility_v1,
             )
             _shown_cache["value"] = document
@@ -124,6 +125,7 @@ def _guard_visibility_destination() -> None:
     document = read_store_document(
         VISIBILITY_FILE_PATH,
         encoding="utf-8",
+        kind="playlist visibility file",
         validate=validate_visibility_v1,
     )
     if document.state is StoreState.FUTURE:

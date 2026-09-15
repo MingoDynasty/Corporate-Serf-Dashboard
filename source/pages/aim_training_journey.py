@@ -69,7 +69,7 @@ def generate_graph(selected_playlist, checkpoint_hour, color_scheme):
         return apply_light_dark_mode(
             generate_empty_plot(
                 "Graph settings incomplete",
-                "Choose a Checkpoint Hour value to plot progress.",
+                "Set a checkpoint hour to plot progress.",
             ),
             color_scheme,
         )
@@ -113,7 +113,7 @@ def layout(**kwargs):  # noqa: ARG001
     return dmc.Box(
         [
             dmc.Alert(
-                children="This page is still a work in progress!",
+                children="This page is a work in progress.",
                 # props as configured above:
                 color="blue",
                 icon=local_icon("material-symbols:info-outline"),
@@ -137,7 +137,7 @@ def layout(**kwargs):  # noqa: ARG001
                                 ),
                                 dmc.NumberInput(
                                     id="checkpoint-hour",
-                                    label="Checkpoint Hour",
+                                    label="Checkpoint hour",
                                     min=1,
                                     persistence=True,
                                     # placeholder="Checkpoint Hour...",

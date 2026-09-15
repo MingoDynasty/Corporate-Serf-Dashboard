@@ -137,7 +137,7 @@ def _iter_playlist_files(root: Path, *, missing_ok: bool) -> list[Path]:
     if not root.exists():
         if missing_ok:
             return []
-        _record_startup_playlist_warning(f"Playlist directory is missing: {root}")
+        _record_startup_playlist_warning(f"Couldn't find the playlist folder {root}.")
         return []
 
     return sorted(
@@ -189,9 +189,9 @@ def validate_playlist_v1(payload: dict) -> PlaylistData:
         return PlaylistData.model_validate(payload)
     except ValidationError as exc:
         if _is_code_validation_error(exc):
-            msg = "has a missing or blank playlist code; add a `code` field."
+            msg = 'has no playlist code. Add a "code" field to it.'
             raise SchemaPayloadError(msg) from exc
-        msg = "is not valid playlist data."
+        msg = "isn't valid playlist data."
         raise SchemaPayloadError(msg) from exc
 
 
@@ -206,6 +206,7 @@ def read_user_playlist_document(playlist_file: Path) -> StoreDocument:
     return read_store_document(
         playlist_file,
         encoding="utf-8",
+        kind="playlist file",
         validate=validate_playlist_v1,
     )
 
@@ -801,19 +802,18 @@ def _load_bundled_playlist_file(playlist_file: Path) -> PlaylistData | None:
     except OSError:
         _bundled_corpus_load_complete = False
         _record_startup_playlist_warning(
-            f"Failed to read playlist file: {playlist_file}"
+            f"Couldn't read the playlist file {playlist_file}."
         )
     except ValidationError as exc:
         _bundled_corpus_load_complete = False
         if _is_code_validation_error(exc):
             _record_startup_playlist_warning(
-                "Skipping playlist file "
-                f"{playlist_file}: missing or blank playlist code; "
-                "add a `code` field."
+                'The playlist file has no playlist code. Add a "code" field to '
+                f"it. File: {playlist_file}"
             )
         else:
             _record_startup_playlist_warning(
-                f"Invalid JSON format in playlist file: {playlist_file}"
+                f"The playlist file isn't valid JSON. File: {playlist_file}"
             )
     return None
 
@@ -830,7 +830,7 @@ def _load_user_playlist_file(playlist_file: Path) -> PlaylistData | None:
     if document.state is not StoreState.MISSING:
         # MISSING means the file vanished between listing and reading, which
         # needs no warning; everything else is a file the user should know about.
-        _record_startup_playlist_warning(f"Skipping playlist file: {document.message}")
+        _record_startup_playlist_warning(document.message)
     return None
 
 
@@ -869,9 +869,9 @@ def load_playlists() -> None:  # noqa: PLR0912
             if playlist_data.code in playlist_database:
                 winning_source = playlist_sources[playlist_data.code]
                 _record_startup_playlist_warning(
-                    "Skipping playlist file "
-                    f"{playlist_file}: playlist code {playlist_data.code} "
-                    f"already loaded from {winning_source}."
+                    "Skipped a duplicate playlist file. Its playlist code "
+                    f"{playlist_data.code} is already loaded from another file. "
+                    f"Skipped file: {playlist_file} · Loaded file: {winning_source}"
                 )
                 if root == USER_PLAYLIST_DIRECTORY_PATH:
                     if winning_source.is_relative_to(BUNDLED_PLAYLIST_DIRECTORY_PATH):
@@ -990,8 +990,8 @@ def load_playlist_from_code(  # noqa: PLR0911
             detail,
         )
         message = (
-            f"Failed to look up playlist code {input_playlist_code}: "
-            "KovaaK's API error."
+            f"Couldn't look up {input_playlist_code} on KovaaK's. Check the code "
+            "and try again."
         )
         return message, None
     if response and len(response.data) == 1:
@@ -1012,30 +1012,23 @@ def load_playlist_from_code(  # noqa: PLR0911
             # rejects a blank/whitespace one, so a structurally valid search
             # response can still fail here and must degrade to the refusal
             # rather than escape into the Dash callback.
-            message = (
-                "Invalid playlist data returned by API for playlist code: "
-                f"{input_playlist_code}"
+            logger.warning(
+                "Invalid playlist data returned by API for playlist code: %s",
+                input_playlist_code,
             )
-            logger.warning(message)
-            return message, None
+            return f"The playlist data for {input_playlist_code} is unusable.", None
     else:
         # KovaaK's search failed to produce exactly one usable record: zero
         # records (its null-hydration quirk drops the match through the
         # ignore_null_playlist_items validator) or an ambiguous multi-match.
         # Fall back to Evxl's exact by-code lookup before refusing.
         if not response or not response.data:
-            refusal_message = (
-                f"Failed to load playlist data for playlist code: {input_playlist_code}"
-            )
             logger.info(
                 "KovaaK's search returned no usable record for %s; "
                 "trying Evxl playlist-by-code.",
                 input_playlist_code,
             )
         else:
-            refusal_message = (
-                f"Found more than one playlist from code: {input_playlist_code}"
-            )
             logger.info(
                 "KovaaK's search returned %d records for %s; "
                 "trying Evxl playlist-by-code.",
@@ -1058,14 +1051,19 @@ def load_playlist_from_code(  # noqa: PLR0911
                 ],
             )
         except (requests.RequestException, ValidationError) as exc:
-            # Includes Evxl's HTTP 400 for unknown or mis-cased codes. The user
-            # sees the same refusal as before the fallback existed.
+            # Includes Evxl's HTTP 400 for unknown or mis-cased codes, but also
+            # a connection error, so the refusal must not claim that no playlist
+            # matches. The search's log line keeps the zero-versus-many detail.
             logger.warning(
                 "Evxl playlist-by-code fallback failed for %s: %s",
                 input_playlist_code,
                 exc,
             )
-            return refusal_message, None
+            message = (
+                f"Couldn't load a playlist for the code {input_playlist_code}. "
+                "Check the code and try again."
+            )
+            return message, None
 
         logger.info(
             "Resolved %s through Evxl playlist-by-code (canonical code %s).",
@@ -1075,12 +1073,16 @@ def load_playlist_from_code(  # noqa: PLR0911
 
     if playlist_data.code in playlist_database:
         existing_playlist = playlist_database[playlist_data.code]
-        message = (
-            "Playlist code already exists: "
-            f"{playlist_data.code} is already imported as "
-            f"{existing_playlist.name} ({existing_playlist.code})."
+        logger.warning(
+            "Playlist code already exists: %s is already imported as %s (%s).",
+            playlist_data.code,
+            existing_playlist.name,
+            existing_playlist.code,
         )
-        logger.warning(message)
+        message = (
+            f"The playlist code {playlist_data.code} is already imported as "
+            f'"{existing_playlist.name}".'
+        )
         # Duplicate refusal carries the conflicting existing code so the page
         # layer can check its visibility without importing the visibility
         # service (which would create an import cycle through data_service).
@@ -1088,32 +1090,45 @@ def load_playlist_from_code(  # noqa: PLR0911
     try:
         write_playlist_data_to_file(playlist_data)
     except ValueError:
-        message = (
-            "Invalid playlist data returned by API: "
-            f"{playlist_data.name} ({playlist_data.code})"
+        logger.warning(
+            "Invalid playlist data returned by API: %s (%s)",
+            playlist_data.name,
+            playlist_data.code,
         )
-        logger.warning(message)
-        return message, None
+        return f"The playlist data for {playlist_data.code} is unusable.", None
     except OSError:
-        message = (
-            f"Failed to save playlist data: {playlist_data.name} ({playlist_data.code})"
+        # The refusal sends the user to the log, and nothing on the write path
+        # records the OSError itself (a full disk, a denied directory, a failed
+        # fsync), so the traceback has to ride on this line.
+        logger.warning(
+            "Failed to save playlist data: %s (%s)",
+            playlist_data.name,
+            playlist_data.code,
+            exc_info=True,
         )
-        logger.warning(message)
+        message = (
+            f'Couldn\'t save the playlist file for "{playlist_data.name}" '
+            f"({playlist_data.code}). See data/logs/debug.log."
+        )
         return message, None
     except UnsupportedSchemaError:
         # The destination point-check found a file from a newer build. Nothing
         # was written, and the incumbent is untouched.
-        message = (
-            f"Cannot save this playlist: {playlist_data.name} "
-            f"({playlist_data.code}) would replace a playlist file written by a "
-            "newer version of this app."
+        logger.warning(
+            "Cannot save this playlist: %s (%s) would replace a playlist file "
+            "written by a newer version of this app.",
+            playlist_data.name,
+            playlist_data.code,
         )
-        logger.warning(message)
+        message = (
+            f'The playlist "{playlist_data.name}" ({playlist_data.code}) would '
+            "replace a playlist file written by a newer version of this app. "
+            "Update the app to import it."
+        )
         return message, None
     except PlaylistFileCollisionError as exc:
-        message = str(exc)
-        logger.warning(message)
-        return message, None
+        # Logged where it is raised, with the file name the message leaves out.
+        return str(exc), None
     playlist_database[playlist_data.code] = playlist_data
     _user_root_playlist_codes.add(playlist_data.code)
     # Record the file just written so a later delete unlinks the real path
@@ -1157,12 +1172,14 @@ def delete_user_playlist(playlist_code: str) -> str | None:
     with _PLAYLIST_IO_LOCK:
         file_paths = _user_root_playlist_files.get(playlist_code)
         if not file_paths:
-            message = (
-                f"Playlist code cannot be deleted: {playlist_code} is not a "
-                "user playlist."
+            logger.warning(
+                "Playlist code cannot be deleted: %s is not a user playlist.",
+                playlist_code,
             )
-            logger.warning(message)
-            return message
+            return (
+                f"The playlist code {playlist_code} isn't one you imported, so it "
+                "can't be deleted."
+            )
         error_message: str | None = None
         deleted: set[Path] = set()
         # reversed(): non-winning duplicates first, the served winner last.
@@ -1174,8 +1191,13 @@ def delete_user_playlist(playlist_code: str) -> str | None:
                 deleted.add(file_path)
                 logger.warning("Playlist file already missing on delete: %s", file_path)
             except OSError:
-                error_message = f"Failed to delete playlist file: {file_path}"
-                logger.warning(error_message, exc_info=True)
+                logger.warning(
+                    "Failed to delete playlist file: %s", file_path, exc_info=True
+                )
+                error_message = (
+                    "Couldn't delete the playlist file. See data/logs/debug.log. "
+                    f"File: {file_path}"
+                )
                 break
             else:
                 deleted.add(file_path)
@@ -1220,8 +1242,13 @@ def delete_superseded_user_playlist_files() -> str | None:
                     file_path,
                 )
             except OSError:
-                error_message = f"Failed to delete playlist file: {file_path}"
-                logger.warning(error_message, exc_info=True)
+                logger.warning(
+                    "Failed to delete playlist file: %s", file_path, exc_info=True
+                )
+                error_message = (
+                    "Couldn't delete the playlist file. See data/logs/debug.log. "
+                    f"File: {file_path}"
+                )
                 remaining.append((file_path, code))
         _superseded_user_playlist_files[:] = remaining
     return error_message
@@ -1247,10 +1274,16 @@ def _guard_playlist_destination(file_path: Path) -> None:
         raise UnsupportedSchemaError(document.message)
     if document.state is StoreState.SUPPORTED:
         incumbent = document.value
+        logger.warning(
+            "Cannot save this playlist: %s already holds %s (%s). Delete that "
+            "playlist first, then import again.",
+            file_path.name,
+            incumbent.name,
+            incumbent.code,
+        )
         msg = (
-            f"Cannot save this playlist: {file_path.name} already holds "
-            f"{incumbent.name} ({incumbent.code}). Delete that playlist first, "
-            "then import again."
+            f'The file for this playlist already holds "{incumbent.name}" '
+            f"({incumbent.code}). Delete that playlist first, then import again."
         )
         raise PlaylistFileCollisionError(msg)
     back_up_unusable_store(file_path)

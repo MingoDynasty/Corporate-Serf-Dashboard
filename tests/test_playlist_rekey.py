@@ -181,9 +181,10 @@ def test_duplicate_code_in_one_root_uses_total_filename_order_and_warns(
 
     assert data_service.playlist_database == {"SharedCode": winner}
     assert data_service.drain_startup_playlist_warnings() == [
-        "Skipping playlist file "
-        f"{bundled_root.resolve() / 'b.json'}: playlist code SharedCode "
-        f"already loaded from {bundled_root.resolve() / 'A.json'}."
+        "Skipped a duplicate playlist file. Its playlist code SharedCode is "
+        "already loaded from another file. "
+        f"Skipped file: {bundled_root.resolve() / 'b.json'} · "
+        f"Loaded file: {bundled_root.resolve() / 'A.json'}"
     ]
     assert sorted(
         [Path("a.json"), Path("A.json")],
@@ -211,9 +212,10 @@ def test_bundled_root_wins_over_user_root_and_user_file_is_not_deleted(
     }
     assert (user_root / "import.json").exists()
     assert data_service.drain_startup_playlist_warnings() == [
-        "Skipping playlist file "
-        f"{user_root.resolve() / 'import.json'}: playlist code SharedCode "
-        f"already loaded from {bundled_root.resolve() / 'benchmark.json'}."
+        "Skipped a duplicate playlist file. Its playlist code SharedCode is "
+        "already loaded from another file. "
+        f"Skipped file: {user_root.resolve() / 'import.json'} · "
+        f"Loaded file: {bundled_root.resolve() / 'benchmark.json'}"
     ]
 
 
@@ -240,9 +242,11 @@ def test_load_playlists_skips_missing_empty_and_blank_codes_with_actionable_warn
     data_service.load_playlists()
 
     assert data_service.playlist_database == {"ValidCode": valid}
-    warnings = data_service.drain_startup_playlist_warnings()
-    assert len(warnings) == 3
-    assert all("add a `code` field" in warning for warning in warnings)
+    assert data_service.drain_startup_playlist_warnings() == [
+        'The playlist file has no playlist code. Add a "code" field to it. '
+        f"File: {bundled_root.resolve() / name}"
+        for name in ("blank.json", "empty.json", "missing.json")
+    ]
 
 
 def test_import_refuses_duplicate_code_but_allows_duplicate_name(
@@ -268,8 +272,7 @@ def test_import_refuses_duplicate_code_but_allows_duplicate_name(
     message, imported_code = data_service.load_playlist_from_code("ExistingCode")
 
     assert message == (
-        "Playlist code already exists: ExistingCode is already imported as "
-        "Same Name (ExistingCode)."
+        'The playlist code ExistingCode is already imported as "Same Name".'
     )
     # Duplicate refusal now carries the conflicting existing (canonical) code,
     # so the page layer can check whether that playlist is hidden.
@@ -367,6 +370,7 @@ def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
 def test_import_reports_write_failures_without_updating_database(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     api_response = SimpleNamespace(
@@ -379,15 +383,30 @@ def test_import_reports_write_failures_without_updating_database(
         ]
     )
     monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+    write_error = PermissionError("playlist file is locked")
 
     def fail_write(_playlist):
-        raise PermissionError("playlist file is locked")
+        raise write_error
 
     monkeypatch.setattr(data_service, "write_playlist_data_to_file", fail_write)
 
-    message, imported_code = data_service.load_playlist_from_code("LockedCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("LockedCode")
 
-    assert message == "Failed to save playlist data: Locked Playlist (LockedCode)"
+    assert message == (
+        'Couldn\'t save the playlist file for "Locked Playlist" (LockedCode). '
+        "See data/logs/debug.log."
+    )
+    # The message points at the log, so the log has to carry the cause.
+    (record,) = [
+        record
+        for record in caplog.records
+        if record.getMessage()
+        == "Failed to save playlist data: Locked Playlist (LockedCode)"
+    ]
+    assert record.exc_info is not None
+    assert record.exc_info[1] is write_error
+    assert "PermissionError: playlist file is locked" in caplog.text
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
@@ -458,9 +477,7 @@ def test_import_refuses_blank_code_from_search_without_raising(monkeypatch, tmp_
     message, imported_code = data_service.load_playlist_from_code("BlankCode")
 
     assert imported_code is None
-    assert message == (
-        "Invalid playlist data returned by API for playlist code: BlankCode"
-    )
+    assert message == "The playlist data for BlankCode is unusable."
     assert data_service.playlist_database == {}
     assert not user_root.exists()
 
@@ -529,7 +546,10 @@ def test_import_refuses_when_search_empty_and_evxl_returns_http_400(
 
     message, imported_code = data_service.load_playlist_from_code("GarbageCode")
 
-    assert message == "Failed to load playlist data for playlist code: GarbageCode"
+    assert message == (
+        "Couldn't load a playlist for the code GarbageCode. "
+        "Check the code and try again."
+    )
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
@@ -551,7 +571,9 @@ def test_import_refuses_when_search_empty_and_evxl_connection_error(
 
     message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
-    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert message == (
+        "Couldn't load a playlist for the code SomeCode. Check the code and try again."
+    )
     assert imported_code is None
 
 
@@ -571,7 +593,9 @@ def test_import_refuses_when_evxl_payload_has_blank_canonical_code(
 
     message, imported_code = data_service.load_playlist_from_code("SomeCode")
 
-    assert message == "Failed to load playlist data for playlist code: SomeCode"
+    assert message == (
+        "Couldn't load a playlist for the code SomeCode. Check the code and try again."
+    )
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()
@@ -618,7 +642,10 @@ def test_import_preserves_ambiguity_refusal_when_evxl_also_fails(
 
     message, imported_code = data_service.load_playlist_from_code("AmbiguousCode")
 
-    assert message == "Found more than one playlist from code: AmbiguousCode"
+    assert message == (
+        "Couldn't load a playlist for the code AmbiguousCode. "
+        "Check the code and try again."
+    )
     assert imported_code is None
 
 
@@ -666,8 +693,7 @@ def test_evxl_fallback_duplicate_code_refusal_carries_canonical_code(
     message, imported_code = data_service.load_playlist_from_code("sharedcode")
 
     assert message == (
-        "Playlist code already exists: SharedCode is already imported as "
-        "Existing Name (SharedCode)."
+        'The playlist code SharedCode is already imported as "Existing Name".'
     )
     assert imported_code == "SharedCode"
 
@@ -838,8 +864,10 @@ def test_delete_user_playlist_keeps_served_winner_when_a_duplicate_is_locked(
 
     result = data_service.delete_user_playlist("DupCode")
 
-    assert result is not None
-    assert "Failed to delete playlist file" in result
+    assert result == (
+        "Couldn't delete the playlist file. See data/logs/debug.log. "
+        f"File: {user_root.resolve() / 'b.json'}"
+    )
     # The served (winning) file survives — the store is not serving a deleted
     # file — and the store still holds the winner's data.
     assert (user_root / "a.json").exists()
@@ -860,8 +888,9 @@ def test_delete_user_playlist_refuses_bundled_code(monkeypatch, tmp_path):
 
     result = data_service.delete_user_playlist("BundledCode")
 
-    assert result is not None
-    assert "cannot be deleted" in result
+    assert result == (
+        "The playlist code BundledCode isn't one you imported, so it can't be deleted."
+    )
     assert bundled_file.exists()
     assert "BundledCode" in data_service.playlist_database
 
@@ -872,8 +901,9 @@ def test_delete_user_playlist_refuses_unknown_code(monkeypatch, tmp_path):
 
     result = data_service.delete_user_playlist("NopeCode")
 
-    assert result is not None
-    assert "cannot be deleted" in result
+    assert result == (
+        "The playlist code NopeCode isn't one you imported, so it can't be deleted."
+    )
 
 
 def test_delete_user_playlist_tolerates_already_missing_file(monkeypatch, tmp_path):
@@ -906,8 +936,10 @@ def test_delete_user_playlist_reports_oserror_without_touching_store(
 
     result = data_service.delete_user_playlist("UserCode")
 
-    assert result is not None
-    assert "Failed to delete playlist file" in result
+    assert result == (
+        "Couldn't delete the playlist file. See data/logs/debug.log. "
+        f"File: {user_root.resolve() / 'user.json'}"
+    )
     assert "UserCode" in data_service.playlist_database
     assert "UserCode" in data_service._user_root_playlist_files
 
@@ -1092,8 +1124,11 @@ def test_a_newer_stamped_user_playlist_is_skipped_and_says_so(monkeypatch, tmp_p
     data_service.load_playlists()
 
     assert data_service.playlist_database == {}
-    warnings = data_service.drain_startup_playlist_warnings()
-    assert "newer version of this app" in warnings[0]
+    assert data_service.drain_startup_playlist_warnings() == [
+        "The playlist file was written by a newer version of this app "
+        "(schema_version 2). It is intact. Update the app to use it. "
+        f"File: {user_root.resolve() / 'future.json'}"
+    ]
 
 
 def test_a_stamped_user_playlist_with_an_invalid_payload_names_the_code_fix(
@@ -1111,7 +1146,10 @@ def test_a_stamped_user_playlist_with_an_invalid_payload_names_the_code_fix(
     data_service.load_playlists()
 
     assert data_service.playlist_database == {}
-    assert "code" in data_service.drain_startup_playlist_warnings()[0]
+    assert data_service.drain_startup_playlist_warnings() == [
+        'The playlist file has no playlist code. Add a "code" field to it. '
+        f"File: {user_root.resolve() / 'codeless.json'}"
+    ]
 
 
 def test_bundled_playlists_stay_unstamped_and_load(monkeypatch, tmp_path):
@@ -1145,7 +1183,10 @@ def test_import_refuses_when_a_newer_file_holds_the_destination_path(
     message, imported_code = data_service.load_playlist_from_code("BlockedCode")
 
     assert imported_code is None
-    assert "newer version of this app" in message
+    assert message == (
+        'The playlist "Blocked" (BlockedCode) would replace a playlist file written '
+        "by a newer version of this app. Update the app to import it."
+    )
     assert destination.read_text(encoding="utf-8") == before
     assert data_service.playlist_database == {}
     assert not list(user_root.glob(".*.tmp"))
@@ -1239,7 +1280,10 @@ def test_import_refuses_a_filename_collision_with_a_healthy_playlist(
     message, imported_code = data_service.load_playlist_from_code("OtherCode")
 
     assert imported_code is None
-    assert "already holds" in message
+    assert message == (
+        'The file for this playlist already holds "Squad Alpha" (IncumbentCode). '
+        "Delete that playlist first, then import again."
+    )
     assert destination.read_text(encoding="utf-8") == before
     assert not list(user_root.glob("*.bak"))
     assert not list(user_root.glob(".*.tmp"))
@@ -1267,4 +1311,4 @@ def test_the_duplicate_code_refusal_still_runs_before_the_point_check(
     message, imported_code = data_service.load_playlist_from_code("LoadedCode")
 
     assert imported_code == "LoadedCode"
-    assert "already exists" in message
+    assert message == 'The playlist code LoadedCode is already imported as "Loaded".'

@@ -32,7 +32,7 @@ DEFAULT_AUTO_CLOSE_MS = 8000
 def toast(  # noqa: PLR0913
     notification_id: str,
     title: str,
-    message: str,
+    message: str | list,
     *,
     color: str,
     icon: Any = None,
@@ -45,7 +45,8 @@ def toast(  # noqa: PLR0913
     wants to appear under; a channel toast passes its logical channel key and
     hands the payload to ``channel_toast``, which stamps a fresh instance id
     over it. ``auto_close=False`` keeps the toast up until the user dismisses
-    it.
+    it. ``message`` may be a children list of strings and components, which
+    the container renders the same way it renders ``icon``.
     """
     notification: dict[str, Any] = {
         "action": "show",

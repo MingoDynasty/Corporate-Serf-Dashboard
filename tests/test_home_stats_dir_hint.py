@@ -15,7 +15,7 @@ dash.Dash(__name__, use_pages=True, pages_folder="")
 
 from source.pages import home  # noqa: E402
 
-HINT_TEXT = "No stats directory configured — set it in "
+HINT_TEXT = "No stats folder configured. Set it in "
 RESTART_HINT_TEXT = "Restart the app to apply your saved settings."
 
 
@@ -74,12 +74,14 @@ def test_hint_replaces_the_scenario_list_without_a_usable_directory(
 
     hint = _component_by_id(page, "stats-dir-hint")
     assert hint is not None
-    text, link = hint.children
+    text, link, period = hint.children
     assert text == HINT_TEXT
     # The repair surface exists now, so the hint points straight at it.
     assert isinstance(link, dmc.Anchor)
     assert link.children == "Settings"
     assert link.href == "/settings"
+    # Its own child, so the period does not render underlined inside the link.
+    assert period == "."
     assert _component_by_id(page, "scenario-dropdown-selection").data == []
 
 
@@ -147,9 +149,10 @@ def test_hint_keeps_its_link_when_only_the_identity_changed(monkeypatch):
 
     hint = _component_by_id(page, "stats-dir-hint")
     assert hint is not None
-    text, link = hint.children
+    text, link, period = hint.children
     assert text == HINT_TEXT
     assert isinstance(link, dmc.Anchor)
+    assert period == "."
 
 
 def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
@@ -170,9 +173,10 @@ def test_hint_keeps_its_link_when_the_directory_was_cleared(monkeypatch):
 
     hint = _component_by_id(page, "stats-dir-hint")
     assert hint is not None
-    text, link = hint.children
+    text, link, period = hint.children
     assert text == HINT_TEXT
     assert isinstance(link, dmc.Anchor)
+    assert period == "."
 
 
 def test_select_playlist_lists_nothing_without_a_usable_directory(monkeypatch):

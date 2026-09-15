@@ -62,7 +62,7 @@ def test_empty_file_is_tolerated_and_warned(settings_path, caplog):
     with caplog.at_level(logging.WARNING):
         assert settings.get_kovaaks_username() is None
 
-    assert "is not valid JSON" in caplog.text
+    assert f"The settings file isn't valid JSON. File: {settings_path}" in caplog.text
 
 
 def test_malformed_json_is_tolerated_and_warned(settings_path, caplog):
@@ -71,13 +71,16 @@ def test_malformed_json_is_tolerated_and_warned(settings_path, caplog):
     with caplog.at_level(logging.WARNING):
         assert settings.get_settings() == {}
 
-    assert "is not valid JSON" in caplog.text
+    assert f"The settings file isn't valid JSON. File: {settings_path}" in caplog.text
 
 
 def test_non_object_payload_is_tolerated(settings_path):
     _write_raw(settings_path, json.dumps(["kovaaks_username"]))
 
     assert settings.get_settings() == {}
+    assert settings.get_settings_store_message() == (
+        f"The settings file must hold a JSON object. File: {settings_path}"
+    )
 
 
 def test_non_string_value_is_tolerated(settings_path):
@@ -486,19 +489,34 @@ def test_an_unstamped_file_is_an_error_state_naming_the_fix(settings_path):
 
     assert settings.get_settings() == {}
     assert settings.get_settings_store_state() is store_schema.StoreState.ERROR
-    assert '"schema_version": 1' in settings.get_settings_store_message()
+    assert settings.get_settings_store_message() == (
+        'The settings file has no "schema_version" line. Add "schema_version": 1 to '
+        f"it, or delete the file to start over. File: {settings_path}"
+    )
 
 
 @pytest.mark.parametrize(
-    "marker",
-    [True, "1", 1.0, None, 0, -1],
+    ("marker", "as_written"),
+    [
+        (True, "true"),
+        ("1", '"1"'),
+        (1.0, "1.0"),
+        (None, "null"),
+        (0, "0"),
+        (-1, "-1"),
+    ],
     ids=["bool", "string", "float", "null", "zero", "negative"],
 )
 def test_a_marker_that_is_not_a_positive_integer_is_an_error_state(
     settings_path,
     marker,
+    as_written,
 ):
-    """Including 0 and negatives: garbage is not the future, or writes strand."""
+    """Including 0 and negatives: garbage is not the future, or writes strand.
+
+    The message quotes the value as the file holds it, in JSON, not as Python
+    would print it.
+    """
     _write_raw(
         settings_path,
         json.dumps({"schema_version": marker, "kovaaks_username": "MingoDynasty"}),
@@ -506,6 +524,10 @@ def test_a_marker_that_is_not_a_positive_integer_is_an_error_state(
 
     assert settings.get_settings() == {}
     assert settings.get_settings_store_state() is store_schema.StoreState.ERROR
+    assert settings.get_settings_store_message() == (
+        f'The settings file\'s "schema_version" is {as_written}. It must be the '
+        f"whole number 1. File: {settings_path}"
+    )
 
 
 def test_a_newer_stamp_is_the_future_state(settings_path):
@@ -516,7 +538,11 @@ def test_a_newer_stamp_is_the_future_state(settings_path):
 
     assert settings.get_settings() == {}
     assert settings.get_settings_store_state() is store_schema.StoreState.FUTURE
-    assert "newer version of this app" in settings.get_settings_store_message()
+    assert settings.get_settings_store_message() == (
+        "The settings file was written by a newer version of this app "
+        "(schema_version 2). It is intact. Update the app to use it. "
+        f"File: {settings_path}"
+    )
 
 
 def test_a_supported_stamp_does_not_vouch_for_the_payload(settings_path):
@@ -533,7 +559,10 @@ def test_an_unknown_key_under_a_supported_stamp_is_an_error_naming_the_key(
     _write(settings_path, {"kovaaks_username": "MingoDynasty", "kovaaks_usernam": "x"})
 
     assert settings.get_settings() == {}
-    assert '"kovaaks_usernam"' in settings.get_settings_store_message()
+    assert settings.get_settings_store_message() == (
+        'The settings file has an unknown setting "kovaaks_usernam". '
+        f"File: {settings_path}"
+    )
 
 
 def test_an_error_state_read_never_touches_the_file(settings_path):

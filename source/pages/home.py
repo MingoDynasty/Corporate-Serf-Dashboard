@@ -26,6 +26,7 @@ from source.app_shell import (
     RunEventBatch,
     RunEventData,
 )
+from source.components.control_name import control_name
 from source.components.local_icon import local_icon
 from source.config.config_service import get_config
 from source.config.settings_service import (
@@ -84,7 +85,7 @@ logger = logging.getLogger(__name__)
 SCENARIO_RANK_LOADING_DELAY_MS = 250
 TOOLTIP_EVENTS = {"hover": True, "focus": True, "touch": True}
 SETTINGS_HELP_TOOLTIP_WIDTH = 280
-SETTINGS_HELP_TEXT = {
+SETTINGS_HELP_TEXT: dict[str, str | list] = {
     "automatically-change-scenario": (
         "Automatically selects the scenario you just played when a new run is detected."
     ),
@@ -92,10 +93,12 @@ SETTINGS_HELP_TEXT = {
         "Shows the selected playlist's rank threshold lines on the graph when "
         "rank data is available."
     ),
-    "show-all-ranks": (
+    "show-all-ranks": [
         "Draws every rank in the playlist's ladder instead of only the ones "
-        "around your plotted scores. Needs Rank Thresholds turned on."
-    ),
+        "around your plotted scores. Needs ",
+        control_name("Rank thresholds"),
+        " turned on.",
+    ],
     "high-score-overlay": (
         "Shows your current personal best score as a reference line on the graph."
     ),
@@ -105,22 +108,25 @@ SETTINGS_HELP_TEXT = {
     ),
     "score-threshold-percentage": (
         "Sets the score goal as a percentage of your personal best. The "
-        "overlay line tracks your current personal best; notifications judge "
-        "the run against the personal best it was chasing."
+        "overlay line tracks your current personal best. Notifications judge "
+        "a run against the personal best you had before the run."
     ),
-    "score-threshold-notification": (
+    "score-threshold-notification": [
         "Adds a pass or fail verdict to run notifications when the run can be "
-        "judged against the score threshold. Needs Run Notifications turned on."
-    ),
+        "judged against the score threshold. Needs ",
+        control_name("Run notifications"),
+        " turned on.",
+    ],
     "run-notification": (
         "Controls threshold verdict and placement notifications for your runs. "
         "Personal best celebrations use their own setting."
     ),
-    "top-n-scores": (
-        "How many of your best scores to plot per sensitivity — or per day in "
-        "Score vs Time — within the selected date range. A new run that lands "
-        "in the top N also triggers a notification."
-    ),
+    "top-n-scores": [
+        "How many of your best scores to plot per sensitivity within the "
+        "selected date range, or per day in ",
+        control_name("Score vs Time"),
+        ". A new run that lands in the top N also triggers a notification.",
+    ],
 }
 RANK_REFRESH_TOOLTIP = (
     "Fetch your current position live from the KovaaK's leaderboard. The "
@@ -196,12 +202,13 @@ SETUP_CARD_IDENTITY_BODY = (
     "See your leaderboard position and percentiles for every scenario."
 )
 SETUP_CARD_SKIP_FINE_PRINT = (
-    "Skipping username disables rank lookups. You can set it anytime in Settings."
+    "Skipping keeps position lookups off. You can add your username anytime in "
+    "Settings."
 )
 SETUP_CARD_STATS_DIR_TITLE = "Finish setting up"
 SETUP_CARD_STATS_DIR_BODY = (
-    "No KovaaK's stats folder was found, so the dashboard can't read your runs "
-    "yet. Set it in Settings."
+    "No KovaaK's stats folder was found, so this app can't read your runs yet. "
+    "Set it in Settings."
 )
 # Shown when the settings file exists but cannot be used. The key-absence
 # states below cannot speak for it: an unusable store reads as no keys at all,
@@ -209,8 +216,8 @@ SETUP_CARD_STATS_DIR_BODY = (
 SETUP_CARD_STORE_TITLE = "Your settings can't be read"
 SETUP_CARD_STORE_BODY = (
     "A settings file exists, but this version of the app can't use it, so the "
-    "dashboard started without your settings. Open Settings to see what's "
-    "wrong and how to fix it."
+    "app started without your settings. Open Settings to see what's wrong and "
+    "how to fix it."
 )
 SETUP_CARD_OPEN_SETTINGS_LABEL = "Open Settings"
 SETUP_CARD_SKIP_LABEL = "Skip"
@@ -221,13 +228,13 @@ SETUP_CARD_SKIP_LABEL = "Skip"
 # click, so they share one channel: a second attempt replaces whatever the
 # first one said instead of stacking a contradiction beside it.
 SETUP_CARD_SKIP_PROBLEM_CHANNEL = "setup-card-skip-problem"
-SETUP_CARD_SKIP_REFUSED_TITLE = "Skip was not saved"
+SETUP_CARD_SKIP_REFUSED_TITLE = "Skip wasn't saved"
 SETUP_CARD_SKIP_REFUSED_MESSAGE = (
     "The settings file was written by a newer version of this app. Update the "
     "app to change settings."
 )
 SETUP_CARD_SKIP_FAILED_MESSAGE = (
-    "Nothing was written. Try again, or see data/logs/debug.log for details."
+    "Nothing was written. Try again. See data/logs/debug.log."
 )
 # The primary action navigates, so it ships as one link wearing the button's
 # styling. A ``dmc.Button`` inside a ``dmc.Anchor`` renders a focusable
@@ -249,15 +256,19 @@ _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
 _SELECT_SCENARIO_PLOT_MESSAGE = "Select a scenario to see your score history."
 _INCOMPLETE_GRAPH_CONTROLS_TITLE = "Graph settings incomplete"
+# The empty-state messages are plotly annotation text, which cannot hold a
+# component, so a control name is bolded with ``<b>`` inside the string.
 _INCOMPLETE_GRAPH_CONTROLS_MESSAGE = (
-    "Choose a Top N value and start date to plot this scenario."
+    "Set <b>Top N scores</b> and the oldest date to plot this scenario."
 )
 _NO_SCENARIO_DATA_PLOT_TITLE = "No local runs found"
 _NO_SCENARIO_DATA_PLOT_MESSAGE = "Play this scenario once and the graph will fill in."
 _NO_DATE_RANGE_DATA_PLOT_TITLE = "No runs in this date range"
-_NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older start date or play more runs."
+_NO_DATE_RANGE_DATA_PLOT_MESSAGE = "Choose an older date or play more runs."
 _UNSUPPORTED_GRAPH_OPTION_PLOT_TITLE = "Unsupported graph option"
-_UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = "Choose Score vs Sensitivity or Score vs Time."
+_UNSUPPORTED_GRAPH_OPTION_PLOT_MESSAGE = (
+    "Choose <b>Score vs Sensitivity</b> or <b>Score vs Time</b>."
+)
 _RANK_HINT_USERNAME_UNSET = "username_unset"
 _RANK_HINT_LOOKUP_FAILED = "lookup_failed"
 _RANK_HINT_SERVED_STALE = "served_stale"
@@ -278,11 +289,9 @@ _RUN_IMPORT_FAILURE_NOTIFICATION_ID = "run-import-failure"
 # dismissed.
 _RUN_VERDICT_CHANNEL = "run-verdict"
 _RANK_REFRESH_FAILED_TITLE = "Position refresh failed"
-# Both refresh-failure paths leave the displayed value alone, so one line
-# covers them: the hard failure keeps whatever was on screen, and the
-# served-stale path keeps the cached position it just re-served.
-_RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh — position unchanged."
-_RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh — showing the cached position."
+_RANK_REFRESH_STALE_TITLE = "Refresh failed · position from cache"
+_RANK_REFRESH_FAILED_MESSAGE = "Couldn't refresh. The position shown is unchanged."
+_RANK_REFRESH_STALE_MESSAGE = "Couldn't refresh. The position shown is from cache."
 # Notices that fire once per app session rather than once per trigger, by id.
 # A set, so the check-and-set needs no ``global`` rebinding; sound under
 # Waitress's single-process thread pool, and a lost race is benign because the
@@ -319,7 +328,7 @@ class RunEventsPayload(TypedDict):
     celebrated_run_id: str | None
 
 
-def _settings_help_label(label: str, help_text: str) -> dmc.Group:
+def _settings_help_label(label: str, help_text: str | list) -> dmc.Group:
     return dmc.Group(
         [
             # `inherit` so the label text takes the enclosing <label>'s font
@@ -361,7 +370,7 @@ def format_scenario_rank(rank_info: ScenarioRankInfo) -> str:  # noqa: PLR0911
                 if rank_info.percentile is not None:
                     return (
                         f"{rank_info.rank:,} of {rank_info.total_players:,} "
-                        f"({rank_info.percentile:.2f}% Percentile)"
+                        f"({rank_info.percentile:.2f}% percentile)"
                     )
                 return f"{rank_info.rank:,} of {rank_info.total_players:,}"
             return f"{rank_info.rank:,}"
@@ -449,8 +458,8 @@ def _build_run_import_failure_notification(
         failures[0]
         if len(failures) == 1
         else (
-            f"{len(failures)} new run files could not be processed. "
-            "See debug.log for details."
+            f"{len(failures)} new run files couldn't be processed. "
+            "See data/logs/debug.log."
         )
     )
     return toast(
@@ -582,12 +591,12 @@ def _rank_hint_children(hint: str) -> list:
     """Render one inline Position hint, including its repair affordance."""
     if hint == _RANK_HINT_USERNAME_UNSET:
         return [
-            " — set your KovaaK's username in ",
+            " · set your KovaaK's username in ",
             dmc.Anchor("Settings", href="/settings", refresh=False),
         ]
     if hint == _RANK_HINT_LOOKUP_FAILED:
-        return [" — lookup failed, Refresh to retry"]
-    return [" — from cache, Refresh to update"]
+        return [" · lookup failed"]
+    return [" · from cache"]
 
 
 def _rank_display(value: str, hint: str | None) -> str | list:
@@ -745,11 +754,19 @@ def _rank_refresh_problem_notification(*, served_stale: bool) -> dict[str, objec
     exclusive verdicts on one attempt, so they replace each other rather than
     stacking two contradictory claims about the same click.
     """
+    if served_stale:
+        return toast(
+            _RANK_REFRESH_PROBLEM_CHANNEL,
+            _RANK_REFRESH_STALE_TITLE,
+            _RANK_REFRESH_STALE_MESSAGE,
+            color="yellow",
+            icon=local_icon("material-symbols:refresh-rounded"),
+        )
     return toast(
         _RANK_REFRESH_PROBLEM_CHANNEL,
         _RANK_REFRESH_FAILED_TITLE,
-        _RANK_REFRESH_STALE_MESSAGE if served_stale else _RANK_REFRESH_FAILED_MESSAGE,
-        color="yellow" if served_stale else "red",
+        _RANK_REFRESH_FAILED_MESSAGE,
+        color="red",
         icon=local_icon("material-symbols:refresh-rounded"),
     )
 
@@ -833,7 +850,7 @@ def refresh_rank(  # noqa: PLR0911
 
     A failed refresh returns ``no_update`` for the value rather than ``N/A``,
     so whatever was on screen stays put -- usually the cached position -- and
-    the red toast's "position unchanged" is true either way.
+    the red toast's "The position shown is unchanged." is true either way.
 
     Every verdict is a channel emission, so a repeat click always re-pops its
     answer instead of being swallowed by ``show``'s dedupe. A fresh position
@@ -850,7 +867,7 @@ def refresh_rank(  # noqa: PLR0911
     if not selected_scenario:
         return "N/A", no_update, no_update, no_update
     if not get_kovaaks_username():
-        # ``no_update``: the field already reads "N/A — set your KovaaK's
+        # ``no_update``: the field already reads "N/A · set your KovaaK's
         # username in Settings", so only the toast is new.
         return no_update, *channel_toast(
             _rank_refresh_username_unset_notification(), toast_channels
@@ -984,7 +1001,7 @@ def _build_live_run_notification(
     placement = (
         f"your {_placement_phrase(latest['nth_score'])} at {latest['sensitivity']}"
     )
-    score = f"{selected_scenario} — {latest['score']:.2f}"
+    score = f"{selected_scenario}: {latest['score']:.2f}"
 
     if verdict is None:
         if not placed:
@@ -1007,14 +1024,14 @@ def _build_live_run_notification(
             icon=local_icon("material-symbols:check"),
         )
 
-    shortfall = f"{score}, {verdict.percentage:.1f}% of PB — "
-    shortfall += f"need {verdict.goal_percentage:.1f}%."
+    shortfall = f"{score}, {verdict.percentage:.1f}% of PB "
+    shortfall += f"(need {verdict.goal_percentage:.1f}%)."
     if placed:
         shortfall += f" Still {placement}."
     return toast(
         _RUN_VERDICT_CHANNEL,
         "Below threshold",
-        f"{shortfall} Keep grinding...",
+        shortfall,
         color="yellow",
         icon=local_icon("material-symbols:warning-outline"),
     )
@@ -1471,8 +1488,9 @@ def _stats_dir_hint() -> list:
     return [
         dmc.Text(
             [
-                "No stats directory configured — set it in ",
+                "No stats folder configured. Set it in ",
                 dmc.Anchor("Settings", href="/settings", refresh=False),
+                ".",
             ],
             className="stats-dir-hint",
             id="stats-dir-hint",
@@ -1719,7 +1737,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="rank-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Rank Thresholds",
+                            "Rank thresholds",
                             SETTINGS_HELP_TEXT["rank-overlay"],
                         ),
                         checked=True,
@@ -1739,7 +1757,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="high-score-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "PB Score",
+                            "PB score",
                             SETTINGS_HELP_TEXT["high-score-overlay"],
                         ),
                         checked=True,
@@ -1826,7 +1844,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="score-threshold-overlay-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Score Threshold Overlay",
+                            "Score threshold overlay",
                             SETTINGS_HELP_TEXT["score-threshold-overlay"],
                         ),
                         checked=True,
@@ -1835,12 +1853,12 @@ def _chart_options_panel() -> dmc.Box:
                     dmc.NumberInput(
                         id="score-threshold-percentage",
                         label=_settings_help_label(
-                            "Score Threshold Percentage",
+                            "Score threshold percentage",
                             SETTINGS_HELP_TEXT["score-threshold-percentage"],
                         ),
                         min=1,
                         persistence=True,
-                        placeholder="Score Percentage...",
+                        placeholder="Percentage",
                         radius="sm",
                         size="sm",
                         variant="default",
@@ -1857,7 +1875,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="score-threshold-notification-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Score Threshold Verdict",
+                            "Score threshold verdict",
                             SETTINGS_HELP_TEXT["score-threshold-notification"],
                         ),
                         checked=True,
@@ -1872,7 +1890,7 @@ def _chart_options_panel() -> dmc.Box:
                         id="run-notification-switch",
                         labelPosition="right",
                         label=_settings_help_label(
-                            "Run Notifications",
+                            "Run notifications",
                             SETTINGS_HELP_TEXT["run-notification"],
                         ),
                         checked=True,
@@ -1983,7 +2001,7 @@ def layout(
                                             label="Selected scenario",
                                             maxDropdownHeight="75vh",
                                             persistence=scenario_persistence,
-                                            placeholder="Select a scenario...",
+                                            placeholder="Select a scenario",
                                             scrollAreaProps={"type": "auto"},
                                             searchable=True,
                                             value=selected_scenario,

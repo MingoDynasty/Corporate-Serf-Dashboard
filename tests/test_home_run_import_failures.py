@@ -44,7 +44,7 @@ def test_a_batch_of_failures_still_makes_one_toast():
 
     assert len(notifications) == 1
     assert notifications[0]["message"] == (
-        "3 new run files could not be processed. See debug.log for details."
+        "3 new run files couldn't be processed. See data/logs/debug.log."
     )
 
 

@@ -62,8 +62,8 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - The table load is driven by the mounted layout's `playlist-scenarios-code`
   store, never by the URL change
   ([2026-04-29](../decision_log.md#2026-04-29-drive-playlist-table-loads-from-mounted-route-state)).
-  An unknown code renders "Playlist code is not imported: {code}"; no code
-  renders "Select a playlist from the Playlists page."
+  An unknown code renders "No imported playlist has the code {code}."; no
+  code renders "Select a playlist from the Playlists page."
 
 ## The overview
 
@@ -87,13 +87,15 @@ section and [product.md](../product.md). Leaderboard placement is worded
   playlist, or one with no played scenario, reads `N/A`
   ([2026-07-16](../decision_log.md#2026-07-16-warm-playlist-percentiles-with-one-polite-background-worker)).
   The placeholder is dimmed with the tooltip "Shown once all N played
-  scenarios have data — open the playlist to fetch now"; a Lowest value
+  scenarios have data. Open the playlist to fetch it now."; a Lowest value
   shows "Lowest: {scenario}" on hover.
 - The warmup status line has three renderings: "Updating percentile data: N
   remaining", the same with " (~{duration})" once a pace sample exists
   (smallest form "<1 min"), and "Updating percentile data: N remaining ·
-  paused; retrying at H:MM AM/PM" (12-hour local time, never with the ETA)
-  in backoff; "Percentile update stopped: {reason}" after a fatal stop. A
+  paused until H:MM AM/PM" (12-hour local time, never with the ETA) in
+  backoff; "Percentile update stopped: {reason}" after a fatal stop, where
+  the reason is a sentence such as 'KovaaK's username "{name}" wasn't
+  found.'. A
   one-second interval rebuilds rows without recording interactive activity,
   disables after one idle rebuild, and re-arms on the worker's enqueue
   generation
@@ -112,7 +114,7 @@ section and [product.md](../product.md). Leaderboard placement is worded
   The browser-persisted "Show hidden" switch reveals them muted, and the eye
   cell toggles one code with no confirm step. The file is
   `schema_version`-stamped: an unusable or newer-build file yields the seed
-  and shows the yellow alert "Playlist visibility is not being used", with a
+  and shows the yellow alert "Playlist visibility isn't being used", with a
   warning icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)), carrying the
   store's message; an unusable file is copied aside by the first write, and a
   newer-build file refuses every write
@@ -127,17 +129,21 @@ section and [product.md](../product.md). Leaderboard placement is worded
   Set your KovaaK's username in Settings." with Settings linked, as the rank
   spec states
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
-  On an empty grid it reads "No playlists are loaded." or 'All playlists are
-  hidden. Toggle "Show hidden" to manage them.' instead.
+  On an empty grid it reads "No playlists are loaded." or "All playlists are
+  hidden. Turn on the **Show hidden** switch to manage them." instead, the
+  control name rendered bold
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - Both grids feed their quick filter into AG Grid's built-in one client-side.
   Both log AG Grid's `columnSizeOptions` warning on every mount
   ([2026-07-18](../decision_log.md#2026-07-18-accept-dash-ag-grids-columnsizeoptions-console-warning)).
 
 ## Import and delete
 
-- Import opens the "Import Playlist" modal (field "Playlist code", help
-  "Paste a KovaaK's playlist share code and press Import to add that playlist
-  to this list."). Every submit spins the button, refusing clicks, for the
+- Import opens the "Import playlist" modal (field "Playlist code",
+  placeholder "KovaaK's playlist code", help "Paste a KovaaK's playlist share
+  code and press **Import** to add that playlist to this list.", the button
+  name bold) ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Every submit spins the button, refusing
+  clicks, for the
   callback's duration; an empty submit sets the inline error "Enter a
   playlist code." and makes no request.
 - KovaaK's `/playlist/playlists?search=<code>` is primary. Zero usable
@@ -145,28 +151,40 @@ section and [product.md](../product.md). Leaderboard placement is worded
   before refusing; the stored code is the canonical one the resolving source
   returned, never the pasted input
   ([2026-07-17](../decision_log.md#2026-07-17-playlist-import-falls-back-to-evxl-exact-by-code)).
-  The refusals are "Failed to load playlist data for playlist code: {code}"
-  and "Found more than one playlist from code: {code}". Two outcomes never
-  consult Evxl: a search that raises refuses with "Failed to look up playlist
-  code {code}: KovaaK's API error.", and one record with a blank code refuses
-  with "Invalid playlist data returned by API for playlist code: {code}".
-- A loaded code is refused: "Playlist code already exists: {code} is already
-  imported as {name} ({code})."
+  Both refuse with one message, "Couldn't load a playlist for the code
+  {code}. Check the code and try again.", because the Evxl fallback can fail
+  on a connection error as well as an unknown code. Two outcomes never
+  consult Evxl: a search that raises refuses with "Couldn't look up {code}
+  on KovaaK's. Check the code and try again.", and one record with a blank
+  code refuses with "The playlist data for {code} is unusable."
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Each refusal's log line keeps its diagnostic detail.
+- A loaded code is refused: 'The playlist code {code} is already imported as
+  "{name}".'
   ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)),
-  plus ' It is currently hidden — toggle "Show hidden" on this page to
-  unhide it.' when that playlist is hidden. Refusals are red "Playlist import
-  failed" toasts leaving the modal open.
+  plus " It is currently hidden. Turn on the **Show hidden** switch on this
+  page, then click the eye icon on its row to show it." when that playlist is
+  hidden ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). Refusals are red "Playlist import failed"
+  toasts leaving the modal open.
 - The stamped file is written to a temp path and replaced into place after a
   destination check: a newer-build file or any healthy playlist at that
   filename refuses the import; only an unusable file is copied aside and
   replaced
   ([2026-08-11](../decision_log.md#2026-08-11-durable-json-stores-carry-a-schema_version-stamp)).
+  The newer-build refusal reads 'The playlist "{name}" ({code}) would
+  replace a playlist file written by a newer version of this app. Update the
+  app to import it.', the collision 'The file for this playlist already holds
+  "{name}" ({code}). Delete that playlist first, then import again.', and a
+  failed write 'Couldn't save the playlist file for "{name}" ({code}). See
+  data/logs/debug.log.' ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   Success adds the code to the show-list, enqueues warmup, closes and clears
   the modal, rebuilds rows, and toasts green "Playlist imported" / 'Imported
   "{label}" ({code}).'. A failed or refused show-list write changes only the
-  toast: orange "Playlist imported — not shown", with a hint to toggle "Show
-  hidden" and click the row's eye icon
-  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
+  toast: orange "Playlist imported but hidden", whose body appends " It
+  couldn't be marked visible, so it may be missing from playlist selectors.
+  Turn on the **Show hidden** switch on this page, then click the eye icon on
+  its row to show it."
+  ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails);
+  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - Both landing toasts are channels keyed by the canonical stored code, so two
   playlists imported back to back both stand while re-importing one playlist
   replaces its own toast. Either one also clears the import-failure channel,
@@ -176,12 +194,16 @@ section and [product.md](../product.md). Leaderboard placement is worded
 - Delete exists only for user playlists; it unlinks the file recorded for
   the code, drops the store entry, and forgets the show-list membership
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
-  Bundled rows render no icon and never open the modal. "Delete Playlist"
+  Bundled rows render no icon and never open the modal. "Delete playlist"
   asks 'Delete "{label}" ({code})? You can re-import it later by share
   code.' When two user files share the code, every recorded file is unlinked
   (duplicates first, served file last, stopping at the first hard failure).
   Success toasts green "Playlist deleted"; a failed unlink toasts red
-  "Playlist delete failed" and leaves the store alone. A failed show-list
+  "Playlist delete failed" with "Couldn't delete the playlist file. See
+  data/logs/debug.log. File: {path}" and leaves the store alone, and a code
+  that is not a user playlist is refused with "The playlist code {code} isn't
+  one you imported, so it can't be deleted."
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)). A failed show-list
   write after the delete is logged; the green toast still shows
   ([2026-08-02](../decision_log.md#2026-08-02-a-committed-side-effect-reports-its-outcome-even-when-a-later-write-fails)).
   The success is a channel keyed by the deleted code and clears the
@@ -220,18 +242,19 @@ section and [product.md](../product.md). Leaderboard placement is worded
   Hydration is skipped when every scenario is already mapped. Status:
   "Updating positions from KovaaK's… {done}/{total}" live; "Update
   interrupted · {done} of {total} refreshed" cancelled; "{n} of {total}
-  positions unavailable" (+ " · {m} from cache — KovaaK's unreachable") or
-  "{m} of {total} positions from cache — KovaaK's unreachable" degraded;
-  empty when clean.
+  positions unavailable" (+ " · {m} from cache · KovaaK's unreachable") or
+  "{m} of {total} positions from cache · KovaaK's unreachable" degraded;
+  empty when clean ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - That status line is the fill's only report. The fill emits no
   notification, whatever the outcome: unavailable positions, positions
   served from cache, a cancelled fill, and a clean one all settle in place.
   The drain callback declares no `sendNotifications` output at all
   ([2026-08-22](../decision_log.md#2026-08-22-the-playlist-fill-reports-degradation-in-place-only)).
 - With no username the fill is skipped, pending flags are cleared, and the
-  status reads "Positions unavailable — set your KovaaK's username in
-  Settings" with Settings linked
-  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure)).
+  status reads "Positions unavailable. Set your KovaaK's username in
+  Settings." with Settings linked and the period outside the link
+  ([2026-08-09](../decision_log.md#2026-08-09-an-unset-username-is-stated-in-place-never-reported-as-a-failure);
+  copy as amended by [2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
   A playlist deleted between phase 1 and registration settles as "Update
   interrupted" with no pending cell.
 - The scenarios grid owns vertical scrolling inside the AppShell viewport
@@ -258,7 +281,12 @@ section and [product.md](../product.md). Leaderboard placement is worded
   ([2026-07-07](../decision_log.md#2026-07-07-use-playlist-codes-as-playlist-identity)).
   Those warnings drain only when the Scenario Performance page mounts, as
   persistent yellow toasts titled "Playlist not loaded"; a session that
-  starts on `/playlists` sees them after its first visit there.
+  starts on `/playlists` sees them after its first visit there. Each body
+  names the file by kind and ends with its path, such as "The playlist file
+  isn't valid JSON. File: {path}", and a shadowed file reads "Skipped a
+  duplicate playlist file. Its playlist code {code} is already loaded from
+  another file. Skipped file: {path} · Loaded file: {path}"
+  ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)).
 - A user file whose code a bundled benchmark serves is recorded and never
   deleted at startup; the overview offers an in-app cleanup instead
   ([2026-07-11](../decision_log.md#2026-07-11-the-playlist-overview-is-the-playlist-management-surface)).
@@ -267,8 +295,8 @@ section and [product.md](../product.md). Leaderboard placement is worded
   leftover playlist file in data/playlists is superseded by bundled
   benchmarks." or
   "{N} leftover playlist files in data/playlists are superseded by bundled
-  benchmarks.", with a "Delete leftover files" button. The "Delete Leftover
-  Files" modal asks "Delete 1 leftover playlist file from data/playlists? They
+  benchmarks.", with a "Delete leftover files" button. The "Delete leftover
+  files" modal asks "Delete 1 leftover playlist file from data/playlists? They
   are superseded by bundled benchmarks and hold no data." or "Delete {N}
   leftover playlist files from data/playlists? They are superseded by bundled
   benchmarks and hold no data." with a "Delete" button. Cleanup tolerates

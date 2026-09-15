@@ -56,7 +56,7 @@ list in the roadmap.)
   of replaying stale toasts and selections; it narrates the most recent run if
   you come back within a couple of minutes of playing it, and anything older
   reaches the plot silently. The ordinary run toasts can be turned off with one Chart options
-  switch, Run Notifications: with it off the chart still updates and nothing
+  switch, Run notifications: with it off the chart still updates and nothing
   toasts about a routine run, though a personal best still celebrates when
   celebrations are on, and a run file that failed to import still says so. The threshold switch beside the
   percentage decides only whether a run is judged, never whether it toasts.
@@ -78,7 +78,7 @@ list in the roadmap.)
   refresh, as it always did. A Settings control picks which animation plays,
   Confetti, Fireworks, Cannons, or Stars, or turns the whole thing off, with
   a Preview button beside it so the effect can be seen without setting a
-  personal best, and it is independent of the Run Notifications switch: one is
+  personal best, and it is independent of the Run notifications switch: one is
   about routine runs, the other about the moment worth interrupting for. If
   your system asks for reduced motion, the toast still shows and the animation
   does not. *Problem solved:* the one moment every run is chasing used to pass
@@ -97,8 +97,8 @@ list in the roadmap.)
   yours failed to record.
 - **No username means quiet, on the position surfaces too** (PR #227). With
   no KovaaK's username configured, opening a playlist skips the position
-  update entirely and the table says "Positions unavailable — set your
-  KovaaK's username in Settings"; clicking Refresh on Scenario Performance
+  update entirely and the table says "Positions unavailable. Set your
+  KovaaK's username in Settings."; clicking Refresh on Scenario Performance
   answers with a blue notice naming the missing username. *Problem solved:*
   a fresh install could not open a playlist without watching a progress line
   count through an update that was fetching nothing, then land on a red
@@ -162,12 +162,22 @@ list in the roadmap.)
   silence, and spam-clicking Refresh either stacked identical toasts or gave
   nothing back. Now every click gets an answer you can see, and nothing is
   quietly swallowed.
+- **The app reads as if one person wrote it** (PR #291; design in #247). Every
+  message, label, tooltip, and notice follows one short set of copy rules:
+  whole sentences, one name for each thing, everyday contractions, a control
+  named in a sentence set in bold, and error messages that say what happened
+  before what to do. *Problem solved:* the text was written one feature at a
+  time, so the same missing setting read four different ways on four pages,
+  some messages sounded like a log file, and the punctuation that makes app
+  copy read as machine-written ran through all of it. With a launch post
+  about to put the app in front of new users, the copy is now something a
+  cold reader can trust, and a test keeps the em dash from creeping back.
 
 ### Standing: where do I rank
 
 - **Scenario rank and percentile** (PRs #8–#10). The Scenario Performance page
   shows your global leaderboard standing for the selected scenario —
-  `Position: 11,290 of 63,892 (82.33% Percentile)`. It's read from a local cache
+  `Position: 11,290 of 63,892 (82.33% percentile)`. It's read from a local cache
   (one-week TTL) and refetched when a selection finds it stale, after a new
   personal best, or on manual Refresh — not fetched live on every view. *Problem solved:* raw scores aren't comparable
   across scenarios, but percentile is; it turns "804.2" into "top 18%," which
@@ -268,7 +278,7 @@ list in the roadmap.)
   folder was found, when a settings file exists that this build cannot use,
   and otherwise offers the KovaaK's account that turns leaderboard positions
   and percentiles on. In every case it points at the Settings page and nothing
-  else; the account offer can be skipped, which turns rank lookups off and
+  else; the account offer can be skipped, which turns position lookups off and
   never asks again. The playlists overview says the same thing where its
   percentile columns read N/A. *Problem
   solved:* a first launch usually charts runs with no setup at all, which left
@@ -281,8 +291,8 @@ list in the roadmap.)
   takes one code paste, not hand-building a scenario list. Lives on the
   playlist management surface, where the imported playlist lands as a new
   visible row; a duplicate-code refusal whose playlist is hidden points the
-  user at the "Show hidden" toggle. The only part of the app that requires an
-  internet connection besides rank lookups.
+  user at the Show hidden switch and the row's eye icon. The only part of the
+  app that requires an internet connection besides position lookups.
 - **Playlist delete & superseded-copy cleanup** (Playlists overview page, PR
   #98). A per-row Delete on user playlists removes the `data/playlists/` file
   after confirmation (bundled benchmarks offer Hide instead — a share-code
