@@ -1,8 +1,9 @@
-// Plotly only redraws a responsive graph on window `resize` events. The home
-// graph's height is flex-driven by the controls above it, which can change
-// height without a window resize (e.g. the Scenario Stats block wrapping to
-// an extra line), so observe the graph container and resize the plot to
-// match whenever its box changes.
+// Plotly only redraws a responsive graph on window ``resize`` events. The home
+// graph's box is sized by the page layout, which changes without a window
+// resize: the controls row can grow taller (e.g. the Scenario Stats block
+// wrapping to an extra line), and the chart options inspector opens and
+// collapses. So observe the graph container and resize the plot to match
+// whenever its box changes.
 (() => {
     const observed = new WeakSet();
 
