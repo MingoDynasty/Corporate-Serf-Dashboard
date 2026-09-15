@@ -279,23 +279,13 @@
     }
 }
 
-/* Home's persistent notice when the app booted without a usable stats
-   directory. Every scenario control below it is empty, so the line has to
-   read as the explanation for that, not as decoration. */
-.stats-dir-hint {
-    color: var(--mantine-color-dimmed);
-    font-size: var(--mantine-font-size-sm);
-    padding-bottom: 0.5rem;
-}
-
-/* The alert anatomy for inline notices that hold interactive controls: the
-   first-run setup card and the playlists page's leftover-files notice. Those
-   cannot be a dmc.Alert without putting a focusable button inside
-   role="alert", so they are dmc.Paper elements wearing the look through these
-   classes -- the tint, a heavier leading border, and an icon beside the title.
-   Blue is the informational default and the caution modifier swaps in the
-   yellow tokens. Mantine defines the -light tokens per color scheme, so dark
-   mode needs no separate rules. */
+/* The alert anatomy for inline notices built on dmc.Paper instead of
+   dmc.Alert, most of them because they hold a link or a button that must not
+   sit inside role="alert". These classes carry the look: the tint, a heavier
+   leading border, and an icon beside the title, or beside the sentence in a
+   notice without one. Blue is the informational default and the caution
+   modifier swaps in the yellow tokens. Mantine defines the -light tokens per
+   color scheme, so dark mode needs no separate rules. */
 .alert-panel {
     background-color: var(--mantine-color-blue-light);
     /* Mantine's own light-variant foreground: contrast-tuned against the tint
@@ -324,14 +314,26 @@
     font-weight: 600;
 }
 
-/* The first-run setup card at the top of Scenario Performance. It asks for
-   what the app could not configure on its own, so it reads as one bounded
-   block rather than page furniture: narrow enough that the eye takes it in at
-   once, and spaced off the controls below it. Its tint and icon come from the
-   alert anatomy above. */
-.setup-card {
+/* The first-run setup card at the top of Scenario Performance, and the
+   stats-folder hint above it. The card asks for what the app could not
+   configure on its own and the hint explains why every scenario control is
+   empty, so each reads as one bounded block rather than page furniture:
+   narrow enough that the eye takes it in at once, and spaced off the controls
+   below it. One rule for both, so the two panels match in width when they
+   stack. Their tint and icon come from the alert anatomy above. */
+.setup-card,
+.stats-dir-hint {
     margin-bottom: var(--mantine-spacing-md);
     max-width: 32rem;
+}
+
+/* A title-less panel's icon sits beside a sentence that may wrap, so its group
+   aligns to the top rather than the center, which pins the 1em icon to the top
+   of a taller line box, visibly above the first line's middle. Half the
+   leading drops it onto that middle; the icon inherits the sentence's line
+   height, so 1lh is the sentence's line box. */
+.stats-dir-hint .alert-panel-icon {
+    margin-top: calc((1lh - 1em) / 2);
 }
 
 /* The card's primary action. It navigates, so it is an anchor, not a button —

@@ -251,6 +251,10 @@ SETUP_CARD_CLASS = "alert-panel setup-card"
 SETUP_CARD_CAUTION_CLASS = f"{SETUP_CARD_CLASS} alert-panel-caution"
 SETUP_CARD_CAUTION_ICON = "material-symbols:warning-outline"
 SETUP_CARD_INFO_ICON = "material-symbols:info-outline"
+# The stats-folder hint wears the caution panel in both of its branches: each
+# one leaves every plot on the page empty, the same reason the card's
+# stats-folder state is yellow.
+STATS_DIR_HINT_CLASS = "alert-panel alert-panel-caution stats-dir-hint"
 _INTERVAL_PROP = "interval-component.n_intervals"
 _RUN_EVENTS_PROP = "run-events.data"
 _SELECT_SCENARIO_PLOT_TITLE = "No scenario selected"
@@ -1476,26 +1480,43 @@ def _stats_dir_hint() -> list:
     if get_usable_stats_dir() is not None:
         return []
     if is_stats_dir_change_pending() and settings.get(STATS_DIR_KEY):
-        return [
-            dmc.Text(
-                "Restart the app to apply your saved settings.",
-                className="stats-dir-hint",
-                id="stats-dir-hint",
-            )
-        ]
+        return [_stats_dir_hint_panel("Restart the app to apply your saved settings.")]
     if STATS_DIR_KEY not in settings:
         return []
     return [
-        dmc.Text(
+        _stats_dir_hint_panel(
             [
                 "No stats folder configured. Set it in ",
                 dmc.Anchor("Settings", href="/settings", refresh=False),
                 ".",
-            ],
-            className="stats-dir-hint",
-            id="stats-dir-hint",
+            ]
         )
     ]
+
+
+def _stats_dir_hint_panel(sentence: str | list) -> dmc.Paper:
+    """Wrap one hint sentence in the caution panel: the icon beside it, no title.
+
+    A ``dmc.Paper`` rather than a ``dmc.Alert`` because the unconfigured
+    sentence holds a link, and both branches share the one slot and its id.
+    """
+    return dmc.Paper(
+        dmc.Group(
+            [
+                local_icon(SETUP_CARD_CAUTION_ICON, className="alert-panel-icon"),
+                dmc.Text(sentence),
+            ],
+            # Group defaults to wrap="wrap", which sizes the text at its
+            # one-line width and drops a sentence too wide for the space beside
+            # the icon whole onto the row under it instead of wrapping it there.
+            wrap="nowrap",
+            gap="xs",
+            align="flex-start",
+        ),
+        className=STATS_DIR_HINT_CLASS,
+        id="stats-dir-hint",
+        withBorder=True,
+    )
 
 
 def _setup_card(
