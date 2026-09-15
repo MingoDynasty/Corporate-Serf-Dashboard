@@ -235,6 +235,10 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   apply. This app is still running on the settings it started with.", on
   every visit and immediately after the save that caused it
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)).
+  It is a yellow panel under the Save row, with the warning icon beside the
+  sentence and no title, capped at the form fields' width; every state it has
+  is that one color
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
 - "Detect my accounts" fills inputs only. Exactly one candidate with nothing
   unchecked and discovery complete fills both fields ("Found `<username>`.
   **Save** to apply it."); any other result with at least one candidate goes
@@ -373,6 +377,11 @@ configuration is owned by [release_and_install.md](release_and_install.md).
   ([2026-08-02](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)
   as amended by
   [2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+  Both branches wear the card's yellow panel treatment, and the hint can
+  render above the card
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy));
+  the treatment is specified in
+  [scenario_performance.md](scenario_performance.md#hosted-setup-surfaces).
 - An empty username keeps the app fully offline; the short-circuit is
   specified in [scenario_rank.md](scenario_rank.md#data-sources-and-identity)
   ([2026-08-01](../decision_log.md#2026-08-01-no-username-stays-fully-offline--user-independent-totals-rejected)),

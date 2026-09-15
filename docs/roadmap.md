@@ -28,6 +28,15 @@ leave this file entirely. Their user-facing rationale lives in
 [`architecture.md`](./architecture.md), and git history holds the full
 sequence.
 
+- **Setup hints become notices** — the three plain-text lines that tell the
+  user the app needs something from them (the stats-folder hint on Scenario
+  Performance, its restart-pending twin, and the Settings page's restart
+  notice) now wear the same yellow panel, warning icon, and no title that
+  the first-run setup card already wore. The Settings notice leaves the
+  orange the app reserves for a partly-committed action. No wording changed,
+  and the Position field's inline hints stay value qualifiers. (PR #298;
+  design in #281) Design rationale distilled into
+  [`decision_log.md`](./decision_log.md).
 - **App messaging consistency** — every string the app shows now follows one
   short set of copy rules, so the same condition reads the same way on every
   page: whole sentences with periods, one vocabulary, everyday contractions,
@@ -72,17 +81,6 @@ sequence.
   an alert. No wording changed anywhere. (PR #260; design in #256, rulings in
   #259) Design rationale distilled into
   [`decision_log.md`](./decision_log.md).
-- **Run notifications master switch** — run toasts can now be turned off. One
-  Chart options switch, Run notifications, silences the per-run toast family:
-  the threshold verdict and the placement. The chart keeps updating either
-  way, and a run file that failed to import still says so. The switch that
-  used to read "Score Threshold Notification" never gated toasts at all, so it
-  is now "Score threshold verdict" and says what it does. (PR #245; design in
-  #240) Design rationale distilled into
-  [`decision_log.md`](./decision_log.md). The catch-up digest this switch also
-  gated has since been retired, and the personal best celebration is a
-  separate family the switch does not reach (PR #261).
-
 ---
 
 ## Upcoming milestones
@@ -95,13 +93,6 @@ sequence.
   stopgap in `file_watchdog.py`. Design in
   [`run_history_proposal.md`](./proposals/run_history_proposal.md), against the
   baseline in [`specs/scenario_performance.md`](./specs/scenario_performance.md).
-- **Setup hints become notices** — the three plain-text lines that tell the
-  user the app needs something from them (the stats-folder hint on Scenario
-  Performance, its restart-pending twin, and the Settings page's restart
-  notice) take the tint and icon every other notice already has. No wording
-  changes; the Position field's inline hints stay as they are. Design in
-  [`proposals/setup_hints_become_notices_proposal.md`](./proposals/setup_hints_become_notices_proposal.md).
-
 ---
 
 ## Future (briefly)
