@@ -38,14 +38,14 @@ for the value because the field already explains itself. Promoted to a panel,
 the explanation detaches from the value it qualifies and the loudest element
 on the page lands under a stat tile. The decisive case is Skip: declining the
 identity offer on the setup card writes an empty username, after which the
-field reads "N/A — set your KovaaK's username in Settings" on every visit for
+field reads "N/A · set your KovaaK's username in Settings" on every visit for
 good. As a quiet qualifier beside a stat that is correct, and the card's fine
-print already said rank lookups would be off. As a panel it is a permanent
+print already said position lookups stay off. As a panel it is a permanent
 notice nagging about a choice the user made, on the page whose card they just
 dismissed. The
-[messaging-consistency proposal](app_messaging_consistency_proposal.md)'s
-D1 (PR #247, ratified 2026-09-14) also trims these hints to bare
-fragments, which is the opposite direction from a notice.
+[2026-09-14 copy-rules entry](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)
+(shipped in #291) also trimmed these hints to bare fragments, which is the
+opposite direction from a notice.
 
 Choosing differently: promoting them puts a third panel on the page (beside
 the setup card and the promoted stats-folder hint) and needs an answer for
@@ -88,14 +88,12 @@ body. The Aim Training Journey banner does not: icon and one sentence.
 the action ("Restart the app…", "…set it in Settings"). A title over it
 repeats the sentence in fewer words. The title-less shape is shipped (the
 journey banner, a `dmc.Alert`); as a Paper it needs one Group prop, specified
-in Design. No title means no new string: the proposal changes no copy at all,
-which keeps
-it clear of PR #247's Copy block and lets the implementation land on either
-side of #247's implementation PR.
+in Design. No title means no new string: the proposal changes no copy at all.
 
 Choosing differently: a title ("Restart needed", "Stats folder not set") is
-new user-facing copy. It would join a Copy block in this proposal, go through
-copy review, and be the one thing the two arcs would then contend over.
+new user-facing copy. It would join a Copy block in this proposal and go
+through copy review under the shipped copy rules, as the only copy this
+proposal would then own.
 
 ### D4 — The Settings restart notice joins the same anatomy
 
@@ -108,9 +106,10 @@ on the settings it started with." under the Save button whenever
 one (moved, cleared, or set while none was usable), or a frozen identity pin
 differs from the stored username or Steam ID. So it shows after a username
 fix or a folder move on an install that works, as well as on the first-run
-path. The Home restart branch is the subset of that condition where no usable
-pin exists and nothing plots; in the working-install states Home shows no
-hint at all. The notice is plain text colored orange, a color the severity
+path. The Home restart branch is the subset where no usable pin exists and a
+set folder awaits the restart, so nothing plots; under an unusable pin a
+cleared folder or an identity-only change shows the unconfigured branch
+instead, also yellow; under a usable pin Home shows no hint at all. The notice is plain text colored orange, a color the severity
 scale reserves for partial success and marks toast-only. No decision ruled
 that color; the
 [2026-08-02 entry](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)
@@ -155,8 +154,8 @@ yellow text is rejected on the numbers and is not offered as an option.
 
 ### The inventory
 
-Verified against `main` at `5be84bf` (2026-09-12) and re-checked at
-`fcc94e9` (2026-09-14). Three bare `dmc.Text` messages tell the user the app
+Verified against `main` at `5be84bf` (2026-09-12), re-checked at `daac983`
+(2026-09-15, after the copy sweep shipped in #291). Three bare `dmc.Text` messages tell the user the app
 needs something from them: a usable stats folder, or a restart to apply what
 they saved. None carries a tint or an icon, and none is among the five inline
 surfaces the
@@ -165,7 +164,7 @@ enumerated.
 
 | Surface | Function | Copy | Look today |
 | --- | --- | --- | --- |
-| Home, stats folder unconfigured | `_stats_dir_hint()` in `source/pages/home.py` | `No stats directory configured — set it in [Settings]` | dimmed, `sm`, no icon (`.stats-dir-hint`) |
+| Home, stats folder unconfigured | `_stats_dir_hint()` in `source/pages/home.py` | `No stats folder configured. Set it in [Settings].` | dimmed, `sm`, no icon (`.stats-dir-hint`) |
 | Home, restart pending | same function, same id | `Restart the app to apply your saved settings.` | same |
 | Settings, restart pending | `_restart_notice()` in `source/pages/settings.py` | `Restart the app to apply. This app is still running on the settings it started with.` | orange (`--mantine-color-orange-filled`), `sm`, no icon (`.app-settings-restart-notice`) |
 
@@ -254,8 +253,9 @@ the title row: `withBorder=True`; className
 `wrap="nowrap"`, gap `xs`, and `align="flex-start"`, holding
 `local_icon("material-symbols:warning-outline", className="alert-panel-icon")`
 and a `dmc.Text` with today's children verbatim: the restart sentence, or the
-unconfigured sentence with its
-`dmc.Anchor("Settings", href="/settings", refresh=False)`.
+unconfigured sentence's three children, the text, the
+`dmc.Anchor("Settings", href="/settings", refresh=False)`, and the trailing
+period as its own child.
 
 `wrap="nowrap"` is load-bearing. `dmc.Group` defaults to `wrap="wrap"`, and
 flexbox sizes the `dmc.Text` at its one-line width, so a sentence wider than
@@ -333,10 +333,10 @@ it.
 No string is added or changed. Every string this proposal touches is carried
 verbatim:
 
-- Home, unconfigured: `No stats directory configured — set it in [Settings]`
-  (the anchor is a separate child). PR #247's ratified Copy block rewrites this line
-  to `No stats folder configured. Set it in [Settings].`; whichever
-  implementation lands second rebases the one test string.
+- Home, unconfigured: `No stats folder configured. Set it in [Settings].`
+  Three children: the text, the anchor, and the trailing period as its own
+  child, which is where the copy rules put a period that ends a sentence on
+  a link. The panel's `dmc.Text` keeps all three.
 - Home, restart pending: `Restart the app to apply your saved settings.`
 - Settings, restart pending: `Restart the app to apply. This app is still
   running on the settings it started with.`
@@ -362,9 +362,10 @@ implementation.
 - **Yellow text for the Settings notice.** No Mantine yellow reaches 4.5:1 as
   text on the light background (yellow-9 is 3.00:1); the panel keeps its
   sentence at body color, so its legibility never depends on the yellow.
-- **Folding the promotion into PR #247's implementation PR.** The
-  maintainer's standing rule keeps copy changes and other changes in separate
-  PRs; this is the same rule seen from the other side.
+- **Touching any string in this PR.** The maintainer's standing rule keeps
+  copy changes out of other PRs, and one set of rules now governs every
+  string the app shows (the 2026-09-14 entry), so the strings here are
+  carried exactly as main shows them.
 - **A shared "setup panel" builder for the card, the hint, and the notice.**
   Three call sites with two anatomies (titled and not) do not yet justify an
   abstraction; the shared thing is the CSS, which already exists.
@@ -379,8 +380,9 @@ below. No callback signature, id, or settings-service behavior changes.
 
 ## Out of scope
 
-- The Position hints' wording and separator: PR #247's D1.
-- The unconfigured hint's wording: PR #247's Copy block.
+- The Position hints' wording and separator, and the unconfigured hint's
+  wording: both settled by the 2026-09-14 copy-rules entry and shipped in
+  #291. This proposal carries the shipped strings.
 - The five empty-state messages drawn inside the Plotly figure, and every
   toast.
 - The Settings store alert and the Playlists alerts, already on the scale.
@@ -392,7 +394,7 @@ below. No callback signature, id, or settings-service behavior changes.
   colored with a severity token.
 - The unconfigured line's accuracy in the vanished-folder state, where it
   says nothing is configured while the Settings field shows the stored path.
-  A copy question for the messaging arc, not this PR.
+  A copy question under the shipped copy rules, not this PR.
 - Strengthening the pale yellow panel tint, deferred by the 2026-08-30 entry.
 - The configured-but-wrong username case, deferred by the 2026-08-09 entry.
 - Any new notice surface. This proposal changes the look of three messages
@@ -400,9 +402,10 @@ below. No callback signature, id, or settings-service behavior changes.
 
 ## Testing
 
-- `tests/test_home_stats_dir_hint.py`: the two assertions on `hint.children`
-  become walks of the panel for the sentence and, on the unconfigured branch,
-  the `dmc.Anchor`; every case also asserts `hint.className` against the
+- `tests/test_home_stats_dir_hint.py`: the assertions on `hint.children` (the
+  restart string, and the three-way unpack of text, `dmc.Anchor`, and period
+  on the unconfigured branch) become walks of the panel for the same
+  children; every case also asserts `hint.className` against the
   alert-panel classes, on the models named under What pins the current
   shape. The
   co-render case (vanished folder, absent username key) is added, asserting
@@ -436,9 +439,9 @@ below. No callback signature, id, or settings-service behavior changes.
    D1 to D4 are ruled.
 2. **One implementation PR** (Opus 5 at high, from a kickoff prompt that
    names the rulings), in three commits: the Home hint with its tests; the
-   Settings notice with its tests (D4); the docs. It is independent of PR
-   #247's implementation PR: whichever lands second rebases one test string
-   on the unconfigured hint.
+   Settings notice with its tests (D4); the docs. It follows main, where the
+   copy sweep (#291) has already landed, so the carried strings and the
+   `HINT_TEXT` in `tests/test_home_stats_dir_hint.py` are the shipped ones.
 3. **Docs definition of done**, in the implementation PR: a decision-log
    entry that amends the 2026-08-30 entry's five-surface enumeration (a
    superseded-in-part note there, the enumeration erased nowhere) and, if D4
