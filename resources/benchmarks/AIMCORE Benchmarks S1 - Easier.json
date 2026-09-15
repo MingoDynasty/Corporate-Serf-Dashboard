@@ -1,0 +1,781 @@
+{
+  "name": "AIMCORE Benchmarks S1 - Easier",
+  "code": "KovaaKsClickingBuggedFamas",
+  "scenarios": [
+    {
+      "name": "AC KittyClick Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 58.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 67.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 75.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 81.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 89.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 96.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 102.0
+        }
+      ],
+      "leaderboard_id": 203865
+    },
+    {
+      "name": "AC BunnyClick Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 42.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 49.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 55.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 67.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 78.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 86.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 92.0
+        }
+      ],
+      "leaderboard_id": 203867
+    },
+    {
+      "name": "AC PuppyClick Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 49.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 54.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 60.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 67.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 74.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 80.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 89.0
+        }
+      ],
+      "leaderboard_id": 203868
+    },
+    {
+      "name": "AC MicroShot Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 67.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 75.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 83.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 95.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 105.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 118.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 130.0
+        }
+      ],
+      "leaderboard_id": 203869
+    },
+    {
+      "name": "AC WideShot Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 10.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 14.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 18.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 25.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 37.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 44.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 57.0
+        }
+      ],
+      "leaderboard_id": 203870
+    },
+    {
+      "name": "AC ClusterShot Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 53.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 67.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 75.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 89.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 102.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 123.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 203871
+    },
+    {
+      "name": "AC Driftsphere Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 6750.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 7430.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 8700.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 9800.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 10560.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 12000.0
+        }
+      ],
+      "leaderboard_id": 203263
+    },
+    {
+      "name": "AC Arcstrafes Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 900.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 3750.0
+        }
+      ],
+      "leaderboard_id": 203999
+    },
+    {
+      "name": "AC FlowerXYZ Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 600.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 2070.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 2560.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 4250.0
+        }
+      ],
+      "leaderboard_id": 203873
+    },
+    {
+      "name": "AC AirDodge Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 3300.0
+        }
+      ],
+      "leaderboard_id": 203874
+    },
+    {
+      "name": "AC PlazaDodge Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 3300.0
+        }
+      ],
+      "leaderboard_id": 203875
+    },
+    {
+      "name": "AC RoboStrafes Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 6700.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 9200.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 10700.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 13200.0
+        }
+      ],
+      "leaderboard_id": 203866
+    },
+    {
+      "name": "AC MicroTS Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 46.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 59.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 67.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 78.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 85.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 91.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 102.0
+        }
+      ],
+      "leaderboard_id": 203876
+    },
+    {
+      "name": "AC PillTS Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 56.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 60.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 65.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 76.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 83.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 90.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 99.0
+        }
+      ],
+      "leaderboard_id": 203877
+    },
+    {
+      "name": "AC SpeedTS 360 Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 48.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 51.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 59.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 67.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 77.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 89.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 98.0
+        }
+      ],
+      "leaderboard_id": 203878
+    },
+    {
+      "name": "AC Wispswitch Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 15.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 21.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 29.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 35.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 43.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 51.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 58.0
+        }
+      ],
+      "leaderboard_id": 203948
+    },
+    {
+      "name": "AC AirSwitch Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 16.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 20.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 27.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 33.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 40.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 47.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 54.0
+        }
+      ],
+      "leaderboard_id": 203880
+    },
+    {
+      "name": "AC EvaSwitch 360 Easier",
+      "ranks": [
+        {
+          "name": "Fossil",
+          "color": "#7d0b7a",
+          "threshold": 15.0
+        },
+        {
+          "name": "Wind",
+          "color": "#62098d",
+          "threshold": 18.0
+        },
+        {
+          "name": "Hydro",
+          "color": "#4509a2",
+          "threshold": 25.0
+        },
+        {
+          "name": "Solar",
+          "color": "#260dbb",
+          "threshold": 35.0
+        },
+        {
+          "name": "Tidal",
+          "color": "#0a14cd",
+          "threshold": 42.0
+        },
+        {
+          "name": "Fission",
+          "color": "#0928dd",
+          "threshold": 53.0
+        },
+        {
+          "name": "Fusion",
+          "color": "#0d49ec",
+          "threshold": 67.0
+        }
+      ],
+      "leaderboard_id": 203881
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClickingBuggedFamas",
+    "kovaaks_benchmark_id": 2890,
+    "rank_colors": [
+      [
+        "Fossil",
+        "#7d0b7a"
+      ],
+      [
+        "Wind",
+        "#62098d"
+      ],
+      [
+        "Hydro",
+        "#4509a2"
+      ],
+      [
+        "Solar",
+        "#260dbb"
+      ],
+      [
+        "Tidal",
+        "#0a14cd"
+      ],
+      [
+        "Fission",
+        "#0928dd"
+      ],
+      [
+        "Fusion",
+        "#0d49ec"
+      ]
+    ],
+    "generated_at": "2026-09-15T18:08:45.087754+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
