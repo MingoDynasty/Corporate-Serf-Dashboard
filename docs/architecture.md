@@ -633,6 +633,16 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
+- `assets/homeGraphResize.js` — keeps the Scenario Performance graph drawn at
+  its container's size. Plotly only redraws a responsive graph on window
+  `resize` events, but this graph's box changes without one: its height is
+  flex-driven by the controls above it, and the chart options inspector beside
+  it opens and collapses. A document `MutationObserver` finds each
+  `.home-graph` container as Dash mounts it, a `WeakSet` attaches the
+  `ResizeObserver` once per element, and each box change calls
+  `window.Plotly.Plots.resize` on the plot div. The `window.Plotly` guard is
+  load-bearing: dcc injects plotly.js lazily, so until the first graph renders
+  there is nothing to resize.
 - `assets/homeGraphZoomFit.js` — refits the Scenario Performance graph's
   score axis to the runs in view when the x axis is zoomed. It listens on
   each `.home-graph` plot div for `plotly_relayout` events that carry an x
