@@ -4,6 +4,9 @@
 // window, so refit the score axis to the runs in view whenever x is zoomed.
 (() => {
     const attached = new WeakSet();
+    // The y range each plot's last refit applied, so resetting x undoes only
+    // a y range this asset set and never one the user dragged themselves.
+    const lastFit = new WeakMap();
 
     // Only traces (the run points and the Average Score line) are fitted.
     // Overlay lines are shapes and stay out on purpose: the PB Score line
@@ -59,6 +62,7 @@
         // relayout into its figure prop from props that can predate the
         // user's zoom, so a y-only relayout would overwrite that zoom and
         // snap x back to the full range.
+        lastFit.set(gd, range);
         window.Plotly.relayout(gd, {
             "xaxis.range": gd._fullLayout.xaxis.range.slice(),
             "yaxis.range": range,
@@ -66,8 +70,22 @@
     }
 
     function onRelayout(gd, event) {
-        // Double-click, Reset axes, and Autoscale restore both axes already.
         if (event["xaxis.autorange"]) {
+            // A plot-area double-click, Reset axes, and Autoscale restore both
+            // axes already. A double-click on the x-axis drag handle
+            // autoranges x alone and would leave y clamped to the old fit,
+            // so reset y too, with x in the same relayout for the reason the
+            // refit re-sends x. The event that relayout sends carries both
+            // keys and ends here.
+            const fit = lastFit.get(gd);
+            const current = gd._fullLayout.yaxis.range;
+            const yStillFit = fit && fit[0] === current[0] && fit[1] === current[1];
+            if (!event["yaxis.autorange"] && yStillFit) {
+                window.Plotly.relayout(gd, {
+                    "xaxis.autorange": true,
+                    "yaxis.autorange": true,
+                });
+            }
             return;
         }
         // Only an x range change refits, which skips the autosize events a

@@ -628,7 +628,9 @@ flowchart LR
   visibility. It fits visible trace points only, never the overlay shapes. The
   fit's relayout re-sends the current x range: dcc.Graph copies every
   relayout into its `figure` prop from props that can predate the user's
-  zoom, so a y-only relayout would snap x back to the full range.
+  zoom, so a y-only relayout would snap x back to the full range. An
+  x-only autorange (a double-click on the x-axis drag handle) also
+  autoranges y, in the same relayout, when y still holds the last fit.
 - `assets/pbCelebration.js` — the personal best celebration's animation:
   a name-keyed style registry (`confetti`, `fireworks`, `cannons`, `stars`)
   behind `window.pbCelebration.play(style)` and `celebrate(batch, style)`. It
