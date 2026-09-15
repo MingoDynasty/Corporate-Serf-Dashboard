@@ -10,6 +10,7 @@ from pydantic import ValidationError
 
 from source.kovaaks import data_service
 from source.kovaaks.data_models import PlaylistData, Rank, Scenario
+from source.kovaaks.playlist_visibility_service import DEFAULT_VISIBLE_CODES
 from source.utilities import atomic_write
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -1028,6 +1029,18 @@ def test_committed_bundled_playlists_all_carry_leaderboard_ids():
             missing_leaderboard_ids.append(relative)
 
     assert not missing_leaderboard_ids
+
+
+def test_default_visible_codes_are_all_bundled():
+    # A corpus refresh that deletes or re-codes a default benchmark would
+    # otherwise leave a dead code in the seed, and a fresh install would
+    # silently start with fewer benchmarks visible.
+    bundled_codes = {
+        PlaylistData.model_validate_json(path.read_text(encoding="utf-8")).code
+        for path in _committed_bundled_playlist_paths()
+    }
+
+    assert DEFAULT_VISIBLE_CODES - bundled_codes == set()
 
 
 # --- schema_version: user-root reads, and the import destination point-check ---
