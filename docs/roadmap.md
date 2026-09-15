@@ -101,7 +101,7 @@ sequence.
   good. No new surface, no behavior change. Design in
   [`proposals/app_messaging_consistency_proposal.md`](./proposals/app_messaging_consistency_proposal.md).
 - **Setup hints become notices** — the three plain-text lines that tell the
-  user something is blocking the app (the stats-folder hint on Scenario
+  user the app needs something from them (the stats-folder hint on Scenario
   Performance, its restart-pending twin, and the Settings page's restart
   notice) take the tint and icon every other notice already has. No wording
   changes; the Position field's inline hints stay as they are. Design in

@@ -5,9 +5,9 @@ Date: 2026-09-12
 
 ## TL;DR
 
-Three messages that tell the user something is blocking the app are still
-plain text: the stats-folder line at the top of Scenario Performance, its
-restart-pending twin, and the restart notice on the Settings page. The
+Three messages that tell the user the app needs something from them are
+still plain text: the stats-folder line at the top of Scenario Performance,
+its restart-pending twin, and the restart notice on the Settings page. The
 color-language sweep that gave every other notice a tint and an icon never
 reached them, so the faintest lines on the page are the ones the user most
 needs to see. This proposal moves them onto the panel anatomy the setup card
@@ -86,8 +86,10 @@ body. The Aim Training Journey banner does not: icon and one sentence.
 
 **Recommendation: no title.** Each hint is one sentence that already names
 the action ("Restart the app…", "…set it in Settings"). A title over it
-repeats the sentence in fewer words. The title-less anatomy is shipped, and no
-title means no new string: the proposal changes no copy at all, which keeps
+repeats the sentence in fewer words. The title-less shape is shipped (the
+journey banner, a `dmc.Alert`); as a Paper it needs one Group prop, specified
+in Design. No title means no new string: the proposal changes no copy at all,
+which keeps
 it clear of PR #247's Copy block and lets the implementation land on either
 side of #247's implementation PR.
 
@@ -101,40 +103,63 @@ Status: Open. Maintainer lean (2026-09-12): promote it to the same yellow
 panel, non-binding until ruled.
 
 The Settings page shows "Restart the app to apply. This app is still running
-on the settings it started with." under the Save button while any
-restart-scoped change is pending. It is plain text colored orange, a color the
-severity scale reserves for partial success and marks toast-only. No decision
-ruled that color; the
+on the settings it started with." under the Save button whenever
+`is_restart_pending()` holds: the stored stats folder differs from the pinned
+one (moved, cleared, or set while none was usable), or a frozen identity pin
+differs from the stored username or Steam ID. So it shows after a username
+fix or a folder move on an install that works, as well as on the first-run
+path. The Home restart branch is the subset of that condition where no usable
+pin exists and nothing plots; in the working-install states Home shows no
+hint at all. The notice is plain text colored orange, a color the severity
+scale reserves for partial success and marks toast-only. No decision ruled
+that color; the
 [2026-08-02 entry](../decision_log.md#2026-08-02-restart-scoped-settings-are-pinned-at-boot-and-the-stats-folder-finds-itself)
-that created the notice says nothing about its look. It is the same condition
-as the Home restart branch, one page over, on the exact path the user walks
-(Save, then back to Home). This is a scope addition beyond the Scenario
-Performance question that prompted the proposal.
+that created the notice says nothing about its look. This is a scope addition
+beyond the Scenario Performance question that prompted the proposal.
 
-**Recommendation: the same yellow panel.** Same condition, same anatomy, one
-look on both pages. Yellow text is not an option: the
+**Recommendation: the same yellow panel.** One anatomy for the restart
+condition on both pages, and one severity in every state the notice has.
+Yellow in the working-install states comes from the scale's own words: a
+saved change that is not in effect until the user restarts is "a state that
+needs the user without anything having failed", and the restart is optional
+only if the user does not want the change they saved. The 2026-08-30 entry
+rejected a single accent color for exactly this case, because it would make
+"your saved choices are silently not applying" look like an FYI. On the
+first-run path the same yellow then carries from Settings to the Home restart
+branch (D2) with no change of severity mid-flow.
+
+Yellow text is not an option. Measured against the dmc 2.8.0 palette (WCAG
+2.x ratios, page backgrounds `#ffffff` and `#242424`), no Mantine yellow
+reaches 4.5:1 as text on the light background: the darkest, yellow-9, is
+3.00:1, while every shade clears 3:1 on dark. The
 [2026-08-20 point-color entry](../decision_log.md#2026-08-20-run-points-get-a-size-preset-and-a-color-and-the-chart-stops-there)
-measured every Mantine yellow shade and none clears 3:1 on either page
-background. The panel anatomy is precisely the shape that carries yellow
-legibly, on the icon and the border rather than the text. The cost is a
-component change in the settings page, the notice callback returning a
-children list instead of a string, and the settings tests walking for the
-text instead of comparing it.
+found the same for plot points, where no shade reaches 3:1 on both plot
+backgrounds. The panel is legible because its sentence stays at body text
+color (19.66:1 light, 6.85:1 dark); the yellow is a cue on the icon and
+border (1.74:1 against the light tint), never the thing being read. The cost
+is a component change in the settings page, the notice callback returning
+the panel's children for the pending state, and three settings-test
+assertions walking for the sentence instead of comparing it.
 
-Choosing differently: leaving it as orange text costs nothing in code, but
-the notifications spec's statement that no inline surface uses orange stays
-false, the proposal ships one condition as a yellow panel on Home and orange
-text on Settings, and the decision log needs an explicit accepted-exception
-note so the next sweep does not re-find it. Recoloring to yellow text is
-rejected on contrast and is not offered as an option.
+Choosing differently. Leaving the orange text costs nothing in code, but
+orange-filled measures 2.57:1 on white and 4.34:1 on dark, the least legible
+of the three messages (the dimmed Home hint is 3.32:1 on white); the
+notifications spec's statement that no inline surface uses orange stays
+false; and the decision log needs an explicit accepted-exception note so the
+next sweep does not re-find it. Blue on Settings with yellow on Home is
+quieter after a routine identity fix, but on the first-run path one pending
+restart would show blue on Settings and then yellow on Home. Recoloring to
+yellow text is rejected on the numbers and is not offered as an option.
 
 ## Problem
 
 ### The inventory
 
-Verified against `main` at `5be84bf` (2026-09-12). Three bare `dmc.Text`
-messages tell the user a blocking condition exists. None carries a tint or an
-icon, and none is among the five inline surfaces the
+Verified against `main` at `5be84bf` (2026-09-12) and re-checked at
+`fcc94e9` (2026-09-14). Three bare `dmc.Text` messages tell the user the app
+needs something from them: a usable stats folder, or a restart to apply what
+they saved. None carries a tint or an icon, and none is among the five inline
+surfaces the
 [2026-08-30 color-language entry](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)
 enumerated.
 
@@ -176,6 +201,19 @@ Green and orange stay toast-only". The
 it: "no inline surface uses either." The notice's orange predates that entry
 and was not swept because it is a `dmc.Text`, not an alert.
 
+Both messages sit below WCAG's 4.5:1 for normal text in both color schemes,
+and the panel body they would move to does not. Measured against the dmc
+2.8.0 palette with WCAG 2.x relative luminance; page backgrounds `#ffffff`
+(light) and `#242424` (dark); tint alpha 0.1 light and 0.15 dark:
+
+| Text | Light | Dark |
+| --- | --- | --- |
+| Home hint today (`dimmed`) | 3.32:1 | 4.04:1 |
+| Settings notice today (`orange-filled`: orange-6 light, orange-8 dark) | 2.57:1 | 4.34:1 |
+| Caution panel body text on its tint | 19.66:1 | 6.85:1 |
+| Caution panel icon and border on its tint (`yellow-light-color`) | 1.74:1 | 8.70:1 |
+| yellow-9, the darkest yellow, as text on the page | 3.00:1 | 5.18:1 |
+
 ### The co-render, and why it is reachable
 
 The unconfigured hint and the setup card's identity state can show together.
@@ -198,23 +236,38 @@ change is pending.
 string and by id, and asserts `hint.children` directly.
 `tests/test_settings_page.py` asserts the Settings notice's
 `children == RESTART_NOTICE` and its class constant, never its color.
-`tests/test_home_setup_card.py` is the only test asserting the
-`.alert-panel` classes and is the model for the promoted surfaces.
+`tests/test_home_setup_card.py` asserts the `.alert-panel` classes on the
+setup card and is the model for the Home hint; `tests/test_playlist_pages.py`
+asserts the leftover-files Paper's `SUPERSEDED_NOTICE_CLASS` and its hidden
+twin, the closer model for a hidden-class panel like the Settings notice.
 `tests/test_ui_presentation.py` touches none of these.
 
 ## Design
 
 ### The Home hint
 
-`_stats_dir_hint()` returns a `dmc.Paper` instead of a `dmc.Text`, keeping
-`id="stats-dir-hint"` and the two branches' selection logic untouched.
-Anatomy, the setup card's minus the title row: `withBorder=True`; className
-`alert-panel alert-panel-caution stats-dir-hint`; children a `dmc.Group` (gap
-`xs`, aligned to the top so a wrapped sentence does not float the icon) of
+`_stats_dir_hint()` returns a list holding a `dmc.Paper` instead of a
+`dmc.Text` (the layout splats the list), keeping `id="stats-dir-hint"` and
+the two branches' selection logic untouched. Anatomy, the setup card's minus
+the title row: `withBorder=True`; className
+`alert-panel alert-panel-caution stats-dir-hint`; children a `dmc.Group` with
+`wrap="nowrap"`, gap `xs`, and `align="flex-start"`, holding
 `local_icon("material-symbols:warning-outline", className="alert-panel-icon")`
-and a `dmc.Text` holding today's children verbatim: the restart sentence, or
-the unconfigured sentence with its
+and a `dmc.Text` with today's children verbatim: the restart sentence, or the
+unconfigured sentence with its
 `dmc.Anchor("Settings", href="/settings", refresh=False)`.
+
+`wrap="nowrap"` is load-bearing. `dmc.Group` defaults to `wrap="wrap"`, and
+flexbox sizes the `dmc.Text` at its one-line width, so a sentence wider than
+the space beside the icon drops whole onto the next row, under the icon,
+instead of wrapping beside it; `align` alone does not prevent that. A render
+probe during review (dmc 2.8.0, Chromium, the app's stylesheet and vendored
+icon) showed the Settings sentence dropping at the 32rem width and both Home
+sentences dropping in a 343px window; with `wrap="nowrap"` they wrap beside
+the icon. `_settings_help_label()` in `home.py` already uses the prop for the
+same reason. With nowrap the 16px icon sits about 4px above the center of the
+first 25px line box; whether to nudge it, as Mantine's own Alert does, is the
+author's call at implementation.
 
 `dmc.Paper`, not `dmc.Alert`, for both branches. The unconfigured branch
 holds a link, and the 2026-08-30 component rule sends a notice with
@@ -252,10 +305,10 @@ moment" stays true.
 
 Under the lean, the `dmc.Text` with `id="app-settings-restart-notice"`
 becomes a `dmc.Paper` with the same id, `withBorder=True`, and the same
-`Group` anatomy as the Home hint (warning icon beside the sentence).
-`_restart_notice()` returns a children list and a class instead of a string
-and a class: an empty list with `RESTART_NOTICE_HIDDEN_CLASS` when nothing is
-pending, the group with `RESTART_NOTICE_CLASS` when something is. The
+`Group` anatomy as the Home hint (`wrap="nowrap"`, warning icon beside the
+sentence). `_restart_notice()` keeps its `(children, class)` shape: `""` with
+`RESTART_NOTICE_HIDDEN_CLASS` when nothing is pending, exactly as today, and
+the group with `RESTART_NOTICE_CLASS` when something is. The
 `save_user_settings` callback's two outputs on that id keep their shape, and
 the hidden-class reveal (`display: none` on the modifier class) is untouched.
 `RESTART_NOTICE_CLASS` becomes
@@ -265,14 +318,15 @@ keeps only what layout needs (a `max-width` matching the Home panels if the
 form's Stack would otherwise run the panel full width; author's call at
 implementation).
 
-The notice covers identity changes as well as the stats folder. Those need a
-restart too, so the same yellow applies; nothing in the notice's trigger
-logic changes.
+The notice's trigger logic does not change: it shows for every restart-scoped
+change, identity or folder, on a working install or a first-run one, and D4
+gives every one of those states the same yellow.
 
 If D4 is ruled out of scope, the settings page is untouched, and the shipping
 PR's decision-log entry records the orange notice as an accepted exception to
-the toast-only rule, with contrast as the reason, so the next sweep does not
-re-find it.
+the toast-only rule, naming the trade actually accepted: an off-scale color
+at 2.57:1 in light mode, kept on purpose, so the next sweep does not re-find
+it.
 
 ### Copy
 
@@ -295,10 +349,19 @@ implementation.
 - **Removing either Home branch.** Each is the only thing explaining why the
   page beside it is empty; without it the page is blank and silent.
 - **`dmc.Alert` for the restart branch alone.** Permitted by the component
-  rule, rejected above: two components in one slot.
-- **Yellow text for the Settings notice.** No Mantine yellow shade clears 3:1
-  on either page background (measured in the 2026-08-20 point-color entry);
-  the panel carries yellow on the icon and border for exactly this reason.
+  rule, rejected above: two components in one slot. The Home hint also only
+  ever renders with the layout, never dynamically, which is the other half of
+  the rule's reading of `role="alert"`.
+- **`dmc.Alert` for the Settings notice.** The strongest alternative under
+  D4: the notice is text-only and appears after a Save, the store alert on
+  the same page already is one, and `_restart_notice()` would keep returning
+  a string so no settings test would change. Rejected because Mantine's
+  light-variant Alert has a transparent border, 14px body text, and a 20px
+  icon column: it would not look like the Home panel the user sees next, and
+  one look on both pages is the case for D4.
+- **Yellow text for the Settings notice.** No Mantine yellow reaches 4.5:1 as
+  text on the light background (yellow-9 is 3.00:1); the panel keeps its
+  sentence at body color, so its legibility never depends on the yellow.
 - **Folding the promotion into PR #247's implementation PR.** The
   maintainer's standing rule keeps copy changes and other changes in separate
   PRs; this is the same rule seen from the other side.
@@ -321,6 +384,15 @@ below. No callback signature, id, or settings-service behavior changes.
 - The five empty-state messages drawn inside the Plotly figure, and every
   toast.
 - The Settings store alert and the Playlists alerts, already on the scale.
+- The Settings save-status line (`.app-settings-save-status-failed`: red
+  text, no icon, for the failed and the refused save). It stays a status
+  line: a readout beside the button it answers, not a standing notice, which
+  is how the settings spec classes save outcomes. Named so the next sweep
+  does not re-find it; once this ships it is the only bare text in the app
+  colored with a severity token.
+- The unconfigured line's accuracy in the vanished-folder state, where it
+  says nothing is configured while the Settings field shows the stored path.
+  A copy question for the messaging arc, not this PR.
 - Strengthening the pale yellow panel tint, deferred by the 2026-08-30 entry.
 - The configured-but-wrong username case, deferred by the 2026-08-09 entry.
 - Any new notice surface. This proposal changes the look of three messages
@@ -331,12 +403,15 @@ below. No callback signature, id, or settings-service behavior changes.
 - `tests/test_home_stats_dir_hint.py`: the two assertions on `hint.children`
   become walks of the panel for the sentence and, on the unconfigured branch,
   the `dmc.Anchor`; every case also asserts `hint.className` against the
-  alert-panel classes, on `tests/test_home_setup_card.py`'s model. The
+  alert-panel classes, on the models named under What pins the current
+  shape. The
   co-render case (vanished folder, absent username key) is added, asserting
   that both the hint and a non-empty setup card box render, hint first.
   Assertions are tightened, never loosened.
 - `tests/test_settings_page.py` (D4 only): the three `notice == RESTART_NOTICE`
-  assertions walk the children for the sentence; the class assertions stay on
+  assertions walk the children for the sentence. The two hidden-state
+  assertions (`notice == ""` and `notice.children == ""`) stay as they are
+  because the hidden children stay `""`, and the class assertions stay on
   the constants. `FORM_OUTPUT_IDS` is unchanged because the id is.
 - `tests/test_home_rank_format.py` is untouched under D1.
 - Gates: `uv run pytest tests`, `uv run ruff format --check .`,
@@ -348,7 +423,10 @@ below. No callback signature, id, or settings-service behavior changes.
   in Settings, then open Home without restarting); the co-render (the
   unconfigured state with the `kovaaks_username` key deleted from the file);
   and the Settings notice (any Save of a changed folder or identity while the
-  app runs). Deleting `settings.json` does not reach the hint: the bootstrap
+  app runs). Two of these at a width where the sentence needs a second line,
+  the Settings notice at the form's width and the Home hint in a narrow
+  window, checking that the sentence wraps beside the icon and never under
+  it. Deleting `settings.json` does not reach the hint: the bootstrap
   detects and writes a real folder before the pin is taken.
 
 ## Delivery plan
