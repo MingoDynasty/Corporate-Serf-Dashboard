@@ -46,7 +46,12 @@ their full behavior.
   links or buttons, and for content that appears dynamically rather than with
   the page
   ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
-- The five inline notices, each owned by the spec named beside it: the
+  Two text-only notices are `dmc.Paper` panels anyway: the stats-folder hint,
+  whose other branch holds a link and which renders with the page rather than
+  dynamically, and the Settings restart notice, which wears the anatomy the
+  user sees next on the landing page
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+- The seven inline notices, each owned by the spec named beside it: the
   Settings store alert (settings spec) and the Playlists visibility alert
   (playlists spec) are yellow `dmc.Alert`s; the Aim Training Journey
   work-in-progress banner is a blue `dmc.Alert`, recorded only here because
@@ -55,7 +60,11 @@ their full behavior.
   card (settings and scenario-performance specs) is a `dmc.Paper` that is blue
   in its identity state and yellow in its stats-folder and unusable-store
   states
-  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
+  ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices));
+  the stats-folder hint (scenario-performance spec) and the Settings restart
+  notice (settings spec) are yellow `dmc.Paper` panels carrying the icon
+  beside the sentence with no title
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
 
 ## Delivery
 

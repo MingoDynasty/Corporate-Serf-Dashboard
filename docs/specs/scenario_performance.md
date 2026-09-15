@@ -292,10 +292,20 @@ of scope here, apart from its chart toolbar, noted under The graph.
   identity state blue with an info icon ([2026-08-30](../decision_log.md#2026-08-30-one-severity-color-language-for-inline-notices)).
   When the card shows, which state wins, and what Skip writes are specified
   in [settings.md](settings.md#the-setup-card).
-- The stats-folder hint is a single line above the controls: "No stats
+- The stats-folder hint sits above the setup card and reads "No stats
   folder configured. Set it in Settings." with Settings linked and the period
   outside the link ([2026-09-14](../decision_log.md#2026-09-14-app-copy-follows-one-set-of-rules-and-the-em-dash-is-gated-out)), or
   "Restart the app to apply your saved settings." while a saved directory
   awaits a restart. Its key-presence semantics are specified in
   [settings.md](settings.md#the-setup-card)
   ([2026-08-11](../decision_log.md#2026-08-11-a-fresh-install-is-asked-once-on-a-card-keyed-to-key-absence)).
+- Both branches of the hint are a yellow panel wearing the same alert
+  treatment as the card, with the warning icon beside the sentence, no title
+  above it, and the card's width. A sentence too long for one line wraps
+  beside the icon rather than under it
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
+- The hint and the card can render together, hint first: a stored stats
+  folder that has since vanished beside a username key that was never
+  written leaves the yellow hint above the blue account offer, each speaking
+  for its own key
+  ([2026-09-15](../decision_log.md#2026-09-15-setup-hints-wear-the-notice-anatomy)).
