@@ -370,6 +370,7 @@ def test_import_strips_padded_scenario_names_so_they_resolve_local_stats(
 def test_import_reports_write_failures_without_updating_database(
     monkeypatch,
     tmp_path,
+    caplog,
 ):
     _bundled_root, user_root = _configure_roots(monkeypatch, tmp_path)
     api_response = SimpleNamespace(
@@ -382,18 +383,30 @@ def test_import_reports_write_failures_without_updating_database(
         ]
     )
     monkeypatch.setattr(data_service, "get_playlist_data", lambda _code: api_response)
+    write_error = PermissionError("playlist file is locked")
 
     def fail_write(_playlist):
-        raise PermissionError("playlist file is locked")
+        raise write_error
 
     monkeypatch.setattr(data_service, "write_playlist_data_to_file", fail_write)
 
-    message, imported_code = data_service.load_playlist_from_code("LockedCode")
+    with caplog.at_level(logging.WARNING, logger=data_service.logger.name):
+        message, imported_code = data_service.load_playlist_from_code("LockedCode")
 
     assert message == (
         'Couldn\'t save the playlist file for "Locked Playlist" (LockedCode). '
         "See data/logs/debug.log."
     )
+    # The message points at the log, so the log has to carry the cause.
+    (record,) = [
+        record
+        for record in caplog.records
+        if record.getMessage()
+        == "Failed to save playlist data: Locked Playlist (LockedCode)"
+    ]
+    assert record.exc_info is not None
+    assert record.exc_info[1] is write_error
+    assert "PermissionError: playlist file is locked" in caplog.text
     assert imported_code is None
     assert data_service.playlist_database == {}
     assert not user_root.exists()

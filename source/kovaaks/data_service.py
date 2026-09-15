@@ -1097,10 +1097,14 @@ def load_playlist_from_code(  # noqa: PLR0911
         )
         return f"The playlist data for {playlist_data.code} is unusable.", None
     except OSError:
+        # The refusal sends the user to the log, and nothing on the write path
+        # records the OSError itself (a full disk, a denied directory, a failed
+        # fsync), so the traceback has to ride on this line.
         logger.warning(
             "Failed to save playlist data: %s (%s)",
             playlist_data.name,
             playlist_data.code,
+            exc_info=True,
         )
         message = (
             f'Couldn\'t save the playlist file for "{playlist_data.name}" '

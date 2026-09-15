@@ -207,7 +207,10 @@ numbering is the proposal's.
 - Log lines are unchanged where the new user message dropped a fact or added a
   user-only pointer: every import and delete refusal logs its previous text
   beside the new message, and the file-collision refusal is logged where the
-  file name is known, in `_guard_playlist_destination`. The startup playlist
+  file name is known, in `_guard_playlist_destination`. Every message that
+  says `See data/logs/debug.log.` has a log line carrying the exception with
+  its traceback; the playlist-save refusal gained `exc_info` for it, because
+  nothing on the write path logs the `OSError` itself. The startup playlist
   warnings and the store messages are logged by helpers that log what they
   show, so those log lines follow the new copy, and a user-root playlist file
   the loader skips is now logged twice with identical text (store layer and
