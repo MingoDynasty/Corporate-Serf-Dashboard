@@ -113,6 +113,16 @@ of scope here, apart from its chart toolbar, noted under The graph.
   rebuild, so when the selected scenario survives the switch the drawn rank
   lines lag the selection until the next rebuild (a control change, a
   scenario change, or a new run).
+- Zooming the x axis refits the score axis to the runs in view: the run
+  points and Average Score line inside the x window, padded by 5% of their
+  span. Overlay lines are not part of the fit, so a line beyond the fitted
+  range is out of view while zoomed. A trace hidden from the legend is left
+  out too, and showing or hiding one while zoomed refits. A window holding no
+  runs leaves the score axis as it was. Double-clicking the plot, "Reset
+  axes", "Autoscale", and any new figure (a rebuild or an appearance change)
+  return both axes to the full autorange. Double-clicking the x axis alone
+  also returns a refit score axis to its full autorange, but leaves a score
+  range the user dragged themselves.
 - Until the first data callback resolves, the chart is a transparent,
   annotation-free placeholder; a resolved-but-empty result gets an explicit
   empty state instead

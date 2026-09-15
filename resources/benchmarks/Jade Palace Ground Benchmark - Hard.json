@@ -80,17 +80,17 @@
         {
           "name": "Astra",
           "color": "#c4065b",
-          "threshold": 2700.0
+          "threshold": 2650.0
         },
         {
           "name": "Celestial",
           "color": "#56e4fe",
-          "threshold": 3000.0
+          "threshold": 2900.0
         },
         {
           "name": "Transcendent",
           "color": "#faa0fc",
-          "threshold": 3300.0
+          "threshold": 3250.0
         }
       ],
       "leaderboard_id": 128399
@@ -121,7 +121,7 @@
         {
           "name": "Transcendent",
           "color": "#faa0fc",
-          "threshold": 15400.0
+          "threshold": 15000.0
         }
       ],
       "leaderboard_id": 814
@@ -194,22 +194,22 @@
         {
           "name": "Grandmaster",
           "color": "#feeb01",
-          "threshold": 898.0
+          "threshold": 897.0
         },
         {
           "name": "Nova",
           "color": "#6f1d89",
-          "threshold": 905.0
+          "threshold": 904.0
         },
         {
           "name": "Astra",
           "color": "#c4065b",
-          "threshold": 911.0
+          "threshold": 910.0
         },
         {
           "name": "Celestial",
           "color": "#56e4fe",
-          "threshold": 916.0
+          "threshold": 915.0
         },
         {
           "name": "Transcendent",
@@ -354,22 +354,22 @@
         {
           "name": "Nova",
           "color": "#6f1d89",
-          "threshold": 3150.0
+          "threshold": 3200.0
         },
         {
           "name": "Astra",
           "color": "#c4065b",
-          "threshold": 3400.0
+          "threshold": 3500.0
         },
         {
           "name": "Celestial",
           "color": "#56e4fe",
-          "threshold": 3650.0
+          "threshold": 3750.0
         },
         {
           "name": "Transcendent",
           "color": "#faa0fc",
-          "threshold": 3900.0
+          "threshold": 4000.0
         }
       ],
       "leaderboard_id": 154173
@@ -421,17 +421,17 @@
         {
           "name": "Astra",
           "color": "#c4065b",
-          "threshold": 2300.0
+          "threshold": 2250.0
         },
         {
           "name": "Celestial",
           "color": "#56e4fe",
-          "threshold": 2600.0
+          "threshold": 2500.0
         },
         {
           "name": "Transcendent",
           "color": "#faa0fc",
-          "threshold": 2900.0
+          "threshold": 2800.0
         }
       ],
       "leaderboard_id": 141929
@@ -473,12 +473,12 @@
         {
           "name": "Grandmaster",
           "color": "#feeb01",
-          "threshold": 8900.0
+          "threshold": 8700.0
         },
         {
           "name": "Nova",
           "color": "#6f1d89",
-          "threshold": 9800.0
+          "threshold": 9700.0
         },
         {
           "name": "Astra",
@@ -555,7 +555,7 @@
         {
           "name": "Transcendent",
           "color": "#faa0fc",
-          "threshold": 14500.0
+          "threshold": 14700.0
         }
       ],
       "leaderboard_id": 1343
@@ -648,7 +648,7 @@
         "#faa0fc"
       ]
     ],
-    "generated_at": "2026-07-20T22:09:10.667893+00:00",
+    "generated_at": "2026-09-15T18:02:01.476344+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

@@ -705,37 +705,37 @@
         {
           "name": "Stagnant",
           "color": "#F9CB9C",
-          "threshold": 3200.0
+          "threshold": 3400.0
         },
         {
           "name": "Gradual",
           "color": "#FFE599",
-          "threshold": 3400.0
+          "threshold": 3600.0
         },
         {
           "name": "Moderate",
           "color": "#B6D7A8",
-          "threshold": 3600.0
+          "threshold": 3800.0
         },
         {
           "name": "Swift",
           "color": "#A4C2F4",
-          "threshold": 3800.0
+          "threshold": 4000.0
         },
         {
           "name": "Exponential",
           "color": "#B47AD6",
-          "threshold": 4000.0
+          "threshold": 4200.0
         },
         {
           "name": "Accelerated",
           "color": "#AAAAAA",
-          "threshold": 4200.0
+          "threshold": 4400.0
         },
         {
           "name": "Speed",
           "color": "#050000",
-          "threshold": 4400.0
+          "threshold": 4600.0
         }
       ],
       "leaderboard_id": 178766
@@ -774,7 +774,7 @@
         "#050000"
       ]
     ],
-    "generated_at": "2026-07-20T22:09:28.190470+00:00",
+    "generated_at": "2026-09-15T18:02:02.413216+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }

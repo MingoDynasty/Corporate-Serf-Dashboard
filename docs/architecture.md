@@ -633,6 +633,26 @@ flowchart LR
   `window.dashMantineFunctions` when a prop is passed as
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
+- `assets/homeGraphResize.js` — keeps the Scenario Performance graph drawn at
+  its container's size. Plotly only redraws a responsive graph on window
+  `resize` events, but this graph's box changes without one: its height is
+  flex-driven by the controls above it, and the chart options inspector beside
+  it opens and collapses. A document `MutationObserver` finds each
+  `.home-graph` container as Dash mounts it, a `WeakSet` attaches the
+  `ResizeObserver` once per element, and each box change calls
+  `window.Plotly.Plots.resize` on the plot div. The `window.Plotly` guard is
+  load-bearing: dcc injects plotly.js lazily, so until the first graph renders
+  there is nothing to resize.
+- `assets/homeGraphZoomFit.js` — refits the Scenario Performance graph's
+  score axis to the runs in view when the x axis is zoomed. It listens on
+  each `.home-graph` plot div for `plotly_relayout` events that carry an x
+  range and, while x is zoomed, for `plotly_restyle` events that change trace
+  visibility. It fits visible trace points only, never the overlay shapes. The
+  fit's relayout re-sends the current x range: dcc.Graph copies every
+  relayout into its `figure` prop from props that can predate the user's
+  zoom, so a y-only relayout would snap x back to the full range. An
+  x-only autorange (a double-click on the x-axis drag handle) also
+  autoranges y, in the same relayout, when y still holds the last fit.
 - `assets/pbCelebration.js` — the personal best celebration's animation:
   a name-keyed style registry (`confetti`, `fireworks`, `cannons`, `stars`)
   behind `window.pbCelebration.play(style)` and `celebrate(batch, style)`. It

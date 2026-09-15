@@ -15058,8 +15058,10 @@
         "rankColors": {
           "Solivagant": "#66FFA6",
           "Berserker": "#FF667F",
+          "Archon": "#FFB366",
+          "Blessed": "#669FFF",
           "Exalted": "#5FE8DF",
-          "Invictus": "#9966FF",
+          "Ascendant": "#9966FF",
           "Sovereign": "#FFE566"
         },
         "categories": [
@@ -15553,9 +15555,7 @@
     "abbreviation": "AC",
     "color": "#e01f2f",
     "spreadsheetURL": "https://docs.google.com/spreadsheets/d/1uZujbl8tF15mzNwy-wTzai_xpc6wjnJnNbpvoOaEgjs",
-    "dateAdded": "2026-09-10",
-    "hidden": true,
-    "hiddenSlug": "acs1",
+    "dateAdded": "2026-09-15",
     "difficulties": [
       {
         "difficultyName": "Easier",

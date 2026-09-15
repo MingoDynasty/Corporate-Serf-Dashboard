@@ -1,0 +1,781 @@
+{
+  "name": "AIMCORE Benchmarks S1 - Medium",
+  "code": "KovaaKsClippingBurntorangeCamper",
+  "scenarios": [
+    {
+      "name": "AC KittyClick",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 89.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 95.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 102.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 109.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 116.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 124.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 132.0
+        }
+      ],
+      "leaderboard_id": 203882
+    },
+    {
+      "name": "AC BunnyClick",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 62.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 68.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 75.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 83.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 92.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 101.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 110.0
+        }
+      ],
+      "leaderboard_id": 203883
+    },
+    {
+      "name": "AC PuppyClick",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 75.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 82.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 87.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 91.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 98.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 109.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 115.0
+        }
+      ],
+      "leaderboard_id": 203884
+    },
+    {
+      "name": "AC MicroShot",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 121.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 130.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 139.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 148.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 157.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 166.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 175.0
+        }
+      ],
+      "leaderboard_id": 203885
+    },
+    {
+      "name": "AC WideShot",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 47.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 53.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 58.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 63.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 68.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 73.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 78.0
+        }
+      ],
+      "leaderboard_id": 203886
+    },
+    {
+      "name": "AC ClusterShot",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 149.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 159.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 169.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 179.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 189.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 199.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 208.0
+        }
+      ],
+      "leaderboard_id": 203887
+    },
+    {
+      "name": "AC Driftsphere",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 9900.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 10800.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 11700.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 12400.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 13600.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 14600.0
+        }
+      ],
+      "leaderboard_id": 203270
+    },
+    {
+      "name": "AC Arcstrafes",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 204000
+    },
+    {
+      "name": "AC FlowerXYZ",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 4300.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 4800.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 5100.0
+        }
+      ],
+      "leaderboard_id": 203889
+    },
+    {
+      "name": "AC AirDodge",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 203890
+    },
+    {
+      "name": "AC PlazaDodge",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 203891
+    },
+    {
+      "name": "AC RoboStrafes",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 13700.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 14400.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 15000.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 16800.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 17600.0
+        }
+      ],
+      "leaderboard_id": 203898
+    },
+    {
+      "name": "AC MicroTS",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 98.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 107.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 115.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 122.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 128.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 133.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 137.0
+        }
+      ],
+      "leaderboard_id": 203897
+    },
+    {
+      "name": "AC PillTS",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 99.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 106.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 113.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 119.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 125.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 131.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 137.0
+        }
+      ],
+      "leaderboard_id": 203892
+    },
+    {
+      "name": "AC SpeedTS 360",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 93.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 98.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 104.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 110.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 115.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 120.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 126.0
+        }
+      ],
+      "leaderboard_id": 203893
+    },
+    {
+      "name": "AC Wispswitch",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 42.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 46.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 50.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 56.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 60.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 65.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 71.0
+        }
+      ],
+      "leaderboard_id": 203949
+    },
+    {
+      "name": "AC AirSwitch",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 41.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 44.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 50.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 55.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 59.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 64.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 68.0
+        }
+      ],
+      "leaderboard_id": 203895
+    },
+    {
+      "name": "AC EvaSwitch 360",
+      "ranks": [
+        {
+          "name": "Fishbed",
+          "color": "#37baf3",
+          "threshold": 48.0
+        },
+        {
+          "name": "Flogger",
+          "color": "#4bceba",
+          "threshold": 53.0
+        },
+        {
+          "name": "Fulcrum",
+          "color": "#60d796",
+          "threshold": 60.0
+        },
+        {
+          "name": "Flanker",
+          "color": "#7adf77",
+          "threshold": 67.0
+        },
+        {
+          "name": "Eagle",
+          "color": "#99e75b",
+          "threshold": 72.0
+        },
+        {
+          "name": "Typhoon",
+          "color": "#bcee43",
+          "threshold": 77.0
+        },
+        {
+          "name": "Raptor",
+          "color": "#e5f52c",
+          "threshold": 83.0
+        }
+      ],
+      "leaderboard_id": 203896
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsClippingBurntorangeCamper",
+    "kovaaks_benchmark_id": 2891,
+    "rank_colors": [
+      [
+        "Fishbed",
+        "#37baf3"
+      ],
+      [
+        "Flogger",
+        "#4bceba"
+      ],
+      [
+        "Fulcrum",
+        "#60d796"
+      ],
+      [
+        "Flanker",
+        "#7adf77"
+      ],
+      [
+        "Eagle",
+        "#99e75b"
+      ],
+      [
+        "Typhoon",
+        "#bcee43"
+      ],
+      [
+        "Raptor",
+        "#e5f52c"
+      ]
+    ],
+    "generated_at": "2026-09-15T18:08:46.014995+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

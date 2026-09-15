@@ -126,45 +126,45 @@
       "leaderboard_id": 125503
     },
     {
-      "name": "TSK - SYW",
+      "name": "SYW (Smooth Your Wrist) Truly FIXED",
       "ranks": [
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 1200.0
+          "threshold": 440.0
         },
         {
           "name": "Viridian",
           "color": "#368b5c",
-          "threshold": 1325.0
+          "threshold": 490.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 1450.0
+          "threshold": 540.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 1600.0
+          "threshold": 590.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 1750.0
+          "threshold": 640.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 1875.0
+          "threshold": 680.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 2000.0
+          "threshold": 710.0
         }
       ],
-      "leaderboard_id": 120700
+      "leaderboard_id": 13150
     },
     {
       "name": "TSK - Centering 180 Speed 2",
@@ -254,37 +254,37 @@
         {
           "name": "Celadon",
           "color": "#9CFF91",
-          "threshold": 1450.0
+          "threshold": 1350.0
         },
         {
           "name": "Viridian",
           "color": "#368b5c",
-          "threshold": 1575.0
+          "threshold": 1475.0
         },
         {
           "name": "Cerulean",
           "color": "#02A4D3",
-          "threshold": 1700.0
+          "threshold": 1600.0
         },
         {
           "name": "Lavender",
           "color": "#C2C2FF",
-          "threshold": 1800.0
+          "threshold": 1700.0
         },
         {
           "name": "Indigo",
           "color": "#5C3896",
-          "threshold": 1900.0
+          "threshold": 1800.0
         },
         {
           "name": "Fuchsia",
           "color": "#C74375",
-          "threshold": 2000.0
+          "threshold": 1900.0
         },
         {
           "name": "Chiffon",
           "color": "#8FC7E7",
-          "threshold": 2070.0
+          "threshold": 1970.0
         }
       ],
       "leaderboard_id": 202921
@@ -2496,7 +2496,7 @@
         "#8FC7E7"
       ]
     ],
-    "generated_at": "2026-08-09T02:57:05.691474+00:00",
+    "generated_at": "2026-09-15T18:02:03.545340+00:00",
     "generator": "benchmark_importer",
     "schema_version": 2
   }
