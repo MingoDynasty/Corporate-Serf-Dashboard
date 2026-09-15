@@ -1,0 +1,562 @@
+{
+  "name": "Tracer Benchmarks",
+  "code": "KovaaKsTrollingRoyalpurpleTopfrag",
+  "scenarios": [
+    {
+      "name": "Tile Frenzy 360 Strafing 400Prct Track",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 75.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 80.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 85.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 90.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 100.0
+        }
+      ],
+      "leaderboard_id": 1082
+    },
+    {
+      "name": "psalmflick Strafing Tracking",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 70.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 75.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 80.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 85.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 95.0
+        }
+      ],
+      "leaderboard_id": 1753
+    },
+    {
+      "name": "Smoothbot Pauer Close Smooth",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 4500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 4850.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 5750.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 6250.0
+        }
+      ],
+      "leaderboard_id": 164863
+    },
+    {
+      "name": "Arm Turning Training 60s FIXED",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 4100.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 4600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 5100.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 5400.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 6100.0
+        }
+      ],
+      "leaderboard_id": 31640
+    },
+    {
+      "name": "Close long strafes invincible very thin",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 6100.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 7500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 8100.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 9300.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 10000.0
+        }
+      ],
+      "leaderboard_id": 2244
+    },
+    {
+      "name": "psalmflick Strafing Tracking Precise",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 45.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 52.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 58.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 64.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 70.0
+        }
+      ],
+      "leaderboard_id": 3943
+    },
+    {
+      "name": "Air Divine",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 878.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 885.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 890.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 895.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 902.0
+        }
+      ],
+      "leaderboard_id": 645
+    },
+    {
+      "name": "Air UFO Hard Invincible",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 2700.0
+        }
+      ],
+      "leaderboard_id": 2198
+    },
+    {
+      "name": "Overhead Jumps Incline Hard",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 600.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 800.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 850.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 24304
+    },
+    {
+      "name": "Close Fast Strafes Invincible Precise+ OW",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 8200.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 8600.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 9000.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 9250.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 11000.0
+        }
+      ],
+      "leaderboard_id": 88563
+    },
+    {
+      "name": "Ground Plaza Sparky v3 OW Invincible 4",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 2800.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 3200.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 3800.0
+        }
+      ],
+      "leaderboard_id": 7244
+    },
+    {
+      "name": "Air Dodge",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 132.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 140.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 144.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 148.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 155.0
+        }
+      ],
+      "leaderboard_id": 530
+    },
+    {
+      "name": "Closerange Tracking Training Humanoid Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 16000.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 19000.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 20000.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 22000.0
+        }
+      ],
+      "leaderboard_id": 2924
+    },
+    {
+      "name": "Close fse dodge OW",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 12500.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 16500.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 17500.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 19000.0
+        }
+      ],
+      "leaderboard_id": 1063
+    },
+    {
+      "name": "Frog House Revolving 50% smaller",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 4500.0
+        }
+      ],
+      "leaderboard_id": 77778
+    },
+    {
+      "name": "revolving tracking strafes ow",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 7000.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 7400.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 7900.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 8500.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 10000.0
+        }
+      ],
+      "leaderboard_id": 693
+    },
+    {
+      "name": "PsalmTS Revolving",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#0080c0",
+          "threshold": 55.0
+        },
+        {
+          "name": "Master",
+          "color": "#008000",
+          "threshold": 60.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#ffff00",
+          "threshold": 65.0
+        },
+        {
+          "name": "Champion",
+          "color": "#ff80ff",
+          "threshold": 70.0
+        },
+        {
+          "name": "Proper",
+          "color": "#000000",
+          "threshold": 80.0
+        }
+      ],
+      "leaderboard_id": 1821
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsTrollingRoyalpurpleTopfrag",
+    "kovaaks_benchmark_id": 2813,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#0080c0"
+      ],
+      [
+        "Master",
+        "#008000"
+      ],
+      [
+        "Grandmaster",
+        "#ffff00"
+      ],
+      [
+        "Champion",
+        "#ff80ff"
+      ],
+      [
+        "Proper",
+        "#000000"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:05:33.536793+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

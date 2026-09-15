@@ -1,0 +1,1027 @@
+{
+  "name": "Avasive Benchmarks S2 (Hard)",
+  "code": "KovaaKsWipingTealInitiator",
+  "scenarios": [
+    {
+      "name": "Pasu Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1250.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1700.0
+        }
+      ],
+      "leaderboard_id": 203333
+    },
+    {
+      "name": "AbyssClick Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 980.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1340.0
+        }
+      ],
+      "leaderboard_id": 203334
+    },
+    {
+      "name": "BounceClick Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 840.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 980.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1360.0
+        }
+      ],
+      "leaderboard_id": 203335
+    },
+    {
+      "name": "JennClick Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 680.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 800.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 920.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1120.0
+        }
+      ],
+      "leaderboard_id": 203554
+    },
+    {
+      "name": "1w2ts Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1230.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1330.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1420.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1500.0
+        }
+      ],
+      "leaderboard_id": 203337
+    },
+    {
+      "name": "Clustershot Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1500.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1640.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1760.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1870.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1970.0
+        }
+      ],
+      "leaderboard_id": 203338
+    },
+    {
+      "name": "ww4t Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1320.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1410.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1490.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1570.0
+        }
+      ],
+      "leaderboard_id": 203339
+    },
+    {
+      "name": "Odd-Angleshot Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1370.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1480.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1570.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1660.0
+        }
+      ],
+      "leaderboard_id": 203340
+    },
+    {
+      "name": "SmoothBot Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3150.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3625.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4250.0
+        }
+      ],
+      "leaderboard_id": 201483
+    },
+    {
+      "name": "PTI Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2750.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3125.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 203551
+    },
+    {
+      "name": "PreciseTrack Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2950.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3575.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 3875.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4150.0
+        }
+      ],
+      "leaderboard_id": 203332
+    },
+    {
+      "name": "Leapstrafes Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 2975.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4300.0
+        }
+      ],
+      "leaderboard_id": 203341
+    },
+    {
+      "name": "AirXYZ Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 3000.0
+        }
+      ],
+      "leaderboard_id": 203505
+    },
+    {
+      "name": "PasuXYZ Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 2300.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 2600.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 3200.0
+        }
+      ],
+      "leaderboard_id": 203466
+    },
+    {
+      "name": "Plaza Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3750.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 4000.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 203345
+    },
+    {
+      "name": "Thin Strafes Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1400.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1800.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 2200.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 2600.0
+        }
+      ],
+      "leaderboard_id": 203346
+    },
+    {
+      "name": "Pokeball Wide Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1220.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1380.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1440.0
+        }
+      ],
+      "leaderboard_id": 203347
+    },
+    {
+      "name": "PoleTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1320.0
+        }
+      ],
+      "leaderboard_id": 203348
+    },
+    {
+      "name": "DollTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 920.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1110.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1190.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1260.0
+        }
+      ],
+      "leaderboard_id": 203331
+    },
+    {
+      "name": "psalmTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 940.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1070.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1270.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1340.0
+        }
+      ],
+      "leaderboard_id": 203349
+    },
+    {
+      "name": "SmoothTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 380.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 420.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 460.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 500.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 540.0
+        }
+      ],
+      "leaderboard_id": 203350
+    },
+    {
+      "name": "BounceTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 680.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 750.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 820.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 890.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 950.0
+        }
+      ],
+      "leaderboard_id": 203351
+    },
+    {
+      "name": "AngelTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 430.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 490.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 540.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 580.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 620.0
+        }
+      ],
+      "leaderboard_id": 203352
+    },
+    {
+      "name": "AbyssTS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 670.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 730.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 780.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 830.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 870.0
+        }
+      ],
+      "leaderboard_id": 203353
+    },
+    {
+      "name": "HeadClick Dodge Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 920.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1170.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1240.0
+        }
+      ],
+      "leaderboard_id": 203329
+    },
+    {
+      "name": "BounceClick Dodge Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 830.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 920.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1160.0
+        }
+      ],
+      "leaderboard_id": 203354
+    },
+    {
+      "name": "Ground Dodge Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3300.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 3800.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 203355
+    },
+    {
+      "name": "AirTS Dodge Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 560.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 620.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 670.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 720.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 760.0
+        }
+      ],
+      "leaderboard_id": 203356
+    },
+    {
+      "name": "AMS Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 640.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 780.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 900.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1120.0
+        }
+      ],
+      "leaderboard_id": 203357
+    },
+    {
+      "name": "AngelClick Revolving Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 600.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 740.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 860.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 980.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 1080.0
+        }
+      ],
+      "leaderboard_id": 203806
+    },
+    {
+      "name": "Bounce House Precise Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3100.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3400.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 3700.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 4050.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4400.0
+        }
+      ],
+      "leaderboard_id": 203359
+    },
+    {
+      "name": "Smoothsphere Revolving Avasive",
+      "ranks": [
+        {
+          "name": "Tranquility",
+          "color": "#8df97b",
+          "threshold": 3650.0
+        },
+        {
+          "name": "Serenity",
+          "color": "#7bf9de",
+          "threshold": 3975.0
+        },
+        {
+          "name": "Harmony",
+          "color": "#887bf9",
+          "threshold": 4275.0
+        },
+        {
+          "name": "Solace",
+          "color": "#db7bf9",
+          "threshold": 4550.0
+        },
+        {
+          "name": "Euphoria",
+          "color": "#ff9bcd",
+          "threshold": 4800.0
+        }
+      ],
+      "leaderboard_id": 203809
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsWipingTealInitiator",
+    "kovaaks_benchmark_id": 2845,
+    "rank_colors": [
+      [
+        "Tranquility",
+        "#8df97b"
+      ],
+      [
+        "Serenity",
+        "#7bf9de"
+      ],
+      [
+        "Harmony",
+        "#887bf9"
+      ],
+      [
+        "Solace",
+        "#db7bf9"
+      ],
+      [
+        "Euphoria",
+        "#ff9bcd"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:05:37.299202+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

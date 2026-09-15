@@ -23,7 +23,10 @@ thresholds.
 4. Manually copy reviewed output to `resources/benchmarks/` — the app scans
    that whole directory at startup. No per-benchmark activation copies:
    which benchmarks the user sees is a show/hide preference managed on the
-   app's Playlists page ("Show hidden" reveals new arrivals).
+   app's Playlists page ("Show hidden" reveals new arrivals). Which
+   sharecodes belong there is a maintainer rule the script does not enforce:
+   Evxl's listed, non-hidden benchmarks, with delisted files removed
+   ([decision log](../../docs/decision_log.md#2026-09-15-the-bundled-corpus-is-evxls-listed-non-hidden-benchmarks)).
 
 Run from the repository root:
 

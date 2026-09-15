@@ -1,0 +1,1427 @@
+{
+  "name": "\u4e09\u89d2\u6d32-\u7b80\u5355-\u4e8c\u4e09",
+  "code": "KovaaKsPerfectingVividtangerineCd",
+  "scenarios": [
+    {
+      "name": "Tile Frenzy 180",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 55.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 72.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 90.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 107.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 125.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 131.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 137.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 144
+    },
+    {
+      "name": "Gridshot",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 58.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 66.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 72.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 77.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 82.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 88.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 93.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 101.0
+        }
+      ],
+      "leaderboard_id": 902
+    },
+    {
+      "name": "RawMouseControlClicking3",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 1150.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 1312.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 1475.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 1637.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 1802.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 1900.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 2024.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 2150.0
+        }
+      ],
+      "leaderboard_id": 5144
+    },
+    {
+      "name": "cA 900targets",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 99.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 110.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 118.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 125.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 131.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 138.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 146.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 154.0
+        }
+      ],
+      "leaderboard_id": 96440
+    },
+    {
+      "name": "6 sphere hipfire voltaic extra small",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 72.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 80.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 85.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 90.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 94.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 99.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 103.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 109.0
+        }
+      ],
+      "leaderboard_id": 788
+    },
+    {
+      "name": "RawMouseControlExtraSmall (Discipline)",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 444.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 532.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 606.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 676.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 744.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 800.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 884.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 950.0
+        }
+      ],
+      "leaderboard_id": 64298
+    },
+    {
+      "name": "1wall 6targets small",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 478.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 575.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 640.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 695.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 750.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 800.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 860.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 930.0
+        }
+      ],
+      "leaderboard_id": 2
+    },
+    {
+      "name": "ww5t Voltaic Slightly Larger",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 94.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 102.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 108.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 113.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 117.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 123.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 126.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 129.0
+        }
+      ],
+      "leaderboard_id": 185378
+    },
+    {
+      "name": "1wall6targets TE",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 84.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 94.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 104.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 112.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 120.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 127.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 135.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 145.0
+        }
+      ],
+      "leaderboard_id": 10420
+    },
+    {
+      "name": "Centering II 180 no strafes LG56 WARMUP",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 8964.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 9648.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 10062.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 10368.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 10620.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 10818.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 11016.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 11196.0
+        }
+      ],
+      "leaderboard_id": 35492
+    },
+    {
+      "name": "VSTP huge Strafe",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 2405.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 2814.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 3082.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 3405.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 3728.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 4059.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 4473.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 4854.0
+        }
+      ],
+      "leaderboard_id": 99050
+    },
+    {
+      "name": "Flower Easier 50cm",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 1843.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 2259.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 2572.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 2844.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 3083.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 3361.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 3582.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 3722.0
+        }
+      ],
+      "leaderboard_id": 185354
+    },
+    {
+      "name": "cloverRawControl Jumbo",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 7374.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 8523.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 9357.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 10140.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 10905.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 11667.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 12465.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 13326.0
+        }
+      ],
+      "leaderboard_id": 69529
+    },
+    {
+      "name": "VT Controlsphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 2212.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 2656.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 2968.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 3262.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 3533.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 3768.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 4103.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 4218.0
+        }
+      ],
+      "leaderboard_id": 184157
+    },
+    {
+      "name": "Smoothsphere Viscose Easier",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 8634.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 10086.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 11097.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 11919.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 12609.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 13251.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 13797.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 14172.0
+        }
+      ],
+      "leaderboard_id": 185342
+    },
+    {
+      "name": "VT Floating Heads Viscose Easier",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 614.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 702.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 761.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 817.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 873.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 922.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 986.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 1039.0
+        }
+      ],
+      "leaderboard_id": 185409
+    },
+    {
+      "name": "Pasu Voltaic Reload Easier",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 57.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 66.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 73.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 78.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 83.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 88.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 92.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 96.0
+        }
+      ],
+      "leaderboard_id": 185636
+    },
+    {
+      "name": "1wall5targets_pasu_small",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 4.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 6.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 9.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 12.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 15.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 19.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 24.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 30.0
+        }
+      ],
+      "leaderboard_id": 244
+    },
+    {
+      "name": "Night Lantern - @wa11p1per",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 21.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 27.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 32.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 36.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 39.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 43.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 48.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 53.0
+        }
+      ],
+      "leaderboard_id": 29844
+    },
+    {
+      "name": "tamTargetSwitch Control Hard",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 4.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 8.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 11.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 15.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 18.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 21.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 24.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 27.0
+        }
+      ],
+      "leaderboard_id": 757
+    },
+    {
+      "name": "domiSwitch Easy",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 3726.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 4350.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 4765.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 5107.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 5389.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 5695.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 5944.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 6266.0
+        }
+      ],
+      "leaderboard_id": 83043
+    },
+    {
+      "name": "VT Bounceshot Viscose Easier",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 460.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 560.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 630.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 690.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 750.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 800.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 870.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 900.0
+        }
+      ],
+      "leaderboard_id": 185392
+    },
+    {
+      "name": "Pasu Voltaic Easy",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 27.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 35.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 41.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 46.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 51.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 55.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 60.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 66.0
+        }
+      ],
+      "leaderboard_id": 605
+    },
+    {
+      "name": "voxTargetSwitch 2 Large",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 81.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 89.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 95.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 100.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 104.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 109.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 113.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 118.0
+        }
+      ],
+      "leaderboard_id": 84880
+    },
+    {
+      "name": "patCircleSwitch NR",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 62.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 68.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 73.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 77.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 81.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 84.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 88.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 92.0
+        }
+      ],
+      "leaderboard_id": 535
+    },
+    {
+      "name": "aimerz+ Static Switching",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 84.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 92.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 99.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 105.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 110.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 115.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 120.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 126.0
+        }
+      ],
+      "leaderboard_id": 54520
+    },
+    {
+      "name": "waldoTS Novice",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 96.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 106.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 113.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 118.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 124.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 129.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 135.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 141.0
+        }
+      ],
+      "leaderboard_id": 113019
+    },
+    {
+      "name": "psalmTS Voltaic Easy",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 54.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 58.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 62.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 65.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 68.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 72.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 77.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 80.0
+        }
+      ],
+      "leaderboard_id": 960
+    },
+    {
+      "name": "Skeet Tracking",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 227.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 354.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 473.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 599.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 739.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 901.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 1096.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 1347.0
+        }
+      ],
+      "leaderboard_id": 145
+    },
+    {
+      "name": "Bounce 180 Tracking",
+      "ranks": [
+        {
+          "name": "\u767d\u94f6",
+          "color": "#7d7d7d",
+          "threshold": 32.0
+        },
+        {
+          "name": "\u767d\u94f6\u2161",
+          "color": "#a9a7a7",
+          "threshold": 37.0
+        },
+        {
+          "name": "\u9ec4\u91d1",
+          "color": "#d69f6b",
+          "threshold": 41.0
+        },
+        {
+          "name": "\u9ec4\u91d1\u2161",
+          "color": "#e29750",
+          "threshold": 45.0
+        },
+        {
+          "name": "\u94c2\u91d1",
+          "color": "#5782cb",
+          "threshold": 48.0
+        },
+        {
+          "name": "\u94c2\u91d1\u2161",
+          "color": "#417ce1",
+          "threshold": 51.0
+        },
+        {
+          "name": "\u7fe1\u7fe0",
+          "color": "#5bbe91",
+          "threshold": 55.0
+        },
+        {
+          "name": "\u7fe1\u7fe0\u2161",
+          "color": "#39db92",
+          "threshold": 60.0
+        }
+      ],
+      "leaderboard_id": 122
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPerfectingVividtangerineCd",
+    "kovaaks_benchmark_id": 2885,
+    "rank_colors": [
+      [
+        "\u767d\u94f6",
+        "#7d7d7d"
+      ],
+      [
+        "\u767d\u94f6\u2161",
+        "#a9a7a7"
+      ],
+      [
+        "\u9ec4\u91d1",
+        "#d69f6b"
+      ],
+      [
+        "\u9ec4\u91d1\u2161",
+        "#e29750"
+      ],
+      [
+        "\u94c2\u91d1",
+        "#5782cb"
+      ],
+      [
+        "\u94c2\u91d1\u2161",
+        "#417ce1"
+      ],
+      [
+        "\u7fe1\u7fe0",
+        "#5bbe91"
+      ],
+      [
+        "\u7fe1\u7fe0\u2161",
+        "#39db92"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:27.017748+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

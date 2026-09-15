@@ -1,0 +1,1027 @@
+{
+  "name": "Avasive Benchmarks S2 (Easier)",
+  "code": "KovaaKsHipfiringBurntorangeTacmap",
+  "scenarios": [
+    {
+      "name": "Pasu Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 670.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 850.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 203395
+    },
+    {
+      "name": "AbyssClick Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 640.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 760.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 860.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 940.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1000.0
+        }
+      ],
+      "leaderboard_id": 203396
+    },
+    {
+      "name": "BounceClick Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 680.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 760.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 840.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 910.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 980.0
+        }
+      ],
+      "leaderboard_id": 203397
+    },
+    {
+      "name": "JennClick Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 380.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 500.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 600.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 680.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 740.0
+        }
+      ],
+      "leaderboard_id": 203556
+    },
+    {
+      "name": "1w4ts Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 700.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 840.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 960.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1120.0
+        }
+      ],
+      "leaderboard_id": 203399
+    },
+    {
+      "name": "Clustershot Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 1020.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1350.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1420.0
+        }
+      ],
+      "leaderboard_id": 203400
+    },
+    {
+      "name": "ww6t Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 850.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 980.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1250.0
+        }
+      ],
+      "leaderboard_id": 203401
+    },
+    {
+      "name": "Odd-Angleshot Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 820.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 950.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1060.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1220.0
+        }
+      ],
+      "leaderboard_id": 203402
+    },
+    {
+      "name": "SmoothBot Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2500.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2875.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3225.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3850.0
+        }
+      ],
+      "leaderboard_id": 203403
+    },
+    {
+      "name": "PTI Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2375.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3275.0
+        }
+      ],
+      "leaderboard_id": 203553
+    },
+    {
+      "name": "PreciseTrack Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2625.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3350.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3975.0
+        }
+      ],
+      "leaderboard_id": 203404
+    },
+    {
+      "name": "Leapstrafes Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 1975.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 2700.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3025.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3325.0
+        }
+      ],
+      "leaderboard_id": 203405
+    },
+    {
+      "name": "AirXYZ Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2275.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 2425.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 2575.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2700.0
+        }
+      ],
+      "leaderboard_id": 203503
+    },
+    {
+      "name": "PasuXYZ Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2450.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2650.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 2825.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3000.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3150.0
+        }
+      ],
+      "leaderboard_id": 203467
+    },
+    {
+      "name": "Plaza Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 3475.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3675.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3850.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 4000.0
+        }
+      ],
+      "leaderboard_id": 203426
+    },
+    {
+      "name": "Thin Strafes Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 1475.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 2225.0
+        }
+      ],
+      "leaderboard_id": 203409
+    },
+    {
+      "name": "Pokeball Wide Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 890.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 970.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1190.0
+        }
+      ],
+      "leaderboard_id": 203410
+    },
+    {
+      "name": "PoleTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 780.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 850.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 920.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 990.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1050.0
+        }
+      ],
+      "leaderboard_id": 203411
+    },
+    {
+      "name": "DollTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 740.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 820.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 890.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 950.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1010.0
+        }
+      ],
+      "leaderboard_id": 203412
+    },
+    {
+      "name": "psalmTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 840.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 930.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 1080.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 1150.0
+        }
+      ],
+      "leaderboard_id": 203413
+    },
+    {
+      "name": "SmoothTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 300.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 340.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 380.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 420.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 460.0
+        }
+      ],
+      "leaderboard_id": 203414
+    },
+    {
+      "name": "BounceTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 600.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 660.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 720.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 770.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 820.0
+        }
+      ],
+      "leaderboard_id": 203415
+    },
+    {
+      "name": "AngelTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 360.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 400.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 440.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 480.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 520.0
+        }
+      ],
+      "leaderboard_id": 203416
+    },
+    {
+      "name": "AbyssTS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 580.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 640.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 690.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 740.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 780.0
+        }
+      ],
+      "leaderboard_id": 203417
+    },
+    {
+      "name": "HeadClick Dodge Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 650.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 720.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 780.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 840.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 890.0
+        }
+      ],
+      "leaderboard_id": 203418
+    },
+    {
+      "name": "BounceClick Dodge Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 600.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 670.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 740.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 800.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 860.0
+        }
+      ],
+      "leaderboard_id": 203419
+    },
+    {
+      "name": "Ground Dodge Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2900.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3275.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3450.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3600.0
+        }
+      ],
+      "leaderboard_id": 203420
+    },
+    {
+      "name": "AirTS Dodge Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 430.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 480.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 530.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 570.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 610.0
+        }
+      ],
+      "leaderboard_id": 203421
+    },
+    {
+      "name": "AMS Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 390.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 490.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 580.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 660.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 730.0
+        }
+      ],
+      "leaderboard_id": 203422
+    },
+    {
+      "name": "AngelClick Revolving Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 580.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 710.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 820.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 910.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 980.0
+        }
+      ],
+      "leaderboard_id": 203808
+    },
+    {
+      "name": "Bounce House Precise Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 2850.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3075.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 3400.0
+        }
+      ],
+      "leaderboard_id": 203424
+    },
+    {
+      "name": "Smoothsphere Revolving Avasive Easier",
+      "ranks": [
+        {
+          "name": "Flutter",
+          "color": "#a2afed",
+          "threshold": 3250.0
+        },
+        {
+          "name": "Sparkle",
+          "color": "#a47ddc",
+          "threshold": 3550.0
+        },
+        {
+          "name": "Flare",
+          "color": "#dc937d",
+          "threshold": 3775.0
+        },
+        {
+          "name": "Glow",
+          "color": "#ecf269",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Charm",
+          "color": "#5b9dab",
+          "threshold": 4100.0
+        }
+      ],
+      "leaderboard_id": 203811
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsHipfiringBurntorangeTacmap",
+    "kovaaks_benchmark_id": 2843,
+    "rank_colors": [
+      [
+        "Flutter",
+        "#a2afed"
+      ],
+      [
+        "Sparkle",
+        "#a47ddc"
+      ],
+      [
+        "Flare",
+        "#dc937d"
+      ],
+      [
+        "Glow",
+        "#ecf269"
+      ],
+      [
+        "Charm",
+        "#5b9dab"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:05:35.420118+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

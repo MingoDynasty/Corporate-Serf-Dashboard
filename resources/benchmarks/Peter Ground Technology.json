@@ -1,0 +1,239 @@
+{
+  "name": "Peter Ground Technology",
+  "code": "KovaaKsPeakingTwitchyFireteam",
+  "scenarios": [
+    {
+      "name": "Ground Plaza Sparky V3 Thin",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 897.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 902.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 907.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 912.0
+        }
+      ],
+      "leaderboard_id": 1408
+    },
+    {
+      "name": "Plaza Demotori",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 908.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 913.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 917.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 204146
+    },
+    {
+      "name": "VT Ground Advanced S5 Bot 3",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 3500.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 3725.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 3950.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 4200.0
+        }
+      ],
+      "leaderboard_id": 106732
+    },
+    {
+      "name": "midrange long strafe invincible demotori edition",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 10000.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 11000.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 12000.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 13200.0
+        }
+      ],
+      "leaderboard_id": 90392
+    },
+    {
+      "name": "Close Fast Strafes Invincible",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 13500.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 14500.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 15500.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 17000.0
+        }
+      ],
+      "leaderboard_id": 494
+    },
+    {
+      "name": "Close Needle Thin Easy",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 2350.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 2550.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 2750.0
+        }
+      ],
+      "leaderboard_id": 141929
+    },
+    {
+      "name": "MLSI demotori hard",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 5500.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 6500.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 7200.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 8200.0
+        }
+      ],
+      "leaderboard_id": 100709
+    },
+    {
+      "name": "Peepo CFSI",
+      "ranks": [
+        {
+          "name": "Hydroboy",
+          "color": "#3a7e79",
+          "threshold": 18000.0
+        },
+        {
+          "name": "Gsync",
+          "color": "#334ccc",
+          "threshold": 20000.0
+        },
+        {
+          "name": "Marlon",
+          "color": "#0e4953",
+          "threshold": 22000.0
+        },
+        {
+          "name": "Sajid",
+          "color": "#ffffff",
+          "threshold": 25000.0
+        }
+      ],
+      "leaderboard_id": 134902
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsPeakingTwitchyFireteam",
+    "kovaaks_benchmark_id": 2884,
+    "rank_colors": [
+      [
+        "Hydroboy",
+        "#3a7e79"
+      ],
+      [
+        "Gsync",
+        "#334ccc"
+      ],
+      [
+        "Marlon",
+        "#0e4953"
+      ],
+      [
+        "Sajid",
+        "#ffffff"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:39.712859+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

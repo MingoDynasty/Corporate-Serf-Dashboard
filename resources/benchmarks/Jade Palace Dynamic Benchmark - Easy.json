@@ -1,0 +1,655 @@
+{
+  "name": "Jade Palace Dynamic Benchmark - Easy",
+  "code": "KovaaKsBoomstickingCaffeinatedBomb",
+  "scenarios": [
+    {
+      "name": "Pasu Palace Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 90.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 101.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 112.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 122.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 132.0
+        }
+      ],
+      "leaderboard_id": 193483
+    },
+    {
+      "name": "Pasu Voltaic Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 80.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 89.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 98.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 107.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 115.0
+        }
+      ],
+      "leaderboard_id": 605
+    },
+    {
+      "name": "Pasu Reload Goated",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 103.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 114.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 125.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 136.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 147.0
+        }
+      ],
+      "leaderboard_id": 583
+    },
+    {
+      "name": "CombinedClick Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 76.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 88.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 98.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 107.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 116.0
+        }
+      ],
+      "leaderboard_id": 201116
+    },
+    {
+      "name": "Controlswitch Click Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 75.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 85.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 94.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 104.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 113.0
+        }
+      ],
+      "leaderboard_id": 200239
+    },
+    {
+      "name": "Pasu VP Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 910.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 1090.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1180.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1260.0
+        }
+      ],
+      "leaderboard_id": 196553
+    },
+    {
+      "name": "Popcorn Palace Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 570.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 720.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 860.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 980.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1100.0
+        }
+      ],
+      "leaderboard_id": 193482
+    },
+    {
+      "name": "Popcorn MV Easier",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 400.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 480.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 560.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 640.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 720.0
+        }
+      ],
+      "leaderboard_id": 185398
+    },
+    {
+      "name": "Aimerz+ hopClick Easy S1",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 870.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1010.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 1140.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1260.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1370.0
+        }
+      ],
+      "leaderboard_id": 68428
+    },
+    {
+      "name": "Leapcorn Pure Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 60.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 70.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 80.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 90.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 100.0
+        }
+      ],
+      "leaderboard_id": 42061
+    },
+    {
+      "name": "B180 Voltaic",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 78.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 87.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 96.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 104.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 112.0
+        }
+      ],
+      "leaderboard_id": 9
+    },
+    {
+      "name": "Leap 180 Avasive Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 70.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 82.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 92.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 102.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 112.0
+        }
+      ],
+      "leaderboard_id": 202791
+    },
+    {
+      "name": "Flow Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 950.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1240.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1330.0
+        }
+      ],
+      "leaderboard_id": 192630
+    },
+    {
+      "name": "1w4t Pasu Raspberry Jade",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 76.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 88.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 100.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 112.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 124.0
+        }
+      ],
+      "leaderboard_id": 200712
+    },
+    {
+      "name": "cAt purrClick Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1040.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 1120.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 1280.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1360.0
+        }
+      ],
+      "leaderboard_id": 83324
+    },
+    {
+      "name": "SnowClick Revosect Int",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 740.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 820.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 900.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 980.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 1060.0
+        }
+      ],
+      "leaderboard_id": 142899
+    },
+    {
+      "name": "BeanClick Wide 8 Bots Easy",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 138.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 150.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 165.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 174.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 186.0
+        }
+      ],
+      "leaderboard_id": 192660
+    },
+    {
+      "name": "beanClick Euphoric Novice",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 132.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 144.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 156.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 168.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 180.0
+        }
+      ],
+      "leaderboard_id": 197636
+    },
+    {
+      "name": "psalmTS Viscose Click",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 80.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 88.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 96.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 104.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 112.0
+        }
+      ],
+      "leaderboard_id": 185603
+    },
+    {
+      "name": "VT Floating Heads Intermediate S5 Hard",
+      "ranks": [
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 550.0
+        },
+        {
+          "name": "Jade",
+          "color": "#85FA85",
+          "threshold": 650.0
+        },
+        {
+          "name": "Master",
+          "color": "#cd30c1",
+          "threshold": 740.0
+        },
+        {
+          "name": "Grandmaster",
+          "color": "#feeb01",
+          "threshold": 830.0
+        },
+        {
+          "name": "Nova",
+          "color": "#6f1d89",
+          "threshold": 920.0
+        }
+      ],
+      "leaderboard_id": 106273
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsBoomstickingCaffeinatedBomb",
+    "kovaaks_benchmark_id": 2821,
+    "rank_colors": [
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Jade",
+        "#85FA85"
+      ],
+      [
+        "Master",
+        "#cd30c1"
+      ],
+      [
+        "Grandmaster",
+        "#feeb01"
+      ],
+      [
+        "Nova",
+        "#6f1d89"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:31.573946+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}

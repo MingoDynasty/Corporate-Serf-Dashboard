@@ -1,0 +1,408 @@
+{
+  "name": "Aimbeast Ground Intermediate",
+  "code": "KovaaKsAscendingPickedCheater",
+  "scenarios": [
+    {
+      "name": "SouljahStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 2550.0
+        }
+      ],
+      "leaderboard_id": 203662
+    },
+    {
+      "name": "StelosStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1600.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 1675.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 1750.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1825.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 1900.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 1975.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 2050.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 2125.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 2200.0
+        }
+      ],
+      "leaderboard_id": 203661
+    },
+    {
+      "name": "VexinStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1700.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 1775.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 1850.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1925.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 2000.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 2075.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 2150.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 2225.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 2300.0
+        }
+      ],
+      "leaderboard_id": 203660
+    },
+    {
+      "name": "MbmStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 925.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 1075.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 1450.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 1525.0
+        }
+      ],
+      "leaderboard_id": 203666
+    },
+    {
+      "name": "SleepStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 850.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 925.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 1000.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 1075.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 1150.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 1225.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 1300.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 1375.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 1450.0
+        }
+      ],
+      "leaderboard_id": 203664
+    },
+    {
+      "name": "RobidashkaStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 675.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 750.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 825.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 900.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 975.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 1050.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 1125.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 1200.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 1275.0
+        }
+      ],
+      "leaderboard_id": 203665
+    },
+    {
+      "name": "FlickerStrafes Intermediate",
+      "ranks": [
+        {
+          "name": "Platinum",
+          "color": "#2FCFC2",
+          "threshold": 1950.0
+        },
+        {
+          "name": "Platinum_2",
+          "color": "#2FCFC2",
+          "threshold": 2025.0
+        },
+        {
+          "name": "Platinum_3",
+          "color": "#2FCFC2",
+          "threshold": 2100.0
+        },
+        {
+          "name": "Diamond",
+          "color": "#B9F2FF",
+          "threshold": 2175.0
+        },
+        {
+          "name": "Diamond_2",
+          "color": "#B9F2FF",
+          "threshold": 2250.0
+        },
+        {
+          "name": "Diamond_3",
+          "color": "#B9F2FF",
+          "threshold": 2325.0
+        },
+        {
+          "name": "Ruby",
+          "color": "#FF4545",
+          "threshold": 2400.0
+        },
+        {
+          "name": "Ruby_2",
+          "color": "#FF4545",
+          "threshold": 2475.0
+        },
+        {
+          "name": "Ruby_3",
+          "color": "#FF4545",
+          "threshold": 2550.0
+        }
+      ],
+      "leaderboard_id": 203663
+    }
+  ],
+  "generated_from": {
+    "sharecode": "KovaaKsAscendingPickedCheater",
+    "kovaaks_benchmark_id": 2875,
+    "rank_colors": [
+      [
+        "Platinum",
+        "#2FCFC2"
+      ],
+      [
+        "Platinum_2",
+        "#2FCFC2"
+      ],
+      [
+        "Platinum_3",
+        "#2FCFC2"
+      ],
+      [
+        "Diamond",
+        "#B9F2FF"
+      ],
+      [
+        "Diamond_2",
+        "#B9F2FF"
+      ],
+      [
+        "Diamond_3",
+        "#B9F2FF"
+      ],
+      [
+        "Ruby",
+        "#FF4545"
+      ],
+      [
+        "Ruby_2",
+        "#FF4545"
+      ],
+      [
+        "Ruby_3",
+        "#FF4545"
+      ]
+    ],
+    "generated_at": "2026-09-14T22:01:41.496620+00:00",
+    "generator": "benchmark_importer",
+    "schema_version": 2
+  }
+}
