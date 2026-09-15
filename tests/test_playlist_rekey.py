@@ -933,19 +933,29 @@ def test_delete_superseded_user_playlist_files_removes_all_dead_copies(
     assert "BundledCode" in data_service.playlist_database
 
 
-def test_committed_bundled_playlists_all_carry_rank_data():
+def _committed_bundled_playlist_paths() -> list[Path]:
+    """List the committed files under ``resources/benchmarks``.
+
+    ``-z`` and an explicit UTF-8 decode are both load-bearing. Without ``-z``
+    git quotes and octal-escapes non-ASCII paths (the ``三角洲`` files), and
+    ``text=True`` would decode the raw bytes with the Windows code page; either
+    way those paths drop out of the corpus tests silently.
+    """
     result = subprocess.run(
-        ["git", "ls-files", "resources/benchmarks"],
+        ["git", "ls-files", "-z", "resources/benchmarks"],
         cwd=REPO_ROOT,
-        text=True,
         capture_output=True,
         check=True,
     )
-    playlist_paths = [
-        REPO_ROOT / path
-        for path in result.stdout.splitlines()
-        if path.endswith(".json")
-    ]
+    paths = [path for path in result.stdout.decode("utf-8").split("\0") if path]
+    # The corpus root is JSON-only, so any other entry is a mangled path. Fail
+    # on it rather than filtering it out and skipping that file unnoticed.
+    assert [path for path in paths if not path.endswith(".json")] == []
+    return [REPO_ROOT / path for path in paths]
+
+
+def test_committed_bundled_playlists_all_carry_rank_data():
+    playlist_paths = _committed_bundled_playlist_paths()
 
     assert playlist_paths
     missing_rank_data = []
@@ -969,18 +979,7 @@ _LEADERBOARD_ID_COVERAGE_EXCEPTIONS: set[str] = set()
 
 
 def test_committed_bundled_playlists_all_carry_leaderboard_ids():
-    result = subprocess.run(
-        ["git", "ls-files", "resources/benchmarks"],
-        cwd=REPO_ROOT,
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    playlist_paths = [
-        REPO_ROOT / path
-        for path in result.stdout.splitlines()
-        if path.endswith(".json")
-    ]
+    playlist_paths = _committed_bundled_playlist_paths()
 
     assert playlist_paths
     missing_leaderboard_ids = []
