@@ -1506,9 +1506,10 @@ def _stats_dir_hint_panel(sentence: str | list) -> dmc.Paper:
                 local_icon(SETUP_CARD_CAUTION_ICON, className="alert-panel-icon"),
                 dmc.Text(sentence),
             ],
-            # Group defaults to wrap="wrap", which sizes the text at its
-            # one-line width and drops a sentence too wide for the space beside
-            # the icon whole onto the row under it instead of wrapping it there.
+            # ``dmc.Group`` defaults to ``wrap="wrap"``, which sizes the text at
+            # its one-line width and drops a sentence too wide for the space
+            # beside the icon whole onto the row under it instead of wrapping it
+            # there.
             wrap="nowrap",
             gap="xs",
             align="flex-start",

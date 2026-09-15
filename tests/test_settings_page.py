@@ -472,7 +472,7 @@ def test_the_notice_survives_a_page_revisit(clicked, tmp_path):
     assert _restart_notice_sentence(notice.children) == settings_page.RESTART_NOTICE
     assert notice.className == settings_page.RESTART_NOTICE_CLASS
     # Spelled out once: the caution modifier is what makes the panel yellow, and
-    # the equality above would pass for a constant that lost it.
+    # a constant that lost it would still satisfy the equality assertion.
     assert notice.className.split() == [
         "alert-panel",
         "alert-panel-caution",

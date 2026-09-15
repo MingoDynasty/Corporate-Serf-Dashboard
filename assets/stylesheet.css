@@ -279,11 +279,11 @@
     }
 }
 
-/* The alert anatomy for inline notices built on dmc.Paper instead of
-   dmc.Alert, most of them because they hold a link or a button that must not
-   sit inside role="alert". These classes carry the look: the tint, a heavier
-   leading border, and an icon beside the title, or beside the sentence in a
-   notice without one. Blue is the informational default and the caution
+/* The alert anatomy for inline notices built on ``dmc.Paper`` instead of
+   ``dmc.Alert``, most of them because they hold a link or a button that must
+   not sit inside ``role="alert"``. These classes carry the look: the tint, a
+   heavier leading border, and an icon beside the title, or beside the sentence
+   in a notice without one. Blue is the informational default and the caution
    modifier swaps in the yellow tokens. Mantine defines the -light tokens per
    color scheme, so dark mode needs no separate rules. */
 .alert-panel {
@@ -320,7 +320,7 @@
    empty, so each reads as one bounded block rather than page furniture:
    narrow enough that the eye takes it in at once, and spaced off the controls
    below it. One rule for both, so the two panels match in width when they
-   stack. Their tint and icon come from the alert anatomy above. */
+   stack. Their tint and icon come from the ``.alert-panel`` classes. */
 .setup-card,
 .stats-dir-hint {
     margin-bottom: var(--mantine-spacing-md);
@@ -328,10 +328,10 @@
 }
 
 /* A title-less panel's icon sits beside a sentence that may wrap, so its group
-   aligns to the top rather than the center, which pins the 1em icon to the top
-   of a taller line box, visibly above the first line's middle. Half the
+   aligns to the top rather than the center, which pins the ``1em`` icon to the
+   top of a taller line box, visibly above the first line's middle. Half the
    leading drops it onto that middle; the icon inherits the sentence's line
-   height, so 1lh is the sentence's line box. */
+   height, so ``1lh`` is the sentence's line box. */
 .stats-dir-hint .alert-panel-icon,
 .app-settings-restart-notice .alert-panel-icon {
     margin-top: calc((1lh - 1em) / 2);
@@ -437,9 +437,9 @@ a.playlist-scenario-link-cell:hover {
 
 /* The settings page's restart notice: derived at render and after each save,
    so it stays put until the restart actually happens. Ships hidden; the save
-   callback and the layout drop the modifier when a change is pending. A Stack
-   child otherwise runs the full page, so it is capped at the form fields' width
-   and ends where they do. */
+   callback and the layout drop the modifier when a change is pending. A
+   ``dmc.Stack`` child otherwise runs the full page, so it is capped at the form
+   fields' width and ends where they do. */
 .app-settings-restart-notice {
     max-width: 40rem;
 }
