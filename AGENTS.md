@@ -330,10 +330,11 @@ not swept to match; bring one into line when a change touches it anyway.
   2. No em dashes. Split prose into sentences, and chain readout fragments
      with ` · `. The one exception is the `—` empty value under Last played;
      `tests/test_em_dash_guard.py` gates everything else under `source/`.
-  3. Sentence case for controls, placeholders, tooltips, status lines, and
-     toast, alert, and modal titles. Page titles, section headings, and grid
-     column headers keep Title Case, as do proper names and the chart modes
-     `Score vs Sensitivity` and `Score vs Time`.
+  3. Sentence case for controls, placeholders, tooltips, status lines, chart
+     annotations, legend entries, and toast, alert, and modal titles. Page
+     titles, section headings, and grid column headers keep Title Case, as do
+     proper names and the chart modes `Score vs Sensitivity` and
+     `Score vs Time`.
   4. The only ellipsis is the single `…` character, and only for work still
      in progress. Placeholders are bare noun phrases; never elide a path.
   5. Use the common contractions (can't, couldn't, doesn't, isn't, wasn't,
