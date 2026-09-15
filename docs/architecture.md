@@ -622,9 +622,10 @@ flowchart LR
   `{"function": "<name>"}`. Holds `allOptions`, the Autocomplete filter that
   keeps every suggestion visible (see the settings page below).
 - `assets/homeGraphZoomFit.js` — refits the Scenario Performance graph's
-  score axis to the runs in view when the x axis is zoomed. It listens for
-  `plotly_relayout` on each `.home-graph` plot div, acts only on events that
-  carry an x range, and fits trace points only, never the overlay shapes. The
+  score axis to the runs in view when the x axis is zoomed. It listens on
+  each `.home-graph` plot div for `plotly_relayout` events that carry an x
+  range and, while x is zoomed, for `plotly_restyle` events that change trace
+  visibility. It fits visible trace points only, never the overlay shapes. The
   fit's relayout re-sends the current x range: dcc.Graph copies every
   relayout into its `figure` prop from props that can predate the user's
   zoom, so a y-only relayout would snap x back to the full range.

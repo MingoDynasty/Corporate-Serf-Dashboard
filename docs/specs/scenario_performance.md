@@ -110,8 +110,9 @@ of scope here, apart from its chart toolbar, noted under The graph.
 - Zooming the x axis refits the score axis to the runs in view: the run
   points and Average Score line inside the x window, padded by 5% of their
   span. Overlay lines are not part of the fit, so a line beyond the fitted
-  range is out of view while zoomed. A window holding no runs leaves the
-  score axis as it was. Double-click, "Reset axes", "Autoscale", and any new
+  range is out of view while zoomed. A trace hidden from the legend is left
+  out too, and showing or hiding one while zoomed refits. A window holding no
+  runs leaves the score axis as it was. Double-click, "Reset axes", "Autoscale", and any new
   figure (a rebuild or an appearance change) return both axes to the full
   autorange.
 - Until the first data callback resolves, the chart is a transparent,

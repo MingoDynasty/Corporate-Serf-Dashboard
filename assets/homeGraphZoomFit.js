@@ -47,16 +47,7 @@
         return [low - pad, high + pad];
     }
 
-    function onRelayout(gd, event) {
-        // Double-click, Reset axes, and Autoscale restore both axes already.
-        if (event["xaxis.autorange"]) {
-            return;
-        }
-        // Only an x range change refits, which skips the autosize events a
-        // resize sends and a y-only axis drag.
-        if (!Object.keys(event).some((key) => key.startsWith("xaxis.range"))) {
-            return;
-        }
+    function refit(gd) {
         const range = visibleScoreRange(gd);
         const current = gd._fullLayout.yaxis.range;
         // The refit's own relayout carries an x range and re-enters here; the
@@ -74,6 +65,28 @@
         });
     }
 
+    function onRelayout(gd, event) {
+        // Double-click, Reset axes, and Autoscale restore both axes already.
+        if (event["xaxis.autorange"]) {
+            return;
+        }
+        // Only an x range change refits, which skips the autosize events a
+        // resize sends and a y-only axis drag.
+        if (Object.keys(event).some((key) => key.startsWith("xaxis.range"))) {
+            refit(gd);
+        }
+    }
+
+    function onRestyle(gd, [update]) {
+        // Showing or hiding a trace from the legend changes which points are
+        // fitted, and an explicit y range does not follow it the way
+        // autorange would, so a restored trace would stay clipped. Unzoomed,
+        // autorange still owns both axes and needs no help.
+        if ("visible" in update && gd._fullLayout.xaxis.autorange === false) {
+            refit(gd);
+        }
+    }
+
     // Dash mounts and remounts the page contents dynamically, so watch the
     // document for the home graph's plot div appearing.
     new MutationObserver(() => {
@@ -83,6 +96,7 @@
             if (!attached.has(gd) && typeof gd.on === "function") {
                 attached.add(gd);
                 gd.on("plotly_relayout", (event) => onRelayout(gd, event));
+                gd.on("plotly_restyle", (event) => onRestyle(gd, event));
             }
         }
     }).observe(document.documentElement, {childList: true, subtree: true});
